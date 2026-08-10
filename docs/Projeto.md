@@ -112,8 +112,12 @@
 
 ## 1.5 Personas e Jornada do Usuário
 
-### Persona 1: [Nome fictício]
-
+### Persona 1: Robson Oliveira — Diretor
+<div align="center">
+<sub> Imagem 1.5 - Persona 1: Robson Oliveira — Diretor</sub><br>
+  <img src="../assets/Persona-diretor.png" width="100%" alt="Persona 1: Robson Oliveira — Diretor"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
 
 ### Jornada do Usuário — [Persona X]
