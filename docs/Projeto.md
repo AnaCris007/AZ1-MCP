@@ -222,7 +222,7 @@ Para a quantificação do impacto, foi adotada a seguinte escala:
 
 A utilização dessa escala permite converter as classificações qualitativas de impacto em valores numéricos, possibilitando sua combinação com a probabilidade no cálculo da severidade.
 
-A fórmula foi normalizada de modo que a severidade resultante esteja contida entre 0 e 10, sendo 0 correspondente à menor combinação de probabilidade e impacto considerada na matriz e 10 correspondente à maior combinação possível. Dessa forma, quanto maior o valor de severidade, maior é a prioridade atribuída ao risco em relação aos demais riscos identificados.
+A fórmula foi normalizada em relação às faixas efetivamente adotadas neste registro, nas quais a probabilidade varia de 10% a 90% e o impacto assume valores de 1 a 5. Dentro desses limites, a menor combinação possível, correspondente a uma probabilidade de 10% associada a impacto Muito Baixo, resulta em severidade 0, enquanto a maior combinação, correspondente a uma probabilidade de 90% associada a impacto Muito Alto, resulta em severidade 10. Dessa forma, quanto maior o valor de severidade, maior é a prioridade atribuída ao risco em relação aos demais riscos identificados.
 
 As faixas de criticidade adotadas são apresentadas a seguir:
 
