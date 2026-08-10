@@ -148,7 +148,13 @@ A possibilidade de realizar consultas utilizando linguagem natural, por texto ou
 
 A persona de Robson representa o **Diretor**, que utiliza o agente para obter uma visão estratégica e consolidada do portfólio de projetos. Seu papel é acompanhar o desempenho geral das iniciativas, identificar riscos, avanços e possíveis impactos para a organização, utilizando essas informações como apoio à tomada de decisões. O Diretor utiliza a solução principalmente para **obter uma visão estratégica do conjunto de projetos e apoiar decisões de nível executivo**.
 
-### Jornada do Usuário — [Persona X]
+### Jornada do Usuário 1.5.1 — [Robson Oliveira - Diretor]
+
+<div align="center">
+<sub>Imagem 1.5.1 - Jornada do Usuário — Robson Oliveira, Diretor</sub><br>
+  <img src="../assets/Jornada-diretor.png" width="100%" alt="Jornada do Usuário — Robson Oliveira, Diretor"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
 
 ---
