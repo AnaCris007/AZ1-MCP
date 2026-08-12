@@ -1,0 +1,31 @@
+# =============================================================================
+# Configuração do ruff — usada pelo job `lint` do pipeline e localmente.
+# =============================================================================
+# Sem este arquivo, o job roda com o conjunto de regras PADRÃO da versão de
+# ruff que o pip instalar no dia. Isso faz o lint mudar de resultado sozinho
+# quando sai uma versão nova, sem ninguém ter tocado no código. Aqui as regras
+# são declaradas explicitamente, e a versão do ruff é fixada no .gitlab-ci.yml.
+# =============================================================================
+
+target-version = "py312"
+line-length = 120
+
+# Faz o ruff reconhecer `gitlab_kit` como módulo do próprio projeto (primeira
+# parte) e não como dependência externa — é o que separa o bloco de imports
+# `import requests` do bloco `from gitlab_kit import ...`.
+src = ["gitlab-issue-kit/scripts"]
+
+[lint]
+select = [
+    "E4",   # imports (pycodestyle)
+    "E7",   # statements (pycodestyle)
+    "E9",   # erros de sintaxe / runtime (pycodestyle)
+    "F",    # pyflakes — nomes não definidos, imports não usados
+    "I",    # isort — ordenação de imports
+    "UP",   # pyupgrade — sintaxe moderna para o target-version
+    "SIM",  # flake8-simplify
+    "EXE",  # shebang coerente com o bit de execução do arquivo
+]
+
+[lint.isort]
+known-first-party = ["gitlab_kit"]

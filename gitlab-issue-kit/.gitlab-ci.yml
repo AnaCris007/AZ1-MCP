@@ -1,0 +1,78 @@
+# =============================================================================
+# Pipeline CI do projeto — build → test → quality
+# =============================================================================
+# A presença deste arquivo desliga o Auto DevOps: o GitLab só usa o pipeline
+# automático quando não encontra uma configuração de CI alternativa.
+#
+# O projeto é um conjunto de scripts Python de automação (gitlab-issue-kit),
+# SQL e documentação — não há aplicação para containerizar. Por isso o
+# pipeline não constrói imagem Docker e não depende de Container Registry.
+# =============================================================================
+
+stages:
+  - build
+  - test
+  - quality
+
+default:
+  image: python:3.12-slim
+  interruptible: true
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+cache:
+  key:
+    files:
+      - requirements.txt
+  paths:
+    - .cache/pip
+
+# ----------------------------------------------------------------- build
+# Prova que as dependências resolvem e que todo o Python compila.
+build:
+  stage: build
+  script:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - python -m compileall -q gitlab-issue-kit/scripts
+
+# ------------------------------------------------------------------ test
+# Smoke test: os CLIs sobem e o config.yml é YAML válido.
+test:cli:
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - cd gitlab-issue-kit/scripts
+    - python create_issues.py --help
+    - python setup_labels.py --help
+    - python relabel.py --help
+    - python setup_mr_template.py --help
+    - python -c "import yaml, pathlib; yaml.safe_load(pathlib.Path('config.yml').read_text(encoding='utf-8')); print('config.yml OK')"
+
+# Valida os CSVs de backlog usando a própria validação do kit.
+# --dry-run não exige credenciais e não toca na rede.
+test:backlog:
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - cd gitlab-issue-kit/scripts
+    - python create_issues.py --csv ../csv/backlog_exemplo.csv --dry-run
+    - python create_issues.py --csv ../csv/backlog_sprint01.csv --dry-run
+
+# --------------------------------------------------------------- quality
+# A versão do ruff é fixada de propósito: sem pin, uma versão nova do ruff
+# muda o resultado do lint sem ninguém ter alterado o código. As regras
+# aplicadas estão declaradas em ruff.toml, na raiz do repositório.
+lint:
+  stage: quality
+  script:
+    - pip install ruff==0.16.2
+    - ruff check gitlab-issue-kit/scripts
+  allow_failure: true
+
+# Mantém a varredura de segredos que o Auto DevOps fornecia — o .env não
+# está versionado, e este job é o que impede que passe a estar.
+include:
+  - template: Security/Secret-Detection.gitlab-ci.yml
