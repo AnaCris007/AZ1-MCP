@@ -731,26 +731,38 @@ sequenceDiagram
 
 ## 2.3 Requisitos Não Funcionais
 
-<!-- Mínimo de 2 RNFs, derivados dos business drivers,
-     descritos como histórias de usuário e coerentes com os RFs. -->
+### Visão geral dos requisitos não funcionais
 
-#### RNF01 — [Categoria: ex. Desempenho]
 
-> **Como** [persona], **quero** [qualidade do sistema, ex.: receber a resposta em até X segundos], **para** [benefício].
-
-- **Business driver relacionado:** [Fluxo 1/2]
-- **Métrica de verificação:** [como será medido]
-- **Critério de aceitação:** [valor-alvo]
-
-#### RNF02 — [Categoria: ex. Acurácia do modelo]
-
-> **Como** [persona], **quero** [ex.: que a classificação por tags tenha precisão ≥ X%], **para** [benefício].
-
-- **Business driver relacionado:** [...]
-- **Métrica de verificação:** [...]
-- **Critério de aceitação:** [...]
+| ID e título                                        | História de usuário                                                                                                                                               | Business Driver relacionado                           | Critérios de aceitação                                                                                                                                                                                                                                                                      | Prioridade |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **RNF01 — Desempenho das consultas**               | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações       | Pelo menos 80% das consultas deverão ser respondidas em até 20 segundos. Caso esse tempo seja ultrapassado, o sistema deverá informar ao usuário que a solicitação continua em processamento. | Alta       |
+| **RNF02 — Controle de acesso às informações**      | Como gestor, quero que o acesso às informações seja limitado de acordo com o perfil de cada usuário para preservar a confidencialidade dos projetos.              | Confidencialidade e segurança da informação           | O sistema deve autenticar o usuário e validar suas permissões antes de responder às consultas. Nos testes de autorização, 100% das tentativas de acesso a informações não permitidas devem ser bloqueadas.                                                                                  | Alta       |
+| **RNF03 — Precisão na identificação de intenções** | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas               | O componente de processamento de linguagem natural deve atingir precisão mínima de 85% na classificação das intenções em um conjunto de testes previamente validado pela equipe e pelo parceiro. Quando a intenção não for identificada com confiança suficiente, o agente deverá solicitar esclarecimento ao usuário, evitando apresentar respostas incertas como corretas. | Alta       |
+| **RNF04 — Rastreabilidade das consultas**          | Como responsável pela gestão dos projetos, quero que as consultas e respostas sejam registradas para permitir a auditoria das informações fornecidas pelo agente. | Rastreabilidade e transparência                       | O sistema deve registrar o identificador do usuário, a data e hora, o canal utilizado, a intenção identificada, as fontes consultadas e o resultado da solicitação. Os registros devem ser protegidos contra alterações por usuários comuns e mantidos pelo período a ser definido com o parceiro, respeitando os princípios de finalidade, necessidade e minimização da LGPD. | Alta       |
+| **RNF05 — Interoperabilidade entre canais**        | Como usuário, quero acessar o agente por diferentes interfaces para consultar os projetos pelo canal mais adequado à minha rotina.                                | Interoperabilidade e acessibilidade                   | O núcleo do agente deve disponibilizar suas funcionalidades por meio de interfaces padronizadas, permitindo a integração com pelo menos dois canais previstos no projeto sem duplicação das regras de negócio.                                                                              | Média      |
+| **RNF06 — Qualidade da transcrição de áudio**      | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural | O componente de conversão de áudio em texto deve alcançar uma taxa mínima de 85% de palavras reconhecidas corretamente em um conjunto de áudios representativo do contexto do projeto. Quando a transcrição apresentar baixa confiança, o agente deverá solicitar a confirmação do usuário. | Média      |
+| **RNF07 — Disponibilidade da solução**             | Como usuário, quero que o agente esteja disponível durante o período de trabalho para realizar consultas sempre que necessário.                                   | Continuidade operacional e eficiência                 | A solução deve apresentar disponibilidade mínima de 99% durante o horário de operação definido pelo parceiro, desconsiderando manutenções previamente comunicadas. Em caso de indisponibilidade de alguma fonte de dados integrada, o sistema deverá informar o usuário de forma clara, sem falhar silenciosamente. | Média      |
+| **RNF08 — Usabilidade das respostas**              | Como usuário, quero receber respostas claras e organizadas para compreender rapidamente a situação dos projetos, independentemente do meu conhecimento técnico.   | Transparência e apoio à tomada de decisão             | Em testes com representantes das personas, pelo menos 80% dos participantes devem compreender a resposta e identificar a informação solicitada sem auxílio externo, em até 50 segundos de leitura. | Média      |
+| **RNF09 — Proteção e privacidade de dados**        | Como responsável pela governança de dados, quero que as informações pessoais e sensíveis tratadas pelo agente estejam protegidas para garantir conformidade legal e a confiança dos usuários. | Confidencialidade e segurança da informação | O sistema deverá aplicar anonimização ou pseudonimização de dados pessoais em logs quando aplicável, controlar o acesso a esses dados e observar o período de retenção definido com o parceiro. Antes da homologação, testes deverão verificar a ausência de dados pessoais desnecessários nos logs e o bloqueio de acessos não autorizados. | Alta       |
 
 ---
+
+### Relação dos requisitos não funcionais com os Business Drivers
+
+Os requisitos não funcionais foram definidos a partir dos Business Drivers do projeto, considerando as características necessárias para que o agente de IA ofereça informações confiáveis, seguras e acessíveis aos usuários do Metrô de São Paulo.
+
+Os requisitos de desempenho e disponibilidade contribuem para a eficiência das consultas e para a continuidade do uso da solução. O controle de acesso e a proteção de dados pessoais preservam a confidencialidade das informações de acordo com o perfil de cada usuário e com as exigências legais aplicáveis, enquanto a rastreabilidade permite auditar as consultas, as respostas e as fontes utilizadas pelo agente.
+
+A precisão na identificação de intenções e a qualidade da transcrição de áudio buscam garantir que as solicitações em linguagem natural sejam interpretadas corretamente. Já a interoperabilidade possibilita que o agente seja integrado a diferentes canais, como PLM, Telegram e Microsoft Teams, mantendo centralizadas as regras de negócio. Por fim, os requisitos de usabilidade e de proteção de dados buscam garantir que as respostas sejam claras, que apoiem o acompanhamento dos projetos e a tomada de decisão, e que o tratamento das informações pessoais esteja em conformidade com a LGPD.
+
+Os critérios de aceitação estabelecidos permitem avaliar os requisitos de maneira objetiva durante os testes da solução. As metas apresentadas são iniciais e poderão ser revisadas nas próximas sprints, de acordo com os resultados dos testes técnicos e as validações realizadas com o parceiro.
+
+### Coerência com os requisitos funcionais e a modelagem
+
+Os requisitos não funcionais complementam as funcionalidades previstas para o agente, definindo as condições de qualidade sob as quais elas deverão operar. Dessa forma, toda funcionalidade de consulta deverá respeitar o controle de acesso e a proteção de dados pessoais, apresentar desempenho adequado, registrar informações para rastreabilidade e produzir respostas compreensíveis.
+
+A modelagem e a visão técnica da solução deverão considerar componentes responsáveis pela autenticação e autorização, processamento de linguagem natural, transcrição de áudio, registro e proteção de logs, integração com diferentes canais e acesso às fontes de dados. Essa relação mantém a coerência entre os Business Drivers, os requisitos funcionais, os requisitos não funcionais e a arquitetura inicial do sistema.
 
 ## 2.4 Visão Inicial da Solução Técnica
 
