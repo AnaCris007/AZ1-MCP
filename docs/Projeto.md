@@ -297,27 +297,52 @@ A experiência de Robson evolui de forma crescente ao longo da jornada: parte de
 
 ## 1.7 Brainstorming de Features
 
-### Ideias levantadas
+&emsp; O brainstorming de features é uma técnica de levantamento de ideias na qual as funcionalidades possíveis para um produto são registradas de forma ampla, antes de qualquer filtro de escopo, para em seguida serem avaliadas e priorizadas. Essa prática permite que o grupo visualize o universo completo de possibilidades da solução, das capacidades essenciais ao MVP até os desejos de longo prazo do parceiro, e tome decisões de sequenciamento fundamentadas, em vez de definir o escopo de maneira implícita ou arbitrária. Nesta seção, são apresentados o registro das ideias levantadas, os critérios adotados para a priorização e a classificação de cada feature quanto ao seu planejamento no projeto.
+
+&emsp; A partir da análise do TAPI (Termo de Abertura de Projeto Inteli), das discussões internas do grupo e dos desejos manifestados pelo parceiro, foi realizado um brainstorming de funcionalidades para o agente de IA. Nessa etapa, todas as ideias foram registradas, incluindo aquelas que extrapolam o escopo do MVP, como as funcionalidades que dependem da integração com o portfólio real do Metrô ou de aprovações de compliance da companhia. O objetivo desse registro é duplo: sequenciar o desenvolvimento das features viáveis dentro do módulo e preservar, para o parceiro, as ideias que podem orientar evoluções futuras da solução, ainda que não sejam satisfeitas nesta etapa.
+
+&emsp; Cada feature foi avaliada qualitativamente em dois critérios. A importância expressa o valor da funcionalidade para o problema identificado e para os benefícios esperados pelo parceiro, e a viabilidade expressa a capacidade de entrega dentro do módulo, considerando o esforço técnico, as dependências externas e as restrições de confidencialidade. A ordem de prioridade foi definida pela importância, com a viabilidade como critério de desempate, e ajustada pelas dependências técnicas entre as features: as funcionalidades do pipeline de Processamento de Linguagem Natural antecedem todas as demais por constituírem pré-requisito delas. Por fim, a coluna de planejamento classifica o destino de cada feature em quatro categorias: MVP, para as funcionalidades desenvolvidas e validadas dentro do módulo; simulação no MVP, para aquelas cujos mecanismos serão demonstrados sobre a base sintética por dependerem da infraestrutura corporativa real; evolução futura, para as candidatas a incorporação caso haja capacidade adicional nas sprints; e registro para o futuro, para os desejos preservados para a continuidade da solução pelo parceiro.
 
 
-| # | Feature | Origem (grupo/parceiro) | Descrição |
-|---|---|---|---|
-| F01 | [Feature] | [Grupo] | [...] |
-| F02 | [Feature] | [Parceiro] | [...] |
-| F03 | [Feature] | [Grupo] | [...] |
+<div align="center">
+<sub>Tabela X - Brainstorming e priorização de features</sub>
+</div>
 
-### Priorização
+| Prioridade | Feature | Importância | Viabilidade | Planejamento |
+|:---:|---|:---:|:---:|---|
+| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | MVP |
+| 2 | Identificação e classificação de intenções | Alta | Alta | MVP |
+| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | MVP |
+| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | MVP |
+| 5 | Respostas estruturadas | Alta | Alta | MVP |
+| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | MVP |
+| 7 | Localização e consulta de documentos dos projetos | Alta | Média | MVP |
+| 8 | Indicação das fontes | Alta | Média | MVP |
+| 9 | Alertas de prazos e documentos faltantes | Alta | Média | MVP |
+| 10 | Identificação de campos incompletos | Alta | Média | MVP |
+| 11 | Sugestão de conteúdo para campos | Alta | Média | MVP |
+| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | MVP |
+| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | MVP |
+| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | MVP |
+| 15 | Controle de acesso por perfil | Alta | Média/Baixa | Simulação no MVP |
+| 16 | Rastreabilidade das interações | Alta | Média | Simulação no MVP |
+| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | Evolução futura |
+| 18 | Prévia de relatório de status | Média/Alta | Média | Evolução futura |
+| 19 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | Evolução futura |
+| 20 | Painel de alertas e pendências | Média | Média | Evolução futura |
+| 21 | Notificações automáticas | Média | Baixa | Evolução futura |
+| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | Registro para o futuro (Ir Além) |
+| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | Registro para o futuro (Ir Além) |
+| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | Registro para o futuro (evolução tecnológica) |
 
+<div align="center">
+<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
-**Critério de priorização:** [ex.: Importância (1-5) × Viabilidade (1-5)]
-
-| Prioridade | Feature | Importância | Viabilidade | Score | Entra no MVP? |
-|---|---|---|---|---|---|
-| 1º | [F0X] | 5 | 5 | 25 | ✅ Sim |
-| 2º | [F0X] | 4 | 5 | 20 | ✅ Sim |
-| 3º | [F0X] | 5 | 2 | 10 | ❌ Futuro |
-
----
 
 ## 1.8 Canvas do MVP
 
