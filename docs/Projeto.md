@@ -321,21 +321,9 @@ A experiência de Robson evolui de forma crescente ao longo da jornada: parte de
 
 ## 1.8 Canvas do MVP
 
-<!-- Preencha o MVP Canvas (Paulo Caroli) ou estrutura equivalente. -->
+![Business Model Canvas](../assets/negócios/BMC.png)
 
-![Canvas MVP](./assets/mvp-canvas.png)
 
-| Bloco | Conteúdo |
-|---|---|
-| **Proposta do MVP** | [O que é a versão mínima e viável] |
-| **Segmento de personas** | [Para quem é este MVP] |
-| **Jornadas atendidas** | [Quais jornadas o MVP cobre] |
-| **Funcionalidades** | [Features incluídas no recorte] |
-| **Resultado esperado** | [Aprendizado/valor que se espera obter] |
-| **Métricas para validar** | [Como saber se o MVP funcionou] |
-| **Custo e cronograma** | [Estimativa de esforço e prazo] |
-
-**Justificativa do recorte:** [Por que essas features e não outras.]
 
 ---
 
