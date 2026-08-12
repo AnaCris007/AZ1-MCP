@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 gitlab_kit.py — Núcleo compartilhado do kit.
 
@@ -16,7 +15,7 @@ import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 try:
     import requests
@@ -65,7 +64,7 @@ class Credentials:
         return {"PRIVATE-TOKEN": self.token, "Content-Type": "application/json"}
 
 
-def load_credentials(required: bool = True) -> Optional[Credentials]:
+def load_credentials(required: bool = True) -> Credentials | None:
     """Lê GITLAB_URL / GITLAB_TOKEN / GITLAB_PROJECT_ID do ambiente.
 
     Procura um .env no diretório atual (subindo na árvore) e, como fallback,
@@ -145,7 +144,7 @@ class Config:
     template: str = ""
 
     @classmethod
-    def load(cls, path: Path) -> "Config":
+    def load(cls, path: Path) -> Config:
         if not path.exists():
             print(f"❌ Config não encontrado: {path}", file=sys.stderr)
             sys.exit(1)
@@ -199,7 +198,7 @@ class Config:
     def size_label(self, size: str) -> str:
         return f"{self.size_label_prefix}{size}"
 
-    def priority_label(self, priority: str) -> Optional[str]:
+    def priority_label(self, priority: str) -> str | None:
         return self.priority_labels.get(priority.strip().lower())
 
 
@@ -215,12 +214,12 @@ class GitLabClient:
     CSV possa ser validado sem token configurado.
     """
 
-    def __init__(self, config: Config, credentials: Optional[Credentials], dry_run: bool = False) -> None:
+    def __init__(self, config: Config, credentials: Credentials | None, dry_run: bool = False) -> None:
         self.config = config
         self.credentials = credentials
         self.dry_run = dry_run
-        self._milestone_cache: dict[str, Optional[int]] = {}
-        self._known_labels: Optional[set[str]] = None
+        self._milestone_cache: dict[str, int | None] = {}
+        self._known_labels: set[str] | None = None
 
     # --- HTTP ---
 
@@ -255,7 +254,7 @@ class GitLabClient:
 
     # --- Milestones ---
 
-    def resolve_milestone_id(self, title: str) -> Optional[int]:
+    def resolve_milestone_id(self, title: str) -> int | None:
         if self.dry_run:
             print(f"    [DRY-RUN] usaria milestone '{title}'")
             return None

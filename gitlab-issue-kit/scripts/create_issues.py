@@ -20,7 +20,6 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 import requests
 
@@ -61,7 +60,7 @@ class IssueInput:
     kind: str
 
     @classmethod
-    def from_csv_row(cls, row: dict[str, str], row_number: int, config: Config) -> "IssueInput":
+    def from_csv_row(cls, row: dict[str, str], row_number: int, config: Config) -> IssueInput:
         def split(value: str) -> list[str]:
             return [v.strip() for v in (value or "").split(config.list_separator) if v.strip()]
 
@@ -92,7 +91,7 @@ class CreatedIssue:
     title: str
     url: str
     labels: list[str]
-    milestone: Optional[str]
+    milestone: str | None
 
 
 # ---------------------------------------------------------------------------

@@ -75,9 +75,10 @@ def main() -> int:
             continue
         if issue["iid"] in args.exclude_iid:
             continue
-        if args.milestone is not None:
-            if (issue.get("milestone") or {}).get("title") != args.milestone:
-                continue
+        if args.milestone is not None and (
+            issue.get("milestone") or {}
+        ).get("title") != args.milestone:
+            continue
         # já está no estado desejado? então não gasta chamada
         if args.remove and args.remove not in labels:
             continue

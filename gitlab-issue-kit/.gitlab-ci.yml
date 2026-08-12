@@ -62,12 +62,13 @@ test:backlog:
     - python create_issues.py --csv ../csv/backlog_sprint01.csv --dry-run
 
 # --------------------------------------------------------------- quality
-# Informativo por enquanto: remova o allow_failure quando o estilo do
-# código estiver padronizado, para que o lint vire um gate de verdade.
+# A versão do ruff é fixada de propósito: sem pin, uma versão nova do ruff
+# muda o resultado do lint sem ninguém ter alterado o código. As regras
+# aplicadas estão declaradas em ruff.toml, na raiz do repositório.
 lint:
   stage: quality
   script:
-    - pip install ruff
+    - pip install ruff==0.16.2
     - ruff check gitlab-issue-kit/scripts
   allow_failure: true
 
