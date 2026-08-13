@@ -526,21 +526,175 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 ## 1.8 Canvas do MVP
 
-<!-- Preencha o MVP Canvas (Paulo Caroli) ou estrutura equivalente. -->
+![Business Model Canvas](../assets/negócios/BMC.png)
 
-![Canvas MVP](./assets/mvp-canvas.png)
+### Visão geral
 
-| Bloco | Conteúdo |
-|---|---|
-| **Proposta do MVP** | [O que é a versão mínima e viável] |
-| **Segmento de personas** | [Para quem é este MVP] |
-| **Jornadas atendidas** | [Quais jornadas o MVP cobre] |
-| **Funcionalidades** | [Features incluídas no recorte] |
-| **Resultado esperado** | [Aprendizado/valor que se espera obter] |
-| **Métricas para validar** | [Como saber se o MVP funcionou] |
-| **Custo e cronograma** | [Estimativa de esforço e prazo] |
+&emsp;O Business Model Canvas (BMC) foi utilizado para estruturar os principais elementos relacionados à proposta de valor, aos usuários, aos recursos e às atividades necessárias para o desenvolvimento do agente de Inteligência Artificial voltado à gestão de projetos do Metrô de São Paulo. Diferentemente de um produto comercial tradicional, a solução proposta possui caráter interno e tem como principal objetivo gerar ganhos de eficiência operacional, facilitar o acesso às informações dos projetos e apoiar os diferentes perfis envolvidos na gestão e no acompanhamento do portfólio de projetos do Metrô. O Canvas considera o agente de IA como uma interface conversacional capaz de consultar informações organizacionais, auxiliar usuários durante atividades relacionadas à documentação dos projetos e facilitar o acesso ao conhecimento existente nos sistemas internos da organização.
 
-**Justificativa do recorte:** [Por que essas features e não outras.]
+### Parceiros-chave
+
+&emsp;Os parceiros-chave representam os atores necessários para o desenvolvimento, validação e evolução da solução.
+
+**Escritório de Projetos do Metrô**
+
+&emsp;O Escritório de Projetos possui conhecimento sobre os processos, documentos e regras de gestão utilizados dentro da organização. Sua participação é fundamental para fornecer contexto de negócio, validar os comportamentos esperados do agente e verificar se as respostas e funcionalidades desenvolvidas estão alinhadas às necessidades reais dos usuários.
+
+**Inteli / equipe acadêmica**
+
+&emsp;O Inteli participa do desenvolvimento do projeto por meio da equipe de estudantes e professores responsáveis pelo acompanhamento técnico e metodológico da solução.
+
+### Atividades-chave
+
+&emsp;As atividades-chave correspondem às ações necessárias para construir, manter e melhorar continuamente o agente.
+
+**Desenvolvimento e aprimoramento do agente de IA**
+
+&emsp;Implementar as funcionalidades do agente e realizar melhorias com base nos resultados obtidos durante testes e validações com os stakeholders.
+
+**Integração com as fontes de informação do Metrô**
+
+&emsp;Permitir que o agente consulte as fontes de dados relevantes para responder às solicitações dos usuários e fornecer informações relacionadas aos projetos.
+
+**Manutenção da base de conhecimento**
+
+&emsp;Garantir que documentos, informações e demais fontes utilizadas pelo agente estejam organizados e atualizados, reduzindo a possibilidade de respostas baseadas em informações desatualizadas ou inconsistentes.
+
+**Interpretação das intenções dos usuários**
+
+&emsp;Estruturar os fluxos necessários para que o agente consiga compreender diferentes tipos de solicitação realizados em linguagem natural e identificar corretamente as ações ou informações esperadas pelo usuário.
+
+**Monitoramento da qualidade das respostas**
+
+&emsp;Avaliar continuamente as respostas produzidas pelo agente, identificando erros, limitações e oportunidades de melhoria.
+
+### Recursos-chave
+
+&emsp;Os recursos-chave representam os elementos necessários para que a solução consiga operar adequadamente.
+
+**Estrutura e dados do SharePoint**
+
+&emsp;O SharePoint constitui uma das principais fontes de informação consideradas para a solução, concentrando documentos e dados relacionados à gestão dos projetos.
+
+**Tecnologias de Processamento de Linguagem Natural**
+
+&emsp;Permitem que os usuários interajam com o sistema utilizando linguagem natural, sem a necessidade de conhecer estruturas específicas de consulta ou navegar manualmente pelas diferentes fontes de informação.
+
+**Modelo de Inteligência Artificial**
+
+&emsp;O modelo de IA é responsável pela interpretação das solicitações, geração das respostas e apoio às interações realizadas pelo agente.
+
+**Infraestrutura tecnológica da aplicação**
+
+&emsp;A solução depende da infraestrutura necessária para disponibilizar a interface desenvolvida pela equipe, executar o agente e realizar o processamento e a consulta das informações utilizadas durante as interações.
+
+**Conhecimento sobre os processos de gestão de projetos**
+
+&emsp;Além da tecnologia, a solução depende do conhecimento das regras, documentos e processos utilizados pelo Metrô para que as respostas estejam alinhadas ao contexto real da organização.
+
+### Propostas de valor
+
+&emsp;A principal proposta de valor da solução consiste em facilitar a interação dos usuários com as informações relacionadas aos projetos do Metrô.
+
+**Acesso rápido às informações por linguagem natural**
+
+&emsp;O agente reduz a necessidade de navegação manual por diferentes documentos e estruturas de dados, permitindo que os usuários façam perguntas diretamente em linguagem natural.
+
+**Redução do trabalho manual**
+
+&emsp;A solução busca diminuir o tempo empregado na busca, interpretação e consolidação manual de informações relacionadas aos projetos.
+
+**Apoio ao acompanhamento e à tomada de decisão**
+
+&emsp;Ao facilitar o acesso às informações relevantes, o agente pode apoiar líderes, Escritório de Projetos e diretoria durante o acompanhamento dos projetos e a tomada de decisões.
+
+**Maior qualidade e padronização das informações**
+
+&emsp;O agente pode auxiliar os usuários durante o preenchimento e consulta de documentos, contribuindo para uma maior consistência das informações registradas.
+
+**Assistência no cumprimento da documentação de projetos**
+
+&emsp;A solução também busca auxiliar os responsáveis pelos projetos no acompanhamento e preenchimento dos documentos necessários ao longo de seu ciclo de vida.
+
+### Relacionamento com os usuários
+
+&emsp;A relação entre o agente e seus usuários ocorre predominantemente por meio de autoatendimento assistido.
+
+**Assistência personalizada**
+
+&emsp;As respostas e informações apresentadas podem variar de acordo com o perfil, a solicitação e o contexto do usuário.
+
+**Interação sob demanda**
+
+&emsp;Os usuários podem consultar o agente sempre que necessitarem localizar informações, esclarecer dúvidas ou obter suporte relacionado aos processos de gestão.
+
+**Uso recorrente**
+
+&emsp;Por estar relacionado às atividades de acompanhamento e atualização dos projetos, espera-se que o agente seja utilizado de maneira recorrente durante o ciclo de vida dos projetos.
+
+### Segmentos de usuários
+
+&emsp;A solução atende diferentes perfis envolvidos na gestão de projetos do Metrô.
+
+**Diretoria Executiva**
+
+&emsp;Necessita principalmente de informações consolidadas que permitam acompanhar a situação dos projetos e apoiar processos de tomada de decisão.
+
+**Líderes de Projeto**
+
+&emsp;São responsáveis pelo acompanhamento e atualização dos projetos e podem utilizar o agente tanto para consultar informações quanto para receber assistência durante atividades relacionadas à documentação.
+
+**Escritório de Projetos**
+
+&emsp;Possui uma visão mais ampla do portfólio e dos processos de gestão, utilizando a solução para acessar informações e acompanhar o cumprimento das práticas estabelecidas pela organização.
+
+### 8. Canais
+
+&emsp;O principal canal de interação previsto para o MVP é uma **interface própria desenvolvida pela equipe**, por meio da qual os usuários poderão se comunicar diretamente com o agente conversacional. Essa abordagem permite que as funcionalidades centrais da solução sejam desenvolvidas e validadas sem depender, durante o projeto, de uma implantação direta no ambiente corporativo da Microsoft utilizado pelo Metrô. Como possibilidade de evolução após a conclusão do MVP, a solução poderá ser integrada às ferramentas já utilizadas pela organização, de forma a aproximar o agente do fluxo de trabalho cotidiano dos usuários.
+
+**Interface própria do agente**
+
+&emsp;Representa o canal efetivamente implementado durante o desenvolvimento do MVP e será responsável por disponibilizar a interação entre os usuários e o agente de IA.
+
+**Microsoft Teams — integração futura**
+
+&emsp;O Microsoft Teams é considerado um possível canal futuro para disponibilização do agente dentro do ambiente corporativo do Metrô. Essa integração não faz parte da implementação atual e exigirá adequações técnicas e de infraestrutura para implantação no ambiente da organização.
+
+**Microsoft Copilot Studio — integração futura**
+
+&emsp;O Microsoft Copilot Studio também é considerado como uma possibilidade de integração e disponibilização futura da solução dentro do ecossistema Microsoft. Sua utilização não faz parte do escopo de implementação do MVP, mas poderá ser indicada ao parceiro como uma alternativa para continuidade e integração da solução após a entrega do projeto.
+
+**SharePoint / Microsoft 365**
+
+&emsp;O SharePoint possui papel relevante principalmente como fonte de informações e documentos utilizados pelo agente. Em uma implantação futura no ambiente do Metrô, a integração com o ecossistema Microsoft 365 poderá ampliar a disponibilidade e o acesso à solução.
+
+### 9. Estrutura de custos
+
+&emsp;Como a solução depende de infraestrutura tecnológica e de manutenção contínua, os principais custos considerados são:
+
+* licenciamento de ferramentas e serviços de Inteligência Artificial;
+* infraestrutura computacional e processamento;
+* desenvolvimento e manutenção do agente;
+* integração e manutenção das fontes de dados;
+* atividades de governança, segurança e monitoramento da solução.
+
+&emsp;Em uma futura implantação dentro do ecossistema Microsoft do Metrô, também poderão existir custos associados ao licenciamento e à utilização de ferramentas necessárias para integrar o agente a serviços como Microsoft Teams, SharePoint, Microsoft 365 e Copilot Studio.
+
+&emsp;Os custos podem variar de acordo com a arquitetura adotada, o número de usuários, o volume de consultas e os serviços utilizados durante a operação.
+
+### 10. Retorno gerado
+
+&emsp;Por se tratar de uma solução interna desenvolvida para o Metrô de São Paulo, **não existe uma fonte de receita direta associada ao agente**.
+
+&emsp;O retorno esperado ocorre principalmente por meio de ganhos operacionais e redução de custos indiretos, incluindo:
+
+* redução das horas dedicadas a atividades manuais;
+* aumento da produtividade dos profissionais;
+* redução de inconsistências nas informações dos projetos;
+* melhoria do acompanhamento dos projetos;
+* redução potencial de retrabalho e de riscos decorrentes de informações incompletas ou de difícil acesso.
+
+&emsp;Dessa forma, o valor econômico da solução está associado principalmente à eficiência obtida com a utilização do agente e à melhoria da qualidade dos processos de gestão.
 
 ---
 
