@@ -372,27 +372,59 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 ## 1.7 Brainstorming de Features
 
-### Ideias levantadas
+&emsp; O brainstorming de features é uma técnica de levantamento de ideias na qual as funcionalidades possíveis para um produto são registradas de forma ampla, antes de qualquer filtro de escopo, para em seguida serem avaliadas e priorizadas. Essa prática permite que o grupo visualize o universo completo de possibilidades da solução, das capacidades essenciais ao MVP até os desejos de longo prazo do parceiro, e tome decisões de sequenciamento fundamentadas, em vez de definir o escopo de maneira implícita ou arbitrária. Nesta seção, são apresentados o registro das ideias levantadas, os critérios adotados para a priorização e a classificação de cada feature quanto ao seu planejamento no projeto.
+
+&emsp; A partir da análise do TAPI (Termo de Abertura de Projeto Inteli), das discussões internas do grupo e dos desejos manifestados pelo parceiro, foi realizado um brainstorming de funcionalidades para o agente de IA. Nessa etapa, todas as ideias foram registradas, incluindo aquelas que extrapolam o escopo do MVP, como as funcionalidades que dependem da integração com o portfólio real do Metrô ou de aprovações de compliance da companhia. O objetivo desse registro é duplo: sequenciar o desenvolvimento das features viáveis dentro do módulo e preservar, para o parceiro, as ideias que podem orientar evoluções futuras da solução, ainda que não sejam satisfeitas nesta etapa.
+
+&emsp; Cada feature foi avaliada qualitativamente em dois critérios. A importância expressa o valor da funcionalidade para o problema identificado e para os benefícios esperados pelo parceiro, e a viabilidade expressa a capacidade de entrega dentro do módulo, considerando o esforço técnico, as dependências externas e as restrições de confidencialidade. A ordem de prioridade foi definida pela importância, com a viabilidade como critério de desempate, e ajustada pelas dependências técnicas entre as features: as funcionalidades do pipeline de Processamento de Linguagem Natural antecedem todas as demais por constituírem pré-requisito delas. Por fim, a coluna de planejamento classifica o destino de cada feature em quatro categorias: MVP, para as funcionalidades desenvolvidas e validadas dentro do módulo; simulação no MVP, para aquelas cujos mecanismos serão demonstrados sobre a base sintética por dependerem da infraestrutura corporativa real; evolução futura, para as candidatas a incorporação caso haja capacidade adicional nas sprints; e registro para o futuro, para os desejos preservados para a continuidade da solução pelo parceiro.
 
 
-| # | Feature | Origem (grupo/parceiro) | Descrição |
-|---|---|---|---|
-| F01 | [Feature] | [Grupo] | [...] |
-| F02 | [Feature] | [Parceiro] | [...] |
-| F03 | [Feature] | [Grupo] | [...] |
+<div align="center">
+<sub>Tabela X - Brainstorming e priorização de features</sub>
+</div>
 
-### Priorização
+| Prioridade | Feature | Importância | Viabilidade | Planejamento |
+|:---:|---|:---:|:---:|---|
+| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | MVP |
+| 2 | Identificação e classificação de intenções | Alta | Alta | MVP |
+| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | MVP |
+| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | MVP |
+| 5 | Respostas estruturadas | Alta | Alta | MVP |
+| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | MVP |
+| 7 | Localização e consulta de documentos dos projetos | Alta | Média | MVP |
+| 8 | Indicação das fontes | Alta | Média | MVP |
+| 9 | Alertas de prazos e documentos faltantes | Alta | Média | MVP |
+| 10 | Identificação de campos incompletos | Alta | Média | MVP |
+| 11 | Sugestão de conteúdo para campos | Alta | Média | MVP |
+| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | MVP |
+| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | MVP |
+| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | MVP |
+| 15 | Controle de acesso por perfil | Alta | Média/Baixa | Simulação no MVP |
+| 16 | Rastreabilidade das interações | Alta | Média | Simulação no MVP |
+| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | Evolução futura |
+| 18 | Prévia de relatório de status | Média/Alta | Média | Evolução futura |
+| 19 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | Evolução futura |
+| 20 | Painel de alertas e pendências | Média | Média | Evolução futura |
+| 21 | Notificações automáticas | Média | Baixa | Evolução futura |
+| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | Registro para o futuro (Ir Além) |
+| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | Registro para o futuro (Ir Além) |
+| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | Registro para o futuro (evolução tecnológica) |
 
+<div align="center">
+<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
-**Critério de priorização:** [ex.: Importância (1-5) × Viabilidade (1-5)]
+&emsp; O MVP reúne as funcionalidades que serão efetivamente desenvolvidas e validadas ao longo do módulo, sobre a base de dados sintéticos, e representa a resposta mínima e completa ao problema identificado. As primeiras posições da priorização foram ocupadas pelas capacidades de interpretação em linguagem natural, de classificação de intenções e de controle do catálogo de interações, porque nenhuma outra funcionalidade do agente existe sem elas: o pipeline de Processamento de Linguagem Natural é o fundamento técnico sobre o qual toda a solução se apoia. A entrada por voz foi incluída nesse mesmo núcleo por ser um requisito central do módulo e por reutilizar integralmente o processamento de texto, uma vez que o áudio é convertido em texto antes de seguir para o pipeline. Na sequência, foram priorizadas as consultas, as respostas estruturadas e o aviso de dados insuficientes, que juntas entregam o valor mais imediato ao usuário: obter informação confiável de forma rápida. Por fim, os alertas, o apoio ao preenchimento de campos, o esclarecimento de dúvidas e o registro de feedback completam o escopo, agregando a dimensão proativa da solução e gerando insumos para a melhoria contínua do próprio pipeline. Essa ordenação também funciona como instrumento de gestão do risco de prazo registrado na matriz de riscos: caso o cronograma exija replanejamento, o corte de escopo ocorre das últimas para as primeiras posições, preservando sempre as funcionalidades das quais as demais dependem.
 
-| Prioridade | Feature | Importância | Viabilidade | Score | Entra no MVP? |
-|---|---|---|---|---|---|
-| 1º | [F0X] | 5 | 5 | 25 | ✅ Sim |
-| 2º | [F0X] | 4 | 5 | 20 | ✅ Sim |
-| 3º | [F0X] | 5 | 2 | 10 | ❌ Futuro |
+&emsp; A categoria de simulação no MVP foi criada para as funcionalidades que o parceiro considera indispensáveis, mas que só podem ser implementadas de forma plena na infraestrutura corporativa real do Metrô, à qual o grupo não terá acesso nesta etapa. É o caso do controle de acesso por perfil e da rastreabilidade das interações, exigências diretas das restrições de confidencialidade do TAPI. Em vez de simplesmente adiá-las, o grupo optou por demonstrar seus mecanismos sobre a base sintética, com perfis de permissão fictícios e registro das interações realizadas. Essa escolha permite validar o comportamento da solução diante dessas exigências e facilita a futura implantação no ambiente da companhia, já que a lógica estará construída e documentada.
 
----
+&emsp; A evolução futura reúne as funcionalidades que agregariam valor ao produto, mas que dependem da maturidade consolidada do núcleo para serem bem executadas, razão pela qual não integram o compromisso inicial do MVP. As análises comparativas entre projetos e a prévia de relatório de status, embora presentes no escopo macro do TAPI, exigem uma base sintética com múltiplos projetos suficientemente ricos e um mecanismo de consulta já estável, condições que só se confirmam ao longo das sprints. Por isso, essa faixa funciona como um backlog complementar, alinhado à estratégia de aproveitamento da oportunidade de expansão registrada na matriz de riscos: ao final de cada sprint, o grupo avalia se há capacidade de incorporar algum desses itens, priorizando os de maior importância. As funcionalidades que não forem desenvolvidas não se perdem, pois serão registradas nas orientações de evolução entregues ao parceiro.
+
+&emsp; O registro para o futuro, por fim, preserva os desejos do parceiro e as possibilidades de evolução que não serão satisfeitos nesta etapa, atendendo ao propósito do brainstorming de não descartar nenhuma ideia relevante. A integração com o portfólio real do Metrô e a execução efetiva de transações correspondem ao caminho de evolução que o próprio TAPI denomina "Ir Além", e dependem do acesso ao ambiente corporativo e de aprovações das áreas de TI e compliance da companhia, fatores fora do controle do grupo. As prévias de apresentações e relatórios de fechamento, as conexões com estratégia e indicadores e as consultas financeiras são desejos manifestados pelo parceiro que pressupõem essa integração para gerar valor efetivo. Já a adoção de serviços de IA generativa aguarda homologação pela companhia e está prevista nos entregáveis do projeto como estudo inicial. Vale destacar que a importância de várias dessas funcionalidades é alta, e sua posição na priorização decorre exclusivamente da viabilidade no contexto do módulo. O registro formal dessas ideias integra os entregáveis do projeto e oferece à equipe do Metrô um backlog priorizado para dar continuidade à solução após o encerramento do módulo.
 
 ## 1.8 Canvas do MVP
 
