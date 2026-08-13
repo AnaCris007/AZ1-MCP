@@ -91,18 +91,23 @@
 
 ### Visão geral do setor
 
+&emsp; O setor metroferroviário compreende o transporte público de passageiros sobre trilhos em ambientes urbanos e metropolitanos — metrôs, trens metropolitanos, monotrilhos e veículos leves sobre trilhos (VLTs). É um modal estruturante da mobilidade urbana, marcado pela alta capacidade, pela previsibilidade e pelo menor impacto ambiental por passageiro transportado. No Brasil, segundo o Balanço do Setor Metroferroviário 2024 da ANPTrilhos, a malha soma cerca de 1.137,5 km e transportou 2,57 bilhões de passageiros em 2024 (média de aproximadamente 8,6 milhões por dia), distribuídos por cerca de 49 linhas em 21 sistemas de 73 municípios — um crescimento de 3,6% em relação a 2023.
 
+&emsp; Além do papel na mobilidade, o setor gera benefícios econômicos e ambientais expressivos: a ANPTrilhos estima, para 2024, uma economia de R$ 11,7 bilhões com a redução de congestionamentos e a emissão evitada de 2,4 milhões de toneladas de poluentes. Trata-se de uma indústria intensiva em capital, sustentada por obras de infraestrutura de longo prazo — empreendimentos plurianuais e bilionários —, que exigem forte governança de projetos e articulação entre o poder público, os operadores e a iniciativa privada.
 
 ### Tendências e desafios
 
-- **Tendência 1:** [...]
-- **Tendência 2:** [...]
-- **Desafio 1:** [...]
-- **Desafio 2:** [...]
+&emsp; Entre as principais tendências, destaca-se a ampliação da participação privada por meio de concessões e parcerias público-privadas (PPPs) — das 16 empresas operadoras do país, 9 já são privadas —, modelo apontado pela ANPTrilhos como instrumento essencial para viabilizar a expansão da malha, a exemplo da concessão do Trem Intercidades São Paulo–Campinas, firmada em 2024. Somam-se a isso a modernização tecnológica, com sistemas de sinalização CBTC e operação automatizada (sem condutor), a adoção de monotrilhos e VLTs e a digitalização da experiência do usuário, com bilhetagem eletrônica e pagamento por aproximação e QR Code.
+
+&emsp; Do lado dos desafios, a própria ANPTrilhos aponta a necessidade de mais incentivos regulatórios e de maior priorização de investimentos para sustentar a expansão e a modernização do setor. A esses fatores somam-se o financiamento de obras de grande porte com recursos públicos, a recuperação da demanda após a pandemia (ainda pressionada pelo teletrabalho), a complexidade de coordenar múltiplos operadores em uma mesma rede, o envelhecimento de ativos nas linhas mais antigas e a gestão de empreendimentos longos — com milhares de contratos e documentos —, que demanda controle rigoroso de prazos, custos e riscos.
 
 ### Posicionamento do parceiro no mercado
 
+&emsp; A Companhia do Metropolitano de São Paulo (Metrô/SP), fundada em 1968, é uma sociedade de economia mista controlada pelo Governo do Estado de São Paulo e vinculada à Secretaria dos Transportes Metropolitanos. Seu papel vai além da operação: a companhia é responsável pelo planejamento, projeto, construção e operação do sistema metroviário da Região Metropolitana de São Paulo, atuando como principal articuladora da expansão da rede sobre trilhos da capital.
 
+&emsp; Em termos de participação, o Metrô opera diretamente as Linhas 1-Azul, 2-Verde, 3-Vermelha e 15-Prata (além da 17-Ouro), que juntas transportaram mais de 821 milhões de passageiros em 2025, dentro de um sistema metroviário de cerca de 116 km e mais de 100 estações. Historicamente a espinha dorsal do transporte de alta capacidade da cidade, o Metrô hoje divide a operação da rede com concessionárias privadas — como a Linha 4-Amarela (primeira PPP metroviária do país, operada pela ViaQuatro) e as Linhas 5-Lilás, 8 e 9 (ViaMobilidade) —, mantendo, porém, o papel central de planejador e executor dos grandes empreendimentos de expansão do sistema.
+
+**Fontes:** ANPTrilhos — [Balanço do Setor Metroferroviário 2024](https://anptrilhos.org.br/balanco-metroferroviario-2024-transporte-sobre-trilhos-cresce-e-transporta-257-bilhoes-de-passageiros/); Companhia do Metropolitano de São Paulo — [Metropolitano de São Paulo (Wikipédia)](https://pt.wikipedia.org/wiki/Metropolitano_de_S%C3%A3o_Paulo); Metrô/CPTM — [Guia do Metrô de São Paulo em 2026](https://www.metrocptm.com.br/guia-do-metro-de-sao-paulo-em-2026-linhas-operacao-e-como-usar-o-sistema/). Acesso em ago. 2026.
 
 ---
 
@@ -199,7 +204,7 @@
 
 <div align="center">
 <sub>Imagem 1.5 - Persona 1: Robson Oliveira — Diretor</sub><br>
-  <img src="../assets/Persona-diretor.png" width="100%" alt="Persona 1: Robson Oliveira — Diretor"><br>
+  <img src="../assets/design/Persona-diretor.png" width="100%" alt="Persona 1: Robson Oliveira — Diretor"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -235,7 +240,7 @@ A persona de Robson representa o **Diretor**, que utiliza o agente para obter um
 
 <div align="center">
 <sub>Imagem 1.5.1 - Jornada do Usuário — Robson Oliveira - Diretor</sub><br>
-  <img src="../assets/Jornada-diretor.png" width="100%" alt="Jornada do Usuário — Robson Oliveira, Diretor"><br>
+  <img src="../assets/design/Jornada-diretor.png" width="100%" alt="Jornada do Usuário — Robson Oliveira, Diretor"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -270,11 +275,85 @@ A experiência de Robson evolui de forma crescente ao longo da jornada: parte de
 
 ---
 
+### Persona 2: Maria Eduarda Santos — Analista de PMO
+
+<div align="center">
+<sub>Imagem 1.5.2 - Persona 2: Maria Eduarda Santos — Analista de PMO</sub><br>
+  <img src="../assets/design/Persona-pmo.png" width="100%" alt="Persona 2: Maria Eduarda Santos — Analista de PMO"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+### Caracterização
+
+Maria Eduarda Santos é analista do PMO Corporativo do Metrô e atua diretamente na gestão do portfólio de projetos, sendo responsável por manter os dados atualizados, cobrar os responsáveis por pendências de preenchimento e consolidar informações para relatórios e apresentações destinadas à diretoria. Diferentemente de uma visão puramente estratégica, seu trabalho está concentrado na operação diária da governança do portfólio, servindo como elo entre os líderes de projeto e os níveis mais altos da organização.
+
+Sua rotina envolve acompanhar o cumprimento dos prazos mensais de atualização de status, verificar a qualidade dos dados registrados pelas equipes de projeto e apoiar a elaboração de relatórios consolidados. Nesse contexto, ter acesso rápido a informações atualizadas e confiáveis é essencial para que consiga cumprir suas próprias entregas sem depender inteiramente da boa vontade e da disponibilidade dos responsáveis por cada projeto.
+
+### Dores
+
+Uma das principais dificuldades de Maria Eduarda é a necessidade de cobrar manualmente, um a um, os responsáveis por atualizações pendentes, especialmente próximo ao prazo mensal de registro de status. Essa cobrança repetitiva consome tempo que poderia ser dedicado a atividades de maior valor analítico.
+
+Outra dificuldade está na consolidação de dados espalhados entre diferentes sistemas e documentos, como listas do SharePoint, planilhas de Excel e arquivos de Word, processo necessário para a elaboração de relatórios de status e apresentações mensais. A ausência de um mecanismo proativo que sinalize riscos, marcos e pendências antes que se tornem problemas também obriga Maria Eduarda a atuar de forma reativa, identificando falhas apenas quando já se tornaram visíveis.
+
+### Interesses no Sistema
+
+Maria Eduarda tem interesse em consultar e comparar projetos do portfólio sem precisar navegar manualmente pelas listas do SharePoint, obtendo respostas rápidas e organizadas conforme sua necessidade do momento.
+
+Além disso, busca receber alertas proativos sobre marcos, riscos e pendências de preenchimento, de modo a agir antes do prazo, em vez de depender inteiramente da própria iniciativa para lembrar cada responsável. Também tem interesse em contar com apoio na elaboração de relatórios de status e de apresentações mensais para a diretoria, a partir de templates já utilizados pela equipe, e em receber sugestões de conteúdo para campos pendentes, mantendo o controle final sobre o que é efetivamente registrado.
+
+### Expectativas em relação à solução
+
+Maria Eduarda espera que a solução reduza o esforço manual envolvido na cobrança de atualizações e na consolidação de dados, permitindo que ela dedique mais tempo à análise da qualidade das informações e menos à busca e à repetição de tarefas operacionais.
+
+A possibilidade de interagir por linguagem natural, por texto ou voz, aliada a alertas proativos e sugestões de preenchimento, é vista como um fator que aumenta sua produtividade e reduz o risco de pendências passarem despercebidas até próximo do prazo.
+
+### Relação da persona com o produto
+
+A persona de Maria Eduarda representa o **Analista de PMO**, responsável pela operação diária da governança do portfólio. Ela utiliza o agente tanto para **consultar e comparar o andamento dos projetos** quanto para **cobrar, apoiar o preenchimento e consolidar informações** que alimentam os relatórios e as apresentações destinadas à diretoria. O Analista de PMO utiliza a solução principalmente para **reduzir o esforço manual de acompanhamento e cobrança, ganhando tempo para atividades de maior valor analítico dentro do portfólio**.
+
+### Jornada do Usuário 1.5.2 — Maria Eduarda Santos - Analista de PMO
+
+<div align="center">
+<sub>Imagem 1.5.2.1 - Jornada do Usuário — Maria Eduarda Santos - Analista de PMO</sub><br>
+  <img src="../assets/design/Jornada-pmo.png" width="100%" alt="Jornada do Usuário — Maria Eduarda Santos, Analista de PMO"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+### Cenário
+
+Maria Eduarda precisa manter os dados dos projetos atualizados e cobrar os responsáveis antes dos prazos mensais, mas hoje isso depende de acompanhamento manual e de navegação por diferentes sistemas e documentos, consumindo tempo que faltaria à análise e à consolidação das informações.
+
+### Identificação
+
+A jornada de Maria Eduarda começa com a identificação de quais projetos estão com pendência de atualização, geralmente próximo ao prazo mensal de registro de status, fixado até o dia 10 de cada mês. Nessa etapa, sua principal dificuldade está na falta de alertas automáticos que sinalizem pendências antes do prazo, o que representa uma oportunidade para a solução notificar proativamente Maria Eduarda sobre o que precisa ser atualizado.
+
+### Cobrança
+
+Em seguida, Maria Eduarda cobra manualmente cada responsável pelo preenchimento das informações pendentes, geralmente por e-mail ou mensagem. Nessa etapa, a principal dor está na cobrança repetitiva, feita um a um, o que a solução busca resolver ao automatizar lembretes e cobranças por meio do agente.
+
+### Preenchimento
+
+Com os responsáveis notificados, Maria Eduarda acompanha o preenchimento dos campos pendentes nas listas do SharePoint e nos documentos de projeto, muitas vezes precisando orientar os responsáveis sobre o que e como preencher. Nessa etapa, sua principal dificuldade é a ausência de apoio para preencher campos de forma padronizada, o que a solução busca resolver ao sugerir conteúdo para os campos pendentes a partir da interação com o usuário responsável.
+
+### Consolidação
+
+Na sequência, Maria Eduarda consolida os dados atualizados em relatórios de status e apresentações mensais para a diretoria. Sua principal dificuldade é o tempo gasto reunindo informações espalhadas entre diferentes sistemas e documentos. Nessa etapa, a solução pode consolidar automaticamente os dados com rastreabilidade de fonte, reduzindo o esforço manual de montagem dos relatórios.
+
+### Entrega
+
+Por fim, Maria Eduarda entrega o material consolidado ao PMO e à diretoria, respondendo a questionamentos sobre o andamento do portfólio. Essa etapa representa o ponto de maior satisfação na jornada, pois, ao contar com dados atualizados e rastreáveis, reduz-se o risco de entregar informação desatualizada ou incompleta, tornando a entrega mais segura e ágil.
+
+### Experiência do cliente ao longo da jornada
+
+A experiência de Maria Eduarda evolui de forma crescente ao longo da jornada: parte de um sentimento mais neutro/insatisfeito nas etapas iniciais, quando ainda lida com a falta de alertas e a cobrança manual e repetitiva, e cresce progressivamente até atingir o pico de satisfação na etapa de Entrega, momento em que consegue reportar o andamento do portfólio com mais confiança, agilidade e rastreabilidade.
+
+---
+
 ### Persona 3: Rafael Antunes — Líder de Projeto
 
 <div align="center">
 <sub>Imagem 1.5.3 - Persona 3: Rafael Antunes — Líder de Projeto</sub><br>
-  <img src="../assets/Persona-lider.png" width="100%" alt="Persona 3: Rafael Antunes — Líder de Projeto"><br>
+  <img src="../assets/design/Persona-lider.png" width="100%" alt="Persona 3: Rafael Antunes — Líder de Projeto"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -310,7 +389,7 @@ A persona de Rafael representa o **Líder de Projeto**, responsável por um empr
 
 <div align="center">
 <sub>Imagem 1.5.3.1 - Jornada do Usuário — Rafael Antunes - Líder de Projeto</sub><br>
-  <img src="../assets/Jornada-lider.png" width="100%" alt="Jornada do Usuário — Rafael Antunes, Líder de Projeto"><br>
+  <img src="../assets/design/Jornada-lider.png" width="100%" alt="Jornada do Usuário — Rafael Antunes, Líder de Projeto"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -391,27 +470,59 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 ## 1.7 Brainstorming de Features
 
-### Ideias levantadas
+&emsp; O brainstorming de features é uma técnica de levantamento de ideias na qual as funcionalidades possíveis para um produto são registradas de forma ampla, antes de qualquer filtro de escopo, para em seguida serem avaliadas e priorizadas. Essa prática permite que o grupo visualize o universo completo de possibilidades da solução, das capacidades essenciais ao MVP até os desejos de longo prazo do parceiro, e tome decisões de sequenciamento fundamentadas, em vez de definir o escopo de maneira implícita ou arbitrária. Nesta seção, são apresentados o registro das ideias levantadas, os critérios adotados para a priorização e a classificação de cada feature quanto ao seu planejamento no projeto.
+
+&emsp; A partir da análise do TAPI (Termo de Abertura de Projeto Inteli), das discussões internas do grupo e dos desejos manifestados pelo parceiro, foi realizado um brainstorming de funcionalidades para o agente de IA. Nessa etapa, todas as ideias foram registradas, incluindo aquelas que extrapolam o escopo do MVP, como as funcionalidades que dependem da integração com o portfólio real do Metrô ou de aprovações de compliance da companhia. O objetivo desse registro é duplo: sequenciar o desenvolvimento das features viáveis dentro do módulo e preservar, para o parceiro, as ideias que podem orientar evoluções futuras da solução, ainda que não sejam satisfeitas nesta etapa.
+
+&emsp; Cada feature foi avaliada qualitativamente em dois critérios. A importância expressa o valor da funcionalidade para o problema identificado e para os benefícios esperados pelo parceiro, e a viabilidade expressa a capacidade de entrega dentro do módulo, considerando o esforço técnico, as dependências externas e as restrições de confidencialidade. A ordem de prioridade foi definida pela importância, com a viabilidade como critério de desempate, e ajustada pelas dependências técnicas entre as features: as funcionalidades do pipeline de Processamento de Linguagem Natural antecedem todas as demais por constituírem pré-requisito delas. Por fim, a coluna de planejamento classifica o destino de cada feature em quatro categorias: MVP, para as funcionalidades desenvolvidas e validadas dentro do módulo; simulação no MVP, para aquelas cujos mecanismos serão demonstrados sobre a base sintética por dependerem da infraestrutura corporativa real; evolução futura, para as candidatas a incorporação caso haja capacidade adicional nas sprints; e registro para o futuro, para os desejos preservados para a continuidade da solução pelo parceiro.
 
 
-| # | Feature | Origem (grupo/parceiro) | Descrição |
-|---|---|---|---|
-| F01 | [Feature] | [Grupo] | [...] |
-| F02 | [Feature] | [Parceiro] | [...] |
-| F03 | [Feature] | [Grupo] | [...] |
+<div align="center">
+<sub>Tabela X - Brainstorming e priorização de features</sub>
+</div>
 
-### Priorização
+| Prioridade | Feature | Importância | Viabilidade | Planejamento |
+|:---:|---|:---:|:---:|---|
+| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | MVP |
+| 2 | Identificação e classificação de intenções | Alta | Alta | MVP |
+| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | MVP |
+| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | MVP |
+| 5 | Respostas estruturadas | Alta | Alta | MVP |
+| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | MVP |
+| 7 | Localização e consulta de documentos dos projetos | Alta | Média | MVP |
+| 8 | Indicação das fontes | Alta | Média | MVP |
+| 9 | Alertas de prazos e documentos faltantes | Alta | Média | MVP |
+| 10 | Identificação de campos incompletos | Alta | Média | MVP |
+| 11 | Sugestão de conteúdo para campos | Alta | Média | MVP |
+| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | MVP |
+| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | MVP |
+| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | MVP |
+| 15 | Controle de acesso por perfil | Alta | Média/Baixa | Simulação no MVP |
+| 16 | Rastreabilidade das interações | Alta | Média | Simulação no MVP |
+| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | Evolução futura |
+| 18 | Prévia de relatório de status | Média/Alta | Média | Evolução futura |
+| 19 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | Evolução futura |
+| 20 | Painel de alertas e pendências | Média | Média | Evolução futura |
+| 21 | Notificações automáticas | Média | Baixa | Evolução futura |
+| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | Registro para o futuro (Ir Além) |
+| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | Registro para o futuro (Ir Além) |
+| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | Registro para o futuro (desejo do parceiro) |
+| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | Registro para o futuro (evolução tecnológica) |
 
+<div align="center">
+<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
-**Critério de priorização:** [ex.: Importância (1-5) × Viabilidade (1-5)]
+&emsp; O MVP reúne as funcionalidades que serão efetivamente desenvolvidas e validadas ao longo do módulo, sobre a base de dados sintéticos, e representa a resposta mínima e completa ao problema identificado. As primeiras posições da priorização foram ocupadas pelas capacidades de interpretação em linguagem natural, de classificação de intenções e de controle do catálogo de interações, porque nenhuma outra funcionalidade do agente existe sem elas: o pipeline de Processamento de Linguagem Natural é o fundamento técnico sobre o qual toda a solução se apoia. A entrada por voz foi incluída nesse mesmo núcleo por ser um requisito central do módulo e por reutilizar integralmente o processamento de texto, uma vez que o áudio é convertido em texto antes de seguir para o pipeline. Na sequência, foram priorizadas as consultas, as respostas estruturadas e o aviso de dados insuficientes, que juntas entregam o valor mais imediato ao usuário: obter informação confiável de forma rápida. Por fim, os alertas, o apoio ao preenchimento de campos, o esclarecimento de dúvidas e o registro de feedback completam o escopo, agregando a dimensão proativa da solução e gerando insumos para a melhoria contínua do próprio pipeline. Essa ordenação também funciona como instrumento de gestão do risco de prazo registrado na matriz de riscos: caso o cronograma exija replanejamento, o corte de escopo ocorre das últimas para as primeiras posições, preservando sempre as funcionalidades das quais as demais dependem.
 
-| Prioridade | Feature | Importância | Viabilidade | Score | Entra no MVP? |
-|---|---|---|---|---|---|
-| 1º | [F0X] | 5 | 5 | 25 | ✅ Sim |
-| 2º | [F0X] | 4 | 5 | 20 | ✅ Sim |
-| 3º | [F0X] | 5 | 2 | 10 | ❌ Futuro |
+&emsp; A categoria de simulação no MVP foi criada para as funcionalidades que o parceiro considera indispensáveis, mas que só podem ser implementadas de forma plena na infraestrutura corporativa real do Metrô, à qual o grupo não terá acesso nesta etapa. É o caso do controle de acesso por perfil e da rastreabilidade das interações, exigências diretas das restrições de confidencialidade do TAPI. Em vez de simplesmente adiá-las, o grupo optou por demonstrar seus mecanismos sobre a base sintética, com perfis de permissão fictícios e registro das interações realizadas. Essa escolha permite validar o comportamento da solução diante dessas exigências e facilita a futura implantação no ambiente da companhia, já que a lógica estará construída e documentada.
 
----
+&emsp; A evolução futura reúne as funcionalidades que agregariam valor ao produto, mas que dependem da maturidade consolidada do núcleo para serem bem executadas, razão pela qual não integram o compromisso inicial do MVP. As análises comparativas entre projetos e a prévia de relatório de status, embora presentes no escopo macro do TAPI, exigem uma base sintética com múltiplos projetos suficientemente ricos e um mecanismo de consulta já estável, condições que só se confirmam ao longo das sprints. Por isso, essa faixa funciona como um backlog complementar, alinhado à estratégia de aproveitamento da oportunidade de expansão registrada na matriz de riscos: ao final de cada sprint, o grupo avalia se há capacidade de incorporar algum desses itens, priorizando os de maior importância. As funcionalidades que não forem desenvolvidas não se perdem, pois serão registradas nas orientações de evolução entregues ao parceiro.
+
+&emsp; O registro para o futuro, por fim, preserva os desejos do parceiro e as possibilidades de evolução que não serão satisfeitos nesta etapa, atendendo ao propósito do brainstorming de não descartar nenhuma ideia relevante. A integração com o portfólio real do Metrô e a execução efetiva de transações correspondem ao caminho de evolução que o próprio TAPI denomina "Ir Além", e dependem do acesso ao ambiente corporativo e de aprovações das áreas de TI e compliance da companhia, fatores fora do controle do grupo. As prévias de apresentações e relatórios de fechamento, as conexões com estratégia e indicadores e as consultas financeiras são desejos manifestados pelo parceiro que pressupõem essa integração para gerar valor efetivo. Já a adoção de serviços de IA generativa aguarda homologação pela companhia e está prevista nos entregáveis do projeto como estudo inicial. Vale destacar que a importância de várias dessas funcionalidades é alta, e sua posição na priorização decorre exclusivamente da viabilidade no contexto do módulo. O registro formal dessas ideias integra os entregáveis do projeto e oferece à equipe do Metrô um backlog priorizado para dar continuidade à solução após o encerramento do módulo.
 
 ## 1.8 Canvas do MVP
 
@@ -619,7 +730,7 @@ A figura a seguir posiciona esses itens na matriz de probabilidade e impacto, co
 
 <div align="center">
   <sub>FIGURA 1.9 - Matriz de probabilidade e impacto</sub><br>
-  <img src="../assets/matriz-de-risco.png" width="100%" alt="Matriz de probabilidade e impacto do projeto"><br>
+  <img src="../assets/negócios/matriz-de-risco.png" width="100%" alt="Matriz de probabilidade e impacto do projeto"><br>
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
@@ -651,19 +762,31 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 ### Contexto da aplicação
 
-[Como o processamento de linguagem natural transforma o negócio do parceiro...]
+Conforme detalhado na seção 1.1, a gestão do portfólio do Metrô depende hoje de ações manuais para a obtenção de status, a consolidação de documentos e o acompanhamento de pendências. Do ponto de vista computacional, a aplicação de Processamento de Linguagem Natural transforma esse cenário ao substituir a navegação manual por listas e documentos por uma interação direta em linguagem natural, na qual o usuário formula sua solicitação por texto ou por voz e recebe uma resposta já estruturada, rastreável até sua fonte original e adequada ao seu nível de permissão.
 
-### Fluxo de negócio 1: [Nome do fluxo]
+Essa transformação depende de duas capacidades transversais, exigidas por ambos os fluxos descritos a seguir: um canal de entrada que processe texto e áudio de forma equivalente, exibindo a transcrição para conferência quando a entrada ocorrer por voz e um mecanismo de classificação capaz de reconhecer toda solicitação dentro de um catálogo de intenções definido com o parceiro, recusando pedidos fora do escopo do portfólio antes mesmo de consultar as fontes de dados.
 
-- **Situação atual (AS-IS):** [como funciona hoje]
-- **Situação proposta (TO-BE):** [como funcionará com a solução]
-- **Indicadores computacionais:** [ex.: precisão da classificação por tags ≥ X%, taxa de acerto de intenção, WER na conversão áudio→texto, latência de resposta...]
+### Fluxo de negócio 1: Consulta e análise comparativa de projetos
 
-### Fluxo de negócio 2: [Nome do fluxo]
+- **Situação atual (AS-IS):** conforme mapeado no fluxo de negócio (seção 1.6), a consulta e a comparação entre projetos hoje dependem de navegação manual pelas listas do SharePoint e de consolidação visual dos dados, processo sujeito a erros de interpretação e que se torna mais custoso quando envolve cruzar informações de portfólio com indicadores estratégicos.
 
-- **Situação atual (AS-IS):** [...]
-- **Situação proposta (TO-BE):** [...]
-- **Indicadores computacionais:** [...]
+- **Situação proposta (TO-BE):** o usuário formula sua solicitação diretamente em linguagem natural, como por exemplo: "qual o status do projeto X?" ou "compare os projetos X e Y em relação a prazo e riscos", e o sistema retorna os indicadores solicitados já filtrados conforme seu nível de permissão, acompanhados da fonte e da data de apuração de cada dado. Quando a solicitação for ambígua, o sistema solicita esclarecimento apenas sobre o dado faltante, preservando o que já foi informado.
+
+- **Indicadores computacionais:**
+  - ***Precisão da classificação de intenção:*** razão entre o número de solicitações corretamente classificadas dentro do catálogo de intenções e o número total de solicitações recebidas no conjunto de teste.
+  - ***Taxa de acerto na extração de entidades:*** razão entre o número de entidades corretamente extraídas (nome do projeto, período de referência, indicador solicitado) e o número total de entidades presentes nas solicitações do conjunto de teste.
+  - ***Taxa de correspondência entre entidade extraída e registro correto:*** razão entre o número de consultas em que a entidade extraída foi corretamente associada ao registro correspondente no portfólio (ex.: nome do projeto vinculado ao item correto da lista) e o número total de consultas do conjunto de teste, avaliando o desempenho do PLN na etapa de recuperação do dado, e não apenas na extração textual da entidade.
+
+### Fluxo de negócio 2: Apoio proativo ao preenchimento e acompanhamento de pendências
+
+- **Situação atual (AS-IS):** conforme mapeado no fluxo de negócio (seção 1.6), o acompanhamento de pendências depende hoje da cobrança manual do PMO junto a cada responsável antes do prazo mensal, sem qualquer apoio automatizado ao preenchimento de documentos como termo de abertura, cronograma e mapa de benefícios.
+
+- **Situação proposta (TO-BE):** o sistema sugere textos para os campos pendentes a partir da interação com o usuário, mantendo o controle humano sobre o que é efetivamente registrado, e notifica proativamente o PMO sobre marcos, riscos e pendências conforme filtros configurados, sem repetir alertas já enviados.
+
+- **Indicadores computacionais:**
+  - ***Taxa de acerto na extração de entidades:*** razão entre o número de entidades corretamente extraídas da fala ou do texto do usuário (campo a ser atualizado, valor sugerido) e o número total de entidades presentes nas interações do conjunto de teste.
+  - ***Precisão na detecção de alertas:*** razão entre o número de marcos, riscos e pendências corretamente identificados como elegíveis para alerta, conforme os filtros configurados, e o número total de alertas gerados pelo sistema no período avaliado.
+  - ***Taxa de erro na conversão de áudio em texto (WER - Word Error Rate):*** razão entre a soma das substituições, inserções e exclusões de palavras identificadas na transcrição e o número total de palavras do áudio de referência.
 
 ---
 
@@ -750,26 +873,38 @@ sequenceDiagram
 
 ## 2.3 Requisitos Não Funcionais
 
-<!-- Mínimo de 2 RNFs, derivados dos business drivers,
-     descritos como histórias de usuário e coerentes com os RFs. -->
+### Visão geral dos requisitos não funcionais
 
-#### RNF01 — [Categoria: ex. Desempenho]
 
-> **Como** [persona], **quero** [qualidade do sistema, ex.: receber a resposta em até X segundos], **para** [benefício].
-
-- **Business driver relacionado:** [Fluxo 1/2]
-- **Métrica de verificação:** [como será medido]
-- **Critério de aceitação:** [valor-alvo]
-
-#### RNF02 — [Categoria: ex. Acurácia do modelo]
-
-> **Como** [persona], **quero** [ex.: que a classificação por tags tenha precisão ≥ X%], **para** [benefício].
-
-- **Business driver relacionado:** [...]
-- **Métrica de verificação:** [...]
-- **Critério de aceitação:** [...]
+| ID e título                                        | História de usuário                                                                                                                                               | Business Driver relacionado                           | Critérios de aceitação                                                                                                                                                                                                                                                                      | Prioridade |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **RNF01 — Desempenho das consultas**               | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações       | Pelo menos 80% das consultas deverão ser respondidas em até 20 segundos. Caso esse tempo seja ultrapassado, o sistema deverá informar ao usuário que a solicitação continua em processamento. | Alta       |
+| **RNF02 — Controle de acesso às informações**      | Como gestor, quero que o acesso às informações seja limitado de acordo com o perfil de cada usuário para preservar a confidencialidade dos projetos.              | Confidencialidade e segurança da informação           | O sistema deve autenticar o usuário e validar suas permissões antes de responder às consultas. Nos testes de autorização, 100% das tentativas de acesso a informações não permitidas devem ser bloqueadas.                                                                                  | Alta       |
+| **RNF03 — Precisão na identificação de intenções** | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas               | O componente de processamento de linguagem natural deve atingir precisão mínima de 85% na classificação das intenções em um conjunto de testes previamente validado pela equipe e pelo parceiro. Quando a intenção não for identificada com confiança suficiente, o agente deverá solicitar esclarecimento ao usuário, evitando apresentar respostas incertas como corretas. | Alta       |
+| **RNF04 — Rastreabilidade das consultas**          | Como responsável pela gestão dos projetos, quero que as consultas e respostas sejam registradas para permitir a auditoria das informações fornecidas pelo agente. | Rastreabilidade e transparência                       | O sistema deve registrar o identificador do usuário, a data e hora, o canal utilizado, a intenção identificada, as fontes consultadas e o resultado da solicitação. Os registros devem ser protegidos contra alterações por usuários comuns e mantidos pelo período a ser definido com o parceiro, respeitando os princípios de finalidade, necessidade e minimização da LGPD. | Alta       |
+| **RNF05 — Interoperabilidade entre canais**        | Como usuário, quero acessar o agente por diferentes interfaces para consultar os projetos pelo canal mais adequado à minha rotina.                                | Interoperabilidade e acessibilidade                   | O núcleo do agente deve disponibilizar suas funcionalidades por meio de interfaces padronizadas, permitindo a integração com pelo menos dois canais previstos no projeto sem duplicação das regras de negócio.                                                                              | Média      |
+| **RNF06 — Qualidade da transcrição de áudio**      | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural | O componente de conversão de áudio em texto deve alcançar uma taxa mínima de 85% de palavras reconhecidas corretamente em um conjunto de áudios representativo do contexto do projeto. Quando a transcrição apresentar baixa confiança, o agente deverá solicitar a confirmação do usuário. | Média      |
+| **RNF07 — Disponibilidade da solução**             | Como usuário, quero que o agente esteja disponível durante o período de trabalho para realizar consultas sempre que necessário.                                   | Continuidade operacional e eficiência                 | A solução deve apresentar disponibilidade mínima de 99% durante o horário de operação definido pelo parceiro, desconsiderando manutenções previamente comunicadas. Em caso de indisponibilidade de alguma fonte de dados integrada, o sistema deverá informar o usuário de forma clara, sem falhar silenciosamente. | Média      |
+| **RNF08 — Usabilidade das respostas**              | Como usuário, quero receber respostas claras e organizadas para compreender rapidamente a situação dos projetos, independentemente do meu conhecimento técnico.   | Transparência e apoio à tomada de decisão             | Em testes com representantes das personas, pelo menos 80% dos participantes devem compreender a resposta e identificar a informação solicitada sem auxílio externo, em até 50 segundos de leitura. | Média      |
+| **RNF09 — Proteção e privacidade de dados**        | Como responsável pela governança de dados, quero que as informações pessoais e sensíveis tratadas pelo agente estejam protegidas para garantir conformidade legal e a confiança dos usuários. | Confidencialidade e segurança da informação | O sistema deverá aplicar anonimização ou pseudonimização de dados pessoais em logs quando aplicável, controlar o acesso a esses dados e observar o período de retenção definido com o parceiro. Antes da homologação, testes deverão verificar a ausência de dados pessoais desnecessários nos logs e o bloqueio de acessos não autorizados. | Alta       |
 
 ---
+
+### Relação dos requisitos não funcionais com os Business Drivers
+
+Os requisitos não funcionais foram definidos a partir dos Business Drivers do projeto, considerando as características necessárias para que o agente de IA ofereça informações confiáveis, seguras e acessíveis aos usuários do Metrô de São Paulo.
+
+Os requisitos de desempenho e disponibilidade contribuem para a eficiência das consultas e para a continuidade do uso da solução. O controle de acesso e a proteção de dados pessoais preservam a confidencialidade das informações de acordo com o perfil de cada usuário e com as exigências legais aplicáveis, enquanto a rastreabilidade permite auditar as consultas, as respostas e as fontes utilizadas pelo agente.
+
+A precisão na identificação de intenções e a qualidade da transcrição de áudio buscam garantir que as solicitações em linguagem natural sejam interpretadas corretamente. Já a interoperabilidade possibilita que o agente seja integrado a diferentes canais, como PLM, Telegram e Microsoft Teams, mantendo centralizadas as regras de negócio. Por fim, os requisitos de usabilidade e de proteção de dados buscam garantir que as respostas sejam claras, que apoiem o acompanhamento dos projetos e a tomada de decisão, e que o tratamento das informações pessoais esteja em conformidade com a LGPD.
+
+Os critérios de aceitação estabelecidos permitem avaliar os requisitos de maneira objetiva durante os testes da solução. As metas apresentadas são iniciais e poderão ser revisadas nas próximas sprints, de acordo com os resultados dos testes técnicos e as validações realizadas com o parceiro.
+
+### Coerência com os requisitos funcionais e a modelagem
+
+Os requisitos não funcionais complementam as funcionalidades previstas para o agente, definindo as condições de qualidade sob as quais elas deverão operar. Dessa forma, toda funcionalidade de consulta deverá respeitar o controle de acesso e a proteção de dados pessoais, apresentar desempenho adequado, registrar informações para rastreabilidade e produzir respostas compreensíveis.
+
+A modelagem e a visão técnica da solução deverão considerar componentes responsáveis pela autenticação e autorização, processamento de linguagem natural, transcrição de áudio, registro e proteção de logs, integração com diferentes canais e acesso às fontes de dados. Essa relação mantém a coerência entre os Business Drivers, os requisitos funcionais, os requisitos não funcionais e a arquitetura inicial do sistema.
 
 ## 2.4 Visão Inicial da Solução Técnica
 
