@@ -8,7 +8,6 @@
 
 ## Projeto: Azum
 
-
 ## Sumário
 
 <details>
@@ -59,7 +58,6 @@
 
 &emsp; Como resposta a esse desafio, o projeto considera o desenvolvimento de um agente de Inteligência Artificial capaz de compreender solicitações em linguagem natural e, por meio de integrações com o ambiente Microsoft homologado do Metrô, consultar ou registrar informações autorizadas. A solução deverá preservar os processos existentes, as regras de negócio, as permissões de acesso, a segurança e a rastreabilidade, funcionando como uma nova camada de interação com o ambiente já administrado pelo Metrô e apoiando, sem substituir, a análise e a tomada de decisão dos profissionais responsáveis.
 
-
 ### Matriz SWOT
 
 &emsp; Para aprofundar a compreensão do problema e do contexto em que a solução será inserida, foi elaborada uma Matriz SWOT, ferramenta de análise estratégica que organiza os fatores internos (forças e fraquezas) e externos (oportunidades e ameaças) que influenciam o negócio. A imagem 1 apresenta a matriz elaborada para o Metrô de São Paulo, com foco na atuação do PMO Corporativo e na gestão de informações de seus empreendimentos, e os quadrantes são analisados em detalhe na sequência.
@@ -69,7 +67,6 @@
   <img src="../assets/negócios/swot.png" width="100%" alt="matriz swot"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
-
 
 &emsp; A Matriz SWOT foi elaborada para analisar o contexto interno e externo do Metrô de São Paulo, com foco na atuação do PMO Corporativo e na gestão de informações relacionadas aos seus empreendimentos. As forças e fraquezas representam características internas da organização, enquanto as oportunidades e ameaças correspondem a fatores externos que podem influenciar suas atividades.
 
@@ -127,40 +124,40 @@
 
 ### O que o produto FAZ (escopo)
 
-| # | Funcionalidade | Descrição |
-|---|---|---|
-| 1 | Interação em linguagem natural por texto | Recebe solicitações escritas em linguagem natural por meio de uma interface conversacional. |
-| 2 | Interação por voz | Aceita solicitações faladas, convertendo o áudio em texto e encaminhando-o ao mesmo pipeline de processamento. |
-| 3 | Interpretação e classificação de intenções | Interpreta as solicitações por meio de um pipeline de PLN desenvolvido pela equipe, identifica a intenção do usuário e a classifica como consulta, transação ou alerta. |
-| 4 | Controle do catálogo de intenções | Detecta solicitações genéricas ou fora do contexto do portfólio e orienta o usuário sobre o catálogo de interações aceitáveis, recusando interações fora de escopo. |
-| 5 | Consulta a informações dos projetos | Responde a dúvidas sobre documentos, prazos, marcos, riscos, pendências, avanço e situação dos projetos, utilizando dados sintéticos. |
-| 6 | Esclarecimento de conceitos e normativos | Responde a dúvidas sobre conceitos e normativos relativos à gestão de portfólio, programas e projetos. |
-| 7 | Análises e comparações | Compara informações entre projetos do portfólio e apoia análises sobre status e aderência a normativos. |
-| 8 | Prévias de relatórios | Gera prévias de relatórios de status e de apresentações para a diretoria a partir dos dados disponíveis. |
-| 9 | Respostas estruturadas com referências | Apresenta respostas claras e estruturadas, indicando as fontes ou referências utilizadas quando disponíveis, e informa quando não existem dados suficientes para uma resposta confiável. |
-| 10 | Alertas e apoio proativo | Alerta sobre prazos próximos ou vencidos, sinaliza documentos esperados ausentes, identifica campos incompletos e demais pendências, e oferece ajuda proativa conforme o contexto identificado. |
-| 11 | Sugestões de preenchimento | Identifica solicitações de transação e apresenta, no chat, sugestões estruturadas de preenchimento de campos e registros, permitindo que o profissional as avalie antes de qualquer registro. |
-| 12 | Segurança e governança das interações | Respeita as permissões de cada perfil, a confidencialidade das informações e a rastreabilidade das interações. |
+| #   | Funcionalidade                             | Descrição                                                                                                                                                                                       |
+| --- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Interação em linguagem natural por texto   | Recebe solicitações escritas em linguagem natural por meio de uma interface conversacional.                                                                                                     |
+| 2   | Interação por voz                          | Aceita solicitações faladas, convertendo o áudio em texto e encaminhando-o ao mesmo pipeline de processamento.                                                                                  |
+| 3   | Interpretação e classificação de intenções | Interpreta as solicitações por meio de um pipeline de PLN desenvolvido pela equipe, identifica a intenção do usuário e a classifica como consulta, transação ou alerta.                         |
+| 4   | Controle do catálogo de intenções          | Detecta solicitações genéricas ou fora do contexto do portfólio e orienta o usuário sobre o catálogo de interações aceitáveis, recusando interações fora de escopo.                             |
+| 5   | Consulta a informações dos projetos        | Responde a dúvidas sobre documentos, prazos, marcos, riscos, pendências, avanço e situação dos projetos, utilizando dados sintéticos.                                                           |
+| 6   | Esclarecimento de conceitos e normativos   | Responde a dúvidas sobre conceitos e normativos relativos à gestão de portfólio, programas e projetos.                                                                                          |
+| 7   | Análises e comparações                     | Compara informações entre projetos do portfólio e apoia análises sobre status e aderência a normativos.                                                                                         |
+| 8   | Prévias de relatórios                      | Gera prévias de relatórios de status e de apresentações para a diretoria a partir dos dados disponíveis.                                                                                        |
+| 9   | Respostas estruturadas com referências     | Apresenta respostas claras e estruturadas, indicando as fontes ou referências utilizadas quando disponíveis, e informa quando não existem dados suficientes para uma resposta confiável.        |
+| 10  | Alertas e apoio proativo                   | Alerta sobre prazos próximos ou vencidos, sinaliza documentos esperados ausentes, identifica campos incompletos e demais pendências, e oferece ajuda proativa conforme o contexto identificado. |
+| 11  | Sugestões de preenchimento                 | Identifica solicitações de transação e apresenta, no chat, sugestões estruturadas de preenchimento de campos e registros, permitindo que o profissional as avalie antes de qualquer registro.   |
+| 12  | Segurança e governança das interações      | Respeita as permissões de cada perfil, a confidencialidade das informações e a rastreabilidade das interações.                                                                                  |
 
 ### O que o produto NÃO FAZ (fora de escopo)
 
-| # | Item fora do escopo | Justificativa |
-|---|---|---|
-| 1 | Utilizar dados reais ou sensíveis do Metrô | Restrição de confidencialidade do parceiro: nenhum dado sensível pode ser processado fora de ambientes homologados; o MVP é validado exclusivamente sobre dados sintéticos. |
-| 2 | Integrar-se ao portfólio real ou ser implantado em produção | O TAPI delimita a integração com o portfólio real como evolução posterior ("Ir Além"); o MVP é uma prova de conceito em ambiente controlado. |
-| 3 | Preencher, alterar, salvar ou excluir informações automaticamente em qualquer base ou sistema | Decisão de projeto para preservar a responsabilidade humana: as transações geram apenas sugestões no chat, e o registro é efetuado pelo profissional nas ferramentas oficiais. |
-| 4 | Executar automaticamente as sugestões apresentadas | O profissional deve avaliar e decidir sobre cada sugestão, mantendo-se como responsável final pelas informações registradas. |
-| 5 | Tomar decisões técnicas, administrativas ou estratégicas, ou aprovar documentos, riscos, prazos e ações de governança | O agente tem caráter de apoio: decisões e aprovações permanecem sob responsabilidade dos profissionais e dos processos de governança do Metrô. |
-| 6 | Substituir os sistemas, processos ou profissionais do Metrô | O produto é uma camada adicional de interação sobre a estrutura existente, e não um substituto dela. |
-| 7 | Permitir acesso a informações incompatíveis com as permissões do usuário | Exigência de confidencialidade e controle de acesso por perfil definida pelo parceiro. |
-| 8 | Responder a solicitações fora do catálogo de intenções | O TAPI determina que interações genéricas ou sem contexto sejam detectadas, orientadas e descartadas. |
-| 9 | Garantir respostas conclusivas com dados ausentes, incompletos ou desatualizados, ou prever com certeza resultados futuros | Limitação inerente à natureza da solução: as respostas dependem da qualidade dos dados disponíveis, e o agente sinaliza incertezas em vez de ocultá-las. |
-| 10 | Contemplar todos os documentos, processos e possibilidades do ambiente corporativo | Delimitação necessária de escopo para um MVP acadêmico com prazo definido; a cobertura completa é evolução futura. |
+| #   | Item fora do escopo                                                                                                        | Justificativa                                                                                                                                                                  |
+| --- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Utilizar dados reais ou sensíveis do Metrô                                                                                 | Restrição de confidencialidade do parceiro: nenhum dado sensível pode ser processado fora de ambientes homologados; o MVP é validado exclusivamente sobre dados sintéticos.    |
+| 2   | Integrar-se ao portfólio real ou ser implantado em produção                                                                | O TAPI delimita a integração com o portfólio real como evolução posterior ("Ir Além"); o MVP é uma prova de conceito em ambiente controlado.                                   |
+| 3   | Preencher, alterar, salvar ou excluir informações automaticamente em qualquer base ou sistema                              | Decisão de projeto para preservar a responsabilidade humana: as transações geram apenas sugestões no chat, e o registro é efetuado pelo profissional nas ferramentas oficiais. |
+| 4   | Executar automaticamente as sugestões apresentadas                                                                         | O profissional deve avaliar e decidir sobre cada sugestão, mantendo-se como responsável final pelas informações registradas.                                                   |
+| 5   | Tomar decisões técnicas, administrativas ou estratégicas, ou aprovar documentos, riscos, prazos e ações de governança      | O agente tem caráter de apoio: decisões e aprovações permanecem sob responsabilidade dos profissionais e dos processos de governança do Metrô.                                 |
+| 6   | Substituir os sistemas, processos ou profissionais do Metrô                                                                | O produto é uma camada adicional de interação sobre a estrutura existente, e não um substituto dela.                                                                           |
+| 7   | Permitir acesso a informações incompatíveis com as permissões do usuário                                                   | Exigência de confidencialidade e controle de acesso por perfil definida pelo parceiro.                                                                                         |
+| 8   | Responder a solicitações fora do catálogo de intenções                                                                     | O TAPI determina que interações genéricas ou sem contexto sejam detectadas, orientadas e descartadas.                                                                          |
+| 9   | Garantir respostas conclusivas com dados ausentes, incompletos ou desatualizados, ou prever com certeza resultados futuros | Limitação inerente à natureza da solução: as respostas dependem da qualidade dos dados disponíveis, e o agente sinaliza incertezas em vez de ocultá-las.                       |
+| 10  | Contemplar todos os documentos, processos e possibilidades do ambiente corporativo                                         | Delimitação necessária de escopo para um MVP acadêmico com prazo definido; a cobertura completa é evolução futura.                                                             |
 
 #### Delimitação do MVP
- &emsp;  O MVP será destinado à validação do pipeline de PLN e das principais formas de interação do agente em um ambiente controlado, utilizando dados sintéticos. O foco estará na capacidade de compreender solicitações por texto e por voz, responder a consultas, apoiar comparações, emitir alertas e sugerir o preenchimento de campos, sempre mantendo o profissional como responsável pela avaliação, pelo registro das informações e pela decisão final.
-&emsp; Em síntese: no MVP, o agente consulta, interpreta, compara, responde, alerta e sugere preenchimentos utilizando dados sintéticos. O profissional analisa, registra e decide. A integração com o portfólio real, o preenchimento automático de qualquer base, o uso de dados sensíveis e a implantação em produção ficam fora do escopo.
 
+ &emsp; O MVP será destinado à validação do pipeline de PLN e das principais formas de interação do agente em um ambiente controlado, utilizando dados sintéticos. O foco estará na capacidade de compreender solicitações por texto e por voz, responder a consultas, apoiar comparações, emitir alertas e sugerir o preenchimento de campos, sempre mantendo o profissional como responsável pela avaliação, pelo registro das informações e pela decisão final.
+&emsp; Em síntese: no MVP, o agente consulta, interpreta, compara, responde, alerta e sugere preenchimentos utilizando dados sintéticos. O profissional analisa, registra e decide. A integração com o portfólio real, o preenchimento automático de qualquer base, o uso de dados sensíveis e a implantação em produção ficam fora do escopo.
 
 ## 1.4 Objetivo do Produto
 
@@ -168,13 +165,13 @@
 
 &emsp; Esse objetivo foi formulado a partir da conclusão central da análise do problema: o desafio do Metrô não está na ausência de uma estrutura de gestão, mas no custo operacional de interagir com ela. Por essa razão, o objetivo não propõe a substituição de sistemas, processos ou profissionais, e sim a redução do atrito entre o profissional e a informação, atuando exatamente sobre os pontos em que a análise identificou esforço manual: a localização de informações dispersas em diferentes arquivos, listas e sistemas, a consolidação de análises e o registro de novos dados. O objetivo geral desdobra-se nas seguintes metas específicas, alinhadas ao problema identificado e às necessidades do negócio:
 
-* **Agilizar o acesso à informação:** permitir que o profissional obtenha dados sobre documentos, prazos, marcos, riscos, pendências e avanço dos projetos por meio de uma única interface conversacional, reduzindo o tempo gasto na navegação manual por diferentes arquivos, listas, relatórios e sistemas;
-* **Compreender corretamente as solicitações dos usuários:** desenvolver e avaliar um pipeline de Processamento de Linguagem Natural capaz de identificar as intenções dos usuários e classificá-las como consultas, transações ou alertas, com desempenho acompanhado por métricas de classificação a cada iteração, detectando e orientando solicitações genéricas ou fora do catálogo de interações aceitáveis;
-* **Apoiar a análise dos projetos:** oferecer respostas estruturadas sobre os projetos do portfólio e prévias de relatórios de status e apresentações, apoiando decisões mais ágeis e fundamentadas em evidências;
-* **Fortalecer o acompanhamento preventivo do portfólio:** identificar e comunicar proativamente prazos próximos ou vencidos, documentos ausentes, campos incompletos e demais pendências, ampliando a capacidade do PMO de antecipar riscos e desvios;
-* **Apoiar a qualidade da entrada de dados:** apresentar sugestões estruturadas de preenchimento de campos e registros a partir das solicitações de transação, contribuindo para a redução de erros e inconsistências, mantendo o profissional como responsável pelo registro e pela decisão final;
-* **Garantir conformidade com as restrições do parceiro:** validar a solução exclusivamente sobre dados sintéticos, respeitando as permissões de acesso por perfil, a confidencialidade das informações e a rastreabilidade das interações, sem trânsito de dados por serviços externos não homologados;
-* **Assegurar aderência e sustentabilidade tecnológica:** conceber a solução sobre o ecossistema Microsoft (Copilot Studio / Power Platform), de forma que possa ser operada, mantida e evoluída pela própria equipe do Metrô, com flexibilidade para permanecer funcional diante de eventuais mudanças na plataforma de portfólio.
+- **Agilizar o acesso à informação:** permitir que o profissional obtenha dados sobre documentos, prazos, marcos, riscos, pendências e avanço dos projetos por meio de uma única interface conversacional, reduzindo o tempo gasto na navegação manual por diferentes arquivos, listas, relatórios e sistemas;
+- **Compreender corretamente as solicitações dos usuários:** desenvolver e avaliar um pipeline de Processamento de Linguagem Natural capaz de identificar as intenções dos usuários e classificá-las como consultas, transações ou alertas, com desempenho acompanhado por métricas de classificação a cada iteração, detectando e orientando solicitações genéricas ou fora do catálogo de interações aceitáveis;
+- **Apoiar a análise dos projetos:** oferecer respostas estruturadas sobre os projetos do portfólio e prévias de relatórios de status e apresentações, apoiando decisões mais ágeis e fundamentadas em evidências;
+- **Fortalecer o acompanhamento preventivo do portfólio:** identificar e comunicar proativamente prazos próximos ou vencidos, documentos ausentes, campos incompletos e demais pendências, ampliando a capacidade do PMO de antecipar riscos e desvios;
+- **Apoiar a qualidade da entrada de dados:** apresentar sugestões estruturadas de preenchimento de campos e registros a partir das solicitações de transação, contribuindo para a redução de erros e inconsistências, mantendo o profissional como responsável pelo registro e pela decisão final;
+- **Garantir conformidade com as restrições do parceiro:** validar a solução exclusivamente sobre dados sintéticos, respeitando as permissões de acesso por perfil, a confidencialidade das informações e a rastreabilidade das interações, sem trânsito de dados por serviços externos não homologados;
+- **Assegurar aderência e sustentabilidade tecnológica:** conceber a solução sobre o ecossistema Microsoft (Copilot Studio / Power Platform), de forma que possa ser operada, mantida e evoluída pela própria equipe do Metrô, com flexibilidade para permanecer funcional diante de eventuais mudanças na plataforma de portfólio.
 
 &emsp; Para evidenciar o alinhamento entre as metas, o problema identificado e as necessidades do negócio, a tabela a seguir apresenta a rastreabilidade de cada meta em relação ao aspecto do problema que a origina e ao benefício esperado pelo parceiro que ela atende, conforme registrado no TAPI:
 
@@ -182,15 +179,15 @@
 <sub>Tabela x - Rastreabilidade entre metas, problema e benefícios esperados pelo parceiro</sub>
 </div>
 
-| Meta | Origem no problema | Benefício esperado pelo parceiro |
-|---|---|---|
-| Agilizar o acesso à informação | Navegação manual por diferentes arquivos, listas, relatórios e sistemas | Eficiência; Transparência |
-| Compreender as solicitações dos usuários | Viabilizador técnico da interação em linguagem natural (núcleo do MVP) | Precisão |
-| Apoiar a análise dos projetos | Consolidação manual de documentos e análises | Capacidade analítica e suporte à decisão; Relatórios automatizados |
-| Fortalecer o acompanhamento preventivo | Limitação da capacidade do PMO de identificar riscos e desvios preventivamente | Proatividade |
-| Apoiar a qualidade da entrada de dados | Registro de informações trabalhoso e suscetível a erros e inconsistências | Precisão |
-| Garantir conformidade com as restrições | Exigências de confidencialidade, permissões por perfil e rastreabilidade | Confidencialidade; Rastreabilidade |
-| Assegurar aderência e sustentabilidade tecnológica | Premissa de possível troca da plataforma de portfólio | Interoperabilidade e integração; Sustentação e autonomia da equipe interna |
+| Meta                                               | Origem no problema                                                             | Benefício esperado pelo parceiro                                           |
+| -------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Agilizar o acesso à informação                     | Navegação manual por diferentes arquivos, listas, relatórios e sistemas        | Eficiência; Transparência                                                  |
+| Compreender as solicitações dos usuários           | Viabilizador técnico da interação em linguagem natural (núcleo do MVP)         | Precisão                                                                   |
+| Apoiar a análise dos projetos                      | Consolidação manual de documentos e análises                                   | Capacidade analítica e suporte à decisão; Relatórios automatizados         |
+| Fortalecer o acompanhamento preventivo             | Limitação da capacidade do PMO de identificar riscos e desvios preventivamente | Proatividade                                                               |
+| Apoiar a qualidade da entrada de dados             | Registro de informações trabalhoso e suscetível a erros e inconsistências      | Precisão                                                                   |
+| Garantir conformidade com as restrições            | Exigências de confidencialidade, permissões por perfil e rastreabilidade       | Confidencialidade; Rastreabilidade                                         |
+| Assegurar aderência e sustentabilidade tecnológica | Premissa de possível troca da plataforma de portfólio                          | Interoperabilidade e integração; Sustentação e autonomia da equipe interna |
 
 <div align="center">
 <sup>Fonte: Material produzido pelos autores, 2026.</sup>
@@ -243,7 +240,6 @@ A persona de Robson representa o **Diretor**, que utiliza o agente para obter um
   <img src="../assets/Jornada-diretor.png" width="100%" alt="Jornada do Usuário — Robson Oliveira, Diretor"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
-
 
 ### Cenário
 
@@ -319,7 +315,6 @@ A persona de Rafael representa o **Líder de Projeto**, responsável por um empr
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-
 ### Cenário
 
 Rafael precisa manter as informações do seu empreendimento sempre atualizadas e responder a demandas do PMO e da diretoria, mas registrar e localizar esses dados exige navegar por diferentes sistemas e documentos, consumindo tempo que faltaria à gestão do projeto.
@@ -383,41 +378,40 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 &emsp; Cada feature foi avaliada qualitativamente em dois critérios. A importância expressa o valor da funcionalidade para o problema identificado e para os benefícios esperados pelo parceiro, e a viabilidade expressa a capacidade de entrega dentro do módulo, considerando o esforço técnico, as dependências externas e as restrições de confidencialidade. A ordem de prioridade foi definida pela importância, com a viabilidade como critério de desempate, e ajustada pelas dependências técnicas entre as features: as funcionalidades do pipeline de Processamento de Linguagem Natural antecedem todas as demais por constituírem pré-requisito delas. Por fim, a coluna de planejamento classifica o destino de cada feature em quatro categorias: MVP, para as funcionalidades desenvolvidas e validadas dentro do módulo; simulação no MVP, para aquelas cujos mecanismos serão demonstrados sobre a base sintética por dependerem da infraestrutura corporativa real; evolução futura, para as candidatas a incorporação caso haja capacidade adicional nas sprints; e registro para o futuro, para os desejos preservados para a continuidade da solução pelo parceiro.
 
-
 <div align="center">
 <sub>Tabela X - Brainstorming e priorização de features</sub>
 </div>
 
-| Prioridade | Feature | Importância | Viabilidade | Planejamento |
-|:---:|---|:---:|:---:|---|
-| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | MVP |
-| 2 | Identificação e classificação de intenções | Alta | Alta | MVP |
-| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | MVP |
-| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | MVP |
-| 5 | Respostas estruturadas | Alta | Alta | MVP |
-| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | MVP |
-| 7 | Localização e consulta de documentos dos projetos | Alta | Média | MVP |
-| 8 | Indicação das fontes | Alta | Média | MVP |
-| 9 | Alertas de prazos e documentos faltantes | Alta | Média | MVP |
-| 10 | Identificação de campos incompletos | Alta | Média | MVP |
-| 11 | Sugestão de conteúdo para campos | Alta | Média | MVP |
-| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | MVP |
-| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | MVP |
-| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | MVP |
-| 15 | Controle de acesso por perfil | Alta | Média/Baixa | Simulação no MVP |
-| 16 | Rastreabilidade das interações | Alta | Média | Simulação no MVP |
-| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | Evolução futura |
-| 18 | Prévia de relatório de status | Média/Alta | Média | Evolução futura |
-| 19 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | Evolução futura |
-| 20 | Painel de alertas e pendências | Média | Média | Evolução futura |
-| 21 | Notificações automáticas | Média | Baixa | Evolução futura |
-| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | Registro para o futuro (Ir Além) |
-| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | Registro para o futuro (Ir Além) |
-| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | Registro para o futuro (desejo do parceiro) |
-| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | Registro para o futuro (desejo do parceiro) |
-| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | Registro para o futuro (desejo do parceiro) |
-| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | Registro para o futuro (desejo do parceiro) |
-| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | Registro para o futuro (evolução tecnológica) |
+| Prioridade | Feature                                                                           | Importância | Viabilidade | Planejamento                                  |
+| :--------: | --------------------------------------------------------------------------------- | :---------: | :---------: | --------------------------------------------- |
+|     1      | Consulta em linguagem natural por voz e texto                                     |    Alta     |    Alta     | MVP                                           |
+|     2      | Identificação e classificação de intenções                                        |    Alta     |    Alta     | MVP                                           |
+|     3      | Detecção de solicitações fora do catálogo de intenções                            |    Alta     |    Alta     | MVP                                           |
+|     4      | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) |    Alta     |    Alta     | MVP                                           |
+|     5      | Respostas estruturadas                                                            |    Alta     |    Alta     | MVP                                           |
+|     6      | Aviso de dados insuficientes para resposta confiável                              |    Alta     |    Alta     | MVP                                           |
+|     7      | Localização e consulta de documentos dos projetos                                 |    Alta     |    Média    | MVP                                           |
+|     8      | Indicação das fontes                                                              |    Alta     |    Média    | MVP                                           |
+|     9      | Alertas de prazos e documentos faltantes                                          |    Alta     |    Média    | MVP                                           |
+|     10     | Identificação de campos incompletos                                               |    Alta     |    Média    | MVP                                           |
+|     11     | Sugestão de conteúdo para campos                                                  |    Alta     |    Média    | MVP                                           |
+|     12     | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio     | Média/Alta  |    Média    | MVP                                           |
+|     13     | Sugestões proativas de consultas e perguntas sugeridas                            |    Média    |    Média    | MVP                                           |
+|     14     | Registro de feedback do usuário sobre as respostas                                |    Média    |    Média    | MVP                                           |
+|     15     | Controle de acesso por perfil                                                     |    Alta     | Média/Baixa | Simulação no MVP                              |
+|     16     | Rastreabilidade das interações                                                    |    Alta     |    Média    | Simulação no MVP                              |
+|     17     | Análises comparativas entre projetos                                              |    Alta     | Média/Baixa | Evolução futura                               |
+|     18     | Prévia de relatório de status                                                     | Média/Alta  |    Média    | Evolução futura                               |
+|     19     | Fluxo guiado de criação de projetos (sugestões por etapas)                        |    Média    |    Baixa    | Evolução futura                               |
+|     20     | Painel de alertas e pendências                                                    |    Média    |    Média    | Evolução futura                               |
+|     21     | Notificações automáticas                                                          |    Média    |    Baixa    | Evolução futura                               |
+|     22     | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI)           |    Alta     |    Baixa    | Registro para o futuro (Ir Além)              |
+|     23     | Execução efetiva de transações com confirmação do usuário                         |    Alta     |    Baixa    | Registro para o futuro (Ir Além)              |
+|     24     | Prévia de apresentação mensal para a diretoria                                    |    Média    |    Baixa    | Registro para o futuro (desejo do parceiro)   |
+|     25     | Prévia do relatório de fechamento do portfólio e dos projetos                     |    Média    |    Baixa    | Registro para o futuro (desejo do parceiro)   |
+|     26     | Identificação de conexões com estratégia e indicadores                            |    Média    |    Baixa    | Registro para o futuro (desejo do parceiro)   |
+|     27     | Consultas sobre faturas e pagamentos dos projetos                                 |    Média    |    Baixa    | Registro para o futuro (desejo do parceiro)   |
+|     28     | Adoção de serviços de IA generativa homologados                                   |    Média    |    Baixa    | Registro para o futuro (evolução tecnológica) |
 
 <div align="center">
 <sup>Fonte: Material produzido pelos autores, 2026.</sup>
@@ -437,15 +431,15 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 ![Canvas MVP](./assets/mvp-canvas.png)
 
-| Bloco | Conteúdo |
-|---|---|
-| **Proposta do MVP** | [O que é a versão mínima e viável] |
-| **Segmento de personas** | [Para quem é este MVP] |
-| **Jornadas atendidas** | [Quais jornadas o MVP cobre] |
-| **Funcionalidades** | [Features incluídas no recorte] |
-| **Resultado esperado** | [Aprendizado/valor que se espera obter] |
-| **Métricas para validar** | [Como saber se o MVP funcionou] |
-| **Custo e cronograma** | [Estimativa de esforço e prazo] |
+| Bloco                     | Conteúdo                                |
+| ------------------------- | --------------------------------------- |
+| **Proposta do MVP**       | [O que é a versão mínima e viável]      |
+| **Segmento de personas**  | [Para quem é este MVP]                  |
+| **Jornadas atendidas**    | [Quais jornadas o MVP cobre]            |
+| **Funcionalidades**       | [Features incluídas no recorte]         |
+| **Resultado esperado**    | [Aprendizado/valor que se espera obter] |
+| **Métricas para validar** | [Como saber se o MVP funcionou]         |
+| **Custo e cronograma**    | [Estimativa de esforço e prazo]         |
 
 **Justificativa do recorte:** [Por que essas features e não outras.]
 
@@ -473,13 +467,13 @@ Em que:
 
 Para a quantificação do impacto, foi adotada a seguinte escala:
 
-| Impacto | Valor |
-| --- | :---: |
-| Muito Baixo | 1 |
-| Baixo | 2 |
-| Moderado | 3 |
-| Alto | 4 |
-| Muito Alto | 5 |
+| Impacto     | Valor |
+| ----------- | :---: |
+| Muito Baixo |   1   |
+| Baixo       |   2   |
+| Moderado    |   3   |
+| Alto        |   4   |
+| Muito Alto  |   5   |
 
 A utilização dessa escala permite converter as classificações qualitativas de impacto em valores numéricos, possibilitando sua combinação com a probabilidade no cálculo da severidade.
 
@@ -487,13 +481,13 @@ A fórmula foi normalizada em relação às faixas efetivamente adotadas neste r
 
 As faixas de criticidade adotadas são apresentadas a seguir:
 
-| Severidade | Criticidade |
-| ---: | --- |
-| 0,0 a 2,0 | Muito Baixa |
-| 2,01 a 4,0 | Baixa |
-| 4,01 a 6,0 | Moderada |
-| 6,01 a 8,0 | Alta |
-| 8,01 a 10,0 | Muito Alta |
+|  Severidade | Criticidade |
+| ----------: | ----------- |
+|   0,0 a 2,0 | Muito Baixa |
+|  2,01 a 4,0 | Baixa       |
+|  4,01 a 6,0 | Moderada    |
+|  6,01 a 8,0 | Alta        |
+| 8,01 a 10,0 | Muito Alta  |
 
 ### 1.9.2. Ameaças
 
@@ -620,18 +614,18 @@ As faixas de criticidade adotadas são apresentadas a seguir:
 
 O quadro a seguir consolida os dez itens registrados, reunindo a avaliação atribuída a cada um, o responsável pelo acompanhamento e o status atual:
 
-| ID | Risco | Categoria | Probabilidade | Impacto | Severidade | Criticidade | Responsável | Status |
-| --- | --- | --- | ---: | --- | ---: | --- | --- | --- |
-| AM1 | Comunicação interna do grupo | Comunicação | 30% | Alto | 2,50 | Baixa | Tobias Viana | Em Monitoramento |
-| AM2 | Baixa acurácia na identificação de intenções | Técnico | 30% | Muito Alto | 3,18 | Baixa | Ana Cristina | Aberto |
-| AM3 | Atraso na liberação de acesso ao ambiente Microsoft pelo parceiro | Stakeholders | 70% | Moderado | 4,55 | Moderada | Rui Facó | Aberto |
-| AM4 | Atraso no fornecimento de informações pelo Metrô | Dados e Stakeholders | 50% | Alto | 4,32 | Moderada | Karol Barbosa | Aberto |
-| AM5 | Não conclusão do projeto dentro do prazo | Cronograma | 10% | Muito Alto | 0,91 | Muito Baixa | Felipe Simão | Aberto |
-| AM6 | Dados insuficientes ou inadequados para validação do agente | Dados | 70% | Alto | 6,14 | Alta | Matheus Ferreira | Aberto |
-| AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | Equipe | 50% | Moderado | 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
-| OP1 | Reutilização e evolução da solução | Arquitetura | 70% | Alto | 6,14 | Alta | Felipe Simão | Em Monitoramento |
-| OP2 | Expansão do agente para novas funcionalidades de gestão de portfólio | Escopo | 50% | Moderado | 3,18 | Baixa | Paulo Henrique | Aberto |
-| OP3 | Validação com dados e cenários mais próximos da realidade | Dados | 50% | Alto | 4,32 | Moderada | Matheus Ferreira | Em Monitoramento |
+| ID  | Risco                                                                | Categoria            | Probabilidade | Impacto    | Severidade | Criticidade | Responsável      | Status           |
+| --- | -------------------------------------------------------------------- | -------------------- | ------------: | ---------- | ---------: | ----------- | ---------------- | ---------------- |
+| AM1 | Comunicação interna do grupo                                         | Comunicação          |           30% | Alto       |       2,50 | Baixa       | Tobias Viana     | Em Monitoramento |
+| AM2 | Baixa acurácia na identificação de intenções                         | Técnico              |           30% | Muito Alto |       3,18 | Baixa       | Ana Cristina     | Aberto           |
+| AM3 | Atraso na liberação de acesso ao ambiente Microsoft pelo parceiro    | Stakeholders         |           70% | Moderado   |       4,55 | Moderada    | Rui Facó         | Aberto           |
+| AM4 | Atraso no fornecimento de informações pelo Metrô                     | Dados e Stakeholders |           50% | Alto       |       4,32 | Moderada    | Karol Barbosa    | Aberto           |
+| AM5 | Não conclusão do projeto dentro do prazo                             | Cronograma           |           10% | Muito Alto |       0,91 | Muito Baixa | Felipe Simão     | Aberto           |
+| AM6 | Dados insuficientes ou inadequados para validação do agente          | Dados                |           70% | Alto       |       6,14 | Alta        | Matheus Ferreira | Aberto           |
+| AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe           | Equipe               |           50% | Moderado   |       3,18 | Baixa       | Paulo Henrique   | Em Monitoramento |
+| OP1 | Reutilização e evolução da solução                                   | Arquitetura          |           70% | Alto       |       6,14 | Alta        | Felipe Simão     | Em Monitoramento |
+| OP2 | Expansão do agente para novas funcionalidades de gestão de portfólio | Escopo               |           50% | Moderado   |       3,18 | Baixa       | Paulo Henrique   | Aberto           |
+| OP3 | Validação com dados e cenários mais próximos da realidade            | Dados                |           50% | Alto       |       4,32 | Moderada    | Matheus Ferreira | Em Monitoramento |
 
 A figura a seguir posiciona esses itens na matriz de probabilidade e impacto, com as ameaças representadas à esquerda e as oportunidades à direita:
 
@@ -647,11 +641,11 @@ A seleção dos itens mais críticos tomou como critério a severidade calculada
 
 O uso da severidade também torna a priorização verificável, uma vez que a regra de cálculo é explícita e qualquer leitor pode reproduzir o resultado a partir dos valores declarados para cada item, o que afasta a seleção arbitrária dos riscos que o grupo considera mais relevantes. Como a mesma regra se aplica a ameaças e a oportunidades, os dez itens compõem uma ordenação única, na qual uma oportunidade bem posicionada indica prioridade de aproveitamento, e não de correção. A partir desse critério, três itens se destacam dos demais:
 
-| Item | Descrição resumida | Severidade | Criticidade |
-| --- | --- | ---: | --- |
-| AM6 | Dados insuficientes ou inadequados para validação do agente | 6,14 | Alta |
-| OP1 | Reutilização e evolução da solução | 6,14 | Alta |
-| AM3 | Atraso na liberação de acesso ao ambiente Microsoft pelo parceiro | 4,55 | Moderada |
+| Item | Descrição resumida                                                | Severidade | Criticidade |
+| ---- | ----------------------------------------------------------------- | ---------: | ----------- |
+| AM6  | Dados insuficientes ou inadequados para validação do agente       |       6,14 | Alta        |
+| OP1  | Reutilização e evolução da solução                                |       6,14 | Alta        |
+| AM3  | Atraso na liberação de acesso ao ambiente Microsoft pelo parceiro |       4,55 | Moderada    |
 
 A **AM6** ocupa o topo da priorização por combinar a maior probabilidade atribuída entre as ameaças com um impacto que atinge a própria evidência de qualidade do projeto. Como o agente é validado exclusivamente sobre dados sintéticos, o conjunto de validação é o único instrumento capaz de demonstrar que a solução funciona, de modo que sua inadequação não degrada apenas uma métrica isolada, mas retira a sustentação de todas as conclusões apresentadas ao parceiro. Trata se, além disso, de um risco cuja causa está inteiramente sob controle do grupo, o que torna o esforço preventivo especialmente eficaz.
 
@@ -689,28 +683,41 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 ### Histórias de usuário
 
-<!-- Formato: Como [persona], quero [ação] para [benefício].
-     Inclua critérios de aceitação testáveis. -->
+#### RF01 — Consultar dados de projetos
 
-#### RF01 — [Título da história]
-
-> **Como** [persona], **quero** [ação/funcionalidade], **para** [benefício/valor].
+> **Como** usuário responsável pelo acompanhamento de projetos, **quero** consultar os dados dos projetos por meio do agente, **para** obter as informações necessárias à gestão e à tomada de decisão.
 
 **Critérios de aceitação:**
-- [ ] [Critério 1]
-- [ ] [Critério 2]
 
-**Prioridade:** [Alta/Média/Baixa] · **Persona relacionada:** [Persona X]
+- [ ] O agente consulta as fontes de dados autorizadas a partir da solicitação do usuário.
+- [ ] O agente apresenta uma resposta coerente com os dados recuperados ou informa claramente quando não houver dados disponíveis.
 
-#### RF02 — [Título da história]
+#### RF02 — Apresentar a fonte da informação
 
-> **Como** [persona], **quero** [ação], **para** [benefício].
+> **Como** usuário do agente, **quero** visualizar a fonte utilizada na resposta, **para** verificar a procedência da informação apresentada.
 
 **Critérios de aceitação:**
-- [ ] [Critério 1]
-- [ ] [Critério 2]
 
-<!-- Repita para cada requisito funcional. -->
+- [ ] Toda informação proveniente dos projetos identifica a respectiva fonte consultada.
+- [ ] A referência apresentada permite localizar o registro ou documento de origem, respeitando as permissões do usuário.
+
+#### RF03 — Sugerir o preenchimento de documentos
+
+> **Como** responsável por documentos de projeto, **quero** receber sugestões de preenchimento com base nos dados disponíveis, **para** reduzir o trabalho manual e completar documentos pendentes.
+
+**Critérios de aceitação:**
+
+- [ ] O agente identifica os campos que podem ser sugeridos a partir de dados disponíveis e autorizados.
+- [ ] A sugestão informa os dados e as fontes que a fundamentam e exige revisão do usuário antes de qualquer confirmação.
+
+#### RF04 — Notificar proativamente o usuário de pendências
+
+> **Como** responsável pelo acompanhamento de projetos, **quero** receber notificações proativas sobre pendências, **para** atuar antes que elas prejudiquem o andamento do projeto.
+
+**Critérios de aceitação:**
+
+- [ ] O agente identifica pendências conforme regras de negócio configuradas e notifica os usuários responsáveis.
+- [ ] A notificação apresenta a pendência, o projeto relacionado e a fonte que motivou o alerta.
 
 ### Modelagem estática — Diagrama de classes do domínio
 
@@ -734,10 +741,10 @@ classDiagram
 
 **Descrição das classes:**
 
-| Classe | Responsabilidade | Relacionamentos |
-|---|---|---|
-| Usuario | [...] | [...] |
-| [Entidade] | [...] | [...] |
+| Classe     | Responsabilidade | Relacionamentos |
+| ---------- | ---------------- | --------------- |
+| Usuario    | [...]            | [...]           |
+| [Entidade] | [...]            | [...]           |
 
 ### Modelagem dinâmica — Cenários e diagramas de sequência
 
@@ -770,36 +777,38 @@ sequenceDiagram
 
 ### Visão geral dos requisitos não funcionais
 
+Os valores-alvo ainda não acordados estão identificados como **a validar com o parceiro**. A validação deverá definir esses valores antes da homologação, sem alterar a métrica nem o procedimento de teste descritos.
 
-| ID e título                                        | História de usuário                                                                                                                                               | Business Driver relacionado                           | Critérios de aceitação                                                                                                                                                                                                                                                                      | Prioridade |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| **RNF01 — Desempenho das consultas**               | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações       | Pelo menos 80% das consultas deverão ser respondidas em até 20 segundos. Caso esse tempo seja ultrapassado, o sistema deverá informar ao usuário que a solicitação continua em processamento. | Alta       |
-| **RNF02 — Controle de acesso às informações**      | Como gestor, quero que o acesso às informações seja limitado de acordo com o perfil de cada usuário para preservar a confidencialidade dos projetos.              | Confidencialidade e segurança da informação           | O sistema deve autenticar o usuário e validar suas permissões antes de responder às consultas. Nos testes de autorização, 100% das tentativas de acesso a informações não permitidas devem ser bloqueadas.                                                                                  | Alta       |
-| **RNF03 — Precisão na identificação de intenções** | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas               | O componente de processamento de linguagem natural deve atingir precisão mínima de 85% na classificação das intenções em um conjunto de testes previamente validado pela equipe e pelo parceiro. Quando a intenção não for identificada com confiança suficiente, o agente deverá solicitar esclarecimento ao usuário, evitando apresentar respostas incertas como corretas. | Alta       |
-| **RNF04 — Rastreabilidade das consultas**          | Como responsável pela gestão dos projetos, quero que as consultas e respostas sejam registradas para permitir a auditoria das informações fornecidas pelo agente. | Rastreabilidade e transparência                       | O sistema deve registrar o identificador do usuário, a data e hora, o canal utilizado, a intenção identificada, as fontes consultadas e o resultado da solicitação. Os registros devem ser protegidos contra alterações por usuários comuns e mantidos pelo período a ser definido com o parceiro, respeitando os princípios de finalidade, necessidade e minimização da LGPD. | Alta       |
-| **RNF05 — Interoperabilidade entre canais**        | Como usuário, quero acessar o agente por diferentes interfaces para consultar os projetos pelo canal mais adequado à minha rotina.                                | Interoperabilidade e acessibilidade                   | O núcleo do agente deve disponibilizar suas funcionalidades por meio de interfaces padronizadas, permitindo a integração com pelo menos dois canais previstos no projeto sem duplicação das regras de negócio.                                                                              | Média      |
-| **RNF06 — Qualidade da transcrição de áudio**      | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural | O componente de conversão de áudio em texto deve alcançar uma taxa mínima de 85% de palavras reconhecidas corretamente em um conjunto de áudios representativo do contexto do projeto. Quando a transcrição apresentar baixa confiança, o agente deverá solicitar a confirmação do usuário. | Média      |
-| **RNF07 — Disponibilidade da solução**             | Como usuário, quero que o agente esteja disponível durante o período de trabalho para realizar consultas sempre que necessário.                                   | Continuidade operacional e eficiência                 | A solução deve apresentar disponibilidade mínima de 99% durante o horário de operação definido pelo parceiro, desconsiderando manutenções previamente comunicadas. Em caso de indisponibilidade de alguma fonte de dados integrada, o sistema deverá informar o usuário de forma clara, sem falhar silenciosamente. | Média      |
-| **RNF08 — Usabilidade das respostas**              | Como usuário, quero receber respostas claras e organizadas para compreender rapidamente a situação dos projetos, independentemente do meu conhecimento técnico.   | Transparência e apoio à tomada de decisão             | Em testes com representantes das personas, pelo menos 80% dos participantes devem compreender a resposta e identificar a informação solicitada sem auxílio externo, em até 50 segundos de leitura. | Média      |
-| **RNF09 — Proteção e privacidade de dados**        | Como responsável pela governança de dados, quero que as informações pessoais e sensíveis tratadas pelo agente estejam protegidas para garantir conformidade legal e a confiança dos usuários. | Confidencialidade e segurança da informação | O sistema deverá aplicar anonimização ou pseudonimização de dados pessoais em logs quando aplicável, controlar o acesso a esses dados e observar o período de retenção definido com o parceiro. Antes da homologação, testes deverão verificar a ausência de dados pessoais desnecessários nos logs e o bloqueio de acessos não autorizados. | Alta       |
+| ID e título                                                | História de usuário                                                                                                                                               | Business Driver relacionado                               | Característica de qualidade        | Critério mensurável e verificável                                                                                                                                                                                                                                                           | Forma de validação ou teste                                                                                                                                     |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **RNF01 — Desempenho das consultas**                       | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações           | Desempenho                         | Pelo menos 80% das consultas textuais devem apresentar uma resposta em até 15 segundos, desconsiderando indisponibilidades dos serviços externos.                                                                                                                                           | Executar conjunto representativo de consultas e medir o tempo de resposta e taxa de sucesso.                                                                    |
+| **RNF02 — Controle de acesso às informações**              | Como gestor, quero que o acesso às informações seja limitado de acordo com o perfil de cada usuário para preservar a confidencialidade dos projetos.              | Confidencialidade e segurança da informação               | Segurança e controle de acesso     | O sistema deve autenticar o usuário e validar suas permissões antes de responder às consultas. Nos testes de autorização, pelo menos 80% das tentativas de acesso a informações não permitidas devem ser bloqueadas em até 15 segundos.                                                     | Executar testes de autorização com diferentes perfis e verificar bloqueio de acessos não autorizados dentro do tempo limite.                                    |
+| **RNF03 — Precisão na identificação de intenções**         | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas                   | Precisão e confiabilidade          | O componente de processamento de linguagem natural deve atingir precisão mínima de 85% na classificação das intenções em um conjunto de testes previamente validado pela equipe e pelo parceiro.                                                                                            | Avaliar o classificador em conjunto de teste rotulado, separado dos dados de treinamento.                                                                       |
+| **RNF04 — Rastreabilidade das consultas**                  | Como responsável pela gestão dos projetos, quero que as consultas e respostas sejam registradas para permitir a auditoria das informações fornecidas pelo agente. | Rastreabilidade e transparência                           | Auditabilidade e rastreabilidade   | O sistema deve registrar o identificador do usuário, a data e hora, o canal utilizado, a intenção identificada, as fontes consultadas e o resultado da solicitação. Os registros devem ser protegidos contra alterações por usuários comuns.                                                | Verificar se todos os elementos obrigatórios estão presentes nos logs de auditoria e se são imutáveis.                                                          |
+| **RNF05 — Interoperabilidade entre canais**                | Como usuário, quero acessar o agente por diferentes interfaces para consultar os projetos pelo canal mais adequado à minha rotina.                                | Interoperabilidade e acessibilidade                       | Flexibilidade e integração         | O núcleo do agente deve disponibilizar suas funcionalidades por meio de interfaces padronizadas, permitindo a integração com pelo menos dois canais previstos no projeto sem duplicação das regras de negócio.                                                                              | Verificar que funcionalidades principais funcionam identicamente em ambos os canais.                                                                            |
+| **RNF06 — Qualidade da transcrição de áudio**              | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural     | Acurácia em reconhecimento de fala | O componente de conversão de áudio em texto deve alcançar uma taxa mínima de 85% de palavras reconhecidas corretamente em um conjunto de áudios representativo do contexto do projeto. Quando a transcrição apresentar baixa confiança, o agente deverá solicitar a confirmação do usuário. | Testar com áudios do vocabulário de projetos e medir taxa de erro de palavras (WER) e solicitações de confirmação.                                              |
+| **RNF07 — Disponibilidade da solução**                     | Como usuário, quero que o agente esteja disponível durante o período de trabalho para realizar consultas sempre que necessário.                                   | Continuidade operacional e eficiência                     | Confiabilidade e disponibilidade   | A solução deve apresentar disponibilidade mínima de 99% durante o horário de operação definido pelo parceiro, desconsiderando manutenções previamente comunicadas.                                                                                                                          | Monitorar uptime da aplicação e infraestrutura durante período de operação.                                                                                     |
+| **RNF08 — Usabilidade das respostas**                      | Como usuário, quero receber respostas claras e organizadas para compreender rapidamente a situação dos projetos, independentemente do meu conhecimento técnico.   | Transparência e apoio à tomada de decisão                 | Usabilidade e compreensibilidade   | Em testes com representantes das personas, pelo menos 80% dos participantes devem compreender a resposta e identificar a informação solicitada sem auxílio externo.                                                                                                                         | Conduzir testes de usabilidade com representantes das personas e validar compreensão.                                                                           |
+| **RNF09 — Tratamento de ambiguidades**                     | Como usuário do agente, quero receber uma solicitação de esclarecimento quando meu pedido for ambíguo, para evitar respostas ou ações incorretas.                 | Confiabilidade no acesso e no tratamento das informações. | Robustez e prevenção de erro       | A taxa de ambiguidades detectadas e a taxa máxima de respostas indevidas para entradas ambíguas devem alcançar valores **a validar com o parceiro**; toda ambiguidade detectada deve gerar pedido de esclarecimento.                                                                        | Aplicar casos ambíguos previamente rotulados e verificar a detecção, a ausência de resposta conclusiva indevida e a apresentação da pergunta de esclarecimento. |
+| **RNF10 — Escalabilidade do agente**                       | Como administrador da solução, quero que o agente seja capaz de processar aumentos de volume de consultas e dados sem degradação significativa de desempenho.     | Continuidade operacional e sustentabilidade técnica       | Escalabilidade e performance       | O agente deve suportar aumento de até 10x no volume de consultas simultâneas mantendo a latência em até 20 segundos para 95% das requisições; o pipeline deve processar datasets sinteticamente maiores sem aumento proporcional de memória.                                                | Realizar testes de carga progressivos, aumentando gradualmente o volume de consultas e medir latência, throughput e uso de recursos.                            |
+| **RNF11 — Explicabilidade das sugestões de preenchimento** | Como responsável por documentos, quero compreender as razões pelas quais o agente sugeriu determinados valores ou conteúdos.                                      | Transparência e confiabilidade dos dados sugeridos        | Explicabilidade e rastreabilidade  | Cada sugestão de preenchimento deve indicar explicitamente a fonte dos dados utilizados e o raciocínio por trás da sugestão; pelo menos 85% das sugestões devem ser acompanhadas de referências válidas e justificativa compreensível.                                                      | Verificar que todas as sugestões apresentadas incluem fontes identificáveis e justificativas claras; validar compreensão junto aos usuários.                    |
 
----
+### Tabela de rastreabilidade entre requisitos não funcionais e funcionais
 
-### Relação dos requisitos não funcionais com os Business Drivers
-
-Os requisitos não funcionais foram definidos a partir dos Business Drivers do projeto, considerando as características necessárias para que o agente de IA ofereça informações confiáveis, seguras e acessíveis aos usuários do Metrô de São Paulo.
-
-Os requisitos de desempenho e disponibilidade contribuem para a eficiência das consultas e para a continuidade do uso da solução. O controle de acesso e a proteção de dados pessoais preservam a confidencialidade das informações de acordo com o perfil de cada usuário e com as exigências legais aplicáveis, enquanto a rastreabilidade permite auditar as consultas, as respostas e as fontes utilizadas pelo agente.
-
-A precisão na identificação de intenções e a qualidade da transcrição de áudio buscam garantir que as solicitações em linguagem natural sejam interpretadas corretamente. Já a interoperabilidade possibilita que o agente seja integrado a diferentes canais, como PLM, Telegram e Microsoft Teams, mantendo centralizadas as regras de negócio. Por fim, os requisitos de usabilidade e de proteção de dados buscam garantir que as respostas sejam claras, que apoiem o acompanhamento dos projetos e a tomada de decisão, e que o tratamento das informações pessoais esteja em conformidade com a LGPD.
-
-Os critérios de aceitação estabelecidos permitem avaliar os requisitos de maneira objetiva durante os testes da solução. As metas apresentadas são iniciais e poderão ser revisadas nas próximas sprints, de acordo com os resultados dos testes técnicos e as validações realizadas com o parceiro.
-
-### Coerência com os requisitos funcionais e a modelagem
-
-Os requisitos não funcionais complementam as funcionalidades previstas para o agente, definindo as condições de qualidade sob as quais elas deverão operar. Dessa forma, toda funcionalidade de consulta deverá respeitar o controle de acesso e a proteção de dados pessoais, apresentar desempenho adequado, registrar informações para rastreabilidade e produzir respostas compreensíveis.
-
-A modelagem e a visão técnica da solução deverão considerar componentes responsáveis pela autenticação e autorização, processamento de linguagem natural, transcrição de áudio, registro e proteção de logs, integração com diferentes canais e acesso às fontes de dados. Essa relação mantém a coerência entre os Business Drivers, os requisitos funcionais, os requisitos não funcionais e a arquitetura inicial do sistema.
+| RNF                                            | RF relacionado         | Relação de rastreabilidade                                                                                                |
+| ---------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| RNF01 — Desempenho das consultas               | RF01                   | Qualifica o desempenho das respostas às consultas de dados dos projetos.                                                  |
+| RNF02 — Controle de acesso às informações      | RF01, RF02, RF03, RF04 | Assegura que as consultas, indicações de fonte, sugestões e notificações respeitem as permissões de cada usuário.         |
+| RNF03 — Precisão na identificação de intenções | RF01, RF03, RF04       | Mede a qualidade da compreensão de linguagem natural que fundamenta consultas, sugestões de preenchimento e notificações. |
+| RNF04 — Rastreabilidade das consultas          | RF01, RF02, RF03, RF04 | Mede o registro e a imutabilidade das auditoria de todas as interações com o agente.                                      |
+| RNF05 — Interoperabilidade entre canais        | RF01, RF03, RF04       | Assegura que consultas, sugestões e notificações funcionem de maneira consistente em múltiplos canais.                    |
+| RNF06 — Qualidade da transcrição de áudio      | RF01, RF03, RF04       | Qualifica a entrada por voz utilizada em consultas, sugestões de preenchimento e notificações.                            |
+| RNF07 — Disponibilidade da solução             | RF01, RF02, RF03, RF04 | Assegura que o agente esteja disponível para consultas, sugestões e notificações durante o horário de operação.           |
+| RNF08 — Usabilidade das respostas              | RF01, RF02             | Mede a clareza e compreensibilidade das respostas às consultas e das indicações de fonte.                                 |
+| RNF09 — Tratamento de ambiguidades             | RF01, RF03, RF04       | Evita a execução dessas funcionalidades quando a solicitação não possui clareza ou informação suficiente.                 |
+| RNF10 — Escalabilidade do agente               | RF01, RF02, RF03, RF04 | Qualifica a capacidade do agente de manter desempenho sob aumento de volume de consultas e dados.                         |
+| RNF11 — Explicabilidade das sugestões          | RF03                   | Mede a clareza e rastreabilidade das fontes e justificativas das sugestões de preenchimento apresentadas.                 |
+                                      |
 
 ## 2.4 Visão Inicial da Solução Técnica
 
@@ -813,11 +822,11 @@ A modelagem e a visão técnica da solução deverão considerar componentes res
 
 ### Descrição das camadas
 
-| Camada | Componentes | Responsabilidade |
-|---|---|---|
-| **Interface (IHC)** | [ex.: Web App, Chat UI] | [...] |
-| **Lógica de negócio** | [ex.: API, Serviço de PLN, Orquestrador] | [...] |
-| **Dados e serviços** | [ex.: Banco de dados, APIs externas, storage] | [...] |
+| Camada                | Componentes                                   | Responsabilidade |
+| --------------------- | --------------------------------------------- | ---------------- |
+| **Interface (IHC)**   | [ex.: Web App, Chat UI]                       | [...]            |
+| **Lógica de negócio** | [ex.: API, Serviço de PLN, Orquestrador]      | [...]            |
+| **Dados e serviços**  | [ex.: Banco de dados, APIs externas, storage] | [...]            |
 
 ### Conexões entre componentes
 
@@ -830,17 +839,17 @@ A modelagem e a visão técnica da solução deverão considerar componentes res
 
 <!-- Estimativa inicial — pode ser revisada nas próximas sprints. -->
 
-| Categoria | Tecnologia/Ferramenta | Justificativa |
-|---|---|---|
-| Linguagem (backend) | [ex.: Python 3.12] | [...] |
-| Framework (backend) | [ex.: FastAPI] | [...] |
-| Frontend | [ex.: React] | [...] |
-| PLN / IA | [ex.: spaCy, Hugging Face, API de LLM] | [...] |
-| Banco de dados | [ex.: PostgreSQL] | [...] |
-| Infraestrutura | [ex.: Docker, AWS] | [...] |
-| Versionamento | [ex.: Git + GitHub] | [...] |
-| Gestão do projeto | [ex.: GitHub Projects] | [...] |
-| Modelagem | [ex.: draw.io, Mermaid, Bizagi] | [...] |
+| Categoria           | Tecnologia/Ferramenta                  | Justificativa |
+| ------------------- | -------------------------------------- | ------------- |
+| Linguagem (backend) | [ex.: Python 3.12]                     | [...]         |
+| Framework (backend) | [ex.: FastAPI]                         | [...]         |
+| Frontend            | [ex.: React]                           | [...]         |
+| PLN / IA            | [ex.: spaCy, Hugging Face, API de LLM] | [...]         |
+| Banco de dados      | [ex.: PostgreSQL]                      | [...]         |
+| Infraestrutura      | [ex.: Docker, AWS]                     | [...]         |
+| Versionamento       | [ex.: Git + GitHub]                    | [...]         |
+| Gestão do projeto   | [ex.: GitHub Projects]                 | [...]         |
+| Modelagem           | [ex.: draw.io, Mermaid, Bizagi]        | [...]         |
 
 ---
 
@@ -848,7 +857,7 @@ A modelagem e a visão técnica da solução deverão considerar componentes res
 
 <!-- Registre as decisões mais relevantes tomadas pelo grupo. -->
 
-| # | Data | Decisão | Alternativas consideradas | Justificativa |
-|---|---|---|---|---|
-| D01 | [DD/MM] | [...] | [...] | [...] |
-| D02 | [DD/MM] | [...] | [...] | [...] |
+| #   | Data    | Decisão | Alternativas consideradas | Justificativa |
+| --- | ------- | ------- | ------------------------- | ------------- |
+| D01 | [DD/MM] | [...]   | [...]                     | [...]         |
+| D02 | [DD/MM] | [...]   | [...]                     | [...]         |
