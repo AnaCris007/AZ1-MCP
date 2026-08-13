@@ -669,19 +669,31 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 ### Contexto da aplicação
 
-[Como o processamento de linguagem natural transforma o negócio do parceiro...]
+Conforme detalhado na seção 1.1, a gestão do portfólio do Metrô depende hoje de ações manuais para a obtenção de status, a consolidação de documentos e o acompanhamento de pendências. Do ponto de vista computacional, a aplicação de Processamento de Linguagem Natural transforma esse cenário ao substituir a navegação manual por listas e documentos por uma interação direta em linguagem natural, na qual o usuário formula sua solicitação por texto ou por voz e recebe uma resposta já estruturada, rastreável até sua fonte original e adequada ao seu nível de permissão.
 
-### Fluxo de negócio 1: [Nome do fluxo]
+Essa transformação depende de duas capacidades transversais, exigidas por ambos os fluxos descritos a seguir: um canal de entrada que processe texto e áudio de forma equivalente, exibindo a transcrição para conferência quando a entrada ocorrer por voz e um mecanismo de classificação capaz de reconhecer toda solicitação dentro de um catálogo de intenções definido com o parceiro, recusando pedidos fora do escopo do portfólio antes mesmo de consultar as fontes de dados.
 
-- **Situação atual (AS-IS):** [como funciona hoje]
-- **Situação proposta (TO-BE):** [como funcionará com a solução]
-- **Indicadores computacionais:** [ex.: precisão da classificação por tags ≥ X%, taxa de acerto de intenção, WER na conversão áudio→texto, latência de resposta...]
+### Fluxo de negócio 1: Consulta e análise comparativa de projetos
 
-### Fluxo de negócio 2: [Nome do fluxo]
+- **Situação atual (AS-IS):** conforme mapeado no fluxo de negócio (seção 1.6), a consulta e a comparação entre projetos hoje dependem de navegação manual pelas listas do SharePoint e de consolidação visual dos dados, processo sujeito a erros de interpretação e que se torna mais custoso quando envolve cruzar informações de portfólio com indicadores estratégicos.
 
-- **Situação atual (AS-IS):** [...]
-- **Situação proposta (TO-BE):** [...]
-- **Indicadores computacionais:** [...]
+- **Situação proposta (TO-BE):** o usuário formula sua solicitação diretamente em linguagem natural, como por exemplo: "qual o status do projeto X?" ou "compare os projetos X e Y em relação a prazo e riscos", e o sistema retorna os indicadores solicitados já filtrados conforme seu nível de permissão, acompanhados da fonte e da data de apuração de cada dado. Quando a solicitação for ambígua, o sistema solicita esclarecimento apenas sobre o dado faltante, preservando o que já foi informado.
+
+- **Indicadores computacionais:**
+  - ***Precisão da classificação de intenção:*** razão entre o número de solicitações corretamente classificadas dentro do catálogo de intenções e o número total de solicitações recebidas no conjunto de teste.
+  - ***Taxa de acerto na extração de entidades:*** razão entre o número de entidades corretamente extraídas (nome do projeto, período de referência, indicador solicitado) e o número total de entidades presentes nas solicitações do conjunto de teste.
+  - ***Taxa de correspondência entre entidade extraída e registro correto:*** razão entre o número de consultas em que a entidade extraída foi corretamente associada ao registro correspondente no portfólio (ex.: nome do projeto vinculado ao item correto da lista) e o número total de consultas do conjunto de teste, avaliando o desempenho do PLN na etapa de recuperação do dado, e não apenas na extração textual da entidade.
+
+### Fluxo de negócio 2: Apoio proativo ao preenchimento e acompanhamento de pendências
+
+- **Situação atual (AS-IS):** conforme mapeado no fluxo de negócio (seção 1.6), o acompanhamento de pendências depende hoje da cobrança manual do PMO junto a cada responsável antes do prazo mensal, sem qualquer apoio automatizado ao preenchimento de documentos como termo de abertura, cronograma e mapa de benefícios.
+
+- **Situação proposta (TO-BE):** o sistema sugere textos para os campos pendentes a partir da interação com o usuário, mantendo o controle humano sobre o que é efetivamente registrado, e notifica proativamente o PMO sobre marcos, riscos e pendências conforme filtros configurados, sem repetir alertas já enviados.
+
+- **Indicadores computacionais:**
+  - ***Taxa de acerto na extração de entidades:*** razão entre o número de entidades corretamente extraídas da fala ou do texto do usuário (campo a ser atualizado, valor sugerido) e o número total de entidades presentes nas interações do conjunto de teste.
+  - ***Precisão na detecção de alertas:*** razão entre o número de marcos, riscos e pendências corretamente identificados como elegíveis para alerta, conforme os filtros configurados, e o número total de alertas gerados pelo sistema no período avaliado.
+  - ***Taxa de erro na conversão de áudio em texto (WER - Word Error Rate):*** razão entre a soma das substituições, inserções e exclusões de palavras identificadas na transcrição e o número total de palavras do áudio de referência.
 
 ---
 
