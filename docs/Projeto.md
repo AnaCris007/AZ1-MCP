@@ -434,18 +434,37 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 [Descrição da cadeia de valor...]
 
-### Fluxo principal (BPMN)
+### Fluxo do Business Process Model and Notation (BPMN)
 
-<!-- Diagrama BPMN do fluxo principal. Ferramentas sugeridas: Bizagi, draw.io, Camunda Modeler. -->
+&emsp; Esta seção modela, em notação BPMN, o fluxo de consulta e registro de informações do portfólio de projetos do Metrô de São Paulo em dois momentos: o processo como ocorre atualmente (AS-IS) e o processo com a solução proposta incorporada (TO-BE). É a comparação entre os dois diagramas que evidencia a contribuição do produto — não pela substituição das atividades ou dos responsáveis, que permanecem os mesmos, mas pela redução do atrito na interação com a informação, preservando os processos, as permissões e a rastreabilidade já estabelecidos pela companhia.
 
-![Diagrama BPMN — Fluxo principal](./assets/bpmn-fluxo-principal.png)
+&emsp; O primeiro diagrama representa o fluxo atual. A interação parte da necessidade de informação do usuário, que acessa o agente disponível no Microsoft Studio e formula sua demanda clicando em blocos de texto pré-definidos ou enviando uma mensagem escrita. A plataforma filtra os dados conforme a pergunta, consulta o catálogo de portfólios e exibe as informações encontradas. O ponto crítico do fluxo está no gateway "Conseguiu a resposta?": quando a demanda não é atendida, não há tratamento previsto — o usuário retorna ao início e reformula a solicitação por conta própria, repetindo o ciclo até obter o que precisa ou desistir.
 
-**Descrição do processo:**
+<div align="center">
+  <sub>FIGURA 1.6.1 - Fluxo de gestão de portfólio de projetos (AS-IS)</sub><br>
+  <img src="../assets/negócios/diagrama_as_is.svg" width="100%" alt="Diagrama BPMN do fluxo de gestão de portfólio de projetos no estado atual"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
 
-1. **[Atividade 1]:** [descrição]
-2. **[Atividade 2]:** [descrição]
-3. **[Gateway/decisão]:** [condições e caminhos]
-4. **[Atividade final]:** [descrição]
+&emsp; O segundo diagrama representa o mesmo fluxo com a solução incorporada. A necessidade do usuário e a responsabilidade pelas decisões permanecem inalteradas; o que muda é a forma de interação, que passa a ocorrer por linguagem natural — texto ou áudio — sobre a plataforma de portfólio já administrada pelo Metrô. Uma camada de Processamento de Linguagem Natural transcreve o áudio quando necessário, pré-processa e normaliza o texto e classifica a intenção do usuário. Caso a intenção não seja compreendida, o fluxo não termina em falha silenciosa: o agente devolve perguntas de esclarecimento e só encerra a sessão se não houver resposta. Reconhecida a intenção, o fluxo se divide entre consulta e inserção de informação, e a resposta é devolvida ao usuário.
+
+<div align="center">
+  <sub>FIGURA 1.6.2 - Fluxo de gestão de portfólio de projetos (TO-BE)</sub><br>
+  <img src="../assets/negócios/diagrama_to_be.svg" width="100%" alt="Diagrama BPMN do fluxo de gestão de portfólio de projetos com o agente de IA incorporado"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Principais diferenças entre os fluxos:**
+
+| Aspecto | AS-IS | TO-BE |
+| --- | --- | --- |
+| Forma de entrada | Blocos de texto pré-definidos ou mensagem escrita | Linguagem natural, por texto ou áudio |
+| Interpretação da demanda | Filtragem direta a partir da pergunta | Pré-processamento, normalização e classificação da intenção |
+| Demanda não compreendida | Usuário retorna ao início e reformula por conta própria | Agente devolve perguntas de esclarecimento antes de encerrar |
+| Operações suportadas | Consulta de informação | Consulta e inserção de informação |
+| Encerramento | Depende de o usuário obter a resposta por tentativa e erro | Sessão encerrada explicitamente, com resposta ou por ausência de retorno |
+
+&emsp; A leitura conjunta dos dois diagramas mostra que o ganho não está em acrescentar etapas ao processo, e sim em deslocar para o agente o esforço que hoje recai sobre o usuário: interpretar a demanda, reformular a pergunta quando o resultado não satisfaz e navegar pela estrutura até localizar a informação. As atividades de negócio e a decisão final permanecem sob responsabilidade dos profissionais do Metrô, conforme delimitado na seção 1.3.
 
 ---
 
