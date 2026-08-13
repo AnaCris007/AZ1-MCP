@@ -1,171 +1,382 @@
-<Table>
-  <tr>
-    <td><a href= "https://www.btgpactual.com/"><img src="img/logo-btg.png" alt="Centro Paula Souza" border="0"></td>
-    <td>
-      <a href= "https://www.inteli.edu.br/"><img src="img/logo-Inteli.png" alt="Inteli - Instituto de Tecnologia e Liderança" border="0"></a>
-    </td>
-  </tr>
-</table>
+<p align='center'>
+  <a href='https://www.inteli.edu.br/'>
+    <img src='../assets/inteli.png' alt='Inteli - Instituto de Tecnologia e Liderança' width='300'>
+  </a>
+</p>
 
-# Nome do Projeto: <nome do projeto>
+# G01
 
-## Nome do Grupo: <nome do grupo>
+## Integrantes
 
-## Integrantes:
+- [Ana Cristina Jardim](https://www.linkedin.com/in/ana-cristina-jardim/)
+- [Felipe Simão](https://www.linkedin.com/in/felipefmsimao/)
+- [Karol Barbosa Rocha](https://www.linkedin.com/in/karolbarbosarocha/)
+- [Matheus Ferreira da Silva](https://www.linkedin.com/in/matheusferreirads-/)
+- [Paulo Henrique Bueno Fernandes](https://www.linkedin.com/in/paulo-henrique0601/)
+- [Rui Facó](https://www.linkedin.com/in/ruifac%C3%B3/)
+- [Tobias Viana](https://www.linkedin.com/in/tobias-viana/)
 
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
+## Orientadora
+
+- [Vanessa Nunes](https://www.linkedin.com/in/vanunes/)
 
 
-# Sumário
 
-- [1. Introdução](#1-introdução)
-  - [1.1 Objetivo do Documento](#11-objetivo-do-documento)
-- [2. Política de Branches](#2-política-de-branches)
-  - [2.1 Visão Geral do Gitflow](#21-visão-geral-do-gitflow)
-  - [2.2 Estrutura de Branches](#22-estrutura-de-branches)
-  - [2.3 Diretrizes de Uso das Branches](#23-diretrizes-de-uso-das-branches)
-- [3. Políticas de Commit](#3-políticas-de-commit)
-- [4. Política de Push e Pull Requests](#4-política-de-push-e-pull-requests)
-- [5. Infraestrutura como Código](#5-infraestrutura-como-código)
-- [6. Gestão de Arquivos Sensíveis](#6-gestao-de-arquivos-sensiveis)
-- [7. Política de Rollback](#7-política-de-rollback)
-- [8. Registro de Variáveis de Ambiente][#8-registro-de-variaveis-de-ambiente]
-- [Referências](#referências)
+## Professores:
+### Orientador(a)
+- <a href="https://www.linkedin.com/in/vanunes/">Vanessa Nunes</a>
+### Instrutores
+- <a href="https://www.linkedin.com/in/reginaldo-arakaki-9574222b/">Computação - Reginaldo Arakaki</a>
+- <a href="https://www.linkedin.com/in/bryan-kano/">Computação - Bryan Kano</a>
+- <a href="https://www.linkedin.com/in/fernando-pizzo-208b526a/">Matemática e Física - Fernando Pizzo</a>
+- <a href="https://www.linkedin.com/in/lisane-valdo/">Negócios - Lisane Valdo</a>
+- <a href="https://www.linkedin.com/in/bruno-grandchamp-rodilha/?locale=pt">Design - Bruno Rodilha</a>
+- <a href="https://www.linkedin.com/in/professor1/">Liderança - Filipe Gonçalves</a>
+
+---
+
+## Projeto: Azum
+
+# Gestão do Projeto
+
+## Sumário
+
+<details>
+<summary><strong>1. Introdução</strong></summary>
+
+- [1.1 Objetivo do documento](#11-objetivo-do-documento)
+- [1.2 Organização evolutiva do documento](#12-organização-evolutiva-do-documento)
+
+</details>
+
+<details>
+<summary><strong>2. Acordos e Práticas Permanentes</strong></summary>
+
+- [2.1 Contrato de Convivência, SLA e Rituais](#21-contrato-de-convivência-sla-e-rituais)
+  - [2.1.1 Regra de Ouro](#211-regra-de-ouro)
+  - [2.1.2 Resolução de impasses](#212-resolução-de-impasses)
+  - [2.1.3 Gestão de conflitos](#213-gestão-de-conflitos)
+  - [2.1.4 Quadro Kanban](#214-quadro-kanban)
+  - [2.1.5 Comunicação oficial](#215-comunicação-oficial)
+  - [2.1.6 Dailies e demais rituais](#216-dailies-e-demais-rituais)
+  - [2.1.7 Acordos adicionais](#217-acordos-adicionais)
+- [2.2 Gestão do Processo de Desenvolvimento](#22-gestão-do-processo-de-desenvolvimento)
+  - [2.2.1 Fluxo de trabalho](#221-fluxo-de-trabalho)
+  - [2.2.2 Política de atualização do GitLab](#222-política-de-atualização-do-gitlab)
+  - [2.2.3 Política de commits](#223-política-de-commits)
+  - [2.2.4 Revisão e melhoria contínua](#224-revisão-e-melhoria-contínua)
+- [2.3 Acompanhamento Contínuo dos Riscos](#23-acompanhamento-contínuo-dos-riscos)
+
+</details>
+
+<details>
+<summary><strong>3. Sprint 1</strong></summary>
+
+- [3.1 Visão geral da entrega](#31-visão-geral-da-entrega)
+- [3.2 Análise e retrospectiva da Sprint 1](#32-análise-e-retrospectiva-da-sprint-1)
+  - [3.2.1 Síntese da sprint](#321-síntese-da-sprint)
+  - [3.2.2 Pontos fortes](#322-pontos-fortes)
+  - [3.2.3 Pontos fracos](#323-pontos-fracos)
+  - [3.2.4 Ações de melhoria para a Sprint 2](#324-ações-de-melhoria-para-a-sprint-2)
+  - [3.2.5 Revisão dos riscos na Sprint 1](#325-revisão-dos-riscos-na-sprint-1)
+  - [3.2.6 Alinhamento com o Escritório de Projetos](#326-alinhamento-com-o-escritório-de-projetos)
+- [3.3 Matriz de Papéis e Responsabilidades](#33-matriz-de-papéis-e-responsabilidades)
+- [3.4 Planejamento da Sprint 2](#34-planejamento-da-sprint-2)
+
+</details>
+
+<details>
+<summary><strong>4. Sprint 2</strong></summary>
+
+- [4.1 Entregas de gestão da Sprint 2](#41-entregas-de-gestão-da-sprint-2)
+
+</details>
+
+<details>
+<summary><strong>5. Sprint 3</strong></summary>
+
+- [5.1 Entregas de gestão da Sprint 3](#51-entregas-de-gestão-da-sprint-3)
+
+</details>
+
+<details>
+<summary><strong>6. Sprint 4</strong></summary>
+
+- [6.1 Entregas de gestão da Sprint 4](#61-entregas-de-gestão-da-sprint-4)
+
+</details>
+
+<details>
+<summary><strong>7. Sprint 5</strong></summary>
+
+- [7.1 Entregas de gestão da Sprint 5](#71-entregas-de-gestão-da-sprint-5)
+
+</details>
+
+---
 
 # 1. Introdução
-_conteúdo_
 
-## 1.1 Objetivo do Documento
-Este documento estabelece diretrizes claras para a utilização de boas práticas no desenvolvimento de software, visando a organização e a qualidade do código. Todos os membros da equipe devem seguir as instruções definidas.
+## 1.1 Objetivo do documento
 
-# 2. Política de Branches
-_conteúdo_
+<!-- Explique que o documento mantém as práticas permanentes do módulo e os registros específicos de cada sprint. -->
 
-## 2.1 Visão Geral do Gitflow
-Nota: Fornecer uma breve explicação sobre o Gitflow e sua importância para o gerenciamento eficiente do código fonte.
+_Conteúdo a ser preenchido pela equipe._
 
-## 2.2 Estrutura de Branches
-Padrão de Nomenclatura das Branches:
+## 1.2 Organização evolutiva do documento
 
-> **main**: Contém o código pronto para produção.
-> **dev**: Integração contínua das novas funcionalidades em desenvolvimento.
-> **feature/[nome-da-feature]**: Para desenvolvimento de novas funcionalidades. Exemplo: feature/integracao-api
-> **bugfix/[nome-do-bug]**: Para correção de bugs. Exemplo: bugfix/corrige-login
-> **release/[versao]**: Preparação para lançamento de uma nova versão. Exemplo: release/v1.0.0
-> **hotfix/[nome-do-hotfix]**: Correção urgente diretamente na produção. Exemplo: hotfix/corrige-bug-em-producao
+<!-- Explique que os acordos permanentes ficam em seção própria e que cada sprint preserva apenas seus registros específicos. A gestão de configuração permanece em GestaoConfiguracao.md. -->
 
-## 2.3 Diretrizes de Uso das Branches
-- Cada nova funcionalidade deve ser desenvolvida em uma branch de feature criada a partir da branch develop.
-  - Nomeação das branches de features deve seguir o padrão feature/[nome-da-feature].
-- Todas as novas funcionalidades devem ser desenvolvidas em branches de features e integradas na branch develop através de pull requests.
-- Commits diretos na branch main são proibidos! 
-  - Configurem o Github para proteger de commits direto para a main.
-- Branches de hotfix devem ser criadas a partir da branch main para corrigir problemas críticos em produção.
-  - Nomeação das branches de hotfix deve seguir o padrão hotfix/[nome-do-hotfix].
+_Conteúdo a ser preenchido pela equipe._
 
-# 3. Políticas de Commit
-Integrar "Conventional Commits" nas políticas de commit ajuda a manter um histórico de commits claro e estruturado, facilitando a automação de processos como geração de changelogs e versionamento semântico.
+---
 
-As mensagens de commit devem seguir o padrão de Conventional Commits para garantir clareza e consistência.
+# 2. Acordos e Práticas Permanentes
 
-Formato: [Tipo][Escopo opcional]: Mensagem clara e descritiva.
+As diretrizes desta seção valem para todo o módulo. Alterações devem ser discutidas pela equipe e registradas, sem apagar o histórico dos acordos anteriores.
 
-Os tipos devem ser:
+## 2.1 Contrato de Convivência, SLA e Rituais
 
-> **feat**: Uma nova funcionalidade para o usuário.
-> **fix**: Correção de bug.
-> **docs**: Mudanças na documentação.
-> **style**: Mudanças que não afetam o significado do código (espaços em branco, formatação, etc.).
-> **refactor**: Uma mudança de código que não corrige um bug nem adiciona uma funcionalidade.
-> **test**: Adição ou correção de testes.
-> **chore**: Atualizações de tarefas de build ou ferramentas auxiliares e bibliotecas, como a geração de documentação.
+### 2.1.1 Regra de Ouro
 
-Exemplo de commit: feat(auth): add login feature with JWT
+> **Nossa Regra de Ouro:** [Preencher coletivamente.]
 
-Proibido:
-- O uso de emojis nas mensagens de commit, e commits com mensagens vagas como "melhorias" ou "atualizações".
+### 2.1.2 Resolução de impasses
 
-IMPORTANTE!
-- Realizar commits frequentes (diários) para facilitar o rastreamento de mudanças e a colaboração.
+<!-- Defina etapas, prazos e quem será consultado caso o time não alcance consenso. -->
 
-# 4. Política de Push e Pull Requests
+_Conteúdo a ser preenchido pela equipe._
 
-**Políticas de Push**:
-- Não é permitido fazer push diretamente para a main ou dev.
-- Todas as contribuições devem ser feitas via branches e submetidas por meio de pull requests.
+### 2.1.3 Gestão de conflitos
 
-**Regras de Push**:
-- Todo código deve passar por revisão de código por pares antes de ser mergeado.
-- A revisão só deve ser aprovada se os testes automatizados forem bem-sucedidos e os critérios de qualidade (cobertura de testes, análise de código) forem atendidos.
+| Etapa | Gatilho | Ação | Participantes | Prazo de resposta |
+|---|---|---|---|---|
+| 1 | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| 2 | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| 3 | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
 
-**Revisão por Pares - Critério de Aprovação**:
-- O pull request deve ser revisado por, no mínimo, uma pessoa.
-- A revisão de código deve considerar: 
-  - Está funcional e resolve o problema proposto.
-  - Passou em todos os testes automatizados.
-  - Cobertura mínima de testes (60% ou mais). 
-  - Verificação de boas práticas de código.
-  - Não introduz duplicidade de código.
-- Após a aprovação, a branch deve ser mergeada na dev e o pull request pode ser fechado. 
-- O Scrum Master da Sprint é responsável por subir os artefatos para a MAIN ao final da Sprint.
+### 2.1.4 Quadro Kanban
+
+- **Ferramenta:** GitLab.
+- **Criação das tasks:** [Preencher].
+- **Atualização obrigatória:** [Dia e horário].
+- **Responsável pela atualização:** [Preencher].
+- **Informações mínimas:** descrição, tipo, prioridade, estimativa, DoR, DoD, responsável e dependências.
+
+### 2.1.5 Comunicação oficial
+
+- **Canal oficial:** [Preencher].
+- **Registro das decisões:** [Preencher].
+- **SLA para mensagens comuns:** [Preencher].
+- **SLA para bloqueios urgentes:** [Preencher].
+
+### 2.1.6 Dailies e demais rituais
+
+| Ritual | Formato | Frequência | Duração máxima | Participantes | Registro |
+|---|---|---|---|---|---|
+| Daily | [Presencial/Assíncrona] | [Preencher] | 15 minutos | Equipe | [Preencher] |
+| Planejamento | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Revisão | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Retrospectiva | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+
+### 2.1.7 Acordos adicionais
+
+_Conteúdo a ser preenchido pela equipe._
+
+---
+
+## 2.2 Gestão do Processo de Desenvolvimento
+
+### 2.2.1 Fluxo de trabalho
+
+<!-- Descreva o fluxo da task desde sua criação até revisão e conclusão. -->
+
+_Conteúdo a ser preenchido pela equipe._
+
+### 2.2.2 Política de atualização do GitLab
+
+<!-- Defina responsáveis, frequência, movimentação dos cards, bloqueios e encerramento. -->
+
+_Conteúdo a ser preenchido pela equipe._
+
+### 2.2.3 Política de commits
+
+<!-- Registre frequência, vínculo com tasks, formato das mensagens e revisão. Branches e merges pertencem a GestaoConfiguracao.md. -->
+
+_Conteúdo a ser preenchido pela equipe._
+
+### 2.2.4 Revisão e melhoria contínua
+
+<!-- Explique como as políticas serão verificadas e ajustadas nas retrospectivas. -->
+
+_Conteúdo a ser preenchido pela equipe._
+
+---
+
+## 2.3 Acompanhamento Contínuo dos Riscos
+
+<!-- Defina como a matriz de riscos será revisitada durante as cinco sprints. -->
+
+| Elemento | Definição da equipe |
+|---|---|
+| Periodicidade da revisão | [Preencher] |
+| Responsável pelo acompanhamento | [Preencher] |
+| Ritual de revisão | [Preencher] |
+| Local de registro das atualizações | [Preencher] |
+| Critério para escalonamento | [Preencher] |
+
+---
+
+# 3. Sprint 1
+
+## 3.1 Visão geral da entrega
+
+Esta seção reúne todos os componentes do artefato de gestão entregues na Sprint 1: retrospectiva, revisão dos riscos, papéis e responsabilidades da equipe, contrato de convivência, planejamento da Sprint 2 e políticas do processo de desenvolvimento.
+
+## 3.2 Análise e retrospectiva da Sprint 1
+
+### 3.2.1 Síntese da sprint
+
+| Aspecto | Registro |
+|---|---|
+| Objetivo da sprint | [Preencher] |
+| Entregas planejadas | [Preencher] |
+| Entregas concluídas | [Preencher] |
+| Resultado geral | [Preencher] |
+
+### 3.2.2 Pontos fortes
+
+| Ponto forte | Evidência | Impacto no desempenho |
+|---|---|---|
+| [Preencher] | [Preencher] | [Preencher] |
+
+### 3.2.3 Pontos fracos
+
+| Ponto fraco | Evidência | Impacto | Causa provável |
+|---|---|---|---|
+| [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+
+### 3.2.4 Ações de melhoria para a Sprint 2
+
+| Ação | Problema tratado | Responsável | Prazo | Critério de verificação | Status |
+|---|---|---|---|---|---|
+| [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | Não iniciada |
+
+### 3.2.5 Revisão dos riscos na Sprint 1
+
+| ID | Risco | Situação na Sprint 1 | Probabilidade | Impacto | Resposta | Responsável | Próxima revisão | Status |
+|---|---|---|---|---|---|---|---|---|
+| [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
 
 
-## 5. Infraestrutura como Código
-- Uso obrigatório de Docker para padronizar ambientes de desenvolvimento e produção.
-- Incluir na raiz do repositório:
-  - Dockerfile(s) para build de aplicações e serviços.
-  - .dockerignore para excluir arquivos desnecessários do contexto de build.
-  - docker-compose.yml para orquestrar múltiplos serviços/containers localmente.
-- Cada serviço/contêiner deve ter seu próprio Dockerfile customizável, se necessário.
-- O Docker Compose deve funcionar para rodar toda a stack do sistema localmente com um único comando (docker-compose up).
 
-## 6. Gestão de Arquivos Sensíveis
-- É obrigatório o uso de .gitignore bem configurado para bloquear:
-  - Arquivos contendo senhas, segredos ou informações sensíveis.
-  - Arquivos de configuração individuais (por exemplo, .env, configs locais, etc).
-- Explicação/documentação das diferenças entre arquivos de configuração locais, de desenvolvimento e de produção (ex.: .env.local, .env.dev, .env.prod).
-- Nunca commitar dados sensíveis ou credenciais diretamente no repositório.
+### 3.2.6 Alinhamento com o Escritório de Projetos
 
-## 7. Política de Rollback
-- Documentar o processo básico para rollback de uma release defeituosa.
-- Passos mínimos recomendados:
-  - Identificar rapidamente a versão estável anterior (tag/release/commit).
-  - Criar uma branch/selecione a tag da versão a ser restaurada.
-  - Realizar o deploy dessa versão, conforme procedimento do time.
-  - Comunicar o time e stakeholders sobre a reversão.
-- Deixar esses procedimentos registrados no repositório (ex: docs/rollback.md).
+| Critério | Evidência | Situação | Ação necessária |
+|---|---|---|---|
+| [Preencher] | [Preencher] | [Atendido/Parcial/Pendente] | [Preencher] |
 
-## 8. Registro de Variáveis de Ambiente
-- Obrigatório manter um arquivo .env.example documentando todas as variáveis de ambiente exigidas pela aplicação.
-- O arquivo deve listar todas as keys (sem valores reais/sensíveis) e breve explicação de cada variável.
-- Todos os membros devem usar esse exemplo para criar seus próprios arquivos .env locais.
-- Exemplo:
-  - DB_HOST= # Endereço do banco de dados
-  - DB_USER= # Usuário do banco
-  - DB_PASS= # Senha do banco (NUNCA commitada)
-  - SECRET_KEY= # Chave secreta do sistema
+---
 
-# Referências
-- Conventional Commits: https://www.conventionalcommits.org/en/v1.0.0/
-- GitFlow: https://nvie.com/posts/a-successful-git-branching-model/
-- Gitihub/iuricode: https://github.com/iuricode/padroes-de-commits
-- Docker (documentação oficial): https://docs.docker.com/
-- Best Practices for Writing Dockerfiles: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
-- Docker Compose (documentação oficial): https://docs.docker.com/compose/
-- .dockerignore Reference: https://docs.docker.com/engine/reference/builder/#dockerignore-file
-- .gitignore (documentação oficial): https://git-scm.com/docs/gitignore
-- gitignore.io (gerador de .gitignore para diferentes stacks): https://www.toptal.com/developers/gitignore/
-- Handling secrets in Git repos (GitHub Guide): https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-and-storing-encrypted-secrets
-- Creating a pull request template for your repository: https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository
-- Exemplo de Checklists para PRs: https://github.com/othneildrew/Best-README-Template#pull-request-template
-- Best Practices for Rollbacks (Atlassian): https://www.atlassian.com/continuous-delivery/principles/rollback-strategies
-- How to Use Git Revert and Git Reset: https://www.git-tower.com/learn/git/faq/git-reset-vs-revert/
-- 12 Factor App: Config: https://12factor.net/config
-- Dotenv (Exemplo e uso de arquivos .env): https://github.com/motdotla/dotenv#usage
+## 3.3 Matriz de Papéis e Responsabilidades
+
+### 3.3.1 Papéis da Sprint 1
+
+| Integrante | Papel principal | Artefato ou tarefa | Principais responsabilidades | Entregas esperadas |
+|---|---|---|---|---|
+| Ana Cristina Jardim | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Felipe Simão | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Karol Barbosa Rocha | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Matheus Ferreira da Silva | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Paulo Henrique Bueno Fernandes | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Rui Facó | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Tobias Viana | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+
+### 3.3.2 Critérios de distribuição
+
+<!-- Explique como a equipe evitou centralização, equilibrou a carga e favoreceu habilidades multidisciplinares. -->
+
+_Conteúdo a ser preenchido pela equipe._
+
+---
+
+## 3.4 Planejamento da Sprint 2
+
+### 3.4.1 Objetivo da sprint
+
+> **Objetivo da Sprint 2:** [Preencher com um resultado claro e verificável.]
+
+### 3.4.2 Priorização e sequenciamento
+
+| Ordem | Task ou conjunto de tasks | Prioridade | Dependência | Justificativa |
+|---|---|---|---|---|
+| 1 | [Preencher] | [Alta/Média/Baixa] | [Preencher] | [Preencher] |
+
+### 3.4.3 Escala de estimativas
+
+| Tamanho | Esforço estimado |
+|---|---|
+| PP | Menor que o esforço classificado como P |
+| P | Até 30 minutos |
+| M | De 30 a 60 minutos |
+| G | De 60 a 120 minutos |
+
+<!-- Defina um limite objetivo para PP. Tasks maiores que G devem ser decompostas. -->
+
+### 3.4.4 Registro das tasks no Kanban
+
+**Link do quadro:** [Inserir link do Kanban da Sprint 2.]
+
+Cada task deve conter título, descrição, tipo, prioridade, estimativa t-shirt, responsável, dependências, DoR e DoD.
+
+### 3.4.5 Definition of Ready
+
+- [Critério definido pela equipe];
+- [Critério definido pela equipe];
+- [Critério definido pela equipe].
+
+### 3.4.6 Definition of Done
+
+- [Critério definido pela equipe];
+- [Critério definido pela equipe];
+- [Critério definido pela equipe].
+
+---
+
+# 4. Sprint 2
+
+## 4.1 Entregas de gestão da Sprint 2
+
+<!-- Acrescente aqui somente os registros e artefatos específicos da Sprint 2. -->
+
+_Seção reservada para a próxima entrega._
+
+---
+
+# 5. Sprint 3
+
+## 5.1 Entregas de gestão da Sprint 3
+
+<!-- Acrescente aqui somente os registros e artefatos específicos da Sprint 3. -->
+
+_Seção reservada para entrega futura._
+
+---
+
+# 6. Sprint 4
+
+## 6.1 Entregas de gestão da Sprint 4
+
+<!-- Acrescente aqui somente os registros e artefatos específicos da Sprint 4. -->
+
+_Seção reservada para entrega futura._
+
+---
+
+# 7. Sprint 5
+
+## 7.1 Entregas de gestão da Sprint 5
+
+<!-- Acrescente aqui somente os registros e artefatos específicos da Sprint 5. -->
+
+_Seção reservada para entrega futura._
