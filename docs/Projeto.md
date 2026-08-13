@@ -693,18 +693,20 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 |---|---|---|---|
 | RF01: Receber solicitações por áudio e responder no canal de origem | Como usuário do portfólio, quero enviar minhas solicitações por áudio e receber a resposta pelo mesmo canal, para consultar o portfólio quando não posso digitar ou ler a tela, como em deslocamento ou em vistoria de campo. | Ao receber uma solicitação em áudio, o sistema deve convertê-la em texto, apresentar a transcrição ao usuário e devolver a resposta em áudio. Ao receber uma solicitação em texto, deve devolver a resposta em texto. O canal da resposta deve sempre corresponder ao canal da solicitação. | Alta |
 | RF02: Consultar dados de projetos | Como PMO, quero consultar dados de um projeto, para obter informações sobre seu status e acompanhamento sem precisar consultar manualmente os documentos do portfólio. | Ao receber uma solicitação, o sistema deve identificar a que projeto e a que dado ela se refere, consultar as fontes disponíveis e retornar os dados solicitados. Quando a solicitação não corresponder a nenhuma consulta prevista sobre o portfólio, deve informar a limitação ao usuário sem consultar as fontes. | Alta |
-| RF03: Apresentar a fonte da informação | Como diretor, quero saber de qual documento e de qual data veio cada resposta, para confiar na informação antes de tomar uma decisão. | Ao apresentar qualquer dado de negócio, o sistema deve exibir o documento de origem, o caminho de acesso no SharePoint e a data da última atualização, listando todas as fontes quando a resposta combinar mais de uma. | Alta |
+| RF03: Apresentar a fonte da informação | Como diretor, quero saber de qual documento e de qual data veio cada resposta, para confiar na informação antes de tomar uma decisão. | Ao apresentar qualquer dado de negócio, o sistema deve exibir o documento de origem, a referência que permite localizá-lo no repositório e a data da sua última atualização, listando todas as fontes quando a resposta combinar mais de uma. | Alta |
 | RF04: Sugerir o preenchimento de documentos | Como líder de projeto, quero receber sugestões de texto para os campos pendentes dos meus documentos, para preencher o portfólio mais rápido mantendo o controle sobre o que é efetivamente gravado. | Ao solicitar apoio no preenchimento de um documento, o sistema deve apresentar no chat uma sugestão de texto para cada campo pendente, permitindo a cópia individual das sugestões e sem alterar o documento de origem. | Média |
 | RF05: Notificar proativamente o usuário de pendências | Como usuário do portfólio, quero ser notificado quando tiver pendências relacionadas aos projetos que acompanho, para tomar as providências necessárias dentro do prazo. | Ao identificar uma nova pendência relacionada a um projeto acompanhado pelo usuário, o sistema deve notificá-lo automaticamente, informando o projeto e a pendência, sem exigir uma solicitação prévia do usuário. | Média |
 | RF06: Atualizar o cadastro de projetos a partir de instruções do usuário | Como líder de projeto, quero atualizar os dados de um projeto ditando ou escrevendo a alteração no chat, para manter o cadastro em dia sem abrir as planilhas e os documentos do portfólio. | Ao receber uma instrução de atualização, o sistema deve identificar o projeto e os campos afetados, apresentar ao usuário os valores que serão gravados e efetivar a alteração apenas após confirmação explícita, registrando o autor e a data da alteração. | Baixa |
 
 ### 2.2.1. Modelagem estática: classes e atributos do domínio
 
-&emsp; A modelagem estática representa as entidades do domínio de gestão de portfólio do Metrô de São Paulo sobre as quais o agente atua. O modelo parte do Portfólio, que agrupa os projetos de um exercício, e desdobra cada projeto em três eixos: os artefatos que o documentam, as pendências que dele se originam e os usuários que o acompanham. Essa estrutura sustenta os três comportamentos previstos nos requisitos funcionais, que são consultar dados de projetos, sugerir o preenchimento de campos de artefatos e notificar pendências.
+&emsp; A modelagem estática representa as entidades do domínio de gestão de portfólio do Metrô de São Paulo sobre as quais o agente atua. O modelo parte do Portfólio, que agrupa os projetos de um exercício, e desdobra cada projeto em três eixos: os artefatos que o documentam, as pendências que dele se originam e os usuários que o acompanham.
+
+&emsp; O quarto eixo é a hierarquia de usuários. As três personas que aparecem nas histórias da seção anterior, o diretor do RF03, o PMO do RF02 e o líder de projeto do RF04 e do RF06, correspondem a três especializações da classe Usuário. Essa correspondência de um para um entre as personas das histórias e as classes do modelo é o que amarra a modelagem estática aos requisitos funcionais.
 
 <div align="center">
   <sub>FIGURA 2.1: modelagem estática (classes e atributos do domínio)</sub><br>
-  <img src="../assets/diagrama-de-classes.png" width="100%" alt="Diagrama de classes do domínio de gestão de portfólio"><br>
+  <img src="../assets/diagrama-de-classes.svg" width="100%" alt="Diagrama de classes do domínio de gestão de portfólio"><br>
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
@@ -712,13 +714,15 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 | Classe | Responsabilidade | RFs atendidos |
 |---|---|---|
-| Portfólio | Agrupa os projetos administrados pelo PMO Corporativo em um determinado exercício, delimitando o conjunto percorrido na verificação periódica de pendências | RF07 |
-| Projeto | Representa o empreendimento acompanhado pelo PMO, concentrando os dados de identificação, situação e avanço consultados pelo agente | RF03, RF04, RF05, RF06, RF07 |
-| Usuário | Representa o profissional que interage com o agente, com o perfil que determina seu papel e os projetos que acompanha | RF01, RF03, RF07 |
-| Perfil | Enumeração que tipifica o usuário nos três papéis previstos, diferenciando o alcance da atuação de cada um sobre o portfólio | RF03, RF07 |
-| Pendência | Representa um item em aberto originado por um projeto, com prazo e situação, que fundamenta a notificação proativa | RF07 |
-| Artefato | Representa o documento do projeto hospedado no SharePoint, cujos metadados sustentam a indicação de fonte das respostas | RF04, RF06, RF07 |
-| CampoArtefato | Representa um campo individual de um artefato, com o valor registrado e as marcações que identificam se ele está pendente de preenchimento | RF06, RF07 |
+| Portfólio | Agrupa os projetos administrados pelo PMO Corporativo em um determinado exercício, delimitando tanto o conjunto percorrido na verificação periódica de pendências quanto o alcance de acesso dos perfis de âmbito consolidado | RF02, RF05 |
+| Projeto | Representa o empreendimento acompanhado pelo PMO, concentrando os dados de identificação, situação e avanço consultados pelo agente | RF02, RF03, RF04, RF05, RF06 |
+| Usuário | Superclasse que reúne os atributos comuns a todos os perfis e as relações que independem do papel exercido, como o acompanhamento de projetos e o recebimento de notificações | RF01, RF05 |
+| Diretor | Especialização de Usuário com alcance de supervisão sobre o portfólio consolidado, perfil da história do RF03 | RF03 |
+| PMO | Especialização de Usuário que administra o portfólio, com alcance sobre todos os projetos, perfil da história do RF02 | RF02 |
+| LiderProjeto | Especialização de Usuário responsável por um subconjunto de projetos, único perfil com relação de responsabilidade formal e, por consequência, com permissão de alteração | RF04, RF06 |
+| Pendência | Representa um item em aberto originado por um projeto, com prazo e situação, que fundamenta a notificação proativa | RF05 |
+| Artefato | Representa o documento que integra a documentação do projeto, cujos metadados sustentam a indicação de fonte das respostas | RF03, RF04, RF05 |
+| CampoArtefato | Representa um campo individual de um artefato, com o valor registrado e as marcações que identificam se ele está pendente de preenchimento | RF04, RF05 |
 
 **Atributos por classe:**
 
@@ -736,16 +740,15 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 | Usuário | `id` | int | Identificador único do usuário |
 | Usuário | `nome` | string | Nome do profissional |
 | Usuário | `email` | string | Endereço corporativo utilizado no envio das notificações |
-| Usuário | `perfil` | Perfil | Papel do usuário, restrito aos valores da enumeração |
 | Pendência | `id` | int | Identificador único da pendência |
 | Pendência | `tipo` | string | Natureza da pendência, como prazo, documento ou aprovação |
 | Pendência | `descricao` | string | Detalhamento do item em aberto |
-| Pendência | `prazo` | date | Data limite para tratamento, base da notificação do RF07 |
+| Pendência | `prazo` | date | Data limite para tratamento, base da notificação do RF05 |
 | Pendência | `situacao` | string | Estado corrente da pendência |
 | Artefato | `id` | int | Identificador único do artefato |
 | Artefato | `tipo` | string | Natureza do documento, como ata, relatório ou contrato |
-| Artefato | `caminhoSharePoint` | string | Localização do documento, exibida como fonte no RF04 |
-| Artefato | `dataUltimaAtualizacao` | datetime | Data da última alteração, exibida junto à fonte no RF04 |
+| Artefato | `referencia` | string | Localizador que permite recuperar o documento no repositório em que ele estiver hospedado, exibido como fonte da informação no RF03 |
+| Artefato | `data` | datetime | Data da última atualização do documento, exibida junto à fonte no RF03 |
 | Artefato | `versao` | string | Versão vigente do documento |
 | CampoArtefato | `id` | int | Identificador único do campo |
 | CampoArtefato | `nome` | string | Rótulo do campo dentro do artefato |
@@ -753,7 +756,9 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 | CampoArtefato | `obrigatorio` | boolean | Indica se o preenchimento do campo é exigido |
 | CampoArtefato | `preenchido` | boolean | Indica se o campo já possui conteúdo |
 
-&emsp; A combinação dos atributos `obrigatorio` e `preenchido` da classe CampoArtefato é o que permite determinar quais campos de um artefato estão pendentes, insumo direto da sugestão de preenchimento prevista no RF06. Da mesma forma, os atributos `caminhoSharePoint` e `dataUltimaAtualizacao` da classe Artefato são os que sustentam a exigência do RF04 de apresentar a origem e a data de cada informação devolvida pelo agente.
+&emsp; A combinação dos atributos `obrigatorio` e `preenchido` da classe CampoArtefato é o que permite determinar quais campos de um artefato estão pendentes, insumo direto da sugestão de preenchimento prevista no RF04. Da mesma forma, os atributos `referencia` e `data` da classe Artefato são os que sustentam a exigência do RF03 de apresentar a origem e a data de cada informação devolvida pelo agente. Os dois recebem esses nomes para corresponder aos parâmetros homônimos que trafegam nas mensagens do cenário 1, de modo que o dado armazenado e o dado exibido sejam identificáveis como o mesmo ao longo das duas modelagens.
+
+&emsp; As três especializações de Usuário não declaram atributos próprios. A diferença entre elas não é de dado armazenado, e sim de alcance de acesso, que é uma característica relacional e por isso está expressa nas associações descritas a seguir.
 
 **Relacionamentos:**
 
@@ -762,25 +767,35 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 | Portfólio | contém | Projeto | 1 para 1..* | Agregação |
 | Projeto | compõe | Artefato | 1 para 0..* | Composição |
 | Artefato | compõe | CampoArtefato | 1 para 1..* | Composição |
-| Projeto | origina | Pendência | 1 para 0..* | Associação |
+| Projeto | origina | Pendência | 1 para 0..* | Composição |
 | Usuário | acompanha | Projeto | 0..* para 0..* | Associação |
-| Pendência | notifica | Usuário | 0..* para 1 | Associação |
+| Pendência | notifica | Usuário | 0..* para 0..* | Associação |
+| Diretor | supervisiona | Portfólio | 0..* para 1 | Associação |
+| PMO | administra | Portfólio | 0..* para 1 | Associação |
+| LiderProjeto | lidera | Projeto | 1 para 1..* | Associação |
+| Diretor, PMO e LiderProjeto | especializa | Usuário | Não se aplica | Generalização |
 
-&emsp; A distinção entre agregação e composição é intencional. O Portfólio agrega Projetos porque um projeto mantém identidade própria e pode ser reagrupado em outro exercício sem deixar de existir. Já o Artefato compõe o Projeto e o CampoArtefato compõe o Artefato, porque nenhum dos dois faz sentido isoladamente: excluído o projeto, seus artefatos perdem o objeto que documentam, e excluído o artefato, seus campos perdem a estrutura que os define.
+&emsp; A distinção entre agregação e composição é intencional. O Portfólio agrega Projetos porque um projeto mantém identidade própria e pode ser reagrupado em outro exercício sem deixar de existir. Já o Artefato compõe o Projeto, o CampoArtefato compõe o Artefato e a Pendência é composta pelo Projeto, porque nenhum dos três faz sentido isoladamente: excluído o projeto, seus artefatos perdem o objeto que documentam e suas pendências perdem o objeto a que se referem.
 
-&emsp; A associação `acompanha`, com cardinalidade de muitos para muitos entre Usuário e Projeto, é o que viabiliza a personalização da notificação prevista no RF07. É por meio dela que o sistema determina quais pendências interessam a cada usuário, sem exigir uma configuração paralela de assinatura.
+&emsp; Os papéis do usuário são modelados por herança e não por um atributo de tipo. A razão é que cada perfil possui alcance de acesso distinto, e alcance de acesso é uma relação, não uma propriedade. É por isso que a distinção entre os três aparece nas associações e não em atributos: `Diretor` e `PMO` se ligam ao `Portfólio`, o que expressa alcance sobre o conjunto consolidado, enquanto `LiderProjeto` se liga diretamente a `Projeto`, o que restringe seu alcance aos empreendimentos sob sua responsabilidade. A granularidade da associação é a granularidade do acesso.
+
+&emsp; A cardinalidade de `lidera`, de 1 para 1..*, reforça essa leitura. O `1` do lado do líder estabelece que cada projeto possui um único responsável, e é essa unicidade que delimita o conjunto ao qual o perfil tem acesso privilegiado e permissão de alteração, prevista no RF06.
+
+&emsp; A associação `acompanha`, com cardinalidade de muitos para muitos entre Usuário e Projeto, é o que viabiliza a personalização da notificação prevista no RF05. Ela é deliberadamente distinta de `lidera`: acompanhar exprime interesse e define quem recebe notificação, ao passo que liderar exprime responsabilidade formal e define quem pode alterar. Um líder normalmente acompanha os projetos que lidera, mas as duas relações respondem a perguntas diferentes e por isso coexistem no modelo.
 
 &emsp; A modelagem declara apenas classes e atributos, sem operações, por representar a estrutura de dados do domínio de portfólio. O comportamento do agente está representado na modelagem dinâmica desta seção e nos componentes da solução técnica descritos na seção 2.4.
 
 ### 2.2.2. Modelagem dinâmica: cenários e diagramas de sequência
 
-&emsp; A modelagem dinâmica descreve como as classes declaradas na modelagem estática são percorridas durante a execução das solicitações previstas nos requisitos funcionais. Foram definidos três cenários que, em conjunto, cobrem os sete requisitos. Os dois primeiros são iniciados pelo usuário em linguagem natural e compartilham a mesma cadeia de tratamento da entrada, enquanto o terceiro é iniciado pelo próprio sistema, sem interação conversacional.
+&emsp; A modelagem dinâmica descreve como as classes declaradas na modelagem estática são percorridas durante a execução das solicitações previstas nos requisitos funcionais. Foram definidos três cenários. Os dois primeiros são iniciados pelo usuário em linguagem natural e compartilham a mesma cadeia de tratamento da entrada, enquanto o terceiro é iniciado pelo próprio sistema, sem interação conversacional.
 
 | Cenário | Descrição | Iniciador | RFs cobertos |
 |---|---|---|---|
-| Cenário 1 | Consultar informações do projeto | Usuário | RF01, RF02, RF03, RF04, RF05 |
-| Cenário 2 | Sugerir preenchimento de documento | Usuário | RF01, RF02, RF06 |
-| Cenário 3 | Notificar pendências | Agendador (sistema) | RF07 |
+| Cenário 1 | Consultar informações do projeto | Usuário | RF01, RF02, RF03 |
+| Cenário 2 | Sugerir preenchimento de documento | Usuário | RF04 |
+| Cenário 3 | Notificar pendências | Agendador (sistema) | RF05 |
+
+&emsp; Os três cenários representam o fluxo principal de cada requisito, sem o tratamento de exceções, que fica previsto para a sprint seguinte. O RF06, de prioridade baixa e viabilidade ainda em avaliação, não recebeu cenário nesta sprint, conforme registrado na seção 2.2.3.
 
 #### Linhas de vida adotadas
 
@@ -788,9 +803,11 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 | Linha de vida | Papel nos cenários | Correspondência no modelo estático |
 |---|---|---|
-| Usuário | Ator que inicia a interação nos cenários 1 e 2 e recebe a notificação no cenário 3 | Classe `Usuário` |
+| Usuário | Ator que inicia a interação nos cenários 1 e 2 e recebe a notificação no cenário 3 | Classe `Usuário` e suas especializações |
 | `: InterfaceDeChat` | Canal de entrada e saída das solicitações em linguagem natural | Componente de interface (seção 2.4) |
-| `: PipelinePLN` | Classifica a intenção e extrai as entidades da solicitação | Componente de lógica de negócio (seção 2.4) |
+| `: ServicoDeVoz` | Converte áudio em texto na entrada e texto em áudio na saída (exclusivo do cenário 1) | Componente de serviços (seção 2.4) |
+| `: PipelinePLN` | Conduz o tratamento da solicitação, extrai as entidades do texto e aciona os demais componentes | Componente de lógica de negócio (seção 2.4) |
+| `: Intencao` | Detém o catálogo de intenções e classifica o texto contra ele, devolvendo a intenção reconhecida e os parâmetros que ela exige | Componente de lógica de negócio (seção 2.4) |
 | `: Agente` | Orquestra a execução da intenção, consulta as fontes e compõe a resposta | Componente de lógica de negócio (seção 2.4) |
 | `: FonteDeDados` | Encapsula o acesso às entidades persistidas do domínio | `Portfólio`, `Projeto`, `Artefato`, `CampoArtefato`, `Pendência`, `Usuário` |
 | `: ServicoDeNotificacao` | Entrega a notificação ao usuário pelo canal corporativo (exclusivo do cenário 3) | Componente de serviços (seção 2.4) |
@@ -798,7 +815,7 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 &emsp; As linhas de vida de componente adotam a sintaxe UML de instância anônima, no formato `: Classe`, enquanto o Usuário é identificado pelo nome do papel, por ser um ator e não uma instância de componente.
 
-**Nota:** apenas a linha de vida Usuário e a linha de vida `: FonteDeDados` possuem contrapartida direta na modelagem estática. As demais representam componentes da solução técnica, e não entidades do domínio, coerentemente com a decisão de declarar o diagrama de classes sem operações.
+**Nota:** apenas a linha de vida Usuário e a linha de vida `: FonteDeDados` possuem contrapartida direta na modelagem estática. As demais representam componentes da solução técnica, e não entidades do domínio. Isso vale inclusive para o `: Intencao`: intenção é conceito da camada de processamento de linguagem natural, que existiria de forma diferente se a interface não fosse conversacional, ao contrário de Projeto ou Artefato, que existem na gestão de portfólio independentemente da solução adotada. A separação entre os dois planos é deliberada e está detalhada na seção 2.4.
 
 #### Convenções de notação adotadas
 
@@ -820,7 +837,7 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 <div align="center">
   <sub>FIGURA 2.2: diagrama de sequência do cenário 1 (consultar informações do projeto)</sub><br>
-  <img src="../assets/diagrama-de-sequencia-cenario-1.drawio.svg" width="100%" alt="Diagrama de sequência do cenário de consulta de informações do projeto"><br>
+  <img src="../assets/sequencia-1.svg" width="100%" alt="Diagrama de sequência do cenário de consulta de informações do projeto"><br>
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
@@ -828,28 +845,41 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 | # | Mensagem | Tipo | Origem | Destino | Requisito |
 |---|---|---|---|---|---|
-| 1 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
-| 2 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF01 |
-| 3 | `classificarIntencao(texto)` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | RF02 |
-| 4 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF03 |
-| 5 | `buscarDados(projeto, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF03 |
-| 6 | `dados, caminhoSharePoint, dataUltimaAtualizacao` | Retorno | `: FonteDeDados` | `: Agente` | RF03, RF04 |
-| 7 | `exibirResposta(resposta, referencia, data)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF04 |
-| 8 | `resposta, referência, data` | Retorno | `: InterfaceDeChat` | Usuário | RF04 |
+| 1 | `enviarAudio(audio)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
+| 2 | `transcrever(audio)` | Síncrona | `: InterfaceDeChat` | `: ServicoDeVoz` | RF01 |
+| 3 | `textoTranscrito` | Retorno | `: ServicoDeVoz` | `: InterfaceDeChat` | RF01 |
+| 4 | `textoTranscrito` | Retorno | `: InterfaceDeChat` | Usuário | RF01 |
+| 5 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
+| 6 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF02 |
+| 7 | `classificarIntencao(texto)` | Síncrona | `: PipelinePLN` | `: Intencao` | RF02 |
+| 8 | `intencaoIdentificada, parametrosObrigatorios` | Retorno | `: Intencao` | `: PipelinePLN` | RF02 |
+| 9 | `extrairEntidades(texto, parametrosObrigatorios)` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | RF02 |
+| 10 | `log()` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | Rastreabilidade |
+| 11 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF02 |
+| 12 | `buscarDados(projeto, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF02 |
+| 13 | `dados, caminho` | Retorno | `: FonteDeDados` | `: Agente` | RF02, RF03 |
+| 14 | `exibirResposta(resposta, referencia, data)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
+| 15 | `sintetizar(resposta)` | Síncrona | `: InterfaceDeChat` | `: ServicoDeVoz` | RF01 |
+| 16 | `audioResposta` | Retorno | `: ServicoDeVoz` | `: InterfaceDeChat` | RF01 |
+| 17 | `audioResposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF01, RF03 |
+| 18 | `resposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF01, RF03 |
 
 **Fragmentos de interação:**
 
 | Fragmento | Condição de guarda | Comportamento | Requisito |
 |---|---|---|---|
-| `alt` | `[intenção fora do catálogo]` | O `: PipelinePLN` devolve `intencaoNaoCatalogada, perguntasSugeridas` e a `: InterfaceDeChat` devolve `limitacaoDeEscopo, perguntasSugeridas` ao usuário, encerrando a interação sem qualquer mensagem dirigida à `: FonteDeDados` | RF02 |
-| `alt` | `[intenção reconhecida]` | A execução prossegue para a resolução dos parâmetros e para a consulta às fontes | RF03 |
-| `loop` | `[enquanto faltar parâmetros]` | Ciclo formado pelo retorno `parametroFaltante`, propagado do `: PipelinePLN` à `: InterfaceDeChat` e desta ao usuário, seguido das chamadas `informarDado(valor)` e `complementarSolicitacao(idSolicitacao, valor)`, repetido até que a solicitação esteja completa | RF05 |
+| `alt` de entrada | `[canal de entrada em áudio]` | Passos 1 a 4: a solicitação chega em áudio, o `: ServicoDeVoz` a transcreve e a transcrição é devolvida ao usuário para conferência | RF01 |
+| `alt` de entrada | `[canal de entrada em texto]` | Passo 5: a solicitação já chega em texto e segue direto para o tratamento | RF01 |
+| `alt` de saída | `[canal de entrada em áudio]` | Passos 15 a 17: a resposta é sintetizada em áudio antes de ser devolvida | RF01, RF03 |
+| `alt` de saída | `[canal de entrada em texto]` | Passo 18: a resposta é devolvida em texto | RF01, RF03 |
 
-&emsp; A ordem das mensagens materializa uma restrição do RF02: a classificação da intenção (passo 3) precede o acesso à `: FonteDeDados` (passo 5). Solicitações fora do catálogo de intenções são interrompidas no ramo correspondente do fragmento `alt`, antes de qualquer consulta, o que impede que o agente exponha dados do portfólio em resposta a pedidos alheios ao domínio.
+&emsp; Os dois fragmentos `alt` usam deliberadamente a mesma condição de guarda. Não se trata de repetição acidental: é essa coincidência que expressa graficamente a exigência do RF01 de que o canal da resposta corresponda ao canal da solicitação. Se o fragmento de saída tivesse guarda própria, como uma preferência declarada pelo usuário, o critério de aceitação estaria violado, porque a resposta poderia divergir do canal de entrada.
 
-&emsp; O ciclo de esclarecimento é modelado como `loop` e não como uma única troca de mensagens. Essa escolha atende ao RF05 em dois pontos. O primeiro é a repetição enquanto houver parâmetro faltante, que trata solicitações com mais de uma lacuna. O segundo é a mensagem `complementarSolicitacao(idSolicitacao, valor)`, que devolve ao `: PipelinePLN` apenas o valor informado e o identificador da solicitação em curso, preservando as entidades já reconhecidas e dispensando a reformulação integral do pedido.
+&emsp; O passo 4 devolve a transcrição ao próprio usuário antes de a solicitação seguir para o tratamento. Esse retorno atende à cláusula de conferência do RF01 e é o que permite ao usuário perceber um erro de transcrição antes de receber uma resposta construída sobre a interpretação errada.
 
-&emsp; O passo 6 devolve, além dos dados do projeto, o `caminhoSharePoint` e a `dataUltimaAtualizacao` do artefato de origem. Esse retorno conjunto é o que permite ao passo 8 devolver `resposta`, `referência` e `data` em uma única exibição, atendendo ao RF04 sem uma consulta adicional às fontes.
+&emsp; A classificação da intenção não é uma operação interna do `: PipelinePLN`, e sim uma chamada ao `: Intencao`, que detém o catálogo. A escolha segue o princípio de atribuir a responsabilidade a quem possui a informação necessária para cumpri-la: só quem conhece as intenções catalogadas consegue dizer a qual delas o texto corresponde. O retorno do passo 8 traz duas informações, a intenção reconhecida e os parâmetros que ela exige, e é o segundo deles que orienta a extração de entidades do passo 9.
+
+&emsp; O passo 13 devolve, além dos dados do projeto, o caminho do artefato de origem. Esse retorno conjunto é o que permite aos passos 17 e 18 entregarem conteúdo, referência e data em uma única exibição, atendendo ao RF03 sem uma consulta adicional às fontes.
 
 #### Cenário 2: sugerir preenchimento de documento
 
@@ -857,7 +887,7 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 <div align="center">
   <sub>FIGURA 2.3: diagrama de sequência do cenário 2 (sugerir preenchimento de documento)</sub><br>
-  <img src="../assets/diagrama-de-sequencia-cenario-2-drawio.svg" width="100%" alt="Diagrama de sequência do cenário de sugestão de preenchimento de documento"><br>
+  <img src="../assets/sequencia-2.svg" width="100%" alt="Diagrama de sequência do cenário de sugestão de preenchimento de documento"><br>
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
@@ -865,27 +895,35 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 | # | Mensagem | Tipo | Origem | Destino | Requisito |
 |---|---|---|---|---|---|
-| 1 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
-| 2 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF01 |
-| 3 | `classificarIntencao(texto)` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | RF02 |
-| 4 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF06 |
-| 5 | `obterCamposPendentes(artefato, projeto, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF06 |
-| 6 | `camposPendentes, contextoDoProjeto` | Retorno | `: FonteDeDados` | `: Agente` | RF06 |
-| 7 | `gerarSugestao(campo, contextoDoProjeto)` | Síncrona | `: Agente` | `: Agente` | RF06 |
-| 8 | `enviarSugestoes(sugestoesPorCampo)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF06 |
-| 9 | `sugestoes` | Retorno | `: InterfaceDeChat` | Usuário | RF06 |
+| 1 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF04 |
+| 2 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF04 |
+| 3 | `classificarIntencao(texto)` | Síncrona | `: PipelinePLN` | `: Intencao` | RF04 |
+| 4 | `intencaoIdentificada, parametrosObrigatorios` | Retorno | `: Intencao` | `: PipelinePLN` | RF04 |
+| 5 | `extrairEntidades(texto, parametrosObrigatorios)` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | RF04 |
+| 6 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF04 |
+| 7 | `obterCamposPendentes(artefato, projeto, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF04 |
+| 8 | `camposPendentes, contextoDoProjeto` | Retorno | `: FonteDeDados` | `: Agente` | RF04 |
+| 9 | `gerarSugestao(campo, contextoDoProjeto)` | Síncrona | `: Agente` | `: Agente` | RF04 |
+| 10 | `enviarSugestoes(sugestoesPorCampo)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF04 |
+| 11 | `sugestoes` | Retorno | `: InterfaceDeChat` | Usuário | RF04 |
+| 12 | `informarArtefatoCompleto()` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF04 |
+| 13 | `artefatoCompleto` | Retorno | `: InterfaceDeChat` | Usuário | RF04 |
 
 **Fragmentos de interação:**
 
 | Fragmento | Condição de guarda | Comportamento | Requisito |
 |---|---|---|---|
-| `alt` | `[há campos pendentes]` | O `: Agente` gera as sugestões e a `: InterfaceDeChat` as devolve individualmente ao usuário | RF06 |
-| `alt` | `[nenhum campo pendente]` | O `: Agente` emite `informarArtefatoCompleto()` e a `: InterfaceDeChat` devolve `artefatoCompleto` ao usuário, sem gerar sugestões | RF06 |
-| `loop` | `[para cada campo pendente]` | A sugestão é gerada campo a campo, o que garante a granularidade exigida pelo critério de aceitação do RF06 | RF06 |
+| `alt` | `[há campos pendentes]` | Passos 9 a 11: o `: Agente` gera as sugestões e a `: InterfaceDeChat` as devolve ao usuário | RF04 |
+| `alt` | `[nenhum campo pendente]` | Passos 12 e 13: o `: Agente` emite `informarArtefatoCompleto()` e a `: InterfaceDeChat` devolve `artefatoCompleto`, sem gerar sugestões | RF04 |
+| `loop` | `[para cada campo pendente]` | Passo 9: a sugestão é gerada campo a campo, o que garante a granularidade exigida pelo critério de aceitação do RF04 | RF04 |
 
-&emsp; A mensagem `obterCamposPendentes` do passo 5 é a tradução direta da combinação dos atributos `obrigatorio` e `preenchido` da classe `CampoArtefato`, descrita na modelagem estática. É essa combinação que define o conjunto sobre o qual o fragmento `loop` itera.
+&emsp; Os passos 1 a 6 reproduzem literalmente a cadeia de tratamento de entrada do cenário 1, incluindo a consulta ao catálogo de intenções e a extração de entidades orientada pelos parâmetros obrigatórios. Essa repetição é intencional e demonstra que o mesmo mecanismo de interpretação serve a requisitos distintos: o que muda é apenas a intenção reconhecida e, por consequência, a ação executada pelo `: Agente` a partir do passo 7.
 
-&emsp; O `: Agente` devolve as sugestões ao usuário pela `: InterfaceDeChat` e não emite qualquer mensagem de escrita à `: FonteDeDados`. Essa ausência é deliberada e representa graficamente a restrição do RF06 de não alterar o documento de origem, mantendo com o usuário a decisão sobre o que é efetivamente gravado.
+&emsp; O `loop` envolve somente a geração da sugestão, e não o envio. A distinção importa: as sugestões são produzidas campo a campo, atendendo à granularidade exigida pelo RF04, mas entregues em uma única mensagem ao final, o que evita fragmentar a conversa em uma mensagem por campo.
+
+&emsp; A mensagem `obterCamposPendentes` do passo 7 é a tradução direta da combinação dos atributos `obrigatorio` e `preenchido` da classe `CampoArtefato`, descrita na modelagem estática. É essa combinação que define o conjunto sobre o qual o fragmento `loop` itera.
+
+&emsp; O `: Agente` devolve as sugestões ao usuário pela `: InterfaceDeChat` e não emite qualquer mensagem de escrita à `: FonteDeDados`. Essa ausência é deliberada e representa graficamente a restrição do RF04 de não alterar o documento de origem, mantendo com o usuário a decisão sobre o que é efetivamente gravado. É também o que distingue este cenário do RF06, em que a escrita é o objetivo e por isso exige confirmação explícita.
 
 #### Cenário 3: notificar pendências
 
@@ -893,7 +931,7 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 <div align="center">
   <sub>FIGURA 2.4: diagrama de sequência do cenário 3 (notificar pendências)</sub><br>
-  <img src="../assets/diagrama-de-sequencia-cenario-3.drawio.svg" width="100%" alt="Diagrama de sequência do cenário de notificação proativa de pendências"><br>
+  <img src="../assets/sequencia-3.svg" width="100%" alt="Diagrama de sequência do cenário de notificação proativa de pendências"><br>
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
@@ -901,25 +939,25 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 | # | Mensagem | Tipo | Origem | Destino | Requisito |
 |---|---|---|---|---|---|
-| 1 | `executarVerificacaoPeriodica()` | Assíncrona | `: Agendador` | `: Agente` | RF07 |
-| 2 | `consultarProjetos(prazos, campos, situacoes)` | Síncrona | `: Agente` | `: FonteDeDados` | RF07 |
-| 3 | `projetos, artefatos` | Retorno | `: FonteDeDados` | `: Agente` | RF07 |
-| 4 | `identificarPendencias(projetos)` | Síncrona | `: Agente` | `: Agente` | RF07 |
-| 5 | `obterUsuariosQueAcompanham(projeto)` | Síncrona | `: Agente` | `: FonteDeDados` | RF07 |
-| 6 | `usuariosDestino` | Retorno | `: FonteDeDados` | `: Agente` | RF07 |
-| 7 | `enviarNotificacao(pendencia, usuariosDestino)` | Síncrona | `: Agente` | `: ServicoDeNotificacao` | RF07 |
-| 8 | `notificar(projeto, pendencia)` | Assíncrona | `: ServicoDeNotificacao` | Usuário | RF07 |
+| 1 | `executarVerificacaoPeriodica()` | Assíncrona | `: Agendador` | `: Agente` | RF05 |
+| 2 | `consultarProjetos(prazos, campos, situacoes)` | Síncrona | `: Agente` | `: FonteDeDados` | RF05 |
+| 3 | `projetos, artefatos` | Retorno | `: FonteDeDados` | `: Agente` | RF05 |
+| 4 | `identificarPendencias(projetos)` | Síncrona | `: Agente` | `: Agente` | RF05 |
+| 5 | `obterUsuariosQueAcompanham(projeto)` | Síncrona | `: Agente` | `: FonteDeDados` | RF05 |
+| 6 | `usuariosDestino` | Retorno | `: FonteDeDados` | `: Agente` | RF05 |
+| 7 | `enviarNotificacao(pendencia, usuariosDestino)` | Síncrona | `: Agente` | `: ServicoDeNotificacao` | RF05 |
+| 8 | `notificar(projeto, pendencia)` | Assíncrona | `: ServicoDeNotificacao` | Usuário | RF05 |
 
 **Fragmentos de interação:**
 
 | Fragmento | Condição de guarda | Comportamento | Requisito |
 |---|---|---|---|
-| `opt` | `[há pendências identificadas]` | Quando a verificação não encontra pendências, a sequência se encerra sem notificação, o que evita comunicação desnecessária ao usuário | RF07 |
-| `loop` | `[para cada pendência identificada]` | O destinatário é resolvido por pendência, de modo que cada usuário receba apenas o que se refere aos projetos que acompanha | RF07 |
+| `opt` | `[há pendências identificadas]` | Quando a verificação não encontra pendências, a sequência se encerra sem notificação, o que evita comunicação desnecessária ao usuário | RF05 |
+| `loop` | `[para cada pendência identificada]` | O destinatário é resolvido por pendência, de modo que cada usuário receba apenas o que se refere aos projetos que acompanha | RF05 |
 
 &emsp; A mensagem `obterUsuariosQueAcompanham` do passo 5 percorre a associação `acompanha` entre `Usuário` e `Projeto`, de cardinalidade muitos para muitos. É esse relacionamento que dispensa uma configuração paralela de assinatura de notificações, conforme observado na modelagem estática.
 
-&emsp; A ausência da `: InterfaceDeChat` e do `: PipelinePLN` entre as linhas de vida é o traço que distingue este cenário dos demais. Ela expressa graficamente o critério de aceitação do RF07, segundo o qual a notificação ocorre sem exigir uma solicitação prévia do usuário.
+&emsp; A ausência da `: InterfaceDeChat` e do `: PipelinePLN` entre as linhas de vida é o traço que distingue este cenário dos demais. Ela expressa graficamente o critério de aceitação do RF05, segundo o qual a notificação ocorre sem exigir uma solicitação prévia do usuário.
 
 &emsp; É também o único cenário em que uma mensagem assíncrona chega ao ator. O disparo do `: Agendador` e a entrega pelo `: ServicoDeNotificacao` não bloqueiam o remetente à espera de resposta, ao contrário das consultas à `: FonteDeDados`, que são síncronas porque o `: Agente` depende do resultado para prosseguir. A notação evita a leitura equivocada de que a notificação seria o retorno de alguma solicitação do usuário, que neste cenário não existe.
 
@@ -929,35 +967,48 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 **Requisitos, cenários e classes:**
 
-| RF | Cenário | Classes envolvidas | Atributos e relacionamentos determinantes | Mensagem que evidencia o atendimento |
-|---|---|---|---|---|
-| RF01: Receber solicitações por áudio e responder no canal de origem | Cenário 1 | `Usuário` | `id`, `perfil` | `enviarAudio(audio)`, `transcrever(audio)`, retorno `textoTranscrito`, `sintetizar(resposta)` e retorno `audioResposta`, nos dois fragmentos `alt` de canal |
-| RF02: Identificar e classificar intenções | Cenários 1 e 2 | Nenhuma classe de domínio | Não se aplica | `classificarIntencao(texto)`, anterior a qualquer acesso à `: FonteDeDados`, e o retorno `limitacaoDeEscopo, perguntasSugeridas` no ramo de intenção não catalogada |
-| RF03: Consultar dados de projetos | Cenário 1 | `Projeto` | `codigo`, `status`, `percentualAvanco`, `dataTerminoPrevista` | `executarIntencao(intencao, entidades, idUsuario)` e `buscarDados(projeto, idUsuario)` |
-| RF04: Apresentar a fonte da informação | Cenário 1 | `Artefato`, `Projeto` | `caminhoSharePoint`, `dataUltimaAtualizacao`, relacionamento `compõe` | Retorno `dados, caminhoSharePoint, dataUltimaAtualizacao`, chamada `exibirResposta(resposta, referencia, data)` e retorno `resposta, referência, data` |
-| RF05: Solicitar esclarecimento em casos ambíguos | Cenário 1 | `Projeto` | `codigo`, `nome` | Retorno `parametroFaltante` e chamada `complementarSolicitacao(idSolicitacao, valor)`, no fragmento `loop` |
-| RF06: Sugerir o preenchimento de documentos | Cenário 2 | `Artefato`, `CampoArtefato`, `Projeto` | `obrigatorio`, `preenchido`, `nome`, `valor`, relacionamento `compõe` | `obterCamposPendentes(artefato, projeto, idUsuario)`, `gerarSugestao(campo, contextoDoProjeto)` e `enviarSugestoes(sugestoesPorCampo)` |
-| RF07: Notificar proativamente o usuário de pendências | Cenário 3 | `Portfólio`, `Projeto`, `Artefato`, `CampoArtefato`, `Pendência`, `Usuário` | `prazo`, `situacao`, `preenchido`, `email`, relacionamentos `contém`, `origina`, `acompanha` e `notifica` | `consultarProjetos(prazos, campos, situacoes)`, `identificarPendencias(projetos)`, `obterUsuariosQueAcompanham(projeto)` e `enviarNotificacao(pendencia, usuariosDestino)` |
+| RF | Persona da história | Cenário | Classes envolvidas | Atributos e relacionamentos determinantes | Mensagem que evidencia o atendimento |
+|---|---|---|---|---|---|
+| RF01: Receber solicitações por áudio e responder no canal de origem | Usuário do portfólio | Cenário 1 | `Usuário` | `id` | `enviarAudio(audio)`, `transcrever(audio)`, retorno `textoTranscrito`, `sintetizar(resposta)` e retorno `audioResposta`, nos dois fragmentos `alt` de canal |
+| RF02: Consultar dados de projetos | PMO | Cenário 1 | `PMO`, `Portfólio`, `Projeto` | `codigo`, `status`, `percentualAvanco`, `dataTerminoPrevista`, relacionamento `administra` | `classificarIntencao(texto)`, `extrairEntidades(texto, parametrosObrigatorios)`, `executarIntencao(intencao, entidades, idUsuario)` e `buscarDados(projeto, idUsuario)` |
+| RF03: Apresentar a fonte da informação | Diretor | Cenário 1 | `Diretor`, `Artefato`, `Projeto` | `referencia`, `data`, relacionamentos `compõe` e `supervisiona` | Retorno `dados, caminho`, chamada `exibirResposta(resposta, referencia, data)` e retornos `audioResposta, referencia, data` e `resposta, referencia, data` |
+| RF04: Sugerir o preenchimento de documentos | Líder de projeto | Cenário 2 | `LiderProjeto`, `Artefato`, `CampoArtefato`, `Projeto` | `obrigatorio`, `preenchido`, `nome`, `valor`, relacionamentos `compõe` e `lidera` | `obterCamposPendentes(artefato, projeto, idUsuario)`, `gerarSugestao(campo, contextoDoProjeto)` e `enviarSugestoes(sugestoesPorCampo)` |
+| RF05: Notificar proativamente o usuário de pendências | Usuário do portfólio | Cenário 3 | `Portfólio`, `Projeto`, `Artefato`, `CampoArtefato`, `Pendência`, `Usuário` | `prazo`, `situacao`, `preenchido`, `email`, relacionamentos `contém`, `origina`, `acompanha` e `notifica` | `consultarProjetos(prazos, campos, situacoes)`, `identificarPendencias(projetos)`, `obterUsuariosQueAcompanham(projeto)` e `enviarNotificacao(pendencia, usuariosDestino)` |
+| RF06: Atualizar o cadastro de projetos a partir de instruções do usuário | Líder de projeto | Não modelado nesta sprint | `LiderProjeto`, `Projeto` | Relacionamento `lidera`, que delimita os projetos passíveis de alteração | Sem cenário, conforme justificado adiante |
+
+&emsp; A coluna de persona evidencia a amarração direta entre as histórias de usuário e a modelagem estática. As três personas que aparecem nas histórias correspondem às três especializações de `Usuário`, de modo que cada requisito escrito na voz de um papel específico tem, no modelo, a classe correspondente entre as classes envolvidas.
 
 **Cobertura das classes pelos cenários:**
 
 | Classe | Cenário 1 | Cenário 2 | Cenário 3 | RFs atendidos |
 |---|---|---|---|---|
-| `Portfólio` | Não | Não | Sim | RF07 |
-| `Projeto` | Sim | Sim | Sim | RF03, RF04, RF05, RF06, RF07 |
-| `Usuário` | Sim | Sim | Sim | RF01, RF03, RF07 |
-| `Perfil` | Sim | Sim | Sim | RF03, RF07 |
-| `Pendência` | Não | Não | Sim | RF07 |
-| `Artefato` | Sim | Sim | Sim | RF04, RF06, RF07 |
-| `CampoArtefato` | Não | Sim | Sim | RF06, RF07 |
+| `Portfólio` | Sim | Não | Sim | RF02, RF05 |
+| `Projeto` | Sim | Sim | Sim | RF02, RF03, RF04, RF05, RF06 |
+| `Usuário` | Sim | Sim | Sim | RF01, RF05 |
+| `Diretor` | Sim | Não | Não | RF03 |
+| `PMO` | Sim | Não | Não | RF02 |
+| `LiderProjeto` | Não | Sim | Não | RF04, RF06 |
+| `Pendência` | Não | Não | Sim | RF05 |
+| `Artefato` | Sim | Sim | Sim | RF03, RF04, RF05 |
+| `CampoArtefato` | Não | Sim | Sim | RF04, RF05 |
 
-&emsp; A verificação de cobertura confirma a coerência entre as três representações. Todos os sete requisitos funcionais aparecem em ao menos um cenário e todas as sete classes do modelo estático são exercitadas por ao menos um cenário, o que indica que não há classe declarada sem uso previsto nem requisito sem representação dinâmica.
+&emsp; A verificação de cobertura confirma a coerência entre as três representações. Cinco dos seis requisitos funcionais aparecem em ao menos um cenário, e todas as nove classes do modelo estático são exercitadas por ao menos um cenário, o que indica que não há classe declarada sem uso previsto.
 
-&emsp; A classe `Projeto` figura nos três cenários e concentra o maior número de requisitos, o que a confirma como entidade central do domínio, conforme antecipado na modelagem estática. Nas extremidades, `Portfólio` é acionada apenas no cenário 3, por delimitar o conjunto de projetos percorrido pela mensagem `consultarProjetos`, e `Pendência` também se restringe ao cenário 3, por ser a entidade produzida pela verificação periódica. A classe `Perfil` aparece de forma indireta nos três cenários, por ser a enumeração que tipifica o atributo `perfil` da classe `Usuário`.
+&emsp; A classe `Projeto` figura nos três cenários e concentra o maior número de requisitos, o que a confirma como entidade central do domínio, conforme antecipado na modelagem estática. Nas extremidades, `Pendência` se restringe ao cenário 3, por ser a entidade produzida pela verificação periódica, e `CampoArtefato` só aparece a partir do cenário 2, por ser a granularidade exigida exclusivamente pela sugestão de preenchimento.
 
-&emsp; As classes `Artefato` e `CampoArtefato` participam de mais de um cenário por cumprirem papéis distintos em cada um. No cenário 1, o `Artefato` fornece os metadados de origem exigidos pelo RF04. No cenário 2, a dupla sustenta a identificação dos campos pendentes exigida pelo RF06. No cenário 3, ambas são percorridas pelo critério `campos` da mensagem `consultarProjetos`, que permite classificar como pendência um artefato com campos obrigatórios ainda não preenchidos.
+&emsp; As especializações de `Usuário` distribuem-se conforme o perfil de cada história. `Diretor` e `PMO` aparecem no cenário 1 porque as histórias do RF02 e do RF03 são escritas nas suas vozes, e `LiderProjeto` aparece no cenário 2 pelo mesmo motivo em relação ao RF04. A superclasse `Usuário` figura nos três cenários por concentrar os atributos e as relações que independem de papel.
 
-&emsp; O RF02 é o único requisito sem classe de domínio associada, por operar sobre o texto da solicitação antes de qualquer acesso às fontes. Essa ausência é consistente com o posicionamento da mensagem `classificarIntencao` nos diagramas dos cenários 1 e 2, sempre anterior à primeira mensagem dirigida à `: FonteDeDados`.
+&emsp; As classes `Artefato` e `CampoArtefato` participam de mais de um cenário por cumprirem papéis distintos em cada um. No cenário 1, o `Artefato` fornece os metadados de origem exigidos pelo RF03. No cenário 2, a dupla sustenta a identificação dos campos pendentes exigida pelo RF04. No cenário 3, ambas são percorridas pelo critério `campos` da mensagem `consultarProjetos`, que permite classificar como pendência um artefato com campos obrigatórios ainda não preenchidos.
+
+**Delimitações desta sprint:**
+
+&emsp; Duas lacunas são registradas de forma explícita, por decisão do grupo e não por omissão.
+
+&emsp; O **RF06 não recebeu diagrama de sequência**. Ele é o único requisito de prioridade baixa e o único cuja viabilidade técnica ainda está em avaliação, além de ser o único que grava dados nas fontes, enquanto os três cenários modelados são de leitura. Modelá-lo exigiria representar um fluxo de escrita com confirmação explícita, o que se optou por postergar para quando a viabilidade estiver confirmada. As classes que ele exercitaria já estão declaradas, de modo que o modelo estático o comporta sem alteração.
+
+&emsp; Os **cenários representam apenas o fluxo principal**. A cláusula do RF02 que determina informar a limitação ao usuário quando a solicitação não corresponder a nenhuma consulta prevista não está representada graficamente, assim como não estão os tratamentos de falha de transcrição ou de indisponibilidade das fontes. A opção por diagramas de caminho feliz privilegia a legibilidade nesta primeira especificação, e os desvios entram na sprint seguinte.
+
+&emsp; Registra-se ainda que a automensagem `log()` do cenário 1 não decorre de nenhum requisito funcional. Ela sustenta a rastreabilidade das interpretações feitas pelo agente, que é atributo de qualidade e será formalizada como requisito não funcional de auditabilidade na seção 2.3.
 
 
 ---
