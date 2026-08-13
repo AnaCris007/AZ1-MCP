@@ -204,7 +204,7 @@
 
 <div align="center">
 <sub>Imagem 1.5 - Persona 1: Robson Oliveira — Diretor</sub><br>
-  <img src="../assets/Persona-diretor.png" width="100%" alt="Persona 1: Robson Oliveira — Diretor"><br>
+  <img src="../assets/design/Persona-diretor.png" width="100%" alt="Persona 1: Robson Oliveira — Diretor"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -240,7 +240,7 @@ A persona de Robson representa o **Diretor**, que utiliza o agente para obter um
 
 <div align="center">
 <sub>Imagem 1.5.1 - Jornada do Usuário — Robson Oliveira - Diretor</sub><br>
-  <img src="../assets/Jornada-diretor.png" width="100%" alt="Jornada do Usuário — Robson Oliveira, Diretor"><br>
+  <img src="../assets/design/Jornada-diretor.png" width="100%" alt="Jornada do Usuário — Robson Oliveira, Diretor"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -275,11 +275,85 @@ A experiência de Robson evolui de forma crescente ao longo da jornada: parte de
 
 ---
 
+### Persona 2: Maria Eduarda Santos — Analista de PMO
+
+<div align="center">
+<sub>Imagem 1.5.2 - Persona 2: Maria Eduarda Santos — Analista de PMO</sub><br>
+  <img src="../assets/design/Persona-pmo.png" width="100%" alt="Persona 2: Maria Eduarda Santos — Analista de PMO"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+### Caracterização
+
+Maria Eduarda Santos é analista do PMO Corporativo do Metrô e atua diretamente na gestão do portfólio de projetos, sendo responsável por manter os dados atualizados, cobrar os responsáveis por pendências de preenchimento e consolidar informações para relatórios e apresentações destinadas à diretoria. Diferentemente de uma visão puramente estratégica, seu trabalho está concentrado na operação diária da governança do portfólio, servindo como elo entre os líderes de projeto e os níveis mais altos da organização.
+
+Sua rotina envolve acompanhar o cumprimento dos prazos mensais de atualização de status, verificar a qualidade dos dados registrados pelas equipes de projeto e apoiar a elaboração de relatórios consolidados. Nesse contexto, ter acesso rápido a informações atualizadas e confiáveis é essencial para que consiga cumprir suas próprias entregas sem depender inteiramente da boa vontade e da disponibilidade dos responsáveis por cada projeto.
+
+### Dores
+
+Uma das principais dificuldades de Maria Eduarda é a necessidade de cobrar manualmente, um a um, os responsáveis por atualizações pendentes, especialmente próximo ao prazo mensal de registro de status. Essa cobrança repetitiva consome tempo que poderia ser dedicado a atividades de maior valor analítico.
+
+Outra dificuldade está na consolidação de dados espalhados entre diferentes sistemas e documentos, como listas do SharePoint, planilhas de Excel e arquivos de Word, processo necessário para a elaboração de relatórios de status e apresentações mensais. A ausência de um mecanismo proativo que sinalize riscos, marcos e pendências antes que se tornem problemas também obriga Maria Eduarda a atuar de forma reativa, identificando falhas apenas quando já se tornaram visíveis.
+
+### Interesses no Sistema
+
+Maria Eduarda tem interesse em consultar e comparar projetos do portfólio sem precisar navegar manualmente pelas listas do SharePoint, obtendo respostas rápidas e organizadas conforme sua necessidade do momento.
+
+Além disso, busca receber alertas proativos sobre marcos, riscos e pendências de preenchimento, de modo a agir antes do prazo, em vez de depender inteiramente da própria iniciativa para lembrar cada responsável. Também tem interesse em contar com apoio na elaboração de relatórios de status e de apresentações mensais para a diretoria, a partir de templates já utilizados pela equipe, e em receber sugestões de conteúdo para campos pendentes, mantendo o controle final sobre o que é efetivamente registrado.
+
+### Expectativas em relação à solução
+
+Maria Eduarda espera que a solução reduza o esforço manual envolvido na cobrança de atualizações e na consolidação de dados, permitindo que ela dedique mais tempo à análise da qualidade das informações e menos à busca e à repetição de tarefas operacionais.
+
+A possibilidade de interagir por linguagem natural, por texto ou voz, aliada a alertas proativos e sugestões de preenchimento, é vista como um fator que aumenta sua produtividade e reduz o risco de pendências passarem despercebidas até próximo do prazo.
+
+### Relação da persona com o produto
+
+A persona de Maria Eduarda representa o **Analista de PMO**, responsável pela operação diária da governança do portfólio. Ela utiliza o agente tanto para **consultar e comparar o andamento dos projetos** quanto para **cobrar, apoiar o preenchimento e consolidar informações** que alimentam os relatórios e as apresentações destinadas à diretoria. O Analista de PMO utiliza a solução principalmente para **reduzir o esforço manual de acompanhamento e cobrança, ganhando tempo para atividades de maior valor analítico dentro do portfólio**.
+
+### Jornada do Usuário 1.5.2 — Maria Eduarda Santos - Analista de PMO
+
+<div align="center">
+<sub>Imagem 1.5.2.1 - Jornada do Usuário — Maria Eduarda Santos - Analista de PMO</sub><br>
+  <img src="../assets/design/Jornada-pmo.png" width="100%" alt="Jornada do Usuário — Maria Eduarda Santos, Analista de PMO"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+### Cenário
+
+Maria Eduarda precisa manter os dados dos projetos atualizados e cobrar os responsáveis antes dos prazos mensais, mas hoje isso depende de acompanhamento manual e de navegação por diferentes sistemas e documentos, consumindo tempo que faltaria à análise e à consolidação das informações.
+
+### Identificação
+
+A jornada de Maria Eduarda começa com a identificação de quais projetos estão com pendência de atualização, geralmente próximo ao prazo mensal de registro de status, fixado até o dia 10 de cada mês. Nessa etapa, sua principal dificuldade está na falta de alertas automáticos que sinalizem pendências antes do prazo, o que representa uma oportunidade para a solução notificar proativamente Maria Eduarda sobre o que precisa ser atualizado.
+
+### Cobrança
+
+Em seguida, Maria Eduarda cobra manualmente cada responsável pelo preenchimento das informações pendentes, geralmente por e-mail ou mensagem. Nessa etapa, a principal dor está na cobrança repetitiva, feita um a um, o que a solução busca resolver ao automatizar lembretes e cobranças por meio do agente.
+
+### Preenchimento
+
+Com os responsáveis notificados, Maria Eduarda acompanha o preenchimento dos campos pendentes nas listas do SharePoint e nos documentos de projeto, muitas vezes precisando orientar os responsáveis sobre o que e como preencher. Nessa etapa, sua principal dificuldade é a ausência de apoio para preencher campos de forma padronizada, o que a solução busca resolver ao sugerir conteúdo para os campos pendentes a partir da interação com o usuário responsável.
+
+### Consolidação
+
+Na sequência, Maria Eduarda consolida os dados atualizados em relatórios de status e apresentações mensais para a diretoria. Sua principal dificuldade é o tempo gasto reunindo informações espalhadas entre diferentes sistemas e documentos. Nessa etapa, a solução pode consolidar automaticamente os dados com rastreabilidade de fonte, reduzindo o esforço manual de montagem dos relatórios.
+
+### Entrega
+
+Por fim, Maria Eduarda entrega o material consolidado ao PMO e à diretoria, respondendo a questionamentos sobre o andamento do portfólio. Essa etapa representa o ponto de maior satisfação na jornada, pois, ao contar com dados atualizados e rastreáveis, reduz-se o risco de entregar informação desatualizada ou incompleta, tornando a entrega mais segura e ágil.
+
+### Experiência do cliente ao longo da jornada
+
+A experiência de Maria Eduarda evolui de forma crescente ao longo da jornada: parte de um sentimento mais neutro/insatisfeito nas etapas iniciais, quando ainda lida com a falta de alertas e a cobrança manual e repetitiva, e cresce progressivamente até atingir o pico de satisfação na etapa de Entrega, momento em que consegue reportar o andamento do portfólio com mais confiança, agilidade e rastreabilidade.
+
+---
+
 ### Persona 3: Rafael Antunes — Líder de Projeto
 
 <div align="center">
 <sub>Imagem 1.5.3 - Persona 3: Rafael Antunes — Líder de Projeto</sub><br>
-  <img src="../assets/Persona-lider.png" width="100%" alt="Persona 3: Rafael Antunes — Líder de Projeto"><br>
+  <img src="../assets/design/Persona-lider.png" width="100%" alt="Persona 3: Rafael Antunes — Líder de Projeto"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -315,7 +389,7 @@ A persona de Rafael representa o **Líder de Projeto**, responsável por um empr
 
 <div align="center">
 <sub>Imagem 1.5.3.1 - Jornada do Usuário — Rafael Antunes - Líder de Projeto</sub><br>
-  <img src="../assets/Jornada-lider.png" width="100%" alt="Jornada do Usuário — Rafael Antunes, Líder de Projeto"><br>
+  <img src="../assets/design/Jornada-lider.png" width="100%" alt="Jornada do Usuário — Rafael Antunes, Líder de Projeto"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -360,18 +434,37 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 [Descrição da cadeia de valor...]
 
-### Fluxo principal (BPMN)
+### Fluxo do Business Process Model and Notation (BPMN)
 
-<!-- Diagrama BPMN do fluxo principal. Ferramentas sugeridas: Bizagi, draw.io, Camunda Modeler. -->
+&emsp; Esta seção modela, em notação BPMN, o fluxo de consulta e registro de informações do portfólio de projetos do Metrô de São Paulo em dois momentos: o processo como ocorre atualmente (AS-IS) e o processo com a solução proposta incorporada (TO-BE). É a comparação entre os dois diagramas que evidencia a contribuição do produto — não pela substituição das atividades ou dos responsáveis, que permanecem os mesmos, mas pela redução do atrito na interação com a informação, preservando os processos, as permissões e a rastreabilidade já estabelecidos pela companhia.
 
-![Diagrama BPMN do fluxo principal](../assets/bpmn-fluxo-principal.png)
+&emsp; O primeiro diagrama representa o fluxo atual. A interação parte da necessidade de informação do usuário, que acessa o agente disponível no Microsoft Studio e formula sua demanda clicando em blocos de texto pré-definidos ou enviando uma mensagem escrita. A plataforma filtra os dados conforme a pergunta, consulta o catálogo de portfólios e exibe as informações encontradas. O ponto crítico do fluxo está no gateway "Conseguiu a resposta?": quando a demanda não é atendida, não há tratamento previsto — o usuário retorna ao início e reformula a solicitação por conta própria, repetindo o ciclo até obter o que precisa ou desistir.
 
-**Descrição do processo:**
+<div align="center">
+  <sub>FIGURA 1.6.1 - Fluxo de gestão de portfólio de projetos (AS-IS)</sub><br>
+  <img src="../assets/negócios/diagrama_as_is.svg" width="100%" alt="Diagrama BPMN do fluxo de gestão de portfólio de projetos no estado atual"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
 
-1. **[Atividade 1]:** [descrição]
-2. **[Atividade 2]:** [descrição]
-3. **[Gateway/decisão]:** [condições e caminhos]
-4. **[Atividade final]:** [descrição]
+&emsp; O segundo diagrama representa o mesmo fluxo com a solução incorporada. A necessidade do usuário e a responsabilidade pelas decisões permanecem inalteradas; o que muda é a forma de interação, que passa a ocorrer por linguagem natural — texto ou áudio — sobre a plataforma de portfólio já administrada pelo Metrô. Uma camada de Processamento de Linguagem Natural transcreve o áudio quando necessário, pré-processa e normaliza o texto e classifica a intenção do usuário. Caso a intenção não seja compreendida, o fluxo não termina em falha silenciosa: o agente devolve perguntas de esclarecimento e só encerra a sessão se não houver resposta. Reconhecida a intenção, o fluxo se divide entre consulta e inserção de informação, e a resposta é devolvida ao usuário.
+
+<div align="center">
+  <sub>FIGURA 1.6.2 - Fluxo de gestão de portfólio de projetos (TO-BE)</sub><br>
+  <img src="../assets/negócios/diagrama_to_be.svg" width="100%" alt="Diagrama BPMN do fluxo de gestão de portfólio de projetos com o agente de IA incorporado"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Principais diferenças entre os fluxos:**
+
+| Aspecto | AS-IS | TO-BE |
+| --- | --- | --- |
+| Forma de entrada | Blocos de texto pré-definidos ou mensagem escrita | Linguagem natural, por texto ou áudio |
+| Interpretação da demanda | Filtragem direta a partir da pergunta | Pré-processamento, normalização e classificação da intenção |
+| Demanda não compreendida | Usuário retorna ao início e reformula por conta própria | Agente devolve perguntas de esclarecimento antes de encerrar |
+| Operações suportadas | Consulta de informação | Consulta e inserção de informação |
+| Encerramento | Depende de o usuário obter a resposta por tentativa e erro | Sessão encerrada explicitamente, com resposta ou por ausência de retorno |
+
+&emsp; A leitura conjunta dos dois diagramas mostra que o ganho não está em acrescentar etapas ao processo, e sim em deslocar para o agente o esforço que hoje recai sobre o usuário: interpretar a demanda, reformular a pergunta quando o resultado não satisfaz e navegar pela estrutura até localizar a informação. As atividades de negócio e a decisão final permanecem sob responsabilidade dos profissionais do Metrô, conforme delimitado na seção 1.3.
 
 ---
 
@@ -433,21 +526,175 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 ## 1.8 Canvas do MVP
 
-<!-- Preencha o MVP Canvas (Paulo Caroli) ou estrutura equivalente. -->
+![Business Model Canvas](../assets/negócios/BMC.png)
 
-![Canvas MVP](../assets/mvp-canvas.png)
+### Visão geral
 
-| Bloco | Conteúdo |
-|---|---|
-| **Proposta do MVP** | [O que é a versão mínima e viável] |
-| **Segmento de personas** | [Para quem é este MVP] |
-| **Jornadas atendidas** | [Quais jornadas o MVP cobre] |
-| **Funcionalidades** | [Features incluídas no recorte] |
-| **Resultado esperado** | [Aprendizado/valor que se espera obter] |
-| **Métricas para validar** | [Como saber se o MVP funcionou] |
-| **Custo e cronograma** | [Estimativa de esforço e prazo] |
+&emsp;O Business Model Canvas (BMC) foi utilizado para estruturar os principais elementos relacionados à proposta de valor, aos usuários, aos recursos e às atividades necessárias para o desenvolvimento do agente de Inteligência Artificial voltado à gestão de projetos do Metrô de São Paulo. Diferentemente de um produto comercial tradicional, a solução proposta possui caráter interno e tem como principal objetivo gerar ganhos de eficiência operacional, facilitar o acesso às informações dos projetos e apoiar os diferentes perfis envolvidos na gestão e no acompanhamento do portfólio de projetos do Metrô. O Canvas considera o agente de IA como uma interface conversacional capaz de consultar informações organizacionais, auxiliar usuários durante atividades relacionadas à documentação dos projetos e facilitar o acesso ao conhecimento existente nos sistemas internos da organização.
 
-**Justificativa do recorte:** [Por que essas features e não outras.]
+### Parceiros-chave
+
+&emsp;Os parceiros-chave representam os atores necessários para o desenvolvimento, validação e evolução da solução.
+
+**Escritório de Projetos do Metrô**
+
+&emsp;O Escritório de Projetos possui conhecimento sobre os processos, documentos e regras de gestão utilizados dentro da organização. Sua participação é fundamental para fornecer contexto de negócio, validar os comportamentos esperados do agente e verificar se as respostas e funcionalidades desenvolvidas estão alinhadas às necessidades reais dos usuários.
+
+**Inteli / equipe acadêmica**
+
+&emsp;O Inteli participa do desenvolvimento do projeto por meio da equipe de estudantes e professores responsáveis pelo acompanhamento técnico e metodológico da solução.
+
+### Atividades-chave
+
+&emsp;As atividades-chave correspondem às ações necessárias para construir, manter e melhorar continuamente o agente.
+
+**Desenvolvimento e aprimoramento do agente de IA**
+
+&emsp;Implementar as funcionalidades do agente e realizar melhorias com base nos resultados obtidos durante testes e validações com os stakeholders.
+
+**Integração com as fontes de informação do Metrô**
+
+&emsp;Permitir que o agente consulte as fontes de dados relevantes para responder às solicitações dos usuários e fornecer informações relacionadas aos projetos.
+
+**Manutenção da base de conhecimento**
+
+&emsp;Garantir que documentos, informações e demais fontes utilizadas pelo agente estejam organizados e atualizados, reduzindo a possibilidade de respostas baseadas em informações desatualizadas ou inconsistentes.
+
+**Interpretação das intenções dos usuários**
+
+&emsp;Estruturar os fluxos necessários para que o agente consiga compreender diferentes tipos de solicitação realizados em linguagem natural e identificar corretamente as ações ou informações esperadas pelo usuário.
+
+**Monitoramento da qualidade das respostas**
+
+&emsp;Avaliar continuamente as respostas produzidas pelo agente, identificando erros, limitações e oportunidades de melhoria.
+
+### Recursos-chave
+
+&emsp;Os recursos-chave representam os elementos necessários para que a solução consiga operar adequadamente.
+
+**Estrutura e dados do SharePoint**
+
+&emsp;O SharePoint constitui uma das principais fontes de informação consideradas para a solução, concentrando documentos e dados relacionados à gestão dos projetos.
+
+**Tecnologias de Processamento de Linguagem Natural**
+
+&emsp;Permitem que os usuários interajam com o sistema utilizando linguagem natural, sem a necessidade de conhecer estruturas específicas de consulta ou navegar manualmente pelas diferentes fontes de informação.
+
+**Modelo de Inteligência Artificial**
+
+&emsp;O modelo de IA é responsável pela interpretação das solicitações, geração das respostas e apoio às interações realizadas pelo agente.
+
+**Infraestrutura tecnológica da aplicação**
+
+&emsp;A solução depende da infraestrutura necessária para disponibilizar a interface desenvolvida pela equipe, executar o agente e realizar o processamento e a consulta das informações utilizadas durante as interações.
+
+**Conhecimento sobre os processos de gestão de projetos**
+
+&emsp;Além da tecnologia, a solução depende do conhecimento das regras, documentos e processos utilizados pelo Metrô para que as respostas estejam alinhadas ao contexto real da organização.
+
+### Propostas de valor
+
+&emsp;A principal proposta de valor da solução consiste em facilitar a interação dos usuários com as informações relacionadas aos projetos do Metrô.
+
+**Acesso rápido às informações por linguagem natural**
+
+&emsp;O agente reduz a necessidade de navegação manual por diferentes documentos e estruturas de dados, permitindo que os usuários façam perguntas diretamente em linguagem natural.
+
+**Redução do trabalho manual**
+
+&emsp;A solução busca diminuir o tempo empregado na busca, interpretação e consolidação manual de informações relacionadas aos projetos.
+
+**Apoio ao acompanhamento e à tomada de decisão**
+
+&emsp;Ao facilitar o acesso às informações relevantes, o agente pode apoiar líderes, Escritório de Projetos e diretoria durante o acompanhamento dos projetos e a tomada de decisões.
+
+**Maior qualidade e padronização das informações**
+
+&emsp;O agente pode auxiliar os usuários durante o preenchimento e consulta de documentos, contribuindo para uma maior consistência das informações registradas.
+
+**Assistência no cumprimento da documentação de projetos**
+
+&emsp;A solução também busca auxiliar os responsáveis pelos projetos no acompanhamento e preenchimento dos documentos necessários ao longo de seu ciclo de vida.
+
+### Relacionamento com os usuários
+
+&emsp;A relação entre o agente e seus usuários ocorre predominantemente por meio de autoatendimento assistido.
+
+**Assistência personalizada**
+
+&emsp;As respostas e informações apresentadas podem variar de acordo com o perfil, a solicitação e o contexto do usuário.
+
+**Interação sob demanda**
+
+&emsp;Os usuários podem consultar o agente sempre que necessitarem localizar informações, esclarecer dúvidas ou obter suporte relacionado aos processos de gestão.
+
+**Uso recorrente**
+
+&emsp;Por estar relacionado às atividades de acompanhamento e atualização dos projetos, espera-se que o agente seja utilizado de maneira recorrente durante o ciclo de vida dos projetos.
+
+### Segmentos de usuários
+
+&emsp;A solução atende diferentes perfis envolvidos na gestão de projetos do Metrô.
+
+**Diretoria Executiva**
+
+&emsp;Necessita principalmente de informações consolidadas que permitam acompanhar a situação dos projetos e apoiar processos de tomada de decisão.
+
+**Líderes de Projeto**
+
+&emsp;São responsáveis pelo acompanhamento e atualização dos projetos e podem utilizar o agente tanto para consultar informações quanto para receber assistência durante atividades relacionadas à documentação.
+
+**Escritório de Projetos**
+
+&emsp;Possui uma visão mais ampla do portfólio e dos processos de gestão, utilizando a solução para acessar informações e acompanhar o cumprimento das práticas estabelecidas pela organização.
+
+### 8. Canais
+
+&emsp;O principal canal de interação previsto para o MVP é uma **interface própria desenvolvida pela equipe**, por meio da qual os usuários poderão se comunicar diretamente com o agente conversacional. Essa abordagem permite que as funcionalidades centrais da solução sejam desenvolvidas e validadas sem depender, durante o projeto, de uma implantação direta no ambiente corporativo da Microsoft utilizado pelo Metrô. Como possibilidade de evolução após a conclusão do MVP, a solução poderá ser integrada às ferramentas já utilizadas pela organização, de forma a aproximar o agente do fluxo de trabalho cotidiano dos usuários.
+
+**Interface própria do agente**
+
+&emsp;Representa o canal efetivamente implementado durante o desenvolvimento do MVP e será responsável por disponibilizar a interação entre os usuários e o agente de IA.
+
+**Microsoft Teams — integração futura**
+
+&emsp;O Microsoft Teams é considerado um possível canal futuro para disponibilização do agente dentro do ambiente corporativo do Metrô. Essa integração não faz parte da implementação atual e exigirá adequações técnicas e de infraestrutura para implantação no ambiente da organização.
+
+**Microsoft Copilot Studio — integração futura**
+
+&emsp;O Microsoft Copilot Studio também é considerado como uma possibilidade de integração e disponibilização futura da solução dentro do ecossistema Microsoft. Sua utilização não faz parte do escopo de implementação do MVP, mas poderá ser indicada ao parceiro como uma alternativa para continuidade e integração da solução após a entrega do projeto.
+
+**SharePoint / Microsoft 365**
+
+&emsp;O SharePoint possui papel relevante principalmente como fonte de informações e documentos utilizados pelo agente. Em uma implantação futura no ambiente do Metrô, a integração com o ecossistema Microsoft 365 poderá ampliar a disponibilidade e o acesso à solução.
+
+### 9. Estrutura de custos
+
+&emsp;Como a solução depende de infraestrutura tecnológica e de manutenção contínua, os principais custos considerados são:
+
+* licenciamento de ferramentas e serviços de Inteligência Artificial;
+* infraestrutura computacional e processamento;
+* desenvolvimento e manutenção do agente;
+* integração e manutenção das fontes de dados;
+* atividades de governança, segurança e monitoramento da solução.
+
+&emsp;Em uma futura implantação dentro do ecossistema Microsoft do Metrô, também poderão existir custos associados ao licenciamento e à utilização de ferramentas necessárias para integrar o agente a serviços como Microsoft Teams, SharePoint, Microsoft 365 e Copilot Studio.
+
+&emsp;Os custos podem variar de acordo com a arquitetura adotada, o número de usuários, o volume de consultas e os serviços utilizados durante a operação.
+
+### 10. Retorno gerado
+
+&emsp;Por se tratar de uma solução interna desenvolvida para o Metrô de São Paulo, **não existe uma fonte de receita direta associada ao agente**.
+
+&emsp;O retorno esperado ocorre principalmente por meio de ganhos operacionais e redução de custos indiretos, incluindo:
+
+* redução das horas dedicadas a atividades manuais;
+* aumento da produtividade dos profissionais;
+* redução de inconsistências nas informações dos projetos;
+* melhoria do acompanhamento dos projetos;
+* redução potencial de retrabalho e de riscos decorrentes de informações incompletas ou de difícil acesso.
+
+&emsp;Dessa forma, o valor econômico da solução está associado principalmente à eficiência obtida com a utilização do agente e à melhoria da qualidade dos processos de gestão.
 
 ---
 
@@ -637,7 +884,7 @@ A figura a seguir posiciona esses itens na matriz de probabilidade e impacto, co
 
 <div align="center">
   <sub>FIGURA 1.9 - Matriz de probabilidade e impacto</sub><br>
-  <img src="../assets/matriz-de-risco.png" width="100%" alt="Matriz de probabilidade e impacto do projeto"><br>
+  <img src="../assets/negócios/matriz-de-risco.png" width="100%" alt="Matriz de probabilidade e impacto do projeto"><br>
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
@@ -669,19 +916,31 @@ Observa se que os dois itens de maior severidade decorrem de decisões internas 
 
 ### Contexto da aplicação
 
-[Como o processamento de linguagem natural transforma o negócio do parceiro...]
+Conforme detalhado na seção 1.1, a gestão do portfólio do Metrô depende hoje de ações manuais para a obtenção de status, a consolidação de documentos e o acompanhamento de pendências. Do ponto de vista computacional, a aplicação de Processamento de Linguagem Natural transforma esse cenário ao substituir a navegação manual por listas e documentos por uma interação direta em linguagem natural, na qual o usuário formula sua solicitação por texto ou por voz e recebe uma resposta já estruturada, rastreável até sua fonte original e adequada ao seu nível de permissão.
 
-### Fluxo de negócio 1: [Nome do fluxo]
+Essa transformação depende de duas capacidades transversais, exigidas por ambos os fluxos descritos a seguir: um canal de entrada que processe texto e áudio de forma equivalente, exibindo a transcrição para conferência quando a entrada ocorrer por voz e um mecanismo de classificação capaz de reconhecer toda solicitação dentro de um catálogo de intenções definido com o parceiro, recusando pedidos fora do escopo do portfólio antes mesmo de consultar as fontes de dados.
 
-- **Situação atual (AS-IS):** [como funciona hoje]
-- **Situação proposta (TO-BE):** [como funcionará com a solução]
-- **Indicadores computacionais:** [ex.: precisão da classificação por tags ≥ X%, taxa de acerto de intenção, WER na conversão áudio para texto, latência de resposta...]
+### Fluxo de negócio 1: Consulta e análise comparativa de projetos
 
-### Fluxo de negócio 2: [Nome do fluxo]
+- **Situação atual (AS-IS):** conforme mapeado no fluxo de negócio (seção 1.6), a consulta e a comparação entre projetos hoje dependem de navegação manual pelas listas do SharePoint e de consolidação visual dos dados, processo sujeito a erros de interpretação e que se torna mais custoso quando envolve cruzar informações de portfólio com indicadores estratégicos.
 
-- **Situação atual (AS-IS):** [...]
-- **Situação proposta (TO-BE):** [...]
-- **Indicadores computacionais:** [...]
+- **Situação proposta (TO-BE):** o usuário formula sua solicitação diretamente em linguagem natural, como por exemplo: "qual o status do projeto X?" ou "compare os projetos X e Y em relação a prazo e riscos", e o sistema retorna os indicadores solicitados já filtrados conforme seu nível de permissão, acompanhados da fonte e da data de apuração de cada dado. Quando a solicitação for ambígua, o sistema solicita esclarecimento apenas sobre o dado faltante, preservando o que já foi informado.
+
+- **Indicadores computacionais:**
+  - ***Precisão da classificação de intenção:*** razão entre o número de solicitações corretamente classificadas dentro do catálogo de intenções e o número total de solicitações recebidas no conjunto de teste.
+  - ***Taxa de acerto na extração de entidades:*** razão entre o número de entidades corretamente extraídas (nome do projeto, período de referência, indicador solicitado) e o número total de entidades presentes nas solicitações do conjunto de teste.
+  - ***Taxa de correspondência entre entidade extraída e registro correto:*** razão entre o número de consultas em que a entidade extraída foi corretamente associada ao registro correspondente no portfólio (ex.: nome do projeto vinculado ao item correto da lista) e o número total de consultas do conjunto de teste, avaliando o desempenho do PLN na etapa de recuperação do dado, e não apenas na extração textual da entidade.
+
+### Fluxo de negócio 2: Apoio proativo ao preenchimento e acompanhamento de pendências
+
+- **Situação atual (AS-IS):** conforme mapeado no fluxo de negócio (seção 1.6), o acompanhamento de pendências depende hoje da cobrança manual do PMO junto a cada responsável antes do prazo mensal, sem qualquer apoio automatizado ao preenchimento de documentos como termo de abertura, cronograma e mapa de benefícios.
+
+- **Situação proposta (TO-BE):** o sistema sugere textos para os campos pendentes a partir da interação com o usuário, mantendo o controle humano sobre o que é efetivamente registrado, e notifica proativamente o PMO sobre marcos, riscos e pendências conforme filtros configurados, sem repetir alertas já enviados.
+
+- **Indicadores computacionais:**
+  - ***Taxa de acerto na extração de entidades:*** razão entre o número de entidades corretamente extraídas da fala ou do texto do usuário (campo a ser atualizado, valor sugerido) e o número total de entidades presentes nas interações do conjunto de teste.
+  - ***Precisão na detecção de alertas:*** razão entre o número de marcos, riscos e pendências corretamente identificados como elegíveis para alerta, conforme os filtros configurados, e o número total de alertas gerados pelo sistema no período avaliado.
+  - ***Taxa de erro na conversão de áudio em texto (WER - Word Error Rate):*** razão entre a soma das substituições, inserções e exclusões de palavras identificadas na transcrição e o número total de palavras do áudio de referência.
 
 ---
 
