@@ -808,7 +808,14 @@ Os valores-alvo ainda não acordados estão identificados como **a validar com o
 | RNF09 — Tratamento de ambiguidades             | RF01, RF03, RF04       | Evita a execução dessas funcionalidades quando a solicitação não possui clareza ou informação suficiente.                 |
 | RNF10 — Escalabilidade do agente               | RF01, RF02, RF03, RF04 | Qualifica a capacidade do agente de manter desempenho sob aumento de volume de consultas e dados.                         |
 | RNF11 — Explicabilidade das sugestões          | RF03                   | Mede a clareza e rastreabilidade das fontes e justificativas das sugestões de preenchimento apresentadas.                 |
-                                      |
+
+### Relação dos requisitos não funcionais com os Business Drivers
+
+Os requisitos não funcionais foram definidos a partir dos Business Drivers do projeto, considerando as características de qualidade necessárias para que o agente ofereça informações confiáveis, seguras e acessíveis aos usuários do Metrô de São Paulo.
+
+Os requisitos de desempenho (RNF01) e disponibilidade (RNF07) contribuem para a **eficiência e agilidade no acesso às informações**, permitindo que os profissionais obtenham respostas rapidamente sem comprometer a tomada de decisão. O controle de acesso (RNF02) e a proteção de dados preservam a **confidencialidade e segurança da informação**, respeitando o perfil de cada usuário e as exigências legais aplicáveis. A rastreabilidade (RNF04) permite **transparência e auditoria** das consultas e respostas.
+
+A precisão na identificação de intenções (RNF03) e o tratamento de ambiguidades (RNF09) garantem a **confiabilidade no acesso e tratamento das informações**, assegurando que solicitações em linguagem natural sejam interpretadas corretamente. A qualidade da transcrição de áudio (RNF06) e interoperabilidade entre canais (RNF05) oferecem **acessibilidade e flexibilidade**. A usabilidade (RNF08) e explicabilidade (RNF11) garantem que as respostas apoiem a **tomada de decisão** de forma clara. A escalabilidade (RNF10) contribui para a **continuidade operacional**, permitindo que o agente processe aumentos de volume sem degradação.
 
 ## 2.4 Visão Inicial da Solução Técnica
 
