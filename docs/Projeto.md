@@ -355,7 +355,7 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 [Descrição da cadeia de valor...]
 
-### Fluxo principal (BPMN)
+### Fluxo do Business Process Model and Notation (BPMN)
 
 &emsp; Esta seção modela, em notação BPMN, o fluxo de consulta e registro de informações do portfólio de projetos do Metrô de São Paulo em dois momentos: o processo como ocorre atualmente (AS-IS) e o processo com a solução proposta incorporada (TO-BE). É a comparação entre os dois diagramas que evidencia a contribuição do produto — não pela substituição das atividades ou dos responsáveis, que permanecem os mesmos, mas pela redução do atrito na interação com a informação, preservando os processos, as permissões e a rastreabilidade já estabelecidos pela companhia.
 
