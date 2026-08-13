@@ -809,7 +809,123 @@ A modelagem e a visão técnica da solução deverão considerar componentes res
 
 ### Diagrama de componentes (UML)
 
-![Diagrama de componentes](./assets/diagrama-componentes.png)
+<div align="center">
+<sub>Imagem 2.4.1 - Diagrama de componentes (UML) — MVP</sub>
+</div>
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {
+  'primaryColor': '#F7F8FA',
+  'primaryBorderColor': '#5B6B79',
+  'primaryTextColor': '#1F2A33',
+  'lineColor': '#8592A0',
+  'fontFamily': 'Helvetica, Arial, sans-serif',
+  'fontSize': '14px'
+}}}%%
+graph TD
+    subgraph IHC["Camada de Interface (IHC)"]
+        UI[Chat UI - Texto e Voz]
+    end
+
+    subgraph LN["Camada de Lógica de Negócio"]
+        ORQ[Orquestrador de Requisições]
+        PLN["Pipeline de PLN<br/>STT · Classificação de Intenção · Extração de Entidades"]
+        AUTH[Controle de Acesso e Autenticação]
+        ACAO["Módulos de Ação<br/>Respostas · Sugestões · Alertas"]
+        AUDIT_M[Auditoria e Feedback]
+    end
+
+    subgraph DS["Camada de Dados e Serviços"]
+        DB[(Base de Dados Sintética do Portfólio)]
+        DOC[(Documentos e Normativos)]
+        LOGS[(Logs de Auditoria)]
+    end
+
+    UI --> ORQ
+    ORQ --> AUTH --> DB
+    ORQ --> PLN
+    PLN --> ACAO
+    ACAO --> DB
+    ACAO --> DOC
+    ACAO --> UI
+    ORQ --> AUDIT_M --> LOGS
+
+    style IHC fill:#EAF1F8,stroke:#4A6D8C,stroke-width:1px
+    style LN fill:#F1EEF8,stroke:#6E5A96,stroke-width:1px
+    style DS fill:#EAF5EE,stroke:#4C8465,stroke-width:1px
+```
+
+<div align="center">
+<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+<p align="center">
+  Para melhor visualização do diagrama, acesse o arquivo no <a href="COLOCAR_LINK_MVP_AQUI">Google Drive</a>.
+</p>
+
+<div align="center">
+<sub>Imagem 2.4.2 - Diagrama de componentes (UML) — Evolução Futura</sub>
+</div>
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {
+  'primaryColor': '#F7F8FA',
+  'primaryBorderColor': '#5B6B79',
+  'primaryTextColor': '#1F2A33',
+  'lineColor': '#8592A0',
+  'fontFamily': 'Helvetica, Arial, sans-serif',
+  'fontSize': '14px'
+}}}%%
+graph TD
+    subgraph IHC["Camada de Interface (IHC)"]
+        UI[Chat UI - Texto e Voz]
+        PAINEL[Painel de Alertas e Pendências]:::novo
+    end
+
+    subgraph LN["Camada de Lógica de Negócio"]
+        ORQ[Orquestrador de Requisições]
+        PLN["Pipeline de PLN<br/>STT · Classificação de Intenção · Extração de Entidades"]
+        AUTH[Controle de Acesso e Autenticação]
+        ACAO["Módulos de Ação<br/>Respostas · Sugestões · Alertas"]
+        AUDIT_M[Auditoria e Feedback]
+        EVOL["Módulos de Evolução<br/>Análise Comparativa · Prévia de Relatórios · Fluxo Guiado"]:::novo
+        NOTIF[Serviço de Notificações Automáticas]:::novo
+    end
+
+    subgraph DS["Camada de Dados e Serviços"]
+        DB[(Base de Dados Sintética do Portfólio)]
+        DOC[(Documentos e Normativos)]
+        LOGS[(Logs de Auditoria)]
+        TEMPLATE[(Templates de Relatório e Apresentação)]:::novo
+    end
+
+    UI --> ORQ
+    ORQ --> AUTH --> DB
+    ORQ --> PLN
+    PLN --> ACAO
+    ACAO --> DB
+    ACAO --> DOC
+    ACAO --> UI
+    ORQ --> AUDIT_M --> LOGS
+
+    ORQ --> EVOL --> DB
+    EVOL --> TEMPLATE
+    ACAO --> NOTIF --> PAINEL
+
+    style IHC fill:#EAF1F8,stroke:#4A6D8C,stroke-width:1px
+    style LN fill:#F1EEF8,stroke:#6E5A96,stroke-width:1px
+    style DS fill:#EAF5EE,stroke:#4C8465,stroke-width:1px
+    classDef novo fill:#FCEFDC,stroke:#B9791E,stroke-width:1.5px,stroke-dasharray: 4 3
+```
+
+<div align="center">
+<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+<p align="center">
+  Para melhor visualização do diagrama, acesse o arquivo no <a href="COLOCAR_LINK_EVOLUCAO_AQUI">Google Drive</a>.
+</p>
+
 
 ### Descrição das camadas
 
