@@ -1,0 +1,214 @@
+# =============================================================================
+# gitlab-issue-kit — configuração do projeto
+# =============================================================================
+# Este arquivo controla TODO o comportamento específico de projeto: quais labels
+# existem, cores, tamanhos, regras de prioridade e o formato do corpo da issue.
+#
+# Ao reutilizar o kit em um projeto novo, edite ESTE arquivo — não os .py.
+# Um config alternativo pode ser passado com --config outro.yml
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# API do GitLab
+# -----------------------------------------------------------------------------
+api:
+  # Pausa entre chamadas de escrita, para respeitar o rate-limit do GitLab.
+  request_delay_seconds: 0.4
+  timeout_seconds: 15
+  # Se a milestone informada no CSV não existir, criá-la automaticamente.
+  create_missing_milestone: true
+
+
+# -----------------------------------------------------------------------------
+# Formato do CSV
+# -----------------------------------------------------------------------------
+csv:
+  # Separador dentro de tasks / dor / dod / dependencies
+  list_separator: ";"
+  # Separador da coluna `labels`
+  label_separator: ","
+
+
+# -----------------------------------------------------------------------------
+# Tamanhos (t-shirt sizing)
+# -----------------------------------------------------------------------------
+# A chave é o valor aceito na coluna `size` do CSV. A label aplicada é
+# size_label_prefix + chave (ex.: P -> SIZE_P).
+sizes:
+  PP: "até 15 minutos (micro task)"
+  P: "até 30 minutos"
+  M: "30–60 minutos"
+  G: "60–120 minutos (considerar quebrar)"
+
+size_label_prefix: "SIZE_"
+
+
+# -----------------------------------------------------------------------------
+# Prioridade
+# -----------------------------------------------------------------------------
+# Só os valores listados aqui geram label. Qualquer outro valor na coluna
+# `priority` (vazio, ou um valor não mapeado) simplesmente não recebe label.
+# Chave = valor no CSV (case-insensitive); valor = nome da label a aplicar.
+#
+# Módulo 7: o dashboard exige label de prioridade em TODA issue — por isso
+# média e baixa também são mapeadas. Variantes sem acento estão registradas
+# porque a busca é literal (só faz strip + lower, não normaliza acento).
+priority_labels:
+  alta: "PRIORIDADE ALTA"
+  high: "PRIORIDADE ALTA"
+  média: "PRIORIDADE MÉDIA"
+  media: "PRIORIDADE MÉDIA"
+  medium: "PRIORIDADE MÉDIA"
+  baixa: "PRIORIDADE BAIXA"
+  low: "PRIORIDADE BAIXA"
+
+
+# -----------------------------------------------------------------------------
+# Tipo de trabalho ("kind") — a label de visão de produto
+# -----------------------------------------------------------------------------
+kind:
+  # Valores aceitos na coluna `kind` do CSV.
+  #
+  # Padrão do G01: o tipo de trabalho de documentação é DOCS, não DOCUMENTATION.
+  # Em issue de camada DOCS as duas labels colapsam em uma só, e a de camada
+  # RESEARCH fica com RESEARCH + DOCS.
+  allowed:
+    - FEATURE
+    - BUG FIX
+    - DOCS
+
+  # Usado quando `kind` está vazio no CSV e nenhuma regra abaixo casa.
+  default: FEATURE
+
+  # Quando `kind` está vazio, infere a partir das labels de camada do CSV.
+  # A primeira label da issue que casar aqui define o kind.
+  infer_from_labels:
+    BACKEND: FEATURE
+    FRONTEND: FEATURE
+    DATABASE: FEATURE
+    TEST: FEATURE
+    INFRA: FEATURE
+    DEVOPS: FEATURE
+    DOCS: DOCS
+    RESEARCH: DOCS
+
+
+# -----------------------------------------------------------------------------
+# Catálogo de labels
+# -----------------------------------------------------------------------------
+# Usado por setup_labels.py (cria todas de uma vez) e por create_issues.py
+# (busca a cor ao criar uma label faltante sob demanda).
+default_label_color: "#cccccc"
+
+labels:
+  # ── Camada / especialidade (vem da coluna `labels` do CSV) ──
+  - { name: BACKEND,  color: "#0075ca", description: "Tarefa relacionada ao backend" }
+  - { name: FRONTEND, color: "#006b75", description: "Tarefa relacionada ao frontend" }
+  - { name: DATABASE, color: "#1d76db", description: "Banco de dados e migrações" }
+  - { name: DOCS,     color: "#e4e669", description: "Documentação" }
+  - { name: INFRA,    color: "#b60205", description: "Infraestrutura" }
+  - { name: TEST,     color: "#cc317c", description: "Testes automatizados ou manuais" }
+  - { name: RESEARCH, color: "#0052cc", description: "Pesquisa e análise" }
+  - { name: DEVOPS,   color: "#5319e7", description: "CI/CD e automação" }
+
+  # ── Tipo de trabalho (aplicado automaticamente via `kind`) ──
+  # DOCS acumula camada e tipo — ver a seção `kind` acima.
+  - { name: FEATURE,       color: "#0e8a16", description: "Nova funcionalidade voltada ao usuário" }
+  - { name: BUG FIX,       color: "#d73a4a", description: "Correção de defeito" }
+  - { name: DOCUMENTATION, color: "#e4e669", description: "Legado — substituída por DOCS como tipo de trabalho" }
+
+  # ── Tamanho (aplicado automaticamente via `size`) ──
+  - { name: SIZE_PP, color: "#0e8a16", description: "Até 15 minutos (micro task)" }
+  - { name: SIZE_P,  color: "#0e8a16", description: "Até 30 minutos" }
+  - { name: SIZE_M,  color: "#e4e669", description: "30–60 minutos" }
+  - { name: SIZE_G,  color: "#d73a4a", description: "60–120 minutos (considerar quebrar)" }
+
+  # ── Prioridade (aplicado automaticamente via `priority`) ──
+  - { name: PRIORIDADE ALTA,  color: "#d73a4a", description: "Alta prioridade — entregar antes" }
+  - { name: PRIORIDADE MÉDIA, color: "#fbca04", description: "Prioridade média — entregar no meio da sprint" }
+  - { name: PRIORIDADE BAIXA, color: "#0e8a16", description: "Baixa prioridade — pode escorregar para a próxima sprint" }
+
+  # ── Especiais: aplicadas à mão durante a sprint, nunca pelo script ──
+  - { name: BUG,   color: "#d73a4a", description: "Defeito identificado em review" }
+  - { name: BLOCK, color: "#b60205", description: "Issue bloqueada — exige comentário com motivo" }
+
+
+# -----------------------------------------------------------------------------
+# Corpo da issue
+# -----------------------------------------------------------------------------
+description:
+  # Texto usado quando a coluna `dependencies` está vazia ou é "Nenhuma".
+  no_dependencies_text: "Nenhuma dependência identificada."
+
+  # Marcador de cada item das listas tasks / dor / dod.
+  checklist_marker: "- [ ] "
+
+  # Marcador de cada item da lista de dependências.
+  bullet_marker: "- "
+
+  # Template do corpo da issue. Placeholders disponíveis:
+  #   {title} {objective} {context} {dependencies} {tasks} {dor} {dod}
+  #   {size} {size_description} {milestone} {priority} {kind}
+  # ATENÇÃO: chaves literais { } precisam ser escritas como {{ }}.
+  template: |
+    **Objetivo da tarefa:** {objective}
+
+    **Contexto:** {context}
+
+    **Dependências:**
+
+    {dependencies}
+
+    **Tasks:**
+
+    {tasks}
+
+    **DoR (Definition of Ready):**
+
+    {dor}
+
+    **DoD (Definition of Done):**
+
+    {dod}
+
+
+# -----------------------------------------------------------------------------
+# Template de merge request
+# -----------------------------------------------------------------------------
+# Usado por setup_mr_template.py. Escrito como arquivo em
+# .gitlab/merge_request_templates/<name>.md, que é onde o GitLab procura.
+merge_request:
+  # Nome que aparece no seletor "Choose a template" ao abrir o MR.
+  name: "Default"
+
+  # Corpo do template. Cobre os 8 critérios de MR avaliados pelo módulo:
+  # título, descrição com as duas seções, link bidirecional, reviewer,
+  # branch padronizada, labels, milestone e revisão real.
+  template: |
+    ## O que foi feito
+
+    <!-- Duas ou três frases sobre a mudança. Mínimo de 40 caracteres. -->
+
+    ## Como testar
+
+    <!-- Passo a passo para o revisor reproduzir e conferir. -->
+
+    1.
+    2.
+
+    ## Issue relacionada
+
+    <!-- Obrigatório: sem isso o dashboard não liga o MR à issue. -->
+
+    Closes #
+
+    ## Checklist
+
+    - [ ] Branch nomeada como `<tipo>/<descricao-em-kebab-case>`
+    - [ ] Commits no formato `<tipo>(<escopo>): <descrição> (#N)`
+    - [ ] Reviewer designado — não sou eu mesmo
+    - [ ] Labels iguais às da issue de origem
+    - [ ] Milestone da sprint vinculada
+    - [ ] DoD da issue atendido por completo
+    - [ ] Documentação atualizada, quando aplicável
