@@ -1358,19 +1358,231 @@ A precisão na identificação de intenções (RNF03) e o tratamento de ambiguid
 
 ## 2.5 Tecnologias e Ferramentas
 
-<!-- Estimativa inicial, pode ser revisada nas próximas sprints. -->
+### Linguagens e Tecnologias Utilizadas
 
-| Categoria           | Tecnologia/Ferramenta                  | Justificativa |
-| ------------------- | -------------------------------------- | ------------- |
-| Linguagem (backend) | [ex.: Python 3.12]                     | [...]         |
-| Framework (backend) | [ex.: FastAPI]                         | [...]         |
-| Frontend            | [ex.: React]                           | [...]         |
-| PLN / IA            | [ex.: spaCy, Hugging Face, API de LLM] | [...]         |
-| Banco de dados      | [ex.: PostgreSQL]                      | [...]         |
-| Infraestrutura      | [ex.: Docker, AWS]                     | [...]         |
-| Versionamento       | [ex.: Git + GitHub]                    | [...]         |
-| Gestão do projeto   | [ex.: GitHub Projects]                 | [...]         |
-| Modelagem           | [ex.: draw.io, Mermaid, Bizagi]        | [...]         |
+O MVP será desenvolvido como uma aplicação independente da infraestrutura atualmente utilizada pelo Metrô, contemplando uma interface própria, uma camada de backend responsável pela lógica de negócio e componentes para processamento de linguagem natural, persistência de dados, consulta de documentos, controle de acesso, agendamento e notificações.
+
+As tecnologias descritas a seguir compõem a base prevista para implementação da solução.
+
+### Python
+
+O **Python** será utilizado principalmente no desenvolvimento do backend, da lógica do agente e das funcionalidades relacionadas ao processamento de linguagem natural.
+
+A linguagem será utilizada em atividades como:
+
+* orquestração das solicitações;
+* integração com serviços e APIs de inteligência artificial;
+* classificação de intenções;
+* extração de entidades;
+* execução das regras de negócio;
+* consulta às fontes de dados;
+* análise de informações dos projetos;
+* identificação de campos incompletos;
+* geração de sugestões;
+* geração de alertas;
+* execução de tarefas periódicas;
+* registro de interações e auditoria.
+
+A escolha de Python está relacionada principalmente à sua ampla utilização no desenvolvimento de aplicações envolvendo inteligência artificial, processamento de linguagem natural e integração com modelos de linguagem.
+
+### TypeScript
+
+O **TypeScript** será utilizado principalmente no desenvolvimento da interface web da aplicação.
+
+A linguagem adiciona tipagem estática ao JavaScript e contribui para maior organização, previsibilidade e manutenção do código da interface.
+
+### SQL
+
+O **SQL** será utilizado para definição, manipulação e consulta das informações estruturadas armazenadas no banco de dados relacional.
+
+Entre essas informações estão dados de projetos, prazos, marcos, riscos, usuários, perfis, permissões, feedbacks e registros de auditoria.
+
+### FastAPI
+
+O **FastAPI** será utilizado como framework principal para construção do backend e das APIs da aplicação.
+
+O backend será responsável por intermediar a comunicação entre a interface, o agente, as fontes de dados e os demais serviços da solução.
+
+Entre suas principais responsabilidades estarão:
+
+* disponibilização de endpoints;
+* processamento das solicitações recebidas;
+* aplicação das regras de negócio;
+* controle de acesso;
+* comunicação com o banco de dados;
+* integração com serviços de inteligência artificial;
+* consulta aos documentos;
+* execução dos módulos de ação;
+* registro de auditoria.
+
+### React e Next.js
+
+A interface da aplicação será desenvolvida utilizando **React**, com **Next.js** como framework web.
+
+Essa camada será responsável pela interface conversacional do agente, permitindo que o usuário realize solicitações por texto ou voz e visualize:
+
+* respostas do agente;
+* informações estruturadas;
+* fontes consultadas;
+* datas de referência;
+* sugestões;
+* alertas;
+* mensagens de insuficiência de dados;
+* solicitações de feedback.
+
+A interface será desenvolvida de forma independente dos canais atualmente utilizados pelo Metrô.
+
+### PostgreSQL
+
+O **PostgreSQL** será utilizado como banco de dados relacional principal do MVP.
+
+O banco deverá armazenar informações estruturadas relacionadas a:
+
+* projetos;
+* prazos;
+* marcos;
+* riscos;
+* avanço dos projetos;
+* usuários;
+* perfis e permissões;
+* campos e artefatos dos projetos;
+* feedbacks;
+* metadados de documentos;
+* registros de auditoria;
+* informações utilizadas na geração de alertas.
+
+Inicialmente, não é prevista a utilização de um segundo banco de dados não relacional, uma vez que os dados estruturados necessários ao MVP podem ser representados adequadamente por meio de um modelo relacional.
+
+### Armazenamento e Consulta de Documentos
+
+Os documentos utilizados pelo agente serão mantidos em um **repositório de arquivos independente**, acompanhado de seus respectivos metadados.
+
+Esse repositório deverá conter documentos sintéticos que reproduzam a organização e os tipos de arquivos existentes no ambiente real do Metrô.
+
+A estrutura permitirá validar funcionalidades como:
+
+* localização de documentos;
+* consulta ao conteúdo dos documentos;
+* identificação de documentos ausentes;
+* esclarecimento de dúvidas sobre normativos;
+* indicação da fonte utilizada na resposta.
+
+Dessa forma, o MVP poderá reproduzir os principais fluxos relacionados às informações atualmente armazenadas no SharePoint sem depender diretamente da infraestrutura corporativa.
+
+### Inteligência Artificial e Processamento de Linguagem Natural
+
+O agente utilizará uma **API de inteligência artificial disponibilizada no ecossistema Microsoft** para apoiar as funcionalidades de processamento de linguagem natural e geração de conteúdo.
+
+Essa integração poderá ser utilizada em atividades como:
+
+* interpretação das solicitações;
+* identificação e classificação de intenções;
+* detecção de solicitações fora do catálogo suportado;
+* extração de entidades e parâmetros;
+* geração de respostas em linguagem natural;
+* geração de sugestões para preenchimento de campos;
+* interpretação de documentos e normativos;
+* apoio à identificação de informações relevantes nas fontes disponíveis.
+
+A aplicação manterá sua própria camada de orquestração e regras de negócio, utilizando os modelos de linguagem como um dos componentes do processamento das solicitações.
+
+### Recuperação de Informação e RAG
+
+Para funcionalidades que envolvem documentos, normativos e outras fontes textuais, poderão ser utilizadas técnicas de **Retrieval-Augmented Generation (RAG)**.
+
+Essa abordagem permite recuperar informações relevantes nas fontes disponíveis antes da geração da resposta pelo modelo de linguagem.
+
+Sua utilização poderá apoiar funcionalidades como:
+
+* consulta a documentos dos projetos;
+* esclarecimento de dúvidas sobre normativos;
+* identificação das fontes utilizadas;
+* geração de respostas fundamentadas nas informações disponíveis;
+* identificação de situações em que não existem dados suficientes para produzir uma resposta confiável.
+
+### Serviço de Voz
+
+O MVP permitirá que o usuário envie solicitações por voz.
+
+Para isso, será utilizado um serviço de **Speech-to-Text (STT)** responsável pela conversão do áudio enviado pelo usuário em texto.
+
+Após a transcrição, a solicitação seguirá o mesmo fluxo utilizado para as mensagens originalmente enviadas em texto.
+
+O serviço de voz será responsável apenas pela conversão da entrada em áudio para texto. As respostas do agente serão apresentadas textualmente na interface.
+
+### Agendamento de Tarefas
+
+O sistema possuirá um mecanismo de **agendamento de tarefas periódicas** para execução automática de verificações que não dependem de uma solicitação direta do usuário.
+
+Para o backend em Python, poderá ser utilizada uma ferramenta como o **APScheduler**.
+
+Esse mecanismo poderá ser utilizado para:
+
+* verificar prazos próximos;
+* identificar documentos faltantes;
+* identificar campos incompletos;
+* analisar periodicamente situações dos projetos;
+* iniciar a geração de alertas proativos.
+
+Dessa forma, determinadas funcionalidades do agente poderão ser executadas de maneira automática e recorrente.
+
+### Serviço de Notificações
+
+O sistema contará com um mecanismo responsável pelo envio dos alertas e notificações identificados durante as verificações automáticas.
+
+O serviço de notificações receberá as pendências encontradas pelo sistema, identificará os usuários relacionados ao projeto e encaminhará a informação pelo canal disponibilizado no MVP.
+
+Esse mecanismo apoiará principalmente funcionalidades relacionadas a:
+
+* alertas de prazo;
+* documentos faltantes;
+* campos incompletos;
+* outras pendências identificadas automaticamente.
+
+### Auditoria, Rastreabilidade e Feedback
+
+As interações realizadas com o agente deverão ser registradas para permitir rastreabilidade das operações.
+
+Os registros poderão incluir informações como:
+
+* usuário responsável pela solicitação;
+* data e horário;
+* canal utilizado;
+* intenção identificada;
+* fontes consultadas;
+* resultado da solicitação;
+* alertas gerados;
+* feedback fornecido pelo usuário.
+
+Essas informações serão armazenadas de forma estruturada e utilizadas para auditoria e análise das interações realizadas com o sistema.
+
+### APIs REST
+
+A comunicação entre a interface, o backend e serviços externos será realizada principalmente por meio de **APIs REST**.
+
+Essa abordagem permitirá separar as responsabilidades entre os diferentes componentes da aplicação e facilitar futuras integrações com outros sistemas.
+
+### Docker
+
+O **Docker** poderá ser utilizado para padronizar os ambientes de desenvolvimento e execução dos principais componentes da solução.
+
+A conteinerização permitirá executar serviços como backend e banco de dados de maneira consistente entre os ambientes utilizados pela equipe.
+
+### Integrações Futuras com o Ecossistema Microsoft
+
+Embora o MVP seja desenvolvido fora da infraestrutura corporativa atualmente utilizada pelo Metrô, sua estrutura deverá possibilitar futuras integrações com os serviços adotados pela organização.
+
+Entre as possíveis integrações futuras estão:
+
+* SharePoint;
+* Microsoft Teams;
+* Copilot Studio;
+* Power Automate;
+* Microsoft Entra ID;
+* demais serviços e APIs disponibilizados pelo ecossistema Microsoft.
+
+Durante o MVP, dados, documentos, usuários e permissões sintéticos serão utilizados para representar as informações e fluxos necessários à validação da solução.
+
 
 ---
 
