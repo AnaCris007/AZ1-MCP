@@ -1057,7 +1057,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 | Linha de vida | Papel nos cenários | Correspondência no modelo estático |
 |---|---|---|
 | Usuário | Ator que inicia a interação nos cenários 1 e 2 e recebe a notificação no cenário 3 | Classe `Usuário` e suas especializações |
-| `: InterfaceDeChat` | Canal de entrada e saída das solicitações em linguagem natural | Componente de interface (seção 2.4) |
+| `: InterfaceDeChat` | Recebe solicitações por texto ou áudio e apresenta as respostas em formato textual | Componente de interface (seção 2.4) |
 | `: ServicoDeVoz` | Converte áudio em texto na entrada (exclusivo do cenário 1) | Componente de serviços (seção 2.4) |
 | `: PipelinePLN` | Conduz o tratamento da solicitação, extrai as entidades do texto e aciona os demais componentes | Componente de lógica de negócio (seção 2.4) |
 | `: Intencao` | Detém o catálogo de intenções e classifica o texto contra ele, devolvendo a intenção reconhecida e os parâmetros que ela exige | Componente de lógica de negócio (seção 2.4) |
@@ -1086,7 +1086,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
 #### Cenário 1: consultar informações do projeto
 
-&emsp; O cenário representa o fluxo mais frequente do agente, no qual o usuário formula uma pergunta sobre um projeto e recebe a resposta acompanhada da indicação de origem. É o cenário de maior alcance, por percorrer a cadeia completa de consulta, do recebimento da solicitação em linguagem natural (RF01) à devolução da resposta fundamentada (RF04), e por representar os dois desvios previstos: a recusa de pedidos fora do catálogo de intenções (RF02) e o ciclo de esclarecimento diante de parâmetros faltantes (RF05).
+&emsp; O cenário representa o fluxo mais frequente do agente, no qual o usuário formula uma pergunta sobre um projeto e recebe a resposta acompanhada da indicação de origem. É o cenário de maior alcance, por percorrer a cadeia completa de consulta, do recebimento da solicitação em linguagem natural (RF01), passando pela consulta aos dados do projeto (RF02), até a devolução da resposta fundamentada com a indicação da fonte (RF03). O diagrama apresenta somente o fluxo principal; a recusa de pedidos fora do catálogo de intenções e o ciclo de esclarecimento diante de parâmetros faltantes, ambos previstos pelo RF02, não estão representados neste cenário.
 
 <div align="center">
   <sub>FIGURA 2.2: diagrama de sequência do cenário 1 (consultar informações do projeto)</sub><br>
