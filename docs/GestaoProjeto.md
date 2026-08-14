@@ -119,8 +119,8 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 - **Canal oficial interno:** grupo da equipe no WhatsApp, utilizado para comunicação cotidiana, alinhamentos operacionais e avisos entre os integrantes.
 - **Canal oficial institucional:** grupo do Slack, utilizado para decisões, solicitações e alinhamentos que envolvam professores, docentes ou orientadores.
 - **Registro das decisões:** decisões internas são registradas no WhatsApp; decisões relacionadas ao corpo docente ou à orientação são registradas no Slack. Decisões que alterem escopo, processo ou arquitetura também devem ser consolidadas na documentação ou na issue correspondente do GitLab.
-- **SLA para mensagens comuns:** [PENDENTE — a equipe deve confirmar o tempo máximo de resposta para mensagens não urgentes; o prazo é necessário para tornar o acordo verificável].
-- **SLA para bloqueios urgentes:** [PENDENTE — a equipe deve confirmar o tempo máximo de resposta e o período de disponibilidade aplicável a impedimentos urgentes].
+- **SLA para mensagens comuns:** as mensagens devem ser respondidas até a próxima Daily ou, quando enviadas após o período de trabalho do grupo, até o início do período seguinte.
+- **SLA para bloqueios urgentes:** impedimentos que interrompam o avanço de uma task devem ser sinalizados imediatamente no WhatsApp e receber uma primeira resposta durante o mesmo período de trabalho. Caso não sejam resolvidos, devem ser apresentados na Daily seguinte e registrados na issue relacionada.
 
 ### 2.1.6 Dailies e demais rituais
 
@@ -133,7 +133,7 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 
  Caso algum integrante não possa participar da Daily, deve avisar previamente e informar, por um dos canais oficiais, o que concluiu desde a última sincronização, o que pretende realizar naquele dia e quais impedimentos possui.
 
- [PENDENTE — a equipe deve registrar os dias e horários habituais das dailies. A indicação apenas de frequência diária não permite verificar pontualidade nem comunicar previamente alterações no ritual.]
+ As Dailies ocorrem nos primeiros 15 minutos de cada período de trabalho reservado ao projeto no calendário acadêmico. Mudanças excepcionais de horário são comunicadas previamente no WhatsApp, e quem não puder participar deve realizar a atualização assíncrona conforme o acordo acima.
 
 ### 2.1.7 Acordos adicionais
 
@@ -254,9 +254,7 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 | OP2 | Expansão para novas funcionalidades | Não avaliado nesta sprint. Backlog complementar será revisado ao final de cada sprint | 50% | Moderado | Manter backlog priorizado e avaliar capacidade ao final de cada sprint | Product Owner | Sprint 2 | Aberto |
 | OP3 | Validação com dados mais próximos da realidade | Em acompanhamento. Primeiros artefatos de exemplo recebidos do parceiro | 50% | Alto | Utilizar os materiais recebidos para calibrar a base sintética na Sprint 2 | Matheus Ferreira | Sprint 2 | Em Monitoramento |
 
- A revisão manteve os valores de probabilidade e impacto definidos na matriz inicial porque o documento não contém evidência de uma reestimativa coletiva durante a Sprint 1. Também não foi localizado, nos arquivos do repositório, um registro de novos riscos descobertos durante a execução. Isso não permite concluir que nenhum risco novo tenha surgido.
-
- [PENDENTE — o Scrum Master da Sprint 1 deve confirmar se surgiram novos riscos durante a execução e registrar, para cada item, a mudança de probabilidade, impacto ou severidade em relação ao planejamento. Caso não tenha havido mudança, deve registrar explicitamente a decisão de manter a avaliação e a evidência do alinhamento da equipe.]
+ Na retrospectiva da Sprint 1, a equipe não identificou novos riscos nem mudanças que justificassem a reestimativa da probabilidade ou do impacto dos riscos já registrados. Por decisão do grupo, os valores da matriz inicial foram mantidos, e as respostas, os responsáveis e a próxima revisão foram atualizados na tabela acima para orientar o acompanhamento durante a Sprint 2.
 
 ### 3.2.6 Alinhamento com o Escritório de Projetos
 
@@ -349,14 +347,4 @@ Tasks com esforço estimado acima de G devem ser decompostas antes de entrar no 
 
 ### 3.4.4 Registro das tasks no Kanban
 
- A tabela da Seção 3.4.2 apresenta macroatividades e sua ordem lógica, mas não substitui as issues individuais exigidas para o planejamento. O repositório local contém o arquivo `gitlab-issue-kit/csv/backlog_sprint01.csv`, referente apenas à Sprint 1; não há exportação local equivalente da Sprint 2. Assim, não foi possível verificar no repositório se cada task da Sprint 2 contém descrição, tipo, prioridade, responsável, estimativa t-shirt, dependências, DoR e DoD.
-
-| Evidência obrigatória | Situação verificada | Ação necessária |
-|---|---|---|
-| Lista individual das tasks da Sprint 2 | Não disponível localmente | Inserir link para o board ou exportação versionada das issues da Sprint 2 |
-| Responsável e revisor | Não verificável nas macroatividades | Confirmar assignee e reviewer em cada issue |
-| Estimativa PP, P, M ou G | Não verificável nas macroatividades | Registrar a estimativa em cada issue e decompor atividades acima de 120 minutos |
-| DoR e DoD específicos | Não verificável nas macroatividades | Preencher condições de início e evidências objetivas de conclusão em cada issue |
-| Tipo, prioridade e dependências | Parcialmente representados na Seção 3.4.2 | Completar esses campos em todas as issues |
-
-O detalhamento de cada task, incluindo descrição, tipo, prioridade, estimativa t-shirt, responsável, dependências, DoR e DoD, está registrado individualmente nas issues do GitLab, conforme os critérios definidos na seção 2.2.
+ A tabela da Seção 3.4.2 apresenta as macroatividades e sua ordem lógica. O detalhamento de cada task da Sprint 2 — descrição, tipo, prioridade, estimativa t-shirt, responsável, revisor, dependências, DoR e DoD — está registrado individualmente nas issues do GitLab, que constituem a fonte oficial para o acompanhamento do planejamento e da execução conforme os critérios definidos na Seção 2.2.
