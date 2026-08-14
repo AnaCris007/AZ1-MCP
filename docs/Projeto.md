@@ -1058,7 +1058,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 |---|---|---|
 | Usuário | Ator que inicia a interação nos cenários 1 e 2 e recebe a notificação no cenário 3 | Classe `Usuário` e suas especializações |
 | `: InterfaceDeChat` | Canal de entrada e saída das solicitações em linguagem natural | Componente de interface (seção 2.4) |
-| `: ServicoDeVoz` | Converte áudio em texto na entrada e texto em áudio na saída (exclusivo do cenário 1) | Componente de serviços (seção 2.4) |
+| `: ServicoDeVoz` | Converte áudio em texto na entrada (exclusivo do cenário 1) | Componente de serviços (seção 2.4) |
 | `: PipelinePLN` | Conduz o tratamento da solicitação, extrai as entidades do texto e aciona os demais componentes | Componente de lógica de negócio (seção 2.4) |
 | `: Intencao` | Detém o catálogo de intenções e classifica o texto contra ele, devolvendo a intenção reconhecida e os parâmetros que ela exige | Componente de lógica de negócio (seção 2.4) |
 | `: Agente` | Orquestra a execução da intenção, consulta as fontes e compõe a resposta | Componente de lógica de negócio (seção 2.4) |
@@ -1112,10 +1112,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 | 12 | `buscarDados(projeto, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF02 |
 | 13 | `dados, caminho` | Retorno | `: FonteDeDados` | `: Agente` | RF02, RF03 |
 | 14 | `exibirResposta(resposta, referencia, data)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
-| 15 | `sintetizar(resposta)` | Síncrona | `: InterfaceDeChat` | `: ServicoDeVoz` | RF01 |
-| 16 | `audioResposta` | Retorno | `: ServicoDeVoz` | `: InterfaceDeChat` | RF01 |
-| 17 | `audioResposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF01, RF03 |
-| 18 | `resposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF01, RF03 |
+| 15 | `resposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF01, RF03 |
 
 **Fragmentos de interação:**
 
@@ -1123,16 +1120,14 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 |---|---|---|---|
 | `alt` de entrada | `[canal de entrada em áudio]` | Passos 1 a 4: a solicitação chega em áudio, o `: ServicoDeVoz` a transcreve e a transcrição é devolvida ao usuário para conferência | RF01 |
 | `alt` de entrada | `[canal de entrada em texto]` | Passo 5: a solicitação já chega em texto e segue direto para o tratamento | RF01 |
-| `alt` de saída | `[canal de entrada em áudio]` | Passos 15 a 17: a resposta é sintetizada em áudio antes de ser devolvida | RF01, RF03 |
-| `alt` de saída | `[canal de entrada em texto]` | Passo 18: a resposta é devolvida em texto | RF01, RF03 |
 
-&emsp; Os dois fragmentos `alt` usam deliberadamente a mesma condição de guarda. Não se trata de repetição acidental: é essa coincidência que expressa graficamente a exigência do RF01 de que o canal da resposta corresponda ao canal da solicitação. Se o fragmento de saída tivesse guarda própria, como uma preferência declarada pelo usuário, o critério de aceitação estaria violado, porque a resposta poderia divergir do canal de entrada.
+&emsp; O fragmento `alt` aplica-se somente à entrada, distinguindo as solicitações recebidas em áudio das recebidas em texto. Após a transcrição do áudio, ambas seguem pelo mesmo fluxo de processamento e resultam em uma resposta textual, independentemente do formato da solicitação original, conforme definido pelo RF01.
 
 &emsp; O passo 4 devolve a transcrição ao próprio usuário antes de a solicitação seguir para o tratamento. Esse retorno atende à cláusula de conferência do RF01 e é o que permite ao usuário perceber um erro de transcrição antes de receber uma resposta construída sobre a interpretação errada.
 
 &emsp; A classificação da intenção não é uma operação interna do `: PipelinePLN`, e sim uma chamada ao `: Intencao`, que detém o catálogo. A escolha segue o princípio de atribuir a responsabilidade a quem possui a informação necessária para cumpri-la: só quem conhece as intenções catalogadas consegue dizer a qual delas o texto corresponde. O retorno do passo 8 traz duas informações, a intenção reconhecida e os parâmetros que ela exige, e é o segundo deles que orienta a extração de entidades do passo 9.
 
-&emsp; O passo 13 devolve, além dos dados do projeto, o caminho do artefato de origem. Esse retorno conjunto é o que permite aos passos 17 e 18 entregarem conteúdo, referência e data em uma única exibição, atendendo ao RF03 sem uma consulta adicional às fontes.
+&emsp; O passo 13 devolve, além dos dados do projeto, o caminho do artefato de origem. Esse retorno conjunto é o que permite ao passo 15 entregar conteúdo, referência e data em uma única exibição textual, atendendo ao RF03 sem uma consulta adicional às fontes.
 
 #### Cenário 2: sugerir preenchimento de documento
 
