@@ -803,168 +803,47 @@ A modelagem e a visão técnica da solução deverão considerar componentes res
 
 ## 2.4 Visão Inicial da Solução Técnica
 
-<!-- OBRIGATÓRIO: diagrama UML de componentes ou de pacotes.
-     Esboço em blocos conectados cobrindo as 3 camadas:
-     interface humano-computador, lógica de negócio, acesso a dados/serviços. -->
+&emsp; A visão técnica apresentada nesta seção traduz, em um esboço preliminar de arquitetura, os fluxos de negócio descritos na seção 2.1 e os requisitos funcionais e não funcionais especificados nas seções 2.2 e 2.3. O diagrama a seguir representa a solução como um conjunto de blocos conectados, organizados em três camadas: interface humano-computador, lógica de negócio e acesso a dados e serviços.
+
+&emsp; A divisão dos componentes de compreensão de linguagem segue o padrão adotado tanto por frameworks open-source de assistentes conversacionais, como o Rasa (RASA, 2024), quanto pela própria plataforma de bots da Microsoft (MICROSOFT, 2024), ecossistema já utilizado pelo parceiro por meio do Copilot Studio. Em ambos os casos, a compreensão da mensagem do usuário é dividida entre um componente de classificação de intenção, responsável por identificar o que o usuário deseja, e um componente de extração de parâmetros, responsável por capturar os dados específicos mencionados na solicitação, como o nome do projeto ou o período de referência.
 
 ### Diagrama de componentes (UML)
 
-A divisão dos componentes de compreensão de linguagem segue o padrão adotado tanto por frameworks open-source de assistentes conversacionais, como o Rasa (RASA, 2024), quanto pela própria plataforma de bots da Microsoft (MICROSOFT, 2024), ecossistema já utilizado pelo parceiro por meio do Copilot Studio. Em ambos os casos, a compreensão da mensagem do usuário é dividida entre um componente de classificação de intenção, responsável por identificar o que o usuário deseja, e um componente de extração de entidades, responsável por capturar os dados específicos mencionados na solicitação (ex.: nome do projeto, período de referência).
-
-### 2.4.1 Diagrama de componentes — MVP
-
 <div align="center">
-<sub>Imagem 2.4.1 - Diagrama de componentes (UML) — MVP</sub>
-</div>
-
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {
-  'primaryColor': '#F7F8FA',
-  'primaryBorderColor': '#5B6B79',
-  'primaryTextColor': '#1F2A33',
-  'lineColor': '#8592A0',
-  'fontFamily': 'Helvetica, Arial, sans-serif',
-  'fontSize': '14px'
-}}}%%
-graph TD
-    subgraph IHC["Camada de Interface (IHC)"]
-        UI[Chat UI - Texto e Voz]
-    end
-
-    subgraph LN["Camada de Lógica de Negócio"]
-        ORQ[Orquestrador de Requisições]
-        PLN["Pipeline de PLN<br/>STT · Classificação de Intenção · Extração de Entidades"]
-        AUTH[Controle de Acesso e Autenticação]
-        ACAO["Módulos de Ação<br/>Respostas · Sugestões · Alertas"]
-        AUDIT_M[Auditoria e Feedback]
-    end
-
-    subgraph DS["Camada de Dados e Serviços"]
-        DB[(Base de Dados Sintética do Portfólio)]
-        DOC[(Documentos e Normativos)]
-        LOGS[(Logs de Auditoria)]
-    end
-
-    UI --> ORQ
-    ORQ --> AUTH --> DB
-    ORQ --> PLN
-    PLN --> ACAO
-    ACAO --> DB
-    ACAO --> DOC
-    ACAO --> UI
-    ORQ --> AUDIT_M --> LOGS
-
-    style IHC fill:#EAF1F8,stroke:#4A6D8C,stroke-width:1px
-    style LN fill:#F1EEF8,stroke:#6E5A96,stroke-width:1px
-    style DS fill:#EAF5EE,stroke:#4C8465,stroke-width:1px
-```
-
-<div align="center">
-<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+<sub>Imagem 2.4.1 - Diagrama de componentes (UML) — Visão inicial da solução técnica</sub><br>
+  <img src="../assets/diagrama_componentes.svg" width="100%" alt="Diagrama de componentes UML da solução, organizado em três camadas: interface, lógica de negócio e dados e serviços"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
 <p align="center">
-  Para melhor visualização do diagrama, acesse o arquivo no <a href="COLOCAR_LINK_MVP_AQUI">Google Drive</a>.
+  Para melhor visualização do diagrama, acesse o arquivo no <a href="https://drive.google.com/file/d/154cjwt0ZTBpfKCDS-TIXnqn2YJdOKqlL/view?usp=sharing">Google Drive</a>.
 </p>
 
-### Descrição das camadas — MVP
+### Descrição das camadas
 
 | Camada | Componentes | Responsabilidade |
 |---|---|---|
-| **Interface (IHC)** | Chat UI (texto e voz) | Recebe a solicitação do usuário nos dois canais previstos e exibe a resposta estruturada, incluindo a transcrição do áudio para conferência quando aplicável. |
-| **Lógica de negócio** | Orquestrador, Pipeline de PLN, Controle de Acesso e Autenticação, Módulos de Ação, Auditoria e Feedback | O Pipeline de PLN concentra a conversão de áudio em texto, a classificação de intenção e a extração de entidades da solicitação. O Controle de Acesso autentica o usuário e valida suas permissões antes de qualquer consulta. Os Módulos de Ação montam a resposta estruturada com indicação de fonte e data, geram sugestões de preenchimento de campos e disparam alertas proativos. O bloco de Auditoria e Feedback registra toda interação para fins de rastreabilidade e coleta a avaliação do usuário sobre as respostas recebidas. |
-| **Dados e serviços** | Base de Dados Sintética do Portfólio, Documentos e Normativos, Logs de Auditoria | Armazenam os dados sintéticos que simulam o portfólio real, os documentos de projeto e normativos consultáveis pelo agente, e os registros de auditoria protegidos contra alteração por usuários comuns. |
+| **Interface (IHC)** | Chat UI - Texto e Voz | Recebe a solicitação do usuário nos dois canais previstos pelo RF01 e exibe a resposta estruturada ao final do processamento. |
+| **Lógica de negócio** | API Gateway, Conversão de Áudio em Texto, Controle de Acesso, PLN - Compreensão (Intenção e Parâmetros), PLN - Transações e Ações, Gerador de Respostas e Explicabilidade, Auditoria e Feedback | O API Gateway centraliza a entrada das solicitações, roteando-as para a Conversão de Áudio em Texto quando a entrada ocorre por voz (RNF06), e em seguida para o Controle de Acesso, que autentica o usuário e valida suas permissões antes de qualquer processamento de linguagem (RNF02). Autorizada a solicitação, o componente de PLN - Compreensão identifica a intenção e extrai os parâmetros relevantes (RNF03), direcionando-a para o componente de PLN - Transações e Ações, responsável pela lógica de negócio de sugestões de preenchimento (RF03) e notificações de pendências (RF04), ou diretamente para o Gerador de Respostas, no caso de consultas (RF01). O Gerador de Respostas monta a saída final, indicando a fonte da informação (RF02) e a justificativa quando aplicável (RNF11), tanto para consultas diretas quanto para o resultado de uma ação processada. Por fim, o componente de Auditoria e Feedback registra o identificador do usuário, o canal, a intenção e o resultado de cada solicitação (RNF04), além de capturar a avaliação do usuário sobre a resposta recebida. |
+| **Dados e serviços** | Repositório de Dados e Conhecimento, Logs de Auditoria | O Repositório de Dados e Conhecimento reúne, sobre a base sintética fornecida pelo parceiro, os dados estruturados do portfólio (projetos, prazos, marcos, riscos), o catálogo de intenções validado com o Metrô e a base de normativos utilizada para o esclarecimento de dúvidas conceituais (RF01, RF03 da seção 1.7, feature 12). Os Logs de Auditoria armazenam, em um repositório separado, os registros de interação e de feedback protegidos contra alteração por usuários comuns (RNF04) — separação motivada pelo padrão de escrita e pelo requisito de imutabilidade distintos dos dados operacionais do portfólio. |
 
-### Conexões entre componentes — MVP
+### Conexões entre componentes
 
-- **Chat UI → Orquestrador:** encaminha a solicitação do usuário para processamento central, já com a transcrição feita quando a entrada for por voz.
-- **Orquestrador → Controle de Acesso → Base de Dados:** valida a permissão do usuário conforme seu perfil antes de autorizar qualquer consulta.
-- **Orquestrador → Pipeline de PLN → Módulos de Ação:** identifica a intenção e as entidades da solicitação, encaminhando para o módulo de ação correspondente (resposta, sugestão ou alerta).
-- **Módulos de Ação → Base de Dados / Documentos:** consultam as fontes necessárias para compor a resposta, a sugestão de preenchimento ou o alerta.
-- **Módulos de Ação → Chat UI:** retornam a resposta estruturada, com fonte e data de apuração, ao usuário.
-- **Orquestrador → Auditoria e Feedback → Logs:** registra identificador do usuário, data, canal, intenção identificada, fontes consultadas, resultado da solicitação e a avaliação do usuário sobre a resposta recebida.
-
----
-
-### 2.4.2 Diagrama de componentes — Evolução Futura
-
-O diagrama a seguir representa o MVP descrito acima acrescido dos componentes correspondentes às features classificadas como "Evolução futura" no brainstorming (seção 1.7): análise comparativa entre projetos, prévia de relatório de status, fluxo guiado de criação de projetos, painel de alertas e notificações automáticas. Os componentes novos estão destacados visualmente. Funcionalidades da categoria "Registro para o futuro" (Ir Além e demais desejos do parceiro), por dependerem de integração com o portfólio real e de aprovações de TI e compliance, não são representadas neste diagrama.
-
-<div align="center">
-<sub>Imagem 2.4.2 - Diagrama de componentes (UML) — Evolução Futura</sub>
-</div>
-
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {
-  'primaryColor': '#F7F8FA',
-  'primaryBorderColor': '#5B6B79',
-  'primaryTextColor': '#1F2A33',
-  'lineColor': '#8592A0',
-  'fontFamily': 'Helvetica, Arial, sans-serif',
-  'fontSize': '14px'
-}}}%%
-graph TD
-    subgraph IHC["Camada de Interface (IHC)"]
-        UI[Chat UI - Texto e Voz]
-        PAINEL[Painel de Alertas e Pendências]:::novo
-    end
-
-    subgraph LN["Camada de Lógica de Negócio"]
-        ORQ[Orquestrador de Requisições]
-        PLN["Pipeline de PLN<br/>STT · Classificação de Intenção · Extração de Entidades"]
-        AUTH[Controle de Acesso e Autenticação]
-        ACAO["Módulos de Ação<br/>Respostas · Sugestões · Alertas"]
-        AUDIT_M[Auditoria e Feedback]
-        EVOL["Módulos de Evolução<br/>Análise Comparativa · Prévia de Relatórios · Fluxo Guiado"]:::novo
-        NOTIF[Serviço de Notificações Automáticas]:::novo
-    end
-
-    subgraph DS["Camada de Dados e Serviços"]
-        DB[(Base de Dados Sintética do Portfólio)]
-        DOC[(Documentos e Normativos)]
-        LOGS[(Logs de Auditoria)]
-        TEMPLATE[(Templates de Relatório e Apresentação)]:::novo
-    end
-
-    UI --> ORQ
-    ORQ --> AUTH --> DB
-    ORQ --> PLN
-    PLN --> ACAO
-    ACAO --> DB
-    ACAO --> DOC
-    ACAO --> UI
-    ORQ --> AUDIT_M --> LOGS
-
-    ORQ --> EVOL --> DB
-    EVOL --> TEMPLATE
-    ACAO --> NOTIF --> PAINEL
-
-    style IHC fill:#EAF1F8,stroke:#4A6D8C,stroke-width:1px
-    style LN fill:#F1EEF8,stroke:#6E5A96,stroke-width:1px
-    style DS fill:#EAF5EE,stroke:#4C8465,stroke-width:1px
-    classDef novo fill:#FCEFDC,stroke:#B9791E,stroke-width:1.5px,stroke-dasharray: 4 3
-```
-
-<div align="center">
-<sup>Fonte: Material produzido pelos autores, 2026.</sup>
-</div>
-
-<p align="center">
-  Para melhor visualização do diagrama, acesse o arquivo no <a href="COLOCAR_LINK_EVOLUCAO_AQUI">Google Drive</a>.
-</p>
-
-### Descrição das camadas — componentes novos (Evolução Futura)
-
-| Camada | Componentes novos | Responsabilidade |
-|---|---|---|
-| **Interface (IHC)** | Painel de Alertas e Pendências | Interface dedicada para visualização consolidada de alertas e pendências, complementando a interação por chat com uma visão em painel. |
-| **Lógica de negócio** | Módulos de Evolução (Análise Comparativa, Prévia de Relatórios, Fluxo Guiado de Criação), Serviço de Notificações Automáticas | Permitem cruzar dados entre múltiplos projetos do portfólio, gerar prévias de relatório de status e de apresentação a partir de templates fornecidos pelo parceiro, conduzir o usuário por etapas na criação de um novo projeto, e transformar os alertas já identificados em notificações automáticas. |
-| **Dados e serviços** | Templates de Relatório e Apresentação | Armazena os modelos de relatório e apresentação já utilizados pelo Metrô, servindo de base para a geração das prévias. |
-
-### Conexões entre componentes novos — Evolução Futura
-
-- **Orquestrador → Módulos de Evolução → Base de Dados / Templates:** cruza dados entre múltiplos projetos e consolida informações em relatórios e apresentações, a partir dos templates fornecidos pelo parceiro.
-- **Módulos de Ação → Serviço de Notificações → Painel de Alertas:** transforma os alertas já identificados em notificações automáticas, consolidadas visualmente no painel do usuário.
+- **Chat UI → API Gateway:** encaminha a solicitação do usuário, em texto ou em áudio, para processamento central.
+- **API Gateway → Conversão de Áudio em Texto:** quando a entrada é por voz, o Gateway aciona a conversão antes de prosseguir com o restante do fluxo.
+- **Conversão de Áudio em Texto → Controle de Acesso:** o texto transcrito segue para validação de permissão, no mesmo fluxo de uma entrada digitada.
+- **API Gateway → Controle de Acesso:** toda solicitação recebida em texto é validada quanto à permissão do usuário antes do processamento de linguagem.
+- **Controle de Acesso → PLN - Compreensão:** somente solicitações autorizadas seguem para o reconhecimento de intenção e a extração de parâmetros.
+- **PLN - Compreensão → PLN - Transações e Ações:** intenções classificadas como ação (sugestão de preenchimento ou alerta) são encaminhadas para a lógica de negócio correspondente.
+- **PLN - Compreensão → Gerador de Respostas:** intenções classificadas como consulta direta seguem para a montagem da resposta.
+- **PLN - Transações e Ações → Repositório de Dados:** consulta os dados necessários para compor a sugestão de preenchimento ou identificar a pendência elegível para alerta.
+- **PLN - Transações e Ações → Gerador de Respostas:** encaminha o resultado da ação processada para formatação da saída final.
+- **Gerador de Respostas → Repositório de Dados:** consulta as informações necessárias para compor a resposta a uma consulta direta.
+- **Gerador de Respostas → Chat UI:** retorna a resposta estruturada ao usuário, com indicação da fonte e da data de apuração.
+- **Gerador de Respostas → Auditoria e Feedback:** registra a resposta entregue e habilita a coleta do feedback do usuário sobre ela.
+- **API Gateway → Auditoria e Feedback:** registra a solicitação recebida, o canal e o identificador do usuário.
+- **PLN - Transações e Ações → Auditoria e Feedback:** registra a ação processada e seu resultado.
+- **Auditoria e Feedback → Logs de Auditoria:** persiste os registros de interação e de feedback no repositório de logs.
 
 ---
 
