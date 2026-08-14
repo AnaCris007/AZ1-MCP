@@ -119,15 +119,11 @@
 
 ## 1.1 Objetivo do documento
 
-<!-- Explique que o documento mantém as práticas permanentes do módulo e os registros específicos de cada sprint. -->
-
-_Conteúdo a ser preenchido pela equipe._
+Este documento reúne as práticas permanentes de gestão adotadas pela equipe ao longo do módulo e os registros específicos de cada sprint. De um lado, consolida os acordos de convivência, os rituais, as políticas de processo e o mecanismo de acompanhamento dos riscos, que valem desde a Sprint 1 até o encerramento do projeto. De outro, preserva, sprint a sprint, a análise retrospectiva, a matriz de papéis e responsabilidades e o planejamento do ciclo seguinte, permitindo rastrear a evolução da equipe e das entregas ao longo do tempo. O objetivo é garantir que o grupo opere de forma organizada, transparente e coerente com os critérios do Escritório de Projetos, e que qualquer integrante ou avaliador consiga compreender o estado do projeto e as decisões tomadas em cada etapa.
 
 ## 1.2 Organização evolutiva do documento
 
-<!-- Explique que os acordos permanentes ficam em seção própria e que cada sprint preserva apenas seus registros específicos. A gestão de configuração permanece em GestaoConfiguracao.md. -->
-
-_Conteúdo a ser preenchido pela equipe._
+O documento está dividido em duas grandes partes. A primeira, composta pela Seção 2, reúne os acordos e práticas permanentes que se aplicam a todo o módulo: o Contrato de Convivência, a Gestão do Processo de Desenvolvimento e o mecanismo de Acompanhamento Contínuo dos Riscos. Essas diretrizes não são reescritas a cada sprint — eventuais ajustes são incorporados sem apagar o histórico dos acordos anteriores, de modo que a evolução dos combinados fique registrada. A segunda parte, composta pelas Seções 3 a 7, reúne os registros específicos de cada sprint: a síntese e a retrospectiva, a revisão dos riscos, a matriz de papéis e responsabilidades e o planejamento da sprint seguinte. Cada sprint preserva seus próprios registros, sem sobrescrever os das sprints anteriores, o que permite acompanhar a evolução da equipe ao longo do módulo. A gestão de configuração, por sua vez, está documentada em arquivo separado, o GestaoConfiguracao.md, que define o fluxo gitflow, as políticas de branches e os procedimentos de criação, mesclagem e exclusão.
 
 ---
 
@@ -189,42 +185,40 @@ _Conteúdo a ser preenchido pela equipe._
 
 ### 2.2.1 Fluxo de trabalho
 
-<!-- Descreva o fluxo da task desde sua criação até revisão e conclusão. -->
+&emsp; O fluxo de trabalho da equipe segue o ciclo completo de uma task, desde sua concepção até o encerramento. Na Sprint Planning, realizada no início de cada sprint, as tasks são definidas coletivamente, estimadas em t-shirt (PP, P, M ou G) e distribuídas entre os integrantes, considerando o equilíbrio de carga, a rotação de responsabilidades e o desenvolvimento de habilidades multidisciplinares. Cada task nasce como uma issue no GitLab, criada na coluna open, com título no infinitivo, descrição, objetivo, DoR, DoD, labels, responsável e milestone da sprint preenchidos antes de ser movida para o backlog.
 
-_Conteúdo a ser preenchido pela equipe._
+&emsp; Durante o desenvolvimento, o integrante responsável move a issue para doing ao iniciar o trabalho, abre uma branch no padrão definido em GestaoConfiguracao.md e realiza commits atômicos e frequentes, sempre referenciando a issue com #. Ao concluir o desenvolvimento, abre um Merge Request para a branch dev, move a issue para waiting review e designa um revisor. O revisor analisa o conteúdo, registra comentários e aprovações diretamente no MR. Após a aprovação e o merge, a issue é encerrada automaticamente pelo Closes e movida para closed, com o DoD verificado. Tasks maiores que G devem ser decompostas antes de entrar no backlog.
 
 ### 2.2.2 Política de atualização do GitLab
 
-<!-- Defina responsáveis, frequência, movimentação dos cards, bloqueios e encerramento. -->
+&emsp; O quadro Kanban no GitLab é o instrumento oficial de visibilidade do trabalho da equipe e deve refletir o estado real das tasks a qualquer momento. A movimentação dos cards é responsabilidade de cada integrante: ao iniciar, revisar ou concluir uma task, o próprio responsável atualiza a coluna correspondente, sem esperar a daily ou a planning para fazê-lo. A atualização obrigatória ocorre diariamente, antes da daily, de modo que a sincronização parta de um quadro já atualizado.
 
-_Conteúdo a ser preenchido pela equipe._
+&emsp;Issues sem milestone, sem assignee ou sem labels são consideradas não conformes e devem ser corrigidas antes de entrar em doing. Ao final da sprint, todas as issues abertas são revisadas na retrospectiva: as concluídas são encerradas, e as não concluídas são reavaliadas e replanejadas para a sprint seguinte.
+
+&emsp; Cards em waiting review são de responsabilidade do autor da task. Cabe a ele acompanhar o prazo de revisão, verificar se o revisor foi corretamente designado e cobrar ativamente a revisão caso ela não ocorra dentro do prazo acordado. Cards parados em waiting review por mais de dois dias sem nenhuma interação no MR devem ser sinalizados pelo autor na daily seguinte, para que o impedimento seja resolvido sem comprometer a entrega da sprint.
 
 ### 2.2.3 Política de commits
 
-<!-- Registre frequência, vínculo com tasks, formato das mensagens e revisão. Branches e merges pertencem a GestaoConfiguracao.md. -->
-
-_Conteúdo a ser preenchido pela equipe._
+&emsp; Os commits devem ser realizados com frequência ao longo de toda a sprint, distribuídos de forma consistente entre os dias de trabalho. A concentração de commits no último dia do sprint é considerada um anti-padrão e impacta negativamente a avaliação do dashboard ágil do módulo. Cada commit deve seguir o formato Conventional Commits, padronizado em português pela equipe, com tipo, escopo opcional e descrição curta no infinitivo, referenciando a issue correspondente com # em algum ponto da mensagem. Um commit representa uma única intenção de trabalho: funcionalidades, correções, documentação e refatorações não devem ser misturadas no mesmo commit. Os tipos aceitos são feat, fix, docs, style, refactor, test, chore, perf, ci, build e revert, e a descrição deve ter no máximo 72 caracteres na primeira linha. Commits sem referência à issue ou fora do formato Conventional Commits são considerados não conformes pelo dashboard e devem ser evitados desde o primeiro commit da sprint.
 
 ### 2.2.4 Revisão e melhoria contínua
 
-<!-- Explique como as políticas serão verificadas e ajustadas nas retrospectivas. -->
+&emsp; Toda entrega deve ser revisada por um integrante que não participou da execução da task, garantindo um olhar externo sobre o conteúdo produzido. Essa prática se aplica tanto ao código quanto à documentação: o autor abre o Merge Request, designa um revisor diferente de si mesmo e aguarda a aprovação antes do merge. O revisor é responsável por registrar comentários no MR, apontar inconsistências e aprovar formalmente a entrega, assegurando que o DoD foi atendido.
 
-_Conteúdo a ser preenchido pela equipe._
-
----
+&emsp; As políticas registradas nesta seção são revisadas a cada retrospectiva de sprint. Durante esse ritual, a equipe avalia se as diretrizes estão sendo seguidas, se geraram os resultados esperados e se precisam de ajuste. Melhorias identificadas são incorporadas ao documento sem apagar o histórico dos acordos anteriores, de modo que a evolução das práticas fique registrada e rastreável. As ações de melhoria definidas na retrospectiva são formalizadas na tabela de ações da seção correspondente à sprint e acompanhadas na planning seguinte, com verificação do critério de conclusão estabelecido.
 
 ## 2.3 Acompanhamento Contínuo dos Riscos
 
-<!-- Defina como a matriz de riscos será revisitada durante as cinco sprints. -->
+
+&emsp; A matriz de riscos registrada no artefato de negócios é revisitada a cada sprint, de modo que o grupo mantenha uma visão atualizada das ameaças e oportunidades ao longo de todo o módulo. A revisão não ocorre apenas na entrega final: ela é um item fixo da retrospectiva de cada sprint, garantindo que riscos materializados sejam tratados e que novos riscos identificados ao longo do desenvolvimento sejam incorporados. A tabela a seguir define o mecanismo de acompanhamento adotado pela equipe:
 
 | Elemento | Definição da equipe |
 |---|---|
-| Periodicidade da revisão | [Preencher] |
-| Responsável pelo acompanhamento | [Preencher] |
-| Ritual de revisão | [Preencher] |
-| Local de registro das atualizações | [Preencher] |
-| Critério para escalonamento | [Preencher] |
-
+| Periodicidade da revisão | Uma vez por sprint, durante a retrospectiva |
+| Responsável pelo acompanhamento | Scrum Master da sprint |
+| Ritual de revisão | Retrospectiva de sprint — item fixo de pauta |
+| Local de registro das atualizações | Tabela de revisão de riscos na seção da sprint correspondente (ex.: 3.2.5 para a Sprint 1) |
+| Critério para escalonamento | Risco materializado ou com probabilidade elevada para Alta e impacto Alto ou Muito Alto — comunicação imediata à orientadora |
 ---
 
 # 3. Sprint 1
