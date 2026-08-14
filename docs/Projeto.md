@@ -1090,7 +1090,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
 <div align="center">
   <sub>FIGURA 2.2: diagrama de sequência do cenário 1 (consultar informações do projeto)</sub><br>
-  <img src="../assets/sequencia-1.svg" width="100%" alt="Diagrama de sequência do cenário de consulta de informações do projeto"><br>
+  <img src="../assets/1.svg" width="100%" alt="Diagrama de sequência do cenário de consulta de informações do projeto"><br>
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
