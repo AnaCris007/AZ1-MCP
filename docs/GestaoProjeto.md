@@ -4,7 +4,7 @@
   </a>
 </p>
 
-# G01
+# Projeto: Azum
 
 ## Integrantes
 
@@ -15,27 +15,8 @@
 - [Paulo Henrique Bueno Fernandes](https://www.linkedin.com/in/paulo-henrique0601/)
 - [Rui Facó](https://www.linkedin.com/in/ruifac%C3%B3/)
 - [Tobias Viana](https://www.linkedin.com/in/tobias-viana/)
-
-## Orientadora
-
-- [Vanessa Nunes](https://www.linkedin.com/in/vanunes/)
-
-
-
-## Professores:
-### Orientador(a)
-- <a href="https://www.linkedin.com/in/vanunes/">Vanessa Nunes</a>
-### Instrutores
-- <a href="https://www.linkedin.com/in/reginaldo-arakaki-9574222b/">Computação - Reginaldo Arakaki</a>
-- <a href="https://www.linkedin.com/in/bryan-kano/">Computação - Bryan Kano</a>
-- <a href="https://www.linkedin.com/in/fernando-pizzo-208b526a/">Matemática e Física - Fernando Pizzo</a>
-- <a href="https://www.linkedin.com/in/lisane-valdo/">Negócios - Lisane Valdo</a>
-- <a href="https://www.linkedin.com/in/bruno-grandchamp-rodilha/?locale=pt">Design - Bruno Rodilha</a>
-- <a href="https://www.linkedin.com/in/professor1/">Liderança - Filipe Gonçalves</a>
-
 ---
 
-## Projeto: Azum
 
 # Gestão do Projeto
 
@@ -233,45 +214,85 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 
 | Aspecto | Registro |
 |---|---|
-| Objetivo da sprint | [Preencher] |
-| Entregas planejadas | [Preencher] |
-| Entregas concluídas | [Preencher] |
-| Resultado geral | [Preencher] |
+| Objetivo da sprint | Estabelecer o entendimento inicial do projeto, consolidando a visão de negócio, a proposta de solução e a especificação técnica preliminar |
+| Entregas planejadas | Artefato de entendimento de negócio (Projeto.md — negócios), artefato de especificação técnica (Projeto.md — técnico) e artefato de gestão do projeto (GestaoProjeto.md) |
+| Entregas concluídas | Artefato de entendimento de negócio, artefato de especificação técnica e artefato de gestão do projeto |
+| Resultado geral | Sprint concluída com todas as entregas planejadas realizadas. A equipe demonstrou boa organização e comunicação ao longo do ciclo, com pontos de melhoria identificados para a Sprint 2 |
 
 ### 3.2.2 Pontos fortes
 
 | Ponto forte | Evidência | Impacto no desempenho |
 |---|---|---|
-| [Preencher] | [Preencher] | [Preencher] |
+| Divisão equilibrada das tasks | Tasks distribuídas na planning com responsáveis definidos e estimativas t-shirt atribuídas, sem concentração de entregas em poucos integrantes | Reduziu a sobrecarga individual e permitiu que todas as frentes avançassem em paralelo ao longo da sprint |
+| Comunicação assertiva da equipe | Decisões registradas no canal oficial, dúvidas resolvidas com agilidade e alinhamentos realizados nas dailies sem necessidade de escalação | Evitou retrabalho e manteve o grupo alinhado sobre o escopo e as prioridades de cada entrega |
+| Encontros internos para discussão das tasks | Reuniões entre os membros para alinhar entendimento do problema, discutir decisões técnicas e revisar o conteúdo produzido antes da abertura dos MRs | Elevou a qualidade das entregas e garantiu coerência entre as seções dos artefatos produzidos por diferentes integrantes |
 
 ### 3.2.3 Pontos fracos
 
 | Ponto fraco | Evidência | Impacto | Causa provável |
 |---|---|---|---|
-| [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Processo de correção e revisão com distribuição irregular | Algumas revisões de MR concentradas em poucos integrantes, sem rotação sistemática entre os membros | Sobrecarga de alguns revisores e menor distribuição do aprendizado sobre o conteúdo de todas as frentes | Ausência de uma política explícita de atribuição de revisores, com a designação ocorrendo de forma informal |
+| Atualizações do Kanban com atrasos pontuais | Cards permaneceram em doing além do esperado sem movimentação para waiting review, dificultando a leitura do estado real da sprint | Redução da visibilidade do progresso e dificuldade de identificar impedimentos com antecedência | Falta de hábito consolidado de atualizar o quadro diariamente, com a movimentação ocorrendo em blocos ao final do dia ou da semana |
 
 ### 3.2.4 Ações de melhoria para a Sprint 2
 
 | Ação | Problema tratado | Responsável | Prazo | Critério de verificação | Status |
 |---|---|---|---|---|---|
-| [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | Não iniciada |
+| Definir na planning o revisor de cada MR, garantindo rotação entre os integrantes | Concentração de revisões em poucos membros | Scrum Master | Até o fim da Sprint Planning da Sprint 2 | Todos os MRs da sprint têm revisores distintos e nenhum integrante revisou mais de dois MRs seguidos sem que outro assumisse | Não iniciada |
+| Atualizar o Kanban diariamente antes da daily, com movimentação dos cards para a coluna correspondente ao estado real da task | Atrasos na atualização do quadro e perda de visibilidade | Cada integrante, pelo próprio card | Ao longo de toda a Sprint 2 | Nenhum card permanece na mesma coluna por mais de dois dias sem comentário de atualização ou label BLOCK | Não iniciada |
 
 ### 3.2.5 Revisão dos riscos na Sprint 1
 
 | ID | Risco | Situação na Sprint 1 | Probabilidade | Impacto | Resposta | Responsável | Próxima revisão | Status |
 |---|---|---|---|---|---|---|---|---|
-| [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-
-
+| AM1 | Comunicação interna do grupo | Não materializado. A comunicação foi assertiva e os acordos do grupo funcionaram bem durante a sprint | 30% | Alto | Manter as boas práticas de comunicação e revisar o documento de acordos na retrospectiva | Scrum Master | Sprint 2 | Em Monitoramento |
+| AM2 | Baixa acurácia na identificação de intenções | Não materializado. O catálogo de intenções ainda está sendo definido, sem desenvolvimento de pipeline nesta sprint | 30% | Muito Alto | Iniciar a definição do catálogo de intenções na Sprint 2 com base nos exemplos do TAPI | Ana Cristina | Sprint 2 | Aberto |
+| AM3 | Atraso na liberação de acesso ao ambiente Microsoft | Não materializado nesta sprint. Solicitação ainda não encaminhada formalmente | 70% | Moderado | Encaminhar solicitação formal com apoio da orientadora no início da Sprint 2 | Product Owner | Sprint 2 | Aberto |
+| AM4 | Atraso no fornecimento de informações pelo Metrô | Não materializado. Primeiros materiais recebidos dentro do prazo esperado | 50% | Alto | Manter canal ativo com o parceiro e antecipar solicitações de artefatos para as próximas sprints | Karol Barbosa | Sprint 2 | Aberto |
+| AM5 | Não conclusão do projeto dentro do prazo | Não materializado. Sprint 1 entregue com todas as entregas planejadas | 10% | Muito Alto | Manter o escopo priorizado e o ritmo de entregas incrementais | Scrum Master | Sprint 2 | Aberto |
+| AM6 | Dados insuficientes ou inadequados para validação | Não materializado. A construção da base sintética ainda não foi iniciada | 70% | Alto | Definir critérios de composição da base sintética na Sprint 2 | Matheus Ferreira | Sprint 2 | Aberto |
+| AM7 | Indisponibilidade ou sobrecarga de integrante | Não materializado. Todos os integrantes participaram ativamente da sprint | 50% | Moderado | Manter a distribuição equilibrada de tasks e documentar o conhecimento das frentes críticas | Scrum Master | Sprint 2 | Em Monitoramento |
+| OP1 | Reutilização e evolução da solução | Em acompanhamento. Decisões de arquitetura iniciais consideram o desacoplamento do núcleo de PLN | 70% | Alto | Documentar as decisões de arquitetura que sustentam o desacoplamento desde a Sprint 2 | Felipe Simão | Sprint 2 | Em Monitoramento |
+| OP2 | Expansão para novas funcionalidades | Não avaliado nesta sprint. Backlog complementar será revisado ao final de cada sprint | 50% | Moderado | Manter backlog priorizado e avaliar capacidade ao final de cada sprint | Product Owner | Sprint 2 | Aberto |
+| OP3 | Validação com dados mais próximos da realidade | Em acompanhamento. Primeiros artefatos de exemplo recebidos do parceiro | 50% | Alto | Utilizar os materiais recebidos para calibrar a base sintética na Sprint 2 | Matheus Ferreira | Sprint 2 | Em Monitoramento |
 
 ### 3.2.6 Alinhamento com o Escritório de Projetos
 
-| Critério | Evidência | Situação | Ação necessária |
-|---|---|---|---|
-| [Preencher] | [Preencher] | [Atendido/Parcial/Pendente] | [Preencher] |
+A avaliação abaixo registra a situação dos critérios ao final da Sprint 1. O estado **Atendido** identifica itens já presentes e adequados; **Em construção** identifica itens iniciados que ainda exigem revisão; e **Próximas sprints** identifica entregas de implementação previstas para etapas posteriores do projeto.
+
+| Categoria | Item | Critério | Situação | Evidência ou encaminhamento |
+|---|---:|---|---|---|
+| README | 1 | Nome do projeto presente? | Em construção | O projeto se chama Azum, mas o título principal do README ainda apresenta apenas o identificador G01. |
+| README | 2 | Nome do grupo presente? | Atendido | O grupo G01 está identificado no título do arquivo. |
+| README | 3 | Integrantes descritos? | Atendido | Os sete integrantes estão relacionados na seção Integrantes. |
+| README | 4 | Links dos integrantes presentes e corretos? | Atendido | Cada integrante possui um link para seu perfil no LinkedIn. |
+| README | 5 | Apresenta descrição curta do projeto? | Em construção | A seção existe, mas o texto descritivo definitivo ainda não foi inserido. |
+| README | 6 | Apresenta estrutura de pastas conforme o modelo (contrato, front-end e documentação)? | Em construção | A estrutura descrita ainda corresponde ao template e deverá ser atualizada conforme a organização real do repositório. |
+| README | 8 | Apresenta histórico de lançamentos? | Atendido | A seção Histórico de lançamentos está presente. |
+| README | 9 | Histórico de lançamentos adequado? | Em construção | As versões, datas e entregas ainda estão com valores de exemplo e deverão refletir as sprints reais. |
+| README | 10 | Apresenta licença? | Atendido | A seção Licença está presente no final do arquivo. |
+| README | 11 | Inteli consta na licença? | Atendido | O Inteli está citado na atribuição da licença. |
+| README | 12 | Nome do grupo ou dos integrantes presentes na licença? | Em construção | A licença ainda contém identificadores genéricos de alunos em vez dos nomes reais. |
+| README | 13 | Links dos integrantes ou do grupo corretos na licença? | Em construção | O endereço da licença ainda utiliza o link genérico do template. |
+| README | 15 | Não apresenta nenhuma outra imagem além da logo do Inteli? | Em construção | Além da logo do Inteli, a licença ainda incorpora ícones externos do Creative Commons. |
+| README | 16 | Instruções iniciais removidas? | Em construção | Ainda existem textos de orientação, placeholders e caminhos herdados do template inicial. |
+| Documentação | 1 | Apresenta pasta `documentos`, `docs` ou `documents` na raiz do projeto? | Atendido | A pasta `docs` está presente na raiz. |
+| Documentação | 2 | Apresenta arquivo `Index.md` preenchido que indexa todos os documentos da pasta `docs`? | Atendido | O `docs/Index.md` relaciona os quatro documentos existentes atualmente na pasta. |
+| Documentação | 3 | Documentação encontrada? | Atendido | A documentação principal está disponível em `docs/Projeto.md` e nos arquivos de gestão. |
+| Documentação | 4 | Sumário de todos os documentos `.md` navegáveis? | Atendido | Os documentos principais possuem sumários com links internos, e o `Index.md` centraliza a navegação. |
+| Documentação | 5 | Instruções e observações dos documentos removidas? | Em construção | Ainda existem comentários de instrução e marcações de preenchimento nos documentos de projeto e gestão. |
+| Documentação | 6 | Links acessíveis? | Em construção | A maior parte dos links está acessível, mas quatro imagens técnicas referenciadas em `Projeto.md` ainda não existem no repositório. |
+| Documentação | 7 | Não compartilha dados sensíveis? | Atendido | Não foram identificadas credenciais ou dados corporativos sensíveis na documentação. |
+| Documentação | 8 | Possui referências bibliográficas, se for o caso? | Atendido | As fontes utilizadas no entendimento de negócio estão registradas em `Projeto.md`. |
+| Documentação | 9 | Formatação adequada? | Em construção | A estrutura geral está padronizada, mas os placeholders e referências pendentes ainda precisam ser corrigidos. |
+| Documentação | 10 | Apresenta todas as seções preenchidas? | Em construção | Permanecem seções reservadas aos integrantes responsáveis e conteúdos técnicos ainda não concluídos. |
+| Documentação | 11 | Arquivos de instrução `.txt` ou não relevantes para o projeto foram removidos? | Atendido | A pasta `docs` contém apenas os quatro arquivos Markdown relevantes para a entrega atual. |
+| Documentação | 12 | Links acessíveis sem solicitação de permissão? | Atendido | A navegação principal utiliza caminhos relativos dentro do próprio repositório. |
+| Aplicação | 1 | Possui pasta `src`? | Atendido | A pasta `src` está presente na raiz do projeto. |
+| Aplicação | 2 | Possui pasta para a lógica ou codificação da aplicação? | Próximas sprints | A estrutura da lógica da aplicação será criada quando começar a implementação do produto. |
+| Aplicação | 3 | Possui arquivo `README.md` com informações sobre como executar a aplicação? | Próximas sprints | O guia de execução será produzido junto à primeira versão executável da aplicação. |
 
 ---
-
 ## 3.3 Matriz de Papéis e Responsabilidades
 
 ### 3.3.1 Papéis da Sprint 1
@@ -298,42 +319,35 @@ _Conteúdo a ser preenchido pela equipe._
 
 ### 3.4.1 Objetivo da sprint
 
-> **Objetivo da Sprint 2:** [Preencher com um resultado claro e verificável.]
+  &emsp; O objetivo é aprofundar o entendimento do usuário e materializar a proposta de UX/UI da solução, definir a estratégia técnica e arquitetural do projeto e evoluir as práticas de gestão da equipe, entregando os artefatos de Design Compreensivo, Estratégia Técnica da Solução e Gestão de Projetos Evolutiva.
 
 ### 3.4.2 Priorização e sequenciamento
 
 | Ordem | Task ou conjunto de tasks | Prioridade | Dependência | Justificativa |
 |---|---|---|---|---|
-| 1 | [Preencher] | [Alta/Média/Baixa] | [Preencher] | [Preencher] |
+| 1 | Estudo do usuário e definição das experiências desejadas | Alta | Entendimento de negócio e requisitos da Sprint 1 | Base para toda a proposta de UX/UI; sem o estudo do usuário não é possível definir experiências nem prototipar interfaces |
+| 2 | Proposta de UX e projeto visual (wireframes e mockups) | Alta | Estudo do usuário concluído | A proposta de UI depende da proposta de UX para garantir coerência com as necessidades mapeadas |
+| 3 | Definição do algoritmo de NLP e da pilha de tecnologias | Alta | Especificação técnica da Sprint 1 | As demais decisões técnicas (APIs, deploy, arquitetura) dependem da escolha do algoritmo e da pilha |
+| 4 | Detalhamento das APIs de Speech to Text, Text to Speech e recebimento de áudios | Alta | Algoritmo e pilha definidos | As APIs precisam ser coerentes com as escolhas de tecnologia |
+| 5 | Modelagem de dados e projeto arquitetural (UML) | Alta | APIs e algoritmo definidos | A modelagem e os diagramas UML consolidam as decisões técnicas e orientam o desenvolvimento |
+| 6 | Processo de deploy em nuvem e estratégia de entrega para Sprints 3, 4 e 5 | Média | Projeto arquitetural definido | O deploy e a estratégia de entrega dependem da arquitetura estar estabilizada |
+| 7 | Retrospectiva da Sprint 1, revisão dos riscos e atualização da matriz de papéis | Alta | Nenhuma | Entrega de gestão independente das demais frentes; deve ser iniciada no começo da sprint |
+| 8 | Planejamento da Sprint 3 no Kanban | Alta | Retrospectiva e planejamento técnico concluídos | O planejamento da Sprint 3 depende das conclusões da retrospectiva e do estado técnico do projeto |
 
 ### 3.4.3 Escala de estimativas
 
 | Tamanho | Esforço estimado |
 |---|---|
-| PP | Menor que o esforço classificado como P |
+| PP | Até 15 minutos |
 | P | Até 30 minutos |
 | M | De 30 a 60 minutos |
 | G | De 60 a 120 minutos |
 
-<!-- Defina um limite objetivo para PP. Tasks maiores que G devem ser decompostas. -->
+Tasks com esforço estimado acima de G devem ser decompostas antes de entrar no backlog.
 
 ### 3.4.4 Registro das tasks no Kanban
 
-**Link do quadro:** [Inserir link do Kanban da Sprint 2.]
-
-Cada task deve conter título, descrição, tipo, prioridade, estimativa t-shirt, responsável, dependências, DoR e DoD.
-
-### 3.4.5 Definition of Ready
-
-- [Critério definido pela equipe];
-- [Critério definido pela equipe];
-- [Critério definido pela equipe].
-
-### 3.4.6 Definition of Done
-
-- [Critério definido pela equipe];
-- [Critério definido pela equipe];
-- [Critério definido pela equipe].
+&emsp; O detalhamento de cada task, incluindo descrição, tipo, prioridade, estimativa t-shirt, responsável, dependências, DoR e DoD, está registrado individualmente nas issues do GitLab, conforme os critérios definidos na seção 2.2.
 
 ---
 
