@@ -4,9 +4,9 @@
   </a>
 </p>
 
-# AZ1
+# AZ1 
 
-**Grupo:** 1
+### **Grupo:** 1
 
 ## Integrantes
 
@@ -23,10 +23,6 @@
 - [Vanessa Nunes](https://www.linkedin.com/in/vanunes/)
 
 
-
-## Professores:
-### Orientador(a) 
-- <a href="https://www.linkedin.com/in/vanunes/">Vanessa Nunes</a>
 ### Instrutores
 - <a href="https://www.linkedin.com/in/reginaldo-arakaki-9574222b/">Computação - Reginaldo Arakaki</a>
 - <a href="https://www.linkedin.com/in/bryan-kano/">Computação - Bryan Kano</a>
