@@ -303,7 +303,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 
  Commits e pushes diretos para `main` e `develop` são proibidos. A integração deve ocorrer por Merge Request, com pelo menos um revisor diferente do autor e com os critérios da Seção 4.1 atendidos. Somente integrantes autorizados pelo grupo podem concluir o merge; o autor pode realizá-lo apenas depois da aprovação registrada pelo revisor. A rotação de responsáveis pelas promoções para `main` está definida no Contrato de Convivência.
 
- [PENDENTE — o responsável pela gestão de configuração deve anexar uma captura de tela ou um link acessível das regras de proteção configuradas no GitLab para `main` e `develop`, além da evidência de que um push direto foi recusado. O texto documenta a política, mas não comprova sua configuração.]
+ > **PENDENTE DE VALIDAÇÃO DA EQUIPE:** o responsável pela gestão de configuração deve anexar uma captura de tela ou um link acessível das regras de proteção configuradas no GitLab para `main` e `develop`, além da evidência de que um push direto foi recusado. O texto documenta a política, mas não comprova sua configuração no repositório remoto.
 
 ### Tratamento de conflitos
 

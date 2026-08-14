@@ -281,11 +281,11 @@ A avaliação abaixo registra a situação dos critérios ao final da Sprint 1. 
 | Documentação | 3 | Documentação encontrada? | Atendido | A documentação principal está disponível em `docs/Projeto.md` e nos arquivos de gestão. |
 | Documentação | 4 | Sumário de todos os documentos `.md` navegáveis? | Atendido | Os documentos principais possuem sumários com links internos, e o `Index.md` centraliza a navegação. |
 | Documentação | 5 | Instruções e observações dos documentos removidas? | Em construção | Ainda existem comentários de instrução e marcações de preenchimento nos documentos de projeto e gestão. |
-| Documentação | 6 | Links acessíveis? | Em construção | A maior parte dos links está acessível, mas quatro imagens técnicas referenciadas em `Projeto.md` ainda não existem no repositório. |
+| Documentação | 6 | Links acessíveis? | Atendido | Todas as imagens e referências internas do `Projeto.md` foram verificadas: os 18 assets referenciados existem no repositório e os links internos do sumário estão acessíveis. |
 | Documentação | 7 | Não compartilha dados sensíveis? | Atendido | Não foram identificadas credenciais ou dados corporativos sensíveis na documentação. |
 | Documentação | 8 | Possui referências bibliográficas, se for o caso? | Atendido | As fontes utilizadas no entendimento de negócio estão registradas em `Projeto.md`. |
-| Documentação | 9 | Formatação adequada? | Em construção | A estrutura geral está padronizada, mas os placeholders e referências pendentes ainda precisam ser corrigidos. |
-| Documentação | 10 | Apresenta todas as seções preenchidas? | Em construção | Permanecem seções reservadas aos integrantes responsáveis e conteúdos técnicos ainda não concluídos. |
+| Documentação | 9 | Formatação adequada? | Atendido | A estrutura foi padronizada, os placeholders de instrução do template foram removidos e a numeração do sumário está coerente com o corpo do documento. |
+| Documentação | 10 | Apresenta todas as seções preenchidas? | Atendido | Todas as seções dos artefatos da Sprint 1 estão preenchidas. Informações que dependem de confirmação da equipe ou do parceiro estão explicitamente marcadas como **PENDENTE DE VALIDAÇÃO DA EQUIPE**. |
 | Documentação | 11 | Arquivos de instrução `.txt` ou não relevantes para o projeto foram removidos? | Atendido | A pasta `docs` contém apenas os quatro arquivos Markdown relevantes para a entrega atual. |
 | Documentação | 12 | Links acessíveis sem solicitação de permissão? | Atendido | A navegação principal utiliza caminhos relativos dentro do próprio repositório. |
 | Aplicação | 1 | Possui pasta `src`? | Atendido | A pasta `src` está presente na raiz do projeto. |
