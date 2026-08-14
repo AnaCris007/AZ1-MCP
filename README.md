@@ -33,7 +33,7 @@
 - <a href="https://www.linkedin.com/in/fernando-pizzo-208b526a/">Matemática e Física - Fernando Pizzo</a>
 - <a href="https://www.linkedin.com/in/lisane-valdo/">Negócios - Lisane Valdo</a>
 - <a href="https://www.linkedin.com/in/bruno-grandchamp-rodilha/?locale=pt">Design - Bruno Rodilha</a> 
-- <a href="https://www.linkedin.com/in/professor1/">Liderança - Filipe Gonçalves</a>
+- <a href="https://www.linkedin.com/in/filipe-gon%C3%A7alves-08a55015b/">Liderança - Filipe Gonçalves</a>
 
 ##  Descrição
 
