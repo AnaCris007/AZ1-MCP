@@ -41,7 +41,7 @@
 
 <a href="/documentos/manual-instalacao.md">Link para o Manual de Instruções</a> que explica como montar, conectar e utilizar o protótipo.
 
-<a href="/documentos/index.md">Link para a documentação geral</a> do projeto.
+[Link para a documentação geral](docs/Index.md) do projeto.
 
 ##  Estrutura de pastas
 
