@@ -46,6 +46,8 @@
   - [2.2.2 Política de atualização do GitLab](#222-política-de-atualização-do-gitlab)
   - [2.2.3 Política de commits](#223-política-de-commits)
   - [2.2.4 Revisão e melhoria contínua](#224-revisão-e-melhoria-contínua)
+  - [2.2.5 Critérios de início e conclusão](#225-critérios-de-início-e-conclusão)
+  - [2.2.6 Atualização de branches e tratamento de conflitos](#226-atualização-de-branches-e-tratamento-de-conflitos)
 - [2.3 Acompanhamento Contínuo dos Riscos](#23-acompanhamento-contínuo-dos-riscos)
 
 </details>
@@ -63,34 +65,6 @@
   - [3.2.6 Alinhamento com o Escritório de Projetos](#326-alinhamento-com-o-escritório-de-projetos)
 - [3.3 Matriz de Papéis e Responsabilidades](#33-matriz-de-papéis-e-responsabilidades)
 - [3.4 Planejamento da Sprint 2](#34-planejamento-da-sprint-2)
-
-</details>
-
-<details>
-<summary><strong>4. Sprint 2</strong></summary>
-
-- [4.1 Entregas de gestão da Sprint 2](#41-entregas-de-gestão-da-sprint-2)
-
-</details>
-
-<details>
-<summary><strong>5. Sprint 3</strong></summary>
-
-- [5.1 Entregas de gestão da Sprint 3](#51-entregas-de-gestão-da-sprint-3)
-
-</details>
-
-<details>
-<summary><strong>6. Sprint 4</strong></summary>
-
-- [6.1 Entregas de gestão da Sprint 4](#61-entregas-de-gestão-da-sprint-4)
-
-</details>
-
-<details>
-<summary><strong>7. Sprint 5</strong></summary>
-
-- [7.1 Entregas de gestão da Sprint 5](#71-entregas-de-gestão-da-sprint-5)
 
 </details>
 
@@ -120,7 +94,7 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 
 ### 2.1.2 Resolução de impasses
 
-&emsp; Em caso de discordância técnica, os integrantes envolvidos apresentam seus argumentos ao grupo, que discute as alternativas buscando uma decisão apoiada pela maioria. Caso não haja consenso após a discussão, as opções consideradas viáveis são submetidas a uma roleta, e o resultado define a decisão a ser seguida pela equipe. A decisão tomada deve ser respeitada por todos e registrada no canal oficial correspondente ao assunto, para que o histórico e a justificativa permaneçam acessíveis.
+&emsp; Em caso de discordância técnica, os integrantes envolvidos apresentam seus argumentos e as alternativas são submetidas a votação por maioria simples. Se nenhuma alternativa alcançar a maioria ou se houver empate, realiza-se uma roleta apenas entre as opções empatadas. O resultado define a decisão a ser seguida pela equipe. A decisão e as alternativas consideradas devem ser registradas no canal oficial correspondente ao assunto, para que o histórico permaneça acessível.
 
 ### 2.1.3 Gestão de conflitos
 
@@ -145,8 +119,8 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 - **Canal oficial interno:** grupo da equipe no WhatsApp, utilizado para comunicação cotidiana, alinhamentos operacionais e avisos entre os integrantes.
 - **Canal oficial institucional:** grupo do Slack, utilizado para decisões, solicitações e alinhamentos que envolvam professores, docentes ou orientadores.
 - **Registro das decisões:** decisões internas são registradas no WhatsApp; decisões relacionadas ao corpo docente ou à orientação são registradas no Slack. Decisões que alterem escopo, processo ou arquitetura também devem ser consolidadas na documentação ou na issue correspondente do GitLab.
-- **SLA para mensagens comuns:** resposta até o fim do mesmo dia útil.
-- **SLA para bloqueios urgentes:** sinalização imediata no WhatsApp e resposta da equipe em até duas horas dentro do período de trabalho do grupo.
+- **SLA para mensagens comuns:** [PENDENTE — a equipe deve confirmar o tempo máximo de resposta para mensagens não urgentes; o prazo é necessário para tornar o acordo verificável].
+- **SLA para bloqueios urgentes:** [PENDENTE — a equipe deve confirmar o tempo máximo de resposta e o período de disponibilidade aplicável a impedimentos urgentes].
 
 ### 2.1.6 Dailies e demais rituais
 
@@ -158,6 +132,8 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 | Retrospectiva | Presencial | Ao final de cada sprint | Conforme o tempo reservado no calendário acadêmico | Equipe | Pontos fortes, pontos fracos, riscos, conflitos e ações de melhoria registrados neste documento |
 
 &emsp; Caso algum integrante não possa participar da Daily, deve avisar previamente e informar, por um dos canais oficiais, o que concluiu desde a última sincronização, o que pretende realizar naquele dia e quais impedimentos possui.
+
+&emsp; [PENDENTE — a equipe deve registrar os dias e horários habituais das dailies. A indicação apenas de frequência diária não permite verificar pontualidade nem comunicar previamente alterações no ritual.]
 
 ### 2.1.7 Acordos adicionais
 
@@ -198,6 +174,16 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 &emsp; Toda entrega deve ser revisada por um integrante que não participou da execução da task, garantindo um olhar externo sobre o conteúdo produzido. Essa prática se aplica tanto ao código quanto à documentação: o autor abre o Merge Request, designa um revisor diferente de si mesmo e aguarda a aprovação antes do merge. O revisor é responsável por registrar comentários no MR, apontar inconsistências e aprovar formalmente a entrega, assegurando que o DoD foi atendido.
 
 &emsp; As políticas registradas nesta seção são revisadas a cada retrospectiva de sprint. Durante esse ritual, a equipe avalia se as diretrizes estão sendo seguidas, se geraram os resultados esperados e se precisam de ajuste. Melhorias identificadas são incorporadas ao documento sem apagar o histórico dos acordos anteriores, de modo que a evolução das práticas fique registrada e rastreável. As ações de melhoria definidas na retrospectiva são formalizadas na tabela de ações da seção correspondente à sprint e acompanhadas na planning seguinte, com verificação do critério de conclusão estabelecido.
+
+### 2.2.5 Critérios de início e conclusão
+
+&emsp; Uma task está pronta para ser iniciada somente quando seu Definition of Ready (DoR) estiver atendido: objetivo e descrição compreensíveis, responsável e revisor definidos, prioridade e estimativa registradas, dependências identificadas e insumos necessários disponíveis. Se alguma dessas condições não estiver atendida, o card permanece em `open` ou `backlog` e não deve ser movido para `doing`.
+
+&emsp; Uma task somente é considerada concluída quando seu Definition of Done (DoD) específico estiver comprovado: entrega produzida e versionada, critérios de aceitação verificados, revisão por pares registrada, ajustes solicitados resolvidos, Merge Request aprovado e integrado à branch de destino e documentação relacionada atualizada, quando aplicável. A issue deve conter ou apontar as evidências de conclusão antes de ser movida para `closed`.
+
+### 2.2.6 Atualização de branches e tratamento de conflitos
+
+&emsp; Antes de solicitar revisão, o autor sincroniza sua branch de trabalho com `develop`, verifica o resultado localmente e resolve eventuais conflitos. Conflitos não devem ser resolvidos diretamente nas branches protegidas. Quando a resolução alterar conteúdo produzido por outro integrante ou envolver decisão técnica, o autor consulta o responsável pelo conteúdo antes de concluir o ajuste e registra a decisão no Merge Request. Os comandos e o procedimento detalhado estão definidos no documento `GestaoConfiguracao.md`.
 
 ## 2.3 Acompanhamento Contínuo dos Riscos
 
@@ -266,6 +252,10 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 | OP1 | Reutilização e evolução da solução | Em acompanhamento. Decisões de arquitetura iniciais consideram o desacoplamento do núcleo de PLN | 70% | Alto | Documentar as decisões de arquitetura que sustentam o desacoplamento desde a Sprint 2 | Felipe Simão | Sprint 2 | Em Monitoramento |
 | OP2 | Expansão para novas funcionalidades | Não avaliado nesta sprint. Backlog complementar será revisado ao final de cada sprint | 50% | Moderado | Manter backlog priorizado e avaliar capacidade ao final de cada sprint | Product Owner | Sprint 2 | Aberto |
 | OP3 | Validação com dados mais próximos da realidade | Em acompanhamento. Primeiros artefatos de exemplo recebidos do parceiro | 50% | Alto | Utilizar os materiais recebidos para calibrar a base sintética na Sprint 2 | Matheus Ferreira | Sprint 2 | Em Monitoramento |
+
+&emsp; A revisão manteve os valores de probabilidade e impacto definidos na matriz inicial porque o documento não contém evidência de uma reestimativa coletiva durante a Sprint 1. Também não foi localizado, nos arquivos do repositório, um registro de novos riscos descobertos durante a execução. Isso não permite concluir que nenhum risco novo tenha surgido.
+
+&emsp; [PENDENTE — o Scrum Master da Sprint 1 deve confirmar se surgiram novos riscos durante a execução e registrar, para cada item, a mudança de probabilidade, impacto ou severidade em relação ao planejamento. Caso não tenha havido mudança, deve registrar explicitamente a decisão de manter a avaliação e a evidência do alinhamento da equipe.]
 
 ### 3.2.6 Alinhamento com o Escritório de Projetos
 
@@ -360,44 +350,14 @@ Tasks com esforço estimado acima de G devem ser decompostas antes de entrar no 
 
 ### 3.4.4 Registro das tasks no Kanban
 
-&emsp; O detalhamento de cada task, incluindo descrição, tipo, prioridade, estimativa t-shirt, responsável, dependências, DoR e DoD, está registrado individualmente nas issues do GitLab, conforme os critérios definidos na seção 2.2.
+&emsp; A tabela da Seção 3.4.2 apresenta macroatividades e sua ordem lógica, mas não substitui as issues individuais exigidas para o planejamento. O repositório local contém o arquivo `gitlab-issue-kit/csv/backlog_sprint01.csv`, referente apenas à Sprint 1; não há exportação local equivalente da Sprint 2. Assim, não foi possível verificar no repositório se cada task da Sprint 2 contém descrição, tipo, prioridade, responsável, estimativa t-shirt, dependências, DoR e DoD.
 
----
+| Evidência obrigatória | Situação verificada | Ação necessária |
+|---|---|---|
+| Lista individual das tasks da Sprint 2 | Não disponível localmente | Inserir link para o board ou exportação versionada das issues da Sprint 2 |
+| Responsável e revisor | Não verificável nas macroatividades | Confirmar assignee e reviewer em cada issue |
+| Estimativa PP, P, M ou G | Não verificável nas macroatividades | Registrar a estimativa em cada issue e decompor atividades acima de 120 minutos |
+| DoR e DoD específicos | Não verificável nas macroatividades | Preencher condições de início e evidências objetivas de conclusão em cada issue |
+| Tipo, prioridade e dependências | Parcialmente representados na Seção 3.4.2 | Completar esses campos em todas as issues |
 
-# 4. Sprint 2
-
-## 4.1 Entregas de gestão da Sprint 2
-
-<!-- Acrescente aqui somente os registros e artefatos específicos da Sprint 2. -->
-
-_Seção reservada para a próxima entrega._
-
----
-
-# 5. Sprint 3
-
-## 5.1 Entregas de gestão da Sprint 3
-
-<!-- Acrescente aqui somente os registros e artefatos específicos da Sprint 3. -->
-
-_Seção reservada para entrega futura._
-
----
-
-# 6. Sprint 4
-
-## 6.1 Entregas de gestão da Sprint 4
-
-<!-- Acrescente aqui somente os registros e artefatos específicos da Sprint 4. -->
-
-_Seção reservada para entrega futura._
-
----
-
-# 7. Sprint 5
-
-## 7.1 Entregas de gestão da Sprint 5
-
-<!-- Acrescente aqui somente os registros e artefatos específicos da Sprint 5. -->
-
-_Seção reservada para entrega futura._
+&emsp; [PENDENTE — o Scrum Master da Sprint 2 deve inserir aqui o link permanente do Kanban ou versionar uma exportação das issues. Sem essa evidência, o planejamento detalhado permanece não verificável fora do GitLab.]

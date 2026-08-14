@@ -17,8 +17,6 @@
 - [Tobias Viana](https://www.linkedin.com/in/tobias-viana/)
 
 
-
-
 # Gestão de Configuração
 
 ## Sumário
@@ -45,6 +43,7 @@
 
 - [3.1 Convenção de nomenclatura](#31-convenção-de-nomenclatura)
 - [3.2 Procedimento de criação](#32-procedimento-de-criação)
+- [3.3 Atualização de uma branch de trabalho](#33-atualização-de-uma-branch-de-trabalho)
 
 </details>
 
@@ -55,6 +54,7 @@
 - [4.2 Procedimento de merge](#42-procedimento-de-merge)
 - [4.3 Exclusão de branches](#43-exclusão-de-branches)
 - [4.4 Releases e hotfixes](#44-releases-e-hotfixes)
+- [4.5 Proteção de branches e conflitos](#45-proteção-de-branches-e-conflitos)
 
 </details>
 
@@ -90,7 +90,7 @@
 
 ## 1.2 Princípios da gestão de configuração
 
-&emsp; A gestão de configuração do projeto Azum é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança no repositório deve estar associada a uma issue do GitLab, de modo que seja sempre possível identificar por que uma alteração foi feita, quem a fez e em qual sprint. O segundo é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches estáveis**: `main`, `develop` e `hmg` não recebem commits diretos, toda integração ocorre exclusivamente por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser distribuído ao longo de toda a sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
+&emsp; A gestão de configuração do projeto Azum é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches estáveis**: `main`, `develop` e, quando configurada, `hmg` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
 
 ---
 
@@ -98,7 +98,7 @@
 
 ## 2.1 Visão geral
 
-&emsp; O projeto Azum adota um fluxo baseado no Gitflow, adaptado às exigências do Módulo 7 do Inteli. O Gitflow organiza o desenvolvimento em branches com responsabilidades bem definidas, separando o trabalho em andamento das versões estáveis e dos ambientes de validação. A adaptação ao módulo inclui a branch `hmg` como ambiente intermediário de homologação entre `develop` e `main`, e a promoção contínua das entregas ao longo da sprint, sem aguardar o final do ciclo para avançar entre ambientes. O fluxo obrigatório de promoção é:
+&emsp; O projeto Azum adota um fluxo baseado no Gitflow, adaptado às exigências do Módulo 7 do Inteli. O Gitflow organiza o desenvolvimento em branches com responsabilidades bem definidas, separando o trabalho em andamento das versões estáveis e dos ambientes de validação. O fluxo documentado prevê a branch `hmg` como ambiente intermediário de homologação entre `develop` e `main`, além da promoção contínua das entregas ao longo da sprint. Entretanto, a inspeção das branches locais e remotas disponíveis não encontrou `hmg`; sua criação e proteção ainda precisam ser confirmadas antes que esse trecho possa ser tratado como prática evidenciada. O fluxo planejado é:
 
 - fluxo regular: `feature/*`, `docs/*` e `fix/*` → `develop` → `hmg` → `main`;
 - correção urgente: `hotfix/*` parte de `main` e retorna por MRs separados para `main` e `develop`.
@@ -115,7 +115,9 @@
 | `docs/<descricao>` | `develop` | Documentação | `develop`, por MR | Temporária |
 | `fix/<descricao>` | `develop` | Correção de bug | `develop`, por MR | Temporária |
 | `hotfix/<descricao>` | `main` | Correção urgente em produção | `main` e `develop`, por MR | Temporária |
-| `release/<versao>` | `develop` | Estabilização antes da homologação | `develop`, por MR; depois `develop` → `hmg` → `main` | Temporária |
+| `release/<versao>` | `develop` | Estabilização antes da homologação | `develop` e `hmg`, por MRs separados; depois `hmg` → `main` (ou `develop` e `main`, se `hmg` não for adotada) | Temporária |
+
+&emsp; [PENDENTE — o responsável pela gestão de configuração deve confirmar a criação da branch `hmg` no GitLab e anexar evidência de sua proteção. Se a equipe decidir não utilizá-la, o fluxo e o diagrama devem ser ajustados para promover releases diretamente a `main`.]
 
 ## 2.3 Fluxo entre branches
 
@@ -188,6 +190,19 @@ git push -u origin docs/brainstorming-features
 
 &emsp; Antes de iniciar o trabalho, a issue correspondente deve estar refinada com DoR atendido, labels, milestone e assignee preenchidos, e o card movido de open para backlog no Kanban do GitLab.
 
+## 3.3 Atualização de uma branch de trabalho
+
+&emsp; Antes de abrir ou atualizar um Merge Request, o autor deve incorporar à branch de trabalho o estado mais recente de `develop`. O projeto adota merge explícito para essa sincronização, coerente com a preservação do histórico definida na Seção 4.2:
+
+```bash
+git checkout develop
+git pull --ff-only origin develop
+git checkout docs/brainstorming-features
+git merge develop
+```
+
+&emsp; Depois da sincronização, o autor executa as verificações aplicáveis à task e envia a branch com `git push`. Se houver conflitos, o merge permanece local e incompleto até que sejam resolvidos conforme a Seção 4.5. Não se deve usar `git push --force` nas branches compartilhadas ou protegidas.
+
 ---
 
 # 4. Política de Integração e Exclusão
@@ -257,7 +272,7 @@ git commit -m "chore: preparar release v1.0.0 (#N)"
 git push -u origin release/v1.0.0
 ```
 
-&emsp; Após a estabilização, abrir um MR de `release/*` para `develop`. Em seguida, promover a versão por dois MRs independentes: `develop` → `hmg` para homologação e, somente após a aprovação, `hmg` → `main` para produção. Depois do merge em `main`, criar a tag e excluir a branch de release:
+&emsp; Após a estabilização, abrir dois MRs a partir de `release/*`: um para `develop`, devolvendo os ajustes de estabilização à linha de desenvolvimento, e outro para `hmg`, iniciando a homologação. Após a aprovação em `hmg`, abrir um MR separado de `hmg` para `main`. Se `hmg` não for adotada, o segundo MR da release deve apontar diretamente para `main`. Depois da integração em `main`, criar a tag e excluir a branch de release:
 
 ```bash
 git checkout main && git pull origin main
@@ -279,13 +294,33 @@ git push -u origin hotfix/corrigir-falha-classificador
 
 &emsp; Após a correção, abrir MR para `main` e, depois do merge, abrir outro MR para sincronizar a alteração com `develop`. A atualização chegará a `hmg` na promoção seguinte de `develop` para homologação. Excluir a branch de hotfix ao final.
 
+## 4.5 Proteção de branches e conflitos
+
+### Proteção
+
+&emsp; Commits e pushes diretos para `main`, `develop` e `hmg` são proibidos. A integração deve ocorrer por Merge Request, com pelo menos um revisor diferente do autor e com os critérios da Seção 4.1 atendidos. Somente integrantes autorizados pelo grupo podem concluir o merge; o autor pode realizá-lo apenas depois da aprovação registrada pelo revisor. A rotação de responsáveis pelas promoções para `main` está definida no Contrato de Convivência.
+
+&emsp; [PENDENTE — o responsável pela gestão de configuração deve anexar captura de tela ou link acessível das regras de proteção configuradas no GitLab para `main`, `develop` e, se adotada, `hmg`. O documento define a política, mas a configuração efetiva não é verificável no repositório local.]
+
+### Tratamento de conflitos
+
+1. O autor atualiza `develop` e executa `git merge develop` em sua própria branch de trabalho;
+2. identifica os arquivos marcados como conflitantes com `git status`;
+3. consulta o autor do conteúdo afetado quando a escolha entre versões envolver decisão de negócio ou técnica;
+4. resolve os marcadores de conflito nos arquivos e executa as verificações aplicáveis;
+5. adiciona somente os arquivos resolvidos com `git add <arquivo>` e conclui o merge com `git commit`;
+6. envia a branch atualizada e registra no Merge Request como o conflito foi resolvido;
+7. solicita nova revisão caso a resolução tenha alterado conteúdo já aprovado.
+
+&emsp; Conflitos nunca são resolvidos por commits diretos em `develop`, `hmg` ou `main`. Também não se utiliza `git reset --hard` ou push forçado como procedimento de resolução.
+
 ---
 
 # 5. Rastreabilidade e Commits
 
 ## 5.1 Vínculo com tasks
 
-&emsp; Toda branch, commit e Merge Request do projeto Azum deve estar associado a uma issue do GitLab. O vínculo é estabelecido de três formas: o nome da branch descreve a issue que está sendo desenvolvida; todo commit referencia a issue com `#N` na mensagem; e o MR contém `Closes #N` na descrição, encerrando a issue automaticamente quando o merge é realizado. Sem esse vínculo, o dashboard não consegue rastrear qual MR entregou qual issue, e a sprint perde pontuação de rastreabilidade.
+&emsp; Toda branch de trabalho, todo commit autoral e todo Merge Request do projeto Azum devem estar associados a uma issue do GitLab. O vínculo é estabelecido de três formas: o nome da branch descreve a issue desenvolvida; cada commit autoral referencia a issue com `#N`; e o MR contém `Closes #N` na descrição, encerrando a issue automaticamente quando o merge é realizado. Commits de merge gerados pela plataforma são rastreados pelo MR correspondente e não precisam repetir o padrão de mensagem autoral.
 
 ## 5.2 Convenção de commits
 
@@ -339,6 +374,8 @@ git push -u origin hotfix/corrigir-falha-classificador
 | Merge Request | [MR !11](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/11) | Vínculo com a issue, reviewer designado e revisão real |
 | Histórico de commits | [Commits da branch](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/commits/docs/brainstorming-features) | Commits semânticos em português com `#N` distribuídos ao longo da sprint |
 
+&emsp; Os links acima são evidências declaradas pela equipe. O histórico local confirma a existência de branches de trabalho com prefixos padronizados, commits autorais vinculados a issues e merges em `develop`. O conteúdo completo da issue e do Merge Request depende de acesso ao GitLab e, portanto, não pôde ser validado apenas com os arquivos locais. Não foram encontradas evidências locais de uso de `release/*`, `hotfix/*` ou `hmg`; as Seções 6.2 e 6.3 são exemplos de aplicação futura, não registros de execução.
+
 ---
 
 # 6. Exemplos Práticos
@@ -362,7 +399,7 @@ git push -u origin docs/brainstorming-features
 
 ## 6.2 Preparação de uma release
 
-**Contexto:** estabilizar as entregas da Sprint 01 antes de promover para main.
+**Contexto ilustrativo:** estabilizar as entregas de uma sprint antes de promover a versão para `main`. Este exemplo descreve a política; não constitui evidência de que uma branch de release já tenha sido utilizada.
 
 ```bash
 git checkout develop && git pull origin develop
@@ -373,7 +410,7 @@ git commit -m "chore: preparar release v1.0.0 (#N)"
 git push -u origin release/v1.0.0
 ```
 
-&emsp; Abrir MR da release para `develop`. Depois, promover `develop` para `hmg`; após a homologação, promover `hmg` para `main`. Por fim, criar a tag em `main`:
+&emsp; Abrir um MR da release para `develop` e outro para `hmg`. Depois da homologação, promover `hmg` para `main`. Se a branch `hmg` não for adotada, abrir o segundo MR diretamente da release para `main`. Por fim, criar a tag em `main`:
 
 ```bash
 git checkout main && git pull origin main
@@ -384,7 +421,7 @@ git push origin --delete release/v1.0.0
 
 ## 6.3 Correção por hotfix
 
-**Contexto:** corrigir falha crítica no classificador de intenções após merge em main (issue #34).
+**Contexto ilustrativo:** corrigir uma falha crítica no classificador de intenções após integração em `main`. A issue `#34` é usada apenas para demonstrar a convenção e não é apresentada como evidência de hotfix executado.
 
 ```bash
 git checkout main && git pull origin main
