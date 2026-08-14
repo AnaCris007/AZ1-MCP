@@ -1,6 +1,6 @@
 <p align='center'>
   <a href='https://www.inteli.edu.br/'>
-    <img src='../assets/inteli.png' alt='Inteli - Instituto de Tecnologia e Liderança' width='300'>
+    <img src='../assets/inteli.png' alt='Inteli, Instituto de Tecnologia e Liderança' width='300'>
   </a>
 </p>
 
@@ -425,7 +425,7 @@ A experiência de Rafael evolui de forma crescente ao longo da jornada: parte de
 
 <!-- Modelagem da cadeia de valor dos processos relacionados ao contexto do projeto. -->
 
-![Cadeia de valor](./assets/cadeia-de-valor.png)
+![Cadeia de valor](../assets/cadeia-de-valor.png)
 
 [Descrição da cadeia de valor...]
 
@@ -940,95 +940,329 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
 ## 2.2 Requisitos Funcionais
 
-### Histórias de usuário
+### Visão geral dos requisitos funcionais
 
-#### RF01 — Consultar dados de projetos
+| ID e título | User story | Critério de aceitação | Prioridade |
+|---|---|---|---|
+| RF01: Receber solicitações por áudio e responder no canal de origem | Como usuário do portfólio, quero enviar minhas solicitações por áudio e receber a resposta pelo mesmo canal, para consultar o portfólio quando não posso digitar ou ler a tela, como em deslocamento ou em vistoria de campo. | Ao receber uma solicitação em áudio, o sistema deve convertê-la em texto, apresentar a transcrição ao usuário e devolver a resposta em áudio. Ao receber uma solicitação em texto, deve devolver a resposta em texto. O canal da resposta deve sempre corresponder ao canal da solicitação. | Alta |
+| RF02: Consultar dados de projetos | Como PMO, quero consultar dados de um projeto, para obter informações sobre seu status e acompanhamento sem precisar consultar manualmente os documentos do portfólio. | Ao receber uma solicitação, o sistema deve identificar a que projeto e a que dado ela se refere, consultar as fontes disponíveis e retornar os dados solicitados. Quando a solicitação não permitir identificar o projeto ou o dado, o sistema deve solicitar o dado faltante antes de consultar as fontes. Quando a solicitação não corresponder a nenhuma consulta prevista sobre o portfólio, deve informar a limitação ao usuário sem consultar as fontes. | Alta |
+| RF03: Apresentar a fonte da informação | Como diretor, quero saber de qual documento e de qual data veio cada resposta, para confiar na informação antes de tomar uma decisão. | Ao apresentar qualquer dado de negócio, o sistema deve exibir o documento de origem, a referência que permite localizá-lo no repositório e a data da sua última atualização, listando todas as fontes quando a resposta combinar mais de uma. | Alta |
+| RF04: Sugerir o preenchimento de documentos | Como líder de projeto, quero receber sugestões de texto para os campos pendentes dos meus documentos, para preencher o portfólio mais rápido mantendo o controle sobre o que é efetivamente gravado. | Ao solicitar apoio no preenchimento de um documento, o sistema deve apresentar no chat uma sugestão de texto para cada campo pendente, permitindo a cópia individual das sugestões e sem alterar o documento de origem. | Média |
+| RF05: Notificar proativamente o usuário de pendências | Como usuário do portfólio, quero ser notificado quando tiver pendências relacionadas aos projetos que acompanho, para tomar as providências necessárias dentro do prazo. | Ao identificar uma nova pendência relacionada a um projeto acompanhado pelo usuário, o sistema deve notificá-lo automaticamente, informando o projeto e a pendência, sem exigir uma solicitação prévia do usuário. | Média |
+| RF06: Atualizar o cadastro de projetos a partir de instruções do usuário | Como líder de projeto, quero atualizar os dados de um projeto ditando ou escrevendo a alteração no chat, para manter o cadastro em dia sem abrir as planilhas e os documentos do portfólio. | Ao receber uma instrução de atualização, o sistema deve identificar o projeto e os campos afetados, apresentar ao usuário os valores que serão gravados e efetivar a alteração apenas após confirmação explícita, registrando o autor e a data da alteração. | Baixa |
 
-> **Como** usuário responsável pelo acompanhamento de projetos, **quero** consultar os dados dos projetos por meio do agente, **para** obter as informações necessárias à gestão e à tomada de decisão.
+### 2.2.1. Modelagem estática: classes e atributos do domínio
 
-**Critérios de aceitação:**
+&emsp; A modelagem estática representa as entidades do domínio de gestão de portfólio do Metrô de São Paulo sobre as quais o agente atua. O modelo parte do Portfólio, que agrupa os projetos de um exercício, e desdobra cada projeto em três eixos: os artefatos que o documentam, as pendências que dele se originam e os usuários que o acompanham.
 
-- [ ] O agente consulta as fontes de dados autorizadas a partir da solicitação do usuário.
-- [ ] O agente apresenta uma resposta coerente com os dados recuperados ou informa claramente quando não houver dados disponíveis.
+&emsp; O quarto eixo é a hierarquia de usuários. As três personas que aparecem nas histórias da seção anterior, o diretor do RF03, o PMO do RF02 e o líder de projeto do RF04 e do RF06, correspondem a três especializações da classe Usuário. Essa correspondência de um para um entre as personas das histórias e as classes do modelo é o que amarra a modelagem estática aos requisitos funcionais.
 
-#### RF02 — Apresentar a fonte da informação
-
-> **Como** usuário do agente, **quero** visualizar a fonte utilizada na resposta, **para** verificar a procedência da informação apresentada.
-
-**Critérios de aceitação:**
-
-- [ ] Toda informação proveniente dos projetos identifica a respectiva fonte consultada.
-- [ ] A referência apresentada permite localizar o registro ou documento de origem, respeitando as permissões do usuário.
-
-#### RF03 — Sugerir o preenchimento de documentos
-
-> **Como** responsável por documentos de projeto, **quero** receber sugestões de preenchimento com base nos dados disponíveis, **para** reduzir o trabalho manual e completar documentos pendentes.
-
-**Critérios de aceitação:**
-
-- [ ] O agente identifica os campos que podem ser sugeridos a partir de dados disponíveis e autorizados.
-- [ ] A sugestão informa os dados e as fontes que a fundamentam e exige revisão do usuário antes de qualquer confirmação.
-
-#### RF04 — Notificar proativamente o usuário de pendências
-
-> **Como** responsável pelo acompanhamento de projetos, **quero** receber notificações proativas sobre pendências, **para** atuar antes que elas prejudiquem o andamento do projeto.
-
-**Critérios de aceitação:**
-
-- [ ] O agente identifica pendências conforme regras de negócio configuradas e notifica os usuários responsáveis.
-- [ ] A notificação apresenta a pendência, o projeto relacionado e a fonte que motivou o alerta.
-
-### Modelagem estática — Diagrama de classes do domínio
-
-<!-- Classes e atributos do domínio, coerentes com as histórias acima. -->
-
-![Diagrama de classes](./assets/diagrama-classes.png)
-
-```mermaid
-classDiagram
-    class Usuario {
-        +id: UUID
-        +nome: String
-        +email: String
-    }
-    class [EntidadeDominio] {
-        +atributo1: Tipo
-        +atributo2: Tipo
-    }
-    Usuario "1" --> "*" [EntidadeDominio] : possui
-```
+<div align="center">
+  <sub>FIGURA 2.1: modelagem estática (classes e atributos do domínio)</sub><br>
+  <img src="../assets/diagrama-de-classes.svg" width="100%" alt="Diagrama de classes do domínio de gestão de portfólio"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
 
 **Descrição das classes:**
 
-| Classe     | Responsabilidade | Relacionamentos |
-| ---------- | ---------------- | --------------- |
-| Usuario    | [...]            | [...]           |
-| [Entidade] | [...]            | [...]           |
+| Classe | Responsabilidade | RFs atendidos |
+|---|---|---|
+| Portfólio | Agrupa os projetos administrados pelo PMO Corporativo em um determinado exercício, delimitando tanto o conjunto percorrido na verificação periódica de pendências quanto o alcance de acesso dos perfis de âmbito consolidado | RF02, RF05 |
+| Projeto | Representa o empreendimento acompanhado pelo PMO, concentrando os dados de identificação, situação e avanço consultados pelo agente | RF02, RF03, RF04, RF05, RF06 |
+| Usuário | Superclasse que reúne os atributos comuns a todos os perfis e as relações que independem do papel exercido, como o acompanhamento de projetos e o recebimento de notificações | RF01, RF05 |
+| Diretor | Especialização de Usuário com alcance de supervisão sobre o portfólio consolidado, perfil da história do RF03 | RF03 |
+| PMO | Especialização de Usuário que administra o portfólio, com alcance sobre todos os projetos, perfil da história do RF02 | RF02 |
+| LiderProjeto | Especialização de Usuário responsável por um subconjunto de projetos, único perfil com relação de responsabilidade formal e, por consequência, com permissão de alteração | RF04, RF06 |
+| Pendência | Representa um item em aberto originado por um projeto, com prazo e situação, que fundamenta a notificação proativa | RF05 |
+| Artefato | Representa o documento que integra a documentação do projeto, cujos metadados sustentam a indicação de fonte das respostas | RF03, RF04, RF05 |
+| CampoArtefato | Representa um campo individual de um artefato, com o valor registrado e as marcações que identificam se ele está pendente de preenchimento | RF04, RF05 |
 
-### Modelagem dinâmica — Cenários e diagramas de sequência
+**Atributos por classe:**
 
-#### Cenário 1: [Nome do cenário — relacionado ao RF0X]
+| Classe | Atributo | Tipo | Finalidade no domínio |
+|---|---|---|---|
+| Portfólio | `id` | int | Identificador único do portfólio |
+| Portfólio | `nome` | string | Denominação do portfólio |
+| Portfólio | `anoExercicio` | int | Exercício ao qual o conjunto de projetos se refere |
+| Projeto | `codigo` | string | Código institucional que identifica o empreendimento |
+| Projeto | `nome` | string | Denominação do empreendimento |
+| Projeto | `status` | string | Situação corrente do projeto, consultada no RF03 |
+| Projeto | `dataInicio` | date | Data de início da execução |
+| Projeto | `dataTerminoPrevista` | date | Data prevista de conclusão, base para a apuração de prazos |
+| Projeto | `percentualAvanco` | float | Grau de execução física do projeto |
+| Usuário | `id` | int | Identificador único do usuário |
+| Usuário | `nome` | string | Nome do profissional |
+| Usuário | `email` | string | Endereço corporativo utilizado no envio das notificações |
+| Pendência | `id` | int | Identificador único da pendência |
+| Pendência | `tipo` | string | Natureza da pendência, como prazo, documento ou aprovação |
+| Pendência | `descricao` | string | Detalhamento do item em aberto |
+| Pendência | `prazo` | date | Data limite para tratamento, base da notificação do RF05 |
+| Pendência | `situacao` | string | Estado corrente da pendência |
+| Artefato | `id` | int | Identificador único do artefato |
+| Artefato | `tipo` | string | Natureza do documento, como ata, relatório ou contrato |
+| Artefato | `referencia` | string | Localizador que permite recuperar o documento no repositório em que ele estiver hospedado, exibido como fonte da informação no RF03 |
+| Artefato | `data` | datetime | Data da última atualização do documento, exibida junto à fonte no RF03 |
+| Artefato | `versao` | string | Versão vigente do documento |
+| CampoArtefato | `id` | int | Identificador único do campo |
+| CampoArtefato | `nome` | string | Rótulo do campo dentro do artefato |
+| CampoArtefato | `valor` | string | Conteúdo atualmente registrado no campo |
+| CampoArtefato | `obrigatorio` | boolean | Indica se o preenchimento do campo é exigido |
+| CampoArtefato | `preenchido` | boolean | Indica se o campo já possui conteúdo |
 
-**Descrição:** [Fluxo passo a passo do cenário.]
+&emsp; A combinação dos atributos `obrigatorio` e `preenchido` da classe CampoArtefato é o que permite determinar quais campos de um artefato estão pendentes, insumo direto da sugestão de preenchimento prevista no RF04. Da mesma forma, os atributos `referencia` e `data` da classe Artefato são os que sustentam a exigência do RF03 de apresentar a origem e a data de cada informação devolvida pelo agente. Os dois recebem esses nomes para corresponder aos parâmetros homônimos que trafegam nas mensagens do cenário 1, de modo que o dado armazenado e o dado exibido sejam identificáveis como o mesmo ao longo das duas modelagens.
 
-![Diagrama de sequência — Cenário 1](./assets/sequencia-cenario1.png)
+&emsp; As três especializações de Usuário não declaram atributos próprios. A diferença entre elas não é de dado armazenado, e sim de alcance de acesso, que é uma característica relacional e por isso está expressa nas associações descritas a seguir.
 
-```mermaid
-sequenceDiagram
-    actor U as Usuário
-    participant F as Frontend
-    participant B as Backend
-    participant N as Serviço PLN
-    U->>F: [ação]
-    F->>B: [requisição]
-    B->>N: [processamento]
-    N-->>B: [resultado]
-    B-->>F: [resposta]
-    F-->>U: [exibição]
-```
+**Relacionamentos:**
 
-<!-- Repita para os demais cenários. Garanta coerência: cada diagrama
-     deve corresponder a uma história de usuário e usar as classes do domínio. -->
+| Origem | Relacionamento | Destino | Cardinalidade | Tipo |
+|---|---|---|---|---|
+| Portfólio | contém | Projeto | 1 para 1..* | Agregação |
+| Projeto | compõe | Artefato | 1 para 0..* | Composição |
+| Artefato | compõe | CampoArtefato | 1 para 1..* | Composição |
+| Projeto | origina | Pendência | 1 para 0..* | Composição |
+| Usuário | acompanha | Projeto | 0..* para 0..* | Associação |
+| Pendência | notifica | Usuário | 0..* para 0..* | Associação |
+| Diretor | supervisiona | Portfólio | 0..* para 1 | Associação |
+| PMO | administra | Portfólio | 0..* para 1 | Associação |
+| LiderProjeto | lidera | Projeto | 1 para 1..* | Associação |
+| Diretor, PMO e LiderProjeto | especializa | Usuário | Não se aplica | Generalização |
+
+&emsp; A distinção entre agregação e composição é intencional. O Portfólio agrega Projetos porque um projeto mantém identidade própria e pode ser reagrupado em outro exercício sem deixar de existir. Já o Artefato compõe o Projeto, o CampoArtefato compõe o Artefato e a Pendência é composta pelo Projeto, porque nenhum dos três faz sentido isoladamente: excluído o projeto, seus artefatos perdem o objeto que documentam e suas pendências perdem o objeto a que se referem.
+
+&emsp; Os papéis do usuário são modelados por herança e não por um atributo de tipo. A razão é que cada perfil possui alcance de acesso distinto, e alcance de acesso é uma relação, não uma propriedade. É por isso que a distinção entre os três aparece nas associações e não em atributos: `Diretor` e `PMO` se ligam ao `Portfólio`, o que expressa alcance sobre o conjunto consolidado, enquanto `LiderProjeto` se liga diretamente a `Projeto`, o que restringe seu alcance aos empreendimentos sob sua responsabilidade. A granularidade da associação é a granularidade do acesso.
+
+&emsp; A cardinalidade de `lidera`, de 1 para 1..*, reforça essa leitura. O `1` do lado do líder estabelece que cada projeto possui um único responsável, e é essa unicidade que delimita o conjunto ao qual o perfil tem acesso privilegiado e permissão de alteração, prevista no RF06.
+
+&emsp; A associação `acompanha`, com cardinalidade de muitos para muitos entre Usuário e Projeto, é o que viabiliza a personalização da notificação prevista no RF05. Ela é deliberadamente distinta de `lidera`: acompanhar exprime interesse e define quem recebe notificação, ao passo que liderar exprime responsabilidade formal e define quem pode alterar. Um líder normalmente acompanha os projetos que lidera, mas as duas relações respondem a perguntas diferentes e por isso coexistem no modelo.
+
+&emsp; A modelagem declara apenas classes e atributos, sem operações, por representar a estrutura de dados do domínio de portfólio. O comportamento do agente está representado na modelagem dinâmica desta seção e nos componentes da solução técnica descritos na seção 2.4.
+
+### 2.2.2. Modelagem dinâmica: cenários e diagramas de sequência
+
+&emsp; A modelagem dinâmica descreve como as classes declaradas na modelagem estática são percorridas durante a execução das solicitações previstas nos requisitos funcionais. Foram definidos três cenários. Os dois primeiros são iniciados pelo usuário em linguagem natural e compartilham a mesma cadeia de tratamento da entrada, enquanto o terceiro é iniciado pelo próprio sistema, sem interação conversacional.
+
+| Cenário | Descrição | Iniciador | RFs cobertos |
+|---|---|---|---|
+| Cenário 1 | Consultar informações do projeto | Usuário | RF01, RF02, RF03 |
+| Cenário 2 | Sugerir preenchimento de documento | Usuário | RF04 |
+| Cenário 3 | Notificar pendências | Agendador (sistema) | RF05 |
+
+&emsp; Os três cenários representam o fluxo principal de cada requisito, sem o tratamento de exceções, que fica previsto para a sprint seguinte. O RF06, de prioridade baixa e viabilidade ainda em avaliação, não recebeu cenário nesta sprint, conforme registrado na seção 2.2.3.
+
+#### Linhas de vida adotadas
+
+&emsp; Os três diagramas utilizam um conjunto comum de linhas de vida, de modo que a leitura de um cenário se aproveite do vocabulário do anterior. A tabela a seguir relaciona cada linha de vida ao seu papel e à sua correspondência na modelagem estática.
+
+| Linha de vida | Papel nos cenários | Correspondência no modelo estático |
+|---|---|---|
+| Usuário | Ator que inicia a interação nos cenários 1 e 2 e recebe a notificação no cenário 3 | Classe `Usuário` e suas especializações |
+| `: InterfaceDeChat` | Canal de entrada e saída das solicitações em linguagem natural | Componente de interface (seção 2.4) |
+| `: ServicoDeVoz` | Converte áudio em texto na entrada e texto em áudio na saída (exclusivo do cenário 1) | Componente de serviços (seção 2.4) |
+| `: PipelinePLN` | Conduz o tratamento da solicitação, extrai as entidades do texto e aciona os demais componentes | Componente de lógica de negócio (seção 2.4) |
+| `: Intencao` | Detém o catálogo de intenções e classifica o texto contra ele, devolvendo a intenção reconhecida e os parâmetros que ela exige | Componente de lógica de negócio (seção 2.4) |
+| `: Agente` | Orquestra a execução da intenção, consulta as fontes e compõe a resposta | Componente de lógica de negócio (seção 2.4) |
+| `: FonteDeDados` | Encapsula o acesso às entidades persistidas do domínio | `Portfólio`, `Projeto`, `Artefato`, `CampoArtefato`, `Pendência`, `Usuário` |
+| `: ServicoDeNotificacao` | Entrega a notificação ao usuário pelo canal corporativo (exclusivo do cenário 3) | Componente de serviços (seção 2.4) |
+| `: Agendador` | Dispara a verificação periódica de pendências (exclusivo do cenário 3) | Componente de lógica de negócio (seção 2.4) |
+
+&emsp; As linhas de vida de componente adotam a sintaxe UML de instância anônima, no formato `: Classe`, enquanto o Usuário é identificado pelo nome do papel, por ser um ator e não uma instância de componente.
+
+**Nota:** apenas a linha de vida Usuário e a linha de vida `: FonteDeDados` possuem contrapartida direta na modelagem estática. As demais representam componentes da solução técnica, e não entidades do domínio. Isso vale inclusive para o `: Intencao`: intenção é conceito da camada de processamento de linguagem natural, que existiria de forma diferente se a interface não fosse conversacional, ao contrário de Projeto ou Artefato, que existem na gestão de portfólio independentemente da solução adotada. A separação entre os dois planos é deliberada e está detalhada na seção 2.4.
+
+#### Convenções de notação adotadas
+
+&emsp; Os três diagramas empregam três tipos de mensagem, distinguidos graficamente e aplicados de forma uniforme. A tabela a seguir registra a convenção, necessária para a leitura correta dos fluxos apresentados adiante.
+
+| Tipo de mensagem | Traço | Ponta da seta | Rótulo | Quando é usada |
+|---|---|---|---|---|
+| Síncrona | Linha contínua | Cheia | Assinatura com parênteses | Chamada em que o remetente aguarda a conclusão, como `buscarDados(projeto, idUsuario)` |
+| Assíncrona | Linha contínua | Vazada | Assinatura com parênteses | Envio em que o remetente não aguarda retorno, como `executarIntencao(intencao, entidades, idUsuario)` e a entrega da notificação no cenário 3 |
+| Retorno | Linha tracejada | Vazada | Dados devolvidos, sem parênteses | Resposta a uma chamada anterior, como `camposPendentes, contextoDoProjeto` |
+
+&emsp; A distinção importa para a leitura das mensagens dirigidas ao ator. Nos cenários 1 e 2, o que chega ao Usuário é sempre um retorno da solicitação que ele mesmo iniciou, representado por linha tracejada com os dados devolvidos. No cenário 3, em que o Usuário nunca formula uma solicitação, a notificação é um envio assíncrono genuíno e por isso aparece como linha contínua com ponta vazada.
+
+&emsp; A passagem do `: PipelinePLN` ao `: Agente` é assíncrona nos cenários 1 e 2 porque o pipeline entrega a intenção reconhecida e não permanece bloqueado à espera do resultado. Quem devolve a resposta ao usuário é o `: Agente`, por meio da `: InterfaceDeChat`, e não o pipeline que originou a chamada. Já as consultas à `: FonteDeDados` são síncronas, porque o `: Agente` depende do dado retornado para compor a resposta.
+
+#### Cenário 1: consultar informações do projeto
+
+&emsp; O cenário representa o fluxo mais frequente do agente, no qual o usuário formula uma pergunta sobre um projeto e recebe a resposta acompanhada da indicação de origem. É o cenário de maior alcance, por percorrer a cadeia completa de consulta, do recebimento da solicitação em linguagem natural (RF01) à devolução da resposta fundamentada (RF04), e por representar os dois desvios previstos: a recusa de pedidos fora do catálogo de intenções (RF02) e o ciclo de esclarecimento diante de parâmetros faltantes (RF05).
+
+<div align="center">
+  <sub>FIGURA 2.2: diagrama de sequência do cenário 1 (consultar informações do projeto)</sub><br>
+  <img src="../assets/sequencia-1.svg" width="100%" alt="Diagrama de sequência do cenário de consulta de informações do projeto"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Fluxo do cenário:**
+
+| # | Mensagem | Tipo | Origem | Destino | Requisito |
+|---|---|---|---|---|---|
+| 1 | `enviarAudio(audio)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
+| 2 | `transcrever(audio)` | Síncrona | `: InterfaceDeChat` | `: ServicoDeVoz` | RF01 |
+| 3 | `textoTranscrito` | Retorno | `: ServicoDeVoz` | `: InterfaceDeChat` | RF01 |
+| 4 | `textoTranscrito` | Retorno | `: InterfaceDeChat` | Usuário | RF01 |
+| 5 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
+| 6 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF02 |
+| 7 | `classificarIntencao(texto)` | Síncrona | `: PipelinePLN` | `: Intencao` | RF02 |
+| 8 | `intencaoIdentificada, parametrosObrigatorios` | Retorno | `: Intencao` | `: PipelinePLN` | RF02 |
+| 9 | `extrairEntidades(texto, parametrosObrigatorios)` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | RF02 |
+| 10 | `log()` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | Rastreabilidade |
+| 11 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF02 |
+| 12 | `buscarDados(projeto, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF02 |
+| 13 | `dados, caminho` | Retorno | `: FonteDeDados` | `: Agente` | RF02, RF03 |
+| 14 | `exibirResposta(resposta, referencia, data)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
+| 15 | `sintetizar(resposta)` | Síncrona | `: InterfaceDeChat` | `: ServicoDeVoz` | RF01 |
+| 16 | `audioResposta` | Retorno | `: ServicoDeVoz` | `: InterfaceDeChat` | RF01 |
+| 17 | `audioResposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF01, RF03 |
+| 18 | `resposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF01, RF03 |
+
+**Fragmentos de interação:**
+
+| Fragmento | Condição de guarda | Comportamento | Requisito |
+|---|---|---|---|
+| `alt` de entrada | `[canal de entrada em áudio]` | Passos 1 a 4: a solicitação chega em áudio, o `: ServicoDeVoz` a transcreve e a transcrição é devolvida ao usuário para conferência | RF01 |
+| `alt` de entrada | `[canal de entrada em texto]` | Passo 5: a solicitação já chega em texto e segue direto para o tratamento | RF01 |
+| `alt` de saída | `[canal de entrada em áudio]` | Passos 15 a 17: a resposta é sintetizada em áudio antes de ser devolvida | RF01, RF03 |
+| `alt` de saída | `[canal de entrada em texto]` | Passo 18: a resposta é devolvida em texto | RF01, RF03 |
+
+&emsp; Os dois fragmentos `alt` usam deliberadamente a mesma condição de guarda. Não se trata de repetição acidental: é essa coincidência que expressa graficamente a exigência do RF01 de que o canal da resposta corresponda ao canal da solicitação. Se o fragmento de saída tivesse guarda própria, como uma preferência declarada pelo usuário, o critério de aceitação estaria violado, porque a resposta poderia divergir do canal de entrada.
+
+&emsp; O passo 4 devolve a transcrição ao próprio usuário antes de a solicitação seguir para o tratamento. Esse retorno atende à cláusula de conferência do RF01 e é o que permite ao usuário perceber um erro de transcrição antes de receber uma resposta construída sobre a interpretação errada.
+
+&emsp; A classificação da intenção não é uma operação interna do `: PipelinePLN`, e sim uma chamada ao `: Intencao`, que detém o catálogo. A escolha segue o princípio de atribuir a responsabilidade a quem possui a informação necessária para cumpri-la: só quem conhece as intenções catalogadas consegue dizer a qual delas o texto corresponde. O retorno do passo 8 traz duas informações, a intenção reconhecida e os parâmetros que ela exige, e é o segundo deles que orienta a extração de entidades do passo 9.
+
+&emsp; O passo 13 devolve, além dos dados do projeto, o caminho do artefato de origem. Esse retorno conjunto é o que permite aos passos 17 e 18 entregarem conteúdo, referência e data em uma única exibição, atendendo ao RF03 sem uma consulta adicional às fontes.
+
+#### Cenário 2: sugerir preenchimento de documento
+
+&emsp; O cenário representa o apoio à documentação do portfólio, no qual o usuário solicita ajuda para preencher um artefato e recebe uma sugestão de texto para cada campo pendente. Reaproveita integralmente a cadeia de tratamento da entrada do cenário 1 (RF01 e RF02) e diverge a partir da execução da intenção, quando o agente passa a operar sobre os campos do artefato em vez dos dados de acompanhamento do projeto.
+
+<div align="center">
+  <sub>FIGURA 2.3: diagrama de sequência do cenário 2 (sugerir preenchimento de documento)</sub><br>
+  <img src="../assets/sequencia-2.svg" width="100%" alt="Diagrama de sequência do cenário de sugestão de preenchimento de documento"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Fluxo do cenário:**
+
+| # | Mensagem | Tipo | Origem | Destino | Requisito |
+|---|---|---|---|---|---|
+| 1 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF04 |
+| 2 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF04 |
+| 3 | `classificarIntencao(texto)` | Síncrona | `: PipelinePLN` | `: Intencao` | RF04 |
+| 4 | `intencaoIdentificada, parametrosObrigatorios` | Retorno | `: Intencao` | `: PipelinePLN` | RF04 |
+| 5 | `extrairEntidades(texto, parametrosObrigatorios)` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | RF04 |
+| 6 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF04 |
+| 7 | `obterCamposPendentes(artefato, projeto, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF04 |
+| 8 | `camposPendentes, contextoDoProjeto` | Retorno | `: FonteDeDados` | `: Agente` | RF04 |
+| 9 | `gerarSugestao(campo, contextoDoProjeto)` | Síncrona | `: Agente` | `: Agente` | RF04 |
+| 10 | `enviarSugestoes(sugestoesPorCampo)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF04 |
+| 11 | `sugestoes` | Retorno | `: InterfaceDeChat` | Usuário | RF04 |
+| 12 | `informarArtefatoCompleto()` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF04 |
+| 13 | `artefatoCompleto` | Retorno | `: InterfaceDeChat` | Usuário | RF04 |
+
+**Fragmentos de interação:**
+
+| Fragmento | Condição de guarda | Comportamento | Requisito |
+|---|---|---|---|
+| `alt` | `[há campos pendentes]` | Passos 9 a 11: o `: Agente` gera as sugestões e a `: InterfaceDeChat` as devolve ao usuário | RF04 |
+| `alt` | `[nenhum campo pendente]` | Passos 12 e 13: o `: Agente` emite `informarArtefatoCompleto()` e a `: InterfaceDeChat` devolve `artefatoCompleto`, sem gerar sugestões | RF04 |
+| `loop` | `[para cada campo pendente]` | Passo 9: a sugestão é gerada campo a campo, o que garante a granularidade exigida pelo critério de aceitação do RF04 | RF04 |
+
+&emsp; Os passos 1 a 6 reproduzem literalmente a cadeia de tratamento de entrada do cenário 1, incluindo a consulta ao catálogo de intenções e a extração de entidades orientada pelos parâmetros obrigatórios. Essa repetição é intencional e demonstra que o mesmo mecanismo de interpretação serve a requisitos distintos: o que muda é apenas a intenção reconhecida e, por consequência, a ação executada pelo `: Agente` a partir do passo 7.
+
+&emsp; O `loop` envolve somente a geração da sugestão, e não o envio. A distinção importa: as sugestões são produzidas campo a campo, atendendo à granularidade exigida pelo RF04, mas entregues em uma única mensagem ao final, o que evita fragmentar a conversa em uma mensagem por campo.
+
+&emsp; A mensagem `obterCamposPendentes` do passo 7 é a tradução direta da combinação dos atributos `obrigatorio` e `preenchido` da classe `CampoArtefato`, descrita na modelagem estática. É essa combinação que define o conjunto sobre o qual o fragmento `loop` itera.
+
+&emsp; O `: Agente` devolve as sugestões ao usuário pela `: InterfaceDeChat` e não emite qualquer mensagem de escrita à `: FonteDeDados`. Essa ausência é deliberada e representa graficamente a restrição do RF04 de não alterar o documento de origem, mantendo com o usuário a decisão sobre o que é efetivamente gravado. É também o que distingue este cenário do RF06, em que a escrita é o objetivo e por isso exige confirmação explícita.
+
+#### Cenário 3: notificar pendências
+
+&emsp; O cenário representa o único comportamento proativo da solução. Diferentemente dos anteriores, não é iniciado por uma solicitação em linguagem natural, mas por um agendador que dispara a verificação periódica do portfólio. O usuário aparece apenas ao final da sequência, como destinatário da notificação.
+
+<div align="center">
+  <sub>FIGURA 2.4: diagrama de sequência do cenário 3 (notificar pendências)</sub><br>
+  <img src="../assets/sequencia-3.svg" width="100%" alt="Diagrama de sequência do cenário de notificação proativa de pendências"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Fluxo do cenário:**
+
+| # | Mensagem | Tipo | Origem | Destino | Requisito |
+|---|---|---|---|---|---|
+| 1 | `executarVerificacaoPeriodica()` | Assíncrona | `: Agendador` | `: Agente` | RF05 |
+| 2 | `consultarProjetos(prazos, campos, situacoes)` | Síncrona | `: Agente` | `: FonteDeDados` | RF05 |
+| 3 | `projetos, artefatos` | Retorno | `: FonteDeDados` | `: Agente` | RF05 |
+| 4 | `identificarPendencias(projetos)` | Síncrona | `: Agente` | `: Agente` | RF05 |
+| 5 | `obterUsuariosQueAcompanham(projeto)` | Síncrona | `: Agente` | `: FonteDeDados` | RF05 |
+| 6 | `usuariosDestino` | Retorno | `: FonteDeDados` | `: Agente` | RF05 |
+| 7 | `enviarNotificacao(pendencia, usuariosDestino)` | Síncrona | `: Agente` | `: ServicoDeNotificacao` | RF05 |
+| 8 | `notificar(projeto, pendencia)` | Assíncrona | `: ServicoDeNotificacao` | Usuário | RF05 |
+
+**Fragmentos de interação:**
+
+| Fragmento | Condição de guarda | Comportamento | Requisito |
+|---|---|---|---|
+| `opt` | `[há pendências identificadas]` | Quando a verificação não encontra pendências, a sequência se encerra sem notificação, o que evita comunicação desnecessária ao usuário | RF05 |
+| `loop` | `[para cada pendência identificada]` | O destinatário é resolvido por pendência, de modo que cada usuário receba apenas o que se refere aos projetos que acompanha | RF05 |
+
+&emsp; A mensagem `obterUsuariosQueAcompanham` do passo 5 percorre a associação `acompanha` entre `Usuário` e `Projeto`, de cardinalidade muitos para muitos. É esse relacionamento que dispensa uma configuração paralela de assinatura de notificações, conforme observado na modelagem estática.
+
+&emsp; A ausência da `: InterfaceDeChat` e do `: PipelinePLN` entre as linhas de vida é o traço que distingue este cenário dos demais. Ela expressa graficamente o critério de aceitação do RF05, segundo o qual a notificação ocorre sem exigir uma solicitação prévia do usuário.
+
+&emsp; É também o único cenário em que uma mensagem assíncrona chega ao ator. O disparo do `: Agendador` e a entrega pelo `: ServicoDeNotificacao` não bloqueiam o remetente à espera de resposta, ao contrário das consultas à `: FonteDeDados`, que são síncronas porque o `: Agente` depende do resultado para prosseguir. A notação evita a leitura equivocada de que a notificação seria o retorno de alguma solicitação do usuário, que neste cenário não existe.
+
+### 2.2.3. Rastreabilidade entre requisitos, cenários e classes
+
+&emsp; A rastreabilidade a seguir demonstra que cada requisito funcional está representado em ao menos um cenário e que cada cenário opera sobre classes efetivamente declaradas na modelagem estática. A verificação percorre os três eixos do artefato, ou seja, as histórias de usuário da seção 2.2, os diagramas de sequência e o diagrama de classes.
+
+**Requisitos, cenários e classes:**
+
+| RF | Persona da história | Cenário | Classes envolvidas | Atributos e relacionamentos determinantes | Mensagem que evidencia o atendimento |
+|---|---|---|---|---|---|
+| RF01: Receber solicitações por áudio e responder no canal de origem | Usuário do portfólio | Cenário 1 | `Usuário` | `id` | `enviarAudio(audio)`, `transcrever(audio)`, retorno `textoTranscrito`, `sintetizar(resposta)` e retorno `audioResposta`, nos dois fragmentos `alt` de canal |
+| RF02: Consultar dados de projetos | PMO | Cenário 1 | `PMO`, `Portfólio`, `Projeto` | `codigo`, `status`, `percentualAvanco`, `dataTerminoPrevista`, relacionamento `administra` | `classificarIntencao(texto)`, `extrairEntidades(texto, parametrosObrigatorios)`, `executarIntencao(intencao, entidades, idUsuario)` e `buscarDados(projeto, idUsuario)` |
+| RF03: Apresentar a fonte da informação | Diretor | Cenário 1 | `Diretor`, `Artefato`, `Projeto` | `referencia`, `data`, relacionamentos `compõe` e `supervisiona` | Retorno `dados, caminho`, chamada `exibirResposta(resposta, referencia, data)` e retornos `audioResposta, referencia, data` e `resposta, referencia, data` |
+| RF04: Sugerir o preenchimento de documentos | Líder de projeto | Cenário 2 | `LiderProjeto`, `Artefato`, `CampoArtefato`, `Projeto` | `obrigatorio`, `preenchido`, `nome`, `valor`, relacionamentos `compõe` e `lidera` | `obterCamposPendentes(artefato, projeto, idUsuario)`, `gerarSugestao(campo, contextoDoProjeto)` e `enviarSugestoes(sugestoesPorCampo)` |
+| RF05: Notificar proativamente o usuário de pendências | Usuário do portfólio | Cenário 3 | `Portfólio`, `Projeto`, `Artefato`, `CampoArtefato`, `Pendência`, `Usuário` | `prazo`, `situacao`, `preenchido`, `email`, relacionamentos `contém`, `origina`, `acompanha` e `notifica` | `consultarProjetos(prazos, campos, situacoes)`, `identificarPendencias(projetos)`, `obterUsuariosQueAcompanham(projeto)` e `enviarNotificacao(pendencia, usuariosDestino)` |
+| RF06: Atualizar o cadastro de projetos a partir de instruções do usuário | Líder de projeto | Não modelado nesta sprint | `LiderProjeto`, `Projeto` | Relacionamento `lidera`, que delimita os projetos passíveis de alteração | Sem cenário, conforme justificado adiante |
+
+&emsp; A coluna de persona evidencia a amarração direta entre as histórias de usuário e a modelagem estática. As três personas que aparecem nas histórias correspondem às três especializações de `Usuário`, de modo que cada requisito escrito na voz de um papel específico tem, no modelo, a classe correspondente entre as classes envolvidas.
+
+**Cobertura das classes pelos cenários:**
+
+| Classe | Cenário 1 | Cenário 2 | Cenário 3 | RFs atendidos |
+|---|---|---|---|---|
+| `Portfólio` | Sim | Não | Sim | RF02, RF05 |
+| `Projeto` | Sim | Sim | Sim | RF02, RF03, RF04, RF05, RF06 |
+| `Usuário` | Sim | Sim | Sim | RF01, RF05 |
+| `Diretor` | Sim | Não | Não | RF03 |
+| `PMO` | Sim | Não | Não | RF02 |
+| `LiderProjeto` | Não | Sim | Não | RF04, RF06 |
+| `Pendência` | Não | Não | Sim | RF05 |
+| `Artefato` | Sim | Sim | Sim | RF03, RF04, RF05 |
+| `CampoArtefato` | Não | Sim | Sim | RF04, RF05 |
+
+&emsp; A verificação de cobertura confirma a coerência entre as três representações. Cinco dos seis requisitos funcionais aparecem em ao menos um cenário, e todas as nove classes do modelo estático são exercitadas por ao menos um cenário, o que indica que não há classe declarada sem uso previsto.
+
+&emsp; A classe `Projeto` figura nos três cenários e concentra o maior número de requisitos, o que a confirma como entidade central do domínio, conforme antecipado na modelagem estática. Nas extremidades, `Pendência` se restringe ao cenário 3, por ser a entidade produzida pela verificação periódica, e `CampoArtefato` só aparece a partir do cenário 2, por ser a granularidade exigida exclusivamente pela sugestão de preenchimento.
+
+&emsp; As especializações de `Usuário` distribuem-se conforme o perfil de cada história. `Diretor` e `PMO` aparecem no cenário 1 porque as histórias do RF02 e do RF03 são escritas nas suas vozes, e `LiderProjeto` aparece no cenário 2 pelo mesmo motivo em relação ao RF04. A superclasse `Usuário` figura nos três cenários por concentrar os atributos e as relações que independem de papel.
+
+&emsp; As classes `Artefato` e `CampoArtefato` participam de mais de um cenário por cumprirem papéis distintos em cada um. No cenário 1, o `Artefato` fornece os metadados de origem exigidos pelo RF03. No cenário 2, a dupla sustenta a identificação dos campos pendentes exigida pelo RF04. No cenário 3, ambas são percorridas pelo critério `campos` da mensagem `consultarProjetos`, que permite classificar como pendência um artefato com campos obrigatórios ainda não preenchidos.
+
+**Delimitações desta sprint:**
+
+&emsp; Duas lacunas são registradas de forma explícita, por decisão do grupo e não por omissão.
+
+&emsp; O **RF06 não recebeu diagrama de sequência**. Ele é o único requisito de prioridade baixa e o único cuja viabilidade técnica ainda está em avaliação, além de ser o único que grava dados nas fontes, enquanto os três cenários modelados são de leitura. Modelá-lo exigiria representar um fluxo de escrita com confirmação explícita, o que se optou por postergar para quando a viabilidade estiver confirmada. As classes que ele exercitaria já estão declaradas, de modo que o modelo estático o comporta sem alteração.
+
+&emsp; Os **cenários representam apenas o fluxo principal**. A cláusula do RF02 que determina informar a limitação ao usuário quando a solicitação não corresponder a nenhuma consulta prevista não está representada graficamente, assim como não estão os tratamentos de falha de transcrição ou de indisponibilidade das fontes. A opção por diagramas de caminho feliz privilegia a legibilidade nesta primeira especificação, e os desvios entram na sprint seguinte.
+
+&emsp; Registra-se ainda que a automensagem `log()` do cenário 1 não decorre de nenhum requisito funcional. Ela sustenta a rastreabilidade das interpretações feitas pelo agente, que é atributo de qualidade e será formalizada como requisito não funcional de auditabilidade na seção 2.3.
+
 
 ---
 
@@ -1041,11 +1275,11 @@ Os valores-alvo ainda não acordados estão identificados como **a validar com o
 | ID e título                                                | História de usuário                                                                                                                                               | Business Driver relacionado                               | Característica de qualidade        | Critério mensurável e verificável                                                                                                                                                                                                                                                           | Forma de validação ou teste                                                                                                                                     |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **RNF01 — Desempenho das consultas**                       | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações           | Desempenho                         | Pelo menos 80% das consultas textuais devem apresentar uma resposta em até 15 segundos, desconsiderando indisponibilidades dos serviços externos.                                                                                                                                           | Executar conjunto representativo de consultas e medir o tempo de resposta e taxa de sucesso.                                                                    |
-| **RNF02 — Controle de acesso às informações**              | Como gestor, quero que o acesso às informações seja limitado de acordo com o perfil de cada usuário para preservar a confidencialidade dos projetos.              | Confidencialidade e segurança da informação               | Segurança e controle de acesso     | O sistema deve autenticar o usuário e validar suas permissões antes de responder às consultas. Nos testes de autorização, pelo menos 80% das tentativas de acesso a informações não permitidas devem ser bloqueadas em até 15 segundos.                                                     | Executar testes de autorização com diferentes perfis e verificar bloqueio de acessos não autorizados dentro do tempo limite.                                    |
+| **RNF02 — Controle de acesso às informações**              | Como diretor, quero que o acesso às informações seja limitado de acordo com o perfil de cada usuário para preservar a confidencialidade dos projetos.              | Confidencialidade e segurança da informação               | Segurança e controle de acesso     | O sistema deve autenticar o usuário e validar suas permissões antes de responder às consultas. Nos testes de autorização, pelo menos 80% das tentativas de acesso a informações não permitidas devem ser bloqueadas em até 15 segundos.                                                     | Executar testes de autorização com diferentes perfis e verificar bloqueio de acessos não autorizados dentro do tempo limite.                                    |
 | **RNF03 — Precisão na identificação de intenções**         | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas                   | Precisão e confiabilidade          | O componente de processamento de linguagem natural deve atingir precisão mínima de 85% na classificação das intenções em um conjunto de testes previamente validado pela equipe e pelo parceiro.                                                                                            | Avaliar o classificador em conjunto de teste rotulado, separado dos dados de treinamento.                                                                       |
 | **RNF04 — Rastreabilidade das consultas**                  | Como responsável pela gestão dos projetos, quero que as consultas e respostas sejam registradas para permitir a auditoria das informações fornecidas pelo agente. | Rastreabilidade e transparência                           | Auditabilidade e rastreabilidade   | O sistema deve registrar o identificador do usuário, a data e hora, o canal utilizado, a intenção identificada, as fontes consultadas e o resultado da solicitação. Os registros devem ser protegidos contra alterações por usuários comuns.                                                | Verificar se todos os elementos obrigatórios estão presentes nos logs de auditoria e se são imutáveis.                                                          |
-| **RNF05 — Interoperabilidade entre canais**                | Como usuário, quero acessar o agente por diferentes interfaces para consultar os projetos pelo canal mais adequado à minha rotina.                                | Interoperabilidade e acessibilidade                       | Flexibilidade e integração         | O núcleo do agente deve disponibilizar suas funcionalidades por meio de interfaces padronizadas, permitindo a integração com pelo menos dois canais previstos no projeto sem duplicação das regras de negócio.                                                                              | Verificar que funcionalidades principais funcionam identicamente em ambos os canais.                                                                            |
-| **RNF06 — Qualidade da transcrição de áudio**              | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural     | Acurácia em reconhecimento de fala | O componente de conversão de áudio em texto deve alcançar uma taxa mínima de 85% de palavras reconhecidas corretamente em um conjunto de áudios representativo do contexto do projeto. Quando a transcrição apresentar baixa confiança, o agente deverá solicitar a confirmação do usuário. | Testar com áudios do vocabulário de projetos e medir taxa de erro de palavras (WER) e solicitações de confirmação.                                              |
+| **RNF05 — Interoperabilidade entre aplicações clientes**   | Como usuário, quero acessar o agente a partir de diferentes aplicações para consultar os projetos pelo ponto de acesso mais adequado à minha rotina.              | Interoperabilidade e acessibilidade                       | Flexibilidade e integração         | O núcleo do agente deve expor suas funcionalidades por meio de interfaces padronizadas, permitindo que pelo menos duas aplicações clientes distintas o consumam sem duplicação das regras de negócio.                                                                                       | Acionar as funcionalidades principais a partir de duas aplicações clientes distintas e verificar que o resultado é idêntico nas duas.                           |
+| **RNF06 — Qualidade da transcrição de áudio**              | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural     | Acurácia em reconhecimento de fala | O componente de conversão de áudio em texto deve alcançar uma taxa mínima de 85% de palavras reconhecidas corretamente em um conjunto de áudios representativo do contexto do projeto.                                                                                                     | Testar com áudios do vocabulário de projetos e medir a taxa de erro de palavras (WER) contra transcrições de referência.                                        |
 | **RNF07 — Disponibilidade da solução**                     | Como usuário, quero que o agente esteja disponível durante o período de trabalho para realizar consultas sempre que necessário.                                   | Continuidade operacional e eficiência                     | Confiabilidade e disponibilidade   | A solução deve apresentar disponibilidade mínima de 99% durante o horário de operação definido pelo parceiro, desconsiderando manutenções previamente comunicadas.                                                                                                                          | Monitorar uptime da aplicação e infraestrutura durante período de operação.                                                                                     |
 | **RNF08 — Usabilidade das respostas**                      | Como usuário, quero receber respostas claras e organizadas para compreender rapidamente a situação dos projetos, independentemente do meu conhecimento técnico.   | Transparência e apoio à tomada de decisão                 | Usabilidade e compreensibilidade   | Em testes com representantes das personas, pelo menos 80% dos participantes devem compreender a resposta e identificar a informação solicitada sem auxílio externo.                                                                                                                         | Conduzir testes de usabilidade com representantes das personas e validar compreensão.                                                                           |
 | **RNF09 — Tratamento de ambiguidades**                     | Como usuário do agente, quero receber uma solicitação de esclarecimento quando meu pedido for ambíguo, para evitar respostas ou ações incorretas.                 | Confiabilidade no acesso e no tratamento das informações. | Robustez e prevenção de erro       | A taxa de ambiguidades detectadas e a taxa máxima de respostas indevidas para entradas ambíguas devem alcançar valores **a validar com o parceiro**; toda ambiguidade detectada deve gerar pedido de esclarecimento.                                                                        | Aplicar casos ambíguos previamente rotulados e verificar a detecção, a ausência de resposta conclusiva indevida e a apresentação da pergunta de esclarecimento. |
@@ -1056,17 +1290,17 @@ Os valores-alvo ainda não acordados estão identificados como **a validar com o
 
 | RNF                                            | RF relacionado         | Relação de rastreabilidade                                                                                                |
 | ---------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| RNF01 — Desempenho das consultas               | RF01                   | Qualifica o desempenho das respostas às consultas de dados dos projetos.                                                  |
-| RNF02 — Controle de acesso às informações      | RF01, RF02, RF03, RF04 | Assegura que as consultas, indicações de fonte, sugestões e notificações respeitem as permissões de cada usuário.         |
-| RNF03 — Precisão na identificação de intenções | RF01, RF03, RF04       | Mede a qualidade da compreensão de linguagem natural que fundamenta consultas, sugestões de preenchimento e notificações. |
-| RNF04 — Rastreabilidade das consultas          | RF01, RF02, RF03, RF04 | Mede o registro e a imutabilidade das auditoria de todas as interações com o agente.                                      |
-| RNF05 — Interoperabilidade entre canais        | RF01, RF03, RF04       | Assegura que consultas, sugestões e notificações funcionem de maneira consistente em múltiplos canais.                    |
-| RNF06 — Qualidade da transcrição de áudio      | RF01, RF03, RF04       | Qualifica a entrada por voz utilizada em consultas, sugestões de preenchimento e notificações.                            |
-| RNF07 — Disponibilidade da solução             | RF01, RF02, RF03, RF04 | Assegura que o agente esteja disponível para consultas, sugestões e notificações durante o horário de operação.           |
-| RNF08 — Usabilidade das respostas              | RF01, RF02             | Mede a clareza e compreensibilidade das respostas às consultas e das indicações de fonte.                                 |
-| RNF09 — Tratamento de ambiguidades             | RF01, RF03, RF04       | Evita a execução dessas funcionalidades quando a solicitação não possui clareza ou informação suficiente.                 |
-| RNF10 — Escalabilidade do agente               | RF01, RF02, RF03, RF04 | Qualifica a capacidade do agente de manter desempenho sob aumento de volume de consultas e dados.                         |
-| RNF11 — Explicabilidade das sugestões          | RF03                   | Mede a clareza e rastreabilidade das fontes e justificativas das sugestões de preenchimento apresentadas.                 |
+| RNF01 — Desempenho das consultas               | RF02                               | Qualifica o tempo de resposta das consultas de dados de projetos, sem alterar o comportamento especificado no requisito.                                                                                       |
+| RNF02 — Controle de acesso às informações      | RF02, RF03, RF04, RF05, RF06       | Assegura que consultas, indicações de fonte, sugestões, notificações e alterações de cadastro respeitem o alcance de cada perfil, materializado nas associações `supervisiona`, `administra` e `lidera`.       |
+| RNF03 — Precisão na identificação de intenções | RF02, RF04, RF06                   | Mede a qualidade da classificação executada pelo `: Intencao` nos cenários 1 e 2, que é o passo comum aos requisitos iniciados por linguagem natural.                                                          |
+| RNF04 — Rastreabilidade das consultas          | RF01, RF02, RF03, RF04, RF05, RF06 | Mede o registro e a imutabilidade da auditoria de todas as interações, comportamento representado pela automensagem `log()` do cenário 1.                                                                      |
+| RNF05 — Interoperabilidade entre aplicações clientes | RF01, RF02, RF04, RF05       | Assegura que as funcionalidades operem de maneira idêntica em qualquer aplicação que consuma o agente. Trata do ponto de acesso, e não da modalidade de entrada e saída, que é objeto do RF01.                 |
+| RNF06 — Qualidade da transcrição de áudio      | RF01                               | Qualifica a conversão de áudio em texto executada pelo `: ServicoDeVoz` no cenário 1, da qual dependem todas as solicitações formuladas por voz.                                                               |
+| RNF07 — Disponibilidade da solução             | RF01, RF02, RF03, RF04, RF05, RF06 | Assegura que o agente esteja disponível durante o horário de operação, condição para a execução de qualquer requisito funcional.                                                                               |
+| RNF08 — Usabilidade das respostas              | RF02, RF03                         | Mede a clareza e a compreensibilidade da resposta e da indicação de fonte devolvidas ao final do cenário 1.                                                                                                    |
+| RNF09 — Tratamento de ambiguidades             | RF02, RF04, RF06                   | Evita a execução dos requisitos iniciados por linguagem natural quando a solicitação não possui informação suficiente, atuando sobre os parâmetros obrigatórios devolvidos pelo `: Intencao`.                  |
+| RNF10 — Escalabilidade do agente               | RF02, RF04                         | Qualifica a capacidade de manter desempenho sob aumento de volume nos dois requisitos que percorrem o portfólio inteiro.                                                                                       |
+| RNF11 — Explicabilidade das sugestões          | RF03, RF04                         | Mede a clareza e a rastreabilidade das fontes e justificativas das sugestões de preenchimento, estendendo ao RF04 a exigência de indicação de origem que o RF03 estabelece para as respostas de consulta.      |
 
 ### Relação dos requisitos não funcionais com os Business Drivers
 
@@ -1074,7 +1308,7 @@ Os requisitos não funcionais foram definidos a partir dos Business Drivers do p
 
 Os requisitos de desempenho (RNF01) e disponibilidade (RNF07) contribuem para a **eficiência e agilidade no acesso às informações**, permitindo que os profissionais obtenham respostas rapidamente sem comprometer a tomada de decisão. O controle de acesso (RNF02) e a proteção de dados preservam a **confidencialidade e segurança da informação**, respeitando o perfil de cada usuário e as exigências legais aplicáveis. A rastreabilidade (RNF04) permite **transparência e auditoria** das consultas e respostas.
 
-A precisão na identificação de intenções (RNF03) e o tratamento de ambiguidades (RNF09) garantem a **confiabilidade no acesso e tratamento das informações**, assegurando que solicitações em linguagem natural sejam interpretadas corretamente. A qualidade da transcrição de áudio (RNF06) e interoperabilidade entre canais (RNF05) oferecem **acessibilidade e flexibilidade**. A usabilidade (RNF08) e explicabilidade (RNF11) garantem que as respostas apoiem a **tomada de decisão** de forma clara. A escalabilidade (RNF10) contribui para a **continuidade operacional**, permitindo que o agente processe aumentos de volume sem degradação.
+A precisão na identificação de intenções (RNF03) e o tratamento de ambiguidades (RNF09) garantem a **confiabilidade no acesso e tratamento das informações**, assegurando que solicitações em linguagem natural sejam interpretadas corretamente. A qualidade da transcrição de áudio (RNF06) e a interoperabilidade entre aplicações clientes (RNF05) oferecem **acessibilidade e flexibilidade**. A usabilidade (RNF08) e explicabilidade (RNF11) garantem que as respostas apoiem a **tomada de decisão** de forma clara. A escalabilidade (RNF10) contribui para a **continuidade operacional**, permitindo que o agente processe aumentos de volume sem degradação.
 
 ## 2.4 Visão Inicial da Solução Técnica
 
@@ -1084,7 +1318,7 @@ A precisão na identificação de intenções (RNF03) e o tratamento de ambiguid
 
 ### Diagrama de componentes (UML)
 
-![Diagrama de componentes](./assets/diagrama-componentes.png)
+![Diagrama de componentes](../assets/diagrama-componentes.png)
 
 ### Descrição das camadas
 
@@ -1103,7 +1337,7 @@ A precisão na identificação de intenções (RNF03) e o tratamento de ambiguid
 
 ## 2.5 Tecnologias e Ferramentas
 
-<!-- Estimativa inicial — pode ser revisada nas próximas sprints. -->
+<!-- Estimativa inicial, pode ser revisada nas próximas sprints. -->
 
 | Categoria           | Tecnologia/Ferramenta                  | Justificativa |
 | ------------------- | -------------------------------------- | ------------- |
