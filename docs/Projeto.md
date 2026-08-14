@@ -1312,26 +1312,47 @@ A precisão na identificação de intenções (RNF03) e o tratamento de ambiguid
 
 ## 2.4 Visão Inicial da Solução Técnica
 
-<!-- OBRIGATÓRIO: diagrama UML de componentes ou de pacotes.
-     Esboço em blocos conectados cobrindo as 3 camadas:
-     interface humano-computador, lógica de negócio, acesso a dados/serviços. -->
+&emsp; A visão técnica apresentada nesta seção traduz, em um esboço preliminar de arquitetura, os fluxos de negócio descritos na seção 2.1 e os requisitos funcionais e não funcionais especificados nas seções 2.2 e 2.3. O diagrama a seguir representa a solução como um conjunto de blocos conectados, organizados em três camadas: interface humano-computador, lógica de negócio e acesso a dados e serviços.
+
+&emsp; A divisão dos componentes de compreensão de linguagem segue o padrão adotado tanto por frameworks open-source de assistentes conversacionais, como o Rasa (RASA, 2024), quanto pela própria plataforma de bots da Microsoft (MICROSOFT, 2024), ecossistema já utilizado pelo parceiro por meio do Copilot Studio. Em ambos os casos, a compreensão da mensagem do usuário é dividida entre um componente de classificação de intenção, responsável por identificar o que o usuário deseja, e um componente de extração de parâmetros, responsável por capturar os dados específicos mencionados na solicitação, como o nome do projeto ou o período de referência.
 
 ### Diagrama de componentes (UML)
 
-![Diagrama de componentes](../assets/diagrama-componentes.png)
+<div align="center">
+<sub>Imagem 2.4.1 - Diagrama de componentes (UML) — Visão inicial da solução técnica</sub><br>
+  <img src="../assets/diagrama_componentes.svg" width="100%" alt="Diagrama de componentes UML da solução, organizado em três camadas: interface, lógica de negócio e dados e serviços"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+<p align="center">
+  Para melhor visualização do diagrama, acesse o arquivo no <a href="https://drive.google.com/file/d/154cjwt0ZTBpfKCDS-TIXnqn2YJdOKqlL/view?usp=sharing">Google Drive</a>.
+</p>
 
 ### Descrição das camadas
 
-| Camada                | Componentes                                   | Responsabilidade |
-| --------------------- | --------------------------------------------- | ---------------- |
-| **Interface (IHC)**   | [ex.: Web App, Chat UI]                       | [...]            |
-| **Lógica de negócio** | [ex.: API, Serviço de PLN, Orquestrador]      | [...]            |
-| **Dados e serviços**  | [ex.: Banco de dados, APIs externas, storage] | [...]            |
+| Camada | Componentes | Responsabilidade |
+|---|---|---|
+| **Interface (IHC)** | Chat UI - Texto e Voz | Recebe a solicitação do usuário nos dois canais previstos pelo RF01 e exibe a resposta estruturada ao final do processamento. |
+| **Lógica de negócio** | API Gateway, Conversão de Áudio em Texto, Controle de Acesso, PLN - Compreensão (Intenção e Parâmetros), PLN - Transações e Ações, Gerador de Respostas e Explicabilidade, Auditoria e Feedback | O API Gateway centraliza a entrada das solicitações, roteando-as para a Conversão de Áudio em Texto quando a entrada ocorre por voz (RNF06), e em seguida para o Controle de Acesso, que autentica o usuário e valida suas permissões antes de qualquer processamento de linguagem (RNF02). Autorizada a solicitação, o componente de PLN - Compreensão identifica a intenção e extrai os parâmetros relevantes (RNF03), direcionando-a para o componente de PLN - Transações e Ações, responsável pela lógica de negócio de sugestões de preenchimento (RF03) e notificações de pendências (RF04), ou diretamente para o Gerador de Respostas, no caso de consultas (RF01). O Gerador de Respostas monta a saída final, indicando a fonte da informação (RF02) e a justificativa quando aplicável (RNF11), tanto para consultas diretas quanto para o resultado de uma ação processada. Por fim, o componente de Auditoria e Feedback registra o identificador do usuário, o canal, a intenção e o resultado de cada solicitação (RNF04), além de capturar a avaliação do usuário sobre a resposta recebida. |
+| **Dados e serviços** | Repositório de Dados e Conhecimento, Logs de Auditoria | O Repositório de Dados e Conhecimento reúne, sobre a base sintética fornecida pelo parceiro, os dados estruturados do portfólio (projetos, prazos, marcos, riscos), o catálogo de intenções validado com o Metrô e a base de normativos utilizada para o esclarecimento de dúvidas conceituais (RF01, RF03 da seção 1.7, feature 12). Os Logs de Auditoria armazenam, em um repositório separado, os registros de interação e de feedback protegidos contra alteração por usuários comuns (RNF04) — separação motivada pelo padrão de escrita e pelo requisito de imutabilidade distintos dos dados operacionais do portfólio. |
 
 ### Conexões entre componentes
 
-- **[Componente A] → [Componente B]:** [protocolo/motivo da conexão, ex.: REST/JSON]
-- **[Componente B] → [Componente C]:** [...]
+- **Chat UI → API Gateway:** encaminha a solicitação do usuário, em texto ou em áudio, para processamento central.
+- **API Gateway → Conversão de Áudio em Texto:** quando a entrada é por voz, o Gateway aciona a conversão antes de prosseguir com o restante do fluxo.
+- **Conversão de Áudio em Texto → Controle de Acesso:** o texto transcrito segue para validação de permissão, no mesmo fluxo de uma entrada digitada.
+- **API Gateway → Controle de Acesso:** toda solicitação recebida em texto é validada quanto à permissão do usuário antes do processamento de linguagem.
+- **Controle de Acesso → PLN - Compreensão:** somente solicitações autorizadas seguem para o reconhecimento de intenção e a extração de parâmetros.
+- **PLN - Compreensão → PLN - Transações e Ações:** intenções classificadas como ação (sugestão de preenchimento ou alerta) são encaminhadas para a lógica de negócio correspondente.
+- **PLN - Compreensão → Gerador de Respostas:** intenções classificadas como consulta direta seguem para a montagem da resposta.
+- **PLN - Transações e Ações → Repositório de Dados:** consulta os dados necessários para compor a sugestão de preenchimento ou identificar a pendência elegível para alerta.
+- **PLN - Transações e Ações → Gerador de Respostas:** encaminha o resultado da ação processada para formatação da saída final.
+- **Gerador de Respostas → Repositório de Dados:** consulta as informações necessárias para compor a resposta a uma consulta direta.
+- **Gerador de Respostas → Chat UI:** retorna a resposta estruturada ao usuário, com indicação da fonte e da data de apuração.
+- **Gerador de Respostas → Auditoria e Feedback:** registra a resposta entregue e habilita a coleta do feedback do usuário sobre ela.
+- **API Gateway → Auditoria e Feedback:** registra a solicitação recebida, o canal e o identificador do usuário.
+- **PLN - Transações e Ações → Auditoria e Feedback:** registra a ação processada e seu resultado.
+- **Auditoria e Feedback → Logs de Auditoria:** persiste os registros de interação e de feedback no repositório de logs.
 
 ---
 
