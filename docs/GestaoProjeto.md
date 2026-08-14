@@ -116,49 +116,60 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 
 ### 2.1.1 Regra de Ouro
 
-> **Nossa Regra de Ouro:** [Preencher coletivamente.]
+> **Nossa Regra de Ouro:** Toda entrega deve ser concluída até quinta-feira, respeitando o prazo definido pelo próprio grupo para cada tarefa, garantindo tempo hábil para revisão antes da Sprint Review.
 
 ### 2.1.2 Resolução de impasses
 
-<!-- Defina etapas, prazos e quem será consultado caso o time não alcance consenso. -->
-
-_Conteúdo a ser preenchido pela equipe._
+&emsp; Em caso de discordância técnica, os integrantes envolvidos apresentam seus argumentos ao grupo, que discute as alternativas buscando uma decisão apoiada pela maioria. Caso não haja consenso após a discussão, as opções consideradas viáveis são submetidas a uma roleta, e o resultado define a decisão a ser seguida pela equipe. A decisão tomada deve ser respeitada por todos e registrada no canal oficial correspondente ao assunto, para que o histórico e a justificativa permaneçam acessíveis.
 
 ### 2.1.3 Gestão de conflitos
 
 | Etapa | Gatilho | Ação | Participantes | Prazo de resposta |
 |---|---|---|---|---|
-| 1 | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| 2 | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| 3 | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| 1 | Primeiro atraso, sinal de baixo engajamento ou descumprimento de um acordo | Realizar feedback direto e informal na Daily, ouvindo o integrante e combinando uma ação de correção | Integrante envolvido e equipe | Na primeira Daily após a identificação do problema |
+| 2 | Persistência do problema após o feedback inicial | Realizar alinhamento formal na Retrospectiva da Sprint e registrar o problema, o compromisso assumido, o responsável e o prazo acordado | Integrante envolvido e equipe | Na retrospectiva da sprint em andamento |
+| 3 | Descumprimento do acordo formal ou ausência de resolução | Acionar o orientador, apresentando o histórico dos alinhamentos e solicitando apoio para encaminhar a situação | Equipe, integrante envolvido e orientador | Imediatamente após a constatação de que o acordo formal não foi cumprido |
 
 ### 2.1.4 Quadro Kanban
 
 - **Ferramenta:** GitLab.
-- **Criação das tasks:** [Preencher].
-- **Atualização obrigatória:** [Dia e horário].
-- **Responsável pela atualização:** [Preencher].
+- **Criação das tasks:** no início de cada sprint, durante a Sprint Planning, com todas as informações mínimas definidas pela equipe.
+- **Atualização obrigatória:** continuamente, sempre que uma task mudar de estado, e obrigatoriamente antes de cada Daily.
+- **Responsável pela atualização:** cada integrante é responsável pelos próprios cards, desde a criação ou atribuição até o encerramento.
 - **Informações mínimas:** descrição, tipo, prioridade, estimativa, DoR, DoD, responsável e dependências.
+
+&emsp; A gestão de um card não deve comprometer o fluxo de trabalho do revisor previamente designado. O responsável pela task deve disponibilizar a entrega com antecedência suficiente para uma revisão de qualidade e observar a Regra de Ouro, segundo a qual as entregas devem estar concluídas até quinta-feira. Impedimentos, mudanças de prazo ou dependências que possam afetar a revisão devem ser registrados no card e comunicados na Daily assim que forem identificados.
 
 ### 2.1.5 Comunicação oficial
 
-- **Canal oficial:** [Preencher].
-- **Registro das decisões:** [Preencher].
-- **SLA para mensagens comuns:** [Preencher].
-- **SLA para bloqueios urgentes:** [Preencher].
+- **Canal oficial interno:** grupo da equipe no WhatsApp, utilizado para comunicação cotidiana, alinhamentos operacionais e avisos entre os integrantes.
+- **Canal oficial institucional:** grupo do Slack, utilizado para decisões, solicitações e alinhamentos que envolvam professores, docentes ou orientadores.
+- **Registro das decisões:** decisões internas são registradas no WhatsApp; decisões relacionadas ao corpo docente ou à orientação são registradas no Slack. Decisões que alterem escopo, processo ou arquitetura também devem ser consolidadas na documentação ou na issue correspondente do GitLab.
+- **SLA para mensagens comuns:** resposta até o fim do mesmo dia útil.
+- **SLA para bloqueios urgentes:** sinalização imediata no WhatsApp e resposta da equipe em até duas horas dentro do período de trabalho do grupo.
 
 ### 2.1.6 Dailies e demais rituais
 
 | Ritual | Formato | Frequência | Duração máxima | Participantes | Registro |
 |---|---|---|---|---|---|
-| Daily | [Presencial/Assíncrona] | [Preencher] | 15 minutos | Equipe | [Preencher] |
-| Planejamento | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| Revisão | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| Retrospectiva | [Preencher] | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Daily | Presencial, em pé; na impossibilidade de participação, atualização assíncrona em um dos canais oficiais | Diária, nos dias de trabalho do grupo | 15 minutos | Equipe | Impedimentos e decisões são registrados no canal oficial ou na issue relacionada |
+| Sprint Planning | Presencial | No início de cada sprint | Conforme o tempo reservado no calendário acadêmico | Equipe | Issues, responsáveis, revisores, prioridades, estimativas e milestone no GitLab |
+| Sprint Review | Presencial | Ao final de cada sprint | Conforme o tempo reservado no calendário acadêmico | Equipe, docentes, orientador e demais participantes convidados | Feedback recebido e ajustes necessários registrados nas issues ou na documentação |
+| Retrospectiva | Presencial | Ao final de cada sprint | Conforme o tempo reservado no calendário acadêmico | Equipe | Pontos fortes, pontos fracos, riscos, conflitos e ações de melhoria registrados neste documento |
+
+&emsp; Caso algum integrante não possa participar da Daily, deve avisar previamente e informar, por um dos canais oficiais, o que concluiu desde a última sincronização, o que pretende realizar naquele dia e quais impedimentos possui.
 
 ### 2.1.7 Acordos adicionais
 
-_Conteúdo a ser preenchido pela equipe._
+#### Postura geral
+
+&emsp; Respeito mútuo e colaboração são requisitos mínimos e inegociáveis da convivência do grupo. Divergências devem se concentrar nas ideias e nas evidências, nunca em ataques pessoais. Todos os integrantes devem ter espaço para apresentar dúvidas, dificuldades e opiniões sem constrangimento, preservando a segurança psicológica da equipe.
+
+#### Fluxo de revisão e merge
+
+&emsp; Os revisores de cada Merge Request são atribuídos previamente durante a Sprint Planning. O integrante designado é responsável por revisar a entrega, registrar comentários quando necessário e aprovar o MR somente depois de verificar o respectivo DoD. A autoria e a revisão de uma mesma entrega não podem ficar com a mesma pessoa.
+
+&emsp; A abertura dos Merge Requests de promoção para a branch `main` é revezada entre os integrantes, seguindo uma lógica semelhante à rotação de Scrum Master. Essa rotação distribui a responsabilidade, evita a centralização do processo e amplia o conhecimento da equipe sobre o fluxo de entrega. A promoção deve respeitar o fluxo de branches e os critérios de aprovação definidos no documento `GestaoConfiguracao.md`.
 
 ---
 
@@ -168,7 +179,7 @@ _Conteúdo a ser preenchido pela equipe._
 
 &emsp; O fluxo de trabalho da equipe segue o ciclo completo de uma task, desde sua concepção até o encerramento. Na Sprint Planning, realizada no início de cada sprint, as tasks são definidas coletivamente, estimadas em t-shirt (PP, P, M ou G) e distribuídas entre os integrantes, considerando o equilíbrio de carga, a rotação de responsabilidades e o desenvolvimento de habilidades multidisciplinares. Cada task nasce como uma issue no GitLab, criada na coluna open, com título no infinitivo, descrição, objetivo, DoR, DoD, labels, responsável e milestone da sprint preenchidos antes de ser movida para o backlog.
 
-&emsp; Durante o desenvolvimento, o integrante responsável move a issue para doing ao iniciar o trabalho, abre uma branch no padrão definido em GestaoConfiguracao.md e realiza commits atômicos e frequentes, sempre referenciando a issue com #. Ao concluir o desenvolvimento, abre um Merge Request para a branch dev, move a issue para waiting review e designa um revisor. O revisor analisa o conteúdo, registra comentários e aprovações diretamente no MR. Após a aprovação e o merge, a issue é encerrada automaticamente pelo Closes e movida para closed, com o DoD verificado. Tasks maiores que G devem ser decompostas antes de entrar no backlog.
+&emsp; Durante o desenvolvimento, o integrante responsável move a issue para doing ao iniciar o trabalho, abre uma branch no padrão definido em GestaoConfiguracao.md e realiza commits atômicos e frequentes, sempre referenciando a issue com #. Ao concluir o desenvolvimento, abre um Merge Request para a branch `develop`, move a issue para waiting review e aciona o revisor previamente definido na Sprint Planning. O revisor analisa o conteúdo, registra comentários e aprovações diretamente no MR. Após a aprovação e o merge, a issue é encerrada automaticamente pelo Closes e movida para closed, com o DoD verificado. Tasks maiores que G devem ser decompostas antes de entrar no backlog.
 
 ### 2.2.2 Política de atualização do GitLab
 
@@ -299,19 +310,21 @@ A avaliação abaixo registra a situação dos critérios ao final da Sprint 1. 
 
 | Integrante | Papel principal | Artefato ou tarefa | Principais responsabilidades | Entregas esperadas |
 |---|---|---|---|---|
-| Ana Cristina Jardim | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| Felipe Simão | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| Karol Barbosa Rocha | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| Matheus Ferreira da Silva | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| Paulo Henrique Bueno Fernandes | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| Rui Facó | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
-| Tobias Viana | [Preencher] | [Preencher] | [Preencher] | [Preencher] |
+| Ana Cristina Jardim | Gestão de riscos e requisitos funcionais | Matriz de Risco do Projeto e Requisitos Funcionais | Identificar, avaliar e definir respostas aos riscos; produzir a representação visual da matriz; escrever histórias de usuário e elaborar as modelagens estática e dinâmica; revisar a visão inicial da solução técnica e a seleção de tecnologias e ferramentas | Matriz de riscos completa, histórias de usuário, diagrama de classes e diagramas de sequência |
+| Felipe Simão | Contexto da indústria e perfil do líder de projeto | Contexto da Indústria do Parceiro e persona/jornada do líder específico do projeto | Analisar o setor e o posicionamento do parceiro; caracterizar o líder específico do projeto e mapear suas necessidades, dores, expectativas e interações com a solução; revisar os Business Drivers e o conteúdo relacionado ao produto | Contexto da indústria documentado e persona e jornada do líder específico do projeto concluídas |
+| Karol Barbosa Rocha | Perfil do diretor e requisitos não funcionais | Persona/jornada do diretor e Requisitos Não Funcionais | Caracterizar o diretor e mapear sua jornada; especificar RNFs derivados dos Business Drivers; revisar a Visão e o Objetivo do Produto | Persona e jornada do diretor e requisitos não funcionais documentados e revisados |
+| Matheus Ferreira da Silva | Perfil do PMO e estratégia técnica inicial | Persona/jornada do PMO, Business Drivers e Visão Inicial da Solução Técnica | Caracterizar o profissional do PMO e mapear sua jornada; descrever os fluxos de negócio e indicadores computacionais; esboçar os componentes da solução; revisar o problema, o fluxo de negócio e os RNFs | Persona e jornada do PMO, Business Drivers e visão técnica inicial concluídos |
+| Paulo Henrique Bueno Fernandes | Entendimento do problema e visão do produto | Problema, Matriz SWOT, Visão e Objetivo do Produto e Brainstorming de Features | Descrever o desafio e seu impacto; elaborar a SWOT; delimitar o escopo do produto; definir metas e priorizar funcionalidades; revisar personas, jornadas e matriz de riscos | Problema e SWOT, visão e objetivos do produto e brainstorming priorizado concluídos |
+| Rui Facó | Definição do MVP e tecnologias | Canvas do MVP e Tecnologias e Ferramentas | Consolidar proposta de valor, segmentos e recorte do MVP; selecionar e justificar tecnologias; revisar brainstorming, requisitos funcionais e fluxo de negócio | Canvas do MVP e relação justificada de tecnologias e ferramentas concluídos |
+| Tobias Viana | Modelagem do fluxo de negócio | Fluxo do Negócio e diagramas BPMN | Modelar a cadeia de valor e o fluxo principal em BPMN; descrever os processos; revisar o contexto da indústria e o Canvas do MVP | Fluxos AS-IS e TO-BE e respectivos diagramas BPMN concluídos |
 
 ### 3.3.2 Critérios de distribuição
 
-<!-- Explique como a equipe evitou centralização, equilibrou a carga e favoreceu habilidades multidisciplinares. -->
+&emsp; A distribuição foi definida durante a Sprint Planning considerando a complexidade e as dependências de cada entrega. Todos os integrantes receberam responsabilidade de autoria e também participaram da revisão de trabalhos conduzidos por outras pessoas. Essa separação entre autor e revisor reduziu a concentração das decisões, ampliou o contato de cada integrante com diferentes partes do projeto e criou verificação cruzada entre os artefatos de negócio e de especificação técnica.
 
-_Conteúdo a ser preenchido pela equipe._
+&emsp; As três personas e suas respectivas jornadas foram distribuídas entre integrantes diferentes: Karol ficou responsável pelo diretor, Matheus pelo profissional do PMO e Felipe pelo líder específico do projeto. A divisão permitiu aprofundar cada perfil sem centralizar toda a análise de usuários em uma única pessoa. As demais frentes foram distribuídas conforme afinidade inicial e oportunidade de desenvolvimento multidisciplinar, enquanto as revisões conectaram conteúdos dependentes, como Business Drivers e RNFs, fluxo de negócio e solução técnica, e visão do produto e personas.
+
+&emsp; A carga foi acompanhada pelo Kanban e pelas dailies. Caso uma atividade apresentasse esforço superior ao estimado ou impedimento relevante, a equipe poderia redistribuir subtarefas sem retirar do responsável original a tutela e a prestação de contas sobre a entrega. Esse mecanismo preservou responsabilidades claras e, ao mesmo tempo, permitiu colaboração entre os integrantes.
 
 ---
 
