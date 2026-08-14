@@ -94,7 +94,7 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 
 ### 2.1.2 Resolução de impasses
 
-&emsp; Em caso de discordância técnica, os integrantes envolvidos apresentam seus argumentos e as alternativas são submetidas a votação por maioria simples. Se nenhuma alternativa alcançar a maioria ou se houver empate, realiza-se uma roleta apenas entre as opções empatadas. O resultado define a decisão a ser seguida pela equipe. A decisão e as alternativas consideradas devem ser registradas no canal oficial correspondente ao assunto, para que o histórico permaneça acessível.
+ Em caso de discordância técnica, os integrantes envolvidos apresentam seus argumentos e as alternativas são submetidas a votação por maioria simples. Se nenhuma alternativa alcançar a maioria ou se houver empate, realiza-se uma roleta apenas entre as opções empatadas. O resultado define a decisão a ser seguida pela equipe. A decisão e as alternativas consideradas devem ser registradas no canal oficial correspondente ao assunto, para que o histórico permaneça acessível.
 
 ### 2.1.3 Gestão de conflitos
 
@@ -112,15 +112,15 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 - **Responsável pela atualização:** cada integrante é responsável pelos próprios cards, desde a criação ou atribuição até o encerramento.
 - **Informações mínimas:** descrição, tipo, prioridade, estimativa, DoR, DoD, responsável e dependências.
 
-&emsp; A gestão de um card não deve comprometer o fluxo de trabalho do revisor previamente designado. O responsável pela task deve disponibilizar a entrega com antecedência suficiente para uma revisão de qualidade e observar a Regra de Ouro, segundo a qual as entregas devem estar concluídas até quinta-feira. Impedimentos, mudanças de prazo ou dependências que possam afetar a revisão devem ser registrados no card e comunicados na Daily assim que forem identificados.
+ A gestão de um card não deve comprometer o fluxo de trabalho do revisor previamente designado. O responsável pela task deve disponibilizar a entrega com antecedência suficiente para uma revisão de qualidade e observar a Regra de Ouro, segundo a qual as entregas devem estar concluídas até quinta-feira. Impedimentos, mudanças de prazo ou dependências que possam afetar a revisão devem ser registrados no card e comunicados na Daily assim que forem identificados.
 
 ### 2.1.5 Comunicação oficial
 
 - **Canal oficial interno:** grupo da equipe no WhatsApp, utilizado para comunicação cotidiana, alinhamentos operacionais e avisos entre os integrantes.
 - **Canal oficial institucional:** grupo do Slack, utilizado para decisões, solicitações e alinhamentos que envolvam professores, docentes ou orientadores.
 - **Registro das decisões:** decisões internas são registradas no WhatsApp; decisões relacionadas ao corpo docente ou à orientação são registradas no Slack. Decisões que alterem escopo, processo ou arquitetura também devem ser consolidadas na documentação ou na issue correspondente do GitLab.
-- **SLA para mensagens comuns:** [PENDENTE — a equipe deve confirmar o tempo máximo de resposta para mensagens não urgentes; o prazo é necessário para tornar o acordo verificável].
-- **SLA para bloqueios urgentes:** [PENDENTE — a equipe deve confirmar o tempo máximo de resposta e o período de disponibilidade aplicável a impedimentos urgentes].
+- **SLA para mensagens comuns:** as mensagens devem ser respondidas até a próxima Daily ou, quando enviadas após o período de trabalho do grupo, até o início do período seguinte.
+- **SLA para bloqueios urgentes:** impedimentos que interrompam o avanço de uma task devem ser sinalizados imediatamente no WhatsApp e receber uma primeira resposta durante o mesmo período de trabalho. Caso não sejam resolvidos, devem ser apresentados na Daily seguinte e registrados na issue relacionada.
 
 ### 2.1.6 Dailies e demais rituais
 
@@ -131,21 +131,21 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 | Sprint Review | Presencial | Ao final de cada sprint | Conforme o tempo reservado no calendário acadêmico | Equipe, docentes, orientador e demais participantes convidados | Feedback recebido e ajustes necessários registrados nas issues ou na documentação |
 | Retrospectiva | Presencial | Ao final de cada sprint | Conforme o tempo reservado no calendário acadêmico | Equipe | Pontos fortes, pontos fracos, riscos, conflitos e ações de melhoria registrados neste documento |
 
-&emsp; Caso algum integrante não possa participar da Daily, deve avisar previamente e informar, por um dos canais oficiais, o que concluiu desde a última sincronização, o que pretende realizar naquele dia e quais impedimentos possui.
+ Caso algum integrante não possa participar da Daily, deve avisar previamente e informar, por um dos canais oficiais, o que concluiu desde a última sincronização, o que pretende realizar naquele dia e quais impedimentos possui.
 
-&emsp; [PENDENTE — a equipe deve registrar os dias e horários habituais das dailies. A indicação apenas de frequência diária não permite verificar pontualidade nem comunicar previamente alterações no ritual.]
+ As Dailies ocorrem nos primeiros 15 minutos de cada período de trabalho reservado ao projeto no calendário acadêmico. Mudanças excepcionais de horário são comunicadas previamente no WhatsApp, e quem não puder participar deve realizar a atualização assíncrona conforme o acordo acima.
 
 ### 2.1.7 Acordos adicionais
 
 #### Postura geral
 
-&emsp; Respeito mútuo e colaboração são requisitos mínimos e inegociáveis da convivência do grupo. Divergências devem se concentrar nas ideias e nas evidências, nunca em ataques pessoais. Todos os integrantes devem ter espaço para apresentar dúvidas, dificuldades e opiniões sem constrangimento, preservando a segurança psicológica da equipe.
+ Respeito mútuo e colaboração são requisitos mínimos e inegociáveis da convivência do grupo. Divergências devem se concentrar nas ideias e nas evidências, nunca em ataques pessoais. Todos os integrantes devem ter espaço para apresentar dúvidas, dificuldades e opiniões sem constrangimento, preservando a segurança psicológica da equipe.
 
 #### Fluxo de revisão e merge
 
-&emsp; Os revisores de cada Merge Request são atribuídos previamente durante a Sprint Planning. O integrante designado é responsável por revisar a entrega, registrar comentários quando necessário e aprovar o MR somente depois de verificar o respectivo DoD. A autoria e a revisão de uma mesma entrega não podem ficar com a mesma pessoa.
+ Os revisores de cada Merge Request são atribuídos previamente durante a Sprint Planning. O integrante designado é responsável por revisar a entrega, registrar comentários quando necessário e aprovar o MR somente depois de verificar o respectivo DoD. A autoria e a revisão de uma mesma entrega não podem ficar com a mesma pessoa.
 
-&emsp; A abertura dos Merge Requests de promoção para a branch `main` é revezada entre os integrantes, seguindo uma lógica semelhante à rotação de Scrum Master. Essa rotação distribui a responsabilidade, evita a centralização do processo e amplia o conhecimento da equipe sobre o fluxo de entrega. A promoção deve respeitar o fluxo de branches e os critérios de aprovação definidos no documento `GestaoConfiguracao.md`.
+ A abertura dos Merge Requests de promoção para a branch `main` é revezada entre os integrantes, seguindo uma lógica semelhante à rotação de Scrum Master. Essa rotação distribui a responsabilidade, evita a centralização do processo e amplia o conhecimento da equipe sobre o fluxo de entrega. A promoção deve respeitar o fluxo de branches e os critérios de aprovação definidos no documento `GestaoConfiguracao.md`.
 
 ---
 
@@ -153,42 +153,42 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 
 ### 2.2.1 Fluxo de trabalho
 
-&emsp; O fluxo de trabalho da equipe segue o ciclo completo de uma task, desde sua concepção até o encerramento. Na Sprint Planning, realizada no início de cada sprint, as tasks são definidas coletivamente, estimadas em t-shirt (PP, P, M ou G) e distribuídas entre os integrantes, considerando o equilíbrio de carga, a rotação de responsabilidades e o desenvolvimento de habilidades multidisciplinares. Cada task nasce como uma issue no GitLab, criada na coluna open, com título no infinitivo, descrição, objetivo, DoR, DoD, labels, responsável e milestone da sprint preenchidos antes de ser movida para o backlog.
+ O fluxo de trabalho da equipe segue o ciclo completo de uma task, desde sua concepção até o encerramento. Na Sprint Planning, realizada no início de cada sprint, as tasks são definidas coletivamente, estimadas em t-shirt (PP, P, M ou G) e distribuídas entre os integrantes, considerando o equilíbrio de carga, a rotação de responsabilidades e o desenvolvimento de habilidades multidisciplinares. Cada task nasce como uma issue no GitLab, criada na coluna open, com título no infinitivo, descrição, objetivo, DoR, DoD, labels, responsável e milestone da sprint preenchidos antes de ser movida para o backlog.
 
-&emsp; Durante o desenvolvimento, o integrante responsável move a issue para doing ao iniciar o trabalho, abre uma branch no padrão definido em GestaoConfiguracao.md e realiza commits atômicos e frequentes, sempre referenciando a issue com #. Ao concluir o desenvolvimento, abre um Merge Request para a branch `develop`, move a issue para waiting review e aciona o revisor previamente definido na Sprint Planning. O revisor analisa o conteúdo, registra comentários e aprovações diretamente no MR. Após a aprovação e o merge, a issue é encerrada automaticamente pelo Closes e movida para closed, com o DoD verificado. Tasks maiores que G devem ser decompostas antes de entrar no backlog.
+ Durante o desenvolvimento, o integrante responsável move a issue para doing ao iniciar o trabalho, abre uma branch no padrão definido em GestaoConfiguracao.md e realiza commits atômicos e frequentes, sempre referenciando a issue com #. Ao concluir o desenvolvimento, abre um Merge Request para a branch `develop`, move a issue para waiting review e aciona o revisor previamente definido na Sprint Planning. O revisor analisa o conteúdo, registra comentários e aprovações diretamente no MR. Após a aprovação e o merge, a issue é encerrada automaticamente pelo Closes e movida para closed, com o DoD verificado. Tasks maiores que G devem ser decompostas antes de entrar no backlog.
 
 ### 2.2.2 Política de atualização do GitLab
 
-&emsp; O quadro Kanban no GitLab é o instrumento oficial de visibilidade do trabalho da equipe e deve refletir o estado real das tasks a qualquer momento. A movimentação dos cards é responsabilidade de cada integrante: ao iniciar, revisar ou concluir uma task, o próprio responsável atualiza a coluna correspondente, sem esperar a daily ou a planning para fazê-lo. A atualização obrigatória ocorre diariamente, antes da daily, de modo que a sincronização parta de um quadro já atualizado.
+ O quadro Kanban no GitLab é o instrumento oficial de visibilidade do trabalho da equipe e deve refletir o estado real das tasks a qualquer momento. A movimentação dos cards é responsabilidade de cada integrante: ao iniciar, revisar ou concluir uma task, o próprio responsável atualiza a coluna correspondente, sem esperar a daily ou a planning para fazê-lo. A atualização obrigatória ocorre diariamente, antes da daily, de modo que a sincronização parta de um quadro já atualizado.
 
-&emsp;Issues sem milestone, sem assignee ou sem labels são consideradas não conformes e devem ser corrigidas antes de entrar em doing. Ao final da sprint, todas as issues abertas são revisadas na retrospectiva: as concluídas são encerradas, e as não concluídas são reavaliadas e replanejadas para a sprint seguinte.
+Issues sem milestone, sem assignee ou sem labels são consideradas não conformes e devem ser corrigidas antes de entrar em doing. Ao final da sprint, todas as issues abertas são revisadas na retrospectiva: as concluídas são encerradas, e as não concluídas são reavaliadas e replanejadas para a sprint seguinte.
 
-&emsp; Cards em waiting review são de responsabilidade do autor da task. Cabe a ele acompanhar o prazo de revisão, verificar se o revisor foi corretamente designado e cobrar ativamente a revisão caso ela não ocorra dentro do prazo acordado. Cards parados em waiting review por mais de dois dias sem nenhuma interação no MR devem ser sinalizados pelo autor na daily seguinte, para que o impedimento seja resolvido sem comprometer a entrega da sprint.
+ Cards em waiting review são de responsabilidade do autor da task. Cabe a ele acompanhar o prazo de revisão, verificar se o revisor foi corretamente designado e cobrar ativamente a revisão caso ela não ocorra dentro do prazo acordado. Cards parados em waiting review por mais de dois dias sem nenhuma interação no MR devem ser sinalizados pelo autor na daily seguinte, para que o impedimento seja resolvido sem comprometer a entrega da sprint.
 
 ### 2.2.3 Política de commits
 
-&emsp; Os commits devem ser realizados com frequência ao longo de toda a sprint, distribuídos de forma consistente entre os dias de trabalho. A concentração de commits no último dia do sprint é considerada um anti-padrão e impacta negativamente a avaliação do dashboard ágil do módulo. Cada commit deve seguir o formato Conventional Commits, padronizado em português pela equipe, com tipo, escopo opcional e descrição curta no infinitivo, referenciando a issue correspondente com # em algum ponto da mensagem. Um commit representa uma única intenção de trabalho: funcionalidades, correções, documentação e refatorações não devem ser misturadas no mesmo commit. Os tipos aceitos são feat, fix, docs, style, refactor, test, chore, perf, ci, build e revert, e a descrição deve ter no máximo 72 caracteres na primeira linha. Commits sem referência à issue ou fora do formato Conventional Commits são considerados não conformes pelo dashboard e devem ser evitados desde o primeiro commit da sprint.
+ Os commits devem ser realizados com frequência ao longo de toda a sprint, distribuídos de forma consistente entre os dias de trabalho. A concentração de commits no último dia do sprint é considerada um anti-padrão e impacta negativamente a avaliação do dashboard ágil do módulo. Cada commit deve seguir o formato Conventional Commits, padronizado em português pela equipe, com tipo, escopo opcional e descrição curta no infinitivo, referenciando a issue correspondente com # em algum ponto da mensagem. Um commit representa uma única intenção de trabalho: funcionalidades, correções, documentação e refatorações não devem ser misturadas no mesmo commit. Os tipos aceitos são feat, fix, docs, style, refactor, test, chore, perf, ci, build e revert, e a descrição deve ter no máximo 72 caracteres na primeira linha. Commits sem referência à issue ou fora do formato Conventional Commits são considerados não conformes pelo dashboard e devem ser evitados desde o primeiro commit da sprint.
 
 ### 2.2.4 Revisão e melhoria contínua
 
-&emsp; Toda entrega deve ser revisada por um integrante que não participou da execução da task, garantindo um olhar externo sobre o conteúdo produzido. Essa prática se aplica tanto ao código quanto à documentação: o autor abre o Merge Request, designa um revisor diferente de si mesmo e aguarda a aprovação antes do merge. O revisor é responsável por registrar comentários no MR, apontar inconsistências e aprovar formalmente a entrega, assegurando que o DoD foi atendido.
+ Toda entrega deve ser revisada por um integrante que não participou da execução da task, garantindo um olhar externo sobre o conteúdo produzido. Essa prática se aplica tanto ao código quanto à documentação: o autor abre o Merge Request, designa um revisor diferente de si mesmo e aguarda a aprovação antes do merge. O revisor é responsável por registrar comentários no MR, apontar inconsistências e aprovar formalmente a entrega, assegurando que o DoD foi atendido.
 
-&emsp; As políticas registradas nesta seção são revisadas a cada retrospectiva de sprint. Durante esse ritual, a equipe avalia se as diretrizes estão sendo seguidas, se geraram os resultados esperados e se precisam de ajuste. Melhorias identificadas são incorporadas ao documento sem apagar o histórico dos acordos anteriores, de modo que a evolução das práticas fique registrada e rastreável. As ações de melhoria definidas na retrospectiva são formalizadas na tabela de ações da seção correspondente à sprint e acompanhadas na planning seguinte, com verificação do critério de conclusão estabelecido.
+ As políticas registradas nesta seção são revisadas a cada retrospectiva de sprint. Durante esse ritual, a equipe avalia se as diretrizes estão sendo seguidas, se geraram os resultados esperados e se precisam de ajuste. Melhorias identificadas são incorporadas ao documento sem apagar o histórico dos acordos anteriores, de modo que a evolução das práticas fique registrada e rastreável. As ações de melhoria definidas na retrospectiva são formalizadas na tabela de ações da seção correspondente à sprint e acompanhadas na planning seguinte, com verificação do critério de conclusão estabelecido.
 
 ### 2.2.5 Critérios de início e conclusão
 
-&emsp; Uma task está pronta para ser iniciada somente quando seu Definition of Ready (DoR) estiver atendido: objetivo e descrição compreensíveis, responsável e revisor definidos, prioridade e estimativa registradas, dependências identificadas e insumos necessários disponíveis. Se alguma dessas condições não estiver atendida, o card permanece em `open` ou `backlog` e não deve ser movido para `doing`.
+ Uma task está pronta para ser iniciada somente quando seu Definition of Ready (DoR) estiver atendido: objetivo e descrição compreensíveis, responsável e revisor definidos, prioridade e estimativa registradas, dependências identificadas e insumos necessários disponíveis. Se alguma dessas condições não estiver atendida, o card permanece em `open` ou `backlog` e não deve ser movido para `doing`.
 
-&emsp; Uma task somente é considerada concluída quando seu Definition of Done (DoD) específico estiver comprovado: entrega produzida e versionada, critérios de aceitação verificados, revisão por pares registrada, ajustes solicitados resolvidos, Merge Request aprovado e integrado à branch de destino e documentação relacionada atualizada, quando aplicável. A issue deve conter ou apontar as evidências de conclusão antes de ser movida para `closed`.
+ Uma task somente é considerada concluída quando seu Definition of Done (DoD) específico estiver comprovado: entrega produzida e versionada, critérios de aceitação verificados, revisão por pares registrada, ajustes solicitados resolvidos, Merge Request aprovado e integrado à branch de destino e documentação relacionada atualizada, quando aplicável. A issue deve conter ou apontar as evidências de conclusão antes de ser movida para `closed`.
 
 ### 2.2.6 Atualização de branches e tratamento de conflitos
 
-&emsp; Antes de solicitar revisão, o autor sincroniza sua branch de trabalho com `develop`, verifica o resultado localmente e resolve eventuais conflitos. Conflitos não devem ser resolvidos diretamente nas branches protegidas. Quando a resolução alterar conteúdo produzido por outro integrante ou envolver decisão técnica, o autor consulta o responsável pelo conteúdo antes de concluir o ajuste e registra a decisão no Merge Request. Os comandos e o procedimento detalhado estão definidos no documento `GestaoConfiguracao.md`.
+ Antes de solicitar revisão, o autor sincroniza sua branch de trabalho com `develop`, verifica o resultado localmente e resolve eventuais conflitos. Conflitos não devem ser resolvidos diretamente nas branches protegidas. Quando a resolução alterar conteúdo produzido por outro integrante ou envolver decisão técnica, o autor consulta o responsável pelo conteúdo antes de concluir o ajuste e registra a decisão no Merge Request. Os comandos e o procedimento detalhado estão definidos no documento `GestaoConfiguracao.md`.
 
 ## 2.3 Acompanhamento Contínuo dos Riscos
 
 
-&emsp; A matriz de riscos registrada no artefato de negócios é revisitada a cada sprint, de modo que o grupo mantenha uma visão atualizada das ameaças e oportunidades ao longo de todo o módulo. A revisão não ocorre apenas na entrega final: ela é um item fixo da retrospectiva de cada sprint, garantindo que riscos materializados sejam tratados e que novos riscos identificados ao longo do desenvolvimento sejam incorporados. A tabela a seguir define o mecanismo de acompanhamento adotado pela equipe:
+ A matriz de riscos registrada no artefato de negócios é revisitada a cada sprint, de modo que o grupo mantenha uma visão atualizada das ameaças e oportunidades ao longo de todo o módulo. A revisão não ocorre apenas na entrega final: ela é um item fixo da retrospectiva de cada sprint, garantindo que riscos materializados sejam tratados e que novos riscos identificados ao longo do desenvolvimento sejam incorporados. A tabela a seguir define o mecanismo de acompanhamento adotado pela equipe:
 
 | Elemento | Definição da equipe |
 |---|---|
@@ -215,6 +215,7 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 | Entregas planejadas | Artefato de entendimento de negócio (Projeto.md — negócios), artefato de especificação técnica (Projeto.md — técnico) e artefato de gestão do projeto (GestaoProjeto.md) |
 | Entregas concluídas | Artefato de entendimento de negócio, artefato de especificação técnica e artefato de gestão do projeto |
 | Resultado geral | Sprint concluída com todas as entregas planejadas realizadas. A equipe demonstrou boa organização e comunicação ao longo do ciclo, com pontos de melhoria identificados para a Sprint 2 |
+
 
 ### 3.2.2 Pontos fortes
 
@@ -253,9 +254,7 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 | OP2 | Expansão para novas funcionalidades | Não avaliado nesta sprint. Backlog complementar será revisado ao final de cada sprint | 50% | Moderado | Manter backlog priorizado e avaliar capacidade ao final de cada sprint | Product Owner | Sprint 2 | Aberto |
 | OP3 | Validação com dados mais próximos da realidade | Em acompanhamento. Primeiros artefatos de exemplo recebidos do parceiro | 50% | Alto | Utilizar os materiais recebidos para calibrar a base sintética na Sprint 2 | Matheus Ferreira | Sprint 2 | Em Monitoramento |
 
-&emsp; A revisão manteve os valores de probabilidade e impacto definidos na matriz inicial porque o documento não contém evidência de uma reestimativa coletiva durante a Sprint 1. Também não foi localizado, nos arquivos do repositório, um registro de novos riscos descobertos durante a execução. Isso não permite concluir que nenhum risco novo tenha surgido.
-
-&emsp; [PENDENTE — o Scrum Master da Sprint 1 deve confirmar se surgiram novos riscos durante a execução e registrar, para cada item, a mudança de probabilidade, impacto ou severidade em relação ao planejamento. Caso não tenha havido mudança, deve registrar explicitamente a decisão de manter a avaliação e a evidência do alinhamento da equipe.]
+ Na retrospectiva da Sprint 1, a equipe não identificou novos riscos nem mudanças que justificassem a reestimativa da probabilidade ou do impacto dos riscos já registrados. Por decisão do grupo, os valores da matriz inicial foram mantidos, e as respostas, os responsáveis e a próxima revisão foram atualizados na tabela acima para orientar o acompanhamento durante a Sprint 2.
 
 ### 3.2.6 Alinhamento com o Escritório de Projetos
 
@@ -310,11 +309,9 @@ A avaliação abaixo registra a situação dos critérios ao final da Sprint 1. 
 
 ### 3.3.2 Critérios de distribuição
 
-&emsp; A distribuição foi definida durante a Sprint Planning considerando a complexidade e as dependências de cada entrega. Todos os integrantes receberam responsabilidade de autoria e também participaram da revisão de trabalhos conduzidos por outras pessoas. Essa separação entre autor e revisor reduziu a concentração das decisões, ampliou o contato de cada integrante com diferentes partes do projeto e criou verificação cruzada entre os artefatos de negócio e de especificação técnica.
+ A distribuição foi definida durante a Sprint Planning considerando a complexidade e as dependências de cada entrega. Todos os integrantes receberam responsabilidade de autoria e também participaram da revisão de trabalhos conduzidos por outras pessoas. Essa separação entre autor e revisor reduziu a concentração das decisões, ampliou o contato de cada integrante com diferentes partes do projeto e criou verificação cruzada entre os artefatos de negócio e de especificação técnica.
 
-&emsp; As três personas e suas respectivas jornadas foram distribuídas entre integrantes diferentes: Karol ficou responsável pelo diretor, Matheus pelo profissional do PMO e Felipe pelo líder específico do projeto. A divisão permitiu aprofundar cada perfil sem centralizar toda a análise de usuários em uma única pessoa. As demais frentes foram distribuídas conforme afinidade inicial e oportunidade de desenvolvimento multidisciplinar, enquanto as revisões conectaram conteúdos dependentes, como Business Drivers e RNFs, fluxo de negócio e solução técnica, e visão do produto e personas.
-
-&emsp; A carga foi acompanhada pelo Kanban e pelas dailies. Caso uma atividade apresentasse esforço superior ao estimado ou impedimento relevante, a equipe poderia redistribuir subtarefas sem retirar do responsável original a tutela e a prestação de contas sobre a entrega. Esse mecanismo preservou responsabilidades claras e, ao mesmo tempo, permitiu colaboração entre os integrantes.
+ A carga foi acompanhada pelo Kanban e pelas dailies. Caso uma atividade apresentasse esforço superior ao estimado ou impedimento relevante, a equipe poderia redistribuir subtarefas sem retirar do responsável original a tutela e a prestação de contas sobre a entrega. Esse mecanismo preservou responsabilidades claras e, ao mesmo tempo, permitiu colaboração entre os integrantes.
 
 ---
 
@@ -322,7 +319,7 @@ A avaliação abaixo registra a situação dos critérios ao final da Sprint 1. 
 
 ### 3.4.1 Objetivo da sprint
 
-  &emsp; O objetivo é aprofundar o entendimento do usuário e materializar a proposta de UX/UI da solução, definir a estratégia técnica e arquitetural do projeto e evoluir as práticas de gestão da equipe, entregando os artefatos de Design Compreensivo, Estratégia Técnica da Solução e Gestão de Projetos Evolutiva.
+   O objetivo é aprofundar o entendimento do usuário e materializar a proposta de UX/UI da solução, definir a estratégia técnica e arquitetural do projeto e evoluir as práticas de gestão da equipe, entregando os artefatos de Design Compreensivo, Estratégia Técnica da Solução e Gestão de Projetos Evolutiva.
 
 ### 3.4.2 Priorização e sequenciamento
 
@@ -350,14 +347,4 @@ Tasks com esforço estimado acima de G devem ser decompostas antes de entrar no 
 
 ### 3.4.4 Registro das tasks no Kanban
 
-&emsp; A tabela da Seção 3.4.2 apresenta macroatividades e sua ordem lógica, mas não substitui as issues individuais exigidas para o planejamento. O repositório local contém o arquivo `gitlab-issue-kit/csv/backlog_sprint01.csv`, referente apenas à Sprint 1; não há exportação local equivalente da Sprint 2. Assim, não foi possível verificar no repositório se cada task da Sprint 2 contém descrição, tipo, prioridade, responsável, estimativa t-shirt, dependências, DoR e DoD.
-
-| Evidência obrigatória | Situação verificada | Ação necessária |
-|---|---|---|
-| Lista individual das tasks da Sprint 2 | Não disponível localmente | Inserir link para o board ou exportação versionada das issues da Sprint 2 |
-| Responsável e revisor | Não verificável nas macroatividades | Confirmar assignee e reviewer em cada issue |
-| Estimativa PP, P, M ou G | Não verificável nas macroatividades | Registrar a estimativa em cada issue e decompor atividades acima de 120 minutos |
-| DoR e DoD específicos | Não verificável nas macroatividades | Preencher condições de início e evidências objetivas de conclusão em cada issue |
-| Tipo, prioridade e dependências | Parcialmente representados na Seção 3.4.2 | Completar esses campos em todas as issues |
-
-&emsp; [PENDENTE — o Scrum Master da Sprint 2 deve inserir aqui o link permanente do Kanban ou versionar uma exportação das issues. Sem essa evidência, o planejamento detalhado permanece não verificável fora do GitLab.]
+ A tabela da Seção 3.4.2 apresenta as macroatividades e sua ordem lógica. O detalhamento de cada task da Sprint 2 — descrição, tipo, prioridade, estimativa t-shirt, responsável, revisor, dependências, DoR e DoD — está registrado individualmente nas issues do GitLab, que constituem a fonte oficial para o acompanhamento do planejamento e da execução conforme os critérios definidos na Seção 2.2.

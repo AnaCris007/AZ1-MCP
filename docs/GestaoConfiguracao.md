@@ -85,12 +85,12 @@
 
 ## 1.1 Objetivo do documento
 
-&emsp; Este documento define as políticas de gestão de configuração adotadas pela equipe no projeto Azum ao longo do Módulo 7 do Inteli. Estão registrados aqui o fluxo Gitflow adaptado ao módulo, as convenções de nomenclatura de branches, os procedimentos de criação, integração e exclusão de branches, a política de commits e os exemplos práticos que ilustram a aplicação dessas políticas no contexto do projeto. O documento é complementar ao [GestaoProjeto.md](./GestaoProjeto.md), que registra as políticas de processo de desenvolvimento, os acordos de convivência e a gestão das sprints.
+ Este documento define as políticas de gestão de configuração adotadas pela equipe no projeto Azum ao longo do Módulo 7 do Inteli. Estão registrados aqui o fluxo Gitflow adaptado ao módulo, as convenções de nomenclatura de branches, os procedimentos de criação, integração e exclusão de branches, a política de commits e os exemplos práticos que ilustram a aplicação dessas políticas no contexto do projeto. O documento é complementar ao [GestaoProjeto.md](./GestaoProjeto.md), que registra as políticas de processo de desenvolvimento, os acordos de convivência e a gestão das sprints.
 
 
 ## 1.2 Princípios da gestão de configuração
 
-&emsp; A gestão de configuração do projeto Azum é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches estáveis**: `main`, `develop` e, quando configurada, `hmg` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
+ A gestão de configuração do projeto Azum é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches permanentes**: `main` e `develop` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
 
 ---
 
@@ -98,9 +98,9 @@
 
 ## 2.1 Visão geral
 
-&emsp; O projeto Azum adota um fluxo baseado no Gitflow, adaptado às exigências do Módulo 7 do Inteli. O Gitflow organiza o desenvolvimento em branches com responsabilidades bem definidas, separando o trabalho em andamento das versões estáveis e dos ambientes de validação. O fluxo documentado prevê a branch `hmg` como ambiente intermediário de homologação entre `develop` e `main`, além da promoção contínua das entregas ao longo da sprint. Entretanto, a inspeção das branches locais e remotas disponíveis não encontrou `hmg`; sua criação e proteção ainda precisam ser confirmadas antes que esse trecho possa ser tratado como prática evidenciada. O fluxo planejado é:
+ O projeto Azum adota um fluxo baseado no Gitflow, com as branches permanentes `main` e `develop` e as branches temporárias `feature/*`, `release/*` e `hotfix/*` exigidas pelo enunciado oficial. As branches `docs/*` e `fix/*` são especializações adotadas pela equipe para documentação e correções comuns. A branch `hmg` não é obrigatória e não existe entre as branches locais ou remotas inspecionadas; por isso, ela não integra o fluxo documentado.
 
-- fluxo regular: `feature/*`, `docs/*` e `fix/*` → `develop` → `hmg` → `main`;
+- fluxo regular: `feature/*`, `docs/*` e `fix/*` → `develop`; uma `release/*` estabiliza o conteúdo e o promove para `main`;
 - correção urgente: `hotfix/*` parte de `main` e retorna por MRs separados para `main` e `develop`.
 
 ## 2.2 Estrutura de branches
@@ -109,22 +109,25 @@
 | Branch | Origem | Finalidade | Destino do merge | Permanência |
 |---|---|---|---|---|
 | `main` | — | Versões estáveis e entregáveis | — | Permanente |
-| `develop` | `main` | Integração contínua do trabalho da sprint | `hmg`, por MR | Permanente |
-| `hmg` | `develop` | Homologação da versão candidata antes de produção | `main`, por MR | Permanente |
+| `develop` | `main` | Integração contínua do trabalho da sprint | `release/*`, por criação de branch | Permanente |
 | `feature/<descricao>` | `develop` | Nova funcionalidade ou artefato | `develop`, por MR | Temporária |
 | `docs/<descricao>` | `develop` | Documentação | `develop`, por MR | Temporária |
 | `fix/<descricao>` | `develop` | Correção de bug | `develop`, por MR | Temporária |
 | `hotfix/<descricao>` | `main` | Correção urgente em produção | `main` e `develop`, por MR | Temporária |
-| `release/<versao>` | `develop` | Estabilização antes da homologação | `develop` e `hmg`, por MRs separados; depois `hmg` → `main` (ou `develop` e `main`, se `hmg` não for adotada) | Temporária |
-
-&emsp; [PENDENTE — o responsável pela gestão de configuração deve confirmar a criação da branch `hmg` no GitLab e anexar evidência de sua proteção. Se a equipe decidir não utilizá-la, o fluxo e o diagrama devem ser ajustados para promover releases diretamente a `main`.]
+| `release/<versao>` | `develop` | Estabilização da versão candidata | `main` e `develop`, por MRs separados quando houver ajustes de estabilização | Temporária |
 
 ## 2.3 Fluxo entre branches
 
-  <div align="center">
-  <img src="../assets/design/gitflow-v2.png" width="100%" alt="Diagrama do fluxo Gitflow do projeto Azum"><br>
-  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
-</div>
+```text
+feature/* ─┐
+docs/* ────┼──> develop ──> release/* ──> main
+fix/* ─────┘                    └────────> develop (ajustes da release)
+
+main ──> hotfix/* ──> main
+                 └──> develop
+```
+
+No fluxo regular, o trabalho é integrado a `develop`. A branch `release/*` é criada a partir de `develop` para estabilizar uma versão e promove o conteúdo aprovado para `main`; ajustes feitos durante a estabilização também retornam a `develop`. Um `hotfix/*` parte de `main` e retorna tanto para `main` quanto para `develop`, evitando que a correção se perca na próxima versão.
 
 ---
 
@@ -132,12 +135,12 @@
 
 ## 3.1 Convenção de nomenclatura
 
-&emsp; Todo nome de branch deve seguir o padrão validado pelo dashboard do módulo:
+ Todo nome de branch deve seguir o padrão validado pelo dashboard do módulo:
 
     <prefixo>/<descricao-curta-em-kebab-case>
 
 
-&emsp; O dashboard valida o nome contra o seguinte padrão:
+ O dashboard valida o nome contra o seguinte padrão:
 
     ^(feature|feat|fix|bugfix|hotfix|docs|doc|style|refactor|test|chore|perf|ci|build|release)/
 
@@ -155,7 +158,7 @@
 | `ci/` | Pipelines de integração e entrega contínua |
 | `build/` | Build, empacotamento e scripts de release |
 | `hotfix/` | Correção urgente em produção |
-| `release/` | Estabilização antes de promover para `hmg` e `main` |
+| `release/` | Estabilização antes de promover para `main` |
 
 **Regras:**
 - Letras minúsculas, sem acentos, sem espaços — usar hífen como separador;
@@ -188,11 +191,11 @@ git checkout -b docs/brainstorming-features
 git push -u origin docs/brainstorming-features
 ```
 
-&emsp; Antes de iniciar o trabalho, a issue correspondente deve estar refinada com DoR atendido, labels, milestone e assignee preenchidos, e o card movido de open para backlog no Kanban do GitLab.
+ Antes de iniciar o trabalho, a issue correspondente deve estar refinada com DoR atendido, labels, milestone e assignee preenchidos, e o card movido de open para backlog no Kanban do GitLab.
 
 ## 3.3 Atualização de uma branch de trabalho
 
-&emsp; Antes de abrir ou atualizar um Merge Request, o autor deve incorporar à branch de trabalho o estado mais recente de `develop`. O projeto adota merge explícito para essa sincronização, coerente com a preservação do histórico definida na Seção 4.2:
+ Antes de abrir ou atualizar um Merge Request, o autor deve incorporar à branch de trabalho o estado mais recente de `develop`. O projeto adota merge explícito para essa sincronização, coerente com a preservação do histórico definida na Seção 4.2:
 
 ```bash
 git checkout develop
@@ -201,7 +204,7 @@ git checkout docs/brainstorming-features
 git merge develop
 ```
 
-&emsp; Depois da sincronização, o autor executa as verificações aplicáveis à task e envia a branch com `git push`. Se houver conflitos, o merge permanece local e incompleto até que sejam resolvidos conforme a Seção 4.5. Não se deve usar `git push --force` nas branches compartilhadas ou protegidas.
+ Depois da sincronização, o autor executa as verificações aplicáveis à task e envia a branch com `git push`. Se houver conflitos, o merge permanece local e incompleto até que sejam resolvidos conforme a Seção 4.5. Não se deve usar `git push --force` nas branches compartilhadas ou protegidas.
 
 ---
 
@@ -211,7 +214,7 @@ git merge develop
 
 | Critério | Regra da equipe |
 |---|---|
-| Branch de destino correta | Branches de trabalho apontam para `develop`; `develop` aponta para `hmg`; `hmg` aponta para `main` |
+| Branch de destino correta | Branches de trabalho apontam para `develop`; releases promovem para `main`; hotfixes retornam para `main` e `develop` |
 | Quantidade mínima de revisores | Um revisor, diferente do autor |
 | Critérios de aprovação | Pelo menos um comentário de revisão real — aprovação sem comentário não conta |
 | Tratamento de conflitos | O autor resolve os conflitos antes de solicitar a revisão |
@@ -246,11 +249,11 @@ Closes #<número da issue>
 5. Após aprovação, realizar o merge pelo GitLab — a estratégia adotada é **merge commit** para preservar o histórico completo;
 6. Excluir a branch de trabalho imediatamente após o merge.
 
-As promoções de ambiente seguem o mesmo controle: um MR de `develop` para `hmg` e outro MR, separado, de `hmg` para `main`. Cada promoção exige revisão e aprovação próprias.
+As promoções seguem o mesmo controle: uma branch `release/*` parte de `develop` e abre um Merge Request para `main`. Se houver ajustes de estabilização exclusivos da release, eles retornam a `develop` por outro Merge Request. Cada integração exige revisão e aprovação próprias.
 
 ## 4.3 Exclusão de branches
 
-&emsp; Branches de trabalho devem ser excluídas imediatamente após o merge, para manter o repositório organizado. A exclusão pode ser feita pelo GitLab no momento do merge (opção "Delete source branch") ou manualmente:
+ Branches de trabalho devem ser excluídas imediatamente após o merge, para manter o repositório organizado. A exclusão pode ser feita pelo GitLab no momento do merge (opção "Delete source branch") ou manualmente:
 
 ```bash
 git push origin --delete docs/brainstorming-features
@@ -272,11 +275,11 @@ git commit -m "chore: preparar release v1.0.0 (#N)"
 git push -u origin release/v1.0.0
 ```
 
-&emsp; Após a estabilização, abrir dois MRs a partir de `release/*`: um para `develop`, devolvendo os ajustes de estabilização à linha de desenvolvimento, e outro para `hmg`, iniciando a homologação. Após a aprovação em `hmg`, abrir um MR separado de `hmg` para `main`. Se `hmg` não for adotada, o segundo MR da release deve apontar diretamente para `main`. Depois da integração em `main`, criar a tag e excluir a branch de release:
+ Após a estabilização, abrir um Merge Request de `release/*` para `main`. Se a release contiver ajustes que ainda não estejam em `develop`, abrir também um Merge Request de retorno para `develop`. Depois da integração em `main`, criar a tag e excluir a branch de release:
 
 ```bash
 git checkout main && git pull origin main
-git tag -a v1.0.0 -m "Release v1.0.0 — Sprint 01"
+git tag -a v1.0.0 -m "Release v1.0.0 — Sprint 1"
 git push origin v1.0.0
 git push origin --delete release/v1.0.0
 ```
@@ -292,15 +295,15 @@ git commit -m "fix(pln): corrigir falha na classificacao de intencao (#N)"
 git push -u origin hotfix/corrigir-falha-classificador
 ```
 
-&emsp; Após a correção, abrir MR para `main` e, depois do merge, abrir outro MR para sincronizar a alteração com `develop`. A atualização chegará a `hmg` na promoção seguinte de `develop` para homologação. Excluir a branch de hotfix ao final.
+ Após a correção, abrir um Merge Request para `main` e, depois do merge, abrir outro para sincronizar a alteração com `develop`. Excluir a branch de hotfix ao final.
 
 ## 4.5 Proteção de branches e conflitos
 
 ### Proteção
 
-&emsp; Commits e pushes diretos para `main`, `develop` e `hmg` são proibidos. A integração deve ocorrer por Merge Request, com pelo menos um revisor diferente do autor e com os critérios da Seção 4.1 atendidos. Somente integrantes autorizados pelo grupo podem concluir o merge; o autor pode realizá-lo apenas depois da aprovação registrada pelo revisor. A rotação de responsáveis pelas promoções para `main` está definida no Contrato de Convivência.
+ Commits e pushes diretos para `main` e `develop` são proibidos. A integração deve ocorrer por Merge Request, com pelo menos um revisor diferente do autor e com os critérios da Seção 4.1 atendidos. Somente integrantes autorizados pelo grupo podem concluir o merge; o autor pode realizá-lo apenas depois da aprovação registrada pelo revisor. A rotação de responsáveis pelas promoções para `main` está definida no Contrato de Convivência.
 
-&emsp; [PENDENTE — o responsável pela gestão de configuração deve anexar captura de tela ou link acessível das regras de proteção configuradas no GitLab para `main`, `develop` e, se adotada, `hmg`. O documento define a política, mas a configuração efetiva não é verificável no repositório local.]
+ [PENDENTE — o responsável pela gestão de configuração deve anexar uma captura de tela ou um link acessível das regras de proteção configuradas no GitLab para `main` e `develop`, além da evidência de que um push direto foi recusado. O texto documenta a política, mas não comprova sua configuração.]
 
 ### Tratamento de conflitos
 
@@ -312,7 +315,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 6. envia a branch atualizada e registra no Merge Request como o conflito foi resolvido;
 7. solicita nova revisão caso a resolução tenha alterado conteúdo já aprovado.
 
-&emsp; Conflitos nunca são resolvidos por commits diretos em `develop`, `hmg` ou `main`. Também não se utiliza `git reset --hard` ou push forçado como procedimento de resolução.
+ Conflitos nunca são resolvidos por commits diretos em `develop` ou `main`. Também não se utiliza `git reset --hard` ou push forçado como procedimento de resolução.
 
 ---
 
@@ -320,11 +323,11 @@ git push -u origin hotfix/corrigir-falha-classificador
 
 ## 5.1 Vínculo com tasks
 
-&emsp; Toda branch de trabalho, todo commit autoral e todo Merge Request do projeto Azum devem estar associados a uma issue do GitLab. O vínculo é estabelecido de três formas: o nome da branch descreve a issue desenvolvida; cada commit autoral referencia a issue com `#N`; e o MR contém `Closes #N` na descrição, encerrando a issue automaticamente quando o merge é realizado. Commits de merge gerados pela plataforma são rastreados pelo MR correspondente e não precisam repetir o padrão de mensagem autoral.
+ Toda branch de trabalho, todo commit autoral e todo Merge Request do projeto Azum devem estar associados a uma issue do GitLab. O vínculo é estabelecido de três formas: o nome da branch descreve a issue desenvolvida; cada commit autoral referencia a issue com `#N`; e o MR contém `Closes #N` na descrição, encerrando a issue automaticamente quando o merge é realizado. Commits de merge gerados pela plataforma são rastreados pelo MR correspondente e não precisam repetir o padrão de mensagem autoral.
 
 ## 5.2 Convenção de commits
 
-&emsp; Os commits seguem o padrão Conventional Commits, padronizado em português. O formato adotado é:
+ Os commits seguem o padrão Conventional Commits, padronizado em português. O formato adotado é:
 
     <tipo>(<escopo opcional>): <descrição curta em português> (#N)
 
@@ -374,7 +377,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 | Merge Request | [MR !11](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/11) | Vínculo com a issue, reviewer designado e revisão real |
 | Histórico de commits | [Commits da branch](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/commits/docs/brainstorming-features) | Commits semânticos em português com `#N` distribuídos ao longo da sprint |
 
-&emsp; Os links acima são evidências declaradas pela equipe. O histórico local confirma a existência de branches de trabalho com prefixos padronizados, commits autorais vinculados a issues e merges em `develop`. O conteúdo completo da issue e do Merge Request depende de acesso ao GitLab e, portanto, não pôde ser validado apenas com os arquivos locais. Não foram encontradas evidências locais de uso de `release/*`, `hotfix/*` ou `hmg`; as Seções 6.2 e 6.3 são exemplos de aplicação futura, não registros de execução.
+ Os links acima são evidências declaradas pela equipe. O histórico local confirma a existência de branches de trabalho com prefixos padronizados, commits autorais vinculados a issues e merges em `develop`. O conteúdo completo da issue e do Merge Request depende de acesso ao GitLab e, portanto, não pôde ser validado apenas com os arquivos locais. Não foram encontradas evidências locais de uso de `release/*` ou `hotfix/*`; as Seções 6.2 e 6.3 são exemplos de aplicação futura, não registros de execução.
 
 ---
 
@@ -382,7 +385,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 
 ## 6.1 Desenvolvimento de uma feature de documentação
 
-**Contexto:** implementar a seção de brainstorming de features no Projeto.md (issue #16, Sprint 01).
+**Contexto:** implementar a seção de brainstorming de features no `Projeto.md` (issue #16, Sprint 1).
 
 ```bash
 git checkout develop && git pull origin develop
@@ -395,7 +398,7 @@ git commit -m "docs: adicionar analise das faixas de priorizacao (#16)"
 git push -u origin docs/brainstorming-features
 ```
 
-&emsp; O fluxo foi concluído pelo [Merge Request !11](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/11), aberto para `develop` com título descritivo, vínculo `Closes #16`, reviewer designado, labels e milestone da Sprint 01. Após a aprovação e o merge, a branch de trabalho deve ser excluída.
+ O fluxo foi concluído pelo [Merge Request !11](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/11), aberto para `develop` com título descritivo, vínculo `Closes #16`, revisor designado, labels e milestone da Sprint 1. Após a aprovação e o merge, a branch de trabalho deve ser excluída.
 
 ## 6.2 Preparação de uma release
 
@@ -410,11 +413,11 @@ git commit -m "chore: preparar release v1.0.0 (#N)"
 git push -u origin release/v1.0.0
 ```
 
-&emsp; Abrir um MR da release para `develop` e outro para `hmg`. Depois da homologação, promover `hmg` para `main`. Se a branch `hmg` não for adotada, abrir o segundo MR diretamente da release para `main`. Por fim, criar a tag em `main`:
+ Abrir um Merge Request da release para `main` e, se houver ajustes de estabilização ainda ausentes de `develop`, outro Merge Request de retorno para `develop`. Por fim, criar a tag em `main`:
 
 ```bash
 git checkout main && git pull origin main
-git tag -a v1.0.0 -m "Release v1.0.0 — Sprint 01"
+git tag -a v1.0.0 -m "Release v1.0.0 — Sprint 1"
 git push origin v1.0.0
 git push origin --delete release/v1.0.0
 ```
@@ -433,7 +436,7 @@ git commit -m "test(pln): adicionar caso de teste para falha corrigida (#34)"
 git push -u origin hotfix/corrigir-falha-classificador
 ```
 
-&emsp; Abrir MR para `main`. Após o merge, abrir MR de sincronização para `develop`, promover normalmente para `hmg` no próximo ciclo de homologação e excluir a branch.
+ Abrir um Merge Request para `main`. Após o merge, abrir outro Merge Request de sincronização para `develop` e excluir a branch.
 
 ---
 
