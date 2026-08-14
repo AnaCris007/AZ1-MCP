@@ -4,7 +4,7 @@
   </a>
 </p>
 
-# Projeto: Azum
+# Projeto: AZ1
 
 ## Integrantes
 
@@ -85,12 +85,12 @@
 
 ## 1.1 Objetivo do documento
 
- Este documento define as políticas de gestão de configuração adotadas pela equipe no projeto Azum ao longo do Módulo 7 do Inteli. Estão registrados aqui o fluxo Gitflow adaptado ao módulo, as convenções de nomenclatura de branches, os procedimentos de criação, integração e exclusão de branches, a política de commits e os exemplos práticos que ilustram a aplicação dessas políticas no contexto do projeto. O documento é complementar ao [GestaoProjeto.md](./GestaoProjeto.md), que registra as políticas de processo de desenvolvimento, os acordos de convivência e a gestão das sprints.
+ Este documento define as políticas de gestão de configuração adotadas pela equipe no projeto AZ1 ao longo do Módulo 7 do Inteli. Estão registrados aqui o fluxo Gitflow adaptado ao módulo, as convenções de nomenclatura de branches, os procedimentos de criação, integração e exclusão de branches, a política de commits e os exemplos práticos que ilustram a aplicação dessas políticas no contexto do projeto. O documento é complementar ao [GestaoProjeto.md](./GestaoProjeto.md), que registra as políticas de processo de desenvolvimento, os acordos de convivência e a gestão das sprints.
 
 
 ## 1.2 Princípios da gestão de configuração
 
- A gestão de configuração do projeto Azum é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches permanentes**: `main` e `develop` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
+ A gestão de configuração do projeto AZ1 é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches permanentes**: `main` e `develop` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
 
 ---
 
@@ -98,7 +98,7 @@
 
 ## 2.1 Visão geral
 
- O projeto Azum adota um fluxo baseado no Gitflow, com as branches permanentes `main` e `develop` e as branches temporárias `feature/*`, `release/*` e `hotfix/*` exigidas pelo enunciado oficial. As branches `docs/*` e `fix/*` são especializações adotadas pela equipe para documentação e correções comuns. A branch `hmg` não é obrigatória e não existe entre as branches locais ou remotas inspecionadas; por isso, ela não integra o fluxo documentado.
+ O projeto AZ1 adota um fluxo baseado no Gitflow, com as branches permanentes `main` e `develop` e as branches temporárias `feature/*`, `release/*` e `hotfix/*` exigidas pelo enunciado oficial. As branches `docs/*` e `fix/*` são especializações adotadas pela equipe para documentação e correções comuns. A branch `hmg` não é obrigatória e não existe entre as branches locais ou remotas inspecionadas; por isso, ela não integra o fluxo documentado.
 
 - fluxo regular: `feature/*`, `docs/*` e `fix/*` → `develop`; uma `release/*` estabiliza o conteúdo e o promove para `main`;
 - correção urgente: `hotfix/*` parte de `main` e retorna por MRs separados para `main` e `develop`.
@@ -323,7 +323,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 
 ## 5.1 Vínculo com tasks
 
- Toda branch de trabalho, todo commit autoral e todo Merge Request do projeto Azum devem estar associados a uma issue do GitLab. O vínculo é estabelecido de três formas: o nome da branch descreve a issue desenvolvida; cada commit autoral referencia a issue com `#N`; e o MR contém `Closes #N` na descrição, encerrando a issue automaticamente quando o merge é realizado. Commits de merge gerados pela plataforma são rastreados pelo MR correspondente e não precisam repetir o padrão de mensagem autoral.
+ Toda branch de trabalho, todo commit autoral e todo Merge Request do projeto AZ1 devem estar associados a uma issue do GitLab. O vínculo é estabelecido de três formas: o nome da branch descreve a issue desenvolvida; cada commit autoral referencia a issue com `#N`; e o MR contém `Closes #N` na descrição, encerrando a issue automaticamente quando o merge é realizado. Commits de merge gerados pela plataforma são rastreados pelo MR correspondente e não precisam repetir o padrão de mensagem autoral.
 
 ## 5.2 Convenção de commits
 

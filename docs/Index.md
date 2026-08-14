@@ -1,6 +1,6 @@
-# Índice da Documentação — Azum
+# Índice da Documentação — AZ1
 
-Navegação central dos documentos do projeto G01 — Azum.
+Navegação central dos documentos do projeto G01 — AZ1.
 
 Este índice apresenta somente os documentos consolidados e navegáveis na versão atual do projeto. Novos artefatos devem ser adicionados conforme forem desenvolvidos e validados pela equipe.
 

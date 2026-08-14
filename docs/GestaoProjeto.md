@@ -4,7 +4,7 @@
   </a>
 </p>
 
-# Projeto: Azum
+# Projeto: AZ1
 
 ## Integrantes
 
@@ -262,20 +262,20 @@ A avaliação abaixo registra a situação dos critérios ao final da Sprint 1. 
 
 | Categoria | Item | Critério | Situação | Evidência ou encaminhamento |
 |---|---:|---|---|---|
-| README | 1 | Nome do projeto presente? | Em construção | O projeto se chama Azum, mas o título principal do README ainda apresenta apenas o identificador G01. |
-| README | 2 | Nome do grupo presente? | Atendido | O grupo G01 está identificado no título do arquivo. |
+| README | 1 | Nome do projeto presente? | Atendido | O título principal do README apresenta o nome AZ1. |
+| README | 2 | Nome do grupo presente? | Atendido | O identificador G01 está apresentado logo abaixo do título do projeto. |
 | README | 3 | Integrantes descritos? | Atendido | Os sete integrantes estão relacionados na seção Integrantes. |
 | README | 4 | Links dos integrantes presentes e corretos? | Atendido | Cada integrante possui um link para seu perfil no LinkedIn. |
-| README | 5 | Apresenta descrição curta do projeto? | Em construção | A seção existe, mas o texto descritivo definitivo ainda não foi inserido. |
-| README | 6 | Apresenta estrutura de pastas conforme o modelo (contrato, front-end e documentação)? | Em construção | A estrutura descrita ainda corresponde ao template e deverá ser atualizada conforme a organização real do repositório. |
+| README | 5 | Apresenta descrição curta do projeto? | Atendido | A seção Descrição apresenta o propósito do AZ1, suas funcionalidades, o público atendido e os limites do MVP. |
+| README | 6 | Apresenta estrutura de pastas conforme o modelo (contrato, front-end e documentação)? | Atendido | A árvore representa a estrutura atual do repositório, incluindo `assets`, `docs`, `src` e os arquivos de configuração da raiz. |
 | README | 8 | Apresenta histórico de lançamentos? | Atendido | A seção Histórico de lançamentos está presente. |
-| README | 9 | Histórico de lançamentos adequado? | Em construção | As versões, datas e entregas ainda estão com valores de exemplo e deverão refletir as sprints reais. |
+| README | 9 | Histórico de lançamentos adequado? | Atendido | A versão 0.1.0 registra a entrega da Sprint 1 em 14/08/2026, e as versões seguintes estão reservadas para os próximos ciclos de 2026. |
 | README | 10 | Apresenta licença? | Atendido | A seção Licença está presente no final do arquivo. |
 | README | 11 | Inteli consta na licença? | Atendido | O Inteli está citado na atribuição da licença. |
-| README | 12 | Nome do grupo ou dos integrantes presentes na licença? | Em construção | A licença ainda contém identificadores genéricos de alunos em vez dos nomes reais. |
-| README | 13 | Links dos integrantes ou do grupo corretos na licença? | Em construção | O endereço da licença ainda utiliza o link genérico do template. |
-| README | 15 | Não apresenta nenhuma outra imagem além da logo do Inteli? | Em construção | Além da logo do Inteli, a licença ainda incorpora ícones externos do Creative Commons. |
-| README | 16 | Instruções iniciais removidas? | Em construção | Ainda existem textos de orientação, placeholders e caminhos herdados do template inicial. |
+| README | 12 | Nome do grupo ou dos integrantes presentes na licença? | Atendido | A licença identifica nominalmente os sete integrantes responsáveis pelo projeto. |
+| README | 13 | Links dos integrantes ou do grupo corretos na licença? | Atendido | Os nomes dos integrantes estão vinculados aos respectivos perfis do LinkedIn, e o nome do projeto aponta para o repositório oficial. |
+| README | 15 | Não apresenta nenhuma outra imagem além da logo do Inteli? | Atendido | O README utiliza somente a logo institucional do Inteli. |
+| README | 16 | Instruções iniciais removidas? | Atendido | As orientações e os caminhos genéricos do template foram substituídos por conteúdo específico do AZ1. |
 | Documentação | 1 | Apresenta pasta `documentos`, `docs` ou `documents` na raiz do projeto? | Atendido | A pasta `docs` está presente na raiz. |
 | Documentação | 2 | Apresenta arquivo `Index.md` preenchido que indexa todos os documentos da pasta `docs`? | Atendido | O `docs/Index.md` relaciona os quatro documentos existentes atualmente na pasta. |
 | Documentação | 3 | Documentação encontrada? | Atendido | A documentação principal está disponível em `docs/Projeto.md` e nos arquivos de gestão. |
