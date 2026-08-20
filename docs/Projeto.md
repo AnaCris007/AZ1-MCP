@@ -24,9 +24,8 @@
 - [1.9 Matriz de Risco do Projeto](#19-matriz-de-risco-do-projeto)
 
 </details>
-
 <details>
-<summary><strong>2. Especificação de Requisitos de Software (Sprint 1)</strong></summary>
+<summary><strong>2. Especificação de Requisitos de Software</strong></summary>
 
 - [2.1 Business Drivers](#21-business-drivers)
 - [2.2 Requisitos Funcionais](#22-requisitos-funcionais)
@@ -37,8 +36,41 @@
 
 </details>
 
-- [3. Registro de Decisões](#3-registro-de-decisões)
-- [4. Fontes](#4-fontes)
+<details>
+<summary><strong>3. Definição Técnica e Arquitetural da Solução</strong></summary>
+
+- [3.1 API de Speech to Text e Text to Speech](#31-api-de-speech-to-text-e-text-to-speech)
+- [3.2 Algoritmo de NLP e Implementação](#32-algoritmo-de-nlp-e-implementação)
+- [3.3 API para Recebimento de Áudios](#33-api-para-recebimento-de-áudios)
+- [3.4 Pilha de Tecnologias](#34-pilha-de-tecnologias)
+- [3.5 Modelagem Conceitual e Lógica dos Dados](#35-modelagem-conceitual-e-lógica-dos-dados)
+- [3.6 Processo de Deploy em Nuvem](#36-processo-de-deploy-em-nuvem)
+- [3.7 Projeto Técnico e Arquitetural](#37-projeto-técnico-e-arquitetural)
+- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+
+</details>
+
+<details>
+<summary><strong>4. Prototipação Exploratória — Design e UX</strong></summary>
+
+- [4.1 Questão de Projeto](#41-questão-de-projeto)
+- [4.2 Alternativas Divergentes](#42-alternativas-divergentes)
+- [4.3 Formatos de Prototipação](#43-formatos-de-prototipação)
+- [4.4 Construção dos Protótipos](#44-construção-dos-protótipos)
+- [4.5 Diário de Construção dos Dois Protótipos](#45-diário-de-construção-dos-dois-protótipos)
+- [4.6 Execução dos Protótipos](#46-execução-dos-protótipos)
+- [4.7 Comparação entre as Alternativas](#47-comparação-entre-as-alternativas)
+- [4.8 Limites dos Protótipos](#48-limites-dos-protótipos)
+- [4.9 Inventário de Decisões em Aberto](#49-inventário-de-decisões-em-aberto)
+- [4.10 Repertório de Situações](#410-repertório-de-situações)
+- [4.11 Registros Visuais](#411-registros-visuais)
+
+</details>
+
+</details>
+
+- [5. Registro de Decisões](#5-registro-de-decisões)
+- [6. Fontes](#6-fontes)
 
 ---
 
