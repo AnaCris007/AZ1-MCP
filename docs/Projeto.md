@@ -1796,7 +1796,20 @@ A exploração dos dois formatos permite observar diferenças relacionadas à in
 
 ### 4.4 Construção dos Protótipos
 
-<!-- Registrar como cada protótipo foi construído, materiais utilizados e principais escolhas feitas durante o processo. -->
+Nesta seção serão apresentados os dois protótipos construídos a partir das alternativas definidas na [seção 4.2](#42-alternativas-divergentes), juntamente com os registros visuais de sua construção.
+
+#### 4.4.1 Construção do Protótipo A: Interação Proativa e Contextual
+
+##### Demonstração do Protótipo A
+
+> **Inserir aqui a demonstração do vídeo referente à interação proativa e contextual.**
+
+#### 4.4.2 Construção do Protótipo B: Interação Sob Demanda
+
+##### Demonstração do Protótipo B
+
+> **Inserir aqui a demonstração da interface gráfica conversacional referente à interação sob demanda.**
+
 
 ### 4.5 Diário de Construção dos Dois Protótipos
 
