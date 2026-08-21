@@ -1693,6 +1693,87 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 | Interoperabilidade e sustentabilidade tecnológica | Todos | Todas | RF01, RF02, RF04, RF05 | RNF05 | — | Cenários 1, 2, 3 | API Gateway (interface padronizada consumível por múltiplas aplicações clientes) |
 | Acessibilidade e uso de linguagem natural | Todos | Todas | RF01 | RNF06 | `Usuário` | Cenário 1 (fragmento áudio) | Chat UI, Conversão de Áudio em Texto, API Gateway |
 
+## 3. Definição Técnica e Arquitetural da Solução
+
+### 3.1 API de Speech to Text e Text to Speech
+
+<!-- Exemplo do que incluir: API escolhida, endpoints, métodos HTTP, parâmetros, respostas e exemplos de requisição e resposta. -->
+
+### 3.2 Algoritmo de NLP e Implementação
+
+<!-- Exemplo do que incluir: algoritmo escolhido, finalidade, funcionamento, bibliotecas utilizadas e exemplo de implementação. -->
+
+### 3.3 API para Recebimento de Áudios
+
+<!-- Exemplo do que incluir: endpoint de upload, método HTTP, formatos aceitos, limite de tamanho e resposta esperada. -->
+
+### 3.4 Pilha de Tecnologias
+
+<!-- Exemplo do que incluir: linguagens, frameworks, bibliotecas, plataforma de execução e justificativa das escolhas. -->
+
+### 3.5 Modelagem Conceitual e Lógica dos Dados
+
+<!-- Exemplo do que incluir: entidades, relacionamentos, atributos principais e diagramas dos modelos de dados. -->
+
+### 3.6 Processo de Deploy em Nuvem
+
+<!-- Exemplo do que incluir: plataforma escolhida, etapas de configuração, implantação, integração e evidências do processo. -->
+
+### 3.7 Projeto Técnico e Arquitetural
+
+<!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
+
+### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
+
+<!-- Exemplo do que incluir: como desenvolvimento, integração, testes e deploy serão distribuídos entre as próximas sprints. -->
+
+
+## 4. Prototipação Exploratória — Design e UX
+
+### 4.1 Questão de Projeto
+
+<!-- Exemplo: Como o agente deve oferecer informações relevantes ao usuário sem interromper excessivamente sua rotina de trabalho? -->
+
+### 4.2 Alternativas Divergentes
+
+<!-- Exemplo: Alternativa A — agente proativo e contextual. Alternativa B — agente acionado somente sob demanda. -->
+
+### 4.3 Formatos de Prototipação
+
+<!-- Exemplo: vídeo/encenação para uma alternativa e outro formato exploratório para a segunda, justificando o que cada formato permite investigar. -->
+
+### 4.4 Construção dos Protótipos
+
+<!-- Registrar como cada protótipo foi construído, materiais utilizados e principais escolhas feitas durante o processo. -->
+
+### 4.5 Diário de Construção dos Dois Protótipos
+
+<!-- Registrar no momento em que ocorrerem: decisões inesperadas, ambiguidades, dúvidas e limitações encontradas durante a construção. -->
+
+### 4.6 Execução dos Protótipos
+
+<!-- Registrar como cada protótipo foi colocado em operação, incluindo situações difíceis, falhas, improvisos e lacunas encontradas. -->
+
+### 4.7 Comparação entre as Alternativas
+
+<!-- Comparar o que cada alternativa revelou, diferenças observadas, pontos que apareceram em apenas uma delas e surpresas encontradas. -->
+
+### 4.8 Limites dos Protótipos
+
+<!-- Explicar especificamente o que os protótipos não permitem concluir e o que ainda dependeria de testes com usuários reais. -->
+
+### 4.9 Inventário de Decisões em Aberto
+
+<!-- Exemplo: quando a IA deve recomendar documentos? Quantos deve mostrar? O que acontece quando o usuário rejeita uma sugestão? -->
+
+### 4.10 Repertório de Situações
+
+<!-- Registrar os casos e situações usados durante a execução, principalmente aqueles que os protótipos não conseguiram atender. -->
+
+### 4.11 Registros Visuais
+
+<!-- Inserir fotos, vídeos, storyboard, desenhos, capturas e demais evidências brutas da construção e execução. -->
+
 ---
 
 # 3. Registro de Decisões
