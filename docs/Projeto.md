@@ -1752,6 +1752,66 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
         └→ SharePoint / OneDrive (documentos integrados)
 ```
 
+
+#### 3.6.2 Serviços Gratuitos e Limites
+
+**Azure Free Tier (sempre gratuito):**
+- Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação/dia)
+- Azure Cognitive Services: 5.000 requisições/mês de Speech, 5.000 requisições/mês de Text
+- Application Insights: 1 GB/mês de ingestão de logs
+
+**Azure Free Tier (12 meses iniciais):**
+- Azure SQL Database: 1 banco com até 5 GB grátis
+- Azure Container Registry: 1 registro com 500 MB grátis
+
+**Microsoft 365 Developer Program:**
+- Tenant completo com 25 usuários
+- Teams, SharePoint, OneDrive, Power Platform, Copilot Studio inclusos
+- Válido enquanto ativo (renovável)
+
+**Para projeto acadêmico sem time constraint:**
+Use Azure Free Tier (sempre grátis) + M365 Dev Program. Para produção real, migre para planos pagos mantendo a mesma arquitetura.
+
+#### 3.6.3 Etapas de Configuração e Implantação
+
+**Passo 1 — Criar Ambientes Microsoft:**
+1. Registrar-se em [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
+2. Criar tenant sandbox (instantâneo, pré-configurado)
+3. Registrar-se em [Azure Portal](https://portal.azure.com) com a mesma conta
+4. Ativar free tier credits (se aplicável)
+
+**Passo 2 — Configurar Azure para Hospedagem do Modelo:**
+1. Criar resource group `az1-nlp-dev`
+2. Criar Azure App Service (tier B1 Free ou B1 Basic)
+3. Configurar deployment via Git ou Docker (Azure Container Registry)
+4. Criar Azure SQL Database ou Cosmos DB para persistência
+
+**Passo 3 — Preparar Modelo e API:**
+1. Estruturar projeto Python em `src/nlp-deploy/`
+2. Criar aplicação Flask/FastAPI com endpoint `/classify` que recebe `{"text": "..."}`
+3. Exportar modelo treinado (TF-IDF + LogReg ou BERTimbau em ONNX) para diretório `model/`
+4. Criar `requirements.txt` com dependências (flask, scikit-learn, joblib, ou onnxruntime)
+
+**Passo 4 — Containerizar e Publicar:**
+1. Criar `Dockerfile` baseado em `python:3.11-slim`
+2. Testar localmente com `docker run`
+3. Fazer build e push para Azure Container Registry
+4. Atualizar App Service para usar imagem do ACR
+
+**Passo 5 — Configurar Copilot Studio:**
+1. Acessar [Copilot Studio](https://copilotstudio.microsoft.com) via M365 Dev tenant
+2. Criar novo Copilot (agent)
+3. Adicionar ação customizada que chama URL do Azure App Service
+4. Configurar fluxo: receber texto → chamar API NLP → retornar intenção e confiança
+5. Testar em preview dentro do Copilot Studio
+6. Publicar para Teams
+
+**Passo 6 — Integração com Power Automate (Opcional):**
+1. Criar cloud flow acionado por evento (ex: novo documento no SharePoint)
+2. Chamar ação customizada do Copilot Studio ou diretamente API do Azure App Service
+3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
+4. Enviar notificação para usuário via Teams
+
 ### 3.7 Projeto Técnico e Arquitetural
 
 <!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
