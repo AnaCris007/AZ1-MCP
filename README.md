@@ -41,6 +41,7 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 
 - [Índice da documentação](docs/Index.md)
 - [Documentação principal do projeto](docs/Projeto.md)
+- [Pipeline de PLN — documentação técnica](docs/PipelinePLN.md)
 
 ##  Estrutura de pastas
 
@@ -51,16 +52,34 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 │   └── negócios/
 ├── docs/
 │   ├── GestaoConfiguracao.md
+│   ├── PipelinePLN.md
 │   ├── GestaoProjeto.md
 │   ├── Index.md
 │   └── Projeto.md
 ├── src/
+│   ├── az1/
+│   │   └── pln/              # pipeline de linguagem natural
 │   └── database/
+├── tests/
 ├── .env.example
 ├── .gitignore
+├── pyproject.toml
 ├── README.md
 ├── requirements.txt
 └── ruff.toml
+```
+
+##  Como executar
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .
+python -m nltk.downloader stopwords rslp
+```
+
+```bash
+python -m az1.pln.experimento     # compara as 256 combinações de pré-processamento
+python -m unittest discover tests # testes
 ```
 
 - `assets/`: imagens e diagramas utilizados na documentação.

@@ -22,7 +22,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | Os requisitos e a solução técnica | [Projeto.md — Especificação de Requisitos](./Projeto.md#2-especificação-de-requisitos-de-software-sprint-1) |
 | Os riscos do projeto | [Projeto.md — Matriz de Risco](./Projeto.md#19-matriz-de-risco-do-projeto) |
 | Como o pipeline de PLN funciona e como rodá-lo | [PipelinePLN.md](./PipelinePLN.md) |
-| Como trocar o dataset de teste do pipeline | [PipelinePLN.md — Como trocar o dataset](./PipelinePLN.md#9-como-trocar-o-dataset) |
+| Como trocar o dataset de teste do pipeline | [PipelinePLN.md — Como trocar o dataset](./PipelinePLN.md#10-como-trocar-o-dataset) |
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
 | O Gitflow, as branches, os commits e os MRs | [GestaoConfiguracao.md](./GestaoConfiguracao.md) |
 

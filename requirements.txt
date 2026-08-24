@@ -1,3 +1,9 @@
+# Dependências do gitlab-issue-kit
 requests>=2.31
 python-dotenv>=1.0
 PyYAML>=6.0
+
+# Dependências do pipeline de PLN (src/az1/pln)
+nltk>=3.8
+scikit-learn>=1.4
+spacy>=3.7
