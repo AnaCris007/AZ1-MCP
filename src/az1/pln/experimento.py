@@ -566,6 +566,21 @@ def imprimir_varredura(
             vencedor = "lematização" if diferenca > 0 else "stemming"
             print(f"{'':>24}  {vencedor} leva por {abs(diferenca):.4f}")
 
+    # No modo exaustivo cada corpus foi avaliado sob as 4 vetorizações, então o
+    # efeito delas é mensurável aqui. No modo duas fases isso não vale — a Fase
+    # 1 roda com uma vetorização só — e a tabela sai em `imprimir_fase2`.
+    if not duas_fases:
+        linhas_vetorizacao = medir_efeito_da_vetorizacao(resultados)
+        if linhas_vetorizacao:
+            cabecalho = f"EFEITO DA VETORIZAÇÃO — pareado em {linhas_vetorizacao[0][3]} pré-processamentos"
+            print(f"\n{cabecalho:^{LARGURA}}")
+            print(f"{'escolha':>24}  {'com':>8}  {'sem':>10}  {'efeito':>9}")
+            print("-" * LARGURA)
+            for nome, com, sem, _ in linhas_vetorizacao:
+                efeito = com - sem
+                marca = "  <- atrapalha" if efeito < -0.01 else ("  <- ajuda" if efeito > 0.01 else "")
+                print(f"{nome:>24}  {com:>8.4f}  {sem:>10.4f}  {efeito:>+9.4f}{marca}")
+
     if variar_ordem:
         analise = analisar_efeito_da_ordem(resultados)
         print(f"\n{'A ORDEM IMPORTA?':^{LARGURA}}")
@@ -716,6 +731,17 @@ def escrever_relatorio(
             )
 
     if not resultados_fase2:
+        linhas_vetorizacao = medir_efeito_da_vetorizacao(resultados_principais)
+        if linhas_vetorizacao:
+            linhas += [
+                "", "### Efeito da vetorização", "",
+                f"Comparação **pareada** em {linhas_vetorizacao[0][3]} pré-processamentos: cada um foi",
+                "avaliado sob as quatro vetorizações, e é esse quarteto que se compara entre si.",
+                "", "| escolha | com | sem | efeito |", "|---|---|---|---|",
+            ]
+            for nome, com, sem, _ in linhas_vetorizacao:
+                linhas.append(f"| {nome} | {com:.4f} | {sem:.4f} | {com - sem:+.4f} |")
+
         linhas += ["", "### Ranking (top 30)", "",
                    "| # | F1-macro | ±dp | vocab | vetorização | pré-processamento |", "|---|---|---|---|---|---|"]
         for posicao, r in enumerate(resultados_principais[:30], start=1):
