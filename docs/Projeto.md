@@ -1717,7 +1717,40 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 ### 3.6 Processo de Deploy em Nuvem
 
-<!-- Exemplo do que incluir: plataforma escolhida, etapas de configuração, implantação, integração e evidências do processo. -->
+#### 3.6.1 Arquitetura e Provedor Selecionado
+
+O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **ecossistema Microsoft**, integrando-se nativamente ao ambiente corporativo do parceiro (Copilot Studio, Power Platform, Teams, SharePoint). Para ambientes acadêmicos, a solução utiliza exclusivamente serviços gratuitos do **Microsoft Azure** e do **Microsoft 365 Developer Program**, sem custo permanente.
+
+**Componentes principais:**
+
+| Componente | Serviço Microsoft | Justificativa |
+|-----------|------------------|--------------|
+| Hospedagem do modelo | Azure App Service (tier gratuito) | HTTP API nativa, escalável, integrado com ecossistema Microsoft |
+| Orquestração do agente | Copilot Studio | Orquestração de ações, fluxos, e integração com Power Automate |
+| Persistência de dados | Azure SQL Database (free tier 12 meses) ou Cosmos DB (free tier 25 GB) | Dados estruturados, integração nativa com Power Platform |
+| Conversão de voz | Azure Cognitive Services (Speech-to-Text) | Free tier generoso: 5 horas/mês grátis |
+| Integração de processos | Power Automate | Automações e orquestração de workflows |
+| Ambiente completo | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários, inclui Teams, SharePoint, Entra ID |
+
+**Por que essa arquitetura:**
+- **Alinhamento com parceiro** — Todo o ecossistema real de produção é Microsoft
+- **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados
+- **Custo zero acadêmico** — Azure Free Tier + M365 Dev Program cobrem tudo sem limites de 12 meses para ambiente de desenvolvimento
+- **Reprodutibilidade** — Qualquer pessoa com account Microsoft consegue replicar em ambiente sandbox
+
+**Arquitetura em alto nível:**  
+
+```
+Usuário em Teams / Copilot Studio (Microsoft 365)
+        ↓
+  Copilot Studio (orquestração nativa)
+        ├→ Power Automate (automações)
+        ├→ Azure App Service (API do modelo NLP)
+        │       ├→ Azure SQL Database / Cosmos DB (logs, histórico)
+        │       └→ Application Insights (monitoramento)
+        ├→ Azure Cognitive Services (STT/TTS)
+        └→ SharePoint / OneDrive (documentos integrados)
+```
 
 ### 3.7 Projeto Técnico e Arquitetural
 
