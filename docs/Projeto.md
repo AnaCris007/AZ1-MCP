@@ -1812,6 +1812,134 @@ Use Azure Free Tier (sempre grátis) + M365 Dev Program. Para produção real, m
 3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
 4. Enviar notificação para usuário via Teams
 
+#### 3.6.4 Exemplo de API (Flask)
+
+```python
+# src/nlp-deploy/app.py
+from flask import Flask, request, jsonify
+import joblib
+import uuid
+from datetime import datetime
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+app = Flask(__name__)
+
+# Carregar modelo
+modelo = joblib.load("model/model.joblib")
+
+# Conexão com banco (Azure SQL ou Postgres)
+# Para dev local: sqlite:///local.db
+# Para Azure SQL: mssql+pyodbc://user:pass@server.database.windows.net/db
+DATABASE_URL = "sqlite:///./classifications.db"
+engine = create_engine(DATABASE_URL)
+
+@app.route("/health", methods=["GET"])
+def health():
+    return {"status": "healthy"}, 200
+
+@app.route("/classify", methods=["POST"])
+def classify():
+    data = request.json
+    texto = data.get("text", "")
+
+    if not texto:
+        return {"error": "text field required"}, 400
+
+    # Classificação
+    probs = modelo.predict_proba([texto])[0]
+    idx = probs.argmax()
+    intencao = modelo.classes_[idx]
+    confianca = float(probs[idx])
+
+    resultado = {
+        "id": str(uuid.uuid4()),
+        "text": texto,
+        "intent": intencao,
+        "confidence": round(confianca, 4),
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+    # Gravar em banco (opcional)
+    # db.insert_classification(resultado)
+
+    return resultado, 200
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=False)
+```
+
+**Dockerfile correspondente:**
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY src/nlp-deploy/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/nlp-deploy/ .
+
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+```
+
+#### 3.6.5 Reprodutibilidade e Verificação
+
+**Checklist de custo (garantir zero spend):**
+- [ ] Azure App Service em tier Free (1 instância)
+- [ ] Azure SQL Database com free tier (primeiros 12 meses)
+- [ ] Cognitive Services em free tier (limites respeitados)
+- [ ] M365 Dev Program ativo (sandbox, sem custo)
+- [ ] Nenhum recurso em tier "Standard" ou "Premium" ativo
+
+**Checklist de funcionalidade:**
+- [ ] Azure App Service com status "Running"
+- [ ] Endpoint `/health` retorna 200 OK
+- [ ] Endpoint `/classify` processa requisições POST
+- [ ] Copilot Studio consegue chamar API
+- [ ] Resposta do agente aparece em Teams
+- [ ] Logs aparecem em Application Insights
+- [ ] Dados são gravados em banco (se integrado)
+
+**Exemplo de requisição ponta a ponta:**
+
+```bash
+curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Qual o prazo do marco de licenciamento ambiental da Linha 6?"}'
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "text": "Qual o prazo do marco de licenciamento ambiental da Linha 6?",
+  "intent": "consulta",
+  "confidence": 0.8734,
+  "timestamp": "2026-08-24T11:21:00.000000"
+}
+```
+
+#### 3.6.6 Próximos Passos para Produção
+
+Quando a solução for promovida para ambiente real do Metrô:
+
+1. **Migrar banco de dados:** De Azure SQL (free 12m) para SQL Server corporativo ou similar
+2. **Copilot Studio em produção:** Usar tenant corporativo em vez de sandbox M365 Dev
+3. **Power Automate com SharePoint real:** Conectar a documentos e listas de verdade
+4. **Entra ID:** Integrar autenticação corporativa do Metrô
+5. **Compliance e segurança:** Implementar audit logs, DLP (Data Loss Prevention), conformidade com políticas corporativas
+
+Toda a arquitetura permanece igual; apenas migram os recursos para ambientes gerenciados pelo Metrô.
+
+#### 3.6.7 Observações Finais
+
+Este deploy foi estruturado como uma prova de conceito (POC) técnica totalmente reprodutível e alinhada ao ecossistema Microsoft do parceiro. A utilização do Microsoft 365 Developer Program e Azure Free Tier garante custo zero para ambientes acadêmicos. A mesma arquitetura e código sem modificações é promovido para produção no ambiente real do Metrô, reduzindo riscos e complexidade de migração.
+
 ### 3.7 Projeto Técnico e Arquitetural
 
 <!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
