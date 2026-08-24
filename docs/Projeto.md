@@ -1705,7 +1705,199 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 ### 3.3 API para Recebimento de Áudios
 
-<!-- Exemplo do que incluir: endpoint de upload, método HTTP, formatos aceitos, limite de tamanho e resposta esperada. -->
+Esta seção documenta a API interna responsável por receber os áudios enviados pelos usuários, estabelecendo o contrato de entrada do canal de voz da solução. As definições apresentadas determinam como o áudio entra no sistema, quais regras devem ser respeitadas antes do processamento e como o cliente deve tratar os resultados.
+
+#### Endpoint e método HTTP
+
+**Decisão:** utilizar o método `POST` no endpoint abaixo:
+
+```http
+POST /api/v1/audio
+```
+
+O método `POST` é adequado para o envio de um novo recurso ao sistema. O prefixo `/api/v1` permite versionar a API e facilita futuras evoluções sem quebrar integrações existentes.
+
+#### Autenticação
+
+**Decisão:** utilizar autenticação por Bearer Token.
+
+```http
+Authorization: Bearer <token>
+```
+
+Esse mecanismo restringe o acesso à API a usuários ou serviços autenticados e segue um padrão amplamente utilizado em APIs HTTP. O token será emitido pelo mecanismo de autenticação da solução. A definição do serviço emissor, entre autenticação própria ou integração com o Copilot Studio, será consolidada na Sprint 3, quando a camada de orquestração estiver especificada.
+
+#### Formato da requisição
+
+**Decisão:** utilizar `multipart/form-data`.
+
+Esse formato é apropriado para o envio de arquivos binários e evita a conversão do áudio para Base64, que aumentaria desnecessariamente o tamanho da requisição.
+
+#### Parâmetros de entrada
+
+| Parâmetro | Tipo | Obrigatório | Formato esperado | Descrição |
+| --- | --- | --- | --- | --- |
+| `audio` | Arquivo binário | Sim | `audio/wav`, `audio/mpeg`, `audio/mp4`, `audio/x-m4a`, `audio/webm` | Arquivo de áudio enviado pelo usuário |
+
+Nesta etapa, o endpoint precisa apenas receber o áudio. Outros parâmetros poderão ser adicionados futuramente caso o fluxo da aplicação exija.
+
+A extensão e o MIME type declarados pelo cliente **não são utilizados como única fonte de verdade**: ambos podem ser inconsistentes com o conteúdo real do arquivo (um cliente pode renomear um arquivo ou enviar um MIME type incorreto). Por isso, a validação de formato deve inspecionar o conteúdo binário do arquivo (assinatura/header do arquivo), e não apenas os metadados informados na requisição.
+
+#### Formatos de áudio suportados
+
+Inicialmente, serão aceitos os seguintes formatos:
+
+| Extensão | MIME types aceitos |
+| --- | --- |
+| `.wav` | `audio/wav`, `audio/x-wav` |
+| `.mp3` | `audio/mpeg` |
+| `.m4a` | `audio/mp4`, `audio/x-m4a` |
+| `.webm` | `audio/webm` |
+
+Diferentes clientes podem declarar variações de MIME type para o mesmo formato — em especial para `.m4a`, que pode chegar como `audio/mp4` ou `audio/x-m4a` dependendo do navegador ou dispositivo. Todas as variações listadas acima devem ser aceitas como válidas para a respectiva extensão. Esses formatos possuem ampla compatibilidade com navegadores, dispositivos móveis e serviços de Speech-to-Text, atendendo aos principais cenários de captura de áudio do sistema.
+
+#### Tamanho máximo do arquivo
+
+Cada arquivo será limitado a **10 MB**. Esse limite evita requisições excessivamente grandes, reduz o consumo desnecessário de memória e rede e oferece margem suficiente para áudios curtos utilizados em interações por voz.
+
+#### Duração máxima
+
+O áudio será limitado a **5 minutos**. A solução foi projetada para interações de voz e consultas, e não para o processamento de gravações extensas. O limite reduz o tempo de processamento e o uso de recursos.
+
+Caso a duração do áudio ultrapasse esse limite, a API retorna `422 Unprocessable Entity` com o erro `audio_too_long`.
+
+#### Exemplo de requisição
+
+```bash
+curl -X POST https://api.azum.com/api/v1/audio \\
+  -H "Authorization: Bearer <token>" \\
+  -F "audio=@consulta.wav"
+```
+
+O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida.
+
+#### Resposta de sucesso
+
+**Código HTTP:** `201 Created`
+
+```json
+{
+  "id": "aud_123456",
+  "status": "received",
+  "message": "Áudio recebido com sucesso."
+}
+```
+
+O código `201` indica que o sistema recebeu e criou um novo recurso associado ao áudio enviado.
+
+#### Respostas de erro
+
+| Código HTTP | Situação |
+| --- | --- |
+| `400 Bad Request` | Requisição malformada (ex: corpo que não é `multipart/form-data` válido) |
+| `401 Unauthorized` | Token ausente ou inválido |
+| `413 Payload Too Large` | Arquivo maior que 10 MB |
+| `415 Unsupported Media Type` | Formato de áudio não suportado (extensão/MIME type fora da lista aceita) |
+| `422 Unprocessable Entity` | Arquivo ausente, vazio, corrompido, com duração acima do limite, ou em formato aceito porém inválido para processamento |
+| `500 Internal Server Error` | Falha interna inesperada |
+
+A distinção entre `415` e `422` é importante para o cliente tratar cada caso corretamente:
+
+- **`415`**: o cliente enviou um arquivo em um formato que a API **não suporta** (extensão/MIME type fora da lista de formatos aceitos).
+- **`422`**: o arquivo está em um formato **aceito**, mas não pode ser processado — por exemplo, está corrompido, vazio, ausente, ou ultrapassa a duração máxima permitida.
+
+Sobre o arquivo ausente: como a implementação utiliza FastAPI, um parâmetro obrigatório declarado como `audio: UploadFile = File(...)` gera automaticamente um erro `422` quando o arquivo não é enviado. O contrato segue esse comportamento nativo do framework, em vez de tratá-lo manualmente para forçar um `400` — isso também é consistente com a semântica HTTP, já que a ausência de um campo obrigatório é um erro semântico (a requisição está bem formada, mas incompleta), não um erro de sintaxe. Dessa forma, `400` fica reservado para requisições estruturalmente inválidas (ex: corpo que não é multipart), e implementação e contrato permanecem alinhados.
+
+Todas as respostas de erro seguem o mesmo formato padronizado:
+
+```json
+{
+  "error": "<código_do_erro>",
+  "message": "<mensagem legível para o usuário>"
+}
+```
+
+| Código de erro | Código HTTP | Situação |
+| --- | --- | --- |
+| `unauthorized` | 401 | Token ausente ou inválido |
+| `unsupported_format` | 415 | Formato de áudio não suportado |
+| `file_too_large` | 413 | Arquivo maior que 10 MB |
+| `audio_too_long` | 422 | Duração do áudio acima de 5 minutos |
+| `invalid_audio` | 422 | Arquivo ausente, vazio ou corrompido |
+
+Exemplos de respostas de erro:
+
+```json
+{
+  "error": "unsupported_format",
+  "message": "Formato de áudio não suportado. Formatos aceitos: wav, mp3, m4a, webm."
+}
+```
+
+```json
+{
+  "error": "file_too_large",
+  "message": "O arquivo excede o tamanho máximo permitido de 10 MB."
+}
+```
+
+```json
+{
+  "error": "audio_too_long",
+  "message": "O áudio excede a duração máxima permitida de 5 minutos."
+}
+```
+
+```json
+{
+  "error": "invalid_audio",
+  "message": "Arquivo de áudio ausente, vazio ou corrompido."
+}
+```
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Token de autenticação ausente ou inválido."
+}
+```
+
+Os códigos HTTP e os códigos de erro padronizados facilitam o tratamento dos erros pelo frontend e tornam o comportamento da API previsível.
+
+#### Requisitos adicionais
+
+Consolidando as regras que o contrato da API precisa respeitar:
+
+- **HTTPS obrigatório**: todas as requisições devem ser feitas via HTTPS, para proteger o áudio e o token de autenticação em trânsito.
+- **Autenticação obrigatória**: toda requisição deve conter um Bearer Token válido.
+- **Arquivo obrigatório**: o campo `audio` deve estar presente na requisição.
+- **Arquivo não vazio**: o arquivo enviado não pode ter tamanho zero.
+- **Tamanho máximo**: 10 MB por arquivo.
+- **Duração máxima**: 5 minutos por áudio.
+- **Formato validado pelo conteúdo real do arquivo**, não apenas pela extensão ou MIME type informado pelo cliente.
+- **Formatos aceitos**: `.wav`, `.mp3`, `.m4a`, `.webm` (com as variações de MIME type aceitas listadas na seção de formatos suportados).
+
+#### Fluxo de processamento
+
+```text
+Usuário
+  ↓
+POST /api/v1/audio
+  ↓
+Autenticação (Bearer Token)
+  ↓
+Validação do arquivo (presença e estrutura)
+  ↓
+Validação de formato, tamanho e duração
+
+  ↙                          ↘
+Áudio aceito              Áudio rejeitado
+  ↓                          ↓
+Encaminha para           Retorna 4xx com
+Speech-to-Text           mensagem de erro
+```
+
+Com essas definições, o contrato da API estabelece como o áudio entra no sistema, quais regras devem ser respeitadas antes de seu processamento e como o cliente deve tratar tanto o caminho de sucesso quanto os casos de erro.
 
 ### 3.4 Pilha de Tecnologias
 
