@@ -2043,7 +2043,11 @@ Nesta seção serão apresentados os dois protótipos construídos a partir das 
 
 ##### Demonstração do Protótipo B
 
-> **Inserir aqui a demonstração da interface gráfica conversacional referente à interação sob demanda.**
+<div align="center">
+<sub>Imagem 4.4.2 - Mockup da interface gráfica conversacional do agente — Interação Sob Demanda</sub><br>
+  <img src="../assets/design/mockup-agente.png" width="100%" alt="Mockup da interface gráfica conversacional do agente para interação sob demanda"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
 
 ### 4.5 Diário de Construção dos Dois Protótipos
