@@ -55,7 +55,10 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 │   ├── Index.md
 │   └── Projeto.md
 ├── src/
-│   └── database/
+│   ├── database/
+│   ├── routes/
+│   ├── schemas/
+│   └── main.py
 ├── .env.example
 ├── .gitignore
 ├── README.md
@@ -66,6 +69,19 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 - `assets/`: imagens e diagramas utilizados na documentação.
 - `docs/`: documentação principal do projeto e de sua gestão.
 - `src/database/`: scripts SQL para criação e carga inicial do banco de dados.
+- `src/routes/`: endpoints da API (FastAPI).
+- `src/schemas/`: modelos Pydantic de request/response da API.
+- `src/main.py`: ponto de entrada da aplicação FastAPI.
+
+##  Rodando a API
+
+```bash
+pip install -r requirements.txt
+cd src
+uvicorn main:app --reload
+```
+
+A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000/docs`.
 
 ##  Configuração para desenvolvimento
 

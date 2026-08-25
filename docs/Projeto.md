@@ -1806,7 +1806,7 @@ A distinção entre `415` e `422` é importante para o cliente tratar cada caso 
 - **`415`**: o cliente enviou um arquivo em um formato que a API **não suporta** (extensão/MIME type fora da lista de formatos aceitos).
 - **`422`**: o arquivo está em um formato **aceito**, mas não pode ser processado — por exemplo, está corrompido, vazio, ausente, ou ultrapassa a duração máxima permitida.
 
-Sobre o arquivo ausente: como a implementação utiliza FastAPI, um parâmetro obrigatório declarado como `audio: UploadFile = File(...)` gera automaticamente um erro `422` quando o arquivo não é enviado. O contrato segue esse comportamento nativo do framework, em vez de tratá-lo manualmente para forçar um `400` — isso também é consistente com a semântica HTTP, já que a ausência de um campo obrigatório é um erro semântico (a requisição está bem formada, mas incompleta), não um erro de sintaxe. Dessa forma, `400` fica reservado para requisições estruturalmente inválidas (ex: corpo que não é multipart), e implementação e contrato permanecem alinhados.
+Sobre o arquivo ausente: como a implementação utiliza FastAPI, um parâmetro obrigatório declarado como `audio: UploadFile = File(...)` gera automaticamente um erro `422` quando o arquivo não é enviado. O contrato segue esse comportamento nativo do framework, em vez de tratá-lo manualmente para forçar um `400` — isso também é consistente com a semântica HTTP, já que a ausência de um campo obrigatório é um erro semântico (a requisição está bem formada, mas incompleta), não um erro de sintaxe. Dessa forma, `400` fica reservado para requisições estruturalmente inválidas (ex: corpo que não é multipart), e implementação e contrato permanecem alinhados. Esse `400` retorna o corpo padronizado com `error: "bad_request"`; já o `422` de arquivo ausente é a única resposta de erro que mantém o corpo nativo do FastAPI (`{"detail": [...]}`), pela razão explicada acima.
 
 Todas as respostas de erro seguem o mesmo formato padronizado:
 
@@ -1819,13 +1819,22 @@ Todas as respostas de erro seguem o mesmo formato padronizado:
 
 | Código de erro | Código HTTP | Situação |
 | --- | --- | --- |
+| `bad_request` | 400 | Requisição malformada (ex: corpo que não é multipart válido) |
 | `unauthorized` | 401 | Token ausente ou inválido |
 | `unsupported_format` | 415 | Formato de áudio não suportado |
 | `file_too_large` | 413 | Arquivo maior que 10 MB |
 | `audio_too_long` | 422 | Duração do áudio acima de 5 minutos |
 | `invalid_audio` | 422 | Arquivo ausente, vazio ou corrompido |
+| `internal_error` | 500 | Falha interna inesperada |
 
 Exemplos de respostas de erro:
+
+```json
+{
+  "error": "bad_request",
+  "message": "Requisição malformada."
+}
+```
 
 ```json
 {
@@ -1859,6 +1868,13 @@ Exemplos de respostas de erro:
 {
   "error": "unauthorized",
   "message": "Token de autenticação ausente ou inválido."
+}
+```
+
+```json
+{
+  "error": "internal_error",
+  "message": "Erro interno inesperado."
 }
 ```
 

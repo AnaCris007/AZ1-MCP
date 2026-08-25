@@ -5,3 +5,5 @@ PyYAML>=6.0
 fastapi
 pydantic
 python-multipart
+uvicorn[standard]
+av
