@@ -2156,7 +2156,21 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 
 ### 4.9 Inventário de Decisões em Aberto
 
-<!-- Exemplo: quando a IA deve recomendar documentos? Quantos deve mostrar? O que acontece quando o usuário rejeita uma sugestão? -->
+Esta seção reúne as decisões de design e comportamento do agente que a construção dos protótipos revelou, mas que permanecem sem resposta definitiva. Para cada uma, registram-se as opções consideradas e o que está em jogo.
+
+<!-- Mesclar aqui as decisões em aberto vindas do Protótipo A. -->
+
+1. **Duplicatas e versões antigas no SharePoint.** Opções: (a) mostrar todas as versões com aviso; (b) mostrar só a mais recente e ocultar antigas; (c) perguntar ao usuário. Em jogo: risco de o colaborador usar documento desatualizado vs. poluição da resposta e desconfiança ("cadê o arquivo que eu sei que existe?").
+
+2. **Transcrição de voz com baixa confiança em termos técnicos.** Opções: (a) buscar com o melhor palpite; (b) confirmar antes de buscar; (c) buscar e sinalizar a incerteza junto do resultado. Em jogo: fluidez da interação vs. risco de busca errada com jargão interno (AMV, CCO, via permanente) — central para o módulo de PLN.
+
+3. **Exibição da transcrição.** Opções: (a) sempre visível; (b) oculta, só a resposta; (c) visível apenas quando houver incerteza. Em jogo: transparência e possibilidade de correção vs. ruído visual.
+
+4. **O que a resposta por voz reproduz.** Opções: (a) leitura do documento; (b) resumo gerado; (c) apenas confirmação verbal ("encontrei, está na tela"). Em jogo: uso com mãos ocupadas / em deslocamento vs. tempo de escuta e risco de resumo impreciso.
+
+5. **Pedido de dado estruturado vs. documento.** O protótipo só devolve arquivos; pedidos como "quantas ocorrências teve na L2" não têm comportamento definido. Opções: (a) responder consultando o banco; (b) devolver o documento-fonte; (c) declarar que só localiza documentos. Em jogo: escopo do agente e expectativa do usuário sobre o que ele "sabe".
+
+6. **Acesso negado por permissão.** Opções: (a) ocultar o documento como se não existisse; (b) mostrar que existe e oferecer solicitação de acesso; (c) mostrar metadados mas não o conteúdo. Em jogo: transparência e agilidade vs. exposição de informação restrita (até o nome de um contrato pode ser sensível).
 
 ### 4.10 Repertório de Situações
 
