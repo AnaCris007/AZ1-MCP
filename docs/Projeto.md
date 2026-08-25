@@ -39,14 +39,15 @@
 <details>
 <summary><strong>3. Definição Técnica e Arquitetural da Solução</strong></summary>
 
-- [3.1 API de Speech to Text e Text to Speech](#31-api-de-speech-to-text-e-text-to-speech)
-- [3.2 Algoritmo de NLP e Implementação](#32-algoritmo-de-nlp-e-implementação)
-- [3.3 API para Recebimento de Áudios](#33-api-para-recebimento-de-áudios)
-- [3.4 Pilha de Tecnologias](#34-pilha-de-tecnologias)
-- [3.5 Modelagem Conceitual e Lógica dos Dados](#35-modelagem-conceitual-e-lógica-dos-dados)
-- [3.6 Processo de Deploy em Nuvem](#36-processo-de-deploy-em-nuvem)
-- [3.7 Projeto Técnico e Arquitetural](#37-projeto-técnico-e-arquitetural)
-- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.1 Catálogo de Intenções e Contrato de Classificação](#31-catálogo-de-intenções-e-contrato-de-classificação)
+- [3.2 API de Speech to Text e Text to Speech](#32-api-de-speech-to-text-e-text-to-speech)
+- [3.3 Algoritmo de NLP e Implementação](#33-algoritmo-de-nlp-e-implementação)
+- [3.4 API para Recebimento de Áudios](#34-api-para-recebimento-de-áudios)
+- [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
+- [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
+- [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
+- [3.8 Projeto Técnico e Arquitetural](#38-projeto-técnico-e-arquitetural)
+- [3.9 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -1695,35 +1696,269 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 ## 3. Definição Técnica e Arquitetural da Solução
 
-### 3.1 API de Speech to Text e Text to Speech
+### 3.1 Catálogo de Intenções e Contrato de Classificação
+
+O catálogo de intenções define os tipos de solicitação que o agente deve reconhecer no MVP. A classificação ocorre após a entrada ser convertida para texto, quando aplicável, e antes da consulta às fontes ou do acionamento de qualquer processo. Solicitações que não correspondam às intenções catalogadas devem ser recusadas com uma orientação sobre as interações disponíveis.
+
+| ID | Intenção técnica | Objetivo | Saída esperada | MVP |
+|---|---|---|---|:---:|
+| INT-01 | `consultar_documentos_normativos` | Consultar conceitos, regras, processos e informações dos documentos disponibilizados | Resposta fundamentada com indicação da fonte | Sim |
+| INT-02 | `consultar_projeto_sintetico` | Consultar informações dos projetos do ambiente de demonstração | Dados estruturados do projeto sintético | Sim |
+| INT-03 | `orientar_mapa_beneficios` | Apoiar o preenchimento do Mapa de Benefícios | Perguntas, campos pendentes e sugestões | Sim |
+| INT-04 | `orientar_tap` | Apoiar o preenchimento do Termo de Abertura do Projeto | Orientações e sugestões para os campos do TAP | Sim |
+| INT-05 | `orientar_entregas_cronograma` | Apoiar a definição de entregas, marcos, atividades, datas e dependências | Sugestões e validações do cronograma | Sim |
+| INT-06 | `orientar_avanco_mensal` | Apoiar o preenchimento das informações de avanço do projeto | Dados necessários e sugestões de complementação | Sim |
+| INT-07 | `orientar_riscos_problemas` | Apoiar a descrição e análise de riscos ou problemas | Sugestões de classificação, criticidade e plano de ação | Sim |
+| INT-08 | `analisar_completude_coerencia` | Verificar se as informações fornecidas estão completas e coerentes | Diagnóstico de ausências, inconsistências e recomendações | Sim |
+| INT-09 | `gerar_alertas_pendencias` | Identificar situações que precisam da atenção do usuário | Lista priorizada de alertas com justificativas | Sim, com dados de demonstração |
+| INT-10 | `fora_do_catalogo` | Tratar solicitações que o protótipo não consegue executar | Explicação do limite e opções disponíveis | Sim |
+
+#### Contrato de classificação
+
+Para cada solicitação, o componente de compreensão deve devolver, no mínimo:
+
+- a intenção identificada;
+- as entidades extraídas;
+- os parâmetros obrigatórios ausentes;
+- a indicação de que a solicitação está fora do catálogo, quando aplicável.
+
+O agente só deve prosseguir quando a intenção estiver suficientemente identificada e os parâmetros necessários estiverem disponíveis. Em caso de ambiguidade ou informação faltante, deve solicitar esclarecimento ao usuário.
+
+#### Delimitação central
+
+As intenções de orientação, análise e alerta produzem apenas respostas e sugestões no chat. No MVP, o agente consulta, interpreta, orienta e sugere conteúdos, mas não preenche documentos oficiais, não altera ou grava registros, não executa transações e não acessa o portfólio real do Metrô, as respostas dependem exclusivamente de documentos disponibilizados, dados sintéticos, informações fornecidas na conversa e artefatos anexados pelo usuário. Toda sugestão apresentada pelo agente deve ser revisada e confirmada pelo usuário, e o agente não deve apresentar sugestões como decisões oficiais, aprovações ou determinações de conformidade.
+
+#### Regra de classificação durante fluxos guiados
+
+O classificador de intenções não deve interpretar cada resposta fornecida durante um fluxo guiado como uma nova intenção. Por exemplo, se o agente pergunta "Qual é a data de término da entrega?" e o usuário responde "31 de dezembro de 2026", essa resposta não representa uma nova intenção: o gerenciador de diálogo deve tratá-la como o preenchimento da entidade `data_termino` do processo em andamento.
+
+Uma nova classificação de intenção só deve ser executada quando o sistema detectar:
+
+- a resposta não corresponder ao tipo ou ao formato esperado da entidade em preenchimento;
+- mudança de assunto em relação ao processo em andamento;
+- solicitação explícita do usuário para iniciar outro processo.
+
+### 3.2 API de Speech to Text e Text to Speech
 
 <!-- Exemplo do que incluir: API escolhida, endpoints, métodos HTTP, parâmetros, respostas e exemplos de requisição e resposta. -->
 
-### 3.2 Algoritmo de NLP e Implementação
+### 3.3 Algoritmo de NLP e Implementação
 
 <!-- Exemplo do que incluir: algoritmo escolhido, finalidade, funcionamento, bibliotecas utilizadas e exemplo de implementação. -->
 
-### 3.3 API para Recebimento de Áudios
+### 3.4 API para Recebimento de Áudios
 
-<!-- Exemplo do que incluir: endpoint de upload, método HTTP, formatos aceitos, limite de tamanho e resposta esperada. -->
+Esta seção documenta a API interna responsável por receber os áudios enviados pelos usuários, estabelecendo o contrato de entrada do canal de voz da solução. As definições apresentadas determinam como o áudio entra no sistema, quais regras devem ser respeitadas antes do processamento e como o cliente deve tratar os resultados.
 
-### 3.4 Pilha de Tecnologias
+#### Endpoint e método HTTP
+
+**Decisão:** utilizar o método `POST` no endpoint abaixo:
+
+```http
+POST /api/v1/audio
+```
+
+O método `POST` é adequado para o envio de um novo recurso ao sistema. O prefixo `/api/v1` permite versionar a API e facilita futuras evoluções sem quebrar integrações existentes.
+
+#### Autenticação
+
+**Decisão:** utilizar autenticação por Bearer Token.
+
+```http
+Authorization: Bearer <token>
+```
+
+Esse mecanismo restringe o acesso à API a usuários ou serviços autenticados e segue um padrão amplamente utilizado em APIs HTTP. O token será emitido pelo mecanismo de autenticação da solução. A definição do serviço emissor, entre autenticação própria ou integração com o Copilot Studio, será consolidada na Sprint 3, quando a camada de orquestração estiver especificada.
+
+#### Formato da requisição
+
+**Decisão:** utilizar `multipart/form-data`.
+
+Esse formato é apropriado para o envio de arquivos binários e evita a conversão do áudio para Base64, que aumentaria desnecessariamente o tamanho da requisição.
+
+#### Parâmetros de entrada
+
+| Parâmetro | Tipo | Obrigatório | Formato esperado | Descrição |
+| --- | --- | --- | --- | --- |
+| `audio` | Arquivo binário | Sim | `audio/wav`, `audio/mpeg`, `audio/mp4`, `audio/x-m4a`, `audio/webm` | Arquivo de áudio enviado pelo usuário |
+
+Nesta etapa, o endpoint precisa apenas receber o áudio. Outros parâmetros poderão ser adicionados futuramente caso o fluxo da aplicação exija.
+
+A extensão e o MIME type declarados pelo cliente **não são utilizados como única fonte de verdade**: ambos podem ser inconsistentes com o conteúdo real do arquivo (um cliente pode renomear um arquivo ou enviar um MIME type incorreto). Por isso, a validação de formato deve inspecionar o conteúdo binário do arquivo (assinatura/header do arquivo), e não apenas os metadados informados na requisição.
+
+#### Formatos de áudio suportados
+
+Inicialmente, serão aceitos os seguintes formatos:
+
+| Extensão | MIME types aceitos |
+| --- | --- |
+| `.wav` | `audio/wav`, `audio/x-wav` |
+| `.mp3` | `audio/mpeg` |
+| `.m4a` | `audio/mp4`, `audio/x-m4a` |
+| `.webm` | `audio/webm` |
+
+Diferentes clientes podem declarar variações de MIME type para o mesmo formato — em especial para `.m4a`, que pode chegar como `audio/mp4` ou `audio/x-m4a` dependendo do navegador ou dispositivo. Todas as variações listadas acima devem ser aceitas como válidas para a respectiva extensão. Esses formatos possuem ampla compatibilidade com navegadores, dispositivos móveis e serviços de Speech-to-Text, atendendo aos principais cenários de captura de áudio do sistema.
+
+#### Tamanho máximo do arquivo
+
+Cada arquivo será limitado a **10 MB**. Esse limite evita requisições excessivamente grandes, reduz o consumo desnecessário de memória e rede e oferece margem suficiente para áudios curtos utilizados em interações por voz.
+
+#### Duração máxima
+
+O áudio será limitado a **5 minutos**. A solução foi projetada para interações de voz e consultas, e não para o processamento de gravações extensas. O limite reduz o tempo de processamento e o uso de recursos.
+
+Caso a duração do áudio ultrapasse esse limite, a API retorna `422 Unprocessable Entity` com o erro `audio_too_long`.
+
+#### Exemplo de requisição
+
+```bash
+curl -X POST https://api.azum.com/api/v1/audio \\
+  -H "Authorization: Bearer <token>" \\
+  -F "audio=@consulta.wav"
+```
+
+O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida.
+
+#### Resposta de sucesso
+
+**Código HTTP:** `201 Created`
+
+```json
+{
+  "id": "aud_123456",
+  "status": "received",
+  "message": "Áudio recebido com sucesso."
+}
+```
+
+O código `201` indica que o sistema recebeu e criou um novo recurso associado ao áudio enviado.
+
+#### Respostas de erro
+
+| Código HTTP | Situação |
+| --- | --- |
+| `400 Bad Request` | Requisição malformada (ex: corpo que não é `multipart/form-data` válido) |
+| `401 Unauthorized` | Token ausente ou inválido |
+| `413 Payload Too Large` | Arquivo maior que 10 MB |
+| `415 Unsupported Media Type` | Formato de áudio não suportado (extensão/MIME type fora da lista aceita) |
+| `422 Unprocessable Entity` | Arquivo ausente, vazio, corrompido, com duração acima do limite, ou em formato aceito porém inválido para processamento |
+| `500 Internal Server Error` | Falha interna inesperada |
+
+A distinção entre `415` e `422` é importante para o cliente tratar cada caso corretamente:
+
+- **`415`**: o cliente enviou um arquivo em um formato que a API **não suporta** (extensão/MIME type fora da lista de formatos aceitos).
+- **`422`**: o arquivo está em um formato **aceito**, mas não pode ser processado — por exemplo, está corrompido, vazio, ausente, ou ultrapassa a duração máxima permitida.
+
+Sobre o arquivo ausente: como a implementação utiliza FastAPI, um parâmetro obrigatório declarado como `audio: UploadFile = File(...)` gera automaticamente um erro `422` quando o arquivo não é enviado. O contrato segue esse comportamento nativo do framework, em vez de tratá-lo manualmente para forçar um `400` — isso também é consistente com a semântica HTTP, já que a ausência de um campo obrigatório é um erro semântico (a requisição está bem formada, mas incompleta), não um erro de sintaxe. Dessa forma, `400` fica reservado para requisições estruturalmente inválidas (ex: corpo que não é multipart), e implementação e contrato permanecem alinhados.
+
+Todas as respostas de erro seguem o mesmo formato padronizado:
+
+```json
+{
+  "error": "<código_do_erro>",
+  "message": "<mensagem legível para o usuário>"
+}
+```
+
+| Código de erro | Código HTTP | Situação |
+| --- | --- | --- |
+| `unauthorized` | 401 | Token ausente ou inválido |
+| `unsupported_format` | 415 | Formato de áudio não suportado |
+| `file_too_large` | 413 | Arquivo maior que 10 MB |
+| `audio_too_long` | 422 | Duração do áudio acima de 5 minutos |
+| `invalid_audio` | 422 | Arquivo ausente, vazio ou corrompido |
+
+Exemplos de respostas de erro:
+
+```json
+{
+  "error": "unsupported_format",
+  "message": "Formato de áudio não suportado. Formatos aceitos: wav, mp3, m4a, webm."
+}
+```
+
+```json
+{
+  "error": "file_too_large",
+  "message": "O arquivo excede o tamanho máximo permitido de 10 MB."
+}
+```
+
+```json
+{
+  "error": "audio_too_long",
+  "message": "O áudio excede a duração máxima permitida de 5 minutos."
+}
+```
+
+```json
+{
+  "error": "invalid_audio",
+  "message": "Arquivo de áudio ausente, vazio ou corrompido."
+}
+```
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Token de autenticação ausente ou inválido."
+}
+```
+
+Os códigos HTTP e os códigos de erro padronizados facilitam o tratamento dos erros pelo frontend e tornam o comportamento da API previsível.
+
+#### Requisitos adicionais
+
+Consolidando as regras que o contrato da API precisa respeitar:
+
+- **HTTPS obrigatório**: todas as requisições devem ser feitas via HTTPS, para proteger o áudio e o token de autenticação em trânsito.
+- **Autenticação obrigatória**: toda requisição deve conter um Bearer Token válido.
+- **Arquivo obrigatório**: o campo `audio` deve estar presente na requisição.
+- **Arquivo não vazio**: o arquivo enviado não pode ter tamanho zero.
+- **Tamanho máximo**: 10 MB por arquivo.
+- **Duração máxima**: 5 minutos por áudio.
+- **Formato validado pelo conteúdo real do arquivo**, não apenas pela extensão ou MIME type informado pelo cliente.
+- **Formatos aceitos**: `.wav`, `.mp3`, `.m4a`, `.webm` (com as variações de MIME type aceitas listadas na seção de formatos suportados).
+
+#### Fluxo de processamento
+
+```text
+Usuário
+  ↓
+POST /api/v1/audio
+  ↓
+Autenticação (Bearer Token)
+  ↓
+Validação do arquivo (presença e estrutura)
+  ↓
+Validação de formato, tamanho e duração
+
+  ↙                          ↘
+Áudio aceito              Áudio rejeitado
+  ↓                          ↓
+Encaminha para           Retorna 4xx com
+Speech-to-Text           mensagem de erro
+```
+
+Com essas definições, o contrato da API estabelece como o áudio entra no sistema, quais regras devem ser respeitadas antes de seu processamento e como o cliente deve tratar tanto o caminho de sucesso quanto os casos de erro.
+
+### 3.5 Pilha de Tecnologias
 
 <!-- Exemplo do que incluir: linguagens, frameworks, bibliotecas, plataforma de execução e justificativa das escolhas. -->
 
-### 3.5 Modelagem Conceitual e Lógica dos Dados
+### 3.6 Modelagem Conceitual e Lógica dos Dados
 
 <!-- Exemplo do que incluir: entidades, relacionamentos, atributos principais e diagramas dos modelos de dados. -->
 
-### 3.6 Processo de Deploy em Nuvem
+### 3.7 Processo de Deploy em Nuvem
 
 <!-- Exemplo do que incluir: plataforma escolhida, etapas de configuração, implantação, integração e evidências do processo. -->
 
-### 3.7 Projeto Técnico e Arquitetural
+### 3.8 Projeto Técnico e Arquitetural
 
 <!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
 
-### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
+### 3.9 Estratégia de Entrega para as Sprints 3, 4 e 5
 
 <!-- Exemplo do que incluir: como desenvolvimento, integração, testes e deploy serão distribuídos entre as próximas sprints. -->
 
@@ -1732,19 +1967,84 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 ### 4.1 Questão de Projeto
 
-<!-- Exemplo: Como o agente deve oferecer informações relevantes ao usuário sem interromper excessivamente sua rotina de trabalho? -->
+**Como deve ocorrer a interação entre o usuário e o agente de IA para facilitar o acesso às informações relevantes dos projetos durante sua rotina de trabalho?**
+
+Essa questão permanece em aberto porque, embora o agente tenha como objetivo facilitar o acesso às informações dos projetos, ainda não está definida a forma como essa interação deve acontecer no cotidiano do usuário. Diferentes formas de interação podem alterar quando e como as informações são apresentadas, o nível de iniciativa do agente e o controle do usuário sobre as consultas. A exploração das alternativas permitirá investigar as consequências dessas diferentes formas de interação antes de definir um comportamento para o sistema.
 
 ### 4.2 Alternativas Divergentes
 
-<!-- Exemplo: Alternativa A — agente proativo e contextual. Alternativa B — agente acionado somente sob demanda. -->
+Para investigar diferentes formas de interação entre o usuário e o agente de IA durante a rotina de trabalho, foram propostas duas alternativas que apresentam comportamentos distintos quanto à iniciativa do agente e à forma de acesso às informações dos projetos.
+
+#### 4.2.1 Alternativa A: Interação Proativa e Contextual
+
+Nesta alternativa, o agente acompanha o contexto das atividades realizadas pelo usuário durante sua rotina de trabalho e identifica informações e documentos do banco de dados que possam ser relevantes para a atividade em andamento. Ao encontrar conteúdos potencialmente úteis, o agente apresenta uma recomendação, permitindo que o usuário escolha se deseja ou não acessá-los.
+
+A proposta busca explorar uma interação em que o agente possui maior iniciativa, oferecendo informações sem depender de uma consulta explícita. O usuário, entretanto, mantém o controle sobre a interação, podendo aceitar ou rejeitar as recomendações apresentadas.
+
+Ao final do período de trabalho, as informações consideradas relevantes podem ser organizadas em um ambiente integrado ao Microsoft Teams, junto ao chatbot do agente, permitindo visualizar conteúdos priorizados, pendências identificadas e possíveis próximos passos.
+
+#### 4.2.2 Alternativa B: Interação Sob Demanda
+
+Nesta alternativa, o agente não apresenta recomendações durante as atividades do usuário. A interação ocorre somente quando o próprio usuário identifica uma necessidade e inicia uma consulta ao agente, informando o que deseja encontrar ou compreender sobre determinado projeto.
+
+A partir da solicitação realizada, o agente consulta as informações disponíveis e apresenta os documentos e conteúdos relacionados à necessidade expressa pelo usuário. Dessa forma, a iniciativa da interação permanece com a pessoa, que determina quando utilizar o agente e quais informações deseja consultar.
+
+Essa alternativa busca explorar uma experiência com menor nível de intervenção durante a rotina de trabalho, priorizando o controle do usuário sobre o momento e o contexto em que o agente é acionado.
+
+#### Divergência entre as alternativas
+
+As alternativas diferem principalmente em **quem inicia a interação**. Na Alternativa A, o agente identifica oportunidades de apoio e apresenta recomendações de forma proativa durante a atividade. Na Alternativa B, o agente permanece disponível, mas só realiza a busca e apresenta informações após uma solicitação explícita do usuário.
+
+Essa diferença pode alterar aspectos relevantes da experiência, como o esforço necessário para encontrar informações, a frequência de interrupções, o nível de controle percebido pelo usuário e a capacidade do agente de antecipar necessidades. Neste momento, nenhuma das alternativas é considerada definitiva ou superior à outra; ambas serão exploradas por meio dos protótipos.
 
 ### 4.3 Formatos de Prototipação
 
-<!-- Exemplo: vídeo/encenação para uma alternativa e outro formato exploratório para a segunda, justificando o que cada formato permite investigar. -->
+Para explorar as duas alternativas propostas, foram escolhidos formatos de prototipação que permitem observar diferentes aspectos da interação entre o usuário e o agente de IA. Os protótipos serão construídos em paralelo e utilizados como instrumentos de investigação, sem representar versões finais da solução.
+
+#### 4.3.1 Alternativa A: Vídeo e Encenação da Interação Proativa
+
+A alternativa de interação proativa e contextual será explorada por meio de um **vídeo encenado**, representando um usuário durante sua rotina de trabalho enquanto o agente acompanha o contexto das atividades realizadas.
+
+Ao longo da encenação, serão representados momentos em que o agente identifica documentos potencialmente relevantes e apresenta recomendações visuais ao usuário. O usuário poderá aceitar ou rejeitar essas recomendações, permitindo observar como a iniciativa do agente interfere no fluxo normal de trabalho.
+
+O formato foi escolhido por permitir representar a experiência ao longo do tempo e investigar questões como **quando uma recomendação deveria aparecer, com que frequência o agente deveria intervir, como o usuário mantém controle sobre as sugestões e em quais situações uma recomendação pode deixar de ajudar e passar a interromper a atividade**.
+
+O vídeo não busca representar uma interface final ou tecnicamente implementada, mas sim simular o comportamento e a relação entre usuário e agente em um cenário de uso.
+
+#### 4.3.2 Alternativa B: Interface de Interação Sob Demanda
+
+A alternativa de interação sob demanda será explorada por meio de uma **interface gráfica conversacional**, na qual o usuário inicia a interação com o agente sempre que identifica a necessidade de consultar alguma informação relacionada aos projetos.
+
+Nesse formato, o usuário pode realizar perguntas em linguagem natural por **texto ou voz**. A partir da solicitação, o agente interpreta a consulta, busca as informações disponíveis nas fontes de dados do projeto e apresenta uma resposta em linguagem natural, podendo também indicar os documentos e fontes relacionados à informação apresentada.
+
+Diferentemente da alternativa proativa, o agente não acompanha continuamente as atividades realizadas pelo usuário nem apresenta recomendações espontâneas. A interação depende de uma ação explícita do usuário, que determina quando o agente será acionado e qual informação deseja consultar.
+
+Esse formato permite investigar **como o usuário formula suas necessidades em linguagem natural, quanto contexto precisa fornecer para obter uma resposta adequada e quais dificuldades podem surgir quando ele precisa identificar a necessidade e iniciar a interação com o agente**.
+
+A prototipação por interface gráfica também permite representar e explorar situações como consultas ambíguas, perguntas por texto ou voz, necessidade de esclarecimento e apresentação das fontes utilizadas pelo agente.
+
+#### Relação dos formatos com a questão de projeto
+
+Os dois formatos permitem investigar a questão definida na [seção 4.1](#41-questão-de-projeto) a partir de formas distintas de interação entre o usuário e o agente. O vídeo encenado permite explorar uma experiência proativa e contextual, na qual o agente acompanha a rotina de trabalho e pode recomendar informações e documentos sem depender de uma solicitação inicial. Já a interface gráfica conversacional permite explorar uma experiência sob demanda, em que o usuário inicia a interação por texto ou voz e recebe respostas em linguagem natural a partir de suas solicitações.
+
+A exploração dos dois formatos permite observar diferenças relacionadas à iniciativa do agente, ao nível de controle do usuário, à possibilidade de interrupções e ao esforço necessário para acessar informações. O objetivo não é determinar previamente qual alternativa é superior, mas compreender as consequências e limitações de cada forma de interação para orientar decisões futuras do projeto.
 
 ### 4.4 Construção dos Protótipos
 
-<!-- Registrar como cada protótipo foi construído, materiais utilizados e principais escolhas feitas durante o processo. -->
+Nesta seção serão apresentados os dois protótipos construídos a partir das alternativas definidas na [seção 4.2](#42-alternativas-divergentes), juntamente com os registros visuais de sua construção.
+
+#### 4.4.1 Construção do Protótipo A: Interação Proativa e Contextual
+
+##### Demonstração do Protótipo A
+
+> **Inserir aqui a demonstração do vídeo referente à interação proativa e contextual.**
+
+#### 4.4.2 Construção do Protótipo B: Interação Sob Demanda
+
+##### Demonstração do Protótipo B
+
+> **Inserir aqui a demonstração da interface gráfica conversacional referente à interação sob demanda.**
+
 
 ### 4.5 Diário de Construção dos Dois Protótipos
 
