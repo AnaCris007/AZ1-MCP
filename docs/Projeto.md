@@ -1813,7 +1813,9 @@ Nesta seção serão apresentados os dois protótipos construídos a partir das 
 
 ### 4.5 Diário de Construção dos Dois Protótipos
 
-<!-- Registrar no momento em que ocorrerem: decisões inesperadas, ambiguidades, dúvidas e limitações encontradas durante a construção. -->
+> **Registro em andamento:** os dois protótipos estão em fase de construção. Esta seção será atualizada continuamente durante a elaboração, os ensaios e a execução, registrando no momento em que ocorrerem as decisões inesperadas, ambiguidades, dúvidas, improvisos, falhas e limitações encontradas.
+
+Os registros serão mantidos como evidências do processo exploratório, inclusive quando provocarem mudanças no roteiro ou revelarem comportamentos do sistema que ainda não foram definidos.
 
 ### 4.6 Execução dos Protótipos
 
