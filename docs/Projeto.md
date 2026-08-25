@@ -2128,11 +2128,31 @@ Esta seção registra como cada protótipo foi colocado em operação, incluindo
 
 ### 4.7 Comparação entre as Alternativas
 
-<!-- Comparar o que cada alternativa revelou, diferenças observadas, pontos que apareceram em apenas uma delas e surpresas encontradas. -->
+<!-- Consolidação do grupo: comparar o que cada alternativa revelou, diferenças observadas, pontos que apareceram em apenas uma delas e surpresas encontradas. Abaixo, os insumos de cada protótipo. -->
+
+**O que a interface conversacional (Protótipo B) tornou visível:** como o usuário formula pedidos em linguagem natural e quanta ambiguidade cabe numa frase curta; o problema das versões e duplicatas de documentos; o ciclo de confirmação exigido pela entrada por voz; e a fronteira entre pedido de documento e pedido de dado estruturado.
+
+**O que só o vídeo encenado (Protótipo A) consegue mostrar e a interface não:** o momento e a frequência da iniciativa do agente ao longo do tempo de trabalho — na interface sob demanda esse eixo simplesmente não existe, pois toda interação depende de uma ação explícita do usuário.
+
+**Confirmação entre construção e execução (Protótipo B):** a fronteira entre pedido de documento e pedido de dado estruturado — identificada como decisão em aberto durante a construção (decisão nº 5 do inventário) — foi encontrada espontaneamente pelo participante durante a execução, sem que ele tivesse conhecimento do inventário. A execução também revelou um ponto que a construção não havia antecipado: a semelhança do protótipo com produtos reais gera expectativa de funcionalidade real, o que favorece o reconhecimento imediato da interface, mas produz frustração quando a simulação é percebida.
+
+> **Inserir aqui os insumos do Protótipo A e a consolidação da comparação pelo grupo.**
 
 ### 4.8 Limites dos Protótipos
 
-<!-- Explicar especificamente o que os protótipos não permitem concluir e o que ainda dependeria de testes com usuários reais. -->
+Esta seção explicita o que cada protótipo **não** permite concluir e o que ainda dependeria de testes com usuários reais.
+
+#### Limites do Protótipo A — Vídeo Encenado
+
+> **Inserir aqui os limites específicos do Protótipo A.**
+
+#### Limites do Protótipo B — Interface de Interação Sob Demanda
+
+- **Respostas fixas por palavra-chave:** não há PLN real, então nada se conclui sobre a qualidade de interpretação dos pedidos.
+- **Voz simulada:** nada se conclui sobre a taxa de erro do ASR com o jargão do Metrô nem sobre o comportamento com ruído de ambiente.
+- **Sem SharePoint real:** nada se conclui sobre tempo de resposta, cobertura da base documental ou permissões reais.
+- **O participante do teste foi Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO:** a formulação de pedidos de um colaborador real, com vocabulário e pressa reais, só seria observada com usuários do Metrô.
+- **A execução foi registrada por anotações e capturas de tela, sem gravação de vídeo:** o registro depende do que foi anotado no momento; reações e hesitações do participante não ficaram integralmente documentadas.
 
 ### 4.9 Inventário de Decisões em Aberto
 
