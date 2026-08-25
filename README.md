@@ -61,6 +61,7 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 │   └── main.py
 ├── .env.example
 ├── .gitignore
+├── docker-compose.yml
 ├── README.md
 ├── requirements.txt
 └── ruff.toml
@@ -75,13 +76,21 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 
 ##  Rodando a API
 
+O endpoint de recebimento de áudio armazena os arquivos em um bucket S3-compatível. Para desenvolvimento local, suba o MinIO (já com o bucket `az1-audio` criado automaticamente):
+
+```bash
+docker compose up -d
+```
+
+Depois, rode a API normalmente:
+
 ```bash
 pip install -r requirements.txt
 cd src
 uvicorn main:app --reload
 ```
 
-A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000/docs`.
+A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000/docs`. O console do MinIO fica em `http://127.0.0.1:9001` (usuário/senha: `minioadmin`/`minioadmin`).
 
 ##  Configuração para desenvolvimento
 

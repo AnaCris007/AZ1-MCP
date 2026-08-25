@@ -5,7 +5,8 @@ from uuid import uuid4
 from fastapi import APIRouter, File, Header, UploadFile
 
 from schemas.audio import AudioErrorCode, AudioUploadResponse
-from services.audio_service import MAX_DURATION_SECONDS, AudioProbeError, probe_audio
+from services.audio_service import AUDIO_FORMAT_CONTENT_TYPES, MAX_DURATION_SECONDS, AudioProbeError, probe_audio
+from services.storage_service import store_audio
 
 router = APIRouter(tags=["audio"])
 
@@ -55,8 +56,12 @@ async def upload_audio(
     if probe.duration_seconds > MAX_DURATION_SECONDS:
         raise AudioAPIError(422, "audio_too_long", "O áudio excede a duração máxima permitida de 5 minutos.")
 
+    audio_id = f"aud_{uuid4().hex[:12]}"
+    content_type = AUDIO_FORMAT_CONTENT_TYPES[probe.audio_format]
+    store_audio(key=audio_id, content=content, content_type=content_type)
+
     return AudioUploadResponse(
-        id=f"aud_{uuid4().hex[:12]}",
+        id=audio_id,
         status="received",
         message="Áudio recebido com sucesso.",
     )

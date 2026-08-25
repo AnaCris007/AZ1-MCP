@@ -1788,7 +1788,7 @@ O header `Content-Type: multipart/form-data` não é definido manualmente: a fla
 }
 ```
 
-O código `201` indica que o sistema recebeu e criou um novo recurso associado ao áudio enviado.
+O código `201` indica que o sistema recebeu e criou um novo recurso associado ao áudio enviado. Após passar por todas as validações, o áudio é armazenado em um bucket compatível com S3 usando o `id` gerado como chave do objeto — esse `id` é o que a próxima etapa do pipeline (Speech-to-Text) utiliza para recuperar o arquivo.
 
 #### Respostas de erro
 

@@ -8,6 +8,13 @@ import av
 
 MAX_DURATION_SECONDS = 5 * 60
 
+AUDIO_FORMAT_CONTENT_TYPES = {
+    "wav": "audio/wav",
+    "mp3": "audio/mpeg",
+    "m4a": "audio/mp4",
+    "webm": "audio/webm",
+}
+
 _FORMAT_MATCHERS = (
     ("wav", "wav"),
     ("mp3", "mp3"),
