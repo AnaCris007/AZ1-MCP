@@ -39,14 +39,15 @@
 <details>
 <summary><strong>3. Definição Técnica e Arquitetural da Solução</strong></summary>
 
-- [3.1 API de Speech to Text e Text to Speech](#31-api-de-speech-to-text-e-text-to-speech)
-- [3.2 Algoritmo de NLP e Implementação](#32-algoritmo-de-nlp-e-implementação)
-- [3.3 API para Recebimento de Áudios](#33-api-para-recebimento-de-áudios)
-- [3.4 Pilha de Tecnologias](#34-pilha-de-tecnologias)
-- [3.5 Modelagem Conceitual e Lógica dos Dados](#35-modelagem-conceitual-e-lógica-dos-dados)
-- [3.6 Processo de Deploy em Nuvem](#36-processo-de-deploy-em-nuvem)
-- [3.7 Projeto Técnico e Arquitetural](#37-projeto-técnico-e-arquitetural)
-- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.1 Catálogo de Intenções e Contrato de Classificação](#31-catálogo-de-intenções-e-contrato-de-classificação)
+- [3.2 API de Speech to Text e Text to Speech](#32-api-de-speech-to-text-e-text-to-speech)
+- [3.3 Algoritmo de NLP e Implementação](#33-algoritmo-de-nlp-e-implementação)
+- [3.4 API para Recebimento de Áudios](#34-api-para-recebimento-de-áudios)
+- [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
+- [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
+- [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
+- [3.8 Projeto Técnico e Arquitetural](#38-projeto-técnico-e-arquitetural)
+- [3.9 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -1695,15 +1696,73 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 ## 3. Definição Técnica e Arquitetural da Solução
 
-### 3.1 API de Speech to Text e Text to Speech
+### 3.1 Catálogo de Intenções e Contrato de Classificação
+
+O catálogo de intenções define os tipos de solicitação que o agente deve reconhecer no MVP. A classificação ocorre após a entrada ser convertida para texto, quando aplicável, e antes da consulta às fontes ou do acionamento de qualquer processo. Solicitações que não correspondam às intenções catalogadas devem ser recusadas com uma orientação sobre as interações disponíveis.
+
+| ID | Intenção técnica | Objetivo | Saída esperada | MVP |
+|---|---|---|---|:---:|
+| INT-01 | `consultar_documentos_normativos` | Consultar conceitos, regras, processos e informações dos documentos disponibilizados | Resposta fundamentada com indicação da fonte | Sim |
+| INT-02 | `consultar_projeto_sintetico` | Consultar informações dos projetos do ambiente de demonstração | Dados estruturados do projeto sintético | Sim |
+| INT-03 | `orientar_mapa_beneficios` | Apoiar o preenchimento do Mapa de Benefícios | Perguntas, campos pendentes e sugestões | Sim |
+| INT-04 | `orientar_tap` | Apoiar o preenchimento do Termo de Abertura do Projeto | Orientações e sugestões para os campos do TAP | Sim |
+| INT-05 | `orientar_entregas_cronograma` | Apoiar a definição de entregas, marcos, atividades, datas e dependências | Sugestões e validações do cronograma | Sim |
+| INT-06 | `orientar_avanco_mensal` | Apoiar o preenchimento das informações de avanço do projeto | Dados necessários e sugestões de complementação | Sim |
+| INT-07 | `orientar_riscos_problemas` | Apoiar a descrição e análise de riscos ou problemas | Sugestões de classificação, criticidade e plano de ação | Sim |
+| INT-08 | `analisar_completude_coerencia` | Verificar se as informações fornecidas estão completas e coerentes | Diagnóstico de ausências, inconsistências e recomendações | Sim |
+| INT-09 | `gerar_alertas_pendencias` | Identificar situações que precisam da atenção do usuário | Lista priorizada de alertas com justificativas | Sim, com dados de demonstração |
+| INT-10 | `fora_do_catalogo` | Tratar solicitações que o protótipo não consegue executar | Explicação do limite e opções disponíveis | Sim |
+
+#### Contrato de classificação
+
+Para cada solicitação, o componente de compreensão deve devolver, no mínimo:
+
+- a intenção identificada;
+- o grau de confiança da classificação;
+- as entidades extraídas;
+- os parâmetros obrigatórios ausentes;
+- a indicação de que a solicitação está fora do catálogo, quando aplicável.
+
+O agente só deve prosseguir quando a intenção estiver suficientemente identificada e os parâmetros necessários estiverem disponíveis. Em caso de ambiguidade ou informação faltante, deve solicitar esclarecimento ao usuário.
+
+#### Delimitação central
+
+As intenções de orientação, análise e alerta produzem apenas respostas e sugestões no chat. No MVP, o agente consulta, interpreta, orienta e sugere conteúdos, mas não preenche documentos oficiais, não altera ou grava registros, não executa transações e não acessa o portfólio real do Metrô, as respostas dependem exclusivamente de documentos disponibilizados, dados sintéticos, informações fornecidas na conversa e artefatos anexados pelo usuário. Toda sugestão apresentada pelo agente deve ser revisada e confirmada pelo usuário, e o agente não deve apresentar sugestões como decisões oficiais, aprovações ou determinações de conformidade.
+
+#### Intenções de controle da conversa
+
+Além das dez intenções de domínio, o gerenciador de diálogo reconhece intenções de controle, responsáveis por conduzir os fluxos guiados (entrevistas de preenchimento, revisões e confirmações). Elas não acionam processos do PMO e não aparecem na tabela de intenções principais.
+
+| ID | Intenção | Exemplos |
+|---|---|---|
+| CTRL-01 | `continuar_processo` | "Sim", "pode continuar", "vamos para o próximo" |
+| CTRL-02 | `corrigir_informacao` | "Quero alterar a data", "corrija o objetivo" |
+| CTRL-03 | `revisar_respostas` | "Mostre o que já foi preenchido" |
+| CTRL-04 | `salvar_rascunho` | "Quero salvar e continuar depois" |
+| CTRL-05 | `cancelar_processo` | "Cancele", "quero parar" |
+| CTRL-06 | `solicitar_ajuda` | "O que preciso informar?", "dê um exemplo" |
+| CTRL-07 | `confirmar_saida` | "Está correto", "pode finalizar" |
+| CTRL-08 | `trocar_processo` | "Agora quero trabalhar no cronograma" |
+
+#### Regra de classificação durante fluxos guiados
+
+O classificador de intenções não deve interpretar cada resposta fornecida durante um fluxo guiado como uma nova intenção. Por exemplo, se o agente pergunta "Qual é a data de término da entrega?" e o usuário responde "31 de dezembro de 2026", essa resposta não representa uma nova intenção: o gerenciador de diálogo deve tratá-la como o preenchimento da entidade `data_termino` do processo em andamento.
+
+Uma nova classificação de intenção só deve ser executada quando o sistema detectar:
+
+- baixa confiança na classificação da resposta como preenchimento de entidade;
+- mudança de assunto em relação ao processo em andamento;
+- solicitação explícita para iniciar outro processo (intenção `trocar_processo`).
+
+### 3.2 API de Speech to Text e Text to Speech
 
 <!-- Exemplo do que incluir: API escolhida, endpoints, métodos HTTP, parâmetros, respostas e exemplos de requisição e resposta. -->
 
-### 3.2 Algoritmo de NLP e Implementação
+### 3.3 Algoritmo de NLP e Implementação
 
 <!-- Exemplo do que incluir: algoritmo escolhido, finalidade, funcionamento, bibliotecas utilizadas e exemplo de implementação. -->
 
-### 3.3 API para Recebimento de Áudios
+### 3.4 API para Recebimento de Áudios
 
 Esta seção documenta a API interna responsável por receber os áudios enviados pelos usuários, estabelecendo o contrato de entrada do canal de voz da solução. As definições apresentadas determinam como o áudio entra no sistema, quais regras devem ser respeitadas antes do processamento e como o cliente deve tratar os resultados.
 
@@ -1899,23 +1958,23 @@ Speech-to-Text           mensagem de erro
 
 Com essas definições, o contrato da API estabelece como o áudio entra no sistema, quais regras devem ser respeitadas antes de seu processamento e como o cliente deve tratar tanto o caminho de sucesso quanto os casos de erro.
 
-### 3.4 Pilha de Tecnologias
+### 3.5 Pilha de Tecnologias
 
 <!-- Exemplo do que incluir: linguagens, frameworks, bibliotecas, plataforma de execução e justificativa das escolhas. -->
 
-### 3.5 Modelagem Conceitual e Lógica dos Dados
+### 3.6 Modelagem Conceitual e Lógica dos Dados
 
 <!-- Exemplo do que incluir: entidades, relacionamentos, atributos principais e diagramas dos modelos de dados. -->
 
-### 3.6 Processo de Deploy em Nuvem
+### 3.7 Processo de Deploy em Nuvem
 
 <!-- Exemplo do que incluir: plataforma escolhida, etapas de configuração, implantação, integração e evidências do processo. -->
 
-### 3.7 Projeto Técnico e Arquitetural
+### 3.8 Projeto Técnico e Arquitetural
 
 <!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
 
-### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
+### 3.9 Estratégia de Entrega para as Sprints 3, 4 e 5
 
 <!-- Exemplo do que incluir: como desenvolvimento, integração, testes e deploy serão distribuídos entre as próximas sprints. -->
 
