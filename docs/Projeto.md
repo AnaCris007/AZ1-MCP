@@ -1718,7 +1718,6 @@ O catálogo de intenções define os tipos de solicitação que o agente deve re
 Para cada solicitação, o componente de compreensão deve devolver, no mínimo:
 
 - a intenção identificada;
-- o grau de confiança da classificação;
 - as entidades extraídas;
 - os parâmetros obrigatórios ausentes;
 - a indicação de que a solicitação está fora do catálogo, quando aplicável.
@@ -1729,30 +1728,15 @@ O agente só deve prosseguir quando a intenção estiver suficientemente identif
 
 As intenções de orientação, análise e alerta produzem apenas respostas e sugestões no chat. No MVP, o agente consulta, interpreta, orienta e sugere conteúdos, mas não preenche documentos oficiais, não altera ou grava registros, não executa transações e não acessa o portfólio real do Metrô, as respostas dependem exclusivamente de documentos disponibilizados, dados sintéticos, informações fornecidas na conversa e artefatos anexados pelo usuário. Toda sugestão apresentada pelo agente deve ser revisada e confirmada pelo usuário, e o agente não deve apresentar sugestões como decisões oficiais, aprovações ou determinações de conformidade.
 
-#### Intenções de controle da conversa
-
-Além das dez intenções de domínio, o gerenciador de diálogo reconhece intenções de controle, responsáveis por conduzir os fluxos guiados (entrevistas de preenchimento, revisões e confirmações). Elas não acionam processos do PMO e não aparecem na tabela de intenções principais.
-
-| ID | Intenção | Exemplos |
-|---|---|---|
-| CTRL-01 | `continuar_processo` | "Sim", "pode continuar", "vamos para o próximo" |
-| CTRL-02 | `corrigir_informacao` | "Quero alterar a data", "corrija o objetivo" |
-| CTRL-03 | `revisar_respostas` | "Mostre o que já foi preenchido" |
-| CTRL-04 | `salvar_rascunho` | "Quero salvar e continuar depois" |
-| CTRL-05 | `cancelar_processo` | "Cancele", "quero parar" |
-| CTRL-06 | `solicitar_ajuda` | "O que preciso informar?", "dê um exemplo" |
-| CTRL-07 | `confirmar_saida` | "Está correto", "pode finalizar" |
-| CTRL-08 | `trocar_processo` | "Agora quero trabalhar no cronograma" |
-
 #### Regra de classificação durante fluxos guiados
 
 O classificador de intenções não deve interpretar cada resposta fornecida durante um fluxo guiado como uma nova intenção. Por exemplo, se o agente pergunta "Qual é a data de término da entrega?" e o usuário responde "31 de dezembro de 2026", essa resposta não representa uma nova intenção: o gerenciador de diálogo deve tratá-la como o preenchimento da entidade `data_termino` do processo em andamento.
 
 Uma nova classificação de intenção só deve ser executada quando o sistema detectar:
 
-- baixa confiança na classificação da resposta como preenchimento de entidade;
+- a resposta não corresponder ao tipo ou ao formato esperado da entidade em preenchimento;
 - mudança de assunto em relação ao processo em andamento;
-- solicitação explícita para iniciar outro processo (intenção `trocar_processo`).
+- solicitação explícita do usuário para iniciar outro processo.
 
 ### 3.2 API de Speech to Text e Text to Speech
 
