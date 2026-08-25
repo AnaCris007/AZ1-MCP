@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -6,13 +8,14 @@ from routes import audio_router
 from routes.audio import AudioAPIError
 from schemas.audio import ErrorResponse
 
-app = FastAPI(title="AZ1 API")
+logger = logging.getLogger(__name__)
 
+app = FastAPI(title="AZ1 API")
 app.include_router(audio_router, prefix="/api/v1")
 
 
 @app.exception_handler(AudioAPIError)
-async def audio_api_error_handler(request: Request, exc: AudioAPIError) -> JSONResponse:
+def audio_api_error_handler(request: Request, exc: AudioAPIError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
@@ -20,7 +23,7 @@ async def audio_api_error_handler(request: Request, exc: AudioAPIError) -> JSONR
 
 
 @app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
     if exc.status_code == 400:
         return JSONResponse(
             status_code=400,
@@ -30,7 +33,8 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
 
 
 @app.exception_handler(Exception)
-async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Erro não tratado ao processar %s %s", request.method, request.url.path, exc_info=exc)
     return JSONResponse(
         status_code=500,
         content=ErrorResponse(error="internal_error", message="Erro interno inesperado.").model_dump(),

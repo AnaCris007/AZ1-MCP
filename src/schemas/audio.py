@@ -6,7 +6,6 @@ AudioStatus = Literal["received"]
 
 AudioErrorCode = Literal[
     "bad_request",
-    "unauthorized",
     "unsupported_format",
     "file_too_large",
     "audio_too_long",
