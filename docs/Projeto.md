@@ -1719,15 +1719,15 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 #### 3.6.1 Arquitetura e Provedor Selecionado
 
-O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **ecossistema Microsoft**, integrando-se nativamente ao ambiente corporativo do parceiro (Copilot Studio, Power Platform, Teams, SharePoint). Para ambientes acadêmicos, a solução utiliza exclusivamente serviços gratuitos do **Microsoft Azure** e do **Microsoft 365 Developer Program**, sem custo permanente.
+O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **Microsoft Azure**. No MVP, o núcleo permanece independente; Copilot Studio, Power Platform, Teams e SharePoint são integrações futuras com o ambiente corporativo do parceiro.
 
 **Componentes principais:**
 
 | Componente | Serviço Microsoft | Justificativa |
 |-----------|------------------|--------------|
 | Hospedagem do modelo | Azure App Service (tier gratuito) | HTTP API nativa, escalável, integrado com ecossistema Microsoft |
-| Orquestração do agente | Copilot Studio | Orquestração de ações, fluxos, e integração com Power Automate |
-| Persistência de dados | Azure SQL Database (free tier 12 meses) ou Cosmos DB (free tier 25 GB) | Dados estruturados, integração nativa com Power Platform |
+| Integração futura | Copilot Studio | Possível orquestração corporativa após o MVP independente |
+| Persistência de dados | PostgreSQL | Mantém a tecnologia de banco definida para o MVP e pode ser hospedada em serviço compatível no Azure |
 | Conversão de voz | Azure Cognitive Services (Speech-to-Text) | Free tier generoso: 5 horas/mês grátis |
 | Integração de processos | Power Automate | Automações e orquestração de workflows |
 | Ambiente completo | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários, inclui Teams, SharePoint, Entra ID |
@@ -1735,8 +1735,8 @@ O deploy do pipeline de Processamento de Linguagem Natural foi definido para o *
 **Por que essa arquitetura:**
 - **Alinhamento com parceiro** — Todo o ecossistema real de produção é Microsoft
 - **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados
-- **Custo zero acadêmico** — Azure Free Tier + M365 Dev Program cobrem tudo sem limites de 12 meses para ambiente de desenvolvimento
-- **Reprodutibilidade** — Qualquer pessoa com account Microsoft consegue replicar em ambiente sandbox
+- **Controle de custo acadêmico** — as camadas gratuitas poderão ser utilizadas quando disponíveis e compatíveis com a implantação escolhida
+- **Reprodutibilidade** — os passos e parâmetros necessários serão registrados para repetição em ambiente autorizado
 
 **Arquitetura em alto nível:**  
 
@@ -1770,7 +1770,7 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 - Válido enquanto ativo (renovável)
 
 **Para projeto acadêmico sem time constraint:**
-Use Azure Free Tier (sempre grátis) + M365 Dev Program. Para produção real, migre para planos pagos mantendo a mesma arquitetura.
+No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e suficientes. A implantação real deverá considerar licenciamento e recursos corporativos.
 
 #### 3.6.3 Etapas de Configuração e Implantação
 
@@ -1782,13 +1782,13 @@ Use Azure Free Tier (sempre grátis) + M365 Dev Program. Para produção real, m
 
 **Passo 2 — Configurar Azure para Hospedagem do Modelo:**
 1. Criar resource group `az1-nlp-dev`
-2. Criar Azure App Service (tier B1 Free ou B1 Basic)
+2. Criar Azure App Service (`F1 Free` para publicação compatível ou `B1 Basic`, pago, quando os requisitos exigirem)
 3. Configurar deployment via Git ou Docker (Azure Container Registry)
-4. Criar Azure SQL Database ou Cosmos DB para persistência
+4. Criar ou conectar uma instância PostgreSQL para persistência
 
 **Passo 3 — Preparar Modelo e API:**
 1. Estruturar projeto Python em `src/nlp-deploy/`
-2. Criar aplicação Flask/FastAPI com endpoint `/classify` que recebe `{"text": "..."}`
+2. Criar aplicação FastAPI com endpoint `/classify` que recebe `{"text": "..."}`
 3. Exportar modelo treinado (TF-IDF + LogReg ou BERTimbau em ONNX) para diretório `model/`
 4. Criar `requirements.txt` com dependências (flask, scikit-learn, joblib, ou onnxruntime)
 
@@ -1813,6 +1813,7 @@ Use Azure Free Tier (sempre grátis) + M365 Dev Program. Para produção real, m
 4. Enviar notificação para usuário via Teams
 
 #### 3.6.4 Exemplo de API (Flask)
+
 
 ```python
 # src/nlp-deploy/app.py
@@ -1888,11 +1889,11 @@ CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 
 #### 3.6.5 Reprodutibilidade e Verificação
 
-**Checklist de custo (garantir zero spend):**
+**Checklist de controle de custo:**
 - [ ] Azure App Service em tier Free (1 instância)
 - [ ] Azure SQL Database com free tier (primeiros 12 meses)
 - [ ] Cognitive Services em free tier (limites respeitados)
-- [ ] M365 Dev Program ativo (sandbox, sem custo)
+- [ ] Elegibilidade e licenciamento do ambiente Microsoft confirmados
 - [ ] Nenhum recurso em tier "Standard" ou "Premium" ativo
 
 **Checklist de funcionalidade:**
@@ -1905,6 +1906,8 @@ CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 - [ ] Dados são gravados em banco (se integrado)
 
 **Exemplo de requisição ponta a ponta:**
+
+> A URL abaixo é ilustrativa e deverá ser substituída pela URL real após a execução do deploy.
 
 ```bash
 curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
@@ -1938,7 +1941,7 @@ Toda a arquitetura permanece igual; apenas migram os recursos para ambientes ger
 
 #### 3.6.7 Observações Finais
 
-Este deploy foi estruturado como uma prova de conceito (POC) técnica totalmente reprodutível e alinhada ao ecossistema Microsoft do parceiro. A utilização do Microsoft 365 Developer Program e Azure Free Tier garante custo zero para ambientes acadêmicos. A mesma arquitetura e código sem modificações é promovido para produção no ambiente real do Metrô, reduzindo riscos e complexidade de migração.
+Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossistema Microsoft do parceiro. A reprodutibilidade será confirmada após a execução dos passos e a inclusão das evidências. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 
 ### 3.7 Projeto Técnico e Arquitetural
 
