@@ -2174,11 +2174,46 @@ Esta seção reúne as decisões de design e comportamento do agente que a const
 
 ### 4.10 Repertório de Situações
 
-<!-- Registrar os casos e situações usados durante a execução, principalmente aqueles que os protótipos não conseguiram atender. -->
+Esta seção registra os casos e situações usados durante a construção e a execução dos protótipos, com destaque para aqueles que não foram atendidos.
+
+#### Situações do Protótipo A
+
+> **Inserir aqui as situações usadas no Protótipo A.**
+
+#### Situações do Protótipo B
+
+Situações embutidas na construção da interface:
+
+- "preciso do último relatório de manutenção preventiva da linha 1" — **atendida**
+- "me manda o cronograma atualizado" — **ambígua**; o protótipo respondeu com pergunta de desambiguação
+- "abre o contrato de concessão da linha 4 pra mim" — **bloqueada por permissão**
+- (voz) "acha pra mim o laudo do AMV da estação Sé" — sigla com baixa confiança na transcrição; o protótipo **pediu confirmação** antes de buscar
+
+Situações registradas durante a execução (sessão com participante externo à construção):
+
+- Uso livre da interface (localizar conversa, enviar texto, iniciar gravação) — **atendida sem instrução**, por reconhecimento do padrão convencional de chat
+- Tentativa de enviar áudio real e ouvir a resposta falada — **não atendida**: funcionalidade simulada; exigiu explicação verbal
+- "quantas ocorrências teve na L2 em julho?" — **não atendida**: pedido de dado estruturado; o protótipo caiu no fallback por só definir comportamento para busca de documentos
 
 ### 4.11 Registros Visuais
 
-<!-- Inserir fotos, vídeos, storyboard, desenhos, capturas e demais evidências brutas da construção e execução. -->
+Esta seção reúne as evidências brutas da construção e da execução dos protótipos (fotos, vídeos, storyboard, desenhos e capturas de tela).
+
+#### Registros do Protótipo A
+
+> **Inserir aqui os registros visuais do Protótipo A (fotos do set, frames do vídeo, storyboard).**
+
+#### Registros do Protótipo B
+
+Os registros da construção da interface estão inseridos na [seção 4.5](#45-diário-de-construção-dos-dois-protótipos), na ordem em que os estados foram produzidos:
+
+- **Imagem 4.5.1** — primeiro estado da interface, apenas com interação por texto ([estado-1-somente-texto.png](../assets/design/estado-1-somente-texto.png));
+- **Imagem 4.5.2** — estado intermediário, com a adição da entrada por voz e dos botões "ouvir resposta" ([estado-2-emoji.png](../assets/design/estado-2-emoji.png));
+- **Imagem 4.5.3** — estado intermediário, com gravação de voz, transcrição automática e confirmação de termo com baixa confiança ([estado-2-voz-emoji.png](../assets/design/estado-2-voz-emoji.png));
+- **Imagem 4.5.4** — estado final do protótipo, com o fluxo completo de voz e permissões ([prototipo-chatbot-metro.png](../assets/design/prototipo-chatbot-metro.png));
+- **Imagem 4.4.2** — mockup da interface apresentado na demonstração ([mockup-agente.png](../assets/design/mockup-agente.png)).
+
+A execução do Protótipo B foi registrada por anotações feitas durante a sessão e por capturas de tela. A principal evidência da execução é a Imagem 4.6.1 ([execucao-fallback-dado-estruturado.png](../assets/design/execucao-fallback-dado-estruturado.png)), que mostra o protótipo falhando diante do pedido de dado estruturado. Não houve gravação de vídeo da sessão.
 
 ---
 
