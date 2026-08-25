@@ -10,10 +10,10 @@
 target-version = "py312"
 line-length = 120
 
-# Faz o ruff reconhecer `gitlab_kit` como módulo do próprio projeto (primeira
-# parte) e não como dependência externa — é o que separa o bloco de imports
-# `import requests` do bloco `from gitlab_kit import ...`.
-src = ["gitlab-issue-kit/scripts"]
+# Faz o ruff reconhecer `gitlab_kit`, `pln` e `schemas` como módulos do próprio
+# projeto (primeira parte) e não como dependências externas — é o que separa o
+# bloco de imports `import requests` do bloco `from gitlab_kit import ...`.
+src = ["gitlab-issue-kit/scripts", "src"]
 
 [lint]
 select = [
@@ -28,4 +28,4 @@ select = [
 ]
 
 [lint.isort]
-known-first-party = ["gitlab_kit"]
+known-first-party = ["gitlab_kit", "pln", "schemas"]
