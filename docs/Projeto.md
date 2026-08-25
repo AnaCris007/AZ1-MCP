@@ -2098,7 +2098,33 @@ Esta seção registra, na ordem em que ocorreram, as decisões inesperadas, ambi
 
 ### 4.6 Execução dos Protótipos
 
-<!-- Registrar como cada protótipo foi colocado em operação, incluindo situações difíceis, falhas, improvisos e lacunas encontradas. -->
+Esta seção registra como cada protótipo foi colocado em operação, incluindo situações difíceis, falhas, improvisos e lacunas encontradas durante a execução.
+
+#### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
+
+> **Inserir aqui o registro de execução do Protótipo A.**
+
+#### Protótipo B — Interface de Interação Sob Demanda
+
+**Como foi rodado:** A sessão foi realizada em 25 de agosto de 2026, às 9h30, na biblioteca da faculdade, com duração aproximada de 30 minutos, com Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO do Metrô. O participante não acompanhou a construção da interface e recebeu apenas o contexto mínimo ("você é analista do PMO e precisa encontrar documentos e informações dos projetos"), sem tutorial ou demonstração prévia. A primeira parte da sessão foi de uso livre; na segunda, foram propostos pedidos fora do escopo coberto pelo protótipo. O registro foi feito por anotações durante a sessão e capturas de tela; não houve gravação de vídeo.
+
+**O que aconteceu (não o que se esperava):**
+
+| # | Pedido do participante | O que o protótipo fez | Falha / improviso / lacuna |
+|---|------------------------|-----------------------|----------------------------|
+| 1 | Uso livre inicial: localizar a conversa ativa, enviar mensagem de texto e iniciar gravação de áudio | O participante navegou sem nenhuma instrução, reconhecendo os elementos por semelhança com interfaces de chat que já utiliza | Nenhuma falha. Achado: o padrão convencional de interface elimina o custo de aprendizado — comportamento relevante para a comparação com a Alternativa A |
+| 2 | Tentou gravar um áudio real e ouvir a resposta falada | A gravação, a transcrição e a reprodução são simuladas; a expectativa de funcionalidade real foi frustrada | **Improviso registrado:** foi preciso explicar verbalmente o que o sistema real faria. O protótipo não comunica seus próprios limites — a semelhança com produtos reais gera expectativa de funcionamento real |
+| 3 | "quantas ocorrências teve na L2 em julho?" | Caiu no fallback "não encontrei documentos correspondentes", com o aviso de lacuna exibido na tela | **Lacuna confirmada:** pedido de dado estruturado, não de documento. O protótipo só define comportamento para busca de arquivos. Corresponde à decisão nº 5 do [inventário (seção 4.9)](#49-inventário-de-decisões-em-aberto), levantada na construção e confirmada na execução |
+
+**Falhas encontradas:** O protótipo falhou diante de um pedido legítimo de informação (consulta a dado estruturado do banco, e não a um documento), caindo no fallback genérico. Além disso, falhou em comunicar sua própria natureza simulada: o participante esperava enviar e ouvir áudio de verdade.
+
+**Improvisos registrados:** Em ambas as falhas foi necessário intervir verbalmente — explicar que a decisão sobre consultas ao banco está em aberto e que o fluxo de voz é simulado. Cada intervenção verbal indica um comportamento que o sistema real precisará definir.
+
+<div align="center">
+<sub>Imagem 4.6.1 - Fallback exibido durante a execução, diante do pedido de dado estruturado ("quantas ocorrências teve na L2 em julho?")</sub><br>
+  <img src="../assets/design/execucao-fallback-dado-estruturado.png" width="100%" alt="Captura da interface exibindo o fallback de documento não encontrado durante o teste de execução"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
 ### 4.7 Comparação entre as Alternativas
 
