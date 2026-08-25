@@ -39,14 +39,15 @@
 <details>
 <summary><strong>3. Definição Técnica e Arquitetural da Solução</strong></summary>
 
-- [3.1 API de Speech to Text e Text to Speech](#31-api-de-speech-to-text-e-text-to-speech)
-- [3.2 Algoritmo de NLP e Implementação](#32-algoritmo-de-nlp-e-implementação)
-- [3.3 API para Recebimento de Áudios](#33-api-para-recebimento-de-áudios)
-- [3.4 Pilha de Tecnologias](#34-pilha-de-tecnologias)
-- [3.5 Modelagem Conceitual e Lógica dos Dados](#35-modelagem-conceitual-e-lógica-dos-dados)
-- [3.6 Processo de Deploy em Nuvem](#36-processo-de-deploy-em-nuvem)
-- [3.7 Projeto Técnico e Arquitetural](#37-projeto-técnico-e-arquitetural)
-- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.1 Catálogo de Intenções e Contrato de Classificação](#31-catálogo-de-intenções-e-contrato-de-classificação)
+- [3.2 API de Speech to Text e Text to Speech](#32-api-de-speech-to-text-e-text-to-speech)
+- [3.3 Algoritmo de NLP e Implementação](#33-algoritmo-de-nlp-e-implementação)
+- [3.4 API para Recebimento de Áudios](#34-api-para-recebimento-de-áudios)
+- [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
+- [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
+- [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
+- [3.8 Projeto Técnico e Arquitetural](#38-projeto-técnico-e-arquitetural)
+- [3.9 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -1695,15 +1696,57 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 ## 3. Definição Técnica e Arquitetural da Solução
 
-### 3.1 API de Speech to Text e Text to Speech
+### 3.1 Catálogo de Intenções e Contrato de Classificação
+
+O catálogo de intenções define os tipos de solicitação que o agente deve reconhecer no MVP. A classificação ocorre após a entrada ser convertida para texto, quando aplicável, e antes da consulta às fontes ou do acionamento de qualquer processo. Solicitações que não correspondam às intenções catalogadas devem ser recusadas com uma orientação sobre as interações disponíveis.
+
+| ID | Intenção técnica | Objetivo | Saída esperada | MVP |
+|---|---|---|---|:---:|
+| INT-01 | `consultar_documentos_normativos` | Consultar conceitos, regras, processos e informações dos documentos disponibilizados | Resposta fundamentada com indicação da fonte | Sim |
+| INT-02 | `consultar_projeto_sintetico` | Consultar informações dos projetos do ambiente de demonstração | Dados estruturados do projeto sintético | Sim |
+| INT-03 | `orientar_mapa_beneficios` | Apoiar o preenchimento do Mapa de Benefícios | Perguntas, campos pendentes e sugestões | Sim |
+| INT-04 | `orientar_tap` | Apoiar o preenchimento do Termo de Abertura do Projeto | Orientações e sugestões para os campos do TAP | Sim |
+| INT-05 | `orientar_entregas_cronograma` | Apoiar a definição de entregas, marcos, atividades, datas e dependências | Sugestões e validações do cronograma | Sim |
+| INT-06 | `orientar_avanco_mensal` | Apoiar o preenchimento das informações de avanço do projeto | Dados necessários e sugestões de complementação | Sim |
+| INT-07 | `orientar_riscos_problemas` | Apoiar a descrição e análise de riscos ou problemas | Sugestões de classificação, criticidade e plano de ação | Sim |
+| INT-08 | `analisar_completude_coerencia` | Verificar se as informações fornecidas estão completas e coerentes | Diagnóstico de ausências, inconsistências e recomendações | Sim |
+| INT-09 | `gerar_alertas_pendencias` | Identificar situações que precisam da atenção do usuário | Lista priorizada de alertas com justificativas | Sim, com dados de demonstração |
+| INT-10 | `fora_do_catalogo` | Tratar solicitações que o protótipo não consegue executar | Explicação do limite e opções disponíveis | Sim |
+
+#### Contrato de classificação
+
+Para cada solicitação, o componente de compreensão deve devolver, no mínimo:
+
+- a intenção identificada;
+- as entidades extraídas;
+- os parâmetros obrigatórios ausentes;
+- a indicação de que a solicitação está fora do catálogo, quando aplicável.
+
+O agente só deve prosseguir quando a intenção estiver suficientemente identificada e os parâmetros necessários estiverem disponíveis. Em caso de ambiguidade ou informação faltante, deve solicitar esclarecimento ao usuário.
+
+#### Delimitação central
+
+As intenções de orientação, análise e alerta produzem apenas respostas e sugestões no chat. No MVP, o agente consulta, interpreta, orienta e sugere conteúdos, mas não preenche documentos oficiais, não altera ou grava registros, não executa transações e não acessa o portfólio real do Metrô, as respostas dependem exclusivamente de documentos disponibilizados, dados sintéticos, informações fornecidas na conversa e artefatos anexados pelo usuário. Toda sugestão apresentada pelo agente deve ser revisada e confirmada pelo usuário, e o agente não deve apresentar sugestões como decisões oficiais, aprovações ou determinações de conformidade.
+
+#### Regra de classificação durante fluxos guiados
+
+O classificador de intenções não deve interpretar cada resposta fornecida durante um fluxo guiado como uma nova intenção. Por exemplo, se o agente pergunta "Qual é a data de término da entrega?" e o usuário responde "31 de dezembro de 2026", essa resposta não representa uma nova intenção: o gerenciador de diálogo deve tratá-la como o preenchimento da entidade `data_termino` do processo em andamento.
+
+Uma nova classificação de intenção só deve ser executada quando o sistema detectar:
+
+- a resposta não corresponder ao tipo ou ao formato esperado da entidade em preenchimento;
+- mudança de assunto em relação ao processo em andamento;
+- solicitação explícita do usuário para iniciar outro processo.
+
+### 3.2 API de Speech to Text e Text to Speech
 
 <!-- Exemplo do que incluir: API escolhida, endpoints, métodos HTTP, parâmetros, respostas e exemplos de requisição e resposta. -->
 
-### 3.2 Algoritmo de NLP e Implementação
+### 3.3 Algoritmo de NLP e Implementação
 
 <!-- Exemplo do que incluir: algoritmo escolhido, finalidade, funcionamento, bibliotecas utilizadas e exemplo de implementação. -->
 
-### 3.3 API para Recebimento de Áudios
+### 3.4 API para Recebimento de Áudios
 
 Esta seção documenta a API interna responsável por receber os áudios enviados pelos usuários, estabelecendo o contrato de entrada do canal de voz da solução. As definições apresentadas determinam como o áudio entra no sistema, quais regras devem ser respeitadas antes do processamento e como o cliente deve tratar os resultados.
 
@@ -1915,23 +1958,247 @@ Speech-to-Text           mensagem de erro
 
 Com essas definições, o contrato da API estabelece como o áudio entra no sistema, quais regras devem ser respeitadas antes de seu processamento e como o cliente deve tratar tanto o caminho de sucesso quanto os casos de erro.
 
-### 3.4 Pilha de Tecnologias
+### 3.5 Pilha de Tecnologias
 
 <!-- Exemplo do que incluir: linguagens, frameworks, bibliotecas, plataforma de execução e justificativa das escolhas. -->
 
-### 3.5 Modelagem Conceitual e Lógica dos Dados
+### 3.6 Modelagem Conceitual e Lógica dos Dados
 
 <!-- Exemplo do que incluir: entidades, relacionamentos, atributos principais e diagramas dos modelos de dados. -->
 
-### 3.6 Processo de Deploy em Nuvem
+### 3.7 Processo de Deploy em Nuvem
 
-<!-- Exemplo do que incluir: plataforma escolhida, etapas de configuração, implantação, integração e evidências do processo. -->
+#### 3.6.1 Arquitetura e Provedor Selecionado
 
-### 3.7 Projeto Técnico e Arquitetural
+O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **Microsoft Azure**. No MVP, o núcleo permanece independente; Copilot Studio, Power Platform, Teams e SharePoint são integrações futuras com o ambiente corporativo do parceiro.
+
+**Componentes principais:**
+
+| Componente | Serviço Microsoft | Justificativa |
+|-----------|------------------|--------------|
+| Hospedagem do modelo | Azure App Service (tier gratuito) | HTTP API nativa, escalável, integrado com ecossistema Microsoft |
+| Integração futura | Copilot Studio | Possível orquestração corporativa após o MVP independente |
+| Persistência de dados | PostgreSQL | Mantém a tecnologia de banco definida para o MVP e pode ser hospedada em serviço compatível no Azure |
+| Conversão de voz | Azure Cognitive Services (Speech-to-Text) | Free tier generoso: 5 horas/mês grátis |
+| Integração de processos | Power Automate | Automações e orquestração de workflows |
+| Ambiente completo | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários, inclui Teams, SharePoint, Entra ID |
+
+**Por que essa arquitetura:**
+- **Alinhamento com parceiro** — Todo o ecossistema real de produção é Microsoft
+- **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados
+- **Controle de custo acadêmico** — as camadas gratuitas poderão ser utilizadas quando disponíveis e compatíveis com a implantação escolhida
+- **Reprodutibilidade** — os passos e parâmetros necessários serão registrados para repetição em ambiente autorizado
+
+**Arquitetura em alto nível:**  
+
+```
+Usuário em Teams / Copilot Studio (Microsoft 365)
+        ↓
+  Copilot Studio (orquestração nativa)
+        ├→ Power Automate (automações)
+        ├→ Azure App Service (API do modelo NLP)
+        │       ├→ Azure SQL Database / Cosmos DB (logs, histórico)
+        │       └→ Application Insights (monitoramento)
+        ├→ Azure Cognitive Services (STT/TTS)
+        └→ SharePoint / OneDrive (documentos integrados)
+```
+
+
+#### 3.6.2 Serviços Gratuitos e Limites
+
+**Azure Free Tier (sempre gratuito):**
+- Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação/dia)
+- Azure Cognitive Services: 5.000 requisições/mês de Speech, 5.000 requisições/mês de Text
+- Application Insights: 1 GB/mês de ingestão de logs
+
+**Azure Free Tier (12 meses iniciais):**
+- Azure SQL Database: 1 banco com até 5 GB grátis
+- Azure Container Registry: 1 registro com 500 MB grátis
+
+**Microsoft 365 Developer Program:**
+- Tenant completo com 25 usuários
+- Teams, SharePoint, OneDrive, Power Platform, Copilot Studio inclusos
+- Válido enquanto ativo (renovável)
+
+**Para projeto acadêmico sem time constraint:**
+No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e suficientes. A implantação real deverá considerar licenciamento e recursos corporativos.
+
+#### 3.6.3 Etapas de Configuração e Implantação
+
+**Passo 1 — Criar Ambientes Microsoft:**
+1. Registrar-se em [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
+2. Criar tenant sandbox (instantâneo, pré-configurado)
+3. Registrar-se em [Azure Portal](https://portal.azure.com) com a mesma conta
+4. Ativar free tier credits (se aplicável)
+
+**Passo 2 — Configurar Azure para Hospedagem do Modelo:**
+1. Criar resource group `az1-nlp-dev`
+2. Criar Azure App Service (`F1 Free` para publicação compatível ou `B1 Basic`, pago, quando os requisitos exigirem)
+3. Configurar deployment via Git ou Docker (Azure Container Registry)
+4. Criar ou conectar uma instância PostgreSQL para persistência
+
+**Passo 3 — Preparar Modelo e API:**
+1. Estruturar projeto Python em `src/nlp-deploy/`
+2. Criar aplicação FastAPI com endpoint `/classify` que recebe `{"text": "..."}`
+3. Exportar modelo treinado (TF-IDF + LogReg ou BERTimbau em ONNX) para diretório `model/`
+4. Criar `requirements.txt` com dependências (flask, scikit-learn, joblib, ou onnxruntime)
+
+**Passo 4 — Containerizar e Publicar:**
+1. Criar `Dockerfile` baseado em `python:3.11-slim`
+2. Testar localmente com `docker run`
+3. Fazer build e push para Azure Container Registry
+4. Atualizar App Service para usar imagem do ACR
+
+**Passo 5 — Configurar Copilot Studio:**
+1. Acessar [Copilot Studio](https://copilotstudio.microsoft.com) via M365 Dev tenant
+2. Criar novo Copilot (agent)
+3. Adicionar ação customizada que chama URL do Azure App Service
+4. Configurar fluxo: receber texto → chamar API NLP → retornar intenção e confiança
+5. Testar em preview dentro do Copilot Studio
+6. Publicar para Teams
+
+**Passo 6 — Integração com Power Automate (Opcional):**
+1. Criar cloud flow acionado por evento (ex: novo documento no SharePoint)
+2. Chamar ação customizada do Copilot Studio ou diretamente API do Azure App Service
+3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
+4. Enviar notificação para usuário via Teams
+
+#### 3.6.4 Exemplo de API (Flask)
+
+
+```python
+# src/nlp-deploy/app.py
+from flask import Flask, request, jsonify
+import joblib
+import uuid
+from datetime import datetime
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+app = Flask(__name__)
+
+# Carregar modelo
+modelo = joblib.load("model/model.joblib")
+
+# Conexão com banco (Azure SQL ou Postgres)
+# Para dev local: sqlite:///local.db
+# Para Azure SQL: mssql+pyodbc://user:pass@server.database.windows.net/db
+DATABASE_URL = "sqlite:///./classifications.db"
+engine = create_engine(DATABASE_URL)
+
+@app.route("/health", methods=["GET"])
+def health():
+    return {"status": "healthy"}, 200
+
+@app.route("/classify", methods=["POST"])
+def classify():
+    data = request.json
+    texto = data.get("text", "")
+
+    if not texto:
+        return {"error": "text field required"}, 400
+
+    # Classificação
+    probs = modelo.predict_proba([texto])[0]
+    idx = probs.argmax()
+    intencao = modelo.classes_[idx]
+    confianca = float(probs[idx])
+
+    resultado = {
+        "id": str(uuid.uuid4()),
+        "text": texto,
+        "intent": intencao,
+        "confidence": round(confianca, 4),
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+    # Gravar em banco (opcional)
+    # db.insert_classification(resultado)
+
+    return resultado, 200
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=False)
+```
+
+**Dockerfile correspondente:**
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY src/nlp-deploy/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/nlp-deploy/ .
+
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+```
+
+#### 3.6.5 Reprodutibilidade e Verificação
+
+**Checklist de controle de custo:**
+- [ ] Azure App Service em tier Free (1 instância)
+- [ ] Azure SQL Database com free tier (primeiros 12 meses)
+- [ ] Cognitive Services em free tier (limites respeitados)
+- [ ] Elegibilidade e licenciamento do ambiente Microsoft confirmados
+- [ ] Nenhum recurso em tier "Standard" ou "Premium" ativo
+
+**Checklist de funcionalidade:**
+- [ ] Azure App Service com status "Running"
+- [ ] Endpoint `/health` retorna 200 OK
+- [ ] Endpoint `/classify` processa requisições POST
+- [ ] Copilot Studio consegue chamar API
+- [ ] Resposta do agente aparece em Teams
+- [ ] Logs aparecem em Application Insights
+- [ ] Dados são gravados em banco (se integrado)
+
+**Exemplo de requisição ponta a ponta:**
+
+> A URL abaixo é ilustrativa e deverá ser substituída pela URL real após a execução do deploy.
+
+```bash
+curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Qual o prazo do marco de licenciamento ambiental da Linha 6?"}'
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "text": "Qual o prazo do marco de licenciamento ambiental da Linha 6?",
+  "intent": "consulta",
+  "confidence": 0.8734,
+  "timestamp": "2026-08-24T11:21:00.000000"
+}
+```
+
+#### 3.6.6 Próximos Passos para Produção
+
+Quando a solução for promovida para ambiente real do Metrô:
+
+1. **Migrar banco de dados:** De Azure SQL (free 12m) para SQL Server corporativo ou similar
+2. **Copilot Studio em produção:** Usar tenant corporativo em vez de sandbox M365 Dev
+3. **Power Automate com SharePoint real:** Conectar a documentos e listas de verdade
+4. **Entra ID:** Integrar autenticação corporativa do Metrô
+5. **Compliance e segurança:** Implementar audit logs, DLP (Data Loss Prevention), conformidade com políticas corporativas
+
+Toda a arquitetura permanece igual; apenas migram os recursos para ambientes gerenciados pelo Metrô.
+
+#### 3.6.7 Observações Finais
+
+Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossistema Microsoft do parceiro. A reprodutibilidade será confirmada após a execução dos passos e a inclusão das evidências. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
+
+### 3.8 Projeto Técnico e Arquitetural
 
 <!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
 
-### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
+### 3.9 Estratégia de Entrega para as Sprints 3, 4 e 5
 
 <!-- Exemplo do que incluir: como desenvolvimento, integração, testes e deploy serão distribuídos entre as próximas sprints. -->
 
