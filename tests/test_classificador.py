@@ -18,18 +18,23 @@ from pathlib import Path
 
 from sklearn.base import clone
 
-from az1.pln.classificador import (
+from pln.caminhos import DATASET_PADRAO
+from pln.classificador import (
     CONFIG_PRE_PADRAO,
+    CONFIG_VET_PADRAO,
     PreprocessadorDeTexto,
-    avaliar_com_validacao_cruzada,
+    VarianteNB,
+    avaliar_classificador,
     carregar_dataset,
     carregar_modelo,
     construir_classificador,
     listar_palavras_de_maior_peso_por_intencao,
     prever_intencao,
     salvar_modelo,
+    variantes_compativeis,
 )
-from az1.pln.preprocessamento import ConfigPreprocessamento, ModoStopwords, preprocessar
+from pln.preprocessamento import ConfigPreprocessamento, ModoStopwords, Tokenizacao, preprocessar
+from pln.vetorizacao import ConfigVetorizacao, ModoVetorizacao
 
 TEXTOS = [
     "Qual o status do projeto?", "Qual o avanço da obra?", "Quantos documentos existem?",
@@ -70,10 +75,29 @@ class TesteConstrucao(unittest.TestCase):
         modelo = construir_classificador().fit(TEXTOS, ROTULOS)
         self.assertEqual(len(modelo.predict(["Qual o status?"])), 1)
 
-    def test_max_iter_alto_o_bastante_para_convergir(self):
-        # Com o padrão 100 o otimizador não converge em matrizes esparsas de
-        # texto, e o sklearn avisa — o que significa "parou antes de terminar".
-        self.assertGreaterEqual(construir_classificador().named_steps["classificador"].max_iter, 1000)
+    def test_padroes_do_modelo_vieram_do_ajuste_fino(self):
+        # Trava contra alguém trocar os hiperparâmetros sem passar por
+        # `ajuste_fino.py`. Os valores abaixo são a recomendação de
+        # resultados/ajuste_fino.md. Se este teste falhar, aquele relatório e
+        # docs/PipelinePLN.md precisam ser atualizados junto.
+        #
+        # O que este teste NÃO garante: que sejam os melhores possíveis. Eles
+        # venceram um empate de 2010 configurações em 3000 — ver a ressalva de
+        # saturação no cabeçalho deste módulo.
+        from pln.classificador import ALPHA_PADRAO, FIT_PRIOR_PADRAO, VARIANTE_PADRAO
+
+        self.assertIs(VARIANTE_PADRAO, VarianteNB.MULTINOMIAL)
+        self.assertEqual(ALPHA_PADRAO, 1.0)
+        self.assertIs(FIT_PRIOR_PADRAO, True)
+
+    def test_suavizacao_ligada(self):
+        # Substituiu o antigo teste de `max_iter`, que era da regressão
+        # logística e deixou de existir com a troca para Naive Bayes. O análogo
+        # é o `alpha`: com 0 a suavização desliga e volta o problema que ela
+        # existe para resolver — um termo nunca visto numa classe tem
+        # probabilidade zero, e um único zero zera o produto inteiro, então uma
+        # palavra desconhecida basta para eliminar uma intenção inteira.
+        self.assertGreater(construir_classificador().named_steps["classificador"].alpha, 0)
 
 
 class TestePrevisao(unittest.TestCase):
@@ -136,7 +160,7 @@ class TesteConfiguracaoViajaComOModelo(unittest.TestCase):
 
 class TesteAvaliacao(unittest.TestCase):
     def test_avaliar_devolve_f1_relatorio_matriz_e_classes(self):
-        f1, relatorio, matriz, classes = avaliar_com_validacao_cruzada(TEXTOS, ROTULOS, construir_classificador(), k=3)
+        f1, relatorio, matriz, classes = avaliar_classificador(TEXTOS, ROTULOS, construir_classificador(), k=3)
         self.assertGreaterEqual(f1, 0.0)
         self.assertLessEqual(f1, 1.0)
         self.assertIn("precision", relatorio)
@@ -144,23 +168,70 @@ class TesteAvaliacao(unittest.TestCase):
         self.assertEqual(len(matriz), len(classes))
 
     def test_matriz_de_confusao_soma_o_total_de_exemplos(self):
-        _, _, matriz, _ = avaliar_com_validacao_cruzada(TEXTOS, ROTULOS, construir_classificador(), k=3)
+        _, _, matriz, _ = avaliar_classificador(TEXTOS, ROTULOS, construir_classificador(), k=3)
         self.assertEqual(sum(sum(linha) for linha in matriz), len(TEXTOS))
 
 
 class TesteDatasetPadrao(unittest.TestCase):
-    def test_config_padrao_veio_do_experimento(self):
-        # Trava contra alguém trocar o padrão sem passar pelo experimento:
-        # se este teste falhar, a documentação em docs/PipelinePLN.md e os
-        # comparativos em resultados/ precisam ser atualizados junto.
+    def test_config_padrao_e_a_primeira_colocada_do_experimento(self):
+        # Trava contra alguém trocar o padrão sem passar pelo experimento. Os
+        # valores abaixo são o rank #1 de resultados/comparativo_preprocessamento.md
+        # — `bow n=1` com `[tok:split] (texto cru)`, nenhuma etapa ligada.
+        # Se este teste falhar, o comparativo e docs/PipelinePLN.md precisam ser
+        # atualizados junto.
+        #
+        # O que este teste NÃO garante: que essa seja a melhor forma de preparar
+        # o texto. Ela venceu um empate de 2261 configurações, todas em F1
+        # 1,0000, por ser a mais simples — ver a ressalva em classificador.py.
         self.assertEqual(CONFIG_PRE_PADRAO.etapas_ativas_na_ordem(), ())
+        self.assertIs(CONFIG_PRE_PADRAO.tokenizacao, Tokenizacao.SPLIT)
+        self.assertIs(CONFIG_VET_PADRAO.modo, ModoVetorizacao.BOW)
+        self.assertEqual(CONFIG_VET_PADRAO.n_max, 1)
 
     def test_dataset_de_exemplo_carrega(self):
-        from az1.pln.classificador import DATASET_PADRAO
-
         textos, rotulos = carregar_dataset(DATASET_PADRAO)
         self.assertEqual(len(textos), len(rotulos))
         self.assertGreater(len(textos), 0)
+
+
+class TesteCompatibilidadeDeVariante(unittest.TestCase):
+    # A escolha da variante de Naive Bayes NÃO é livre: ela é determinada pela
+    # vetorização. Multinomial e Complement estimam P(termo|classe) somando
+    # colunas, e soma negativa não é probabilidade de nada; vetores de embedding
+    # têm coordenadas negativas por construção. Gaussiano é o caminho inverso:
+    # lê coordenada contínua e não sabe o que fazer com matriz esparsa.
+    #
+    # Sem a checagem, a combinação errada morre lá no fundo do scikit-learn com
+    # `ValueError: Negative values in data`, que não menciona nem embeddings nem
+    # Naive Bayes e manda quem lê procurar no lugar errado.
+
+    EMBEDDING = ConfigVetorizacao(ModoVetorizacao.EMBEDDING, n_max=1)
+    BOW = ConfigVetorizacao(ModoVetorizacao.BOW, n_max=1)
+
+    def test_denso_so_aceita_gaussiano(self):
+        self.assertEqual(variantes_compativeis(self.EMBEDDING), (VarianteNB.GAUSSIANO,))
+
+    def test_esparso_nao_aceita_gaussiano(self):
+        self.assertNotIn(VarianteNB.GAUSSIANO, variantes_compativeis(self.BOW))
+
+    def test_toda_variante_serve_a_alguma_familia(self):
+        # Uma variante que não fosse compatível com nada seria inalcançável — e
+        # continuaria aparecendo em `--variante` na linha de comando.
+        cobertas = set(variantes_compativeis(self.BOW)) | set(variantes_compativeis(self.EMBEDDING))
+        self.assertEqual(cobertas, set(VarianteNB))
+
+    def test_combinacao_invalida_e_recusada_com_mensagem_util(self):
+        with self.assertRaises(ValueError) as caso:
+            construir_classificador(config_vet=self.EMBEDDING, variante=VarianteNB.MULTINOMIAL)
+        mensagem = str(caso.exception)
+        self.assertIn("multinomial", mensagem)
+        self.assertIn("gaussiano", mensagem, "a mensagem não diz qual variante usar")
+
+    def test_combinacao_valida_treina(self):
+        modelo = construir_classificador(
+            config_vet=self.EMBEDDING, variante=VarianteNB.GAUSSIANO, alpha=1e-9
+        )
+        self.assertEqual(len(modelo.fit(TEXTOS, ROTULOS).predict(["Qual o status?"])), 1)
 
 
 if __name__ == "__main__":

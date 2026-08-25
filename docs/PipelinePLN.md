@@ -1,6 +1,6 @@
 # Pipeline de PLN — como funciona
 
-Documentação técnica do módulo `src/az1/pln`, que decide **como preparar texto** antes de classificar
+Documentação técnica do módulo `src/pln`, que decide **como preparar texto** antes de classificar
 intenções. O dataset é intercambiável; o método e a estrutura descritos aqui não mudam com ele.
 
 ---
@@ -21,24 +21,46 @@ experimento mede todas as combinações no dataset real, escolhendo por número.
 ## 2. Estrutura de arquivos
 
 ```text
-src/az1/pln/
+src/pln/                  o pacote — código-fonte e dados de entrada
+├── caminhos.py           onde ficam os dados, para onde vão os resultados
 ├── preprocessamento.py   texto  → tokens
 ├── vetorizacao.py        tokens → matriz numérica
-├── classificador.py      o modelo do produto (regressão logística)
-├── experimento.py        a busca e as análises
-├── dados/                datasets rotulados
-│   └── intencoes_exemplo.csv
-├── resultados/           comparativos gerados (versionados)
-│   ├── comparativo_preprocessamento.csv
-│   ├── comparativo_preprocessamento.md
-│   └── classificador.joblib
+├── classificador.py      o modelo do produto (Naive Bayes)
+├── experimento.py        a busca do TEXTO — pré-processamento x vetorização
+├── ajuste_fino.py        a busca do MODELO — variante x suavização x priori
+├── dados/                datasets rotulados, versionados
+│   └── intencoes_exemplos.csv
 └── README.md             referência rápida
+
+resultados/               SAÍDA GERADA, na raiz do repositório
+├── comparativo_preprocessamento.csv
+├── comparativo_preprocessamento.md
+├── ajuste_fino.md
+└── classificador.joblib
+
+entregas/                 SAÍDA GERADA — o pipeline em um arquivo só
+└── pln_completo.py
+
+scripts/
+└── gerar_pln_completo.py gera entregas/pln_completo.py a partir de src/pln/
 
 tests/
 ├── test_preprocessamento.py   34 testes
-├── test_vetorizacao.py        13 testes
-└── test_classificador.py      17 testes
+├── test_vetorizacao.py        21 testes
+├── test_classificador.py      23 testes
+├── test_ajuste_fino.py        24 testes
+└── test_entrega_unica.py       4 testes
 ```
+
+**Entrada e saída não moram juntas.** `dados/` é parte do pacote: versionado, pequeno, alterado por
+pessoas, e sem ele o código não roda — por isso viaja dentro do wheel e continua funcionando depois de
+um `pip install`. `resultados/` e `entregas/` são o oposto: gerados por máquina, sobrescritos a cada
+rodada, e o código roda perfeitamente sem eles. Ficam fora de `src/`, que é o que evita um `.joblib`
+binário aparecer no diff de um módulo Python.
+
+Quem resolve os dois caminhos é `caminhos.py`, num lugar só. Antes dele cada módulo montava o seu com
+`Path(__file__)...`, repetido em três arquivos — e o nome do dataset estava escrito errado nos três ao
+mesmo tempo.
 
 A separação segue o fluxo dos dados. Cada arquivo tem uma responsabilidade e não conhece a do outro:
 `preprocessamento.py` não sabe que existe vetorização; `vetorizacao.py` não sabe que existe stemming;
@@ -63,14 +85,17 @@ flowchart TB
 
     subgraph V["vetorizacao.py"]
         direction TB
-        MO["peso: bag of words | tf-idf"]
-        NG["janela: unigrama | unigrama+bigrama"]
-        MO --> NG
+        ESP["ESPARSA<br/>bag of words | tf-idf<br/>janela: uni | uni+bi"]
+        DEN["DENSA<br/>embedding pré-treinado<br/>300 dimensões, com negativos"]
     end
 
-    V --> EXP["experimento.py<br/>MultinomialNB — a régua"]
-    V --> PROD["classificador.py<br/>LogisticRegression — o modelo"]
+    ESP --> EXP["experimento.py — a régua<br/>MultinomialNB(alpha=1.0)"]
+    DEN --> EXPD["experimento.py — a régua<br/>GaussianNB"]
+    ESP --> PROD["classificador.py — o modelo<br/>ajustado por ajuste_fino.py"]
+    DEN --> PROD
+
     EXP --> A["validação cruzada<br/>estratificada, 5 dobras"]
+    EXPD --> A
     PROD --> A
     A --> M["F1-macro"]
 ```
@@ -158,14 +183,56 @@ perda é um efeito real de ordem, que o experimento deve enxergar em vez de esco
 
 ## 5. A vetorização
 
-`vetorizacao.py` converte tokens em matriz. Duas escolhas independentes:
+O pré-processamento decide **quais tokens existem**; a vetorização decide **como cada token vira
+número**. São duas famílias, diferentes em espécie e não em grau.
 
-| Campo | Opções | Diferença |
+| | Esparsas (`bow`, `tfidf`) | Densa (`embedding`) |
 |---|---|---|
-| `modo` | `bow` / `tfidf` | **bow**: peso é a contagem bruta. **tfidf**: contagem × fator que cresce quanto mais raro o termo — termo presente em todo documento é achatado |
-| `n_max` | `1` / `2` | **1**: só palavras isoladas. **2**: acrescenta pares vizinhos, capturando "não atualizou" como unidade — ao custo de inflar o vocabulário |
+| Colunas | uma por termo do corpus | 300 fixas, do modelo pré-treinado |
+| O que o número diz | quantas vezes o termo apareceu | a posição do documento num espaço |
+| Sabe algo da língua? | não — "prazo" e "cronograma" são colunas tão distintas quanto "prazo" e "banana" | sim — "prazo" e "cronograma" ficam perto |
+| Valores negativos | nunca | sempre |
+| Janela de n-grama | sim, unigrama ou uni+bigrama | não se aplica |
 
-`VETORIZACAO_REFERENCIA` (`tfidf n=1`) é a régua usada pelo modo `--duas-fases`.
+### 5.1 As esparsas
+
+**Bag of words** conta. Simples e literal, e trata "projeto" — que aparece em quase toda frase — com o
+mesmo prestígio de "desapropriação", que aparece numa só. **TF-IDF** multiplica a contagem pelo IDF,
+fator que cresce quanto mais raro o termo é no corpus: é o conserto exato dessa fraqueza. Em corpus
+pequeno, porém, o IDF fica instável, calculado sobre poucas ocorrências, e nem sempre ganha.
+
+### 5.2 A densa, e o que ela não é
+
+O documento vira a **média dos vetores pré-treinados dos seus tokens**. A aposta é trazer conhecimento
+de fora do nosso corpus: o modelo sabe que "prazo" e "cronograma" são parentes sem nunca ter visto
+nossas 300 frases. O preço é que a média destrói a ordem e dilui — uma frase longa vira um ponto no
+meio de tudo que ela contém, e **a negação some**: "não venceu" e "venceu" ficam quase no mesmo lugar.
+
+> **Isto não é Word2Vec skip-gram.** Os vetores do `pt_core_news_md` são **fastText treinado com CBOW**
+> sobre OSCAR Common Crawl + Wikipédia — está na metadata do próprio modelo (`nlp.meta["sources"]`).
+>
+> CBOW e skip-gram são os dois objetivos de treino do Word2Vec, e são inversos: CBOW prevê a palavra a
+> partir do contexto, skip-gram prevê o contexto a partir da palavra. Skip-gram costuma representar
+> melhor palavra rara — exatamente o caso de "desapropriação" no nosso domínio. fastText acrescenta uma
+> terceira coisa: compõe o vetor a partir de pedaços da palavra, e por isso tem vetor até para palavra
+> nunca vista.
+>
+> Para usar skip-gram de verdade seria preciso um arquivo de vetores treinado assim — os do NILC/USP são
+> a referência em português, na casa das centenas de MB — e trocar `MODELO_DE_VETORES` por um carregador
+> daquele formato. O modo se chama `embedding`, e não `w2v_skipgram`, porque nomear errado é a forma
+> mais barata de mentir num relatório.
+
+### 5.3 A armadilha da retokenização, nas duas famílias
+
+O caminho óbvio para vetorizar com spaCy é `nlp(texto).vector`, que já devolve a média. É o caminho
+**errado**, e erra em silêncio: `nlp(texto)` **tokeniza de novo**, jogando fora a tokenização que o
+pré-processamento escolheu. As três estratégias de tokenização passariam a dar resultado idêntico, e o
+experimento reportaria "não faz diferença" com toda a confiança.
+
+É o mesmo problema que `token_pattern` e `lowercase=True` causam nos vetorizadores do scikit-learn. Por
+isso, nas duas famílias, os tokens já vêm prontos do pré-processamento e a vetorização só os consome:
+`tokenizer=str.split` nas esparsas, `texto.split()` na densa. Há testes que quebram se isso for
+revertido.
 
 ---
 
@@ -177,44 +244,116 @@ coisa: a régua do experimento, escolhida por ser determinística e rápida, por
 O pipeline completo é um único objeto do scikit-learn:
 
 ```text
-texto bruto → PreprocessadorDeTexto → Vetorizador → LogisticRegression
+texto bruto → PreprocessadorDeTexto → Vetorizador → Naive Bayes
 ```
 
 Isso importa na prática: treinar, avaliar, salvar e prever passam a operar sobre **texto bruto**. Não
 existe a possibilidade de alguém treinar com um pré-processamento e prever com outro — o erro mais comum
 e mais difícil de diagnosticar em PLN, porque não levanta exceção: o modelo simplesmente erra mais.
 
-### 6.1 Por que regressão logística
+### 6.1 Por que Naive Bayes — e o que se perdeu na troca
+
+O módulo usava regressão logística. A troca foi feita por medição, e o que se perdeu continua valendo a
+pena registrar.
+
+**A favor:**
 
 | Motivo | Consequência para o AZ1 |
 |---|---|
-| Devolve **probabilidade** por classe | O agente pode dizer "não entendi" em vez de chutar |
-| Pesos **interpretáveis** | Dá para mostrar quais palavras levaram a cada decisão (`listar_palavras_de_maior_peso_por_intencao`) |
-| Não assume independência entre palavras | Lida melhor com termos que sempre aparecem juntos, como "material rodante" |
+| Aprende com pouquíssimo dado | Não há otimização iterativa que precise de exemplos para convergir — com poucas centenas de frases isso deixa de ser detalhe |
+| É determinístico | Sem sorteio interno, sem `random_state`. Duas execuções dão exatamente o mesmo modelo |
+| Mesma família da régua do experimento | A ressalva de que "a régua é Naive Bayes mas o produto é outro modelo" deixa de existir |
+| Pesos legíveis por contraste | `listar_palavras_de_maior_peso_por_intencao` mostra quais palavras levaram a cada decisão |
 
-Naive Bayes também expõe `predict_proba`, mas seus valores são mal calibrados: saturam perto de 0 e 1
-mesmo quando o modelo está incerto. Para um limiar de confiança valer alguma coisa, o número precisa
-significar algo.
+**Contra — e continua verdade:**
+
+A **calibração da confiança piorou**. Naive Bayes multiplica probabilidades assumindo termos
+independentes; como não são, a evidência é contada mais de uma vez e a saída satura perto de 0 e 1.
+`prever_intencao` devolve um número entre 0 e 1 que **ordena bem e calibra mal**: serve para comparar
+duas frases entre si, não para ser lido como "92% de chance de estar certo". Um limiar de recusa fixado
+sobre esse número recusa de menos. A regressão logística calibrava melhor; foi o que se perdeu.
+
+A suposição de independência também continua falsa: "material rodante" e "estrutura analítica" são
+contados como duas evidências separadas. É o preço do modelo e não some com ajuste.
 
 ### 6.2 Os parâmetros
 
 | Parâmetro | Valor | Por quê |
 |---|---|---|
-| `C` | `1.0` | Inverso da regularização. Alto deixa o modelo decorar; baixo o força a soluções simples. Com mais palavras do que frases, regularizar importa |
-| `class_weight` | `"balanced"` | Pesa cada classe pelo inverso da frequência. Nulo com classes iguais, essencial quando o dataset real for desequilibrado |
-| `max_iter` | `1000` | O padrão 100 não converge em matrizes esparsas de texto, e o aviso do sklearn significa "parou antes de terminar" |
-| `random_state` | `42` | Reprodutibilidade, mesma razão da semente do experimento |
+| variante | `MultinomialNB` | Assume **contagem**: modela cada classe como um sorteio de palavras com reposição. É o padrão da área para texto, e foi o vencedor medido |
+| `alpha` | `1.0` | Suavização de Laplace/Lidstone: a contagem fictícia somada a todo par (termo, classe). Sem ela um termo nunca visto numa classe tem probabilidade zero, e **um único zero zera o produto inteiro** — uma palavra desconhecida bastaria para eliminar uma intenção. Faz aqui o papel que `C` fazia na regressão logística, com o sentido invertido: `C` alto = menos regularização, `alpha` alto = mais |
+| `fit_prior` | `True` | Aprende as probabilidades a priori da frequência no treino. `False` é o análogo mais próximo do antigo `class_weight="balanced"` — Naive Bayes não tem `class_weight` |
+| — | sem `random_state` | Naive Bayes é determinístico: não há nada a semear |
 
-### 6.3 A configuração padrão veio do experimento
+**Estes três vêm de `ajuste_fino.py`**, não do experimento — ver 6.5. Na última rodada, 3000
+candidatos:
 
-`CONFIG_PRE_PADRAO` e `CONFIG_VET_PADRAO` são a recomendação da última execução do experimento. **Duas
-coisas as invalidam:** trocar o dataset, e o fato de terem sido escolhidas medindo com Naive Bayes como
-régua — a regressão logística pode preferir outro pré-processamento.
+| Eixo | Resultado |
+|---|---|
+| variante | `multinomial` 0,9989 · `bernoulli` 0,9978 · `complement` 0,9947 |
+| `alpha` | praticamente plano entre 0,01 e 1,0; só piora em 2,0 (−0,0026) |
+| `fit_prior` | **nenhuma diferença** — 0,9971 nos dois, coerente com as três classes terem o mesmo tamanho |
 
-O caminho rigoroso é rodar o experimento de novo com este classificador no lugar da régua. Enquanto isso
-não é feito, os valores são o melhor palpite disponível — e são um palpite medido, não arbitrário.
+`bernoulli` já foi o padrão daqui, pelo argumento de que binarizar vence em frase curta. O argumento era
+plausível; a medição o pôs em segundo. É o tipo de troca que o módulo existe para fazer.
 
-### 6.4 A confiança não resolve o fora-do-catálogo
+### 6.3 A configuração padrão veio do experimento — com uma ressalva grande
+
+`CONFIG_PRE_PADRAO` e `CONFIG_VET_PADRAO` são a primeira colocada da última varredura exaustiva:
+`bow n=1` com `[tok:split] (texto cru)` — nenhuma etapa de pré-processamento ligada.
+
+**Leia a ressalva antes de confiar nesses dois.** No dataset de exemplo atual a varredura devolve
+F1-macro **1,0000 com desvio 0,0000** — e não devolve isso para a vencedora, devolve para milhares de
+configurações. A medição não está errada; está **saturada**, e medição saturada não ordena nada. O
+ajuste fino sofre do mesmo: **2010 dos 3000** candidatos empatam. Ver a seção 7.1.
+
+Entre as empatadas, o critério que sobrou foi **simplicidade**: a configuração que não faz nada com o
+texto vence porque nenhuma etapa se mostrou capaz de melhorar o que já está em 1,0000. É defensável
+— não se mantém etapa que não paga por si —, mas é diferente de "esta é a melhor forma de preparar o
+texto".
+
+### 6.4 Variante e vetorização não são escolhas independentes
+
+Não dá para combinar qualquer variante com qualquer vetorização, e a restrição não é de gosto — é de
+execução.
+
+| Vetorização | Variantes possíveis | Por quê |
+|---|---|---|
+| `bow`, `tfidf` | `multinomial`, `complement`, `bernoulli` | Estimam P(termo\|classe) somando colunas. Soma negativa não é probabilidade de nada, e o scikit-learn recusa a entrada |
+| `embedding` | `gaussiano` | Vetores densos têm coordenadas negativas por construção. `GaussianNB` assume normal por dimensão, que é a leitura certa de coordenada contínua — e é péssima em matriz esparsa quase toda zero |
+
+`variantes_compativeis()` devolve as válidas, e `construir_classificador` recusa a combinação errada com
+uma mensagem que diz o que usar. Sem isso, o erro apareceria lá no fundo do scikit-learn como
+`ValueError: Negative values in data`, que não menciona nem embeddings nem Naive Bayes.
+
+**A consequência metodológica está declarada:** quando o relatório compara `embedding` com `tfidf`, ele
+compara **dois pipelines inteiros**, não duas representações com o resto constante. Parte da diferença
+vem da representação e parte vem do classificador, e a medição não separa as duas. Isso não invalida o
+número para a decisão prática — o que vai para produção é o pipeline inteiro. Invalida a frase
+"embeddings são piores que TF-IDF", que a medição não sustenta na forma isolada. A comparação entre
+`bow` e `tfidf` continua limpa: mesma régua nos dois lados.
+
+### 6.5 Duas buscas, duas perguntas
+
+| Script | Varia | Fixa |
+|---|---|---|
+| `experimento.py` | o **texto** — pré-processamento × vetorização | o modelo: `MultinomialNB(alpha=1.0)`, a régua |
+| `ajuste_fino.py` | o **modelo** — variante × suavização × priori | o texto: os melhores do experimento |
+
+Rodar na ordem importa, porque o segundo lê o relatório do primeiro:
+
+```bash
+python -m pln.experimento
+python -m pln.ajuste_fino
+```
+
+**Isto é uma busca em estágios, e estágio não acha ótimo global** — a mesma objeção que fez a opção
+`--duas-fases` ser removida do experimento. A diferença que justifica manter aqui é de tamanho, não de
+método: o produto cartesiano completo seria 432 pré-processamentos × 5 vetorizações × variantes × 6
+suavizações × 2 prioris, dezenas de milhares de validações cruzadas. O corte está declarado e é
+ajustável em uma flag — `--top-pre`, e `--top-pre 0` varre todos os pré-processamentos do relatório.
+
+### 6.6 A confiança não resolve o fora-do-catálogo
 
 Testando o modelo treinado com uma pergunta sem relação nenhuma com o portfólio:
 
@@ -254,13 +393,47 @@ faria a nota subir mentindo.
 **A métrica é F1-macro, não acurácia.** Acurácia engana com classes desbalanceadas: se 80% das mensagens
 fossem consulta, responder "consulta" para tudo daria 80% e seria inútil. O macro tira média por classe.
 
-### 7.1 Deduplicação por texto resultante
+### 7.1 A ressalva atual: o benchmark está saturado
+
+As cinco decisões acima garantem que a comparação seja **válida**. Elas não garantem que ela seja
+**útil** — para isso o dataset precisa conter casos que o modelo erre, e o de exemplo não contém.
+
+Na última varredura exaustiva:
+
+| Sintoma | Número |
+|---|---|
+| F1-macro da melhor configuração | 1,0000, desvio 0,0000 |
+| Configurações empatadas dentro de 1 desvio | 2261 de 6456 |
+| Amplitude média de F1 ao variar a ordem das etapas | 0,0064 |
+
+A causa está no dataset, não no pipeline:
+
+- são **300 frases geradas por gabarito**, 100 por classe;
+- há apenas **16 primeiras palavras distintas** entre as 300, e **77% dos exemplos são decididos pela
+  primeira palavra sozinha** — `Registra`/`Atualiza`/`Cria` abrem transação, `Qual`/`Quem`/`Resuma`
+  abrem consulta, `Existe`/`Há`/`Tem` abrem alerta;
+- o vocabulário de cada classe cabe em 71 a 91 palavras;
+- **20 exemplos por classe já bastam** para F1 0,9366. Os outros 80 por classe não acrescentam
+  dificuldade, só repetição — e a validação cruzada acaba colocando frases quase idênticas no treino e
+  no teste ao mesmo tempo.
+
+**O que isso invalida e o que não invalida.** Não invalida o método nem o código: as conclusões
+qualitativas se mantiveram nas duas rodadas — remover pontuação atrapalha, remover stopwords atrapalha,
+a ordem das etapas muda o texto em cerca de 60% dos grupos. O que se perdeu é a capacidade de **ordenar
+o topo**: qualquer escolha entre as 2261 empatadas é arbitrária do ponto de vista da medida.
+
+**O conserto é o dataset**, não o experimento. Frases escritas por pessoas diferentes, com vocabulário
+livre, sinônimos, erros de digitação e formas indiretas de pedir a mesma coisa ("e o cronograma da 6,
+como está?"). Enquanto o corpus for gabarito, o número vai continuar dizendo 1,0000 e não vai continuar
+querendo dizer nada.
+
+### 7.2 Deduplicação por texto resultante
 
 Etapas que não interagem comutam, então muitas permutações de ordem produzem **texto idêntico**. Ordem
 que gera o mesmo texto é o mesmo experimento. O experimento agrupa por hash do corpus e treina só os
 distintos — na prática, ~95% do trabalho some.
 
-### 7.2 Comparação pareada
+### 7.3 Comparação pareada
 
 Para os campos de múltipla escolha, a média simples seria enviesada: quando stopwords é `manter` ou
 morfologia é `nenhuma`, a etapa não entra na lista de ativas, a configuração fica com uma etapa a menos
@@ -270,7 +443,7 @@ etapas".
 O pareamento resolve: para cada conjunto idêntico das demais escolhas, todos os valores do campo são
 comparados entre si. Tudo o mais constante — a diferença só pode vir do campo em questão.
 
-### 7.3 Regra da parcimônia
+### 7.4 Regra da parcimônia
 
 Entre as configurações empatadas com a primeira (dentro de um desvio padrão), o experimento recomenda a
 **mais simples**. Uma etapa a mais que não paga o próprio custo é complexidade sem retorno.
@@ -285,25 +458,46 @@ Instalação, uma vez:
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
 python -m nltk.downloader stopwords rslp
-python -m spacy download pt_core_news_sm
+python -m spacy download pt_core_news_sm   # lematização e tokenização linguística
+python -m spacy download pt_core_news_md   # vetores da vetorização densa
 ```
 
 Execução:
 
 ```bash
-python -m az1.pln.experimento                    # varredura exaustiva (padrão)
-python -m az1.pln.experimento --sem-ordem        # só a ordem padrão, execução rápida
-python -m az1.pln.experimento --duas-fases       # busca em estágios, 1/4 das avaliações
-python -m az1.pln.experimento --dataset caminho/seus_dados.csv --k 10
+python -m pln.experimento                    # varredura exaustiva (padrão)
+python -m pln.experimento --sem-ordem        # só a ordem padrão, execução rápida
+python -m pln.experimento --dataset caminho/seus_dados.csv --k 10
+```
+
+Ajustar o modelo, **depois** do experimento — ele lê o relatório que o experimento grava:
+
+```bash
+python -m pln.ajuste_fino                    # sobre os 5 melhores pré-processamentos
+python -m pln.ajuste_fino --top-pre 20       # sobre os 20 melhores
+python -m pln.ajuste_fino --top-pre 0        # sobre todos do relatório
 ```
 
 Treinar e avaliar o classificador:
 
 ```bash
-python -m az1.pln.classificador                                       # treina, avalia e salva
-python -m az1.pln.classificador --prever "Quais prazos vencem hoje?"  # usa o modelo salvo
-python -m az1.pln.classificador --C 0.5 --k 10
+python -m pln.classificador                                       # treina, avalia e salva
+python -m pln.classificador --prever "Quais prazos vencem hoje?"  # usa o modelo salvo
+python -m pln.classificador --variante complement --alpha 0.5 --k 10
 ```
+
+O arquivo único de entrega, que roda sem instalar o pacote:
+
+```bash
+python scripts/gerar_pln_completo.py         # regera a partir de src/pln/
+python entregas/pln_completo.py treinar
+python entregas/pln_completo.py prever "Quais prazos vencem esta semana?"
+python entregas/pln_completo.py experimento --sem-ordem
+python entregas/pln_completo.py ajuste
+```
+
+`entregas/pln_completo.py` **nunca é editado à mão** — a fonte é `src/pln/`, e
+`tests/test_entrega_unica.py` falha se os dois divergirem.
 
 | Flag | Efeito |
 |---|---|
@@ -311,36 +505,38 @@ python -m az1.pln.classificador --C 0.5 --k 10
 | `--k` | Dobras da validação cruzada (padrão 5) |
 | `--top` | Linhas mostradas no ranking (padrão 10) |
 | `--sem-ordem` | Não permuta a ordem das etapas |
-| `--duas-fases` | Busca em estágios em vez do produto cartesiano |
-| `--top-fase1` | Com `--duas-fases`: quantas configurações passam à Fase 2 |
+| `--top-pre` | Só no ajuste fino: quantos pré-processamentos entram na busca (0 = todos) |
 
-A varredura exaustiva leva **cerca de 4 minutos** com 120 exemplos e 5 dobras. O tempo cresce com o
-tamanho do dataset e com o número de dobras.
+O tempo cresce com o tamanho do dataset e com o número de dobras.
 
-### 8.1 Exaustivo contra duas fases
+### 8.1 Só existe a varredura exaustiva
 
-O padrão testa o produto cartesiano completo — cada pré-processamento contra cada vetorização. É o
-único método que encontra o ótimo global.
+Havia aqui uma opção `--duas-fases`, que varria o pré-processamento com a vetorização fixa e só depois
+varria a vetorização sobre as melhores. Custava 1/4 das avaliações e **foi removida**: busca em estágios
+não garante o ótimo global e neste dataset comprovadamente não o encontrava — o melhor pré-processamento
+sob TF-IDF não era o melhor sob bag of words, e a combinação vencedora se perdia por 0,0078 de F1.
 
-`--duas-fases` varre o pré-processamento com a vetorização fixa, seleciona as melhores configurações e
-só então varre a vetorização sobre elas. Custa 1/4 das avaliações, **mas não garante o ótimo global**:
-no dataset de exemplo ele erra o alvo, porque `remover_numeros` é medíocre sob a régua TF-IDF (79º
-lugar) e é a melhor configuração sob bag of words. É a alternativa para quando a varredura completa
-ficar cara demais; nesse caso, use `--top-fase1` alto.
+Manter os dois caminhos custava um parâmetro atravessando seis funções e dois formatos de relatório,
+para oferecer um resultado que a própria documentação desaconselhava usar. Se um dia a varredura
+completa ficar cara demais, o caminho é **reduzir o espaço de busca de propósito** — não voltar a um
+método que erra de um jeito difícil de perceber.
 
 ### 8.2 Saída
 
-Além do relatório no terminal, o experimento grava em `resultados/`:
+Além do relatório no terminal, os dois scripts gravam em `resultados/`:
 
-- **`.csv`** — o ranking completo, uma linha por execução, com todas as colunas de configuração
-- **`.md`** — as tabelas de análise e o top 30, para colar no MR ou na apresentação
+| Arquivo | De quem | O quê |
+|---|---|---|
+| `comparativo_preprocessamento.csv` | `experimento.py` | O ranking completo, uma linha por execução, com todas as colunas de configuração — é este que `ajuste_fino.py` lê de volta |
+| `comparativo_preprocessamento.md` | `experimento.py` | As tabelas de análise e o top 30, para colar no MR |
+| `ajuste_fino.md` | `ajuste_fino.py` | Os eixos do modelo e os valores prontos para colar em `classificador.py` |
 
 ---
 
 ## 9. Como testar
 
 ```bash
-python -m unittest discover tests -v     # 64 testes
+python -m unittest discover tests -v     # 106 testes
 python -m unittest tests.test_vetorizacao -v
 ```
 
@@ -409,7 +605,7 @@ O CSV precisa de duas colunas:
 | `intencao` | O rótulo — hoje `consulta`, `transacao` ou `alerta` |
 
 ```bash
-python -m az1.pln.experimento --dataset caminho/para/seu.csv
+python -m pln.experimento --dataset caminho/para/seu.csv
 ```
 
 Recomendações ao montar o dataset novo:
@@ -468,6 +664,11 @@ permutações de ordem crescem fatorialmente com o número de etapas ativas.
 | Busca em estágios | Perde o ótimo global quando há interação entre escolhas | Por isso o padrão é exaustivo |
 | Confiança alta em pergunta fora do escopo | O agente responde bobagem com cara de certeza | Só o dataset resolve — ver 6.4 |
 | Treino e previsão com pré-processamentos diferentes | O modelo erra mais, sem levantar exceção | Pipeline único, travado por teste |
+| Dataset fácil demais | Todas as configurações empatam e o experimento deixa de ordenar | Ver 7.1 — só um dataset mais difícil resolve |
+| Retokenização na vetorização densa | `nlp(texto).vector` refaz a tokenização e as três estratégias passam a empatar | Média feita à mão sobre `texto.split()`, travado por teste |
+| Variante de NB incompatível com a vetorização | `ValueError` do sklearn que não menciona nem embeddings nem NB | `variantes_compativeis`, recusa com mensagem útil |
+| Tamanho de grade escrito à mão na comparação pareada | Nenhum grupo fica completo e a tabela **some** do relatório sem erro | Derivado de `todas_as_vetorizacoes()`; comparação por família, travado por teste |
+| Cópia do pipeline mantida à mão | As duas divergem e todo conserto precisa ser feito duas vezes | `entregas/pln_completo.py` é gerado, travado por teste |
 
 ---
 
@@ -475,9 +676,12 @@ permutações de ordem crescem fatorialmente com o número de etapas ativas.
 
 | Biblioteca | Para quê |
 |---|---|
-| `scikit-learn` | Vetorizadores, Naive Bayes, regressão logística, validação cruzada, métricas |
+| `scikit-learn` | Vetorizadores, Naive Bayes, validação cruzada, métricas |
 | `nltk` | Lista de stopwords, stemmer RSLP, tokenizador regex |
 | `spacy` + `pt_core_news_sm` | Lematizador e tokenizador linguístico de português |
+| `spacy` + `pt_core_news_md` | Vetores pré-treinados da vetorização densa (fastText CBOW, 20 mil chaves × 300 dimensões) |
 
-O `spacy.blank("pt")` usado na tokenização **não** exige o modelo — só as regras do idioma, que vêm com
-o pacote. O modelo `pt_core_news_sm` é necessário apenas para a lematização.
+O `spacy.blank("pt")` usado na tokenização **não** exige modelo nenhum — só as regras do idioma, que vêm
+com o pacote. Os dois modelos são necessários apenas para o que a tabela diz: `_sm` para a lematização,
+`_md` para os vetores. Sem eles, as funções que os carregam levantam `RuntimeError` com o comando de
+download, em vez de um erro de biblioteca.

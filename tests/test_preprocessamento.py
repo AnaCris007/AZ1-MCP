@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import unittest
 
-from az1.pln.preprocessamento import (
+from pln.preprocessamento import (
     ETAPAS,
     NEGACOES,
     ConfigPreprocessamento,

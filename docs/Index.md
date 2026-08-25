@@ -10,7 +10,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 |---|---|---|
 | [Projeto](./Projeto.md) | Documento central do projeto, reunindo contexto do parceiro, problema, visão e objetivo do produto, personas, jornadas, fluxo de negócio, ideação, Canvas do MVP, riscos, requisitos e visão inicial da solução técnica. | Consulta principal para compreensão técnica e de negócio da solução. |
 | [Gestão do Projeto](./GestaoProjeto.md) | Consolida os acordos permanentes da equipe, o processo de desenvolvimento, o acompanhamento de riscos, as retrospectivas, as ações de melhoria e o planejamento das sprints. | Referência para acompanhamento da organização da equipe e da evolução do projeto. |
-| [Pipeline de PLN](./PipelinePLN.md) | Documentação técnica do módulo `src/az1/pln`: estrutura dos arquivos, as opções de pré-processamento e vetorização, a metodologia de avaliação do experimento, como rodar, como testar e como trocar o dataset. | Referência para quem for mexer no código do pipeline ou interpretar os comparativos. |
+| [Pipeline de PLN](./PipelinePLN.md) | Documentação técnica do módulo `src/pln`: estrutura dos arquivos, as opções de pré-processamento e vetorização, a metodologia de avaliação do experimento, como rodar, como testar e como trocar o dataset. | Referência para quem for mexer no código do pipeline ou interpretar os comparativos. |
 | [Gestão de Configuração](./GestaoConfiguracao.md) | Define o Gitflow adotado, o papel das branches, as convenções de nomenclatura, as políticas de commits e Merge Requests, os procedimentos de integração e os exemplos de aplicação. | Referência para versionamento, rastreabilidade e colaboração no GitLab. |
 
 ## Guia rápido por tema
