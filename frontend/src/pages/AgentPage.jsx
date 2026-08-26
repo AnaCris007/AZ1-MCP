@@ -2,29 +2,29 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, Mic } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import AgentOrb from '../components/AgentOrb/AgentOrb'
+import CalendarView from '../components/CalendarView/CalendarView'
 import ChatMessage from '../components/ChatMessage/ChatMessage'
 import IconRail from '../components/IconRail/IconRail'
 import PromptBar from '../components/PromptBar/PromptBar'
 import SettingsModal from '../components/SettingsModal/SettingsModal'
 import Sidebar, { SidebarOpenButton } from '../components/Sidebar/Sidebar'
+import TasksView from '../components/TasksView/TasksView'
 import TopBar from '../components/TopBar/TopBar'
 import metroMapPattern from '../assets/metro-map-pattern.svg'
 import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
+import { sendMessage } from '../lib/api'
 
-const TAB_LABELS = {
-  calendar: 'Agenda',
-  tasks: 'Tarefas',
-}
-
-const INITIAL_CONVERSATIONS = [
-  { id: '1', title: 'Status do projeto Alfa' },
-  { id: '2', title: 'Revisão de documentos de escopo' },
-  { id: '3', title: 'Pendências da sprint atual' },
-]
-
-const MOCK_REPLY =
+const FALLBACK_REPLY =
   'Estou aqui para ajudar. Em breve estarei conectado aos serviços de fala e processamento de linguagem natural para responder de forma completa.'
+
+const TITLE_MAX_LENGTH = 42
+
+function titleFromMessage(text) {
+  return text.length > TITLE_MAX_LENGTH
+    ? `${text.slice(0, TITLE_MAX_LENGTH).trimEnd()}…`
+    : text
+}
 
 export default function AgentPage() {
   const { theme, mode, setMode, toggleTheme } = useTheme()
@@ -35,7 +35,8 @@ export default function AgentPage() {
   )
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [conversations] = useState(INITIAL_CONVERSATIONS)
+  const [conversations, setConversations] = useState([])
+  const [conversationHistory, setConversationHistory] = useState({})
   const [activeId, setActiveId] = useState(null)
   const [messages, setMessages] = useState([])
   const [inputValue, setInputValue] = useState('')
@@ -52,24 +53,49 @@ export default function AgentPage() {
     }
   }, [messages, isProcessing])
 
+  useEffect(() => {
+    if (!activeId) return
+    setConversationHistory((prev) => ({ ...prev, [activeId]: messages }))
+  }, [activeId, messages])
+
   const submitMessage = (text) => {
     const trimmed = text.trim()
     if (!trimmed) return
+
+    const conversationId = activeId ?? crypto.randomUUID()
+
+    if (!activeId) {
+      setActiveId(conversationId)
+      setConversations((prev) => [
+        { id: conversationId, title: titleFromMessage(trimmed) },
+        ...prev,
+      ])
+    }
 
     setMessages((prev) => [...prev, { role: 'user', content: trimmed }])
     setInputValue('')
     setIsProcessing(true)
 
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { role: 'agent', content: MOCK_REPLY }])
-      setIsProcessing(false)
-    }, 1200)
+    sendMessage(trimmed, conversationId)
+      .then((data) => {
+        setMessages((prev) => [...prev, { role: 'agent', content: data.reply }])
+      })
+      .catch(() => {
+        console.info('[chat] backend indisponível, usando resposta de exemplo')
+        setMessages((prev) => [...prev, { role: 'agent', content: FALLBACK_REPLY }])
+      })
+      .finally(() => setIsProcessing(false))
   }
 
   const handleNewConversation = () => {
     setMessages([])
     setActiveId(null)
     setInputValue('')
+  }
+
+  const handleSelectConversation = (id) => {
+    setActiveId(id)
+    setMessages(conversationHistory[id] ?? [])
   }
 
   const handleToggleListening = () => {
@@ -123,7 +149,7 @@ export default function AgentPage() {
           onToggle={() => setSidebarCollapsed(true)}
           conversations={conversations}
           activeId={activeId}
-          onSelectConversation={setActiveId}
+          onSelectConversation={handleSelectConversation}
           onNewConversation={handleNewConversation}
         />
       </div>
@@ -136,7 +162,7 @@ export default function AgentPage() {
             conversations={conversations}
             activeId={activeId}
             onSelectConversation={(id) => {
-              setActiveId(id)
+              handleSelectConversation(id)
               setMobileSidebarOpen(false)
             }}
             onNewConversation={() => {
@@ -176,7 +202,14 @@ export default function AgentPage() {
           }
         />
 
-        <main className="flex min-h-0 flex-1 flex-col">
+        <main
+          className="flex min-h-0 flex-1 flex-col"
+          style={{
+            backgroundImage: `url("${metroMapPattern}")`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: '340px 340px',
+          }}
+        >
           {activeTab === 'voice' ? (
             <div className="flex flex-1 flex-col items-center justify-center px-4 pb-10">
               <motion.div
@@ -203,24 +236,12 @@ export default function AgentPage() {
                 Voltar para o chat
               </button>
             </div>
-          ) : activeTab !== 'chat' ? (
-            <div className="flex flex-1 flex-col items-center justify-center px-4 pb-10">
-              <p className="text-[18px] font-medium text-text-primary">
-                {TAB_LABELS[activeTab]}
-              </p>
-              <p className="mt-2 text-center text-[13px] text-text-secondary">
-                Em breve.
-              </p>
-            </div>
+          ) : activeTab === 'calendar' ? (
+            <CalendarView />
+          ) : activeTab === 'tasks' ? (
+            <TasksView />
           ) : !hasStarted ? (
-            <div
-              className="flex flex-1 flex-col items-center justify-center px-4 pb-10"
-              style={{
-                backgroundImage: `url("${metroMapPattern}")`,
-                backgroundRepeat: 'repeat',
-                backgroundSize: '340px 340px',
-              }}
-            >
+            <div className="flex flex-1 flex-col items-center justify-center px-4 pb-10">
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -250,7 +271,10 @@ export default function AgentPage() {
               </motion.p>
             </div>
           ) : (
-            <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 pt-6">
+            <div
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto bg-background/90 px-4 pt-6"
+            >
               <div className="mx-auto flex w-full max-w-[720px] flex-col">
                 <AnimatePresence initial={false}>
                   {messages.map((message, index) => (
@@ -272,7 +296,9 @@ export default function AgentPage() {
           )}
 
           {activeTab === 'chat' && (
-            <div className="shrink-0 px-4 pb-6 pt-3">
+            <div
+              className={`shrink-0 px-4 pb-6 pt-3 ${hasStarted ? 'bg-background/90' : ''}`}
+            >
               <PromptBar
                 value={inputValue}
                 onChange={setInputValue}
@@ -283,6 +309,8 @@ export default function AgentPage() {
             </div>
           )}
         </main>
+
+        <div className="h-16 shrink-0 md:hidden" />
       </div>
 
       <SettingsModal

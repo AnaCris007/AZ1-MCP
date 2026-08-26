@@ -10,8 +10,8 @@ const NAV_ITEMS = [
 
 export default function IconRail({ activeTab, onSelectTab }) {
   return (
-    <nav className="hidden w-16 shrink-0 flex-col items-center gap-1 bg-sidebar py-4 md:flex">
-      <div className="mb-4 flex h-9 w-9 items-center justify-center">
+    <nav className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-around border-t border-border bg-sidebar py-2 md:static md:z-auto md:w-16 md:shrink-0 md:flex-col md:items-center md:justify-start md:gap-1 md:border-t-0 md:py-4">
+      <div className="mb-4 hidden h-9 w-9 items-center justify-center md:flex">
         <Logo size={36} />
       </div>
 
