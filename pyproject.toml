@@ -1,0 +1,72 @@
+# =============================================================================
+# az1 — configuração de pacote e de ferramentas
+# =============================================================================
+# A existência deste arquivo é o que permite `pip install -e .` e, com isso,
+# `from pln import ...` funcionar de qualquer pasta, em qualquer script, sem
+# nenhum `sys.path.insert`. Manipular sys.path é o remendo que se usa na
+# ausência de um pacote instalado: funciona no arquivo onde foi escrito e
+# quebra assim que alguém importa o módulo de outro lugar.
+#
+# Layout adotado: "src layout". O código fica em src/ e não na raiz do
+# repositório. A vantagem é que os testes rodam contra o pacote INSTALADO, e
+# não contra os arquivos soltos ao lado — se um import estiver quebrado ou um
+# arquivo de dados não for empacotado, o teste falha aqui, e não no deploy.
+#
+# POR QUE HATCHLING E NÃO SETUPTOOLS
+# ----------------------------------
+# São dois backends de build equivalentes para o nosso caso. A diferença que
+# motivou a troca é visível: o setuptools materializa um diretório
+# `az1.egg-info/` dentro de `src/` a cada `pip install -e .` — metadados de
+# build no meio do código-fonte, que todo mundo precisa aprender a ignorar. O
+# hatchling não cria nada disso na árvore de trabalho.
+#
+# O nome da DISTRIBUIÇÃO (`az1`, abaixo) e os nomes de IMPORT (`pln`,
+# `schemas`) são coisas separadas e não precisam coincidir — é o mesmo arranjo
+# de `scikit-learn`, que se importa como `sklearn`.
+# =============================================================================
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "az1"
+version = "0.1.0"
+description = "Agente de apoio à gestão do portfólio de projetos do PMO do Metrô de São Paulo"
+requires-python = ">=3.12"
+dependencies = [
+    "av>=14.0",
+    "boto3>=1.35",
+    "fastapi>=0.115",
+    "joblib>=1.3",
+    "nltk>=3.8",
+    "numpy>=1.26",
+    "pydantic>=2",
+    "python-multipart>=0.0.12",
+    "scikit-learn>=1.4",
+    "spacy>=3.7",
+    "uvicorn[standard]>=0.30",
+]
+
+[project.optional-dependencies]
+# Ferramentas de desenvolvimento, não necessárias para executar o agente.
+dev = [
+    "httpx>=0.27",
+    "ruff==0.16.2",
+]
+
+# Os pacotes de topo do projeto. Precisam ser listados explicitamente
+# porque estão sob `src/` — sem isto o hatchling procuraria por um pacote de
+# nome igual ao da distribuição (`az1/`), que não existe.
+#
+# Arquivos de dados que moram DENTRO de um pacote (o caso de
+# `pln/dados/*.csv`) entram no wheel automaticamente. Sem isso o experimento
+# quebraria ao rodar fora da pasta do repositório.
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/az1_api",
+    "src/pln",
+    "src/routes",
+    "src/schemas",
+    "src/services",
+]
