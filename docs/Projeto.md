@@ -1717,102 +1717,183 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 ### 3.6 Processo de Deploy em Nuvem
 
+Esta seção descreve como a solução sai do ambiente de desenvolvimento e passa a executar em nuvem: qual provedor foi escolhido e por quê (3.6.1), como os artefatos se distribuem entre os nós de execução (3.6.2), quais serviços gratuitos sustentam o ambiente acadêmico (3.6.3), quais passos reproduzem a implantação do zero (3.6.4), qual o contrato da API implantada (3.6.5), como cada alteração de código chega aos ambientes (3.6.6) e como verificar que tudo subiu corretamente (3.6.7). As seções 3.6.8 e 3.6.9 registram, respectivamente, o caminho para produção e as decisões técnicas ainda em aberto.
+
 #### 3.6.1 Arquitetura e Provedor Selecionado
 
 O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **ecossistema Microsoft**, integrando-se nativamente ao ambiente corporativo do parceiro (Copilot Studio, Power Platform, Teams, SharePoint). Para ambientes acadêmicos, a solução utiliza exclusivamente serviços gratuitos do **Microsoft Azure** e do **Microsoft 365 Developer Program**, sem custo permanente.
 
 **Componentes principais:**
 
-| Componente | Serviço Microsoft | Justificativa |
-|-----------|------------------|--------------|
-| Hospedagem do modelo | Azure App Service (tier gratuito) | HTTP API nativa, escalável, integrado com ecossistema Microsoft |
-| Orquestração do agente | Copilot Studio | Orquestração de ações, fluxos, e integração com Power Automate |
-| Persistência de dados | Azure SQL Database (free tier 12 meses) ou Cosmos DB (free tier 25 GB) | Dados estruturados, integração nativa com Power Platform |
-| Conversão de voz | Azure Cognitive Services (Speech-to-Text) | Free tier generoso: 5 horas/mês grátis |
-| Integração de processos | Power Automate | Automações e orquestração de workflows |
-| Ambiente completo | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários, inclui Teams, SharePoint, Entra ID |
+| Componente | Nó no diagrama | Serviço Microsoft | Justificativa |
+|---|---|---|---|
+| Interface web | Web App Frontend | Azure App Service | Serve a Chat UI construída em React, TypeScript e Next.js |
+| Núcleo da aplicação | Web App Backend | Azure App Service | Hospeda o pipeline de PLN, as regras de negócio e as APIs REST |
+| Empacotamento e publicação | Docker - Azure Container | Azure Container Registry | Guarda as imagens de frontend e backend utilizadas na implantação |
+| Persistência de dados | Database - Azure Storage | Azure SQL Database (free tier 12 meses) | Banco relacional único, com os schemas de portfólio e de auditoria |
+| Armazenamento de arquivos | Bucket Storage | Azure Blob Storage | Conteúdo não relacional: prompts e documentos sintéticos |
+| Conversão de voz | API de Transcrição | Azure AI Speech (Speech to Text) | Free tier de 5 horas de áudio por mês |
+| Modelo de linguagem | LLM | API de modelo de linguagem | Geração de respostas e apoio à recuperação de informação |
+| Observabilidade | Rastreabilidade | Application Insights | Telemetria e logs técnicos, distintos do log de auditoria |
+| Ambiente completo | — | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários; base da integração futura |
 
 **Por que essa arquitetura:**
-- **Alinhamento com parceiro** — Todo o ecossistema real de produção é Microsoft
-- **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados
-- **Custo zero acadêmico** — Azure Free Tier + M365 Dev Program cobrem tudo sem limites de 12 meses para ambiente de desenvolvimento
-- **Reprodutibilidade** — Qualquer pessoa com account Microsoft consegue replicar em ambiente sandbox
 
-**Arquitetura em alto nível:**  
+- **Alinhamento com o parceiro** — todo o ecossistema real de produção do Metrô é Microsoft;
+- **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados quando a solução for promovida;
+- **Custo zero acadêmico** — Azure Free Tier e M365 Developer Program cobrem o ambiente de desenvolvimento sem cobrança;
+- **Reprodutibilidade** — qualquer integrante com conta Microsoft consegue replicar o ambiente em sandbox;
+- **Banco único** — a persistência estruturada foi concentrada em um único banco relacional, sem introduzir base não relacional, conforme decidido na Seção 2.5.
 
-```
-Usuário em Teams / Copilot Studio (Microsoft 365)
-        ↓
-  Copilot Studio (orquestração nativa)
-        ├→ Power Automate (automações)
-        ├→ Azure App Service (API do modelo NLP)
-        │       ├→ Azure SQL Database / Cosmos DB (logs, histórico)
-        │       └→ Application Insights (monitoramento)
-        ├→ Azure Cognitive Services (STT/TTS)
-        └→ SharePoint / OneDrive (documentos integrados)
-```
+#### 3.6.2 Diagrama de Implantação
 
+ Enquanto o diagrama de componentes da Seção 2.4 responde *o que* a solução faz, organizando as responsabilidades em três camadas lógicas, o diagrama de implantação responde *onde* cada uma dessas responsabilidades passa a executar depois do deploy. É a passagem da visão lógica para a visão física: os mesmos componentes especificados nas Seções 2.2 e 2.3 reaparecem aqui distribuídos entre nós concretos de execução, cada um com um serviço de nuvem correspondente e um protocolo definido de comunicação.
 
-#### 3.6.2 Serviços Gratuitos e Limites
+ A notação adotada é a de diagrama de implantação da UML, no mesmo padrão empregado pela documentação de arquitetura da Microsoft para soluções hospedadas em Azure. Cada cubo representa um `<<Node>>`, isto é, um ambiente de execução com identidade própria — uma máquina, um contêiner ou um serviço gerenciado. Os retângulos internos representam os elementos implantados nesse nó: `<<Component>>` para unidades com comportamento em tempo de execução e `<<Artifact>>` para arquivos entregues, como as imagens de contêiner. As linhas entre os nós são caminhos de comunicação, e o rótulo de cada uma indica o protocolo empregado.
+
+ A organização em nós separa três fronteiras que importam para o projeto. A primeira é a fronteira do cliente: o nó **Internet - Browser** é o único que executa fora da infraestrutura de nuvem, na máquina do profissional do PMO. A segunda é a fronteira da assinatura: a **Instância de Deploy na Nuvem** reúne tudo o que a equipe provisiona e controla. A terceira é a fronteira do serviço externo: o nó **LLM** aparece fora da instância porque o modelo de linguagem é consumido como serviço de terceiro, o que tem consequências diretas sobre autenticação, custo e tráfego de dados — motivo pelo qual, no MVP, apenas dados sintéticos transitam por ele.
+
+##### Diagrama de implantação (UML)
+
+<div align="center">
+<sub>Imagem 3.6.1 - Diagrama de implantação (UML) — Distribuição dos artefatos da solução em nuvem</sub><br>
+  <img src="../assets/diagrama_de_deploy.drawio.svg" width="100%" alt="Diagrama de implantação UML da solução: o nó Internet - Browser contém a Chat UI e a Captura de áudio; a Instância de Deploy na Nuvem contém os nós Web App Frontend, Docker - Azure Container, Web App Backend com nove componentes, API de Transcrição, Database - Azure Storage, Bucket Storage e Rastreabilidade; o nó LLM aparece fora da instância de nuvem"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+<p align="center">
+  Para melhor visualização do diagrama, acesse o arquivo no <a href="#">Google Drive</a>. [PENDENTE — publicar o arquivo e substituir o link.]
+</p>
+
+##### Descrição dos nós de execução
+
+| Nó | Elementos implantados | Responsabilidade |
+|---|---|---|
+| **Internet - Browser** | Chat UI, Captura de áudio | Único nó fora da infraestrutura de nuvem: executa no navegador da máquina do profissional do PMO. A Chat UI é o código de interface baixado do Web App Frontend e executado localmente; é por ela que a solicitação é digitada e que a resposta é exibida junto da fonte consultada e da data de referência (RF02 e RF03). A Captura de áudio grava a mensagem falada e a encaminha como arquivo ao backend, atendendo ao canal de voz previsto no RF01 e à acessibilidade exigida pelo RNF06. Nenhum processamento de linguagem natural ocorre neste nó: ele apenas coleta a entrada e apresenta a saída. |
+| **Web App Frontend** | React + TypeScript + Next.js, Assets estáticos | Hospeda a aplicação cliente e a entrega ao navegador. Os Assets estáticos reúnem os arquivos de JavaScript, folhas de estilo e fontes que compõem a Chat UI; o bloco React + TypeScript + Next.js responde pela construção e pela renderização dessas telas. A separação em relação ao Web App Backend mantém a aplicação cliente desacoplada do núcleo, condição do RNF05 para que outras aplicações possam futuramente consumir a mesma API. |
+| **Docker - Azure Container** | `<<Artifact>>` Imagens frontend + backend | Registro das imagens de contêiner produzidas pelo pipeline descrito na Seção 3.6.6. Não participa da execução: sua função é guardar a versão exata de frontend e backend que foi construída, testada e aprovada, para que os dois Web Apps obtenham dela a imagem no momento da implantação. É esse nó que garante que a versão validada em homologação seja idêntica à promovida para produção. |
+| **Web App Backend** | API Gateway, Controle de Acesso implícito no Gateway, PLN - Compreensão, PLN - Transações e Ações, API de Recebimento de áudio, API de Transcrição, Gerador de Respostas, Auditoria e Feedback, Agendador, Lista de Tarefas | Concentra toda a camada de lógica de negócio definida na Seção 2.4. O API Gateway centraliza a entrada das solicitações e autentica o usuário antes de qualquer processamento (RNF02). A API de Recebimento de áudio aceita o arquivo enviado pelo navegador e a API de Transcrição atua como cliente do serviço de voz, de modo que áudio e texto convergem para o mesmo fluxo (RF01 e RNF06). O PLN - Compreensão classifica a intenção e extrai os parâmetros da solicitação (RNF03), encaminhando pedidos de preenchimento e alertas ao PLN - Transações e Ações (RF04, RF05 e RF06) e consultas ao Gerador de Respostas (RF02), que monta a saída e informa a fonte e a justificativa (RF03 e RNF11). O Agendador executa as verificações periódicas que não dependem de solicitação do usuário e alimenta a Lista de Tarefas com as pendências encontradas, sustentando o acompanhamento preventivo do RF05. O Auditoria e Feedback registra usuário, data, canal, intenção, fontes e resultado de cada interação (RNF04). |
+| **API de Transcrição** | Speech to Text | Serviço gerenciado de conversão de fala em texto, provisionado na mesma assinatura. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. |
+| **Database - Azure Storage** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback exigidos pelo RNF04. A separação em dois schemas, e não em dois bancos, atende à exigência da Seção 2.4 de proteger os logs contra alteração por usuário comum — o controle é feito por permissão — sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. |
+| **Bucket Storage** | Armazenamento de Prompts | Armazenamento de objetos para o conteúdo que não se representa bem em modelo relacional. Guarda os prompts utilizados pelo pipeline de PLN, versionados de forma independente do código, o que permite ajustá-los sem reconstruir a imagem do backend. |
+| **Rastreabilidade** | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois Web Apps. Não se confunde com o schema `auditoria`: a Rastreabilidade responde à pergunta técnica de saber se o sistema está funcionando, enquanto a auditoria responde à pergunta de negócio de saber quem pediu o quê e com qual resultado (RNF04). São dados com público, retenção e requisito de imutabilidade distintos, e por isso ficam em nós distintos. |
+| **LLM** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11). Por estar fora da fronteira da assinatura, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
+
+##### Caminhos de comunicação
+
+| Origem → destino | Protocolo ou mecanismo | Momento | Dados e motivo da conexão |
+|---|---|---|---|
+| Usuário → Internet - Browser | Interação direta | Execução | Solicitação digitada ou falada pelo profissional do PMO. |
+| Chat UI → Web App Frontend | HTTPS | Execução | Baixa os arquivos que compõem a interface — JavaScript, folhas de estilo e fontes — na primeira visita e a cada nova versão publicada. |
+| Captura de áudio → API de Recebimento de áudio | HTTPS/REST | Execução | Envia o arquivo de áudio gravado no navegador para que a transcrição ocorra no servidor, e não no cliente. |
+| Chat UI → API Gateway | HTTPS/REST | Execução | Envia a solicitação em texto e recebe a resposta estruturada, mantendo a aplicação cliente desacoplada da lógica interna (RNF05). |
+| API de Recebimento de áudio → API de Transcrição | HTTPS/REST | Execução | Encaminha o áudio ao serviço de voz e recebe o texto transcrito, que segue pelo mesmo fluxo das mensagens digitadas. |
+| Web App Backend → LLM | HTTPS/REST | Execução | Envia o contexto recuperado e recebe a resposta gerada em linguagem natural, empregada pelo Gerador de Respostas. |
+| Web App Backend → Database - Azure Storage | SQL sobre TLS | Execução | Consulta os dados do portfólio para responder e para identificar pendências, e grava os registros de auditoria. |
+| Web App Backend → Bucket Storage | HTTPS com SDK | Execução | Lê os prompts utilizados pelo pipeline de PLN. |
+| Auditoria e Feedback → Rastreabilidade | Telemetria | Execução | Publica eventos, métricas e logs técnicos para monitoramento da disponibilidade e do desempenho. |
+| Docker - Azure Container → Web App Frontend | `docker pull` | Implantação | Entrega a imagem do frontend ao App Service no momento do deploy. |
+| Docker - Azure Container → Web App Backend | `docker pull` | Implantação | Entrega a imagem do backend ao App Service no momento do deploy. |
+
+ A coluna **Momento** separa os dois planos que o diagrama necessariamente sobrepõe. As conexões de **Execução** ocorrem a cada interação do usuário e trafegam dados por HTTP, SQL ou SDK. As conexões de **Implantação** ocorrem uma única vez a cada deploy, quando o App Service obtém a imagem no registro e sobe o contêiner. A distinção evita a leitura equivocada de que o navegador obteria imagens de contêiner: o navegador participa apenas do primeiro plano e recebe arquivos servidos pelo Web App Frontend.
+
+##### Fluxo de uma solicitação ponta a ponta
+
+ Os três percursos a seguir descrevem como os nós do diagrama cooperam nos cenários especificados na Seção 2.2.2, e cobrem todos os elementos implantados.
+
+ **Consulta em texto.** O profissional abre o AZ1 no navegador; a Chat UI já foi baixada do Web App Frontend e executa localmente. Ao enviar a pergunta, a Chat UI faz uma requisição HTTPS ao API Gateway, no Web App Backend, que autentica o usuário e valida suas permissões antes de prosseguir (RNF02). O PLN - Compreensão classifica a solicitação como consulta e extrai os parâmetros mencionados, como o nome do projeto e o período (RNF03). O Gerador de Respostas consulta o schema `portfolio` no banco, recupera os prompts necessários no Bucket Storage e aciona o LLM para redigir a resposta, que retorna à Chat UI acompanhada da fonte consultada e da data de referência (RF02 e RF03). Em paralelo, o Auditoria e Feedback grava a interação no schema `auditoria` e publica os eventos técnicos na Rastreabilidade (RNF04).
+
+ **Solicitação por voz.** O percurso difere apenas na entrada. A Captura de áudio grava a mensagem falada e a envia à API de Recebimento de áudio, que valida o arquivo e o repassa à API de Transcrição; esta atua como cliente do serviço Speech to Text e devolve o texto correspondente. A partir desse ponto, a solicitação segue exatamente o mesmo caminho da consulta em texto, o que atende ao RF01 sem exigir um segundo pipeline de intenções e preserva a acessibilidade prevista no RNF06.
+
+ **Alerta proativo.** Este percurso não parte do usuário. O Agendador executa verificações periódicas sobre o schema `portfolio`, identificando prazos próximos, campos incompletos e documentos ausentes. As pendências encontradas alimentam a Lista de Tarefas, e o PLN - Transações e Ações as converte em alertas e sugestões de preenchimento, apresentados ao profissional quando ele acessa a interface (RF04, RF05 e RF06). Também aqui o Auditoria e Feedback registra o alerta gerado, de modo que a origem de cada recomendação permaneça rastreável.
+
+ Em nenhum dos três percursos o agente altera de forma autônoma os registros do portfólio: a solução sugere e alerta, e a responsabilidade pelo registro e pela decisão permanece com o profissional, conforme delimitado na Seção 1.3.
+
+##### Correspondência entre os componentes lógicos e os nós de execução
+
+ A tabela a seguir fecha a rastreabilidade entre a visão lógica da Seção 2.4 e a visão física desta seção, permitindo verificar que nenhum componente especificado ficou sem lugar de execução definido.
+
+| Componente da Seção 2.4 | Nó de execução | Observação |
+|---|---|---|
+| Chat UI - Texto e Voz | Internet - Browser, servida pelo Web App Frontend | O componente executa no navegador; o Web App Frontend é o nó que o entrega. |
+| API Gateway | Web App Backend | Ponto único de entrada; concentra também a autenticação e a validação de permissões. |
+| Conversão de Áudio em Texto | Web App Backend e API de Transcrição | Dividido em dois elementos: a API de Recebimento de áudio e a API de Transcrição no backend, e o Speech to Text no serviço gerenciado. |
+| Controle de Acesso | Web App Backend | Implantado junto ao API Gateway, aplicado antes de qualquer processamento de linguagem. |
+| PLN - Compreensão | Web App Backend | Classificação de intenção e extração de parâmetros. |
+| PLN - Transações e Ações | Web App Backend | Sugestões e alertas, apoiado pelo Agendador e pela Lista de Tarefas. |
+| Gerador de Respostas e Explicabilidade | Web App Backend, com apoio do LLM | A composição da resposta e a indicação da fonte permanecem no backend; o LLM apoia a redação. |
+| Auditoria e Feedback | Web App Backend | Grava no schema `auditoria` e publica telemetria na Rastreabilidade. |
+| Repositório de Dados e Conhecimento | Database - Azure Storage e Bucket Storage | Dados estruturados no banco; conteúdo não relacional no armazenamento de objetos. |
+| Logs de Auditoria | Database - Azure Storage, schema `auditoria` | Separados dos dados operacionais por schema e por permissão (RNF04). |
+
+#### 3.6.3 Serviços Gratuitos e Limites
 
 **Azure Free Tier (sempre gratuito):**
-- Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação/dia)
-- Azure Cognitive Services: 5.000 requisições/mês de Speech, 5.000 requisições/mês de Text
-- Application Insights: 1 GB/mês de ingestão de logs
+
+- Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação por dia)
+- Azure AI Speech: 5 horas de áudio por mês no tier F0
+- Application Insights: 1 GB por mês de ingestão de logs
 
 **Azure Free Tier (12 meses iniciais):**
+
 - Azure SQL Database: 1 banco com até 5 GB grátis
 - Azure Container Registry: 1 registro com 500 MB grátis
+- Azure Blob Storage: cota gratuita de armazenamento e transações
 
 **Microsoft 365 Developer Program:**
+
 - Tenant completo com 25 usuários
-- Teams, SharePoint, OneDrive, Power Platform, Copilot Studio inclusos
+- Teams, SharePoint, OneDrive, Power Platform e Copilot Studio inclusos
 - Válido enquanto ativo (renovável)
 
-**Para projeto acadêmico sem time constraint:**
-Use Azure Free Tier (sempre grátis) + M365 Dev Program. Para produção real, migre para planos pagos mantendo a mesma arquitetura.
+**Para o projeto acadêmico:**
+Utilizar Azure Free Tier somado ao M365 Developer Program. Para produção real, migrar para planos pagos mantendo a mesma arquitetura e as mesmas imagens.
 
-#### 3.6.3 Etapas de Configuração e Implantação
+#### 3.6.4 Etapas de Configuração e Implantação
 
-**Passo 1 — Criar Ambientes Microsoft:**
-1. Registrar-se em [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
-2. Criar tenant sandbox (instantâneo, pré-configurado)
-3. Registrar-se em [Azure Portal](https://portal.azure.com) com a mesma conta
-4. Ativar free tier credits (se aplicável)
+**Passo 1 — Criar os ambientes Microsoft:**
 
-**Passo 2 — Configurar Azure para Hospedagem do Modelo:**
-1. Criar resource group `az1-nlp-dev`
-2. Criar Azure App Service (tier B1 Free ou B1 Basic)
-3. Configurar deployment via Git ou Docker (Azure Container Registry)
-4. Criar Azure SQL Database ou Cosmos DB para persistência
+1. Registrar-se no [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
+2. Criar o tenant sandbox (instantâneo, pré-configurado)
+3. Registrar-se no [Azure Portal](https://portal.azure.com) com a mesma conta
+4. Ativar os créditos de free tier, se aplicável
 
-**Passo 3 — Preparar Modelo e API:**
-1. Estruturar projeto Python em `src/nlp-deploy/`
-2. Criar aplicação Flask/FastAPI com endpoint `/classify` que recebe `{"text": "..."}`
-3. Exportar modelo treinado (TF-IDF + LogReg ou BERTimbau em ONNX) para diretório `model/`
-4. Criar `requirements.txt` com dependências (flask, scikit-learn, joblib, ou onnxruntime)
+**Passo 2 — Provisionar a infraestrutura:**
 
-**Passo 4 — Containerizar e Publicar:**
-1. Criar `Dockerfile` baseado em `python:3.11-slim`
-2. Testar localmente com `docker run`
-3. Fazer build e push para Azure Container Registry
-4. Atualizar App Service para usar imagem do ACR
+1. Criar o resource group `az1-nlp-dev`
+2. Criar o App Service Plan e os dois Web Apps: frontend e backend
+3. Criar o Azure Container Registry que abrigará as imagens
+4. Criar o Azure SQL Database e aplicar os schemas `portfolio` e `auditoria`
+5. Criar a conta de Blob Storage
+6. Provisionar o recurso de Azure AI Speech e o acesso ao modelo de linguagem
+7. Criar o recurso de Application Insights e vinculá-lo aos dois Web Apps
 
-**Passo 5 — Configurar Copilot Studio:**
-1. Acessar [Copilot Studio](https://copilotstudio.microsoft.com) via M365 Dev tenant
-2. Criar novo Copilot (agent)
-3. Adicionar ação customizada que chama URL do Azure App Service
-4. Configurar fluxo: receber texto → chamar API NLP → retornar intenção e confiança
-5. Testar em preview dentro do Copilot Studio
-6. Publicar para Teams
+**Passo 3 — Preparar o backend:**
 
-**Passo 6 — Integração com Power Automate (Opcional):**
-1. Criar cloud flow acionado por evento (ex: novo documento no SharePoint)
-2. Chamar ação customizada do Copilot Studio ou diretamente API do Azure App Service
-3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
-4. Enviar notificação para usuário via Teams
+1. Estruturar o projeto Python em `src/nlp-deploy/`
+2. Implementar os endpoints do Web App Backend, incluindo `/classify`, `/audio` e `/health`
+3. Exportar o modelo treinado para o diretório `model/`
+4. Declarar as dependências em `requirements.txt`
 
-#### 3.6.4 Exemplo de API (Flask)
+**Passo 4 — Containerizar e publicar:**
+
+1. Criar o `Dockerfile` baseado em `python:3.11-slim`
+2. Testar localmente com `docker run` ou `docker compose up`
+3. Fazer o build e o push das imagens para o Azure Container Registry
+4. Apontar cada Web App para a imagem correspondente no registro
+
+**Passo 5 — Configurar variáveis e segredos:**
+
+1. Registrar a cadeia de conexão do banco e as chaves dos serviços nas configurações do App Service
+2. Não versionar segredos: o `.env` permanece fora do repositório, conforme o `.gitignore`
+
+**Passo 6 — Integração futura com o ecossistema Microsoft (fora do escopo do MVP):**
+
+1. Criar o agente no Copilot Studio e adicionar uma ação que chame a URL do backend
+2. Criar fluxos no Power Automate acionados por eventos do SharePoint
+3. Publicar o agente no Teams e integrar a autenticação ao Microsoft Entra ID
+
+#### 3.6.5 Exemplo de API (Flask)
 
 ```python
 # src/nlp-deploy/app.py
@@ -1828,7 +1909,7 @@ app = Flask(__name__)
 # Carregar modelo
 modelo = joblib.load("model/model.joblib")
 
-# Conexão com banco (Azure SQL ou Postgres)
+# Conexão com banco (Azure SQL)
 # Para dev local: sqlite:///local.db
 # Para Azure SQL: mssql+pyodbc://user:pass@server.database.windows.net/db
 DATABASE_URL = "sqlite:///./classifications.db"
@@ -1886,23 +1967,55 @@ EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 ```
 
-#### 3.6.5 Reprodutibilidade e Verificação
+#### 3.6.6 Processo de Entrega Contínua
+
+O diagrama da Seção 3.6.2 descreve o **estado final** da implantação. Esta seção descreve o **caminho** até ele: o que acontece entre um commit e a imagem em execução, apoiado no fluxo de branches definido no documento de Gestão de Configuração.
+
+**Etapas do pipeline:**
+
+| Etapa | O que faz | Ferramenta |
+|---|---|---|
+| 01 — Lint | Verifica padrão de código no backend e no frontend | `ruff` · `eslint` |
+| 02 — Testes | Executa a suíte automatizada e apura a cobertura | `pytest` |
+| 03 — Build | Constrói as imagens de frontend e de backend | Docker |
+| 04 — Registro | Publica as imagens no Azure Container Registry | `docker push` |
+| 05 — Deploy | Faz o Web App buscar a imagem e aplica as migrações do banco | `docker pull` |
+| 06 — Verificação | Confirma que a aplicação respondeu após subir | `GET /health` |
+
+**Gatilhos e destinos:**
+
+| Gatilho | Etapas executadas | Destino | Aprovação |
+|---|---|---|---|
+| `push` em `feature/*` ou `fix/*` | 01 a 03 | Nenhum ambiente | Automática — a falha bloqueia o Merge Request |
+| `merge` em `develop` | 01 a 06 | Ambiente de homologação | Automática, após Merge Request aprovado por revisor |
+| `merge` em `main` com tag `vX.Y.Z` | 01 a 06 | Ambiente de produção | Manual, por portão no pipeline |
+| `hotfix/*` a partir de `main` | 01 a 06 | Ambiente de produção | Manual, com merge de retorno obrigatório para `develop` |
+
+As quatro rotas compartilham as mesmas quatro primeiras etapas e divergem apenas no destino. É isso que torna o processo auditável: a imagem que entra em produção é exatamente a mesma que passou pelos testes e que já rodou em homologação, identificada pela tag da versão.
+
+**Ambiente local:** antes da etapa 01, o desenvolvimento roda com `docker compose up`, que sobe backend, frontend e banco a partir das mesmas imagens usadas pelo pipeline. É essa paridade entre desenvolvimento e implantação que justifica a adoção do Docker registrada na Seção 2.5.
+
+#### 3.6.7 Reprodutibilidade e Verificação
 
 **Checklist de custo (garantir zero spend):**
-- [ ] Azure App Service em tier Free (1 instância)
-- [ ] Azure SQL Database com free tier (primeiros 12 meses)
-- [ ] Cognitive Services em free tier (limites respeitados)
-- [ ] M365 Dev Program ativo (sandbox, sem custo)
+
+- [ ] Azure App Service em tier gratuito
+- [ ] Azure SQL Database com free tier ativo
+- [ ] Azure AI Speech em free tier, com os limites respeitados
+- [ ] Azure Container Registry dentro da cota gratuita
+- [ ] M365 Developer Program ativo (sandbox, sem custo)
 - [ ] Nenhum recurso em tier "Standard" ou "Premium" ativo
 
 **Checklist de funcionalidade:**
-- [ ] Azure App Service com status "Running"
+
+- [ ] Os dois Web Apps com status "Running"
 - [ ] Endpoint `/health` retorna 200 OK
 - [ ] Endpoint `/classify` processa requisições POST
-- [ ] Copilot Studio consegue chamar API
-- [ ] Resposta do agente aparece em Teams
+- [ ] Endpoint `/audio` aceita arquivo e devolve a transcrição
+- [ ] A Chat UI carrega no navegador e conversa com o backend
+- [ ] Dados são gravados nos schemas `portfolio` e `auditoria`
+- [ ] Arquivos são gravados e lidos no Bucket Storage
 - [ ] Logs aparecem em Application Insights
-- [ ] Dados são gravados em banco (se integrado)
 
 **Exemplo de requisição ponta a ponta:**
 
@@ -1924,21 +2037,34 @@ curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
 }
 ```
 
-#### 3.6.6 Próximos Passos para Produção
+#### 3.6.8 Próximos Passos para Produção
 
-Quando a solução for promovida para ambiente real do Metrô:
+Quando a solução for promovida para o ambiente real do Metrô:
 
-1. **Migrar banco de dados:** De Azure SQL (free 12m) para SQL Server corporativo ou similar
-2. **Copilot Studio em produção:** Usar tenant corporativo em vez de sandbox M365 Dev
-3. **Power Automate com SharePoint real:** Conectar a documentos e listas de verdade
-4. **Entra ID:** Integrar autenticação corporativa do Metrô
-5. **Compliance e segurança:** Implementar audit logs, DLP (Data Loss Prevention), conformidade com políticas corporativas
+1. **Migrar o banco de dados:** do Azure SQL Database em free tier para a instância corporativa;
+2. **Copilot Studio em produção:** usar o tenant corporativo em vez do sandbox do M365 Developer Program;
+3. **Power Automate com SharePoint real:** conectar aos documentos e listas efetivamente utilizados pelo PMO;
+4. **Microsoft Entra ID:** integrar a autenticação corporativa do Metrô ao Controle de Acesso;
+5. **Compliance e segurança:** implementar retenção de logs de auditoria, Data Loss Prevention (DLP) e conformidade com as políticas corporativas.
 
-Toda a arquitetura permanece igual; apenas migram os recursos para ambientes gerenciados pelo Metrô.
+Toda a arquitetura permanece igual; apenas os recursos migram para ambientes gerenciados pelo Metrô, e as mesmas imagens são promovidas sem alteração de código.
 
-#### 3.6.7 Observações Finais
+#### 3.6.9 Decisões Técnicas em Aberto
 
-Este deploy foi estruturado como uma prova de conceito (POC) técnica totalmente reprodutível e alinhada ao ecossistema Microsoft do parceiro. A utilização do Microsoft 365 Developer Program e Azure Free Tier garante custo zero para ambientes acadêmicos. A mesma arquitetura e código sem modificações é promovido para produção no ambiente real do Metrô, reduzindo riscos e complexidade de migração.
+O desenho da implantação expôs pontos que ainda dependem de decisão da equipe. Eles estão registrados aqui para que sejam fechados antes da implementação, e não durante ela.
+
+| # | Ponto em aberto | Impacto | Encaminhamento |
+|---|---|---|---|
+| 1 | A Seção 2.5 nomeia PostgreSQL; esta seção adota o Azure SQL Database | Alto — muda o driver, a sintaxe das migrações e o nó do diagrama | Confirmar o Azure SQL e corrigir a Seção 2.5, ou o inverso |
+| 2 | O nó do banco está rotulado como "Database - Azure Storage" | Médio — Azure Storage não é banco relacional; o nome mistura dois serviços | Renomear o nó para "Azure SQL Database", já que o Bucket Storage cobre o armazenamento de arquivos |
+| 3 | O Bucket Storage guarda apenas "Armazenamento de Prompts" | Médio — o RF03 exige repositório de documentos com metadados para citar a fonte | Definir se os documentos sintéticos ficam nesse mesmo nó e ajustar o rótulo |
+| 4 | O nó de LLM está fora da instância de nuvem | Médio — muda a fronteira de rede, a autenticação e o custo | Confirmar se o modelo é externo ou se será o Azure OpenAI, hospedado na mesma assinatura |
+| 5 | O tier do App Service ainda não está definido | Médio — slots de implantação, usados para publicação e rollback, não existem nos tiers gratuito e básico | Confirmar o tier disponível; sem slots, o rollback passa a ser o redeploy da tag anterior |
+| 6 | Convivem no documento um classificador local e uma API de IA | Médio — muda o que é empacotado na imagem do backend | Definir se a classificação de intenções roda no modelo local e o LLM responde apenas pela geração |
+
+#### 3.6.10 Observações Finais
+
+Este deploy foi estruturado como uma prova de conceito técnica, reprodutível e alinhada ao ecossistema Microsoft do parceiro. A utilização do Microsoft 365 Developer Program e do Azure Free Tier garante custo zero para o ambiente acadêmico, e a conteinerização assegura que a mesma imagem validada em desenvolvimento seja a promovida para produção, reduzindo o risco e a complexidade da migração para o ambiente real do Metrô.
 
 ### 3.7 Projeto Técnico e Arquitetural
 
