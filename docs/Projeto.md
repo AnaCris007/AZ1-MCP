@@ -39,14 +39,15 @@
 <details>
 <summary><strong>3. Definição Técnica e Arquitetural da Solução</strong></summary>
 
-- [3.1 API de Speech to Text e Text to Speech](#31-api-de-speech-to-text-e-text-to-speech)
-- [3.2 Algoritmo de NLP e Implementação](#32-algoritmo-de-nlp-e-implementação)
-- [3.3 API para Recebimento de Áudios](#33-api-para-recebimento-de-áudios)
-- [3.4 Pilha de Tecnologias](#34-pilha-de-tecnologias)
-- [3.5 Modelagem Conceitual e Lógica dos Dados](#35-modelagem-conceitual-e-lógica-dos-dados)
-- [3.6 Processo de Deploy em Nuvem](#36-processo-de-deploy-em-nuvem)
-- [3.7 Projeto Técnico e Arquitetural](#37-projeto-técnico-e-arquitetural)
-- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.1 Catálogo de Intenções e Contrato de Classificação](#31-catálogo-de-intenções-e-contrato-de-classificação)
+- [3.2 API de Speech to Text e Text to Speech](#32-api-de-speech-to-text-e-text-to-speech)
+- [3.3 Algoritmo de NLP e Implementação](#33-algoritmo-de-nlp-e-implementação)
+- [3.4 API para Recebimento de Áudios](#34-api-para-recebimento-de-áudios)
+- [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
+- [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
+- [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
+- [3.8 Projeto Técnico e Arquitetural](#38-projeto-técnico-e-arquitetural)
+- [3.9 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -1695,36 +1696,295 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 
 ## 3. Definição Técnica e Arquitetural da Solução
 
-### 3.1 API de Speech to Text e Text to Speech
+### 3.1 Catálogo de Intenções e Contrato de Classificação
+
+O catálogo de intenções define os tipos de solicitação que o agente deve reconhecer no MVP. A classificação ocorre após a entrada ser convertida para texto, quando aplicável, e antes da consulta às fontes ou do acionamento de qualquer processo. Solicitações que não correspondam às intenções catalogadas devem ser recusadas com uma orientação sobre as interações disponíveis.
+
+| ID | Intenção técnica | Objetivo | Saída esperada | MVP |
+|---|---|---|---|:---:|
+| INT-01 | `consultar_documentos_normativos` | Consultar conceitos, regras, processos e informações dos documentos disponibilizados | Resposta fundamentada com indicação da fonte | Sim |
+| INT-02 | `consultar_projeto_sintetico` | Consultar informações dos projetos do ambiente de demonstração | Dados estruturados do projeto sintético | Sim |
+| INT-03 | `orientar_mapa_beneficios` | Apoiar o preenchimento do Mapa de Benefícios | Perguntas, campos pendentes e sugestões | Sim |
+| INT-04 | `orientar_tap` | Apoiar o preenchimento do Termo de Abertura do Projeto | Orientações e sugestões para os campos do TAP | Sim |
+| INT-05 | `orientar_entregas_cronograma` | Apoiar a definição de entregas, marcos, atividades, datas e dependências | Sugestões e validações do cronograma | Sim |
+| INT-06 | `orientar_avanco_mensal` | Apoiar o preenchimento das informações de avanço do projeto | Dados necessários e sugestões de complementação | Sim |
+| INT-07 | `orientar_riscos_problemas` | Apoiar a descrição e análise de riscos ou problemas | Sugestões de classificação, criticidade e plano de ação | Sim |
+| INT-08 | `analisar_completude_coerencia` | Verificar se as informações fornecidas estão completas e coerentes | Diagnóstico de ausências, inconsistências e recomendações | Sim |
+| INT-09 | `gerar_alertas_pendencias` | Identificar situações que precisam da atenção do usuário | Lista priorizada de alertas com justificativas | Sim, com dados de demonstração |
+| INT-10 | `fora_do_catalogo` | Tratar solicitações que o protótipo não consegue executar | Explicação do limite e opções disponíveis | Sim |
+
+#### Contrato de classificação
+
+Para cada solicitação, o componente de compreensão deve devolver, no mínimo:
+
+- a intenção identificada;
+- as entidades extraídas;
+- os parâmetros obrigatórios ausentes;
+- a indicação de que a solicitação está fora do catálogo, quando aplicável.
+
+O agente só deve prosseguir quando a intenção estiver suficientemente identificada e os parâmetros necessários estiverem disponíveis. Em caso de ambiguidade ou informação faltante, deve solicitar esclarecimento ao usuário.
+
+#### Delimitação central
+
+As intenções de orientação, análise e alerta produzem apenas respostas e sugestões no chat. No MVP, o agente consulta, interpreta, orienta e sugere conteúdos, mas não preenche documentos oficiais, não altera ou grava registros, não executa transações e não acessa o portfólio real do Metrô, as respostas dependem exclusivamente de documentos disponibilizados, dados sintéticos, informações fornecidas na conversa e artefatos anexados pelo usuário. Toda sugestão apresentada pelo agente deve ser revisada e confirmada pelo usuário, e o agente não deve apresentar sugestões como decisões oficiais, aprovações ou determinações de conformidade.
+
+#### Regra de classificação durante fluxos guiados
+
+O classificador de intenções não deve interpretar cada resposta fornecida durante um fluxo guiado como uma nova intenção. Por exemplo, se o agente pergunta "Qual é a data de término da entrega?" e o usuário responde "31 de dezembro de 2026", essa resposta não representa uma nova intenção: o gerenciador de diálogo deve tratá-la como o preenchimento da entidade `data_termino` do processo em andamento.
+
+Uma nova classificação de intenção só deve ser executada quando o sistema detectar:
+
+- a resposta não corresponder ao tipo ou ao formato esperado da entidade em preenchimento;
+- mudança de assunto em relação ao processo em andamento;
+- solicitação explícita do usuário para iniciar outro processo.
+
+### 3.2 API de Speech to Text e Text to Speech
 
 <!-- Exemplo do que incluir: API escolhida, endpoints, métodos HTTP, parâmetros, respostas e exemplos de requisição e resposta. -->
 
-### 3.2 Algoritmo de NLP e Implementação
+### 3.3 Algoritmo de NLP e Implementação
 
 <!-- Exemplo do que incluir: algoritmo escolhido, finalidade, funcionamento, bibliotecas utilizadas e exemplo de implementação. -->
 
-### 3.3 API para Recebimento de Áudios
+### 3.4 API para Recebimento de Áudios
 
-<!-- Exemplo do que incluir: endpoint de upload, método HTTP, formatos aceitos, limite de tamanho e resposta esperada. -->
+Esta seção documenta a API interna responsável por receber os áudios enviados pelos usuários, estabelecendo o contrato de entrada do canal de voz da solução. As definições apresentadas determinam como o áudio entra no sistema, quais regras devem ser respeitadas antes do processamento e como o cliente deve tratar os resultados.
 
-### 3.4 Pilha de Tecnologias
+#### Endpoint e método HTTP
+
+**Decisão:** utilizar o método `POST` no endpoint abaixo:
+
+```http
+POST /api/v1/audio
+```
+
+O método `POST` é adequado para o envio de um novo recurso ao sistema. O prefixo `/api/v1` permite versionar a API e facilita futuras evoluções sem quebrar integrações existentes.
+
+#### Autenticação
+
+**Decisão:** utilizar autenticação por Bearer Token.
+
+```http
+Authorization: Bearer <token>
+```
+
+Esse mecanismo restringe o acesso à API a usuários ou serviços autenticados e segue um padrão amplamente utilizado em APIs HTTP. O token será emitido pelo mecanismo de autenticação da solução. A definição do serviço emissor, entre autenticação própria ou integração com o Copilot Studio, será consolidada na Sprint 3, quando a camada de orquestração estiver especificada.
+
+#### Formato da requisição
+
+**Decisão:** utilizar `multipart/form-data`.
+
+Esse formato é apropriado para o envio de arquivos binários e evita a conversão do áudio para Base64, que aumentaria desnecessariamente o tamanho da requisição.
+
+#### Parâmetros de entrada
+
+| Parâmetro | Tipo | Obrigatório | Formato esperado | Descrição |
+| --- | --- | --- | --- | --- |
+| `audio` | Arquivo binário | Sim | `audio/wav`, `audio/mpeg`, `audio/mp4`, `audio/x-m4a`, `audio/webm` | Arquivo de áudio enviado pelo usuário |
+
+Nesta etapa, o endpoint precisa apenas receber o áudio. Outros parâmetros poderão ser adicionados futuramente caso o fluxo da aplicação exija.
+
+A extensão e o MIME type declarados pelo cliente **não são utilizados como única fonte de verdade**: ambos podem ser inconsistentes com o conteúdo real do arquivo (um cliente pode renomear um arquivo ou enviar um MIME type incorreto). Por isso, a validação de formato deve inspecionar o conteúdo binário do arquivo (assinatura/header do arquivo), e não apenas os metadados informados na requisição.
+
+#### Formatos de áudio suportados
+
+Inicialmente, serão aceitos os seguintes formatos:
+
+| Extensão | MIME types aceitos |
+| --- | --- |
+| `.wav` | `audio/wav`, `audio/x-wav` |
+| `.mp3` | `audio/mpeg` |
+| `.m4a` | `audio/mp4`, `audio/x-m4a` |
+| `.webm` | `audio/webm` |
+
+Diferentes clientes podem declarar variações de MIME type para o mesmo formato — em especial para `.m4a`, que pode chegar como `audio/mp4` ou `audio/x-m4a` dependendo do navegador ou dispositivo. Todas as variações listadas acima devem ser aceitas como válidas para a respectiva extensão. Esses formatos possuem ampla compatibilidade com navegadores, dispositivos móveis e serviços de Speech-to-Text, atendendo aos principais cenários de captura de áudio do sistema.
+
+#### Tamanho máximo do arquivo
+
+Cada arquivo será limitado a **10 MB**. Esse limite evita requisições excessivamente grandes, reduz o consumo desnecessário de memória e rede e oferece margem suficiente para áudios curtos utilizados em interações por voz.
+
+#### Duração máxima
+
+O áudio será limitado a **5 minutos**. A solução foi projetada para interações de voz e consultas, e não para o processamento de gravações extensas. O limite reduz o tempo de processamento e o uso de recursos.
+
+Caso a duração do áudio ultrapasse esse limite, a API retorna `422 Unprocessable Entity` com o erro `audio_too_long`.
+
+#### Exemplo de requisição
+
+```bash
+curl -X POST https://api.azum.com/api/v1/audio \\
+  -H "Authorization: Bearer <token>" \\
+  -F "audio=@consulta.wav"
+```
+
+O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida.
+
+#### Resposta de sucesso
+
+**Código HTTP:** `201 Created`
+
+```json
+{
+  "id": "aud_123456",
+  "status": "received",
+  "message": "Áudio recebido com sucesso."
+}
+```
+
+O código `201` indica que o sistema recebeu e criou um novo recurso associado ao áudio enviado. Após passar por todas as validações, o áudio é armazenado em um bucket compatível com S3 usando o `id` gerado como chave do objeto — esse `id` é o que a próxima etapa do pipeline (Speech-to-Text) utiliza para recuperar o arquivo.
+
+#### Respostas de erro
+
+| Código HTTP | Situação |
+| --- | --- |
+| `400 Bad Request` | Requisição malformada (ex: corpo que não é `multipart/form-data` válido) |
+| `401 Unauthorized` | Token ausente ou inválido |
+| `413 Payload Too Large` | Arquivo maior que 10 MB |
+| `415 Unsupported Media Type` | Formato de áudio não suportado (extensão/MIME type fora da lista aceita) |
+| `422 Unprocessable Entity` | Arquivo ausente, vazio, corrompido, com duração acima do limite, ou em formato aceito porém inválido para processamento |
+| `500 Internal Server Error` | Falha interna inesperada |
+
+A distinção entre `415` e `422` é importante para o cliente tratar cada caso corretamente:
+
+- **`415`**: o cliente enviou um arquivo em um formato que a API **não suporta** (extensão/MIME type fora da lista de formatos aceitos).
+- **`422`**: o arquivo está em um formato **aceito**, mas não pode ser processado — por exemplo, está corrompido, vazio, ausente, ou ultrapassa a duração máxima permitida.
+
+Sobre o arquivo ausente: como a implementação utiliza FastAPI, um parâmetro obrigatório declarado como `audio: UploadFile = File(...)` gera automaticamente um erro `422` quando o arquivo não é enviado. O contrato segue esse comportamento nativo do framework, em vez de tratá-lo manualmente para forçar um `400` — isso também é consistente com a semântica HTTP, já que a ausência de um campo obrigatório é um erro semântico (a requisição está bem formada, mas incompleta), não um erro de sintaxe. Dessa forma, `400` fica reservado para requisições estruturalmente inválidas (ex: corpo que não é multipart), e implementação e contrato permanecem alinhados. Esse `400` retorna o corpo padronizado com `error: "bad_request"`; já o `422` de arquivo ausente é a única resposta de erro que mantém o corpo nativo do FastAPI (`{"detail": [...]}`), pela razão explicada acima.
+
+Todas as respostas de erro seguem o mesmo formato padronizado:
+
+```json
+{
+  "error": "<código_do_erro>",
+  "message": "<mensagem legível para o usuário>"
+}
+```
+
+| Código de erro | Código HTTP | Situação |
+| --- | --- | --- |
+| `bad_request` | 400 | Requisição malformada (ex: corpo que não é multipart válido) |
+| `unauthorized` | 401 | Token ausente ou inválido |
+| `unsupported_format` | 415 | Formato de áudio não suportado |
+| `file_too_large` | 413 | Arquivo maior que 10 MB |
+| `audio_too_long` | 422 | Duração do áudio acima de 5 minutos |
+| `invalid_audio` | 422 | Arquivo ausente, vazio ou corrompido |
+| `internal_error` | 500 | Falha interna inesperada |
+
+Exemplos de respostas de erro:
+
+```json
+{
+  "error": "bad_request",
+  "message": "Requisição malformada."
+}
+```
+
+```json
+{
+  "error": "unsupported_format",
+  "message": "Formato de áudio não suportado. Formatos aceitos: wav, mp3, m4a, webm."
+}
+```
+
+```json
+{
+  "error": "file_too_large",
+  "message": "O arquivo excede o tamanho máximo permitido de 10 MB."
+}
+```
+
+```json
+{
+  "error": "audio_too_long",
+  "message": "O áudio excede a duração máxima permitida de 5 minutos."
+}
+```
+
+```json
+{
+  "error": "invalid_audio",
+  "message": "Arquivo de áudio ausente, vazio ou corrompido."
+}
+```
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Token de autenticação ausente ou inválido."
+}
+```
+
+```json
+{
+  "error": "internal_error",
+  "message": "Erro interno inesperado."
+}
+```
+
+Os códigos HTTP e os códigos de erro padronizados facilitam o tratamento dos erros pelo frontend e tornam o comportamento da API previsível.
+
+#### Requisitos adicionais
+
+Consolidando as regras que o contrato da API precisa respeitar:
+
+- **HTTPS obrigatório**: todas as requisições devem ser feitas via HTTPS, para proteger o áudio e o token de autenticação em trânsito.
+- **Autenticação obrigatória**: toda requisição deve conter um Bearer Token válido.
+- **Arquivo obrigatório**: o campo `audio` deve estar presente na requisição.
+- **Arquivo não vazio**: o arquivo enviado não pode ter tamanho zero.
+- **Tamanho máximo**: 10 MB por arquivo.
+- **Duração máxima**: 5 minutos por áudio.
+- **Formato validado pelo conteúdo real do arquivo**, não apenas pela extensão ou MIME type informado pelo cliente.
+- **Formatos aceitos**: `.wav`, `.mp3`, `.m4a`, `.webm` (com as variações de MIME type aceitas listadas na seção de formatos suportados).
+
+#### Fluxo de processamento
+
+```text
+Usuário
+  ↓
+POST /api/v1/audio
+  ↓
+Autenticação (Bearer Token)
+  ↓
+Validação do arquivo (presença e estrutura)
+  ↓
+Validação de formato, tamanho e duração
+
+  ↙                          ↘
+Áudio aceito              Áudio rejeitado
+  ↓                          ↓
+Encaminha para           Retorna 4xx com
+Speech-to-Text           mensagem de erro
+```
+
+Com essas definições, o contrato da API estabelece como o áudio entra no sistema, quais regras devem ser respeitadas antes de seu processamento e como o cliente deve tratar tanto o caminho de sucesso quanto os casos de erro.
+
+### 3.5 Pilha de Tecnologias
 
 <!-- Exemplo do que incluir: linguagens, frameworks, bibliotecas, plataforma de execução e justificativa das escolhas. -->
 
-### 3.5 Modelagem Conceitual e Lógica dos Dados
+### 3.6 Modelagem Conceitual e Lógica dos Dados
 
 <!-- Exemplo do que incluir: entidades, relacionamentos, atributos principais e diagramas dos modelos de dados. -->
 
+### 3.7 Processo de Deploy em Nuvem
 ### 3.6 Processo de Deploy em Nuvem
 
 Esta seção descreve como a solução sai do ambiente de desenvolvimento e passa a executar em nuvem: qual provedor foi escolhido e por quê (3.6.1), como os artefatos se distribuem entre os nós de execução (3.6.2), quais serviços gratuitos sustentam o ambiente acadêmico (3.6.3), quais passos reproduzem a implantação do zero (3.6.4), qual o contrato da API implantada (3.6.5), como cada alteração de código chega aos ambientes (3.6.6) e como verificar que tudo subiu corretamente (3.6.7). As seções 3.6.8 e 3.6.9 registram, respectivamente, o caminho para produção e as decisões técnicas ainda em aberto.
 
 #### 3.6.1 Arquitetura e Provedor Selecionado
 
-O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **ecossistema Microsoft**, integrando-se nativamente ao ambiente corporativo do parceiro (Copilot Studio, Power Platform, Teams, SharePoint). Para ambientes acadêmicos, a solução utiliza exclusivamente serviços gratuitos do **Microsoft Azure** e do **Microsoft 365 Developer Program**, sem custo permanente.
+O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **Microsoft Azure**. No MVP, o núcleo permanece independente; Copilot Studio, Power Platform, Teams e SharePoint são integrações futuras com o ambiente corporativo do parceiro.
 
 **Componentes principais:**
 
+| Componente | Serviço Microsoft | Justificativa |
+|-----------|------------------|--------------|
+| Hospedagem do modelo | Azure App Service (tier gratuito) | HTTP API nativa, escalável, integrado com ecossistema Microsoft |
+| Integração futura | Copilot Studio | Possível orquestração corporativa após o MVP independente |
+| Persistência de dados | PostgreSQL | Mantém a tecnologia de banco definida para o MVP e pode ser hospedada em serviço compatível no Azure |
+| Conversão de voz | Azure Cognitive Services (Speech-to-Text) | Free tier generoso: 5 horas/mês grátis |
+| Integração de processos | Power Automate | Automações e orquestração de workflows |
+| Ambiente completo | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários, inclui Teams, SharePoint, Entra ID |
 | Componente | Nó no diagrama | Serviço Microsoft | Justificativa |
 |---|---|---|---|
 | Interface web | Web App Frontend | Azure App Service | Serve a Chat UI construída em React, TypeScript e Next.js |
@@ -1738,6 +1998,27 @@ O deploy do pipeline de Processamento de Linguagem Natural foi definido para o *
 | Ambiente completo | — | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários; base da integração futura |
 
 **Por que essa arquitetura:**
+- **Alinhamento com parceiro** — Todo o ecossistema real de produção é Microsoft
+- **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados
+- **Controle de custo acadêmico** — as camadas gratuitas poderão ser utilizadas quando disponíveis e compatíveis com a implantação escolhida
+- **Reprodutibilidade** — os passos e parâmetros necessários serão registrados para repetição em ambiente autorizado
+
+**Arquitetura em alto nível:**  
+
+```
+Usuário em Teams / Copilot Studio (Microsoft 365)
+        ↓
+  Copilot Studio (orquestração nativa)
+        ├→ Power Automate (automações)
+        ├→ Azure App Service (API do modelo NLP)
+        │       ├→ Azure SQL Database / Cosmos DB (logs, histórico)
+        │       └→ Application Insights (monitoramento)
+        ├→ Azure Cognitive Services (STT/TTS)
+        └→ SharePoint / OneDrive (documentos integrados)
+```
+
+
+#### 3.6.2 Serviços Gratuitos e Limites
 
 - **Alinhamento com o parceiro** — todo o ecossistema real de produção do Metrô é Microsoft;
 - **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados quando a solução for promovida;
@@ -1846,6 +2127,8 @@ O deploy do pipeline de Processamento de Linguagem Natural foi definido para o *
 - Teams, SharePoint, OneDrive, Power Platform e Copilot Studio inclusos
 - Válido enquanto ativo (renovável)
 
+**Para projeto acadêmico sem time constraint:**
+No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e suficientes. A implantação real deverá considerar licenciamento e recursos corporativos.
 **Para o projeto acadêmico:**
 Utilizar Azure Free Tier somado ao M365 Developer Program. Para produção real, migrar para planos pagos mantendo a mesma arquitetura e as mesmas imagens.
 
@@ -1858,6 +2141,11 @@ Utilizar Azure Free Tier somado ao M365 Developer Program. Para produção real,
 3. Registrar-se no [Azure Portal](https://portal.azure.com) com a mesma conta
 4. Ativar os créditos de free tier, se aplicável
 
+**Passo 2 — Configurar Azure para Hospedagem do Modelo:**
+1. Criar resource group `az1-nlp-dev`
+2. Criar Azure App Service (`F1 Free` para publicação compatível ou `B1 Basic`, pago, quando os requisitos exigirem)
+3. Configurar deployment via Git ou Docker (Azure Container Registry)
+4. Criar ou conectar uma instância PostgreSQL para persistência
 **Passo 2 — Provisionar a infraestrutura:**
 
 1. Criar o resource group `az1-nlp-dev`
@@ -1868,6 +2156,11 @@ Utilizar Azure Free Tier somado ao M365 Developer Program. Para produção real,
 6. Provisionar o recurso de Azure AI Speech e o acesso ao modelo de linguagem
 7. Criar o recurso de Application Insights e vinculá-lo aos dois Web Apps
 
+**Passo 3 — Preparar Modelo e API:**
+1. Estruturar projeto Python em `src/nlp-deploy/`
+2. Criar aplicação FastAPI com endpoint `/classify` que recebe `{"text": "..."}`
+3. Exportar modelo treinado (TF-IDF + LogReg ou BERTimbau em ONNX) para diretório `model/`
+4. Criar `requirements.txt` com dependências (flask, scikit-learn, joblib, ou onnxruntime)
 **Passo 3 — Preparar o backend:**
 
 1. Estruturar o projeto Python em `src/nlp-deploy/`
@@ -1886,6 +2179,14 @@ Utilizar Azure Free Tier somado ao M365 Developer Program. Para produção real,
 
 1. Registrar a cadeia de conexão do banco e as chaves dos serviços nas configurações do App Service
 2. Não versionar segredos: o `.env` permanece fora do repositório, conforme o `.gitignore`
+
+**Passo 6 — Integração com Power Automate (Opcional):**
+1. Criar cloud flow acionado por evento (ex: novo documento no SharePoint)
+2. Chamar ação customizada do Copilot Studio ou diretamente API do Azure App Service
+3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
+4. Enviar notificação para usuário via Teams
+
+#### 3.6.4 Exemplo de API (Flask)
 
 **Passo 6 — Integração futura com o ecossistema Microsoft (fora do escopo do MVP):**
 
@@ -1997,6 +2298,11 @@ As quatro rotas compartilham as mesmas quatro primeiras etapas e divergem apenas
 
 #### 3.6.7 Reprodutibilidade e Verificação
 
+**Checklist de controle de custo:**
+- [ ] Azure App Service em tier Free (1 instância)
+- [ ] Azure SQL Database com free tier (primeiros 12 meses)
+- [ ] Cognitive Services em free tier (limites respeitados)
+- [ ] Elegibilidade e licenciamento do ambiente Microsoft confirmados
 **Checklist de custo (garantir zero spend):**
 
 - [ ] Azure App Service em tier gratuito
@@ -2018,6 +2324,8 @@ As quatro rotas compartilham as mesmas quatro primeiras etapas e divergem apenas
 - [ ] Logs aparecem em Application Insights
 
 **Exemplo de requisição ponta a ponta:**
+
+> A URL abaixo é ilustrativa e deverá ser substituída pela URL real após a execução do deploy.
 
 ```bash
 curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
@@ -2049,6 +2357,9 @@ Quando a solução for promovida para o ambiente real do Metrô:
 
 Toda a arquitetura permanece igual; apenas os recursos migram para ambientes gerenciados pelo Metrô, e as mesmas imagens são promovidas sem alteração de código.
 
+#### 3.6.7 Observações Finais
+
+Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossistema Microsoft do parceiro. A reprodutibilidade será confirmada após a execução dos passos e a inclusão das evidências. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 #### 3.6.9 Decisões Técnicas em Aberto
 
 O desenho da implantação expôs pontos que ainda dependem de decisão da equipe. Eles estão registrados aqui para que sejam fechados antes da implementação, e não durante ela.
@@ -2066,11 +2377,11 @@ O desenho da implantação expôs pontos que ainda dependem de decisão da equip
 
 Este deploy foi estruturado como uma prova de conceito técnica, reprodutível e alinhada ao ecossistema Microsoft do parceiro. A utilização do Microsoft 365 Developer Program e do Azure Free Tier garante custo zero para o ambiente acadêmico, e a conteinerização assegura que a mesma imagem validada em desenvolvimento seja a promovida para produção, reduzindo o risco e a complexidade da migração para o ambiente real do Metrô.
 
-### 3.7 Projeto Técnico e Arquitetural
+### 3.8 Projeto Técnico e Arquitetural
 
 <!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
 
-### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
+### 3.9 Estratégia de Entrega para as Sprints 3, 4 e 5
 
 <!-- Exemplo do que incluir: como desenvolvimento, integração, testes e deploy serão distribuídos entre as próximas sprints. -->
 
@@ -2155,36 +2466,197 @@ Nesta seção serão apresentados os dois protótipos construídos a partir das 
 
 ##### Demonstração do Protótipo B
 
-> **Inserir aqui a demonstração da interface gráfica conversacional referente à interação sob demanda.**
+<div align="center">
+<sub>Imagem 4.4.2 - Mockup da interface gráfica conversacional do agente — Interação Sob Demanda</sub><br>
+  <img src="../assets/design/mockup-agente.png" width="100%" alt="Mockup da interface gráfica conversacional do agente para interação sob demanda"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
 
 ### 4.5 Diário de Construção dos Dois Protótipos
 
-<!-- Registrar no momento em que ocorrerem: decisões inesperadas, ambiguidades, dúvidas e limitações encontradas durante a construção. -->
+Esta seção registra, na ordem em que ocorreram, as decisões inesperadas, ambiguidades, dúvidas e limitações encontradas durante a construção de cada protótipo.
 
+#### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
+
+**18/08/2026 — Definição do problema a ser explorado.** Antes de pensar em uma solução, partimos do problema enfrentado pelo usuário: a dificuldade de localizar informações relevantes entre atas, relatórios, cronogramas e outros documentos que mudam ao longo do projeto. A questão inicial não era como desenhar uma interface, mas como reduzir esse esforço sem retirar do usuário o controle sobre seu trabalho.
+
+**19/08/2026 — Escolha do formato do Protótipo A.** Depois de delimitar o problema, discutimos diferentes formas de representar a alternativa proativa e contextual. Consideramos que uma imagem estática ou uma interface isolada mostraria a aparência da recomendação, mas não permitiria observar o momento da interrupção, a mudança de contexto nem a reação do usuário. Por isso, escolhemos o vídeo encenado, formato não baseado em interface digital funcional, por permitir simular a experiência ao longo de um dia de trabalho e tornar visíveis as interações entre usuário e agente.
+
+**20/08/2026 — Construção do roteiro.** Começamos a organizar a encenação como uma jornada: apresentação do problema, surgimento da recomendação proativa, possibilidade de aceitar ou recusar, mudança de projeto, recomendação inadequada, consulta posterior no Microsoft Teams e encerramento do dia. Buscamos uma sequência que apresentasse a proposta sem tratá-la como solução já validada. O roteiro completo está disponível em [Roteiro do Protótipo A](RoteiroPrototipoA.md).
+
+**20/08/2026 — Decisão não prevista: como o agente deve aparecer.** Ao transformar a alternativa em uma encenação, foi necessário definir como a recomendação proativa chegaria ao usuário sem retirar sua atenção da atividade principal. Decidimos representar o agente por uma pequena bolinha azul acompanhada de uma mensagem curta e das opções “Aceitar” e “Recusar”. A escolha permitiu continuar a construção, mas revelou uma decisão de comportamento ainda em aberto: qual deve ser o nível de destaque de uma recomendação para que ela seja percebida sem se tornar uma interrupção excessiva?
+
+**20/08/2026 — Decisão não prevista: o que acontece após a recusa.** A inclusão da opção “Recusar” obrigou o grupo a definir uma reação que ainda não havia sido discutida. No roteiro, o agente desaparece sem insistir e sem repetir imediatamente a recomendação. Entretanto, permaneceu indefinido se a recusa significa que o documento não foi útil, que o momento foi inadequado ou que o usuário não deseja mais receber recomendações daquele tipo.
+
+**21/08/2026 — Ambiguidade: contexto observado não é intenção.** Ao construir as cenas de mudança entre atividades e projetos, percebemos que reconhecer o documento aberto ou o projeto exibido na tela não permite concluir o que o usuário pretende fazer. Um arquivo pode ser aberto apenas para copiar uma data ou conferir uma informação pontual. Essa ambiguidade passou a orientar a Cena 9: como distinguir aquilo que está visível na tela da intenção real do usuário naquele momento?
+
+**21/08/2026 — Dúvida: uso do feedback e permanência no histórico.** A proposta de permitir avaliações de utilidade criou novas perguntas: o agente deveria aprender com cada rejeição? Por quanto tempo esse sinal deveria influenciar recomendações futuras? Quais informações encontradas durante o dia deveriam permanecer disponíveis no histórico integrado ao Microsoft Teams? O roteiro apresenta essas questões sem escolher uma resposta definitiva, pois elas dependem da rotina e das expectativas dos usuários reais.
+
+**24/08/2026 — Validação do roteiro.** Durante a leitura e validação do roteiro, levantamos perguntas que afetariam diretamente a gravação: como o agente identifica uma mudança de contexto; se abrir um documento significa estar trabalhando naquele assunto; quantas recomendações podem aparecer antes de atrapalhar; o que uma recusa comunica; se o feedback deve influenciar sugestões futuras; e quais informações devem permanecer no histórico. Em vez de ocultar essas dúvidas, decidimos incorporá-las à Cena 9 como parte da própria exploração.
+
+**25/08/2026 — Gravação do vídeo encenado.** Após a validação, gravamos o vídeo conforme o roteiro acordado. Foi possível representar toda a sequência planejada, incluindo o problema inicial, a ajuda proativa, o controle de aceitar ou recusar, a mudança de contexto, o feedback e as perguntas que permaneceram sem resposta. A gravação principal foi concluída sem necessidade de alterar a estrutura validada do roteiro.
+
+**25/08/2026 — Edição do material.** Depois da gravação, o vídeo recebeu edição e animações para tornar visíveis elementos que não existiam fisicamente durante a encenação, como a bolinha azul, as mensagens do agente e as transições entre situações. Essa edição facilita a compreensão da alternativa, mas não substitui o registro bruto exigido pelo artefato e não é considerada evidência de que as integrações ou o comportamento apresentados estejam implementados.
+
+**Limitações observadas.** O vídeo permitiu percorrer e comunicar a experiência de uma interação proativa, mas não permite medir a tolerância de usuários reais às interrupções, comprovar que o agente identifica corretamente o contexto, validar como diferentes motivos de recusa seriam interpretados nem reproduzir as integrações reais com Microsoft Teams e bases corporativas. A execução conforme o roteiro também não representa, por si só, o teste até a falha exigido pelo artefato.
+
+
+#### Protótipo B — Interface de Interação Sob Demanda
+
+**20/08/2026 — Início da construção.** Decidimos partir da estrutura convencional de chatbot (sidebar de conversas, histórico de mensagens, campo de entrada), sem inovação de layout, para que a investigação ficasse concentrada no comportamento do agente e não na interface em si. A identidade visual usa a sinalização do Metrô (bolachas de linha, tipografia de placa, faixas de cor) apenas como camada de reconhecimento do contexto.
+
+<div align="center">
+<sub>Imagem 4.5.1 - Primeiro estado da interface: apenas interação por texto, ainda incompleta</sub><br>
+  <img src="../assets/design/estado-1-somente-texto.png" width="100%" alt="Primeiro estado da interface do Protótipo B, com interação apenas por texto"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**21/08/2026 — Decisão não prevista: duplicatas no SharePoint.** Ao montar a conversa de exemplo, foi preciso decidir o que o agente faz quando a busca retorna o mesmo documento em duas versões (uma recente e uma antiga em pasta "Antigos"). O grupo nunca tinha discutido isso. Para conseguir continuar, decidimos exibir as duas com um aviso amarelo de "versão possivelmente desatualizada" — mas a decisão real (ocultar a antiga? perguntar? mesclar?) permanece em aberto e foi registrada no [inventário da seção 4.9](#49-inventário-de-decisões-em-aberto).
+
+**21/08/2026 — Ambiguidade: o que o agente responde a um pedido vago.** Ao simular o pedido "me manda o cronograma atualizado", não soubemos o que o sistema deveria fazer: escolher o mais provável? Listar todos? Perguntar? Improvisamos uma pergunta de desambiguação com botões de projeto. Ficou registrado como ambiguidade: o comportamento correto depende de conhecer a rotina real do PMO.
+
+**22/08/2026 — Decisão não prevista: entrada por voz e transcrição incerta.** Ao adicionar a entrada por voz (exigência do contexto de PLN do módulo), a construção obrigou a decidir: (a) a transcrição aparece para o usuário ou fica oculta? (b) quando o reconhecimento tem baixa confiança em um termo (siglas internas como AMV, CCO), o agente busca assim mesmo ou confirma antes? Decidimos exibir a transcrição e confirmar antes de buscar — mas sem base em observação de usuários; foi o que o material exigiu para o protótipo funcionar. Ambas as decisões foram registradas no inventário da seção 4.9.
+
+**24/08/2026 — Ambiguidade: o que a resposta por voz deveria falar.** O botão "ouvir resposta" existe na interface, mas não soubemos definir o que ele reproduz: o documento inteiro? Um resumo? Apenas "encontrei, veja na tela"? O protótipo não define — a reprodução é simulada. Registrado como lacuna do formato.
+
+**O que o formato não permitiu representar:** a latência real do reconhecimento de voz; o comportamento do ASR com ruído de fundo (ambiente de estação); a conexão real com o SharePoint e o banco de dados (todas as respostas são fixas por palavra-chave, com um fallback de "não encontrei" para qualquer pedido fora do roteiro); e o Teams, citado na Alternativa A, que aqui não aparece.
+
+<div align="center">
+<sub>Imagem 4.5.2 - Estado intermediário: adição da entrada por voz, com microfone no campo de entrada e botões "ouvir resposta"</sub><br>
+  <img src="../assets/design/estado-2-emoji.png" width="100%" alt="Estado intermediário da interface do Protótipo B, com entrada por voz e botões de ouvir resposta"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+<div align="center">
+<sub>Imagem 4.5.3 - Estado intermediário: gravação de voz em andamento, com transcrição automática exibida e confirmação de termo com baixa confiança (AMV)</sub><br>
+  <img src="../assets/design/estado-2-voz-emoji.png" width="100%" alt="Estado intermediário da interface do Protótipo B, com gravação de voz, transcrição automática e confirmação de termo com baixa confiança"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+<div align="center">
+<sub>Imagem 4.5.4 - Estado final do Protótipo B: fluxo completo com bloqueio por permissão, entrada por voz com transcrição e reprodução da resposta em áudio</sub><br>
+  <img src="../assets/design/prototipo-chatbot-metro.png" width="100%" alt="Estado final da interface conversacional do Protótipo B, com bloqueio por permissão, transcrição de voz e reprodução da resposta"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 ### 4.6 Execução dos Protótipos
 
-<!-- Registrar como cada protótipo foi colocado em operação, incluindo situações difíceis, falhas, improvisos e lacunas encontradas. -->
+Esta seção registra como cada protótipo foi colocado em operação, incluindo situações difíceis, falhas, improvisos e lacunas encontradas durante a execução.
+
+#### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
+
+> **Inserir aqui o registro de execução do Protótipo A.**
+
+#### Protótipo B — Interface de Interação Sob Demanda
+
+**Como foi rodado:** A sessão foi realizada em 25 de agosto de 2026, às 9h30, na biblioteca da faculdade, com duração aproximada de 30 minutos, com Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO do Metrô. O participante não acompanhou a construção da interface e recebeu apenas o contexto mínimo ("você é analista do PMO e precisa encontrar documentos e informações dos projetos"), sem tutorial ou demonstração prévia. A primeira parte da sessão foi de uso livre; na segunda, foram propostos pedidos fora do escopo coberto pelo protótipo. O registro foi feito por anotações durante a sessão e capturas de tela; não houve gravação de vídeo.
+
+**O que aconteceu (não o que se esperava):**
+
+| # | Pedido do participante | O que o protótipo fez | Falha / improviso / lacuna |
+|---|------------------------|-----------------------|----------------------------|
+| 1 | Uso livre inicial: localizar a conversa ativa, enviar mensagem de texto e iniciar gravação de áudio | O participante navegou sem nenhuma instrução, reconhecendo os elementos por semelhança com interfaces de chat que já utiliza | Nenhuma falha. Achado: o padrão convencional de interface elimina o custo de aprendizado — comportamento relevante para a comparação com a Alternativa A |
+| 2 | Tentou gravar um áudio real e ouvir a resposta falada | A gravação, a transcrição e a reprodução são simuladas; a expectativa de funcionalidade real foi frustrada | **Improviso registrado:** foi preciso explicar verbalmente o que o sistema real faria. O protótipo não comunica seus próprios limites — a semelhança com produtos reais gera expectativa de funcionamento real |
+| 3 | "quantas ocorrências teve na L2 em julho?" | Caiu no fallback "não encontrei documentos correspondentes", com o aviso de lacuna exibido na tela | **Lacuna confirmada:** pedido de dado estruturado, não de documento. O protótipo só define comportamento para busca de arquivos. Corresponde à decisão nº 5 do [inventário (seção 4.9)](#49-inventário-de-decisões-em-aberto), levantada na construção e confirmada na execução |
+
+**Falhas encontradas:** O protótipo falhou diante de um pedido legítimo de informação (consulta a dado estruturado do banco, e não a um documento), caindo no fallback genérico. Além disso, falhou em comunicar sua própria natureza simulada: o participante esperava enviar e ouvir áudio de verdade.
+
+**Improvisos registrados:** Em ambas as falhas foi necessário intervir verbalmente — explicar que a decisão sobre consultas ao banco está em aberto e que o fluxo de voz é simulado. Cada intervenção verbal indica um comportamento que o sistema real precisará definir.
+
+<div align="center">
+<sub>Imagem 4.6.1 - Fallback exibido durante a execução, diante do pedido de dado estruturado ("quantas ocorrências teve na L2 em julho?")</sub><br>
+  <img src="../assets/design/execucao-fallback-dado-estruturado.png" width="100%" alt="Captura da interface exibindo o fallback de documento não encontrado durante o teste de execução"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
 ### 4.7 Comparação entre as Alternativas
 
-<!-- Comparar o que cada alternativa revelou, diferenças observadas, pontos que apareceram em apenas uma delas e surpresas encontradas. -->
+<!-- Consolidação do grupo: comparar o que cada alternativa revelou, diferenças observadas, pontos que apareceram em apenas uma delas e surpresas encontradas. Abaixo, os insumos de cada protótipo. -->
+
+**O que a interface conversacional (Protótipo B) tornou visível:** como o usuário formula pedidos em linguagem natural e quanta ambiguidade cabe numa frase curta; o problema das versões e duplicatas de documentos; o ciclo de confirmação exigido pela entrada por voz; e a fronteira entre pedido de documento e pedido de dado estruturado.
+
+**O que só o vídeo encenado (Protótipo A) consegue mostrar e a interface não:** o momento e a frequência da iniciativa do agente ao longo do tempo de trabalho — na interface sob demanda esse eixo simplesmente não existe, pois toda interação depende de uma ação explícita do usuário.
+
+**Confirmação entre construção e execução (Protótipo B):** a fronteira entre pedido de documento e pedido de dado estruturado — identificada como decisão em aberto durante a construção (decisão nº 5 do inventário) — foi encontrada espontaneamente pelo participante durante a execução, sem que ele tivesse conhecimento do inventário. A execução também revelou um ponto que a construção não havia antecipado: a semelhança do protótipo com produtos reais gera expectativa de funcionalidade real, o que favorece o reconhecimento imediato da interface, mas produz frustração quando a simulação é percebida.
+
+> **Inserir aqui os insumos do Protótipo A e a consolidação da comparação pelo grupo.**
 
 ### 4.8 Limites dos Protótipos
 
-<!-- Explicar especificamente o que os protótipos não permitem concluir e o que ainda dependeria de testes com usuários reais. -->
+Esta seção explicita o que cada protótipo **não** permite concluir e o que ainda dependeria de testes com usuários reais.
+
+#### Limites do Protótipo A — Vídeo Encenado
+
+> **Inserir aqui os limites específicos do Protótipo A.**
+
+#### Limites do Protótipo B — Interface de Interação Sob Demanda
+
+- **Respostas fixas por palavra-chave:** não há PLN real, então nada se conclui sobre a qualidade de interpretação dos pedidos.
+- **Voz simulada:** nada se conclui sobre a taxa de erro do ASR com o jargão do Metrô nem sobre o comportamento com ruído de ambiente.
+- **Sem SharePoint real:** nada se conclui sobre tempo de resposta, cobertura da base documental ou permissões reais.
+- **O participante do teste foi Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO:** a formulação de pedidos de um colaborador real, com vocabulário e pressa reais, só seria observada com usuários do Metrô.
+- **A execução foi registrada por anotações e capturas de tela, sem gravação de vídeo:** o registro depende do que foi anotado no momento; reações e hesitações do participante não ficaram integralmente documentadas.
 
 ### 4.9 Inventário de Decisões em Aberto
 
-<!-- Exemplo: quando a IA deve recomendar documentos? Quantos deve mostrar? O que acontece quando o usuário rejeita uma sugestão? -->
+Esta seção reúne as decisões de design e comportamento do agente que a construção dos protótipos revelou, mas que permanecem sem resposta definitiva. Para cada uma, registram-se as opções consideradas e o que está em jogo.
+
+<!-- Mesclar aqui as decisões em aberto vindas do Protótipo A. -->
+
+1. **Duplicatas e versões antigas no SharePoint.** Opções: (a) mostrar todas as versões com aviso; (b) mostrar só a mais recente e ocultar antigas; (c) perguntar ao usuário. Em jogo: risco de o colaborador usar documento desatualizado vs. poluição da resposta e desconfiança ("cadê o arquivo que eu sei que existe?").
+
+2. **Transcrição de voz com baixa confiança em termos técnicos.** Opções: (a) buscar com o melhor palpite; (b) confirmar antes de buscar; (c) buscar e sinalizar a incerteza junto do resultado. Em jogo: fluidez da interação vs. risco de busca errada com jargão interno (AMV, CCO, via permanente) — central para o módulo de PLN.
+
+3. **Exibição da transcrição.** Opções: (a) sempre visível; (b) oculta, só a resposta; (c) visível apenas quando houver incerteza. Em jogo: transparência e possibilidade de correção vs. ruído visual.
+
+4. **O que a resposta por voz reproduz.** Opções: (a) leitura do documento; (b) resumo gerado; (c) apenas confirmação verbal ("encontrei, está na tela"). Em jogo: uso com mãos ocupadas / em deslocamento vs. tempo de escuta e risco de resumo impreciso.
+
+5. **Pedido de dado estruturado vs. documento.** O protótipo só devolve arquivos; pedidos como "quantas ocorrências teve na L2" não têm comportamento definido. Opções: (a) responder consultando o banco; (b) devolver o documento-fonte; (c) declarar que só localiza documentos. Em jogo: escopo do agente e expectativa do usuário sobre o que ele "sabe".
+
+6. **Acesso negado por permissão.** Opções: (a) ocultar o documento como se não existisse; (b) mostrar que existe e oferecer solicitação de acesso; (c) mostrar metadados mas não o conteúdo. Em jogo: transparência e agilidade vs. exposição de informação restrita (até o nome de um contrato pode ser sensível).
 
 ### 4.10 Repertório de Situações
 
-<!-- Registrar os casos e situações usados durante a execução, principalmente aqueles que os protótipos não conseguiram atender. -->
+Esta seção registra os casos e situações usados durante a construção e a execução dos protótipos, com destaque para aqueles que não foram atendidos.
+
+#### Situações do Protótipo A
+
+> **Inserir aqui as situações usadas no Protótipo A.**
+
+#### Situações do Protótipo B
+
+Situações embutidas na construção da interface:
+
+- "preciso do último relatório de manutenção preventiva da linha 1" — **atendida**
+- "me manda o cronograma atualizado" — **ambígua**; o protótipo respondeu com pergunta de desambiguação
+- "abre o contrato de concessão da linha 4 pra mim" — **bloqueada por permissão**
+- (voz) "acha pra mim o laudo do AMV da estação Sé" — sigla com baixa confiança na transcrição; o protótipo **pediu confirmação** antes de buscar
+
+Situações registradas durante a execução (sessão com participante externo à construção):
+
+- Uso livre da interface (localizar conversa, enviar texto, iniciar gravação) — **atendida sem instrução**, por reconhecimento do padrão convencional de chat
+- Tentativa de enviar áudio real e ouvir a resposta falada — **não atendida**: funcionalidade simulada; exigiu explicação verbal
+- "quantas ocorrências teve na L2 em julho?" — **não atendida**: pedido de dado estruturado; o protótipo caiu no fallback por só definir comportamento para busca de documentos
 
 ### 4.11 Registros Visuais
 
-<!-- Inserir fotos, vídeos, storyboard, desenhos, capturas e demais evidências brutas da construção e execução. -->
+Esta seção reúne as evidências brutas da construção e da execução dos protótipos (fotos, vídeos, storyboard, desenhos e capturas de tela).
+
+#### Registros do Protótipo A
+
+> **Inserir aqui os registros visuais do Protótipo A (fotos do set, frames do vídeo, storyboard).**
+
+#### Registros do Protótipo B
+
+Os registros da construção da interface estão inseridos na [seção 4.5](#45-diário-de-construção-dos-dois-protótipos), na ordem em que os estados foram produzidos:
+
+- **Imagem 4.5.1** — primeiro estado da interface, apenas com interação por texto ([estado-1-somente-texto.png](../assets/design/estado-1-somente-texto.png));
+- **Imagem 4.5.2** — estado intermediário, com a adição da entrada por voz e dos botões "ouvir resposta" ([estado-2-emoji.png](../assets/design/estado-2-emoji.png));
+- **Imagem 4.5.3** — estado intermediário, com gravação de voz, transcrição automática e confirmação de termo com baixa confiança ([estado-2-voz-emoji.png](../assets/design/estado-2-voz-emoji.png));
+- **Imagem 4.5.4** — estado final do protótipo, com o fluxo completo de voz e permissões ([prototipo-chatbot-metro.png](../assets/design/prototipo-chatbot-metro.png));
+- **Imagem 4.4.2** — mockup da interface apresentado na demonstração ([mockup-agente.png](../assets/design/mockup-agente.png)).
+
+A execução do Protótipo B foi registrada por anotações feitas durante a sessão e por capturas de tela. A principal evidência da execução é a Imagem 4.6.1 ([execucao-fallback-dado-estruturado.png](../assets/design/execucao-fallback-dado-estruturado.png)), que mostra o protótipo falhando diante do pedido de dado estruturado. Não houve gravação de vídeo da sessão.
 
 ---
 
