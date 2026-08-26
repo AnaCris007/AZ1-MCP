@@ -62,12 +62,16 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 ├── scripts/
 │   └── gerar_pln_completo.py # gera entregas/pln_completo.py a partir de src/pln
 ├── src/
-│   ├── pln/                  # pipeline de linguagem natural
-│   ├── schemas/              # contratos de entrada da API
-│   └── database/             # scripts SQL
+│   ├── database/    # scripts SQL
+│   ├── pln/         # pipeline de linguagem natural
+│   ├── routes/      # endpoints da API (FastAPI)
+│   ├── schemas/     # contratos de entrada da API
+│   ├── services/    # casos de uso e adaptadores externos
+│   └── az1_api/     # composição e ponto de entrada da API
 ├── tests/
 ├── .env.example
 ├── .gitignore
+├── docker-compose.yml
 ├── pyproject.toml
 ├── README.md
 ├── requirements.txt
@@ -96,9 +100,33 @@ python -m unittest discover tests  # 106 testes
 - `src/pln/`: o pipeline de linguagem natural — [documentação técnica](docs/PipelinePLN.md).
 - `src/schemas/`: contratos de entrada da API.
 - `src/database/`: scripts SQL para criação e carga inicial do banco de dados.
+- `src/routes/`: endpoints da API (FastAPI).
+- `src/schemas/`: modelos Pydantic de request/response da API.
+- `src/services/`: casos de uso e integração com armazenamento S3-compatível.
+- `src/az1_api/main.py`: ponto de entrada da aplicação FastAPI.
 - `resultados/` e `entregas/`: saída gerada. Nada ali é editado à mão — `resultados/` vem de
   `python -m pln.experimento`, e `entregas/pln_completo.py` de
   `python scripts/gerar_pln_completo.py`.
+
+##  Rodando a API
+
+O endpoint de recebimento de áudio armazena os arquivos em um bucket S3-compatível. Para desenvolvimento local, suba o MinIO (já com o bucket `az1-audio` criado automaticamente):
+
+```bash
+docker compose up -d
+```
+
+Depois, com o projeto instalado por `pip install -e .`, rode a API normalmente:
+
+```bash
+uvicorn az1_api.main:app --reload
+```
+
+A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000/docs`. O console do MinIO fica em `http://127.0.0.1:9001` (usuário/senha: `minioadmin`/`minioadmin`).
+
+Os arquivos são armazenados com a chave `incoming/{audio_id}` e expiram automaticamente após sete dias. O componente de Speech-to-Text recebe o `audio_id` do orquestrador e recupera o objeto diretamente do bucket `az1-audio`; esta API não oferece endpoint de download nem inicia a transcrição.
+
+Antes de expor o endpoint fora de uma rede controlada, será necessário definir autenticação, rate limiting e um limite de corpo no gateway ou proxy. Nesta etapa do MVP, a API é interna e não exige autenticação.
 
 ##  Configuração para desenvolvimento
 
