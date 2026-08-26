@@ -2042,10 +2042,6 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-<p align="center">
-  Para melhor visualização do diagrama, acesse o arquivo no <a href="#">Google Drive</a>. [PENDENTE — publicar o arquivo e substituir o link.]
-</p>
-
 ##### Descrição dos nós de execução
 
 | Nó | Elementos implantados | Responsabilidade |
