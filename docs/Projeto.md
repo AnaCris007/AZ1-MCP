@@ -1744,7 +1744,324 @@ Uma nova classificação de intenção só deve ser executada quando o sistema d
 
 ### 3.3 Algoritmo de NLP e Implementação
 
-<!-- Exemplo do que incluir: algoritmo escolhido, finalidade, funcionamento, bibliotecas utilizadas e exemplo de implementação. -->
+Esta seção documenta o pipeline de Processamento de Linguagem Natural que classifica a intenção de cada solicitação. Ele é o passo comum a todos os requisitos iniciados por linguagem natural, o `classificarIntencao` que aparece nos cenários 1 e 2 da seção 3.8, e é sobre ele que incide o RNF03, que exige precisão mínima de 85% na identificação de intenções.
+
+O código está em `src/pln/`.
+
+#### 3.3.1 Finalidade e escopo
+
+O pipeline recebe **texto**, digitado pelo usuário ou transcrito pela API de Speech-to-Text descrita em 3.2, e devolve **uma das dez intenções do catálogo** definido em 3.1, acompanhada de um grau de confiança.
+
+Ele não interpreta a intenção nem executa a ação correspondente. Essa responsabilidade é do agente, conforme a separação registrada no diagrama de componentes: o pipeline transforma texto e classifica, e o que fazer com a intenção identificada é decisão de quem o consome.
+
+#### 3.3.2 Algoritmo escolhido: Naive Bayes multinomial
+
+**Decisão:** utilizar `MultinomialNB` sobre representação esparsa de termos, tanto na medição quanto no produto.
+
+O critério determinante foi **velocidade**, e ele não é conveniência de desenvolvimento: é o que viabiliza o método de escolha descrito em 3.3.3. O pipeline só pode ser configurado por medição exaustiva se cada medição for barata, porque são 11.644 delas. Medindo o custo de uma validação cruzada de 5 dobras sobre a vetorização mais cara do espaço (`bow n=1-2`, 2.540 colunas):
+
+| Classificador | Custo por validação cruzada | Varredura exaustiva completa |
+| --- | ---: | ---: |
+| **`MultinomialNB`** | **0,029 s** | **~4 min** |
+| `RidgeClassifier` | 0,185 s | ~28 min |
+| `LogisticRegression` | 12,472 s | ~616 min |
+
+A regressão logística é 430 vezes mais lenta nessa vetorização porque o solver `lbfgs` sofre com contagem bruta não normalizada. Com ela, a varredura passaria de quatro minutos para mais de dez horas, e o método deixaria de ser praticável.
+
+Os demais critérios acompanham a escolha:
+
+| Critério | Como o `MultinomialNB` atende |
+| --- | --- |
+| Volume de dados disponível | Estima uma contagem por termo e classe, sem otimização iterativa que exija muitos exemplos para convergir. O dataset atual tem 400 frases, 40 por intenção |
+| Determinismo | Sem sorteio interno nem `random_state`. Duas execuções produzem exatamente o mesmo modelo, o que torna a avaliação reprodutível |
+| RNF11, explicabilidade das sugestões | Expõe peso por termo e por classe, permitindo listar as palavras que sustentaram cada decisão |
+| RNF04 e RNF09, auditabilidade | A intenção identificada e as palavras que a determinaram podem ser registradas no log de cada interação |
+| RNF01 e RNF10, desempenho e escalabilidade | Classificação em microssegundos, e a matriz esparsa não cresce em memória proporcionalmente ao corpus |
+
+**Decisão:** o classificador do produto é o mesmo que serve de instrumento de medida no experimento.
+
+Isso não é redundância, é uma condição de validade. O pré-processamento é escolhido medindo com um classificador fixo; se o produto usasse outro, a escolha do texto teria sido feita para um modelo que não é o que roda. Chegamos a avaliar `BernoulliNB` como modelo do produto, e a medição mostrou o custo dessa separação: o melhor pré-processamento sob Bernoulli estava na posição 43 do ranking construído sob multinomial, fora da janela de candidatos que o ajuste fino recebe. Fixar o mesmo classificador nos dois lugares elimina o problema por construção.
+
+**Limitação declarada:** a confiança devolvida pelo modelo ordena bem e calibra mal. Ela serve para comparar duas frases entre si, mas não deve ser lida como "probabilidade de estar certo". Um limiar de recusa construído sobre ela, necessário para o comportamento previsto no RF02 e na intenção `fora_do_catalogo`, precisa ser calibrado empiricamente sobre dados rotulados, e não escolhido por intuição.
+
+#### 3.3.3 Por que um pipeline que combina opções, e não uma sequência fixa
+
+Antes de classificar uma frase é preciso transformá-la: minusculizar, remover acentos, remover pontuação, descartar stopwords, reduzir palavras à forma base, separar em tokens. A literatura trata várias dessas etapas como boas práticas, mas nenhuma delas tem resposta universal:
+
+- remover stopwords ajuda a classificar **assunto** e atrapalha a classificar **intenção**, porque a lista do português inclui `não`, `nem`, `sem` e `nunca`, palavras que carregam o sinal em "não atualizou o status";
+- reduzir palavras à forma base aproxima termos relacionados e, ao mesmo tempo, junta termos sem relação;
+- a **ordem** entre as etapas altera o resultado, e em alguns casos faz uma etapa parar de funcionar: a lista de stopwords vem acentuada, então filtrá-la depois de remover acentos não remove nada;
+- a **tokenização** não é detalhe de implementação, porque separar por espaço, por expressão regular ou por regra linguística produz vocabulários diferentes a partir do mesmo texto, e é o vocabulário que o classificador enxerga.
+
+**Decisão arquitetural:** o módulo não assume nada. Cada etapa é opcional, a ordem é campo da configuração e a tokenização é uma escolha explícita. Um experimento mede todas as combinações no dataset real e a escolha é feita por número.
+
+Na prática, uma configuração de pré-processamento é um objeto de dados, não uma sequência de chamadas escrita à mão:
+
+```python
+from pln.preprocessamento import (
+    ConfigPreprocessamento, ModoStopwords, ModoMorfologia, Tokenizacao, preprocessar
+)
+
+config = ConfigPreprocessamento(
+    minusculas=True,
+    remover_acentos=True,
+    remover_pontuacao=True,
+    stopwords=ModoStopwords.PRESERVAR_NEGACOES,
+    morfologia=ModoMorfologia.STEMMING,
+    tokenizacao=Tokenizacao.LINGUISTICO,
+    ordem=("minusculas", "remover_pontuacao", "morfologia", "stopwords",
+           "remover_acentos", "remover_numeros"),
+)
+
+preprocessar("O marco da Linha 6 NÃO foi atualizado em 12/03!", config)
+# 'marc linh 6 nao atual 12 03'
+```
+
+O custo dessa decisão é que o espaço de busca fica grande e a avaliação leva minutos. O benefício é que toda escolha do pipeline passa a ser justificável por medição, o que sustenta a exigência de coerência técnica deste artefato: nenhuma etapa está ligada porque "costuma ajudar".
+
+#### 3.3.4 Arquitetura em módulos
+
+Cada arquivo tem uma responsabilidade e não conhece a do outro. `preprocessamento.py` não sabe que existe vetorização, `vetorizacao.py` não sabe que existe stemming, e `experimento.py` e `classificador.py` compõem os dois primeiros sem implementar nenhum deles.
+
+| Módulo | Responsabilidade |
+| --- | --- |
+| `caminhos.py` | Caminhos de entrada e saída, declarados num lugar só |
+| `preprocessamento.py` | Texto para tokens. Seis etapas opcionais, ordem configurável, três tokenizações |
+| `vetorizacao.py` | Tokens para matriz numérica. Dois modos por duas janelas de n-grama |
+| `classificador.py` | O modelo do produto e a interface de previsão |
+| `experimento.py` | Busca do **texto**: pré-processamento × vetorização |
+| `ajuste_fino.py` | Busca dos **parâmetros do modelo**: suavização × priori × vetorização |
+| `dados/` | Datasets rotulados, com as colunas `texto` e `intencao` |
+
+O **pipeline em execução** é uma sequência linear, e é o que roda toda vez que uma solicitação chega:
+
+```mermaid
+flowchart TB
+    T["texto bruto"] --> P
+
+    subgraph P["preprocessamento.py"]
+        direction TB
+        E["6 etapas opcionais,<br/>aplicadas na ordem configurada"]
+        TK["tokenização:<br/>split, regex ou linguístico"]
+        E --> TK
+    end
+
+    P --> V["vetorizacao.py<br/>bag of words ou tf-idf,<br/>janela uni ou uni+bi"]
+    V --> C["MultinomialNB"]
+    C --> S["intenção + confiança"]
+```
+
+As **duas buscas** que configuraram esse pipeline são maquinário de projeto, e não rodam em produção. Elas encadeiam-se por arquivo, e o último passo é manual:
+
+```mermaid
+flowchart TB
+    EXP["experimento.py<br/>varia pré-processamento × vetorização<br/>MultinomialNB(alpha=1.0) fixo"]
+    CSV[("comparativo_preprocessamento.csv")]
+    AJU["ajuste_fino.py<br/>varia suavização × priori × vetorização<br/>texto fixo nos melhores do ranking"]
+    REL[("ajuste_fino.md<br/>bloco de configuração")]
+    PROD["classificador.py<br/>CONFIG_PRE_PADRAO, CONFIG_VET_PADRAO,<br/>ALPHA_PADRAO, FIT_PRIOR_PADRAO"]
+
+    EXP --> CSV --> AJU --> REL
+    REL -. "colar à mão" .-> PROD
+```
+
+**Decisão:** o pipeline do produto é um único objeto do scikit-learn, com o pré-processamento como primeira etapa.
+
+```python
+Pipeline([
+    ("preprocessamento", PreprocessadorDeTexto(config_pre)),
+    ("vetorizador", construir_vetorizador(config_vet)),
+    ("classificador", MultinomialNB(alpha=alpha, fit_prior=fit_prior)),
+])
+```
+
+Isso importa por dois motivos. Primeiro, treinar, avaliar, salvar e prever passam a operar sobre texto bruto, e não existe a possibilidade de alguém treinar com um pré-processamento e prever com outro, que é um erro comum em PLN e não levanta exceção nenhuma: o modelo apenas erra mais. Segundo, dentro da validação cruzada o `Pipeline` garante que o vocabulário e o IDF sejam aprendidos apenas nas dobras de treino, evitando vazamento de dados.
+
+#### 3.3.5 Espaço de busca
+
+| Dimensão | Opções | Combinações |
+| --- | --- | ---: |
+| Etapas booleanas (minúsculas, acentos, pontuação, números) | ligada ou desligada | 2⁴ = 16 |
+| Tratamento de stopwords | manter, remover tudo, preservar negações | 3 |
+| Normalização morfológica | nenhuma, stemming, lematização | 3 |
+| Tokenização | split, regex, linguística | 3 |
+| **Configurações de pré-processamento** | | **432** |
+| Permutações de ordem das etapas ativas | | **19.767** |
+| Vetorizações (2 modos × 2 janelas de n-grama) | | **4** |
+
+Permutações que produzem texto idêntico são o mesmo experimento e são deduplicadas por hash do corpus, o que elimina cerca de 85% do trabalho. A varredura completa resulta em **11.644 execuções distintas** e leva aproximadamente **4 minutos**.
+
+#### 3.3.6 Como o pipeline final foi escolhido
+
+A escolha é feita por duas buscas, e cada uma fixa o que a outra varia:
+
+| Script | Varia | Fixa |
+| --- | --- | --- |
+| `experimento.py` | o **texto**: pré-processamento × vetorização | o modelo: `MultinomialNB(alpha=1.0)` |
+| `ajuste_fino.py` | os **parâmetros do modelo**: suavização × priori × vetorização | o texto: os melhores do experimento |
+
+O `ajuste_fino.py` lê o relatório que o `experimento.py` grava, então a ordem de execução é obrigatória.
+
+##### Decisões metodológicas que sustentam a validade da comparação
+
+**Decisão:** a régua é única e fixa. O `experimento.py` compara formas de preparar texto, então tudo o que vem depois precisa ser idêntico: mesmo algoritmo, mesmos parâmetros, mesma semente.
+
+**Decisão:** o espaço de vetorização contém apenas a família esparsa. Uma vetorização densa por embeddings pré-treinados chegou a ser avaliada e foi removida. O motivo não foi desempenho, e sim que vetores de embedding têm coordenadas negativas, que o `MultinomialNB` não aceita, o que obrigava a trocar de classificador naquela linha do ranking. Com o classificador variando junto com a representação, o efeito de um deixa de ser separável do do outro e a comparação fica **confundida**. Medindo a decomposição no dataset atual:
+
+| Comparação | F1 | Leitura |
+| --- | ---: | --- |
+| tfidf + MultinomialNB | 0,6354 | ponto de partida |
+| tfidf + GaussianNB | 0,4855 | **−0,1499**, só a troca de classificador |
+| embedding + GaussianNB | 0,4239 | **−0,0615**, só a troca de representação |
+| régua única, tfidf contra embedding | 0,6687 contra 0,6387 | **−0,0300**, o efeito real |
+
+O relatório reportava −0,2114 para "embedding é pior". O efeito real da representação é −0,0300, ou seja, **71% do que era atribuído à representação vinha do classificador**. Restringir o espaço à família esparsa resolve o problema pela raiz, porque uma régua atende tudo que está dentro e toda linha do relatório passa a ser interpretável sem ressalva. O custo declarado é que o experimento deixou de responder "vale a pena usar embeddings?", pergunta que passa a exigir um estudo próprio.
+
+**Decisão:** validação cruzada estratificada de 5 dobras, com semente fixa (42). Estratificada para que cada dobra contenha todas as intenções na mesma proporção, e com semente fixa para que duas configurações sejam comparáveis, e não diferentes por sorteio.
+
+**Decisão:** a métrica é F1-macro, e não acurácia. Acurácia engana com classes desbalanceadas, enquanto o macro tira média por classe, de modo que a intenção rara pesa igual à comum.
+
+**Decisão:** as comparações entre opções são pareadas. Média simples seria enviesada, porque `manter` e `nenhuma` deixam a configuração com uma etapa a menos e, portanto, com menos permutações de ordem. O pareamento compara apenas grupos idênticos em todas as demais escolhas.
+
+**Decisão:** entre configurações empatadas, vence a mais simples. "Empatadas" são as que ficam dentro de um desvio padrão da melhor, ou seja, dentro da incerteza da própria medição. O desempate é, nesta ordem: menos etapas, janela de n-grama menor, ordem padrão, maior F1. A ordem padrão vem antes do F1 de propósito, porque entre permutações do mesmo conjunto de etapas a diferença de F1 é menor que o desvio entre dobras, e escolher por ela seria escolher por ruído.
+
+##### Resultados da busca do texto
+
+Efeito de cada escolha, em comparação pareada sobre 576 configurações idênticas nas demais escolhas:
+
+| Escolha | F1 médio | vs referência |
+| --- | ---: | ---: |
+| stopwords: manter | 0,6332 | referência |
+| stopwords: remover tudo | 0,5942 | −0,0390 |
+| stopwords: preservar negações | 0,5943 | −0,0389 |
+| morfologia: nenhuma | 0,5962 | referência |
+| **morfologia: stemming** | **0,6247** | **+0,0285** |
+| morfologia: lematização | 0,6009 | +0,0047 |
+| tokenização: split | 0,5951 | referência |
+| tokenização: regex | 0,6133 | +0,0182 |
+| tokenização: linguística | 0,6134 | +0,0184 |
+
+O resultado sobre stopwords confirma a hipótese de domínio que motivou o terceiro modo: remover stopwords atrapalha, e as duas formas de removê-las são equivalentes entre si.
+
+Sobre a ordem das etapas, ela muda o texto em **1.320 de 1.728 grupos** (76%), com amplitude média de 0,0148 de F1. Usar sempre a ordem padrão custa, em média, 0,0048, uma ordem de grandeza abaixo do desvio entre dobras, o que justifica a regra de desempate adotada.
+
+##### Resultados da busca dos parâmetros
+
+Sobre os vinte melhores pré-processamentos, 960 candidatos avaliados:
+
+| Suavização (`alpha`) | F1 médio | vs melhor |
+| --- | ---: | ---: |
+| **1.0** | **0,6537** | referência |
+| 0.5 | 0,6454 | −0,0083 |
+| 2.0 | 0,6446 | −0,0091 |
+| 0.1 | 0,6190 | −0,0347 |
+
+| Vetorização | F1 médio | vs melhor |
+| --- | ---: | ---: |
+| **bow n=1** | **0,6401** | referência |
+| tfidf n=1 | 0,6276 | −0,0125 |
+| bow n=1-2 | 0,6258 | −0,0143 |
+| tfidf n=1-2 | 0,6148 | −0,0252 |
+
+As probabilidades a priori não fazem diferença nenhuma (0,6271 nos dois valores), o que é coerente com as dez intenções terem exatamente o mesmo número de exemplos. O `alpha` fica no padrão da biblioteca, 1.0, que também foi o melhor medido.
+
+##### Configuração adotada
+
+```python
+CONFIG_PRE_PADRAO = ConfigPreprocessamento(
+    remover_numeros=True,
+    morfologia=ModoMorfologia.STEMMING,
+    tokenizacao=Tokenizacao.REGEX,
+)
+CONFIG_VET_PADRAO = ConfigVetorizacao(ModoVetorizacao.BOW, n_max=1)
+ALPHA_PADRAO      = 1.0
+FIT_PRIOR_PADRAO  = True
+```
+
+F1-macro de **0,6736** em validação cruzada de 5 dobras. Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
+
+**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que 0,6736 está **17,6 pontos percentuais abaixo dos 85% exigidos pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a seção 3.9, e as duas frentes são ampliar o dataset e calibrar um limiar de recusa sobre as nove intenções conhecidas.
+
+#### 3.3.7 Bibliotecas utilizadas
+
+| Biblioteca | Versão | Papel no pipeline |
+| --- | --- | --- |
+| `scikit-learn` | 1.9.0 | Vetorizadores, `MultinomialNB`, `Pipeline`, validação cruzada e métricas |
+| `nltk` | 3.10.3 | Lista de stopwords do português, stemmer RSLP e tokenizador por expressão regular |
+| `spacy` | 3.8.15 | Tokenizador linguístico e lematizador de português (`pt_core_news_sm`) |
+| `numpy` | 2.5.2 | Operações sobre a matriz de pesos na explicação por classe |
+| `joblib` | 1.5.3 | Serialização do modelo treinado e paralelização da varredura |
+
+O tokenizador linguístico usa `spacy.blank("pt")`, que carrega apenas as regras do idioma e não exige o download de modelo. O `pt_core_news_sm` é necessário somente para a lematização.
+
+#### 3.3.8 Execução
+
+Instalação, uma vez:
+
+```bash
+pip install -e .
+python -m nltk.downloader stopwords rslp
+python -m spacy download pt_core_news_sm
+```
+
+Treinar, avaliar e salvar o modelo:
+
+```bash
+python -m pln.classificador
+```
+
+Classificar uma frase com o modelo salvo:
+
+```bash
+python -m pln.classificador --prever "Me ajuda a preencher o TAP da Linha 6?"
+# 'Me ajuda a preencher o TAP da Linha 6?'
+#   -> orientar_tap  (confiança 83.5%)
+```
+
+Reexecutar as duas buscas, nesta ordem:
+
+```bash
+python -m pln.experimento     # varredura exaustiva, ~4 min
+python -m pln.ajuste_fino     # ~40 s sobre os 5 melhores pré-processamentos
+```
+
+Ambas gravam relatórios em `resultados/`, e o segundo emite o bloco de configuração pronto para ser aplicado em `classificador.py`.
+
+Uso programático, que é como o agente consome o pipeline:
+
+```python
+from pln.caminhos import MODELO_PADRAO
+from pln.classificador import carregar_modelo, prever_intencao
+
+modelo = carregar_modelo(MODELO_PADRAO)
+intencao, confianca = prever_intencao(modelo, "Tem algum prazo vencido no lote 3?")
+# ('gerar_alertas_pendencias', 0.947)
+```
+
+Para auditoria e para o atendimento do RNF11, o modelo treinado expõe as palavras que mais distinguem cada intenção. Elas saem reduzidas ao radical porque a configuração adotada aplica stemming:
+
+```python
+from pln.classificador import listar_palavras_de_maior_peso_por_intencao
+
+listar_palavras_de_maior_peso_por_intencao(modelo, quantas=4)
+# {'orientar_tap':             [('tap', 2.71), ('term', 1.76), ('abert', 1.59), ('premiss', 1.50)],
+#  'gerar_alertas_pendencias': [('venc', 1.86), ('sem', 1.79), ('avis', 1.79), ('tem', 1.70)],
+#  ...}
+```
+
+#### 3.3.9 Testes
+
+O módulo tem 100 testes automatizados. Três deles existem especificamente para impedir defeitos que não levantam exceção e fariam a medição mentir sem falhar:
+
+| Teste | O que impede |
+| --- | --- |
+| `TesteNaoRetokeniza` | Que os padrões do scikit-learn retokenizem o texto, anulando em silêncio as etapas `minusculas` e `remover_pontuacao` e a escolha de tokenizador |
+| `TesteReguaUnica` | Que o classificador volte a mudar conforme a vetorização, reintroduzindo o confundimento descrito em 3.3.6 |
+| `TesteComparacaoPareada` | Que algum eixo deixe de render tabela, fazendo a seção correspondente sumir do relatório |
+
+```bash
+python -m unittest discover tests
+```
 
 ### 3.4 API para Recebimento de Áudios
 
