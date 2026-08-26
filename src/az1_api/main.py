@@ -1,17 +1,32 @@
 import logging
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+
+load_dotenv()
+
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from routes import audio_router
+from routes import audio_router, transcription_router
 from routes.audio import AudioAPIError
+from routes.transcription import TranscriptionAPIError
 from schemas.audio import ErrorResponse
+from schemas.transcription import TranscriptionErrorCode
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="AZ1 API")
 app.include_router(audio_router, prefix="/api/v1")
+app.include_router(transcription_router, prefix="/api/v1")
+
+
+@app.exception_handler(TranscriptionAPIError)
+def transcription_api_error_handler(request: Request, exc: TranscriptionAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": exc.error, "message": exc.message},
+    )
 
 
 @app.exception_handler(AudioAPIError)
