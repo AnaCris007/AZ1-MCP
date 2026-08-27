@@ -41,7 +41,6 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 
 - [Índice da documentação](docs/Index.md)
 - [Documentação principal do projeto](docs/Projeto.md)
-- [Pipeline de PLN — documentação técnica](docs/PipelinePLN.md)
 
 ##  Estrutura de pastas
 
@@ -52,15 +51,10 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 │   └── negócios/
 ├── docs/
 │   ├── GestaoConfiguracao.md
-│   ├── PipelinePLN.md
 │   ├── GestaoProjeto.md
 │   ├── Index.md
 │   └── Projeto.md
-├── entregas/
-│   └── pln_completo.py       # o pipeline em UM arquivo — gerado, não editar
 ├── resultados/               # comparativos e modelo treinado — saída gerada
-├── scripts/
-│   └── gerar_pln_completo.py # gera entregas/pln_completo.py a partir de src/pln
 ├── src/
 │   ├── database/    # scripts SQL
 │   ├── pln/         # pipeline de linguagem natural
@@ -85,7 +79,6 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
 python -m nltk.downloader stopwords rslp
 python -m spacy download pt_core_news_sm
-python -m spacy download pt_core_news_md
 ```
 
 ```bash
@@ -97,16 +90,15 @@ python -m unittest discover tests  # 106 testes
 
 - `assets/`: imagens e diagramas utilizados na documentação.
 - `docs/`: documentação principal do projeto e de sua gestão.
-- `src/pln/`: o pipeline de linguagem natural — [documentação técnica](docs/PipelinePLN.md).
+- `src/pln/`: o pipeline de linguagem natural — [documentação técnica](docs/Projeto.md#33-algoritmo-de-nlp-e-implementação).
 - `src/schemas/`: contratos de entrada da API.
 - `src/database/`: scripts SQL para criação e carga inicial do banco de dados.
 - `src/routes/`: endpoints da API (FastAPI).
 - `src/schemas/`: modelos Pydantic de request/response da API.
 - `src/services/`: casos de uso e integração com armazenamento S3-compatível.
 - `src/az1_api/main.py`: ponto de entrada da aplicação FastAPI.
-- `resultados/` e `entregas/`: saída gerada. Nada ali é editado à mão — `resultados/` vem de
-  `python -m pln.experimento`, e `entregas/pln_completo.py` de
-  `python scripts/gerar_pln_completo.py`.
+- `resultados/`: saída gerada. Nada ali é editado à mão — vem de `python -m pln.experimento`,
+  `python -m pln.ajuste_fino` e `python -m pln.classificador`.
 
 ##  Rodando a API
 
