@@ -1418,8 +1418,6 @@ A inclusão do terceiro ramo, com o fluxo bem-sucedido, é intencional, ainda qu
 | Caso crítico 1 | Cenário 2 (seção 2.2.2) | RF02 | RNF08, RNF09 | AM2 | 3.1 (catálogo de intenções e delimitação central) |
 | Caso crítico 2 | Cenário 1 (seção 2.2.2) | RF02, RF03 | RNF01, RNF02, RNF07, RNF08, RNF09, RNF11 | AM8 | 3.3 (algoritmo de NLP), 3.6 (modelagem dos dados) |
 
- Os arquivos editáveis dos dois diagramas estão versionados em `assets/drawio/`, no formato do aplicativo diagrams.net utilizado nos demais diagramas do projeto. Os arquivos `.svg` referenciados nas figuras acima também podem ser abertos diretamente naquele aplicativo, por conterem o modelo do diagrama embutido.
-
 ### 2.2.4. Rastreabilidade entre requisitos, cenários e classes
 
  A rastreabilidade a seguir demonstra que cada requisito funcional está representado em ao menos um cenário e que cada cenário opera sobre classes efetivamente declaradas na modelagem estática. A verificação percorre os três eixos do artefato, ou seja, as histórias de usuário da seção 2.2, os diagramas de sequência e o diagrama de classes.
