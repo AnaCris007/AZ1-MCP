@@ -3,7 +3,7 @@
 ## Roteiro do vídeo encenado
 
 **Participantes:** Karol e Matheus  
-**Estado declarado pela equipe:** roteiro gravado em 25/08/2026. O arquivo de vídeo está versionado, mas o roteiro, isoladamente, não comprova quando cada decisão foi tomada nem se a execução foi levada até uma falha.
+**Estado declarado pela equipe:** roteiro gravado em 25/08/2026. A Cena 10, sobre interação por áudio, foi acrescentada durante a gravação e posteriormente incorporada a este registro; a antiga cena final passou a ser a Cena 11. O arquivo de vídeo está versionado, mas o roteiro, isoladamente, não comprova quando cada decisão foi tomada nem se a execução foi levada até uma falha.
 
 ## Cena 1 — O problema
 
@@ -109,7 +109,15 @@
 
 **Matheus:** No fim, o principal desafio é entender não só o que está na tela, mas o que o usuário realmente pretende fazer.
 
-## Cena 10 — Final
+## Cena 10 — Interação por áudio
+
+**Karol:** Essa interação também pode ser implementada por áudio, através de um fone de ouvido.
+
+**Matheus:** Assim, o agente pode apresentar as recomendações por voz, sem exigir que o usuário pare o que está fazendo para abrir uma interface.
+
+**Karol:** Mantendo a mesma lógica: o agente recomenda e o usuário decide se quer acessar a informação.
+
+## Cena 11 — Final
 
 **Karol:** No começo, a pergunta era simples.
 

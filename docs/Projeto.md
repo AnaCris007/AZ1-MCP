@@ -2332,11 +2332,18 @@ O roteiro e o storyboard demonstram uma experiência proativa ao longo do tempo;
 
 ### 4.5 Diário de Construção dos Dois Protótipos
 
-Esta seção registra, na ordem em que ocorreram, as decisões inesperadas, ambiguidades, dúvidas e limitações encontradas durante a construção de cada protótipo.
+Esta seção consolida decisões, ambiguidades, dúvidas e limitações associadas à construção dos protótipos. **Parte do diário foi sistematizada posteriormente com base no roteiro, nos registros visuais, no histórico Git e nas lembranças da equipe. Por isso, ele não substitui integralmente um registro bruto e contínuo produzido durante a construção.**
 
-O diário consolidado pela equipe registra atividades sobre os dois protótipos entre 20/08 e 24/08 e informa que a comparação ocorreu somente após ambos possuírem uma primeira versão percorrível. Entretanto, o repositório não contém fotos brutas, atas ou capturas com metadados suficientes para comprovar que os registros foram produzidos no momento nem que nenhum protótipo foi refinado após a avaliação do outro.
+As datas abaixo são as datas declaradas pela equipe para as atividades. O histórico Git comprova apenas os momentos de versionamento: a demonstração e o diário do B aparecem nos commits `ceac0b1` e `33d1ba0`, enquanto o roteiro e a construção do A aparecem nos commits `03ce12a` e `bb0f4ec`, todos em branches próprias no dia 25/08. Os estados intermediários do B e os bastidores do A mostram que ambos receberam materiais próprios antes da consolidação final, mas não comprovam a ordem exata de cada decisão nem permitem reconstruir o processo minuto a minuto.
 
-> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar registros brutos datados que comprovem a construção paralela dos protótipos A e B.
+Para manter a rastreabilidade, os registros são classificados assim:
+
+| Classificação | Significado nesta seção |
+|---|---|
+| Construção declarada | atividade atribuída pela equipe ao período de elaboração, posteriormente sistematizada |
+| Execução declarada | acontecimento atribuído pela equipe à operação do protótipo, sem registro audiovisual contínuo |
+| Evidência versionada | arquivo ou estado intermediário cuja existência pode ser verificada no repositório |
+| Reconstrução posterior | interpretação apoiada em roteiro, imagens, commits ou memória, sem anotação bruta contemporânea anexada |
 
 #### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
 
@@ -2356,7 +2363,7 @@ O diário consolidado pela equipe registra atividades sobre os dois protótipos 
 
 **24/08/2026 — Validação do roteiro.** Durante a leitura e validação do roteiro, levantamos perguntas que afetariam diretamente a gravação: como o agente identifica uma mudança de contexto; se abrir um documento significa estar trabalhando naquele assunto; quantas recomendações podem aparecer antes de atrapalhar; o que uma recusa comunica; se o feedback deve influenciar sugestões futuras; e quais informações devem permanecer no histórico. Em vez de ocultar essas dúvidas, decidimos incorporá-las à Cena 9 como parte da própria exploração.
 
-**25/08/2026 — Gravação do vídeo encenado.** Após a validação, gravamos o vídeo conforme o roteiro acordado. Foi possível representar toda a sequência planejada, incluindo o problema inicial, a ajuda proativa, o controle de aceitar ou recusar, a mudança de contexto, o feedback e as perguntas que permaneceram sem resposta. A gravação principal foi concluída sem necessidade de alterar a estrutura validada do roteiro.
+**25/08/2026 — Gravação do vídeo encenado e improvisação declarada.** Durante a gravação, a equipe percebeu que a recomendação proativa estava representada apenas visualmente e acrescentou, na hora, uma cena sobre interação por áudio através de fone de ouvido. A nova cena preservou a regra de controle — o agente recomenda por voz e o usuário decide se deseja acessar a informação — e permitiu representar apoio sem exigir a abertura de uma interface. Esse acréscimo é declarado pela equipe como uma improvisação ocorrida durante a execução; o vídeo final e o roteiro atualizado registram a cena resultante, mas não comprovam isoladamente o momento exato em que a decisão foi tomada.
 
 **25/08/2026 — Edição do material.** Depois da gravação, o vídeo recebeu edição e animações para tornar visíveis elementos que não existiam fisicamente durante a encenação, como a bolinha azul, as mensagens do agente e as transições entre situações. Essa edição facilita a compreensão da alternativa, mas não substitui o registro bruto exigido pelo artefato e não é considerada evidência de que as integrações ou o comportamento apresentados estejam implementados.
 
@@ -2419,11 +2426,25 @@ Esta seção registra como cada protótipo foi colocado em operação, incluindo
 | Recomendações ao longo do dia | A narrativa distribui intervenções durante a rotina | Frequência, prioridade e intervalo aceitáveis não foram testados |
 | Consulta posterior no Teams | O roteiro apresenta histórico e resumo diário | Conteúdo, retenção e tratamento de informações sensíveis não foram definidos |
 
-O roteiro formula uma lacuna quando contexto e intenção divergem, mas não há evidência bruta disponível de que a encenação tenha sido deliberadamente forçada até falhar nem de qual improvisação ocorreu durante a gravação. Uma pergunta incorporada ao roteiro não substitui o registro do que aconteceu durante a execução.
+##### Falha e improvisação observadas no Protótipo A
 
-> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar o registro bruto do teste difícil do Protótipo A, indicando cenário, ação, resposta, ponto de falha e improvisação realmente ocorrida. Até essa evidência existir, a falha do Protótipo A é classificada como não comprovada.
+O roteiro apresenta um limite potencial na Cena 9: diante do conflito entre contexto visível e intenção, deixa de especificar se o agente deveria recomendar, aguardar, pedir confirmação ou permanecer silencioso. Isso continua sendo um limite antecipado, e não uma falha provocada. Durante a gravação, porém, a equipe declara ter encontrado outra limitação concreta: a alternativa dependia da recomendação visual e exigia que a pessoa consultasse uma interface.
+
+| Campo | Registro da improvisação declarada pela equipe |
+|---|---|
+| Situação | Durante a gravação, a interação proativa estava representada somente por elementos visuais. |
+| Comportamento inicialmente previsto | O agente apresentaria uma bolinha e uma mensagem; o usuário aceitaria ou recusaria na interface. |
+| Comportamento não contemplado | Como recomendar quando a pessoa não pode ou não deve interromper a atividade para olhar uma tela. |
+| Improvisação realizada | Inclusão, na hora, da Cena 10, propondo recomendação por áudio através de um fone de ouvido. |
+| Consequência | O protótipo passou a representar um segundo canal para a mesma lógica de controle: o agente recomenda e o usuário decide. |
+| Decisão em aberto | Quando usar áudio ou recurso visual, como preservar privacidade e como aceitar ou recusar sem ambiguidade por voz. |
+| Evidência correspondente | Cena 10 do [roteiro atualizado](RoteiroPrototipoA.md) e cena resultante no [vídeo final](../assets/Vídeos/Vídeo-A.mp4); o caráter de improvisação é uma declaração retrospectiva da equipe. |
+
+A improvisação revela uma limitação real do comportamento inicialmente representado, mas não substitui o teste do conflito contexto–intenção até a falha. Também não valida tecnicamente uso de fone, reconhecimento de voz, privacidade ou adequação do canal em ambientes reais.
 
 #### Protótipo B — Interface de Interação Sob Demanda
+
+##### Registro bruto da construção e execução do Protótipo B
 
 **Como foi rodado, segundo o registro da equipe:** a sessão ocorreu em 25 de agosto de 2026, às 9h30, na biblioteca da faculdade, com duração aproximada de 30 minutos. Roberto Filho, aluno de Engenharia de Software, representou um analista de PMO e recebeu apenas o contexto mínimo ("você é analista do PMO e precisa encontrar documentos e informações dos projetos"), sem tutorial. A primeira parte foi de uso livre; na segunda, foram propostos pedidos fora do escopo. O nome “Felipe” e as iniciais “FS” nas capturas pertencem à persona fixa do mockup, não ao participante. Não há vídeo da sessão; os resultados abaixo dependem das anotações declaradas pela equipe e de uma captura do fallback.
 
@@ -2439,7 +2460,17 @@ O roteiro formula uma lacuna quando contexto e intenção divergem, mas não há
 
 **Improvisos registrados:** Em ambas as falhas foi necessário intervir verbalmente — explicar que a decisão sobre consultas ao banco está em aberto e que o fluxo de voz é simulado. Cada intervenção verbal indica um comportamento que o sistema real precisará definir.
 
-> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar as anotações brutas da sessão ou outro registro que permita auditar as falas, intervenções e reações atribuídas ao participante.
+As falas e reações detalhadas dependem das anotações declaradas pela equipe; a captura da Imagem 4.6.1 comprova visualmente o estado de falha do protótipo, mas não registra toda a sessão.
+
+| Evidência existente | Etapa registrada | Cenário e ação | Resposta e resultado | Falha, limite ou improvisação | Fonte |
+|---|---|---|---|---|---|
+| Estados 4.5.1 a 4.5.4 | construção | evolução da interface de texto para voz, confirmação e permissão | mostram decisões materializadas em telas | não registram uma pessoa operando o protótipo | arquivos PNG versionados |
+| Imagem 4.6.1 | estado atribuído à execução | consulta sobre ocorrências na L2 em julho | fallback genérico de busca documental | evidencia resposta inadequada ao tipo de pedido; não registra a interação completa nem a intervenção verbal | captura PNG produzida pela equipe |
+| Relato consolidado da sessão | reconstrução posterior | tentativa de áudio e consulta fora do escopo | equipe declara que precisou explicar a simulação | não há áudio, vídeo ou anotações brutas anexadas que comprovem a fala e a improvisação | seção 4.6, baseada no relato da equipe |
+
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** gravar ou anexar um registro bruto da execução do Protótipo B, incluindo uma situação difícil que leve o protótipo a falhar ou exija improvisação.
+
+**Roteiro curto para produzir a evidência ausente (não executado):** realizar uma gravação contínua, simples e sem edição, de aproximadamente três a cinco minutos. Mostrar a tela e, se possível, captar a voz do participante. Primeiro, pedir um documento claramente identificável. Depois, fazer um pedido vago, como “mostre o cronograma atualizado”, sem informar o projeto. Por fim, solicitar um dado estruturado fora do fluxo documental, como “quantas ocorrências houve na L2 em julho?”. Manter a gravação quando o protótipo não souber responder e registrar qualquer explicação ou decisão improvisada pelo facilitador. Salvar o arquivo em `assets/Vídeos/` e substituir esta pendência por link, legenda, participantes, data e momentos aproximados da consulta normal, da falha e da improvisação.
 
 <div align="center">
 <sub>Imagem 4.6.1 - Fallback exibido durante a execução, diante do pedido de dado estruturado ("quantas ocorrências teve na L2 em julho?")</sub><br>
@@ -2456,13 +2487,13 @@ A comparação separa o que está evidenciado no material do que permanece sem c
 | Início da interação | O agente inicia a recomendação | O usuário inicia a consulta | Nível de proatividade aceitável |
 | Ambiguidade central | O roteiro explicita que contexto visível não revela necessariamente intenção | Pedidos curtos podem omitir projeto, período, fonte ou tipo de informação | Quando pedir confirmação |
 | Controle do usuário | Aceitar e recusar estão representados, mas o significado da recusa não foi definido | O usuário controla o momento, mas depende dos limites do chat | Como adiar, configurar ou silenciar interações |
-| Falha | A divergência entre contexto e intenção aparece como lacuna planejada; falha de execução não comprovada | Há captura do fallback para pedido de dado estruturado; as intervenções verbais dependem das anotações da equipe | Reexecutar A até falhar e preservar registro bruto; confirmar anotações de B |
+| Limite ou falha | A Cena 9 antecipa um limite do comportamento, mas não há registro bruto de falha provocada na execução | A captura mostra fallback inadequado para pedido de dado estruturado, sem registrar a sessão completa | Provocar e registrar as duas situações em execuções brutas |
 | Contribuição do formato | A encenação representa passagem do tempo, mudança de atividade e interrupção | A interface concretiza pedidos, desambiguação, permissões, versões e transcrição | Como esses efeitos aparecem com usuários do Metrô |
 | Limite | Não mede reação espontânea, fadiga ou precisão | Não mede frequência de intervenções nem integração real | Método comparativo com tarefas e participantes equivalentes |
 
 **O que apareceu somente no A:** a necessidade de definir um gatilho legítimo para recomendações, um limite de frequência, o significado do feedback e a permanência do histórico. O formato não baseado em interface digital permitiu encenar tempo, mudança de atividade e interrupção — relações que uma tela estática do chat não mostraria.
 
-**O que apareceu somente no B:** duplicatas de documentos, pedidos vagos, bloqueio por permissão, incerteza na transcrição e a fronteira entre documento e dado estruturado. Esses problemas surgiram porque o participante pôde formular pedidos concretos e tentar operar controles que pareciam reais.
+**O que apareceu somente no B:** a construção materializou duplicatas de documentos, pedidos vagos, bloqueio por permissão, incerteza na transcrição e a fronteira entre documento e dado estruturado. Segundo o relato posteriormente consolidado pela equipe, a tentativa de operar controles que pareciam reais também revelou expectativas incompatíveis com a simulação; essa parte não possui registro bruto anexado.
 
 **Interpretações posteriores:** no A, a construção tornou explícita a diferença entre estar no projeto correto e compreender a tarefa atual. No B, o registro da equipe relata que a familiaridade visual reduziu o custo de aprendizagem, mas aumentou a frustração quando áudio e resposta se revelaram simulados. A primeira conclusão decorre do roteiro e do diário consolidado; a segunda depende das anotações da sessão ainda não anexadas. A exploração não permite concluir que proatividade ou interação sob demanda seja superior.
 
@@ -2479,7 +2510,7 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 - **Feedback sem semântica definida:** aceitar, recusar e avaliar utilidade aparecem no roteiro, mas não se sabe como esses sinais devem alterar recomendações futuras.
 - **Integrações ilustrativas:** Teams, histórico e acesso às bases são recursos narrativos, não integrações implementadas.
 - **Sem usuários do parceiro:** tolerância a interrupções, privacidade percebida e utilidade contextual só podem ser conhecidas com profissionais do Metrô em uma rotina próxima da real.
-- **Evidência bruta limitada:** o vídeo editado está versionado, mas fotos, ensaios e gravações brutas de bastidores não estão disponíveis; portanto, não é possível auditar integralmente o processo nem a alegada falha da execução.
+- **Evidência bruta limitada:** o vídeo editado e três fotografias de bastidores estão disponíveis, mas não há gravação contínua de ensaio ou do momento de uma falha não roteirizada; portanto, não é possível afirmar que o A foi efetivamente levado até falhar durante a execução.
 
 #### Limites do Protótipo B — Interface de Interação Sob Demanda
 
@@ -2510,6 +2541,7 @@ Esta seção reúne as decisões de design e comportamento do agente que a const
 | P-A04 | Contexto incerto | recomendar | pedir confirmação | aguardar; guardar para resumo | ajuda vs. interrupção ou exposição indevida | diário A, 21/08, e Cena 9 | teste difícil com conflito entre tela e intenção |
 | P-A05 | Uso do feedback | apenas na sessão | histórico por usuário | aprendizagem coletiva; não aprender automaticamente | personalização, privacidade e propagação de erro | diário A, 21/08 | protótipo de políticas de feedback com revisão dos usuários |
 | P-A06 | Conteúdo no Teams/resumo | somente aceitos | aceitos e pendências | vistos; rejeitados; todos com retenção | memória útil vs. excesso e sensibilidade | Cena 7 e diário A, 21/08 | card sorting com usuários e análise de retenção |
+| P-A07 | Canal da recomendação proativa | somente visual | somente áudio por fone | combinar canais; permitir configuração | atenção, acessibilidade, privacidade e controle | improvisação declarada na gravação e Cena 10 | encenar tarefas com tela disponível e indisponível, comparando aceitação e recusa |
 | P-B01 | Duplicatas e versões antigas | mostrar todas com aviso | mostrar só a mais recente | perguntar ao usuário | segurança de versão vs. poluição | diário B, 21/08, e Imagem 4.5.1 | tarefas com versões conflitantes e fonte conhecida |
 | P-B02 | Baixa confiança na transcrição | buscar melhor palpite | confirmar antes | buscar e sinalizar | fluidez vs. consulta incorreta | diário B, 22/08, e Imagem 4.5.3 | teste de voz com siglas e ruído controlado |
 | P-B03 | Exibição da transcrição | sempre visível | apenas com incerteza | oculta | transparência vs. ruído visual | diário B, 22/08 | comparação de três estados da interface |
@@ -2527,13 +2559,14 @@ Esta seção registra os casos e situações usados durante a construção e a e
 | S-A02 | recomendação recusada | usuário trabalhando | agente desaparece sem insistir | comportamento previsto no roteiro | significado da recusa indefinido | A |
 | S-A03 | recomendação aceita | documento relacionado à atividade | agente apresenta documentos | comportamento previsto no roteiro | sem recuperação ou critério real | A |
 | S-A04 | mudança do Projeto X para Y | transição de atividade | recomendações deveriam acompanhar contexto | mudança narrada | gatilho técnico indefinido | A |
-| S-A05 | documento do projeto, mas inadequado à intenção | conflito contexto–objetivo | roteiro reconhece insuficiência do contexto | lacuna formulada | falha de execução não comprovada | A |
+| S-A05 | documento do projeto, mas inadequado à intenção | conflito contexto–objetivo | o roteiro deixa de definir uma resposta e passa às perguntas da Cena 9 | limite potencial identificado no planejamento; falha não provocada em registro bruto | decidir entre recomendar, confirmar, aguardar ou silenciar | A |
 | S-A06 | várias recomendações durante o dia | frequência acumulada | roteiro questiona quando começa a atrapalhar | pergunta em aberto | não houve teste longitudinal | A |
+| S-A07 | recomendação sem interromper para abrir uma interface | usuário continua a atividade | equipe acrescenta a Cena 10 com recomendação por áudio através de fone | improvisação declarada e cena incorporada ao material final | privacidade, escolha do canal e comandos de aceitar/recusar por voz permanecem indefinidos | A |
 | S-B01 | “preciso do último relatório...” | busca documental | mostra documentos e alerta de versão | atendida no mockup | fonte e busca simuladas | B |
 | S-B02 | “me manda o cronograma atualizado” | pedido sem projeto | pergunta qual projeto | ambiguidade tratada no mockup | critério de opções não validado | B |
 | S-B03 | “abre o contrato... linha 4” | conteúdo restrito | informa bloqueio e oferece solicitação | bloqueada por permissão simulada | exposição de metadados em aberto | B |
 | S-B04 | “acha... laudo do AMV...” | voz com sigla técnica | exibe baixa confiança e pede confirmação | tratada no mockup | ASR não executado | B |
-| S-B05 | tentativa de gravar e ouvir áudio | uso livre relatado pela equipe | controles eram simulados | não atendida; exigiu explicação verbal | **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar anotação bruta | B |
+| S-B05 | tentativa de gravar e ouvir áudio | uso livre relatado pela equipe | controles eram simulados | não atendida; exigiu explicação verbal | reação depende do registro textual da equipe | B |
 | S-B06 | “quantas ocorrências teve na L2 em julho?” | pedido de dado estruturado | fallback alega busca sem fonte real | não atendida; captura disponível | fluxo confunde dado e documento | B |
 
 ### 4.11 Aprendizados da Exploração
@@ -2544,32 +2577,53 @@ Esta seção registra os casos e situações usados durante a construção e a e
 - A construção do B mostrou que pedidos vagos exigem desambiguação e que versões, permissões e tipos de fonte alteram a resposta esperada.
 - A baixa confiança na transcrição precisa ser comunicada e tratada antes de uma busca potencialmente errada.
 - O relato da sessão B indica que uma interface visualmente realista pode criar expectativas de funcionalidades que o protótipo não executa; essa interpretação depende das anotações brutas ainda não anexadas.
-- O canal por fone ou áudio permanece uma possibilidade de implementação da proatividade, não uma alternativa validada pela execução atual.
+- A inclusão da Cena 10 durante a gravação revelou que a proatividade não precisa depender exclusivamente de uma tela. O canal por fone foi materializado na encenação como improvisação declarada, mas sua utilidade, privacidade e operação por voz ainda não foram validadas com usuários.
 
 ### 4.12 Próximos Passos
 
 | Decisão a investigar | Método proposto | Evidência esperada |
 |---|---|---|
 | P-A01 a P-A04 — gatilho, frequência, recusa e contexto incerto | reencenar o A com situações difíceis, usuários externos ao roteiro e registro audiovisual bruto | momentos de interrupção, falhas, improvisações e justificativas das preferências |
-| P-A05 e P-A06 — feedback e histórico | card sorting e protótipo de políticas de retenção | categorias priorizadas e riscos percebidos pelos participantes |
+| P-A05 a P-A07 — feedback, histórico e canal | card sorting, protótipo de retenção e encenação comparativa entre aviso visual e áudio | categorias priorizadas, riscos percebidos e preferência de canal por contexto |
 | P-B01, P-B05 e P-B06 — versões, fontes e permissões | tarefas equivalentes com documentos duplicados, dados estruturados e perfis distintos | taxa de conclusão, erros e decisões de apresentação |
 | P-B02 a P-B04 — voz | teste controlado com siglas, ruído e respostas de diferentes extensões | transcrições, correções, tempo e preferência de saída |
 | Comparação A × B | aplicar tarefas equivalentes com profissionais do parceiro | medidas comparáveis de utilidade, interrupção, esforço e controle percebido |
 
 ### 4.13 Registros Visuais
 
-Esta seção reúne as evidências brutas da construção e da execução dos protótipos (fotos, vídeos, storyboard, desenhos e capturas de tela).
+Esta seção reúne evidências de naturezas diferentes — fotografias de bastidores, vídeo editado, roteiro, storyboard e capturas de tela. Cada item é classificado conforme aquilo que realmente comprova; materiais de planejamento e reconstruções posteriores não são apresentados como registros brutos de execução.
 
 #### Registros do Protótipo A
 
 | Evidência | Formato | Etapa registrada | O que permite comprovar | Verificação |
 |---|---|---|---|---|
-| [Vídeo A](../assets/Vídeos/Vídeo-A.mp4) | MP4, 20,7 MB | encenação final | existência de um arquivo audiovisual associado ao A | arquivo e link locais acessíveis; **PENDENTE DE VERIFICAÇÃO:** confirmar conteúdo integral e correspondência com as afirmações de execução |
-| [Roteiro A](RoteiroPrototipoA.md) | Markdown | planejamento da encenação | participantes declarados, falas, ações e dez cenas | link local acessível; não comprova execução |
+| [Vídeo A](../assets/Vídeos/Vídeo-A.mp4) | MP4, 20,7 MB | encenação final | existência do registro audiovisual associado ao A | arquivo, assinatura MP4 e link local verificados |
+| [Roteiro A](RoteiroPrototipoA.md) | Markdown | planejamento e atualização posterior | participantes declarados, falas, ações e onze cenas | link local acessível; registra a cena acrescentada, mas isoladamente não comprova sua execução nem o momento da decisão |
 | [Storyboard A](#441-construção-do-protótipo-a-interação-proativa-e-contextual) | Mermaid | síntese posterior | fluxo comportamental documentado | renderização depende do visualizador; não é evidência bruta |
 | Diário A, [seção 4.5](#45-diário-de-construção-dos-dois-protótipos) | texto | construção consolidada | decisões e ambiguidades declaradas pela equipe | contemporaneidade não comprovada por registro bruto |
+| [Figura 4.13.1](../assets/Vídeos/imagem-1.png) | PNG | bastidores do A | Karol em um dos ambientes utilizados na gravação | origem confirmada pela equipe; arquivo, link e conteúdo visual verificados |
+| [Figura 4.13.2](../assets/Vídeos/imagem-2.png) | PNG | bastidores do A | Matheus com um computador utilizado na gravação | origem confirmada pela equipe; arquivo, link e conteúdo visual verificados |
+| [Figura 4.13.3](../assets/Vídeos/imagem-3.png) | PNG | bastidores do A | Karol e Matheus juntos em outro cenário | origem confirmada pela equipe; arquivo, link e conteúdo visual verificados |
 
-O vídeo editado está versionado, mas fotos, ensaios e gravações brutas de bastidores não foram disponibilizados. Assim, o processo de construção e o momento de falha do A não podem ser auditados integralmente.
+<div align="center">
+<sub>Figura 4.13.1 — Registro bruto de bastidores do Protótipo A, produzido durante a etapa de preparação/gravação: Karol aparece em um dos ambientes da encenação. A fotografia comprova a participação e o ambiente de produção, mas não a execução integral nem uma falha.</sub><br>
+  <img src="../assets/Vídeos/imagem-1.png" width="100%" alt="Karol durante a gravação do Protótipo A em uma sala de trabalho"><br>
+  <sup>Fonte: arquivo disponibilizado pela equipe, 2026.</sup>
+</div>
+
+<div align="center">
+<sub>Figura 4.13.2 — Registro bruto de bastidores do Protótipo A, produzido durante a etapa de preparação/gravação: Matheus aparece com um computador usado na encenação. A fotografia comprova parte da preparação material, mas não o comportamento do protótipo em operação.</sub><br>
+  <img src="../assets/Vídeos/imagem-2.png" width="100%" alt="Matheus durante a gravação do Protótipo A com um computador"><br>
+  <sup>Fonte: arquivo disponibilizado pela equipe, 2026.</sup>
+</div>
+
+<div align="center">
+<sub>Figura 4.13.3 — Registro bruto de bastidores do Protótipo A, produzido durante a etapa de gravação: Karol e Matheus aparecem juntos em outro cenário. A fotografia comprova participantes e diversidade de cenários, mas não registra falha ou improvisação.</sub><br>
+  <img src="../assets/Vídeos/imagem-3.png" width="100%" alt="Karol e Matheus juntos durante a gravação do Protótipo A"><br>
+  <sup>Fonte: arquivo disponibilizado pela equipe, 2026.</sup>
+</div>
+
+Os bastidores ampliam o registro visual da construção, confirmam a participação declarada no roteiro e mostram os diferentes ambientes e equipamentos utilizados na gravação. As imagens não registram o momento de falha ou improvisação.
 
 #### Registros do Protótipo B
 
@@ -2584,9 +2638,42 @@ O vídeo editado está versionado, mas fotos, ensaios e gravações brutas de ba
 
 Não há gravação audiovisual da sessão B nem anotações brutas versionadas. As imagens comprovam estados da interface, mas não comprovam sozinhas as reações e falas atribuídas ao participante.
 
-#### Evidências ausentes
+#### Matriz consolidada de evidências
 
-> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** registros brutos datados da construção paralela; ensaio ou bastidores do A; execução do A levada até uma falha; improvisação ocorrida no A; anotações brutas ou gravação da sessão B.
+| Evidência | Protótipo | Etapa | O que registra | O que comprova | Limitação da evidência |
+|---|---|---|---|---|---|
+| [Vídeo A](../assets/Vídeos/Vídeo-A.mp4) | A | execução roteirizada | encenação editada das onze cenas, incluindo a cena de áudio acrescentada | alternativa colocada em operação e resultado final da improvisação declarada | edição e ausência de registro bruto do momento em que a decisão foi tomada |
+| [Roteiro A](RoteiroPrototipoA.md) | A | planejamento | falas, ações e comportamentos previstos | estrutura e intenção da encenação | comprova planejamento, não execução |
+| Storyboard da seção 4.4.1 | A | síntese posterior | sequência comportamental | articulação do fluxo | não é evidência bruta |
+| Figuras 4.13.1 a 4.13.3 | A | preparação/gravação | participantes, ambientes e equipamento | bastidores da produção | fotografias isoladas; não registram continuidade, áudio, falha ou improvisação |
+| Diário A da seção 4.5 | A | construção declarada | decisões e ambiguidades sistematizadas | percurso declarado pela equipe | parcialmente reconstruído posteriormente |
+| Imagens 4.5.1 a 4.5.4 | B | construção | estados inicial, intermediários e final | evolução material do mockup | capturas sem áudio e sem pessoa operando o protótipo |
+| Imagem 4.4.2 | B | demonstração | visão consolidada do mockup | existência da alternativa sob demanda | não comprova sessão de execução |
+| Imagem 4.6.1 | B | estado atribuído à execução | fallback para pedido estruturado | existência do estado inadequado ao pedido | captura isolada, sem continuidade nem improvisação registrada |
+| Relato da seção 4.6 | B | execução declarada | tentativa de voz, pedido fora do escopo e intervenções atribuídas à equipe | acontecimentos declarados | reconstrução posterior sem notas brutas, áudio ou vídeo anexados |
+| Commits `ceac0b1`, `33d1ba0`, `03ce12a` e `bb0f4ec` | A e B | versionamento | materiais próprios em branches distintas | desenvolvimento independente antes da consolidação | não comprova sequência minuto a minuto nem construção simultânea estrita |
+
+#### Rastreabilidade entre rubrica e evidências
+
+| Critério da rubrica | Evidência relacionada | Situação atual | Pendência |
+|---|---|---|---|
+| Questão de projeto | seção 4.1 | Atendido: questão comportamental em uma frase e justificativa | nenhuma documental |
+| Alternativas divergentes | seção 4.2 e quadro comparativo | Atendido: iniciativa do agente e consequências diferem substancialmente | nenhuma documental |
+| Formato não digital | seção 4.3, roteiro, vídeo e bastidores do A | Atendido: encenação audiovisual, com elementos visuais usados como adereços narrativos | nenhuma documental |
+| Construção paralela | histórico Git, estados do B e bastidores do A | Parcialmente atendido: há materiais independentes anteriores à consolidação | falta registro contemporâneo que demonstre a ordem e impeça refinamento prévio |
+| Diário | seção 4.5 | Parcialmente atendido: decisões, ambiguidades e impossibilidades estão registradas | falta diário bruto contínuo; parte foi sistematizada depois |
+| Execução do Protótipo A | vídeo A e roteiro | Atendido com ressalva: encenação foi realizada | vídeo é editado e roteirizado |
+| Execução do Protótipo B | relato e Imagem 4.6.1 | Parcialmente atendido | falta gravação contínua ou notas brutas da sessão |
+| Falha do Protótipo A | Cena 9 e seção 4.6 | Não comprovado: existe apenas limite antecipado pelo roteiro | anexar execução bruta que provoque situação não prevista |
+| Falha do Protótipo B | Imagem 4.6.1 | Parcialmente atendido: estado inadequado está visível | registrar o percurso que levou ao fallback |
+| Improvisações | Cena 10 do A, vídeo final, relato da equipe e relato do B | Parcialmente atendido: o resultado da improvisação do A está materializado, mas sua ocorrência “na hora” é retrospectiva | anexar registro bruto ou anotação contemporânea; registrar também a intervenção do B |
+| Comparação | seção 4.7 | Atendido: diferenças, achados exclusivos e ausência de vencedor | preservar distinção entre evidência e interpretação |
+| Limites | seção 4.8 | Atendido: limites específicos de ambos e de usuários reais | nenhuma documental |
+| Inventário de decisões | seção 4.9 | Atendido: opções, aspectos em jogo, origem e teste futuro | nenhuma documental |
+| Repertório de situações | seção 4.10 | Atendido com ressalva: inclui sucessos e lacunas | itens atribuídos à execução do B dependem do relato da equipe |
+| Documentação visual | seções 4.4 a 4.6 e 4.13 | Atendido com ressalva: vídeo, fotografias e capturas estão referenciados | faltam registros brutos contínuos das falhas e improvisações |
+
+As evidências disponíveis comprovam a existência dos dois protótipos, seus formatos e parte relevante do processo. A Cena 10 materializa o resultado da improvisação declarada no A, embora o momento da decisão não tenha registro bruto contemporâneo. Ainda não estão integralmente comprovadas a construção paralela, a execução contínua do B e uma falha do A provocada em situação não prevista. Essas lacunas permanecem destacadas para que a equipe produza os registros exigidos sem substituir ausência de evidência por afirmações retrospectivas.
 
 ---
 
