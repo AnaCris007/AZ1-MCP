@@ -32,7 +32,8 @@ Os diagramas e as imagens utilizados pelos documentos estão armazenados na past
 - jornadas das três personas;
 - Matriz SWOT;
 - Matriz de Riscos;
-- diagrama do fluxo Gitflow.
+- diagrama do fluxo Gitflow;
+- linha do tempo de entrega das Sprints 3, 4 e 5.
 
 ## Estrutura atual da documentação
 
