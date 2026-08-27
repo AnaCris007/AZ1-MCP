@@ -8,7 +8,7 @@ load_dotenv()
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from routes import audio_router, transcription_router
+from routes import analysis_router, audio_router, transcription_router
 from routes.audio import AudioAPIError
 from routes.transcription import TranscriptionAPIError
 from schemas.audio import ErrorResponse
@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="AZ1 API")
 app.include_router(audio_router, prefix="/api/v1")
 app.include_router(transcription_router, prefix="/api/v1")
+app.include_router(analysis_router, prefix="/api/v1")
 
 
 @app.exception_handler(TranscriptionAPIError)
