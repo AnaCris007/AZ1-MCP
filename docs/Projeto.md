@@ -2279,6 +2279,8 @@ Nesta seção serão apresentados os dois protótipos construídos a partir das 
 
 O Protótipo A foi materializado por uma encenação em vídeo, seguindo o [roteiro completo](RoteiroPrototipoA.md). A sequência abaixo funciona como storyboard do comportamento representado e permite percorrer a alternativa mesmo sem depender do arquivo de vídeo editado:
 
+**Demonstração audiovisual:** [assistir ao vídeo do Protótipo A](../assets/Vídeos/Vídeo-A.mp4).
+
 ```mermaid
 flowchart LR
     A[Usuário procura informação<br/>em vários documentos] --> B[Agente observa o<br/>contexto de trabalho]
@@ -2522,12 +2524,13 @@ Esta seção reúne as evidências brutas da construção e da execução dos pr
 
 Os registros atualmente versionados são:
 
+- [vídeo da encenação do Protótipo A](../assets/Vídeos/Vídeo-A.mp4), que registra a execução da alternativa proativa e contextual;
 - [roteiro integral da encenação](RoteiroPrototipoA.md), com participantes, falas, ações e dez cenas;
 - storyboard em Mermaid da [seção 4.4.1](#441-construção-do-protótipo-a-interação-proativa-e-contextual);
 - diário cronológico da [seção 4.5](#45-diário-de-construção-dos-dois-protótipos);
 - tabela da execução crítica na [seção 4.6](#46-execução-dos-protótipos).
 
-O diário registra que o vídeo foi gravado e editado em 25 de agosto de 2026. Entretanto, o arquivo audiovisual, os frames e as fotos brutas não estão presentes neste repositório. Essa ausência é declarada como limite da documentação. Quando disponibilizados pelo grupo, os materiais devem ser armazenados na pasta `docs` ou referenciados por endereço externo autorizado, preservando pelo menos um registro bruto da encenação e do ponto em que houve improvisação.
+O vídeo editado está versionado no repositório. Fotos, frames e gravações brutas de bastidores não foram disponibilizados; por isso, o registro visual do processo de construção permanece limitado ao roteiro, ao storyboard, ao diário cronológico e ao vídeo final.
 
 #### Registros do Protótipo B
 
