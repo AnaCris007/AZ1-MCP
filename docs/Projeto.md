@@ -485,6 +485,8 @@ O primeiro diagrama representa o fluxo atual. Suas atividades e decisões são:
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
+O agente de inteligência artificial do passo 2, disponível no Microsoft Studio, corresponde às iniciativas de IA que o Metrô já mantém e que a Matriz SWOT registra como força e oportunidade a especializar (seção 1.1). No fluxo TO-BE a seguir, esse agente é substituído pela Interface de PLN desenvolvida pela equipe, que passa a interpretar a solicitação em linguagem natural e a classificar sua intenção.
+
 O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas atividades e decisões são:
 
 1. o usuário identifica uma necessidade de informação ou de apoio a uma ação sobre o portfólio e envia um comando em linguagem natural;
@@ -503,6 +505,8 @@ O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas at
 </div>
 
 **Nota de escopo:** no diagrama original, o caminho denominado “Inserção de Informação” representa, para o MVP, apenas a geração de uma sugestão de preenchimento. Nenhuma informação é gravada nas fontes oficiais. A execução efetiva de transações permanece registrada como evolução futura na seção 1.7.
+
+**Nota sobre os tipos de intenção:** o gateway “Tipo de intenção” representa apenas os caminhos acionados por uma solicitação síncrona do usuário — consulta e apoio ao preenchimento (a transação sugestiva das seções 1.3 e 1.4). O terceiro tipo definido nessas seções, o alerta, corresponde a uma notificação proativa disparada pelo sistema a partir de prazos, riscos e pendências identificados, e não a uma resposta a uma solicitação do usuário; por isso não aparece como um caminho deste gateway específico, embora seja tratado pelo mesmo classificador de intenções.
 
 **Principais diferenças entre os fluxos:**
 
@@ -526,42 +530,42 @@ O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas at
 
 Cada feature foi avaliada em dois critérios. A importância expressa o valor para o problema e para os benefícios esperados pelo parceiro; a viabilidade representa a capacidade de entrega dentro do módulo, considerando esforço técnico, dependências externas e restrições de confidencialidade. Para tornar a priorização reproduzível, adotou-se a escala Baixa = 1, Média = 2 e Alta = 3; níveis intermediários correspondem à média dos níveis adjacentes. O score é a soma de importância e viabilidade, variando de 2 a 6. Empates são resolvidos, nesta ordem, pela maior importância e pela precedência técnica. Por isso, as funcionalidades do pipeline de Processamento de Linguagem Natural antecedem as que dependem dele. A coluna de planejamento registra o recorte do projeto, mas não altera o score.
 
-**Validação necessária:** confirmar, para cada feature, se sua origem foi o TAPI, o parceiro ou uma discussão interna da equipe e acrescentar essa informação à tabela; o repositório registra apenas as fontes gerais do brainstorming.
+**Critério de origem:** cada feature foi classificada em uma de cinco origens — **TAPI** (descrita explicitamente no termo de abertura), **Parceiro** (solicitada verbalmente em reunião ou entrevista), **Problema identificado** (deduzida diretamente da dor mapeada na seção 1.1 ou nas personas da seção 1.5), **Equipe (produto)** (proposta pelo grupo para melhorar a experiência) ou **Equipe (técnica)** (decorrente de necessidade de arquitetura, do pipeline de PLN ou de segurança). Para as features das faixas Simulação no MVP, Registro para o futuro (Ir Além) e Registro para o futuro (desejo do parceiro), a origem estava registrada em prosa nos parágrafos que seguem a tabela; para as demais, a classificação foi reconstruída a partir do restante do documento — descrição do produto (seção 1.3), problema (seção 1.1) e personas (seção 1.5) — na ausência de um registro contemporâneo ao brainstorming, e deve ser conferida pela equipe.
 
 <div align="center">
 <sub>Tabela 1.7 — Brainstorming e priorização de features</sub>
 </div>
 
-| Prioridade | Feature                                                                           | Importância | Viabilidade | Score | Planejamento                                  |
-| :--------: | --------------------------------------------------------------------------------- | :---------: | :---------: | :---: | --------------------------------------------- |
-| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | 6,0 | MVP |
-| 2 | Identificação e classificação de intenções | Alta | Alta | 6,0 | MVP |
-| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | 6,0 | MVP |
-| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | 6,0 | MVP |
-| 5 | Respostas estruturadas | Alta | Alta | 6,0 | MVP |
-| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | 6,0 | MVP |
-| 7 | Localização e consulta de documentos dos projetos | Alta | Média | 5,0 | MVP |
-| 8 | Indicação das fontes | Alta | Média | 5,0 | MVP |
-| 9 | Alertas de prazos e documentos faltantes | Alta | Média | 5,0 | MVP |
-| 10 | Identificação de campos incompletos | Alta | Média | 5,0 | MVP |
-| 11 | Sugestão de conteúdo para campos | Alta | Média | 5,0 | MVP |
-| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | 4,5 | MVP |
-| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | 4,0 | MVP |
-| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | 4,0 | MVP |
-| 15 | Controle de acesso por perfil | Alta | Média/Baixa | 4,5 | Simulação no MVP |
-| 16 | Rastreabilidade das interações | Alta | Média | 5,0 | Simulação no MVP |
-| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | 4,5 | Evolução futura |
-| 18 | Prévia de relatório de status | Média/Alta | Média | 4,5 | Evolução futura |
-| 19 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | 3,0 | Evolução futura |
-| 20 | Painel de alertas e pendências | Média | Média | 4,0 | Evolução futura |
-| 21 | Notificações automáticas | Média | Baixa | 3,0 | Evolução futura |
-| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) |
-| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) |
-| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | 3,0 | Registro para o futuro (evolução tecnológica) |
+| Prioridade | Feature                                                                           | Importância | Viabilidade | Score | Planejamento                                  | Origem |
+| :--------: | --------------------------------------------------------------------------------- | :---------: | :---------: | :---: | --------------------------------------------- | ------ |
+| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | 6,0 | MVP | TAPI |
+| 2 | Identificação e classificação de intenções | Alta | Alta | 6,0 | MVP | Equipe (técnica) |
+| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | 6,0 | MVP | TAPI |
+| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | 6,0 | MVP | Problema identificado |
+| 5 | Respostas estruturadas | Alta | Alta | 6,0 | MVP | Equipe (produto) |
+| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | 6,0 | MVP | Equipe (técnica) |
+| 7 | Localização e consulta de documentos dos projetos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 8 | Indicação das fontes | Alta | Média | 5,0 | MVP | TAPI |
+| 9 | Alertas de prazos e documentos faltantes | Alta | Média | 5,0 | MVP | Problema identificado |
+| 10 | Identificação de campos incompletos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 11 | Sugestão de conteúdo para campos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | 4,5 | MVP | Equipe (produto) |
+| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | 4,0 | MVP | Equipe (produto) |
+| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | 4,0 | MVP | Equipe (técnica) |
+| 15 | Rastreabilidade das interações | Alta | Média | 5,0 | Simulação no MVP | TAPI |
+| 16 | Controle de acesso por perfil | Alta | Média/Baixa | 4,5 | Simulação no MVP | TAPI |
+| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | 4,5 | Evolução futura | TAPI |
+| 18 | Prévia de relatório de status | Média/Alta | Média | 4,5 | Evolução futura | TAPI |
+| 19 | Painel de alertas e pendências | Média | Média | 4,0 | Evolução futura | Equipe (produto) |
+| 20 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | 3,0 | Evolução futura | Equipe (produto) |
+| 21 | Notificações automáticas | Média | Baixa | 3,0 | Evolução futura | Equipe (técnica) |
+| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) | TAPI |
+| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) | TAPI |
+| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | 3,0 | Registro para o futuro (evolução tecnológica) | Equipe (técnica) |
 
 <div align="center">
 <sup>Fonte: Material produzido pelos autores, 2026.</sup>
@@ -649,23 +653,23 @@ A principal proposta de valor da solução consiste em facilitar a interação d
 
 **Acesso rápido às informações por linguagem natural**
 
-O agente reduz a necessidade de navegação manual por diferentes documentos e estruturas de dados, permitindo que os usuários façam perguntas diretamente em linguagem natural.
+O agente elimina a navegação manual por diferentes documentos e estruturas de dados: o usuário formula a pergunta diretamente em linguagem natural e recebe resposta em até 15 segundos em pelo menos 80% das consultas, conforme o RNF01.
 
 **Redução do trabalho manual**
 
-A solução busca diminuir o tempo empregado na busca, interpretação e consolidação manual de informações relacionadas aos projetos.
+A solução reduz o tempo empregado na busca, na interpretação e na consolidação manual de informações dos projetos, substituindo a navegação por múltiplas fontes por uma única interação conversacional.
 
 **Apoio ao acompanhamento e à tomada de decisão**
 
-Ao facilitar o acesso às informações relevantes, o agente pode apoiar líderes, Escritório de Projetos e diretoria durante o acompanhamento dos projetos e a tomada de decisões.
+Ao estruturar as informações relevantes em respostas claras, o agente apoia líderes, Escritório de Projetos e diretoria no acompanhamento dos projetos e na tomada de decisões: pelo menos 80% dos participantes dos testes de usabilidade compreendem a resposta e identificam a informação solicitada sem auxílio externo, conforme o RNF08.
 
 **Maior qualidade e padronização das informações**
 
-O agente pode auxiliar os usuários durante o preenchimento e consulta de documentos, contribuindo para uma maior consistência das informações registradas.
+O agente eleva a consistência das informações registradas ao sugerir conteúdo padronizado para os campos dos documentos: pelo menos 85% das sugestões vêm acompanhadas de referência válida e justificativa compreensível, conforme o RNF11.
 
 **Assistência no cumprimento da documentação de projetos**
 
-A solução também busca auxiliar os responsáveis pelos projetos no acompanhamento e preenchimento dos documentos necessários ao longo de seu ciclo de vida.
+A solução apoia os responsáveis pelos projetos no preenchimento dos documentos exigidos ao longo do ciclo de vida do empreendimento, apresentando uma sugestão de texto para cada campo pendente sem alterar o documento de origem, conforme os critérios de aceitação do RF04.
 
 ### Relacionamento com os usuários
 
@@ -1005,8 +1009,8 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
 - **Indicadores computacionais:**
   - **Precisão da classificação de intenção:** número de solicitações corretamente classificadas dividido pelo total de solicitações do conjunto de teste. O valor-alvo é de pelo menos 85%, conforme o RNF03.
-  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas dividido pelo total de entidades presentes no conjunto de teste. **Valor-alvo a definir com a equipe** para a extração de nome do projeto, período de referência e indicador solicitado.
-  - **Taxa de correspondência entre entidade e registro:** número de consultas em que a entidade extraída foi associada ao registro correto dividido pelo total de consultas do conjunto de teste. **Valor-alvo a definir com a equipe** para a correspondência entre entidades extraídas e registros do portfólio.
+  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas dividido pelo total de entidades presentes no conjunto de teste, para a extração de nome do projeto, período de referência e indicador solicitado. O valor-alvo é de pelo menos 85%, na mesma linha da precisão mínima definida para a classificação de intenções no RNF03.
+  - **Taxa de correspondência entre entidade e registro:** número de consultas em que a entidade extraída foi associada ao registro correto dividido pelo total de consultas do conjunto de teste. O valor-alvo é de pelo menos 90%, por se tratar de uma correspondência determinística executada após a extração.
 
 ### Fluxo de negócio 2: Apoio proativo ao preenchimento e acompanhamento de pendências
 
@@ -1015,8 +1019,8 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 - **Situação proposta (TO-BE):** o sistema sugere textos para os campos pendentes a partir da interação com o usuário, mantendo o controle humano sobre o que é efetivamente registrado, e notifica proativamente o PMO sobre marcos, riscos e pendências conforme filtros configurados, sem repetir alertas já enviados.
 
 - **Indicadores computacionais:**
-  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas da fala ou do texto dividido pelo total de entidades presentes nas interações do conjunto de teste. **Valor-alvo a definir com a equipe** para a extração do campo e do conteúdo sugerido.
-  - **Precisão na detecção de alertas:** número de marcos, riscos e pendências corretamente identificados como elegíveis dividido pelo total de alertas gerados. **Valor-alvo a definir com a equipe** para a precisão dos alertas e os filtros que comporão o conjunto de teste.
+  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas da fala ou do texto dividido pelo total de entidades presentes nas interações do conjunto de teste, para a extração do campo e do conteúdo sugerido. O valor-alvo é de pelo menos 85%, na mesma linha do RNF03.
+  - **Precisão na detecção de alertas:** número de marcos, riscos e pendências corretamente identificados como elegíveis dividido pelo total de alertas gerados. O valor-alvo é de pelo menos 90%, por se tratar de uma verificação baseada em regras de prazo e status já estruturados; os filtros que comporão o conjunto de teste serão definidos na Sprint 3.
   - **Taxa de erro de palavras (Word Error Rate — WER):** soma de substituições, inserções e exclusões dividida pelo total de palavras do áudio de referência. O valor-alvo é de no máximo 15%, equivalente à taxa mínima de 85% de palavras reconhecidas corretamente definida no RNF06.
 
 ---
