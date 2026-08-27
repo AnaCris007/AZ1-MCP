@@ -1889,7 +1889,7 @@ Isso importa por dois motivos. Primeiro, treinar, avaliar, salvar e prever passa
 | Permutações de ordem das etapas ativas | | **19.767** |
 | Vetorizações (2 modos × 2 janelas de n-grama) | | **4** |
 
-Permutações que produzem texto idêntico são o mesmo experimento e são deduplicadas por hash do corpus, o que elimina cerca de 85% do trabalho. A varredura completa resulta em **11.644 execuções distintas** e leva aproximadamente **4 minutos**.
+As 432 configurações de pré-processamento, combinadas com suas permutações de ordem, produzem 19.767 pares (configuração, ordem). Multiplicados pelas 4 vetorizações, chegam a **79.068 combinações**. Permutações que produzem texto idêntico são o mesmo experimento e são deduplicadas por hash do corpus, o que elimina cerca de 85% do trabalho. A varredura completa resulta em **11.644 execuções distintas** e leva aproximadamente **4 minutos**.
 
 #### 3.3.6 Como o pipeline final foi escolhido
 
@@ -1978,7 +1978,7 @@ ALPHA_PADRAO      = 1.0
 FIT_PRIOR_PADRAO  = True
 ```
 
-F1-macro de **0,6736** em validação cruzada de 5 dobras. Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
+F1-macro de **0,6736** em validação cruzada de 5 dobras — avaliação da configuração vencedora individualmente, não a média da busca de parâmetros (0,6537 na tabela acima, que é a média sobre todos os candidatos com alpha=1,0 nas quatro vetorizações). Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
 
 **Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que 0,6736 está **17,6 pontos percentuais abaixo dos 85% exigidos pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a seção 3.9, e as duas frentes são ampliar o dataset e calibrar um limiar de recusa sobre as nove intenções conhecidas.
 
