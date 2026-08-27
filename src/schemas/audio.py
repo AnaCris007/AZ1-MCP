@@ -2,11 +2,10 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-
 AudioStatus = Literal["received"]
 
 AudioErrorCode = Literal[
-    "unauthorized",
+    "bad_request",
     "unsupported_format",
     "file_too_large",
     "audio_too_long",
