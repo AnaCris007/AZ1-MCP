@@ -3,7 +3,7 @@
 ## Roteiro do vídeo encenado
 
 **Participantes:** Karol e Matheus  
-**Estado:** roteiro em construção, sujeito a alterações durante os ensaios e a execução do protótipo.
+**Estado declarado pela equipe:** roteiro gravado em 25/08/2026. A Cena 10, sobre interação por áudio, foi acrescentada durante a gravação e posteriormente incorporada a este registro; a antiga cena final passou a ser a Cena 11. O arquivo de vídeo está versionado, mas o roteiro, isoladamente, não comprova quando cada decisão foi tomada nem se a execução foi levada até uma falha.
 
 ## Cena 1 — O problema
 
@@ -81,51 +81,56 @@
 
 **Karol:** Por isso, pensamos em permitir que o usuário avalie a recomendação como útil ou não útil. Assim, ele continua tendo controle sobre as sugestões que recebe.
 
-**Matheus:** Isso revelou um ponto importante da nossa exploração: estar relacionado ao mesmo projeto não significa, necessariamente, estar relacionado à intenção do usuário naquele momento.
+**Karol:** Aos poucos, isso foi ficando mais claro:
 
-**Karol:** Ou seja, entender o contexto é importante, mas entender a intenção também é um desafio que precisa ser considerado.
+**Matheus:** Estar no mesmo projeto não significa que a informação seja relevante naquele momento.
 
-## Cena 7 — Para onde vão essas informações?
+**Karol:** Por isso, a IA precisa entender não só o contexto, mas também a intenção do usuário.
 
-**Karol:** Outro ponto que exploramos foi o que acontece com as informações e recomendações recebidas ao longo do dia.
+## Cena 7 — Pra onde vão essas informações?
 
-**Matheus:** A ideia é que o próprio agente tenha um espaço integrado ao Microsoft Teams, onde o usuário possa consultar posteriormente as informações relevantes que apareceram durante suas atividades.
+**Karol:** Também pensamos no que acontece com as informações recebidas ao longo do dia.
 
-**Karol:** Dessa forma, uma informação importante encontrada pela manhã, por exemplo, não precisa ser procurada novamente mais tarde.
+**Matheus:** A ideia é ter um espaço no Teams onde o usuário possa consultar depois o que foi relevante, sem precisar procurar tudo novamente.
 
 ## Cena 8 — Antes de encerrar o dia
 
-**Matheus:** Também pensamos em como o agente poderia ajudar no encerramento do dia sem tomar decisões pelo usuário.
+**Matheus:** No fim do dia, o agente também poderia organizar as principais informações encontradas.
 
-**Karol:** A proposta é organizar as principais informações identificadas durante o trabalho, destacando o que foi relevante, possíveis pendências e próximos passos.
+**Karol:** Destacando pontos relevantes, pendências e próximos passos, sem tomar decisões pelo usuário.
 
-**Matheus:** Por exemplo, o agente poderia indicar que houve uma alteração importante em um cronograma, que uma pendência ainda precisa ser verificada ou que determinado documento pode ser relevante para a próxima reunião.
+## Cena 9 — Quando a ideia é questionada
 
-**Karol:** O objetivo não é dizer ao usuário o que ele deve fazer, mas ajudá-lo a visualizar o que aconteceu durante o dia e o que pode exigir sua atenção depois.
+**Karol:** Mas essa ideia também trouxe novos desafios.
 
-## Cena 9 — Quando a ideia começa a ser questionada
+**Matheus:** Como saber se o usuário mudou de contexto? Quando uma recomendação ajuda ou começa a atrapalhar?
 
-**Karol:** Durante a construção do protótipo, percebemos que essa ideia também levanta várias questões que ainda precisam ser exploradas.
+**Karol:** E como usar o feedback do usuário para melhorar as próximas sugestões?
 
-**Matheus:** Como a IA identifica que o usuário mudou de contexto? Abrir um documento significa que ele realmente está trabalhando naquele assunto? E quantas recomendações podem ser feitas antes de começarem a atrapalhar?
+**Matheus:** No fim, o principal desafio é entender não só o que está na tela, mas o que o usuário realmente pretende fazer.
 
-**Karol:** Também surgiram dúvidas sobre o feedback do usuário. O que deve acontecer quando uma recomendação é rejeitada? A IA deveria considerar esse feedback nas próximas recomendações? E quais informações realmente deveriam permanecer no histórico?
+## Cena 10 — Interação por áudio
 
-**Matheus:** No fim, chegamos a uma questão ainda mais importante: como diferenciar aquilo que simplesmente está na tela do usuário daquilo que ele realmente pretende fazer?
+**Karol:** Essa interação também pode ser implementada por áudio, através de um fone de ouvido.
 
-## Cena 10 — Encerramento
+**Matheus:** Assim, o agente pode apresentar as recomendações por voz, sem exigir que o usuário pare o que está fazendo para abrir uma interface.
+
+**Karol:** Mantendo a mesma lógica: o agente recomenda e o usuário decide se quer acessar a informação.
+
+## Cena 11 — Final
 
 **Karol:** No começo, a pergunta era simples.
 
-**Matheus:** Mas percebemos que o verdadeiro desafio não é fazer a IA aparecer.
+**Matheus:** Mas percebemos que o desafio não é fazer a IA aparecer.
 
-**Karol:** É fazer com que ela entenda quando realmente vale a pena.
+**Karol:** É entender quando realmente vale a pena ajudar.
 
 **Matheus:** Porque uma boa IA não é a que mais interfere.
 
 **Karol:** É a que sabe quando ajudar.
 
-*[Encerramento na tela.]*
+**Encerramento:**
 
-> **Protótipo A — Interação Proativa e Contextual**  
-> Informação certa. No momento certo.
+**Protótipo A — Interação Proativa e Contextual**
+
+***Informação certa. No momento certo.***
