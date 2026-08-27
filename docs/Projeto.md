@@ -1435,6 +1435,8 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 | PLN — Transações e Ações → Auditoria e Feedback | Chamada interna | Registra a intenção processada e o resultado sugestivo ou informativo. |
 | Auditoria e Feedback → Logs de Auditoria | Persistência SQL | Mantém registros separados dos dados operacionais para facilitar controle de acesso e auditoria. |
 
+**Decisão de Sprint 2 — persistência do pipeline de voz adiada para Sprint 3:** o resultado do pipeline de áudio — transcrição e intenção classificada — trafega inteiramente em memória durante o ciclo de vida da requisição HTTP e não é gravado em nenhum banco de dados. O arquivo de áudio permanece no armazenamento de objetos (MinIO), mas a transcrição e a intenção reconhecida são descartadas após a resposta ser devolvida ao cliente. A persistência dessas interações, via componente Auditoria e Feedback nos Logs de Auditoria, está planejada para a Sprint 3, quando o PostgreSQL será provisionado e o schema de auditoria definido. Até lá, rastreabilidade parcial é garantida pelo `audio_id`, que vincula cada requisição ao arquivo de áudio correspondente no MinIO.
+
 ---
 
 ## 2.5 Tecnologias e Ferramentas
