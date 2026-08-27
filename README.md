@@ -118,6 +118,8 @@ A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000
 
 Os arquivos são armazenados com a chave `incoming/{audio_id}` e expiram automaticamente após sete dias. O componente de Speech-to-Text recebe o `audio_id` do orquestrador e recupera o objeto diretamente do bucket `az1-audio`; esta API não oferece endpoint de download nem inicia a transcrição.
 
+O endpoint `POST /api/v1/chat` encaminha a mensagem recebida para a API gratuita do Gemini e devolve a resposta do modelo — por ora, apenas para validar a integração com a interface, sem manter histórico de conversa no servidor. Requer a variável `GEMINI_API_KEY` (veja `.env.example`); sem ela, a primeira chamada ao endpoint falha.
+
 Antes de expor o endpoint fora de uma rede controlada, será necessário definir autenticação, rate limiting e um limite de corpo no gateway ou proxy. Nesta etapa do MVP, a API é interna e não exige autenticação.
 
 ##  Configuração para desenvolvimento
