@@ -1740,7 +1740,114 @@ Uma nova classificação de intenção só deve ser executada quando o sistema d
 
 ### 3.2 API de Speech to Text e Text to Speech
 
-<!-- Exemplo do que incluir: API escolhida, endpoints, métodos HTTP, parâmetros, respostas e exemplos de requisição e resposta. -->
+#### Serviço de Speech to Text
+
+**Decisão:** utilizar o **Deepgram**, modelo `nova-3`, como serviço de conversão de áudio em texto.
+
+O comparativo abaixo registra os critérios avaliados:
+
+| Critério | Deepgram nova-3 | OpenAI Whisper API | Google Cloud STT | Azure Cognitive Speech |
+| --- | --- | --- | --- | --- |
+| Suporte ao português brasileiro | Sim, modelo dedicado | Sim | Sim | Sim |
+| Qualidade em vocabulário técnico | Alta, aceita keyterms de domínio | Alta | Média | Média-alta |
+| Custo por minuto de áudio | ~US$ 0,0043 | ~US$ 0,006 | ~US$ 0,016 | ~US$ 0,014 |
+| Créditos gratuitos disponíveis | US$ 200 (conta nova) | US$ 5 (tier free) | US$ 300 (trial) | US$ 200 (trial) |
+| Latência de resposta | Baixa (~1–2 s para áudios curtos) | Média (~3–5 s) | Baixa | Baixa |
+| SDK Python oficial | Sim (`deepgram-sdk`) | Sim (`openai`) | Sim (`google-cloud-speech`) | Sim (`azure-cognitiveservices-speech`) |
+| Facilidade de integração | Alta, cliente assíncrono nativo | Alta | Média, exige credencial GCP | Média, exige recurso Azure |
+
+O Deepgram foi escolhido por combinar suporte explícito a termos de domínio via parâmetro `keyterm`, relevante para vocabulário do PMO como "empreendimento", "cronograma" e "marco", com latência baixa e créditos gratuitos que viabilizam os testes desta sprint sem custo. A escolha é provisória: a abstração `AudioFetcher` em `src/services/transcription_service.py` isola o cliente do restante do código, de modo que a troca por outro provedor exige alteração apenas na camada de serviço, sem impacto nas rotas ou nos esquemas de resposta. A decisão será reavaliada antes da entrega final com base nos resultados de WER medidos sobre áudios do vocabulário do portfólio, conforme exigido pelo RNF06.
+
+#### Endpoint de transcrição
+
+**Decisão:** expor a transcrição como um endpoint separado do recebimento do áudio, acionado por `audio_id`.
+
+O áudio é armazenado primeiro via `POST /api/v1/audio` e transcrito sob demanda. Essa separação permite que o recebimento e a transcrição evoluam de forma independente e que o mesmo áudio seja retranscrito sem reenvio, caso o serviço externo falhe ou o idioma precise ser corrigido.
+
+```http
+POST /api/v1/audio/{audio_id}/transcribe
+```
+
+#### Parâmetros de entrada
+
+| Parâmetro | Tipo | Obrigatório | Padrão | Descrição |
+| --- | --- | --- | --- | --- |
+| `audio_id` | string (rota) | Sim | | Identificador retornado pelo endpoint de recebimento |
+| `language` | string (query) | Não | `pt-BR` | Código BCP-47 do idioma do áudio |
+
+#### Autenticação
+
+Nenhum cabeçalho de autenticação é exigido nesta versão. A autenticação com o Deepgram é feita internamente pela API, a partir da variável de ambiente `DEEPGRAM_API_KEY`.
+
+#### Resposta de sucesso
+
+**Código HTTP:** `200 OK`
+
+| Campo | Tipo | Descrição |
+| --- | --- | --- |
+| `audio_id` | string | Identificador do áudio transcrito |
+| `text` | string | Texto resultante da transcrição |
+| `language` | string | Idioma utilizado na transcrição |
+| `confidence` | float \| null | Grau de confiança médio reportado pelo serviço (0–1), ou `null` se não disponível |
+| `duration_seconds` | float | Duração do áudio em segundos |
+
+#### Respostas de erro
+
+| Código | Condição |
+| --- | --- |
+| 404 | Áudio não encontrado no armazenamento (`audio_id` inexistente) |
+| 502 | Falha na transcrição: serviço externo indisponível ou retornou erro |
+| 422 | Parâmetro inválido (ex.: `language` com formato incorreto) |
+
+#### Exemplos de requisição e resposta
+
+```bash
+curl -X POST \
+  "http://localhost:8000/api/v1/audio/aud_067071317397468196a9b9c4cffa82c6/transcribe?language=pt-BR"
+```
+
+**Código HTTP:** `200 OK`
+
+```json
+{
+  "audio_id": "aud_067071317397468196a9b9c4cffa82c6",
+  "text": "Qual o status atual do empreendimento Linha 6 e quais são os marcos previstos para o próximo trimestre?",
+  "language": "pt-BR",
+  "confidence": 0.9516,
+  "duration_seconds": 22.831
+}
+```
+
+Áudio inexistente:
+
+```bash
+curl -X POST \
+  "http://localhost:8000/api/v1/audio/aud_inexistente/transcribe"
+```
+
+**Código HTTP:** `404 Not Found`
+
+```json
+{
+  "detail": "Áudio não encontrado: aud_inexistente"
+}
+```
+
+Falha no serviço externo:
+
+**Código HTTP:** `502 Bad Gateway`
+
+```json
+{
+  "detail": "Falha na transcrição do áudio aud_067071317397468196a9b9c4cffa82c6"
+}
+```
+
+#### Serviço de Text to Speech
+
+A implementação do TTS não está no escopo desta sprint. O cliente de TTS exige que o serviço esteja escolhido e com credenciais de teste disponíveis antes de qualquer desenvolvimento, e essa avaliação ainda não foi concluída pelo grupo. Além disso, a integração ponta a ponta STT-PLN-TTS depende tanto do cliente de STT, já implementado, quanto do cliente de TTS, ainda pendente; iniciar a integração sem os dois clientes prontos resultaria em trabalho parcial que não pode ser validado.
+
+O comparativo de provedores, a documentação dos endpoints e os exemplos de uso serão incluídos nesta seção na próxima sprint, após a escolha do serviço e os primeiros testes com o vocabulário do portfólio.
 
 ### 3.3 Algoritmo de NLP e Implementação
 
