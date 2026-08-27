@@ -2406,6 +2406,8 @@ Para manter a rastreabilidade, os registros são classificados assim:
 
 **20/08/2026 — Início da construção.** Decidimos partir da estrutura convencional de chatbot (sidebar de conversas, histórico de mensagens, campo de entrada), sem inovação de layout, para que a investigação ficasse concentrada no comportamento do agente e não na interface em si. A identidade visual usa a sinalização do Metrô (bolachas de linha, tipografia de placa, faixas de cor) apenas como camada de reconhecimento do contexto.
 
+**Demonstração audiovisual:** [assistir ao vídeo do Protótipo B](../assets/Vídeos/Vídeo-B.mp4).
+
 <div align="center">
 <sub>Imagem 4.5.1 - Primeiro estado da interface: apenas interação por texto, ainda incompleta</sub><br>
   <img src="../assets/design/estado-1-somente-texto.png" width="100%" alt="Primeiro estado da interface do Protótipo B, com interação apenas por texto"><br>
