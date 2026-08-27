@@ -78,15 +78,15 @@
 <rect x="1616" y="572" width="158" height="112" fill="#E0453E" stroke="#111111" stroke-width="3"/>
 <text x="735.0" y="527.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">AM1</text>
 <text x="893.0" y="527.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">AM2</text>
-<text x="539.0" y="282.0" text-anchor="middle" font-size="23" font-weight="700" fill="#111111">AM3</text>
-<text x="615.0" y="282.0" text-anchor="middle" font-size="23" font-weight="700" fill="#111111">AM7</text>
-<text x="539.0" y="316.0" text-anchor="middle" font-size="23" font-weight="700" fill="#111111">AM10</text>
-<text x="615.0" y="316.0" text-anchor="middle" font-size="23" font-weight="700" fill="#111111">AM11</text>
+<text x="419.0" y="303.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">AM3</text>
 <text x="735.0" y="396.0" text-anchor="middle" font-size="26" font-weight="700" fill="#111111">AM4</text>
 <text x="735.0" y="434.0" text-anchor="middle" font-size="26" font-weight="700" fill="#111111">AM8</text>
 <text x="893.0" y="639.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">AM5</text>
-<text x="735.0" y="191.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">AM6</text>
-<text x="577.0" y="415.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">AM9</text>
+<text x="735.0" y="303.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">AM6</text>
+<text x="577.0" y="396.0" text-anchor="middle" font-size="26" font-weight="700" fill="#111111">AM7</text>
+<text x="577.0" y="434.0" text-anchor="middle" font-size="26" font-weight="700" fill="#111111">AM9</text>
+<text x="577.0" y="284.0" text-anchor="middle" font-size="26" font-weight="700" fill="#111111">AM10</text>
+<text x="577.0" y="322.0" text-anchor="middle" font-size="26" font-weight="700" fill="#111111">AM11</text>
 <text x="1537.0" y="191.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">OP1</text>
 <text x="1379.0" y="415.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">OP2</text>
 <text x="1537.0" y="415.0" text-anchor="middle" font-size="30" font-weight="700" fill="#111111">OP3</text>

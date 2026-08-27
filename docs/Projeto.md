@@ -46,7 +46,7 @@
 - [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
 - [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
 - [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
-- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -2414,7 +2414,7 @@ Com essas definições, o contrato da API estabelece como o áudio entra no sist
 
 ### 3.7 Processo de Deploy em Nuvem
 
-#### 3.6.1 Arquitetura e Provedor Selecionado
+#### 3.7.1 Arquitetura e Provedor Selecionado
 
 O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **Microsoft Azure**. No MVP, o núcleo permanece independente; Copilot Studio, Power Platform, Teams e SharePoint são integrações futuras com o ambiente corporativo do parceiro.
 
@@ -2450,7 +2450,7 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 ```
 
 
-#### 3.6.2 Serviços Gratuitos e Limites
+#### 3.7.2 Serviços Gratuitos e Limites
 
 **Azure Free Tier (sempre gratuito):**
 - Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação/dia)
@@ -2469,7 +2469,7 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 **Para projeto acadêmico sem time constraint:**
 No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e suficientes. A implantação real deverá considerar licenciamento e recursos corporativos.
 
-#### 3.6.3 Etapas de Configuração e Implantação
+#### 3.7.3 Etapas de Configuração e Implantação
 
 **Passo 1 — Criar Ambientes Microsoft:**
 1. Registrar-se em [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
@@ -2509,7 +2509,7 @@ No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e 
 3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
 4. Enviar notificação para usuário via Teams
 
-#### 3.6.4 Exemplo de API (Flask)
+#### 3.7.4 Exemplo de API (Flask)
 
 
 ```python
@@ -2584,7 +2584,7 @@ EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 ```
 
-#### 3.6.5 Reprodutibilidade e Verificação
+#### 3.7.5 Reprodutibilidade e Verificação
 
 **Checklist de controle de custo:**
 - [ ] Azure App Service em tier Free (1 instância)
@@ -2624,7 +2624,7 @@ curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
 }
 ```
 
-#### 3.6.6 Próximos Passos para Produção
+#### 3.7.6 Próximos Passos para Produção
 
 Quando a solução for promovida para ambiente real do Metrô:
 
@@ -2636,7 +2636,7 @@ Quando a solução for promovida para ambiente real do Metrô:
 
 Toda a arquitetura permanece igual; apenas migram os recursos para ambientes gerenciados pelo Metrô.
 
-#### 3.6.7 Observações Finais
+#### 3.7.7 Observações Finais
 
 Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossistema Microsoft do parceiro. A reprodutibilidade será confirmada após a execução dos passos e a inclusão das evidências. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 
