@@ -37,6 +37,8 @@ Os diagramas e as imagens utilizados pelos documentos estão armazenados na past
 - diagramas de classes, de componentes e de sequência;
 - diagramas BPMN dos fluxos AS-IS e TO-BE e a cadeia de valor;
 - registros visuais dos protótipos A e B.
+- diagrama do fluxo Gitflow;
+- linha do tempo de entrega das Sprints 3, 4 e 5.
 
 ## Estrutura atual da documentação
 
