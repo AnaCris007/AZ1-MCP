@@ -2477,6 +2477,240 @@ A tabela a seguir registra a correspondência entre cada elemento das modelagens
 
 As cardinalidades mínimas do lado "muitos" — um portfólio reúne ao menos um projeto `(1,n)` e um artefato possui ao menos um campo `(1,n)` — não são expressáveis por restrições declarativas simples no modelo relacional, pois exigiriam verificação no momento da inserção da linha "pai". Essas duas regras permanecem documentadas como restrições de aplicação, a serem garantidas pela camada de serviços descrita na seção 2.4.
 
+#### 3.6.5 Dicionário de dados (modelo físico)
+
+O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. Todas as chaves primárias substitutas usam `INTEGER GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais.
+
+As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente (portfólios, projetos, usuários, artefatos, campos e pendências), e o schema **`auditoria`** reúne os registros de interação, fontes consultadas e notificações, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
+
+**`portfolio`** — agrupamento de projetos de um exercício:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do portfólio |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
+| `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
+
+**`usuario`** — profissional autorizado a utilizar o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do usuário |
+| `nome` | `TEXT` | `NOT NULL` | Nome do profissional |
+| `email` | `TEXT` | `NOT NULL`, `UNIQUE` | Endereço corporativo de envio das notificações |
+| `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Papel do usuário, base do controle de acesso do RNF02 |
+
+**`projeto`** — empreendimento acompanhado pelo PMO:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do projeto |
+| `codigo` | `TEXT` | `NOT NULL`, `UNIQUE` | Código institucional do empreendimento (chave natural) |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do empreendimento |
+| `status` | `TEXT` | `NOT NULL` | Situação corrente do projeto |
+| `data_inicio` | `DATE` | — | Data de início da execução |
+| `data_termino_prevista` | `DATE` | — | Data prevista de conclusão, base da apuração de prazos |
+| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física |
+| `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
+| `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
+
+**`artefato`** — documento que integra a documentação do projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do artefato |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto documentado (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, como ata, relatório ou contrato |
+| `referencia` | `TEXT` | `NOT NULL` | Localizador do documento no repositório, exibido como fonte no RF03 |
+| `data` | `TIMESTAMPTZ` | `NOT NULL` | Data da última atualização, exibida junto à fonte no RF03 |
+| `versao` | `TEXT` | — | Versão vigente do documento |
+
+**`campo_artefato`** — campo individual de um artefato:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do campo |
+| `artefato_id` | `INTEGER` | `FK → artefato`, `NOT NULL`, `ON DELETE CASCADE` | Artefato ao qual o campo pertence (composição) |
+| `nome` | `TEXT` | `NOT NULL`, `UNIQUE (artefato_id, nome)` | Rótulo do campo dentro do artefato |
+| `valor` | `TEXT` | — | Conteúdo registrado; nulo ou vazio quando não preenchido |
+| `obrigatorio` | `BOOLEAN` | `NOT NULL`, `DEFAULT FALSE` | Indica se o preenchimento é exigido |
+| `preenchido` | `BOOLEAN` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Derivada de `valor`, elimina inconsistência entre valor e marcação (decisão 2 da seção 3.6.7) |
+
+**`pendencia`** — item em aberto originado por um projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único da pendência |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto de origem (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência, como prazo, documento ou aprovação; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `descricao` | `TEXT` | `NOT NULL` | Detalhamento do item em aberto |
+| `prazo` | `DATE` | — | Data limite para tratamento, base da notificação do RF05 |
+| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'resolvida')` | Estado corrente da pendência |
+
+**`auditoria.interacao`** — registro de auditoria de cada solicitação (RNF04 e RNF09):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Usuário que realizou a interação |
+| `data_hora` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do evento |
+| `canal` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'voz')` | Canal utilizado, conforme o RF01 |
+| `texto_solicitacao` | `TEXT` | `NOT NULL` | Texto da solicitação (original ou transcrito do áudio) |
+| `audio_referencia` | `TEXT` | `CHECK` (preenchida apenas quando `canal = 'voz'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4), vinculando o registro ao arquivo original |
+| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1 | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
+| `resultado` | `TEXT` | `NOT NULL`, `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')` | Desfecho da solicitação |
+| `categoria_erro` | `TEXT` | — | Categoria do erro, quando aplicável (RNF09) |
+| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)` | Tempo de processamento, insumo da verificação do RNF01 |
+| `feedback_usuario` | `TEXT` | — | Avaliação da resposta fornecida pelo usuário, capturada pelo componente Auditoria e Feedback da seção 2.4 |
+
+**`auditoria.interacao_artefato`** — fontes consultadas em cada interação (associativa de `consulta`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `interacao_id` | `INTEGER` | `PK` composta, `FK → interacao` | Interação que consultou a fonte |
+| `artefato_id` | `INTEGER` | `PK` composta, `FK → artefato` | Artefato que fundamentou a resposta (RF03) |
+
+**`usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
+| `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`auditoria.notificacao`** — registro dos envios da notificação proativa (materialização de `notifica`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do envio |
+| `pendencia_id` | `INTEGER` | `FK → pendencia`, `NOT NULL`, `ON DELETE CASCADE` | Pendência comunicada |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `UNIQUE (pendencia_id, usuario_id)` | Destinatário; a unicidade composta impede notificar duas vezes a mesma pendência ao mesmo usuário |
+| `data_envio` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do envio, exigido pelo RNF09 |
+
+#### 3.6.6 Definição física em SQL
+
+A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5 — na nuvem, o serviço gerenciado correspondente do provedor escolhido na seção 3.7. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+
+```sql
+CREATE SCHEMA portfolio;
+CREATE SCHEMA auditoria;
+
+CREATE TABLE portfolio.portfolio (
+    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome          TEXT    NOT NULL,
+    ano_exercicio INTEGER NOT NULL,
+    UNIQUE (nome, ano_exercicio)
+);
+
+CREATE TABLE portfolio.usuario (
+    id     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome   TEXT NOT NULL,
+    email  TEXT NOT NULL UNIQUE,
+    perfil TEXT NOT NULL CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto'))
+);
+
+CREATE TABLE portfolio.projeto (
+    id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    codigo                TEXT NOT NULL UNIQUE,
+    nome                  TEXT NOT NULL,
+    status                TEXT NOT NULL,
+    data_inicio           DATE,
+    data_termino_prevista DATE,
+    percentual_avanco     NUMERIC(5,2) NOT NULL DEFAULT 0
+                          CHECK (percentual_avanco BETWEEN 0 AND 100),
+    portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
+    lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
+);
+
+CREATE TABLE portfolio.artefato (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    referencia TEXT NOT NULL,
+    data       TIMESTAMPTZ NOT NULL,
+    versao     TEXT
+);
+
+CREATE TABLE portfolio.campo_artefato (
+    id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    artefato_id INTEGER NOT NULL REFERENCES portfolio.artefato (id) ON DELETE CASCADE,
+    nome        TEXT NOT NULL,
+    valor       TEXT,
+    obrigatorio BOOLEAN NOT NULL DEFAULT FALSE,
+    preenchido  BOOLEAN GENERATED ALWAYS AS
+                (valor IS NOT NULL AND btrim(valor) <> '') STORED,
+    UNIQUE (artefato_id, nome)
+);
+
+CREATE TABLE portfolio.pendencia (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    descricao  TEXT NOT NULL,
+    prazo      DATE,
+    situacao   TEXT NOT NULL DEFAULT 'aberta'
+               CHECK (situacao IN ('aberta', 'em_tratamento', 'resolvida'))
+);
+
+CREATE TABLE portfolio.usuario_projeto (
+    usuario_id INTEGER NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    PRIMARY KEY (usuario_id, projeto_id)
+);
+
+CREATE TABLE auditoria.interacao (
+    id                     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id             INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_hora              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    canal                  TEXT NOT NULL CHECK (canal IN ('texto', 'voz')),
+    texto_solicitacao      TEXT NOT NULL,
+    audio_referencia       TEXT CHECK (audio_referencia IS NULL OR canal = 'voz'),
+    intencao               TEXT CHECK (intencao IN (
+                               'consultar_documentos_normativos',
+                               'consultar_projeto_sintetico',
+                               'orientar_mapa_beneficios',
+                               'orientar_tap',
+                               'orientar_entregas_cronograma',
+                               'orientar_avanco_mensal',
+                               'orientar_riscos_problemas',
+                               'analisar_completude_coerencia',
+                               'gerar_alertas_pendencias',
+                               'fora_do_catalogo')),
+    resultado              TEXT NOT NULL CHECK (resultado IN
+                               ('sucesso', 'esclarecimento', 'recusada', 'falha')),
+    categoria_erro         TEXT,
+    tempo_processamento_ms INTEGER CHECK (tempo_processamento_ms >= 0),
+    feedback_usuario       TEXT
+);
+
+CREATE TABLE auditoria.interacao_artefato (
+    interacao_id INTEGER NOT NULL REFERENCES auditoria.interacao (id),
+    artefato_id  INTEGER NOT NULL REFERENCES portfolio.artefato (id),
+    PRIMARY KEY (interacao_id, artefato_id)
+);
+
+CREATE TABLE auditoria.notificacao (
+    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    pendencia_id INTEGER NOT NULL REFERENCES portfolio.pendencia (id) ON DELETE CASCADE,
+    usuario_id   INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_envio   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (pendencia_id, usuario_id)
+);
+
+-- Imutabilidade dos registros de auditoria (RNF04)
+REVOKE UPDATE, DELETE ON auditoria.interacao, auditoria.interacao_artefato,
+                        auditoria.notificacao FROM PUBLIC;
+
+-- Exceção pontual: a avaliação do usuário chega depois da resposta, portanto
+-- o papel da aplicação recebe permissão de atualização restrita a essa coluna:
+-- GRANT UPDATE (feedback_usuario) ON auditoria.interacao TO <papel_da_aplicacao>;
+
+-- Índices dos acessos frequentes dos cenários da seção 2.2.2
+CREATE INDEX idx_artefato_projeto        ON portfolio.artefato (projeto_id);
+CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_id);
+CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo);
+CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, data_hora);
+```
+
 
 ### 3.7 Processo de Deploy em Nuvem
 
