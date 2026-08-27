@@ -61,10 +61,12 @@
 - [4.5 Diário de Construção dos Dois Protótipos](#45-diário-de-construção-dos-dois-protótipos)
 - [4.6 Execução dos Protótipos](#46-execução-dos-protótipos)
 - [4.7 Comparação entre as Alternativas](#47-comparação-entre-as-alternativas)
-- [4.8 Limites dos Protótipos](#48-limites-dos-protótipos)
+- [4.8 Limites da Exploração](#48-limites-da-exploração)
 - [4.9 Inventário de Decisões em Aberto](#49-inventário-de-decisões-em-aberto)
 - [4.10 Repertório de Situações](#410-repertório-de-situações)
-- [4.11 Registros Visuais](#411-registros-visuais)
+- [4.11 Aprendizados da Exploração](#411-aprendizados-da-exploração)
+- [4.12 Próximos Passos](#412-próximos-passos)
+- [4.13 Registros Visuais](#413-registros-visuais)
 
 </details>
 
@@ -2207,9 +2209,9 @@ Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossi
 
 ### 4.1 Questão de Projeto
 
-**Como deve ocorrer a interação entre o usuário e o agente de IA para facilitar o acesso às informações relevantes dos projetos durante sua rotina de trabalho?**
+**Até onde o agente de IA deve ajudar proativamente o usuário durante sua rotina de trabalho e em quais situações deve permanecer em silêncio?**
 
-Essa questão permanece em aberto porque, embora o agente tenha como objetivo facilitar o acesso às informações dos projetos, ainda não está definida a forma como essa interação deve acontecer no cotidiano do usuário. Diferentes formas de interação podem alterar quando e como as informações são apresentadas, o nível de iniciativa do agente e o controle do usuário sobre as consultas. A exploração das alternativas permitirá investigar as consequências dessas diferentes formas de interação antes de definir um comportamento para o sistema.
+A questão permanece em aberto porque uma IA excessivamente proativa pode interromper, recomendar conteúdo inadequado ou reduzir a sensação de controle, enquanto uma IA totalmente reativa pode deixar informações relevantes ocultas quando o usuário não sabe o que perguntar. A decisão afeta quem inicia a interação, quando ela ocorre e como contexto e intenção são considerados. A prototipação permite tornar visíveis consequências que uma discussão abstrata não evidencia, sem exigir uma escolha final nesta etapa.
 
 ### 4.2 Alternativas Divergentes
 
@@ -2221,6 +2223,8 @@ Nesta alternativa, o agente acompanha o contexto das atividades realizadas pelo 
 
 A proposta busca explorar uma interação em que o agente possui maior iniciativa, oferecendo informações sem depender de uma consulta explícita. O usuário, entretanto, mantém o controle sobre a interação, podendo aceitar ou rejeitar as recomendações apresentadas.
 
+O agente apenas recomenda: não altera documentos nem aplica informações automaticamente. A alternativa depende de sinais de contexto e, quando possível, da intenção do usuário; uma recomendação pode ser marcada como útil ou não útil. Sua vantagem potencial é antecipar informações, enquanto seu risco central é interromper ou sugerir algo tematicamente relacionado, mas inadequado à tarefa atual.
+
 Ao final do período de trabalho, as informações consideradas relevantes podem ser organizadas em um ambiente integrado ao Microsoft Teams, junto ao chatbot do agente, permitindo visualizar conteúdos priorizados, pendências identificadas e possíveis próximos passos.
 
 #### 4.2.2 Alternativa B: Interação Sob Demanda
@@ -2231,29 +2235,45 @@ A partir da solicitação realizada, o agente consulta as informações disponí
 
 Essa alternativa busca explorar uma experiência com menor nível de intervenção durante a rotina de trabalho, priorizando o controle do usuário sobre o momento e o contexto em que o agente é acionado.
 
+A alternativa reduz interrupções e mantém o momento da interação predominantemente sob controle do usuário. Em contrapartida, exige que a pessoa reconheça a própria necessidade e consiga formular uma consulta; informações importantes podem permanecer ocultas quando ela não sabe o que perguntar. Por isso, a interação sob demanda é uma alternativa defensável, e não uma versão deliberadamente limitada da solução.
+
 #### Divergência entre as alternativas
 
 As alternativas diferem principalmente em **quem inicia a interação**. Na Alternativa A, o agente identifica oportunidades de apoio e apresenta recomendações de forma proativa durante a atividade. Na Alternativa B, o agente permanece disponível, mas só realiza a busca e apresenta informações após uma solicitação explícita do usuário.
 
-Essa diferença pode alterar aspectos relevantes da experiência, como o esforço necessário para encontrar informações, a frequência de interrupções, o nível de controle percebido pelo usuário e a capacidade do agente de antecipar necessidades. Neste momento, nenhuma das alternativas é considerada definitiva ou superior à outra; ambas serão exploradas por meio dos protótipos.
+| Dimensão | Alternativa A — proativa e contextual | Alternativa B — sob demanda |
+|---|---|---|
+| Início da interação | Agente de IA | Usuário |
+| Controle do momento | Compartilhado entre agente e usuário | Predominantemente do usuário |
+| Risco principal | Interrupção ou recomendação inadequada | Informação relevante não ser descoberta |
+| Papel do contexto | Apoia a decisão de quando sugerir | É interpretado depois da solicitação |
+| Esforço do usuário | Menor para descobrir informações | Maior para formular a consulta |
+| Decisão em aberto | Quando o agente deve interferir | Como apoiar quem não sabe o que perguntar |
+
+Essas diferenças alteram o esforço para encontrar informações, a frequência de interrupções e o controle percebido. Nenhuma alternativa é considerada definitiva ou superior; a exploração compara consequências e mantém a decisão em aberto.
 
 ### 4.3 Formatos de Prototipação
 
-Para explorar as duas alternativas propostas, foram escolhidos formatos de prototipação que permitem observar diferentes aspectos da interação entre o usuário e o agente de IA. Os protótipos serão construídos em paralelo e utilizados como instrumentos de investigação, sem representar versões finais da solução.
+Para explorar as duas alternativas propostas, foram escolhidos formatos que permitem observar aspectos diferentes da interação. Ambos são instrumentos de investigação e não representam versões finais da solução.
+
+| Protótipo | Formato e materiais documentados | Modo de construção e execução | Pergunta que permite investigar | O que não consegue representar |
+|---|---|---|---|---|
+| A — proativo e contextual | vídeo, roteiro, encenação por integrantes e animações de recomendação | roteiro percorrido e comportamento encenado ao longo de uma rotina simulada | quando uma recomendação aparece, interrompe, é aceita ou recusada | reação espontânea, detecção real de contexto, frequência acumulada e precisão |
+| B — sob demanda | mockups PNG de uma interface conversacional com texto e voz simulada | estados visuais construídos e sessão de uso declarada pela equipe | como pedidos são formulados e como ambiguidades, permissões e fontes aparecem na interface | PLN, voz, fontes, permissões e latência em funcionamento real |
 
 #### 4.3.1 Alternativa A: Vídeo e Encenação da Interação Proativa
 
-A alternativa de interação proativa e contextual será explorada por meio de um **vídeo encenado**, representando um usuário durante sua rotina de trabalho enquanto o agente acompanha o contexto das atividades realizadas.
+A alternativa de interação proativa e contextual foi explorada por meio de um **vídeo encenado**, representando um usuário durante sua rotina de trabalho enquanto o agente acompanha o contexto das atividades realizadas.
 
-Ao longo da encenação, serão representados momentos em que o agente identifica documentos potencialmente relevantes e apresenta recomendações visuais ao usuário. O usuário poderá aceitar ou rejeitar essas recomendações, permitindo observar como a iniciativa do agente interfere no fluxo normal de trabalho.
+Ao longo da encenação, foram previstos momentos em que o agente identifica documentos potencialmente relevantes e apresenta recomendações visuais ao usuário. O usuário aceita ou rejeita essas recomendações no roteiro, tornando perceptível como a iniciativa do agente pode interferir no fluxo normal de trabalho.
 
 O formato foi escolhido por permitir representar a experiência ao longo do tempo e investigar questões como **quando uma recomendação deveria aparecer, com que frequência o agente deveria intervir, como o usuário mantém controle sobre as sugestões e em quais situações uma recomendação pode deixar de ajudar e passar a interromper a atividade**.
 
-O vídeo não busca representar uma interface final ou tecnicamente implementada, mas sim simular o comportamento e a relação entre usuário e agente em um cenário de uso.
+O vídeo não busca representar uma interface final ou tecnicamente implementada. Seu formato principal é a **encenação do comportamento ao longo do tempo**: as telas e animações funcionam como adereços narrativos para tornar a recomendação perceptível. Por isso, ele é tratado como formato não baseado em uma interface digital funcional. O formato permite explorar ritmo, interrupção, aceitação e recusa, mas não consegue representar detecção real de contexto, reação espontânea ou precisão técnica.
 
 #### 4.3.2 Alternativa B: Interface de Interação Sob Demanda
 
-A alternativa de interação sob demanda será explorada por meio de uma **interface gráfica conversacional**, na qual o usuário inicia a interação com o agente sempre que identifica a necessidade de consultar alguma informação relacionada aos projetos.
+A alternativa de interação sob demanda foi explorada por meio de uma **interface gráfica conversacional**, na qual o usuário inicia a interação com o agente quando identifica a necessidade de consultar alguma informação relacionada aos projetos.
 
 Nesse formato, o usuário pode realizar perguntas em linguagem natural por **texto ou voz**. A partir da solicitação, o agente interpreta a consulta, busca as informações disponíveis nas fontes de dados do projeto e apresenta uma resposta em linguagem natural, podendo também indicar os documentos e fontes relacionados à informação apresentada.
 
@@ -2267,7 +2287,7 @@ A prototipação por interface gráfica também permite representar e explorar s
 
 Os dois formatos permitem investigar a questão definida na [seção 4.1](#41-questão-de-projeto) a partir de formas distintas de interação entre o usuário e o agente. O vídeo encenado permite explorar uma experiência proativa e contextual, na qual o agente acompanha a rotina de trabalho e pode recomendar informações e documentos sem depender de uma solicitação inicial. Já a interface gráfica conversacional permite explorar uma experiência sob demanda, em que o usuário inicia a interação por texto ou voz e recebe respostas em linguagem natural a partir de suas solicitações.
 
-A exploração dos dois formatos permite observar diferenças relacionadas à iniciativa do agente, ao nível de controle do usuário, à possibilidade de interrupções e ao esforço necessário para acessar informações. O objetivo não é determinar previamente qual alternativa é superior, mas compreender as consequências e limitações de cada forma de interação para orientar decisões futuras do projeto.
+A exploração dos dois formatos permite observar diferenças relacionadas à iniciativa do agente, ao controle do usuário, à interrupção e ao esforço para acessar informações. A encenação investiga o comportamento distribuído ao longo de uma rotina; a interface torna concretos pedidos, ambiguidades e respostas. O objetivo não é determinar qual alternativa é superior, mas compreender consequências e limitações de cada uma.
 
 ### 4.4 Construção dos Protótipos
 
@@ -2297,7 +2317,7 @@ flowchart LR
     J -->|Hipótese do roteiro| L[Histórico e resumo<br/>no Microsoft Teams]
 ```
 
-O roteiro e o storyboard demonstram uma experiência proativa ao longo do tempo; não representam uma interface implementada nem comprovam integração com Microsoft Teams ou bases corporativas. O arquivo final e os registros brutos da gravação devem ser mantidos como evidências complementares, conforme delimitado na [seção 4.11](#411-registros-visuais).
+O roteiro e o storyboard demonstram uma experiência proativa ao longo do tempo; não representam uma interface implementada nem comprovam integração com Microsoft Teams ou bases corporativas. O arquivo final e os registros brutos da gravação devem ser mantidos como evidências complementares, conforme delimitado na [seção 4.13](#413-registros-visuais).
 
 #### 4.4.2 Construção do Protótipo B: Interação Sob Demanda
 
@@ -2314,7 +2334,9 @@ O roteiro e o storyboard demonstram uma experiência proativa ao longo do tempo;
 
 Esta seção registra, na ordem em que ocorreram, as decisões inesperadas, ambiguidades, dúvidas e limitações encontradas durante a construção de cada protótipo.
 
-Os registros datados mostram construção em paralelo: o roteiro do A começou em 20/08 e permaneceu em validação até 24/08, enquanto a interface B começou em 20/08 e recebeu decisões e estados intermediários entre 21/08 e 24/08. A avaliação consolidada só ocorreu depois que os dois formatos já possuíam uma primeira versão percorrível.
+O diário consolidado pela equipe registra atividades sobre os dois protótipos entre 20/08 e 24/08 e informa que a comparação ocorreu somente após ambos possuírem uma primeira versão percorrível. Entretanto, o repositório não contém fotos brutas, atas ou capturas com metadados suficientes para comprovar que os registros foram produzidos no momento nem que nenhum protótipo foi refinado após a avaliação do outro.
+
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar registros brutos datados que comprovem a construção paralela dos protótipos A e B.
 
 #### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
 
@@ -2385,25 +2407,25 @@ Esta seção registra como cada protótipo foi colocado em operação, incluindo
 
 #### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
 
-**Como foi rodado:** o roteiro foi lido, ensaiado e encenado por Karol e Matheus entre 24 e 25 de agosto de 2026. “Rodar”, neste formato, significou percorrer as dez cenas em voz alta, representar o aparecimento da recomendação, executar as escolhas de aceitar e recusar e continuar a jornada após mudanças de atividade. A leitura crítica ocorreu antes da gravação; as dúvidas que interromperam o percurso foram mantidas na Cena 9, em vez de serem escondidas por uma resposta inventada.
+**Registro disponível:** o [roteiro](RoteiroPrototipoA.md) identifica Karol e Matheus como participantes, e o [vídeo versionado](../assets/Vídeos/Vídeo-A.mp4) registra a encenação da alternativa. Segundo o diário consolidado pela equipe, o roteiro foi lido, ensaiado e gravado em 25 de agosto de 2026. Neste formato, “rodar” significa percorrer as cenas, representar o aparecimento da recomendação e encenar as escolhas de aceitar e recusar.
 
-**O que aconteceu:**
+**O que o roteiro e o diário permitem afirmar:**
 
-| Situação forçada durante o percurso | O que o protótipo conseguiu representar | Onde falhou / improviso necessário |
+| Situação prevista | Comportamento representado | Lacuna identificada durante a elaboração |
 |---|---|---|
-| Recomendação recusada pelo usuário | O agente desaparece e não insiste imediatamente | O roteiro não consegue distinguir “documento irrelevante”, “momento inadequado” e “não quero mais esse tipo de recomendação”; foi preciso assumir provisoriamente que toda recusa produz o mesmo comportamento |
-| Usuário muda do Projeto X para o Projeto Y | A encenação troca a atividade e passa a mostrar recomendações ligadas ao novo projeto | Não foi possível definir qual evento comprova a mudança de contexto; abrir uma tela ou documento não demonstra a intenção real |
-| Documento relacionado ao projeto, mas inadequado à tarefa atual | Os atores conseguem representar uma sugestão que parece contextual, mas não ajuda | O protótipo chega ao limite: o agente observa o que está na tela, porém não possui informação suficiente para inferir o objetivo do usuário |
-| Várias recomendações ao longo do dia | A encenação mostra que a ajuda pode aparecer em momentos distintos | Não foi possível definir frequência, prioridade ou intervalo aceitáveis sem improvisar uma regra sem evidência de usuários reais |
-| Consulta posterior no Teams | O roteiro representa a ideia de manter histórico e resumo diário | Não define quais itens permanecem, por quanto tempo, nem como informações sensíveis e recomendações rejeitadas seriam tratadas |
+| Recomendação recusada | O agente desaparece e não insiste imediatamente | O roteiro não distingue documento irrelevante, momento inadequado e rejeição permanente |
+| Mudança do Projeto X para o Projeto Y | A atividade e as recomendações mudam de projeto | Não está definido qual evento comprovaria mudança de contexto no sistema real |
+| Documento ligado ao projeto, mas inadequado à tarefa | A Cena 6 explicita que relevância temática não equivale à intenção | O mecanismo para inferir a intenção permanece indefinido |
+| Recomendações ao longo do dia | A narrativa distribui intervenções durante a rotina | Frequência, prioridade e intervalo aceitáveis não foram testados |
+| Consulta posterior no Teams | O roteiro apresenta histórico e resumo diário | Conteúdo, retenção e tratamento de informações sensíveis não foram definidos |
 
-**Falha alcançada:** o protótipo deixa de oferecer uma resposta definida quando o contexto visível e a intenção do usuário divergem. Nesse ponto, os atores não conseguem decidir, apenas pelo roteiro, se o agente deveria recomendar, aguardar, pedir confirmação ou permanecer silencioso. A impossibilidade foi transformada nas perguntas da Cena 9 e nas decisões em aberto da [seção 4.9](#49-inventário-de-decisões-em-aberto).
+O roteiro formula uma lacuna quando contexto e intenção divergem, mas não há evidência bruta disponível de que a encenação tenha sido deliberadamente forçada até falhar nem de qual improvisação ocorreu durante a gravação. Uma pergunta incorporada ao roteiro não substitui o registro do que aconteceu durante a execução.
 
-**Improvisos registrados:** para concluir a encenação, foi necessário assumir que (1) recusar sempre faz o agente desaparecer; (2) a troca da tela representa mudança de contexto; e (3) recomendações aceitas permanecem disponíveis no Teams. Essas escolhas permitiram rodar o protótipo, mas continuam sendo hipóteses, não decisões finais do produto.
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar o registro bruto do teste difícil do Protótipo A, indicando cenário, ação, resposta, ponto de falha e improvisação realmente ocorrida. Até essa evidência existir, a falha do Protótipo A é classificada como não comprovada.
 
 #### Protótipo B — Interface de Interação Sob Demanda
 
-**Como foi rodado:** A sessão foi realizada em 25 de agosto de 2026, às 9h30, na biblioteca da faculdade, com duração aproximada de 30 minutos, com Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO do Metrô. O participante não acompanhou a construção da interface e recebeu apenas o contexto mínimo ("você é analista do PMO e precisa encontrar documentos e informações dos projetos"), sem tutorial ou demonstração prévia. A primeira parte da sessão foi de uso livre; na segunda, foram propostos pedidos fora do escopo coberto pelo protótipo. O registro foi feito por anotações durante a sessão e capturas de tela; não houve gravação de vídeo. O nome “Felipe” e as iniciais “FS” exibidos nas capturas pertencem à persona fixa do mockup e não identificam o participante da sessão.
+**Como foi rodado, segundo o registro da equipe:** a sessão ocorreu em 25 de agosto de 2026, às 9h30, na biblioteca da faculdade, com duração aproximada de 30 minutos. Roberto Filho, aluno de Engenharia de Software, representou um analista de PMO e recebeu apenas o contexto mínimo ("você é analista do PMO e precisa encontrar documentos e informações dos projetos"), sem tutorial. A primeira parte foi de uso livre; na segunda, foram propostos pedidos fora do escopo. O nome “Felipe” e as iniciais “FS” nas capturas pertencem à persona fixa do mockup, não ao participante. Não há vídeo da sessão; os resultados abaixo dependem das anotações declaradas pela equipe e de uma captura do fallback.
 
 **O que aconteceu (não o que se esperava):**
 
@@ -2417,6 +2439,8 @@ Esta seção registra como cada protótipo foi colocado em operação, incluindo
 
 **Improvisos registrados:** Em ambas as falhas foi necessário intervir verbalmente — explicar que a decisão sobre consultas ao banco está em aberto e que o fluxo de voz é simulado. Cada intervenção verbal indica um comportamento que o sistema real precisará definir.
 
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar as anotações brutas da sessão ou outro registro que permita auditar as falas, intervenções e reações atribuídas ao participante.
+
 <div align="center">
 <sub>Imagem 4.6.1 - Fallback exibido durante a execução, diante do pedido de dado estruturado ("quantas ocorrências teve na L2 em julho?")</sub><br>
   <img src="../assets/design/execucao-fallback-dado-estruturado.png" width="100%" alt="Captura da interface exibindo o fallback de documento não encontrado durante o teste de execução"><br>
@@ -2425,24 +2449,24 @@ Esta seção registra como cada protótipo foi colocado em operação, incluindo
 
 ### 4.7 Comparação entre as Alternativas
 
-A comparação abaixo deriva dos diários e das execuções, sem escolher uma alternativa vencedora.
+A comparação separa o que está evidenciado no material do que permanece sem comprovação e não escolhe uma alternativa vencedora.
 
-| Aspecto observado | Protótipo A — proativo e contextual | Protótipo B — sob demanda |
-|---|---|---|
-| Início da interação | O agente decide quando aparecer; tornou visíveis frequência, interrupção e momento da recomendação | O usuário decide quando perguntar; tornou visível o esforço de formular a necessidade |
-| Ambiguidade central | Contexto visível não revela necessariamente a intenção | Uma frase curta pode omitir projeto, período, fonte ou tipo de informação |
-| Controle do usuário | Aceitar e recusar preservam controle, mas o significado da recusa ficou indefinido | O usuário controla o momento da consulta, mas depende dos limites e fallbacks do chat |
-| Falha alcançada | O roteiro não define o que fazer quando contexto e intenção divergem | O fallback trata pedido de dado estruturado como busca documental e a voz simulada cria expectativa de funcionalidade real |
-| O que o formato revelou | A encenação mostrou mudança de contexto, repetição e interrupções ao longo de um dia | A interface mostrou formulações concretas, desambiguação, permissões, versões e transcrição incerta |
-| O que ficou invisível | Precisão técnica, latência e reação espontânea de usuários reais | Frequência de intervenções e efeito acumulado de interrupções ao longo do trabalho |
+| Aspecto | Protótipo A — proativo e contextual | Protótipo B — sob demanda | O que permanece em aberto |
+|---|---|---|---|
+| Início da interação | O agente inicia a recomendação | O usuário inicia a consulta | Nível de proatividade aceitável |
+| Ambiguidade central | O roteiro explicita que contexto visível não revela necessariamente intenção | Pedidos curtos podem omitir projeto, período, fonte ou tipo de informação | Quando pedir confirmação |
+| Controle do usuário | Aceitar e recusar estão representados, mas o significado da recusa não foi definido | O usuário controla o momento, mas depende dos limites do chat | Como adiar, configurar ou silenciar interações |
+| Falha | A divergência entre contexto e intenção aparece como lacuna planejada; falha de execução não comprovada | Há captura do fallback para pedido de dado estruturado; as intervenções verbais dependem das anotações da equipe | Reexecutar A até falhar e preservar registro bruto; confirmar anotações de B |
+| Contribuição do formato | A encenação representa passagem do tempo, mudança de atividade e interrupção | A interface concretiza pedidos, desambiguação, permissões, versões e transcrição | Como esses efeitos aparecem com usuários do Metrô |
+| Limite | Não mede reação espontânea, fadiga ou precisão | Não mede frequência de intervenções nem integração real | Método comparativo com tarefas e participantes equivalentes |
 
 **O que apareceu somente no A:** a necessidade de definir um gatilho legítimo para recomendações, um limite de frequência, o significado do feedback e a permanência do histórico. O formato não baseado em interface digital permitiu encenar tempo, mudança de atividade e interrupção — relações que uma tela estática do chat não mostraria.
 
 **O que apareceu somente no B:** duplicatas de documentos, pedidos vagos, bloqueio por permissão, incerteza na transcrição e a fronteira entre documento e dado estruturado. Esses problemas surgiram porque o participante pôde formular pedidos concretos e tentar operar controles que pareciam reais.
 
-**Surpresas registradas:** no A, estar no projeto correto não significa compreender a tarefa atual; no B, a familiaridade visual reduziu o custo de aprendizagem, mas aumentou a frustração quando áudio e resposta se revelaram simulados. A exploração, portanto, não autoriza concluir que proatividade ou interação sob demanda seja superior: ela mostra decisões diferentes que ainda precisam ser testadas com usuários do Metrô.
+**Interpretações posteriores:** no A, a construção tornou explícita a diferença entre estar no projeto correto e compreender a tarefa atual. No B, o registro da equipe relata que a familiaridade visual reduziu o custo de aprendizagem, mas aumentou a frustração quando áudio e resposta se revelaram simulados. A primeira conclusão decorre do roteiro e do diário consolidado; a segunda depende das anotações da sessão ainda não anexadas. A exploração não permite concluir que proatividade ou interação sob demanda seja superior.
 
-### 4.8 Limites dos Protótipos
+### 4.8 Limites da Exploração
 
 Esta seção explicita o que cada protótipo **não** permite concluir e o que ainda dependeria de testes com usuários reais.
 
@@ -2455,7 +2479,7 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 - **Feedback sem semântica definida:** aceitar, recusar e avaliar utilidade aparecem no roteiro, mas não se sabe como esses sinais devem alterar recomendações futuras.
 - **Integrações ilustrativas:** Teams, histórico e acesso às bases são recursos narrativos, não integrações implementadas.
 - **Sem usuários do parceiro:** tolerância a interrupções, privacidade percebida e utilidade contextual só podem ser conhecidas com profissionais do Metrô em uma rotina próxima da real.
-- **Evidência bruta fora do repositório:** o texto registra gravação e edição, mas o arquivo audiovisual e as fotos de bastidores não estão versionados; portanto, o repositório sozinho não permite auditar integralmente a sessão.
+- **Evidência bruta limitada:** o vídeo editado está versionado, mas fotos, ensaios e gravações brutas de bastidores não estão disponíveis; portanto, não é possível auditar integralmente o processo nem a alegada falha da execução.
 
 #### Limites do Protótipo B — Interface de Interação Sob Demanda
 
@@ -2465,84 +2489,104 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 - **O participante do teste foi Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO:** a formulação de pedidos de um colaborador real, com vocabulário e pressa reais, só seria observada com usuários do Metrô.
 - **A execução foi registrada por anotações e capturas de tela, sem gravação de vídeo:** o registro depende do que foi anotado no momento; reações e hesitações do participante não ficaram integralmente documentadas.
 
+#### Limites comuns e conclusão permitida
+
+- Nenhum protótipo utiliza dados reais do Metrô ou opera no ambiente real de trabalho.
+- Não há recuperação documental, inferência de intenção, permissões ou integração com Teams/SharePoint em funcionamento nos protótipos.
+- O número reduzido de cenários não permite medir confiança, fadiga, aceitação ao longo do tempo ou efeito da frequência de notificações.
+- O canal de áudio não foi testado em condições reais de ruído, privacidade ou indisponibilidade.
+- Para responder a essas questões seriam necessários testes moderados com profissionais do parceiro, tarefas equivalentes, registros brutos e métricas de utilidade, interrupção e sucesso.
+- A exploração **não permite determinar qual alternativa é superior**.
+
 ### 4.9 Inventário de Decisões em Aberto
 
 Esta seção reúne as decisões de design e comportamento do agente que a construção dos protótipos revelou, mas que permanecem sem resposta definitiva. Para cada uma, registram-se as opções consideradas e o que está em jogo.
 
-| ID | Decisão em aberto | Opções identificadas | O que está em jogo | Origem |
-|---|---|---|---|---|
-| P-A01 | Gatilho da recomendação proativa | mudança de tela; tempo na atividade; evento do projeto; confirmação explícita | antecipar uma necessidade sem confundir presença de conteúdo com intenção | A |
-| P-A02 | Frequência e prioridade das recomendações | limite por período; somente alta relevância; usuário configura; modo silencioso | utilidade vs. interrupção e fadiga | A |
-| P-A03 | Significado da recusa | irrelevante; momento inadequado; não repetir tema; perguntar o motivo | aprender com feedback sem interpretar incorretamente uma ação rápida | A |
-| P-A04 | Comportamento após contexto incerto | recomendar; pedir confirmação; aguardar; registrar para o resumo | proatividade vs. risco de atrapalhar ou expor informação indevida | A |
-| P-A05 | Uso e duração do feedback | apenas na sessão; histórico por usuário; aprendizagem coletiva; não aprender automaticamente | personalização, privacidade, auditabilidade e propagação de erros | A |
-| P-A06 | Conteúdo mantido no Teams/resumo diário | aceitos; vistos; rejeitados; pendências; todos com prazo de retenção | memória útil vs. excesso, sensibilidade e rastreabilidade | A |
-| P-B01 | Duplicatas e versões antigas | mostrar todas com aviso; mostrar só a mais recente; perguntar | risco de versão desatualizada vs. poluição da resposta | B |
-| P-B02 | Transcrição com baixa confiança | buscar o melhor palpite; confirmar; buscar e sinalizar | fluidez vs. busca errada com jargão interno | B |
-| P-B03 | Exibição da transcrição | sempre visível; oculta; visível apenas com incerteza | transparência e correção vs. ruído visual | B |
-| P-B04 | Conteúdo da resposta por voz | ler documento; produzir resumo; apenas confirmar que encontrou | acessibilidade vs. tempo de escuta e resumo impreciso | B |
-| P-B05 | Pedido de dado estruturado vs. documento | consultar banco; devolver documento-fonte; declarar limite | escopo do agente e expectativa sobre o que ele sabe | B |
-| P-B06 | Acesso negado | ocultar existência; oferecer solicitação; mostrar só metadados | transparência e agilidade vs. exposição de informação restrita | B |
+| ID | Decisão em aberto | Opção A | Opção B | Outras opções | O que está em jogo | Evidência que revelou a decisão | Próxima forma de investigação |
+|---|---|---|---|---|---|---|---|
+| P-A01 | Gatilho da recomendação | mudança de tela | evento do projeto | tempo na atividade; confirmação explícita | antecipação vs. inferência indevida | diário A, 20–21/08, e Cenas 5–6 | encenar os mesmos gatilhos com usuários e comparar pertinência |
+| P-A02 | Frequência e prioridade | limite por período | apenas alta relevância | configuração pessoal; modo silencioso | utilidade vs. interrupção e fadiga | validação do roteiro em 24/08 | simulação longitudinal com diferentes frequências |
+| P-A03 | Significado da recusa | conteúdo irrelevante | momento inadequado | não repetir tema; perguntar motivo | aprendizagem vs. interpretação errada | diário A, 20/08, e Cena 3 | testar “não”, “agora não” e “não mostrar novamente” separadamente |
+| P-A04 | Contexto incerto | recomendar | pedir confirmação | aguardar; guardar para resumo | ajuda vs. interrupção ou exposição indevida | diário A, 21/08, e Cena 9 | teste difícil com conflito entre tela e intenção |
+| P-A05 | Uso do feedback | apenas na sessão | histórico por usuário | aprendizagem coletiva; não aprender automaticamente | personalização, privacidade e propagação de erro | diário A, 21/08 | protótipo de políticas de feedback com revisão dos usuários |
+| P-A06 | Conteúdo no Teams/resumo | somente aceitos | aceitos e pendências | vistos; rejeitados; todos com retenção | memória útil vs. excesso e sensibilidade | Cena 7 e diário A, 21/08 | card sorting com usuários e análise de retenção |
+| P-B01 | Duplicatas e versões antigas | mostrar todas com aviso | mostrar só a mais recente | perguntar ao usuário | segurança de versão vs. poluição | diário B, 21/08, e Imagem 4.5.1 | tarefas com versões conflitantes e fonte conhecida |
+| P-B02 | Baixa confiança na transcrição | buscar melhor palpite | confirmar antes | buscar e sinalizar | fluidez vs. consulta incorreta | diário B, 22/08, e Imagem 4.5.3 | teste de voz com siglas e ruído controlado |
+| P-B03 | Exibição da transcrição | sempre visível | apenas com incerteza | oculta | transparência vs. ruído visual | diário B, 22/08 | comparação de três estados da interface |
+| P-B04 | Resposta por voz | leitura completa | resumo | confirmação curta | acessibilidade vs. tempo e imprecisão | diário B, 24/08 | teste auditivo com conteúdos de extensões diferentes |
+| P-B05 | Dado estruturado vs. documento | consultar banco | devolver documento-fonte | declarar limite | cobertura do agente e expectativa | captura do fallback, Imagem 4.6.1 | criar fluxos separados e testar pedidos equivalentes |
+| P-B06 | Acesso negado | ocultar existência | oferecer solicitação | mostrar apenas metadados | transparência vs. exposição sensível | estado final, Imagem 4.5.4 | revisão de segurança e teste com perfis distintos |
 
 ### 4.10 Repertório de Situações
 
 Esta seção registra os casos e situações usados durante a construção e a execução dos protótipos, com destaque para aqueles que não foram atendidos.
 
-#### Situações do Protótipo A
+| ID | Situação ou fala | Contexto | Comportamento do protótipo | Resultado documentado | Falha ou lacuna | Protótipo |
+|---|---|---|---|---|---|---|
+| S-A01 | “Eu sei que eu vi isso em algum lugar” | busca entre vários arquivos | narrativa apresenta recomendação proativa | problema e proposta representados | busca e relevância não são reais | A |
+| S-A02 | recomendação recusada | usuário trabalhando | agente desaparece sem insistir | comportamento previsto no roteiro | significado da recusa indefinido | A |
+| S-A03 | recomendação aceita | documento relacionado à atividade | agente apresenta documentos | comportamento previsto no roteiro | sem recuperação ou critério real | A |
+| S-A04 | mudança do Projeto X para Y | transição de atividade | recomendações deveriam acompanhar contexto | mudança narrada | gatilho técnico indefinido | A |
+| S-A05 | documento do projeto, mas inadequado à intenção | conflito contexto–objetivo | roteiro reconhece insuficiência do contexto | lacuna formulada | falha de execução não comprovada | A |
+| S-A06 | várias recomendações durante o dia | frequência acumulada | roteiro questiona quando começa a atrapalhar | pergunta em aberto | não houve teste longitudinal | A |
+| S-B01 | “preciso do último relatório...” | busca documental | mostra documentos e alerta de versão | atendida no mockup | fonte e busca simuladas | B |
+| S-B02 | “me manda o cronograma atualizado” | pedido sem projeto | pergunta qual projeto | ambiguidade tratada no mockup | critério de opções não validado | B |
+| S-B03 | “abre o contrato... linha 4” | conteúdo restrito | informa bloqueio e oferece solicitação | bloqueada por permissão simulada | exposição de metadados em aberto | B |
+| S-B04 | “acha... laudo do AMV...” | voz com sigla técnica | exibe baixa confiança e pede confirmação | tratada no mockup | ASR não executado | B |
+| S-B05 | tentativa de gravar e ouvir áudio | uso livre relatado pela equipe | controles eram simulados | não atendida; exigiu explicação verbal | **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar anotação bruta | B |
+| S-B06 | “quantas ocorrências teve na L2 em julho?” | pedido de dado estruturado | fallback alega busca sem fonte real | não atendida; captura disponível | fluxo confunde dado e documento | B |
 
-| Situação percorrida | Resultado registrado |
-|---|---|
-| Usuário abre cerca de oito documentos e não encontra a última atualização | Problema representado; motiva a alternativa proativa |
-| Agente recomenda enquanto o usuário trabalha e a sugestão é recusada | Executada com a regra provisória de desaparecer sem insistir; motivo da recusa ficou indefinido |
-| Recomendação aceita apresenta documentos relacionados | Representada, mas sem busca real e sem critério verificável de relevância |
-| Usuário muda do Projeto X para o Projeto Y | Parcialmente atendida; o roteiro troca o contexto, mas não define como o sistema detecta a mudança |
-| Documento correto para o projeto, porém inadequado à intenção atual | **Não atendida:** contexto observado não foi suficiente para decidir se o agente deveria intervir |
-| Muitas recomendações ao longo do dia | **Não atendida:** frequência aceitável não pôde ser definida sem usuários reais |
-| Usuário avalia recomendação como útil ou não útil | Representada, mas o efeito do feedback permaneceu em aberto |
-| Usuário consulta histórico e resumo no Teams | Representada narrativamente; conteúdo, retenção e integração não foram definidos |
+### 4.11 Aprendizados da Exploração
 
-#### Situações do Protótipo B
+- A construção do A tornou explícito que **contexto** (projeto, tela, atividade e histórico observáveis) não equivale à **intenção** (objetivo que a pessoa pretende alcançar naquele momento).
+- Aceitar e recusar não bastam para definir o comportamento: “não” pode significar irrelevância, momento inadequado ou rejeição permanente.
+- A frequência de recomendações precisa ser uma política explícita; o formato atual não permite determinar um limite aceitável.
+- A construção do B mostrou que pedidos vagos exigem desambiguação e que versões, permissões e tipos de fonte alteram a resposta esperada.
+- A baixa confiança na transcrição precisa ser comunicada e tratada antes de uma busca potencialmente errada.
+- O relato da sessão B indica que uma interface visualmente realista pode criar expectativas de funcionalidades que o protótipo não executa; essa interpretação depende das anotações brutas ainda não anexadas.
+- O canal por fone ou áudio permanece uma possibilidade de implementação da proatividade, não uma alternativa validada pela execução atual.
 
-Situações embutidas na construção da interface:
+### 4.12 Próximos Passos
 
-- "preciso do último relatório de manutenção preventiva da linha 1" — **atendida**
-- "me manda o cronograma atualizado" — **ambígua**; o protótipo respondeu com pergunta de desambiguação
-- "abre o contrato de concessão da linha 4 pra mim" — **bloqueada por permissão**
-- (voz) "acha pra mim o laudo do AMV da estação Sé" — sigla com baixa confiança na transcrição; o protótipo **pediu confirmação** antes de buscar
+| Decisão a investigar | Método proposto | Evidência esperada |
+|---|---|---|
+| P-A01 a P-A04 — gatilho, frequência, recusa e contexto incerto | reencenar o A com situações difíceis, usuários externos ao roteiro e registro audiovisual bruto | momentos de interrupção, falhas, improvisações e justificativas das preferências |
+| P-A05 e P-A06 — feedback e histórico | card sorting e protótipo de políticas de retenção | categorias priorizadas e riscos percebidos pelos participantes |
+| P-B01, P-B05 e P-B06 — versões, fontes e permissões | tarefas equivalentes com documentos duplicados, dados estruturados e perfis distintos | taxa de conclusão, erros e decisões de apresentação |
+| P-B02 a P-B04 — voz | teste controlado com siglas, ruído e respostas de diferentes extensões | transcrições, correções, tempo e preferência de saída |
+| Comparação A × B | aplicar tarefas equivalentes com profissionais do parceiro | medidas comparáveis de utilidade, interrupção, esforço e controle percebido |
 
-Situações registradas durante a execução (sessão com participante externo à construção):
-
-- Uso livre da interface (localizar conversa, enviar texto, iniciar gravação) — **atendida sem instrução**, por reconhecimento do padrão convencional de chat
-- Tentativa de enviar áudio real e ouvir a resposta falada — **não atendida**: funcionalidade simulada; exigiu explicação verbal
-- "quantas ocorrências teve na L2 em julho?" — **não atendida**: pedido de dado estruturado; o fallback alegou busca no SharePoint e na base mesmo sem existir consulta real, revelando uma mensagem enganosa e um fluxo ainda indefinido
-
-### 4.11 Registros Visuais
+### 4.13 Registros Visuais
 
 Esta seção reúne as evidências brutas da construção e da execução dos protótipos (fotos, vídeos, storyboard, desenhos e capturas de tela).
 
 #### Registros do Protótipo A
 
-Os registros atualmente versionados são:
+| Evidência | Formato | Etapa registrada | O que permite comprovar | Verificação |
+|---|---|---|---|---|
+| [Vídeo A](../assets/Vídeos/Vídeo-A.mp4) | MP4, 20,7 MB | encenação final | existência de um arquivo audiovisual associado ao A | arquivo e link locais acessíveis; **PENDENTE DE VERIFICAÇÃO:** confirmar conteúdo integral e correspondência com as afirmações de execução |
+| [Roteiro A](RoteiroPrototipoA.md) | Markdown | planejamento da encenação | participantes declarados, falas, ações e dez cenas | link local acessível; não comprova execução |
+| [Storyboard A](#441-construção-do-protótipo-a-interação-proativa-e-contextual) | Mermaid | síntese posterior | fluxo comportamental documentado | renderização depende do visualizador; não é evidência bruta |
+| Diário A, [seção 4.5](#45-diário-de-construção-dos-dois-protótipos) | texto | construção consolidada | decisões e ambiguidades declaradas pela equipe | contemporaneidade não comprovada por registro bruto |
 
-- [vídeo da encenação do Protótipo A](../assets/Vídeos/Vídeo-A.mp4), que registra a execução da alternativa proativa e contextual;
-- [roteiro integral da encenação](RoteiroPrototipoA.md), com participantes, falas, ações e dez cenas;
-- storyboard em Mermaid da [seção 4.4.1](#441-construção-do-protótipo-a-interação-proativa-e-contextual);
-- diário cronológico da [seção 4.5](#45-diário-de-construção-dos-dois-protótipos);
-- tabela da execução crítica na [seção 4.6](#46-execução-dos-protótipos).
-
-O vídeo editado está versionado no repositório. Fotos, frames e gravações brutas de bastidores não foram disponibilizados; por isso, o registro visual do processo de construção permanece limitado ao roteiro, ao storyboard, ao diário cronológico e ao vídeo final.
+O vídeo editado está versionado, mas fotos, ensaios e gravações brutas de bastidores não foram disponibilizados. Assim, o processo de construção e o momento de falha do A não podem ser auditados integralmente.
 
 #### Registros do Protótipo B
 
-Os registros da construção da interface estão inseridos na [seção 4.5](#45-diário-de-construção-dos-dois-protótipos), na ordem em que os estados foram produzidos:
+| Evidência | Formato | Etapa registrada | O que permite comprovar | Verificação |
+|---|---|---|---|---|
+| [Imagem 4.5.1](../assets/design/estado-1-somente-texto.png) | PNG | primeiro estado | interface apenas com texto e casos documentais | arquivo, link e conteúdo visual verificados |
+| [Imagem 4.5.2](../assets/design/estado-2-emoji.png) | PNG | estado intermediário | entrada por voz e saída em áudio representadas | arquivo, link e conteúdo visual verificados |
+| [Imagem 4.5.3](../assets/design/estado-2-voz-emoji.png) | PNG | estado intermediário | transcrição e confirmação de “AMV” | arquivo, link e conteúdo visual verificados |
+| [Imagem 4.5.4](../assets/design/prototipo-chatbot-metro.png) | PNG | estado final | voz, reprodução e bloqueio por permissão | arquivo, link e conteúdo visual verificados |
+| [Imagem 4.4.2](../assets/design/mockup-agente.png) | PNG | demonstração | visão consolidada da alternativa sob demanda | arquivo, link e conteúdo visual verificados |
+| [Imagem 4.6.1](../assets/design/execucao-fallback-dado-estruturado.png) | PNG | execução declarada | estado do fallback para pedido estruturado | arquivo, link e conteúdo visual verificados; captura isolada não comprova toda a sessão |
 
-- **Imagem 4.5.1** — primeiro estado da interface, apenas com interação por texto ([estado-1-somente-texto.png](../assets/design/estado-1-somente-texto.png));
-- **Imagem 4.5.2** — estado intermediário, com a adição da entrada por voz e dos botões "ouvir resposta" ([estado-2-emoji.png](../assets/design/estado-2-emoji.png));
-- **Imagem 4.5.3** — estado intermediário, com gravação de voz, transcrição automática e confirmação de termo com baixa confiança ([estado-2-voz-emoji.png](../assets/design/estado-2-voz-emoji.png));
-- **Imagem 4.5.4** — estado final do protótipo, com o fluxo completo de voz e permissões ([prototipo-chatbot-metro.png](../assets/design/prototipo-chatbot-metro.png));
-- **Imagem 4.4.2** — mockup da interface apresentado na demonstração ([mockup-agente.png](../assets/design/mockup-agente.png)).
+Não há gravação audiovisual da sessão B nem anotações brutas versionadas. As imagens comprovam estados da interface, mas não comprovam sozinhas as reações e falas atribuídas ao participante.
 
-A execução do Protótipo B foi registrada por anotações feitas durante a sessão e por capturas de tela. A principal evidência da execução é a Imagem 4.6.1 ([execucao-fallback-dado-estruturado.png](../assets/design/execucao-fallback-dado-estruturado.png)), que mostra o protótipo falhando diante do pedido de dado estruturado. Não houve gravação de vídeo da sessão.
+#### Evidências ausentes
+
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** registros brutos datados da construção paralela; ensaio ou bastidores do A; execução do A levada até uma falha; improvisação ocorrida no A; anotações brutas ou gravação da sessão B.
 
 ---
 

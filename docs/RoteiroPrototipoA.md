@@ -3,7 +3,7 @@
 ## Roteiro do vídeo encenado
 
 **Participantes:** Karol e Matheus  
-**Estado:** roteiro executado e gravado em 25/08/2026; as dúvidas reveladas durante a leitura e a encenação foram preservadas na Cena 9.
+**Estado declarado pela equipe:** roteiro gravado em 25/08/2026. O arquivo de vídeo está versionado, mas o roteiro, isoladamente, não comprova quando cada decisão foi tomada nem se a execução foi levada até uma falha.
 
 ## Cena 1 — O problema
 
