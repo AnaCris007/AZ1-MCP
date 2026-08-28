@@ -970,7 +970,7 @@ A coluna de designação está deliberadamente em branco. A distribuição de re
 | T20 | `src/services/analysis_service.py` | Fluxo de áudio para texto para intenção coberto por teste de integração | A designar na planning | A designar na planning |
 | T21 | `src/routes/` e `src/services/` | Requisição de ponta a ponta devolvendo a intenção classificada, coberta por teste | A designar na planning | A designar na planning |
 | T22 | `docs/Projeto.md`, Seção 3.3 | Seção atualizada e coerente com os relatórios de `resultados/` | A designar na planning | A designar na planning |
-| T23 | `docs/Projeto.md`, Seção 3.3, e `docs/PipelinePLN.md` | Documentação reproduzível por quem não participou da implementação | A designar na planning | A designar na planning |
+| T23 | `docs/Projeto.md`, Seção 3.3, e `src/pln/README.md` | Documentação reproduzível por quem não participou da implementação | A designar na planning | A designar na planning |
 | T24 | `src/database/` | Scripts versionados e executáveis em ambiente limpo | A designar na planning | A designar na planning |
 | T25 | `src/database/` | Banco populado, com consultas de verificação documentadas | A designar na planning | A designar na planning |
 | T26 | `src/services/` e `src/database/` | Interações persistidas e recuperáveis, com teste cobrindo gravação e leitura | A designar na planning | A designar na planning |

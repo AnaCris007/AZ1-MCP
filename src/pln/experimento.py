@@ -1,54 +1,12 @@
-# =============================================================================
-# experimento.py — Busca pela melhor configuração do pipeline
-# =============================================================================
-# O que este script responde, com número em vez de opinião:
+# Varredura exaustiva do espaço de pré-processamento x vetorização, medida por
+# validação cruzada com o classificador fixo (ver `construir_pipeline_de_medicao`).
 #
-# 1. Quais etapas de pré-processamento ajudam neste dataset?
-# 2. A ORDEM das etapas importa? A ordem padrão é a melhor?
-# 3. Remover stopwords ajuda? E remover preservando as negações?
-# 4. Stemming ou lematização — qual reduz melhor as palavras?
-# 5. Qual estratégia de tokenização produz o melhor vocabulário?
-# 6. Qual vetorização e qual janela de n-grama?
+# Espaço: 2^4 etapas booleanas x 3 stopwords x 3 morfologias x 3 tokenizações =
+# 432 configurações, cada uma em todas as permutações das suas etapas ativas
+# (19.767 no total). Ordens que produzem texto idêntico são deduplicadas.
 #
-# MÉTODO: VARREDURA EXAUSTIVA, E SÓ
-# ---------------------------------
-# O experimento testa o produto cartesiano completo — cada pré-processamento
-# contra cada vetorização. É o único método que encontra o ótimo global, e no
-# nosso tamanho de dataset custa alguns minutos.
-#
-# Existiu aqui uma alternativa `--duas-fases`, que varria o pré-processamento
-# com a vetorização fixa e só depois varria a vetorização sobre as melhores.
-# Custava 1/4 das avaliações e foi REMOVIDA, porque busca em estágios não
-# garante o ótimo global e neste dataset comprovadamente não o encontrava: o
-# melhor pré-processamento sob TF-IDF não era o melhor sob bag-of-words, e a
-# combinação vencedora se perdia por 0,0078 de F1.
-#
-# Manter os dois caminhos custava um parâmetro `duas_fases` atravessando seis
-# funções e dois formatos de relatório, para oferecer um resultado que o próprio
-# comentário desaconselhava usar. Se um dia a varredura completa ficar cara
-# demais, o caminho é reduzir o espaço de busca de propósito — não voltar a um
-# método que erra de um jeito difícil de perceber.
-#
-# O ESPAÇO DE BUSCA DO PRÉ-PROCESSAMENTO
-# ---------------------------------------
-#     4 etapas booleanas (minúsculas, acentos, pontuação, números) -> 2^4 = 16
-#     3 modos de stopwords (manter / remover tudo / preservar não) ->       3
-#     3 modos de morfologia (nenhuma / stemming / lematização)     ->       3
-#     3 tokenizações (split / regex / linguística)                 ->       3
-#                                                                     ---------
-#     configurações                                                ->     432
-#
-#     para cada uma, TODAS as permutações das etapas ativas        ->  19.767
-#
-# Ordens que produzem TEXTO IDÊNTICO são o mesmo experimento e são
-# deduplicadas — na prática, ~95% do trabalho some.
-#
-# USO
-# ---
-#     python -m pln.experimento                    # varredura exaustiva (padrão)
+#     python -m pln.experimento
 #     python -m pln.experimento --dataset seus_dados.csv --k 10
-#     python -m pln.experimento --sem-ordem        # só a ordem padrão
-# =============================================================================
 
 from __future__ import annotations
 
@@ -63,6 +21,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 
+from joblib import Parallel, delayed
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
 from pln.caminhos import DATASET_PADRAO, garantir_dir_de_resultados
@@ -86,21 +45,23 @@ from pln.vetorizacao import (
 # entre elas seria sorteio diferente, não pré-processamento diferente.
 SEMENTE = 42
 
-# Campos categóricos da configuração. Cada um vira uma comparação pareada.
-# O primeiro valor de cada enum é a referência ("não fazer nada").
+# O primeiro valor de cada enum é a referência das comparações pareadas.
 CAMPOS_CATEGORICOS: tuple[tuple[str, type[StrEnum]], ...] = (
     ("stopwords", ModoStopwords),
     ("morfologia", ModoMorfologia),
     ("tokenizacao", Tokenizacao),
 )
 
-# Campos que identificam uma configuração, usados para parear comparações.
 CAMPOS_DA_CONFIGURACAO: tuple[str, ...] = (
     "minusculas", "remover_acentos", "remover_pontuacao", "remover_numeros",
     "stopwords", "morfologia", "tokenizacao",
 )
 
 LARGURA = 118
+
+# As tarefas são independentes e a semente é fixa: as notas saem idênticas em
+# série e em paralelo.
+PROCESSOS_PARALELOS = -1
 
 
 @dataclass(frozen=True)
@@ -113,7 +74,7 @@ class Resultado:
     ordens_equivalentes: int = 1
     e_a_ordem_padrao: bool = True
 
-    # Usada para agrupar as ordens irmãs: mesma configuração, ordens diferentes.
+    # Agrupa as ordens irmãs: mesma configuração, ordens diferentes.
     @property
     def configuracao_sem_a_ordem(self) -> ConfigPreprocessamento:
         return self.config.copiar_com_outra_ordem(ETAPAS)
@@ -122,33 +83,11 @@ class Resultado:
         return f"{self.vetorizacao.descrever()} | {self.config.descrever()}"
 
 
-# Quantas colunas a matriz tem — o "tamanho do vocabulário" do ranking.
-#
-# As duas famílias de vetorização respondem isso de formas diferentes, e nenhuma
-# delas é errada: uma esparsa tem `vocabulary_`, um termo por coluna, e o número
-# cresce com o corpus; uma densa tem largura FIXA, e o número não depende do
-# corpus nenhum. Ler `vocabulary_` direto quebrava com AttributeError assim que a
-# vetorização densa entrou no espaço de busca.
 def contar_colunas(vetorizador) -> int:
-    vocabulario = getattr(vetorizador, "vocabulary_", None)
-    if vocabulario is not None:
-        return len(vocabulario)
-    return len(vetorizador.get_feature_names_out())
+    return len(vetorizador.vocabulary_)
 
 
-# Validação cruzada estratificada. Devolve (F1 médio, desvio, vocabulário médio).
-#
-# Validação cruzada e não uma divisão única porque, com poucas centenas de
-# exemplos, uma divisão só daria uma nota dependente demais de quais frases
-# caíram no teste — trocando a semente, a "melhor" configuração mudaria.
-#
-# ESTRATIFICADA para que cada dobra tenha as três intenções na mesma proporção;
-# sem isso uma dobra poderia sair sem nenhum "alerta" e o F1 daquela classe
-# ficaria indefinido.
-#
-# F1-macro e não acurácia porque acurácia engana com classes desbalanceadas: se
-# 80% fossem consulta, responder "consulta" para tudo daria 80% e seria inútil.
-# O macro tira média por classe, então a rara pesa igual à comum.
+# Devolve (F1 médio, desvio, vocabulário médio).
 def medir_configuracao(
     textos: list[str], rotulos: list[str], vetorizacao: ConfigVetorizacao, k: int
 ) -> tuple[float, float, float]:
@@ -167,13 +106,8 @@ def medir_configuracao(
     return statistics.mean(notas), desvio, statistics.mean(vocabularios)
 
 
-# -----------------------------------------------------------------------------
-# Varredura do pré-processamento
-# -----------------------------------------------------------------------------
-
-
-# As 432 configurações, todas com a ordem padrão. As permutações de ordem
-# entram depois, por configuração, em `permutacoes_de_ordem_a_testar`.
+# Todas com a ordem padrão; as permutações entram em
+# `permutacoes_de_ordem_a_testar`.
 def todas_as_configuracoes_de_preprocessamento() -> list[ConfigPreprocessamento]:
     combinacoes = []
     for minusculas, acentos, pontuacao, numeros in itertools.product([False, True], repeat=4):
@@ -194,41 +128,43 @@ def todas_as_configuracoes_de_preprocessamento() -> list[ConfigPreprocessamento]
     return combinacoes
 
 
-# Só as etapas ATIVAS são permutadas — permutar uma etapa desligada não muda
-# nada e multiplicaria o custo à toa. As desligadas são acrescentadas ao fim,
-# na ordem padrão, apenas para satisfazer a validação do dataclass.
-def permutacoes_de_ordem_a_testar(
-    base: ConfigPreprocessamento, variar_ordem: bool = True
-) -> list[tuple[str, ...]]:
+# Só as etapas ativas são permutadas; as desligadas vão ao fim apenas para
+# satisfazer a validação do dataclass.
+#
+# A primeira permutação devolvida é `ativas` na própria ordem, que coincide com a
+# ordem padrão calculada em `varrer_espaco_de_busca`. `e_a_ordem_padrao` depende
+# disso, porque o representante de cada corpus é o primeiro inserido.
+def permutacoes_de_ordem_a_testar(base: ConfigPreprocessamento) -> list[tuple[str, ...]]:
     ativas = base.etapas_ativas_na_ordem()
-    if not variar_ordem:
-        return [base.ordem]
-
     inativas = tuple(etapa for etapa in ETAPAS if etapa not in ativas)
     return [permutacao + inativas for permutacao in itertools.permutations(ativas)]
 
 
-# Identidade do corpus produzido. Duas ordens que geram o mesmo texto são o
-# mesmo experimento e não precisam ser treinadas duas vezes.
+# Ordens que geram o mesmo texto são o mesmo experimento e não são treinadas
+# duas vezes.
 def impressao_digital_do_corpus(corpus: tuple[str, ...]) -> str:
     return hashlib.blake2b("\n".join(corpus).encode("utf-8"), digest_size=16).hexdigest()
 
 
-# Varre o pré-processamento e devolve (resultados, permutações examinadas).
+# Devolve (resultados, permutações examinadas), em duas fases:
 #
-# Por padrão `vetorizacoes` traz todas, e o resultado é o produto
-# cartesiano completo. Com `--duas-fases` traz só a régua, e esta função passa
-# a ser a Fase 1.
+#   1. serial: pré-processa e deduplica por hash do corpus. Sequencial porque os
+#      caches de lematização e stemming são compartilhados entre configurações.
+#   2. paralela: avalia cada par (corpus distinto, vetorização).
+#
+# Os itens são acumulados numa lista antes do despacho para dar ao agendador
+# tarefas grandes e de tamanho parecido.
 def varrer_espaco_de_busca(
     textos: list[str],
     rotulos: list[str],
     k: int,
-    variar_ordem: bool,
     vetorizacoes: list[ConfigVetorizacao],
 ) -> tuple[list[Resultado], int]:
-    resultados: list[Resultado] = []
     permutacoes_examinadas = 0
     configuracoes = todas_as_configuracoes_de_preprocessamento()
+
+    # (config representante, corpus, ordens equivalentes, contém a ordem padrão)
+    trabalho: list[tuple] = []
 
     for numero, base in enumerate(configuracoes, start=1):
         ativas = base.etapas_ativas_na_ordem()
@@ -236,9 +172,8 @@ def varrer_espaco_de_busca(
             e for e in ETAPAS if e not in ativas
         )
 
-        # impressão digital -> [config representante, corpus, ordens equivalentes, contém a ordem padrão]
         corpora_distintos: dict[str, list] = {}
-        for ordem in permutacoes_de_ordem_a_testar(base, variar_ordem):
+        for ordem in permutacoes_de_ordem_a_testar(base):
             permutacoes_examinadas += 1
             config = base.copiar_com_outra_ordem(ordem)
             corpus = tuple(preprocessar(texto, config) for texto in textos)
@@ -250,17 +185,31 @@ def varrer_espaco_de_busca(
             else:
                 corpora_distintos[chave] = [config, list(corpus), 1, ordem == ordem_padrao]
 
-        for config, corpus, equivalentes, tem_a_padrao in corpora_distintos.values():
-            for vetorizacao in vetorizacoes:
-                media, desvio, vocabulario = medir_configuracao(
-                    corpus, rotulos, vetorizacao, k
-                )
-                resultados.append(
-                    Resultado(config, vetorizacao, media, desvio, vocabulario, equivalentes, tem_a_padrao)
-                )
+        trabalho.extend(corpora_distintos.values())
 
         if sys.stdout.isatty():
-            print(f"\r  {numero}/{len(configuracoes)} configurações de pré-processamento", end="", flush=True)
+            print(f"\r  fase 1/2 — {numero}/{len(configuracoes)} configurações pré-processadas",
+                  end="", flush=True)
+
+    itens = [
+        (config, corpus, equivalentes, tem_a_padrao, vetorizacao)
+        for config, corpus, equivalentes, tem_a_padrao in trabalho
+        for vetorizacao in vetorizacoes
+    ]
+
+    if sys.stdout.isatty():
+        print(f"\r  fase 2/2 — {len(itens)} avaliações em paralelo{' ' * 30}", end="", flush=True)
+
+    medidas = Parallel(n_jobs=PROCESSOS_PARALELOS)(
+        delayed(medir_configuracao)(corpus, rotulos, vetorizacao, k)
+        for _, corpus, _, _, vetorizacao in itens
+    )
+
+    resultados = [
+        Resultado(config, vetorizacao, media, desvio, vocabulario, equivalentes, tem_a_padrao)
+        for (config, _, equivalentes, tem_a_padrao, vetorizacao), (media, desvio, vocabulario)
+        in zip(itens, medidas, strict=True)
+    ]
 
     if sys.stdout.isatty():
         print()
@@ -269,19 +218,6 @@ def varrer_espaco_de_busca(
     return resultados, permutacoes_examinadas
 
 
-# -----------------------------------------------------------------------------
-# Análises
-# -----------------------------------------------------------------------------
-
-
-# Efeito médio de cada etapa booleana, sobre TODAS as execuções.
-#
-# Esta é a leitura confiável, e não o topo do ranking. Com poucos dados, a
-# combinação em primeiro lugar chegou lá em boa parte por sorteio — o desvio
-# padrão costuma ser maior que a diferença entre as dez primeiras.
-#
-# Aqui cada média resume metade do espaço de busca, então o ruído das outras
-# escolhas se cancela e o que sobra é o efeito daquela etapa isolada.
 def medir_efeito_das_etapas_booleanas(
     resultados: list[Resultado],
 ) -> list[tuple[str, float, float, float]]:
@@ -295,23 +231,9 @@ def medir_efeito_das_etapas_booleanas(
     return sorted(linhas, key=lambda linha: linha[3], reverse=True)
 
 
-# Compara os valores de um campo categórico, PAREADO. Vale para os três campos
-# de múltipla escolha: stopwords, morfologia e tokenização.
-#
-# POR QUE PAREADO, E NÃO A MÉDIA SIMPLES
-# ---------------------------------------
-# Média simples por valor seria enviesada. Quando stopwords é `manter`, ou
-# morfologia é `nenhuma`, a etapa correspondente não entra na lista de ativas —
-# a configuração fica com UMA ETAPA A MENOS e, portanto, com menos permutações
-# de ordem. Comparar essa média com a dos demais valores misturaria dois
-# efeitos: o do tratamento em si e o de ter menos etapas.
-#
-# O pareamento resolve: para cada conjunto idêntico das demais escolhas
-# (mesmas etapas, mesmos outros campos categóricos, mesma vetorização, todos na
-# ordem padrão), pegam-se todos os valores do campo e comparam-se entre si.
-# Tudo o mais constante — a diferença só pode vir do campo em questão.
-#
-# A referência é o PRIMEIRO valor do enum, que é sempre o "não fazer nada".
+# Média simples seria enviesada: `manter` e `nenhuma` deixam a configuração com
+# uma etapa a menos e, portanto, com menos permutações de ordem. O pareamento
+# mantém tudo o mais constante, restringindo os grupos à ordem padrão.
 def comparar_valores_pareados(
     resultados: list[Resultado], campo: str, enum_do_campo: type[StrEnum]
 ) -> tuple[list[tuple[str, float, float]], int]:
@@ -337,22 +259,10 @@ def comparar_valores_pareados(
     return linhas, len(completos)
 
 
-# O efeito de cada escolha de vetorização, comparada de forma PAREADA.
-#
-# Cada pré-processamento foi avaliado sob TODAS as vetorizações. Só entram os
-# grupos completos: comparar um pré-processamento que rodou sob cinco
-# vetorizações com outro que rodou sob duas mediria a amostra, não a escolha.
-#
-# CADA COMPARAÇÃO TEM O SEU PRÓPRIO UNIVERSO, e isso não é detalhe. Perguntar
-# "bigrama ajuda?" só faz sentido entre as vetorizações que TÊM janela de
-# n-grama — a densa não tem, e incluí-la no lado "sem bigrama" jogaria a média
-# de um pipeline completamente diferente dentro da comparação, fazendo o bigrama
-# parecer melhor ou pior por um motivo que não é o bigrama.
-#
-# O `len(g) == 4` que existia aqui era o número de vetorizações da época, escrito
-# à mão. Quando a quinta entrou, nenhum grupo tinha mais tamanho 4, a lista saía
-# vazia e a tabela inteira DESAPARECIA do relatório — sem erro, sem aviso. Agora
-# o tamanho esperado é derivado de `todas_as_vetorizacoes()`.
+# Só entram os grupos completos, senão a comparação mediria a amostra e não a
+# escolha. O tamanho esperado é derivado de `todas_as_vetorizacoes()`: escrito à
+# mão, ele deixa de casar com qualquer grupo quando uma vetorização é
+# acrescentada, e a tabela some do relatório sem erro.
 def medir_efeito_da_vetorizacao(
     resultados: list[Resultado],
 ) -> list[tuple[str, float, float, int]]:
@@ -365,18 +275,10 @@ def medir_efeito_da_vetorizacao(
     if not completos:
         return []
 
-    e_densa = ConfigVetorizacao.produz_vetores_densos
     comparacoes = (
         # nome, quem entra no "com", quem é elegível para a comparação
-        ("tfidf (vs bow)",
-         lambda v: v.modo is ModoVetorizacao.TFIDF,
-         lambda v: not e_densa(v)),
-        ("bigrama (vs só uni)",
-         lambda v: v.n_max >= 2,
-         lambda v: not e_densa(v)),
-        ("embedding (vs esparsas)",
-         e_densa,
-         lambda v: True),
+        ("tfidf (vs bow)", lambda v: v.modo is ModoVetorizacao.TFIDF, lambda v: True),
+        ("bigrama (vs só uni)", lambda v: v.n_max >= 2, lambda v: True),
     )
 
     linhas: list[tuple[str, float, float, int]] = []
@@ -407,16 +309,8 @@ class AnaliseDeOrdem:
     perda_media_da_ordem_padrao: float
 
 
-# Responde: a ordem importa, e a ordem padrão é a melhor?
-#
-# Um GRUPO é o conjunto de resultados que compartilham exatamente as mesmas
-# etapas e a mesma vetorização, diferindo APENAS na ordem. Dentro de um grupo,
-# tudo o mais é constante — então qualquer diferença de F1 só pode ter vindo da
-# ordem. É um experimento controlado, e é o que dá direito de afirmar causa em
-# vez de correlação.
-#
-# A amplitude do grupo (maior F1 menos menor F1) é o tamanho do efeito da ordem
-# naquela configuração.
+# Cada grupo reúne resultados idênticos em tudo menos na ordem das etapas, de
+# modo que a amplitude de F1 dentro dele é o efeito da ordem.
 def analisar_efeito_da_ordem(resultados: list[Resultado]) -> AnaliseDeOrdem:
     grupos: dict[tuple, list[Resultado]] = defaultdict(list)
     for resultado in resultados:
@@ -459,11 +353,6 @@ def analisar_efeito_da_ordem(resultados: list[Resultado]) -> AnaliseDeOrdem:
     )
 
 
-# -----------------------------------------------------------------------------
-# Saída no terminal
-# -----------------------------------------------------------------------------
-
-
 def imprimir_ranking(resultados: list[Resultado], top: int) -> None:
     print(f"{'#':>3}  {'F1-macro':>8}  {'±dp':>6}  {'vocab':>6}  combinação")
     print("-" * LARGURA)
@@ -487,9 +376,7 @@ TITULOS_DOS_CAMPOS = {
 }
 
 
-def imprimir_varredura(
-    resultados: list[Resultado], top: int, permutacoes: int, variar_ordem: bool
-) -> None:
+def imprimir_varredura(resultados: list[Resultado], top: int, permutacoes: int) -> None:
     titulo = "VARREDURA EXAUSTIVA — pré-processamento x vetorização"
     print(f"\n{'=' * LARGURA}")
     print(f"{titulo:^{LARGURA}}")
@@ -534,24 +421,23 @@ def imprimir_varredura(
             marca = "  <- atrapalha" if efeito < -0.01 else ("  <- ajuda" if efeito > 0.01 else "")
             print(f"{nome:>24}  {com:>8.4f}  {sem:>10.4f}  {efeito:>+9.4f}{marca}")
 
-    if variar_ordem:
-        analise = analisar_efeito_da_ordem(resultados)
-        print(f"\n{'A ORDEM IMPORTA?':^{LARGURA}}")
-        print("-" * LARGURA)
-        print(f"  Permutações examinadas                        : {permutacoes}")
-        print(f"  Execuções distintas depois da deduplicação    : {len(resultados)}")
-        print(f"  Grupos em que a ordem muda o texto            : {analise.grupos_sensiveis} de {analise.grupos_totais}")
-        print(f"  Amplitude média de F1 dentro desses grupos    : {analise.amplitude_media:.4f}")
-        print(f"  Amplitude máxima                              : {analise.amplitude_maxima:.4f}")
-        if analise.par_extremo:
-            melhor, pior = analise.par_extremo
-            print(f"    melhor: {melhor.f1_medio:.4f}  {melhor.descrever()}")
-            print(f"    pior  : {pior.f1_medio:.4f}  {pior.descrever()}")
-        if analise.ordem_padrao_avaliada:
-            porcentagem = 100 * analise.ordem_padrao_venceu / analise.ordem_padrao_avaliada
-            print(f"  Ordem padrão foi a melhor do grupo            : "
-                  f"{analise.ordem_padrao_venceu}/{analise.ordem_padrao_avaliada} ({porcentagem:.0f}%)")
-            print(f"  Perda média por usar a ordem padrão           : {analise.perda_media_da_ordem_padrao:.4f}")
+    analise = analisar_efeito_da_ordem(resultados)
+    print(f"\n{'A ORDEM IMPORTA?':^{LARGURA}}")
+    print("-" * LARGURA)
+    print(f"  Permutações examinadas                        : {permutacoes}")
+    print(f"  Execuções distintas depois da deduplicação    : {len(resultados)}")
+    print(f"  Grupos em que a ordem muda o texto            : {analise.grupos_sensiveis} de {analise.grupos_totais}")
+    print(f"  Amplitude média de F1 dentro desses grupos    : {analise.amplitude_media:.4f}")
+    print(f"  Amplitude máxima                              : {analise.amplitude_maxima:.4f}")
+    if analise.par_extremo:
+        melhor, pior = analise.par_extremo
+        print(f"    melhor: {melhor.f1_medio:.4f}  {melhor.descrever()}")
+        print(f"    pior  : {pior.f1_medio:.4f}  {pior.descrever()}")
+    if analise.ordem_padrao_avaliada:
+        porcentagem = 100 * analise.ordem_padrao_venceu / analise.ordem_padrao_avaliada
+        print(f"  Ordem padrão foi a melhor do grupo            : "
+              f"{analise.ordem_padrao_venceu}/{analise.ordem_padrao_avaliada} ({porcentagem:.0f}%)")
+        print(f"  Perda média por usar a ordem padrão           : {analise.perda_media_da_ordem_padrao:.4f}")
 
 
 def empatadas_com_a_melhor(resultados: list[Resultado]) -> list[Resultado]:
@@ -582,12 +468,8 @@ def imprimir_recomendacao(resultados: list[Resultado]) -> None:
     print(f"Melhor absoluta : {melhor.f1_medio:.4f}  {melhor.descrever()}")
     print(f"Dentro de 1 desvio padrão da melhor: {len(empatadas)} de {len(resultados)} — empatadas na prática.")
     print(f"Mais simples entre as empatadas: {mais_simples.f1_medio:.4f}  {mais_simples.descrever()}")
-    print("\n^ é esta que vale a pena adotar: mesmo resultado, menos etapas para manter.")
-
-
-# -----------------------------------------------------------------------------
-# Relatório em arquivo
-# -----------------------------------------------------------------------------
+    print("\n^ é esta que vale a pena adotar: dentro do erro da melhor, com menos etapas")
+    print("  para manter e na ordem padrão, que não depende do sorteio das dobras.")
 
 
 def escrever_relatorio(
@@ -595,7 +477,6 @@ def escrever_relatorio(
     dataset: Path,
     k: int,
     permutacoes: int,
-    variar_ordem: bool,
 ) -> None:
     dir_resultados = garantir_dir_de_resultados()
 
@@ -622,7 +503,9 @@ def escrever_relatorio(
         "",
         f"- Dataset: `{dataset.name}`",
         f"- Validação cruzada estratificada de {k} dobras, semente {SEMENTE}",
-        "- Classificador fixo: `MultinomialNB(alpha=1.0)` — régua de medição, não o modelo final",
+        "- Régua fixa: `MultinomialNB(alpha=1.0)`, instrumento de medida, não o modelo final",
+        "- A MESMA régua nas quatro vetorizações, que são todas esparsas: é o que torna a "
+        "comparação entre elas identificável",
         "",
         "## Varredura exaustiva — pré-processamento x vetorização",
         "",
@@ -649,20 +532,19 @@ def escrever_relatorio(
         for valor, media, diferenca in linhas_campo:
             linhas.append(f"| {valor} | {media:.4f} | {diferenca:+.4f} |")
 
-    if variar_ordem:
-        analise = analisar_efeito_da_ordem(resultados)
-        linhas += [
-            "", "### A ordem importa?", "",
-            f"- Grupos em que a ordem muda o texto: **{analise.grupos_sensiveis} de {analise.grupos_totais}**",
-            f"- Amplitude média de F1 nesses grupos: **{analise.amplitude_media:.4f}**",
-            f"- Amplitude máxima: **{analise.amplitude_maxima:.4f}**",
-        ]
-        if analise.ordem_padrao_avaliada:
-            porcentagem = 100 * analise.ordem_padrao_venceu / analise.ordem_padrao_avaliada
-            linhas.append(
-                f"- Ordem padrão foi a melhor em **{analise.ordem_padrao_venceu}/"
-                f"{analise.ordem_padrao_avaliada} ({porcentagem:.0f}%)** dos grupos"
-            )
+    analise = analisar_efeito_da_ordem(resultados)
+    linhas += [
+        "", "### A ordem importa?", "",
+        f"- Grupos em que a ordem muda o texto: **{analise.grupos_sensiveis} de {analise.grupos_totais}**",
+        f"- Amplitude média de F1 nesses grupos: **{analise.amplitude_media:.4f}**",
+        f"- Amplitude máxima: **{analise.amplitude_maxima:.4f}**",
+    ]
+    if analise.ordem_padrao_avaliada:
+        porcentagem = 100 * analise.ordem_padrao_venceu / analise.ordem_padrao_avaliada
+        linhas.append(
+            f"- Ordem padrão foi a melhor em **{analise.ordem_padrao_venceu}/"
+            f"{analise.ordem_padrao_avaliada} ({porcentagem:.0f}%)** dos grupos"
+        )
 
     linhas_vetorizacao = medir_efeito_da_vetorizacao(resultados)
     if linhas_vetorizacao:
@@ -692,7 +574,6 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dataset", type=Path, default=DATASET_PADRAO)
     parser.add_argument("--k", type=int, default=5, help="número de dobras da validação cruzada")
     parser.add_argument("--top", type=int, default=10, help="quantas linhas mostrar em cada ranking")
-    parser.add_argument("--sem-ordem", action="store_true", help="usa só a ordem padrão (execução rápida)")
     args = parser.parse_args(argv)
 
     with args.dataset.open(encoding="utf-8", newline="") as arquivo:
@@ -700,20 +581,19 @@ def main(argv: list[str] | None = None) -> int:
     textos = [linha["texto"] for linha in linhas]
     rotulos = [linha["intencao"] for linha in linhas]
 
-    variar_ordem = not args.sem_ordem
     vetorizacoes = todas_as_vetorizacoes()
 
     print(f"Dataset: {args.dataset}  ({len(textos)} exemplos, {len(set(rotulos))} classes)")
     print(f"Distribuição: {dict(Counter(rotulos))}")
     print(f"Configurações de pré-processamento: {len(todas_as_configuracoes_de_preprocessamento())}")
-    print(f"Varredura de ordem: {'todas as permutações das etapas ativas' if variar_ordem else 'somente a ordem padrão'}")
+    print("Varredura de ordem: todas as permutações das etapas ativas")
     print(f"Validação cruzada estratificada de {args.k} dobras, semente {SEMENTE}")
     print(f"Varredura EXAUSTIVA: cada pré-processamento contra as {len(vetorizacoes)} vetorizações\n")
 
-    resultados, permutacoes = varrer_espaco_de_busca(textos, rotulos, args.k, variar_ordem, vetorizacoes)
-    imprimir_varredura(resultados, args.top, permutacoes, variar_ordem)
+    resultados, permutacoes = varrer_espaco_de_busca(textos, rotulos, args.k, vetorizacoes)
+    imprimir_varredura(resultados, args.top, permutacoes)
     imprimir_recomendacao(resultados)
-    escrever_relatorio(resultados, args.dataset, args.k, permutacoes, variar_ordem)
+    escrever_relatorio(resultados, args.dataset, args.k, permutacoes)
     return 0
 
 

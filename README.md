@@ -41,7 +41,6 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 
 - [Índice da documentação](docs/Index.md)
 - [Documentação principal do projeto](docs/Projeto.md)
-- [Pipeline de PLN — documentação técnica](docs/PipelinePLN.md)
 
 ##  Estrutura de pastas
 
@@ -52,7 +51,6 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 │   └── negócios/
 ├── docs/
 │   ├── GestaoConfiguracao.md
-│   ├── PipelinePLN.md
 │   ├── GestaoProjeto.md
 │   ├── Index.md
 │   └── Projeto.md
@@ -97,7 +95,7 @@ python -m unittest discover tests  # 106 testes
 
 - `assets/`: imagens e diagramas utilizados na documentação.
 - `docs/`: documentação principal do projeto e de sua gestão.
-- `src/pln/`: o pipeline de linguagem natural — [documentação técnica](docs/PipelinePLN.md).
+- `src/pln/`: o pipeline de linguagem natural, [documentação técnica](docs/Projeto.md#33-algoritmo-de-nlp-e-implementação).
 - `src/schemas/`: contratos de entrada da API.
 - `src/database/`: scripts SQL para criação e carga inicial do banco de dados.
 - `src/routes/`: endpoints da API (FastAPI).

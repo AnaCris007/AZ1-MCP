@@ -10,7 +10,6 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 |---|---|---|
 | [Projeto](./Projeto.md) | Documento central do projeto. Reúne o entendimento de negócio (Seção 1), a especificação de requisitos (Seção 2), a definição técnica e arquitetural — APIs de voz, algoritmo de PLN, API de áudio, pilha, modelagem de dados, deploy, estratégia das Sprints 3 a 5 e projeto técnico e arquitetural (Seção 3) — e a prototipação exploratória de design e UX (Seção 4). | Consulta principal para compreensão técnica e de negócio da solução. |
 | [Gestão do Projeto](./GestaoProjeto.md) | Consolida os acordos permanentes da equipe, o processo de desenvolvimento, o acompanhamento de riscos, as retrospectivas, as ações de melhoria e o planejamento das sprints. | Referência para acompanhamento da organização da equipe e da evolução do projeto. |
-| [Pipeline de PLN](./PipelinePLN.md) | Documentação técnica do módulo `src/pln`: estrutura dos arquivos, as opções de pré-processamento e vetorização, a metodologia de avaliação do experimento, como rodar, como testar e como trocar o dataset. | Referência para quem for mexer no código do pipeline ou interpretar os comparativos. |
 | [Gestão de Configuração](./GestaoConfiguracao.md) | Define o Gitflow adotado, o papel das branches, as convenções de nomenclatura, as políticas de commits e Merge Requests, os procedimentos de integração e os exemplos de aplicação. | Referência para versionamento, rastreabilidade e colaboração no GitLab. |
 | [Roteiro do Protótipo A](./RoteiroPrototipoA.md) | Roteiro do vídeo encenado do Protótipo A, com as onze cenas que exercitam a interação proativa e contextual do agente, incluindo os casos de erro e de interação por áudio. | Evidência bruta da prototipação exploratória, complementar à Seção 4 do Projeto.md. |
 
@@ -30,8 +29,6 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | Como implantar a solução em nuvem | [Projeto.md, Processo de Deploy em Nuvem](./Projeto.md#37-processo-de-deploy-em-nuvem) |
 | O que será entregue em cada uma das Sprints 3, 4 e 5 | [Projeto.md, Estratégia de Entrega](./Projeto.md#38-estratégia-de-entrega-para-as-sprints-3-4-e-5) |
 | Os diagramas de classes, de componentes e de sequência | [Projeto.md, Projeto Técnico e Arquitetural](./Projeto.md#39-projeto-técnico-e-arquitetural) |
-| Como o pipeline de PLN funciona e como rodá-lo | [PipelinePLN.md](./PipelinePLN.md) |
-| Como trocar o dataset de teste do pipeline | [PipelinePLN.md, Como trocar o dataset](./PipelinePLN.md#10-como-trocar-o-dataset) |
 | O algoritmo de PLN, como ele foi escolhido e como rodá-lo | [Projeto.md, Algoritmo de NLP e Implementação](./Projeto.md#33-algoritmo-de-nlp-e-implementação) |
 | Como os protótipos foram construídos e executados | [Projeto.md, Prototipação Exploratória](./Projeto.md#4-prototipação-exploratória--design-e-ux) |
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
@@ -65,7 +62,6 @@ Os diagramas de classes, de componentes e de sequência criados na Seção 3.9 d
 docs/
 ├── Index.md
 ├── Projeto.md
-├── PipelinePLN.md
 ├── GestaoProjeto.md
 ├── GestaoConfiguracao.md
 └── RoteiroPrototipoA.md
