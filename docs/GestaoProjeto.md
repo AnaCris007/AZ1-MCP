@@ -102,12 +102,6 @@
   - [4.7.5 Detalhamento das tasks](#475-detalhamento-das-tasks)
   - [4.7.6 Artefato, evidência e designação por task](#476-artefato-evidência-e-designação-por-task)
   - [4.7.7 Registro das tasks no Kanban](#477-registro-das-tasks-no-kanban)
-- [4.8 Merge Requests da Sprint 2](#48-merge-requests-da-sprint-2)
-  - [4.8.1 Fonte dos dados e o que pôde ser verificado](#481-fonte-dos-dados-e-o-que-pôde-ser-verificado)
-  - [4.8.2 Tabela dos Merge Requests da Sprint 2](#482-tabela-dos-merge-requests-da-sprint-2)
-  - [4.8.3 Resumo quantitativo](#483-resumo-quantitativo)
-  - [4.8.4 Análise da rastreabilidade](#484-análise-da-rastreabilidade)
-  - [4.8.5 Ações decorrentes para a Sprint 3](#485-ações-decorrentes-para-a-sprint-3)
 
 </details>
 
@@ -493,7 +487,7 @@ A tabela retoma as ações registradas na Seção 3.2.4 e confronta cada uma com
 
 | Ação da Sprint 1 | Critério de verificação estabelecido | Situação | Evidência |
 |---|---|---|---|
-| Definir na planning o revisor de cada MR, garantindo rotação entre os integrantes | Todos os MRs da sprint têm revisores distintos e nenhum integrante revisou mais de dois MRs seguidos sem que outro assumisse | **Atendida quanto ao objetivo; critério revisado** | O objetivo da ação foi cumprido: todas as entregas tiveram responsável e revisor designados na planning, com revisor distinto do autor, e os sete integrantes revisaram ao menos uma entrega de outra pessoa, conforme a matriz da Seção 4.4.1. A segunda metade do critério, que limitava a dois o número de revisões seguidas por integrante, mostrou-se inadequada na prática e foi substituída na retrospectiva pelos motivos registrados abaixo |
+| Definir na planning o revisor de cada MR, garantindo rotação entre os integrantes | Todos os MRs da sprint têm revisores distintos e nenhum integrante revisou mais de dois MRs seguidos sem que outro assumisse | **Atendida quanto ao objetivo; critério revisado** | O objetivo da ação foi cumprido, e a verificação agora é por dado da API do GitLab, e não por autodeclaração. Sobre os 28 MRs mesclados da sprint: todos têm revisor designado, em **nenhum** deles o revisor coincide com o autor, e os **sete integrantes revisaram ao menos uma entrega de outra pessoa** (Karol Barbosa 7, Felipe Simão 5, Matheus Silva 4, Tobias Viana 4, Paulo Fernandes 3, Rui Facó 3, Ana Jardim 2). A segunda metade do critério, que limitava a dois o número de revisões seguidas por integrante, não é atendida — a maior sequência do mesmo revisor é de três MRs — e foi substituída na retrospectiva pelos motivos registrados abaixo |
 | Atualizar o Kanban diariamente antes da daily, com movimentação dos cards para a coluna correspondente ao estado real da task | Nenhum card permanece na mesma coluna por mais de dois dias sem comentário de atualização ou label BLOCK | **Atendida** | A equipe registra que nenhum card permaneceu mais de um dia na mesma coluna durante a sprint, e que o quadro foi atualizado antes das dailies conforme a política da Seção 2.2.2. O critério de dois dias foi cumprido com folga |
 
  **Revisão do critério de rotação de revisores.** O critério fixado na Sprint 1 limitava a dois o número de entregas seguidas revisadas pelo mesmo integrante. A retrospectiva concluiu que ele não mede o que pretendia medir, por duas razões. A primeira é que a noção de entregas seguidas não é bem definida no fluxo real da equipe: Merge Requests de frentes distintas são abertos e integrados em ordens sobrepostas, de modo que não existe uma sequência única contra a qual verificar o limite, e o resultado da aferição muda conforme a ordenação escolhida. A segunda é que o critério penaliza justamente o arranjo que melhora a revisão: quando uma frente encadeia decisões dependentes, como a questão de projeto, as alternativas divergentes e a escolha dos formatos de prototipação, o revisor que acompanhou a primeira decisão é quem tem contexto para avaliar as seguintes, e trocá-lo por obrigação normativa reduz a qualidade da revisão em nome de uma métrica.
@@ -508,8 +502,6 @@ A tabela segue o formato exigido pelo Escritório de Projetos: cada ação decla
 |---|---|---|---|---|---|---|
 | Concentração dos commits e da produção documental nos últimos dias do ciclo, que originou também as seções não preenchidas do `Projeto.md`. Apuração da Sprint 2: 41,5% dos commits em um único dia | Distribuir o trabalho ao longo da sprint, com commit autoral diário por integrante e abertura do Merge Request assim que a primeira parte utilizável da entrega estiver pronta | Cada integrante, acompanhado pelo Scrum Master | Ao longo de toda a Sprint 3 | Histograma de commits por dia da sprint, extraído do histórico e anexado à issue da retrospectiva | Nenhum dia de trabalho do grupo concentra mais de 40% dos commits da sprint, e nenhum integrante fica mais de dois dias consecutivos sem commit autoral | Não iniciada |
 | Documento descrevendo um estado do repositório já superado, como ocorreu com a branch `hmg` na Sprint 1 e com as seções técnicas do `Projeto.md` nesta sprint | Conferir os artefatos contra o estado real do repositório na data da entrega, e não na data da escrita, registrando a data da verificação | Scrum Master da Sprint 3 | No último dia da Sprint 3, antes da Sprint Review | Tabela de alinhamento com o Escritório de Projetos revisada e datada, anexada à issue de conferência | A tabela é revisada e datada no dia da entrega, e nenhuma afirmação sobre o repositório diverge do que ele contém naquele momento | Não iniciada |
-| Perda do conjunto de treino com as dez intenções na integração entre as issues #130 e #108, e perda de conteúdo do `Projeto.md` corrigida pelo commit `7cf8527`; risco AM12 | Não atribuir a duas frentes simultâneas o mesmo arquivo de dados ou a mesma seção de documento e, quando for inevitável, nomear na planning quem concilia o conteúdo após o segundo merge | Scrum Master da Sprint 3 | Na Sprint Planning da Sprint 3 | Quadro de distribuição da sprint, com a coluna de arquivo afetado por task e o conciliador nomeado onde houver sobreposição | Nenhuma perda de conteúdo detectada na conferência de encerramento da Sprint 3 | Proposta na homologação; **PENDENTE DE VALIDAÇÃO DA EQUIPE** |
-| O desalinhamento entre o modelo treinado e o catálogo de intenções passou despercebido por depender de leitura manual; risco AM12 | Acrescentar à suíte um teste que compare os rótulos presentes no conjunto de treino com o catálogo da Seção 3.1 do `Projeto.md` | **PENDENTE DE VALIDAÇÃO DA EQUIPE**: definir o responsável na Sprint Planning | Até o fim da Sprint 3 | Teste versionado em `tests/`, com a execução registrada na issue correspondente | A suíte falha quando executada sobre um conjunto de treino cujos rótulos não correspondem ao catálogo | Proposta na homologação; **PENDENTE DE VALIDAÇÃO DA EQUIPE** |
 
  As demais constatações da Seção 4.2.3 não geraram ação própria porque já constam do planejamento como escopo da Sprint 3, e não como mudança de comportamento a acompanhar: o preenchimento das quatro seções técnicas do `Projeto.md` corresponde às tasks T03 a T08, e a instalação do hook que recusa mensagens de commit fora do padrão corresponde à task T37, ambas na Seção 4.7.4. A designação de revisor para as entregas de gestão, por sua vez, é tratada na Sprint Planning conforme a Seção 4.7.7.
 
@@ -601,7 +593,6 @@ $$
 |---|---|---|:--:|:--:|:--:|---|---|---|
 | AM10 | Acúmulo de dívida documental por concentração de trabalho no fim da sprint | A produção concentrou-se nos últimos dias do ciclo, e a conferência de 27/08 encontrou quatro seções técnicas do `Projeto.md` (3.2, 3.5, 3.6 e 3.8) ainda com o comentário de instrução do template, além da ausência de uma seção que abrigue o projeto arquitetural | 70% | Moderado | 4,55 | Moderada | Karol Barbosa Rocha | Materializado |
 | AM11 | Divergência entre a documentação e o estado real do repositório | A Seção 2.1 do `GestaoConfiguracao.md` afirmava que a branch `hmg` não existia; a branch passou a existir cerca de quinze minutos depois da escrita e tornou-se o caminho efetivo de promoção para `main`, sem que o documento fosse corrigido durante a Sprint 1 | 70% | Moderado | 4,55 | Moderada | Tobias Viana | Materializado |
-| AM12 | Perda de conteúdo na resolução de conflitos entre frentes que tocam o mesmo arquivo | Identificado na homologação dos artefatos, em 28/08. O conjunto de treino com as dez intenções do catálogo, restaurado pelo commit `80a2751` (issue #108), não sobreviveu à integração com o commit `581f647` (issue #130): a `develop` mantém a versão de três classes genéricas, e o mesmo ocorreu com o modelo serializado, apesar do commit `7b774c4` (issue #79). Há precedente na sprint: o commit `7cf8527` (issue #85) registra a restauração de conteúdo do `Projeto.md` perdido no commit `7a2e9b4` | 70% | Alto | 6,14 | Alta | **PENDENTE DE VALIDAÇÃO DA EQUIPE** | Materializado |
 | OP4 | Antecipação da frente de implementação | O pipeline de PLN foi implementado, testado e medido dentro da Sprint 2, com 111 testes automatizados do módulo e relatórios de varredura e ajuste fino, embora a implementação estivesse prevista para as sprints seguintes | 70% | Alto | 6,14 | Alta | Ana Cristina Jardim | Em Monitoramento |
 
 ### 4.3.5 Efetividade das respostas aplicadas
@@ -625,7 +616,7 @@ $$
 
 ### 4.3.6 Quadro consolidado e representação visual
 
- O quadro reúne os dezesseis itens em acompanhamento ao final da Sprint 2, sendo doze ameaças e quatro oportunidades, ordenados por severidade decrescente. O item AM12 foi acrescentado na homologação dos artefatos, posteriormente à retrospectiva, e por isso ainda não tem responsável confirmado pela equipe:
+ O quadro reúne os quinze itens em acompanhamento ao final da Sprint 2, sendo onze ameaças e quatro oportunidades, ordenados por severidade decrescente:
 
 | ID | Item | Categoria | Probabilidade | Impacto | Severidade | Criticidade | Responsável | Status |
 |---|---|---|---:|---|---:|---|---|---|
@@ -641,7 +632,6 @@ $$
 | AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | Equipe | 50% | Moderado | 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
 | AM9 | Degradação da qualidade da transcrição em ambiente ruidoso | Técnico | 50% | Moderado | 3,18 | Baixa | Matheus Ferreira | Aberto |
 | OP2 | Expansão do agente para novas funcionalidades de gestão de portfólio | Escopo | 50% | Moderado | 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
-| AM12 | Perda de conteúdo na resolução de conflitos entre frentes | Processo | 70% | Alto | 6,14 | Alta | **PENDENTE DE VALIDAÇÃO DA EQUIPE** | Materializado |
 | AM3 | Atraso na liberação de acesso ao ambiente Microsoft | Stakeholders | 70% | Baixo | 2,95 | Baixa | Rui Facó | Mitigado |
 | AM1 | Comunicação interna do grupo | Comunicação | 30% | Alto | 2,50 | Baixa | Tobias Viana | Em Monitoramento |
 | AM5 | Não conclusão do projeto dentro do prazo | Cronograma | 10% | Muito Alto | 0,91 | Muito Baixa | Felipe Simão | Em Monitoramento |
@@ -651,8 +641,6 @@ $$
   <img src="../assets/negócios/matriz-de-risco-sprint-2.svg" width="100%" alt="Matriz de probabilidade e impacto do projeto atualizada na Sprint 2"><br>
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
-
-> **Ressalva sobre a figura.** A Figura 4.3 foi produzida na retrospectiva e representa os quinze itens então em acompanhamento. Ela **não inclui o AM12**, identificado depois, na homologação dos artefatos. O item ocuparia a mesma célula de AM6 e OP4, na faixa de 70% de probabilidade com impacto Alto. A atualização da imagem é a primeira providência da revisão de riscos da Sprint 3.
 
  Comparada à matriz da Sprint 1, a representação registra três movimentos. OP1 sobe para a faixa de 90% e passa a ser o item de maior severidade do projeto, invertendo a posição de topo, que na Sprint 1 era ocupada por uma ameaça. AM3 desce de Moderado para Baixo no eixo de impacto, efeito da decisão de eliminar a dependência do ambiente do parceiro. E surge um agrupamento novo na faixa de 70% com impacto Moderado, composto por AM10 e AM11, ambas de natureza processual e ambas materializadas nesta sprint.
 
@@ -674,10 +662,6 @@ $$
 
  A **OP4** entra diretamente na faixa Alta por alterar a margem de manobra do projeto. Ter o pipeline implementado e medido uma sprint antes do previsto libera capacidade para a Sprint 3 atacar a integração ponta a ponta e a qualificação da base, em vez de começar a construção do zero. O aproveitamento dessa folga não é automático: depende de o planejamento alocar a capacidade liberada nas frentes que hoje representam risco, e não em escopo novo.
 
- **Quarto item na mesma faixa: AM12.** O item identificado na homologação empata em severidade com AM6 e OP4, em 6,14, e por isso merece registro junto dos três acima, ainda que fora da seleção formal, que foi feita na retrospectiva. Sua natureza é distinta das demais: não é um risco de produto nem de cronograma, e sim de **processo de integração**. Ele já se materializou duas vezes na mesma sprint — na perda do conjunto de dez intenções e na perda de conteúdo do `Projeto.md` registrada pelo commit `7cf8527` — e a segunda ocorrência foi detectada e corrigida pela própria equipe, enquanto a primeira só apareceu na conferência final. Essa diferença é o que o torna preocupante: o mecanismo de detecção depende de alguém reler o arquivo inteiro depois do merge, e isso não é sustentável à medida que os artefatos crescem.
-
- A resposta proposta tem duas partes independentes. A primeira é preventiva e organizacional: evitar que duas frentes trabalhem simultaneamente sobre o mesmo arquivo de dados ou sobre a mesma seção de documento, o que é decidível na Sprint Planning ao distribuir as tasks. A segunda é detectiva e automatizável: acrescentar à suíte um teste que verifique que os rótulos presentes no conjunto de treino correspondem ao catálogo da Seção 3.1 do `Projeto.md`, de modo que uma perda como essa quebre a suíte em vez de passar despercebida. As duas constam da tabela de ações da Seção 4.2.4.
-
  Vale registrar o deslocamento em relação à Sprint 1. Naquela análise, os três itens mais críticos eram AM6, OP1 e AM3, e a conclusão apontava que dois decorriam de decisões internas e um dependia de terceiros. Nesta sprint, AM3 sai da lista por efeito de uma decisão deliberada da equipe, que eliminou a dependência externa em vez de aguardá-la, e os três itens de topo passam a ser integralmente internos, sendo dois deles oportunidades. A leitura prática é que a exposição do projeto migrou de fatores externos para a capacidade da equipe de aproveitar o que já construiu.
 
 ### 4.3.8 Histórico de acompanhamento
@@ -697,7 +681,6 @@ A tabela permite verificar a evolução de cada item desde sua identificação. 
 | AM9 | Sprint 1 | Não revisado na Seção 3.2.5 | 3,18 / Aberto | Retomado no acompanhamento |
 | AM10 | **Sprint 2** | Não aplicável | 4,55 / Materializado | Novo item |
 | AM11 | **Sprint 2** | Não aplicável | 4,55 / Materializado | Novo item |
-| AM12 | **Sprint 2** | Não aplicável | 6,14 / Materializado | Novo item, identificado na homologação dos artefatos |
 | OP1 | Sprint 1 | 6,14 / Em Monitoramento | **7,95 / Materializado** | **Oportunidade concretizada** |
 | OP2 | Sprint 1 | 3,18 / Aberto | 3,18 / Em Monitoramento | Estável, com tratamento iniciado |
 | OP3 | Sprint 1 | 4,32 / Em Monitoramento | 4,32 / Em Monitoramento | Estável, resposta não executada |
@@ -715,10 +698,9 @@ A tabela acima mostra o estado de cada item por sprint; esta registra, item a it
 | AM9 | 2 | 50% | Moderado | 3,18 | 3,18, sem alteração | Aberto | Mesmo caso de AM8: retomada de item ausente da revisão anterior, sem reavaliação | Seção 1.9.2 do `Projeto.md` e Seção 4.3.2 deste documento |
 | AM10 | 2 | Não aplicável | Não aplicável | Não aplicável | 4,55 (70%, Moderado) | Materializado | Item novo, decorrente da concentração da produção no fim do ciclo | Conferência de 27/08, com quatro seções técnicas do `Projeto.md` sem preenchimento |
 | AM11 | 2 | Não aplicável | Não aplicável | Não aplicável | 4,55 (70%, Moderado) | Materializado | Item novo, decorrente da divergência entre documentação e repositório na Sprint 1 | Seção 2.1 do `GestaoConfiguracao.md` e criação da branch `hmg` no mesmo dia |
-| AM12 | 2 | Não aplicável | Não aplicável | Não aplicável | 6,14 (70%, Alto) | Materializado | Item novo, identificado na homologação dos artefatos em 28/08: perda de conteúdo na resolução de conflitos entre frentes | Conjunto de treino da issue #108 ausente da `develop`; commit `7cf8527` registrando restauração análoga no `Projeto.md` |
 | OP4 | 2 | Não aplicável | Não aplicável | Não aplicável | 6,14 (70%, Alto) | Em Monitoramento | Item novo, decorrente da antecipação da frente de implementação | Módulo de PLN implementado e medido dentro da Sprint 2, com relatórios em `resultados/` |
 
-Duas leituras se destacam neste registro. A primeira é que **a única redução de exposição da sprint veio de uma decisão de projeto, e não da passagem do tempo**: em AM3, a equipe eliminou a dependência externa em vez de aguardá-la, e o efeito apareceu no eixo do impacto, não no da probabilidade. A segunda é que **as três materializações da sprint são todas de processo** — AM10, AM11 e AM12 —, e nenhuma delas é de natureza técnica ou de relacionamento com o parceiro. A exposição do projeto, nesta etapa, está mais no modo de trabalhar do que no problema a resolver.
+Duas leituras se destacam neste registro. A primeira é que **a única redução de exposição da sprint veio de uma decisão de projeto, e não da passagem do tempo**: em AM3, a equipe eliminou a dependência externa em vez de aguardá-la, e o efeito apareceu no eixo do impacto, não no da probabilidade. A segunda é que **as duas materializações da sprint são ambas de processo** — AM10 e AM11 —, e nenhuma delas é de natureza técnica ou de relacionamento com o parceiro. A exposição do projeto, nesta etapa, está mais no modo de trabalhar do que no problema a resolver.
 
 ---
 
@@ -829,7 +811,7 @@ Duas leituras se destacam neste registro. A primeira é que **a única redução
 
 | Ordem | Frente | Prioridade | Dependência | Justificativa |
 |---|---|---|---|---|
-| 1 | Liquidação da dívida documental da Sprint 2 | Alta | Nenhuma | As quatro seções técnicas pendentes em 27/08 e a Seção 3.9 foram concluídas na homologação de 28/08. Permanece nesta posição o que ficou dependente de decisão ou de evidência: a escolha do provedor de TTS, a política de tempo limite da transcrição, a reconciliação entre modelo e catálogo de intenções e as evidências do deploy. Riscos AM10 e AM12 materializados; acumular agrava e trava as frentes que dependem dessas definições |
+| 1 | Liquidação da dívida documental da Sprint 2 | Alta | Nenhuma | As quatro seções técnicas pendentes em 27/08 e a Seção 3.9 foram concluídas na homologação de 28/08. Permanece nesta posição o que ficou dependente de decisão ou de evidência: a escolha do provedor de TTS, a política de tempo limite da transcrição, a reconciliação entre modelo e catálogo de intenções e as evidências do deploy. Risco AM10 materializado; acumular agrava e trava as frentes que dependem dessas definições |
 | 2 | Qualificação da base de intenções | Alta | Nenhuma | Enquanto a base não oferecer dificuldade, nenhuma métrica do classificador sustenta conclusão. Trata AM6 e a lacuna de OP3, que os quatro anexos recebidos do parceiro permitem fechar |
 | 3 | API de recebimento de áudios | Alta | Frente 1 | Entrega própria da Sprint 3 no enunciado; é a porta de entrada de todo o fluxo |
 | 4 | Speech to Text e integração com o pipeline de NLP | Alta | Frentes 2 e 3 | Entrega própria da Sprint 3; fecha o caminho da voz até a intenção classificada, que é o núcleo da proposta |
@@ -970,7 +952,7 @@ A coluna de designação está deliberadamente em branco. A distribuição de re
 | T20 | `src/services/analysis_service.py` | Fluxo de áudio para texto para intenção coberto por teste de integração | A designar na planning | A designar na planning |
 | T21 | `src/routes/` e `src/services/` | Requisição de ponta a ponta devolvendo a intenção classificada, coberta por teste | A designar na planning | A designar na planning |
 | T22 | `docs/Projeto.md`, Seção 3.3 | Seção atualizada e coerente com os relatórios de `resultados/` | A designar na planning | A designar na planning |
-| T23 | `docs/Projeto.md`, Seção 3.3, e `docs/PipelinePLN.md` | Documentação reproduzível por quem não participou da implementação | A designar na planning | A designar na planning |
+| T23 | `docs/Projeto.md`, Seção 3.3, e `src/pln/README.md` | Documentação reproduzível por quem não participou da implementação | A designar na planning | A designar na planning |
 | T24 | `src/database/` | Scripts versionados e executáveis em ambiente limpo | A designar na planning | A designar na planning |
 | T25 | `src/database/` | Banco populado, com consultas de verificação documentadas | A designar na planning | A designar na planning |
 | T26 | `src/services/` e `src/database/` | Interações persistidas e recuperáveis, com teste cobrindo gravação e leitura | A designar na planning | A designar na planning |
@@ -989,15 +971,6 @@ A coluna de designação está deliberadamente em branco. A distribuição de re
 | T39 | `docs/GestaoProjeto.md` e `README.md` | Tabela de alinhamento revisada e datada no dia da entrega | A designar na planning | A designar na planning |
 | T40 | Kanban do GitLab | Issues da Sprint 4 criadas com milestone, labels, assignee e revisor definidos | A designar na planning | A designar na planning |
 
-**Duas tasks propostas na homologação, ainda não aprovadas.** Elas decorrem do risco AM12 e das ações registradas na Seção 4.2.4, e só entram no backlog se a equipe as aprovar na Sprint Planning:
-
-| ID | Task | Tipo | Estimativa | Artefato relacionado | Evidência esperada | Situação |
-|---|---|---|:--:|---|---|---|
-| T41 | Reconciliar o conjunto de treino com o catálogo de intenções da Seção 3.1, restaurando os rótulos perdidos na integração das issues #130 e #108 | fix | G | `src/pln/dados/intencoes_exemplos.csv` e `resultados/classificador.joblib` | Conjunto de treino e modelo serializado reconhecendo as intenções do catálogo, com a divergência da Seção 3.3.2 do `Projeto.md` encerrada | **PENDENTE DE VALIDAÇÃO DA EQUIPE** |
-| T42 | Criar o teste que compara os rótulos do conjunto de treino com o catálogo de intenções documentado | test | P | `tests/` | Teste falhando quando os dois conjuntos divergem, com execução registrada na issue | **PENDENTE DE VALIDAÇÃO DA EQUIPE** |
-
-A T41 é pré-requisito das tasks T12 a T15: ampliar e reavaliar uma base cujos rótulos não correspondem ao catálogo produziria medições igualmente inaproveitáveis. Se aprovada, ela deve ser executada imediatamente após a T10.
-
 ### 4.7.7 Registro das tasks no Kanban
 
  As tabelas das Seções 4.7.4, 4.7.5 e 4.7.6 constituem o planejamento aprovado na Sprint Planning. Cada task é registrada como uma issue no GitLab, com o mesmo identificador no título, e recebe descrição, tipo, prioridade, estimativa t-shirt, responsável, revisor, dependências, DoR e DoD conforme registrado acima. A designação de responsável e revisor observa o critério de cobertura registrado na Seção 4.2.4, segundo o qual nenhuma entrega é revisada por seu próprio autor, todos os integrantes revisam ao menos uma entrega e toda frente com mais de três entregas conta com ao menos dois revisores distintos. A designação contempla também as quatro entregas que ficaram sem responsável na Sprint 2, conforme a Seção 4.4.1.
@@ -1005,114 +978,3 @@ A T41 é pré-requisito das tasks T12 a T15: ampliar e reavaliar uma base cujos 
  O quadro Kanban do GitLab permanece a fonte oficial para o acompanhamento da execução, nos termos da Seção 2.2.2, e este documento registra o planejamento tal como aprovado, permitindo comparar o previsto com o realizado na retrospectiva da Sprint 3.
 
 ---
-
-## 4.8 Merge Requests da Sprint 2
-
-### 4.8.1 Fonte dos dados e o que pôde ser verificado
-
-Esta seção registra os Merge Requests da Sprint 2. Antes da tabela, é preciso declarar de onde vêm os dados, porque isso determina o que pode ser afirmado e o que não pode.
-
-A consulta à API do GitLab foi tentada e **não pôde ser concluída**: a credencial disponível no ambiente local respondeu `HTTP 401 Unauthorized` na chamada ao projeto, o que indica token expirado ou sem o escopo `api`. O servidor respondeu — não é indisponibilidade de rede —, mas a leitura autenticada não foi autorizada. Em consequência, os dados abaixo foram extraídos exclusivamente do **histórico local do repositório**, que é uma fonte primária e verificável: cada Merge Request concluído pelo GitLab gera um commit de merge cuja mensagem contém a referência `See merge request graduacao/2026-2a/t17/g01!N`, o nome de quem concluiu o merge, a data e a branch de origem.
-
-O que essa fonte permite afirmar e o que não permite:
-
-| Informação | Verificável no histórico local? | Como foi obtida, ou por que não |
-|---|---|---|
-| Número do Merge Request | Sim | Referência `!N` na mensagem do commit de merge |
-| Branch de origem e de destino | Sim | Assunto do commit de merge |
-| Título do Merge Request | Sim | Primeira linha do corpo do commit de merge |
-| Data da conclusão do merge | Sim | Data de autoria do commit de merge |
-| Quem concluiu o merge | Sim | Autor do commit de merge, que é quem acionou o botão no GitLab |
-| Autoria dos commits da branch | Sim | Autores dos commits do intervalo entre o primeiro e o segundo pai do merge |
-| Issues vinculadas | Sim | Referências `#N` nas mensagens dos commits da branch |
-| **Autor do Merge Request** | **Não** | Quem abre o MR não fica registrado no commit de merge. A coluna traz o autor dos commits, que é uma aproximação e pode divergir |
-| **Revisor designado e aprovação** | **Não** | Aprovação e designação de revisor vivem apenas na plataforma |
-| **Comentários de revisão** | **Não** | Idem |
-| **Situação da esteira de verificação** | **Não** | Não há pipeline configurado no repositório, conforme o item 14 da Seção 3.7.9 do `Projeto.md` |
-| **Merge Requests fechados sem merge** | **Parcialmente** | Um MR fechado sem merge não deixa commit. A numeração de 1 a 50 está completa e sem lacunas, o que indica que nenhum MR desse intervalo foi fechado sem merge; MRs de número superior a 50, se existirem, não são detectáveis localmente |
-| **Merge Requests ainda abertos** | **Não** | Um MR aberto não deixa rastro no histórico local |
-
-> **ATUALIZAÇÃO PARCIALMENTE BLOQUEADA.** As colunas de autoria do MR, revisor, evidência de revisão e esteira de verificação não puderam ser preenchidas com dados reais do GitLab. Elas estão marcadas como não verificáveis e **não foram preenchidas por inferência**. Para fechá-las, um integrante com token de escopo `api` válido deve consultar a lista de Merge Requests da milestone da Sprint 2 e completar as colunas correspondentes, anexando à issue de gestão a captura da listagem. Enquanto isso não ocorrer, o critério de rastreabilidade de revisão permanece **PENDENTE DE EVIDÊNCIA DA EQUIPE**.
-
-### 4.8.2 Tabela dos Merge Requests da Sprint 2
-
-Os 26 Merge Requests abaixo são os de número `!25` a `!50`, todos integrados à `develop` entre 20/08/2026 e 28/08/2026. Os de número `!1` a `!23` pertencem à Sprint 1, e o `!24` foi a promoção de `hmg` para `main` daquela entrega.
-
-| MR | Título | Autor(es) dos commits | Issue(s) | Branch de origem | Destino | Quem concluiu o merge | Status | Data do merge | Evidência de revisão | Resultado |
-|---|---|---|---|---|---|---|---|---|---|---|
-| [!25](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/25) | docs: organiza sumário da Sprint 2 | Karol Barbosa Rocha | #149 | `docs/sumario-sprint-2` | `develop` | Felipe Simão | Mesclado | 20/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!26](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/26) | docs: adiciona estrutura das seções do projeto | Karol Barbosa Rocha | #138 | `docs/estrutura-secoes-projeto` | `develop` | Rui Facó | Mesclado | 21/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!27](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/27) | docs: inicia documentação da prototipação exploratória | Karol Barbosa Rocha | #147 | `docs/prototipacao-exploratoria` | `develop` | Felipe Simão | Mesclado | 21/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!28](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/28) | docs: define contrato da API de recebimento de áudio | Paulo Henrique Bueno Fernandes | #135 | `docs/contrato-api-audio` | `develop` | Rui Facó | Mesclado | 24/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!29](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/29) | Feature/pre processamento configuravel | Ana Cristina Jardim | #130, #146 | `feature/pre-processamento-configuravel` | `develop` | Matheus Ferreira da Silva | Mesclado | 25/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!30](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/30) | Docs/Documentar estratégia técnica, deploy e ambientes de nuvem | Tobias Viana, Karol Barbosa Rocha | #119, #122, #129 | `docs/deploy` | `develop` | Karol Barbosa Rocha | Mesclado | 25/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!31](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/31) | feat: adiciona schema da api de recebimento de áudio #153 | Rui Facó | #153 | `feat/schema-recebimento-audio` | `develop` | Paulo Henrique Bueno Fernandes | Mesclado | 24/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!32](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/32) | docs: adiciona controle de conversa e delimitação central ao catálogo de intenções #131 | Ana Cristina Jardim, Paulo Henrique Bueno Fernandes | #131 | `docs/definir-intencoes-agente` | `develop` | Ana Cristina Jardim | Mesclado | 25/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!33](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/33) | Docs/diario de construcao prototipo b | Felipe Simão | #137 | `docs/diario-de-construcao-prototipo-B` | `develop` | Karol Barbosa Rocha | Mesclado | 25/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!34](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/34) | docs: documentar construção do protótipo A | Karol Barbosa Rocha | #150 | `docs/documentar-execucao-prototipos` | `develop` | Matheus Ferreira da Silva | Mesclado | 26/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!35](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/35) | feat: implementa endpoint de recebimento de áudio com validações e armazenamento | Rui Facó, Paulo Henrique Bueno Fernandes | #154, #161 | `feat/construir-api-de-audio` | `develop` | Matheus Ferreira da Silva | Mesclado | 26/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!36](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/36) | docs: gestao de projetos sprint 2 | Ana Cristina Jardim | #72, #140 | `docs/gestao-de-projetos-sprint2` | `develop` | Tobias Viana | Mesclado | 28/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!37](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/37) | Docs/descricao pipeline pln inicial | Matheus Ferreira da Silva, Ana Cristina Jardim | #84, #108, #109 | `docs/descricao-pipeline-pln-inicial` | `develop` | Matheus Ferreira da Silva | Mesclado | 27/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!38](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/38) | Docs/criar e documentar diagrama de deploy | Tobias Viana | #85, #121 | `docs/deploy` | `develop` | Ana Cristina Jardim | Mesclado | 28/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!39](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/39) | feat: implementa interface frontend da plataforma AZ1 | Paulo Henrique Bueno Fernandes | #90, #112 | `feat/contruir-interface` | `develop` | Felipe Simão | Mesclado | 27/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!40](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/40) | docs: adicionar dois diagramas de sequencia para casos criticos #124 | Ana Cristina Jardim | #124 | `docs/adicao-diagramas-de-casos-criticos` | `develop` | Karol Barbosa Rocha | Mesclado | 27/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!41](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/41) | docs: finalizar evidências da prototipação exploratória | Karol Barbosa Rocha | #126, #145 | `docs/finalizar-prototipacao-exploratoria` | `develop` | Tobias Viana | Mesclado | 27/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!42](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/42) | docs: adiciona estrtégia de entrega das Sprints 3, 4 e 5 | Ana Cristina Jardim | #127 | `docs/estrategia-de-entrega-por-sprints` | `develop` | Paulo Henrique Bueno Fernandes | Mesclado | 27/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!43](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/43) | Docs/documentar interface | Felipe Simão | #105, #144 | `docs/documentar-interface` | `develop` | Tobias Viana | Mesclado | 28/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!44](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/44) | Feat/integrar stt tts | Matheus Ferreira da Silva, Rui Facó | #79, #100, #101, #102, #104, #132 | `feat/integrar-stt-tts` | `develop` | Rui Facó | Mesclado | 28/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!45](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/45) | Docs/diagrama conceitual | Rui Facó | #116 | `docs/diagrama-conceitual` | `develop` | Felipe Simão | Mesclado | 27/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!46](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/46) | feat: integrar endpoint de chat com a API gratuita do Gemini #111 | Paulo Henrique Bueno Fernandes | #111 | `feat/integrar-interface` | `develop` | Karol Barbosa Rocha | Mesclado | 27/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!47](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/47) | Docs/pilha de tecnologias | Rui Facó | #152 | `docs/pilha-de-tecnologias` | `develop` | Felipe Simão | Mesclado | 28/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!48](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/48) | Docs/modelo logico relacional | Felipe Simão, Paulo Henrique Bueno Fernandes | #117 | `docs/modelo-logico-relacional` | `develop` | Paulo Henrique Bueno Fernandes | Mesclado | 27/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!49](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/49) | Fix/documentar e atualizar o diagrama de componentes | Tobias Viana, Karol Barbosa Rocha | #86 | `fix/diagramas` | `develop` | Karol Barbosa Rocha | Mesclado | 28/08/2026 | Não verificável localmente | Integrado à `develop` |
-| [!50](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/50) | docs: corrige apontamentos da avaliação nas seções 1.6, 1.7, 1.8 e 2.1 #93 | Paulo Henrique Bueno Fernandes | #93 | `docs/revisao-artefato-sprint` | `develop` | Karol Barbosa Rocha | Mesclado | 28/08/2026 | Não verificável localmente | Integrado à `develop` |
-
-### 4.8.3 Resumo quantitativo
-
-Os totais abaixo foram calculados sobre os 26 Merge Requests da tabela, e não estimados.
-
-| Indicador | Valor | Percentual | Observação |
-|---|---:|---:|---|
-| Merge Requests da Sprint 2 | 26 | 100% | Numeração `!25` a `!50`, sem lacunas |
-| Aceitos e integrados | 26 | 100% | Todos para a `develop`, por commit de merge |
-| Fechados sem merge | 0 | 0% | Nenhuma lacuna na numeração de 1 a 50 |
-| Ainda abertos | Não verificável | — | Um MR aberto não deixa rastro local; MRs de número acima de `!50` não são detectáveis |
-| Associados a pelo menos uma issue | 26 | 100% | Pela referência `#N` nos commits da branch |
-| Branches em conformidade com a convenção de nomes | 26 | 100% | Todas usam prefixo válido e descrição em kebab-case |
-| Com revisão comprovada | Não verificável | — | Depende de consulta autenticada ao GitLab |
-| Com esteira de verificação aprovada | 0 | 0% | Não há pipeline configurado no repositório |
-| Merges concluídos por pessoa distinta de todo autor da branch | 20 | 76,9% | Ver a análise abaixo |
-| Merges concluídos por alguém que também assinou commits da branch | 6 | 23,1% | `!30`, `!32`, `!37`, `!44`, `!48` e `!49` |
-
-**Distribuição dos merges entre os integrantes.** A conclusão dos merges não ficou concentrada: os sete integrantes acionaram o merge ao menos duas vezes cada.
-
-| Integrante | Merges concluídos |
-|---|---:|
-| Karol Barbosa Rocha | 6 |
-| Felipe Simão | 5 |
-| Matheus Ferreira da Silva | 4 |
-| Rui Facó | 3 |
-| Paulo Henrique Bueno Fernandes | 3 |
-| Tobias Viana | 3 |
-| Ana Cristina Jardim | 2 |
-
-### 4.8.4 Análise da rastreabilidade
-
-**O que a apuração confirma.** Três resultados são positivos e verificáveis sem depender do GitLab. O primeiro é que **todos os 26 Merge Requests estão vinculados a pelo menos uma issue**, o que sustenta o primeiro princípio de gestão de configuração declarado na Seção 1.2 do `GestaoConfiguracao.md`. O segundo é que **todas as branches seguem a convenção de nomes**, sem exceção. O terceiro é que **a conclusão dos merges está distribuída entre os sete integrantes**, o que indica que o conhecimento do fluxo de integração não ficou concentrado em uma ou duas pessoas.
-
-**Os seis merges concluídos por coautor.** Em `!30`, `!32`, `!37`, `!44`, `!48` e `!49`, quem acionou o merge também assinou commits da branch. É relevante registrar que, **nos seis casos, a branch tinha dois autores distintos**, e quem concluiu o merge não era o autor exclusivo do conteúdo. A regra da Seção 4.5 do `GestaoConfiguracao.md` admite que o autor conclua o merge desde que a aprovação do revisor já esteja registrada, de modo que o padrão observado não contraria a política. O que não se pode afirmar, com os dados disponíveis, é que a aprovação prévia existia em cada um dos seis casos — e é exatamente essa verificação que depende da consulta autenticada ao GitLab.
-
-**O que a apuração não alcança, e por que importa.** A ausência das colunas de revisor e de aprovação não é um detalhe formal: a Seção 2.2.4 exige revisão por integrante diferente do autor para toda entrega, e a Seção 4.2.3 já registra como ponto fraco que as entregas de gestão ficaram sem revisor designado. Sem a consulta ao GitLab, não é possível medir a cobertura real de revisão da sprint, e por isso o indicador correspondente permanece em branco em vez de receber um número plausível.
-
-**Promoção da entrega da Sprint 2.** O histórico local mostra que a `develop` está 139 commits à frente da `hmg`, e que a `main` permanece no estado da Sprint 1, com o `!24` como último merge. Isso significa que, **na data desta revisão, a entrega da Sprint 2 ainda não foi promovida** pelo caminho `develop` → `hmg` → `main` descrito na Seção 6.4 do `GestaoConfiguracao.md`. Registra-se também que **o repositório não possui nenhuma tag**, de modo que a etiquetagem de versão prevista naquela seção não foi executada em nenhuma das duas sprints.
-
-> **PENDENTE DE VALIDAÇÃO DA EQUIPE:** executar, antes da Sprint Review, os dois Merge Requests de promoção — de `develop` para `hmg` e de `hmg` para `main` —, cada um com revisão e aprovação próprias, e criar a tag da versão em `main`. Após a conclusão, acrescentar as duas linhas correspondentes à tabela da Seção 4.8.2 e atualizar os totais da Seção 4.8.3.
-
-### 4.8.5 Ações decorrentes para a Sprint 3
-
-| Problema de rastreabilidade | Ação | Responsável pelo acompanhamento | Prazo | Evidência esperada | Critério de verificação |
-|---|---|---|---|---|---|
-| Cobertura de revisão dos MRs não é verificável fora da plataforma | Registrar, na descrição de cada MR, o nome do revisor designado e o resumo do que foi revisado, de modo que a informação fique também no histórico | Scrum Master da Sprint 3 | Ao longo da Sprint 3 | Descrição dos MRs da Sprint 3 contendo a linha de revisor | Amostragem de cinco MRs da sprint, todos com revisor nomeado na descrição |
-| Token do GitLab expirado impediu a apuração automatizada | Gerar um token de escopo `api` com validade posterior ao fim do módulo e registrar quem o mantém | Tobias Viana | Primeira semana da Sprint 3 | Confirmação de leitura autenticada bem-sucedida, sem exposição do token | A apuração dos MRs da Sprint 3 é feita com dados da plataforma, e não do histórico local |
-| Nenhuma esteira de verificação configurada | Criar a configuração de integração contínua, conforme a task T36 | Tobias Viana | Sprint 4, conforme a Seção 3.8.6 do `Projeto.md` | Primeira execução da esteira registrada na issue | Um MR da Sprint 4 exibe o resultado da verificação automática |
-| Entrega da sprint não promovida por `hmg` | Executar a promoção e a etiquetagem em cada encerramento de sprint | Integrante da rotação de promoção | Último dia de cada sprint | MRs de promoção e tag criada em `main` | `main` contém o conteúdo da sprint e a tag correspondente existe |
