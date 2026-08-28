@@ -46,8 +46,7 @@
 - [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
 - [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
 - [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
-- [3.8 Projeto Técnico e Arquitetural](#38-projeto-técnico-e-arquitetural)
-- [3.9 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -67,8 +66,6 @@
 - [4.11 Aprendizados da Exploração](#411-aprendizados-da-exploração)
 - [4.12 Próximos Passos](#412-próximos-passos)
 - [4.13 Registros Visuais](#413-registros-visuais)
-
-</details>
 
 </details>
 
@@ -1134,7 +1131,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 | Cenário 2 | Sugerir preenchimento de documento | Usuário | RF04 |
 | Cenário 3 | Notificar pendências | Agendador (sistema) | RF05 |
 
- Os três cenários representam o fluxo principal de cada requisito, sem o tratamento de exceções, que fica previsto para a sprint seguinte. O RF06, de prioridade baixa e viabilidade ainda em avaliação, não recebeu cenário nesta sprint, conforme registrado na seção 2.2.3.
+ Os três cenários representam o fluxo principal de cada requisito, sem o tratamento de exceções, que fica previsto para a sprint seguinte. Os fluxos de exceção de dois desses cenários foram modelados na seção 2.2.3, como diagramas de sequência dos casos críticos. O RF06, de prioridade baixa e viabilidade ainda em avaliação, não recebeu cenário nesta sprint, conforme registrado na seção 2.2.4.
 
 #### Linhas de vida adotadas
 
@@ -1172,7 +1169,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
 #### Cenário 1: consultar informações do projeto
 
-&emsp; O cenário representa o fluxo mais frequente do agente, no qual o usuário formula uma pergunta sobre um projeto e recebe a resposta acompanhada da indicação de origem. É o cenário de maior alcance, por percorrer a cadeia completa de consulta, do recebimento da solicitação em linguagem natural (RF01), passando pela consulta aos dados do projeto (RF02), até a devolução da resposta fundamentada com a indicação da fonte (RF03). O diagrama apresenta somente o fluxo principal; a recusa de pedidos fora do catálogo de intenções e o ciclo de esclarecimento diante de parâmetros faltantes, ambos previstos pelo RF02, não estão representados neste cenário.
+&emsp; O cenário representa o fluxo mais frequente do agente, no qual o usuário formula uma pergunta sobre um projeto e recebe a resposta acompanhada da indicação de origem. É o cenário de maior alcance, por percorrer a cadeia completa de consulta, do recebimento da solicitação em linguagem natural (RF01), passando pela consulta aos dados do projeto (RF02), até a devolução da resposta fundamentada com a indicação da fonte (RF03). O diagrama apresenta somente o fluxo principal; a recusa de pedidos fora do catálogo de intenções e o ciclo de esclarecimento diante de parâmetros faltantes, ambos previstos pelo RF02, não estão representados neste cenário. A recusa de pedidos fora do catálogo é modelada no caso crítico 1 da seção 2.2.3; o ciclo de esclarecimento diante de parâmetros faltantes não recebeu diagrama próprio.
 
 <div align="center">
   <sub>FIGURA 2.2: diagrama de sequência do cenário 1 (consultar informações do projeto)</sub><br>
@@ -1295,7 +1292,135 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
  É também o único cenário em que uma mensagem assíncrona chega ao ator. O disparo do `: Agendador` e a entrega pelo `: ServicoDeNotificacao` não bloqueiam o remetente à espera de resposta, ao contrário das consultas à `: FonteDeDados`, que são síncronas porque o `: Agente` depende do resultado para prosseguir. A notação evita a leitura equivocada de que a notificação seria o retorno de alguma solicitação do usuário, que neste cenário não existe.
 
-### 2.2.3. Rastreabilidade entre requisitos, cenários e classes
+### 2.2.3. Casos críticos: diagramas de sequência dos fluxos de exceção
+
+ Um caso crítico é o cenário cuja falha compromete o objetivo da solução, seja porque o usuário deixa de obter a informação de que precisa, seja porque passa a receber uma informação em que não pode confiar. O critério de seleção é o impacto, e não a frequência: uma situação rara pode ser crítica quando seu efeito é grave, e uma situação frequente pode não ser crítica quando o usuário a corrige sem prejuízo.
+
+ Por esse critério, os casos críticos da solução são os próprios cenários modelados na seção anterior, que concentram o valor entregue pelo agente. Aqueles diagramas, porém, representam apenas o fluxo principal de cada um. Os dois diagramas apresentados a seguir completam essa modelagem, representando os fluxos de exceção que decidem o comportamento do agente quando o caminho principal não se confirma. Foram elaborados na Sprint 2 e estão posicionados aqui, e não no capítulo de definição técnica, para que cada cenário e sua contrapartida de exceção possam ser lidos em sequência.
+
+ A escolha dos fluxos de exceção seguiu o impacto sobre a confiança do usuário na solução e a correspondência com riscos já mapeados na seção 1.9.
+
+| Caso crítico | Fluxo de exceção representado | Cenário de origem | Requisitos | Risco tratado |
+|---|---|---|---|---|
+| Caso crítico 1 | A solicitação é compreendida, mas está fora do catálogo de intenções ou exige uma ação vedada ao MVP, e o agente recusa e orienta | Cenário 2 | RF02 | AM2 (baixa acurácia na identificação de intenções) |
+| Caso crítico 2 | A fonte está indisponível ou não há evidência suficiente, e o agente informa o limite em vez de responder sem fundamento | Cenário 1 | RF02, RF03 | AM8 (alucinação do modelo de linguagem) |
+
+ Os dois diagramas reutilizam integralmente as linhas de vida e as convenções de notação declaradas na seção 2.2.2, incluindo a distinção entre mensagem síncrona, assíncrona e retorno. Nenhuma linha de vida nova foi introduzida: os fluxos de exceção percorrem os mesmos componentes do fluxo principal, o que é, em si, um resultado do projeto arquitetural, pois demonstra que o tratamento de erro não exige uma estrutura paralela à da operação normal.
+
+ Três termos aparecem nos diagramas e não constavam dos cenários anteriores. `confianca` é o grau de certeza devolvido pelo componente que produziu o resultado, no caso a classificação da intenção. `limiarScore` é a pontuação mínima abaixo da qual uma evidência não é aceita como fundamento de resposta. `backoff` é o intervalo de espera aplicado entre duas tentativas de acesso a uma fonte que falhou. Os valores desses parâmetros são tratados ao final desta seção.
+
+#### Caso crítico 1: intenção fora do catálogo ou fora do limite de atuação
+
+O caso representa a situação em que o agente compreende exatamente o que foi pedido e, ainda assim, não atende. Isso ocorre por dois motivos distintos, que o diagrama separa em fragmentos alternativos. No primeiro, o texto não corresponde a nenhuma das intenções catalogadas na seção 3.1 e é classificado como `fora_do_catalogo` (INT-10). No segundo, a intenção é reconhecida, mas sua execução exigiria uma ação vedada ao MVP pela delimitação central da seção 3.1, como gravar em um documento oficial ou acessar o portfólio real do Metrô.
+
+<div align="center">
+  <sub>FIGURA 2.5: diagrama de sequência do caso crítico 1 (intenção fora do catálogo ou fora do limite de atuação)</sub><br>
+  <img src="../assets/sequencia-critico-1.svg" width="100%" alt="Diagrama de sequência do caso crítico de intenção fora do catálogo, com os fluxos de recusa por intenção não catalogada e por ação vedada ao MVP"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Fluxo do caso crítico:**
+
+| # | Mensagem | Tipo | Origem | Destino | Requisito |
+|---|---|---|---|---|---|
+| 1 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
+| 2 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF02 |
+| 3 | `classificarIntencao(texto)` | Síncrona | `: PipelinePLN` | `: Intencao` | RF02 |
+| 4 | `intencaoIdentificada, confianca, foraDoCatalogo` | Retorno | `: Intencao` | `: PipelinePLN` | RF02 |
+| 5 | `registrarSolicitacaoNaoAtendida(texto)` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | RNF09 |
+| 6 | `obterIntencoesDisponiveis()` | Síncrona | `: PipelinePLN` | `: Intencao` | RF02 |
+| 7 | `intencoesDisponiveis` | Retorno | `: Intencao` | `: PipelinePLN` | RF02 |
+| 8 | `informarForaDoCatalogo(intencoesDisponiveis)` | Síncrona | `: PipelinePLN` | `: InterfaceDeChat` | RF02 |
+| 9 | `explicacaoDoLimite, opcoesDisponiveis` | Retorno | `: InterfaceDeChat` | Usuário | RF02, RNF08 |
+| 10 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF02 |
+| 11 | `verificarDelimitacao(intencao)` | Síncrona | `: Agente` | `: Agente` | RF02 |
+| 12 | `informarRestricaoDeEscopo(motivo, alternativa)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF02 |
+| 13 | `restricaoDeEscopo, alternativa` | Retorno | `: InterfaceDeChat` | Usuário | RF02, RNF08 |
+
+**Fragmentos de interação:**
+
+| Fragmento | Condição de guarda | Comportamento | Requisito |
+|---|---|---|---|
+| `alt` | `[foraDoCatalogo = verdadeiro (INT-10)]` | Passos 5 a 9: a solicitação é registrada, o catálogo é consultado e o usuário recebe a explicação do limite junto com as interações disponíveis | RF02 |
+| `alt` | `[intenção catalogada, porém exige ação vedada ao MVP]` | Passos 10 a 13: o `: Agente` verifica a delimitação, interrompe a execução e devolve ao usuário o motivo da restrição e a alternativa disponível | RF02 |
+
+As duas recusas ocorrem em pontos diferentes da arquitetura, e essa é a principal informação que o diagrama transmite. A primeira é resolvida pelo `: Intencao`, que decide apenas com o texto, porque a pergunta é se aquilo corresponde a alguma intenção catalogada. A segunda só pode ser resolvida pelo `: Agente`, no passo 11, porque depende do efeito que a execução produziria, e não da forma como a solicitação foi escrita. Uma mesma frase pode ser catalogada e ainda assim inadmissível, e a distinção não está disponível no momento da classificação.
+
+Nenhum dos dois ramos emite mensagem à `: FonteDeDados`. A ausência é deliberada e expressa graficamente que uma solicitação recusada não produz efeito algum sobre os dados, do mesmo modo como o cenário 2 usou essa ausência para representar que o agente não altera o documento de origem. É a tradução, em notação de sequência, da delimitação central da seção 3.1.
+
+A recusa nunca é silenciosa. Os passos 9 e 13 sempre acompanham a negativa de uma orientação, seja a lista de interações disponíveis, seja a alternativa admitida pelo escopo. Um agente que apenas informa não ser capaz de atender transfere ao usuário o encargo de descobrir o que pode ser pedido, o que contraria o critério de compreensibilidade do RNF08 e, na prática, leva ao abandono da ferramenta.
+
+O registro do passo 5 tem uma função que ultrapassa a auditoria. O conjunto das solicitações classificadas como `fora_do_catalogo` é o insumo mais direto para decidir quais intenções incorporar ao catálogo nas próximas sprints, e sustenta a oportunidade OP2, de expansão do agente para novas funcionalidades de gestão de portfólio, registrada na seção 1.9.
+
+Cabe observar que a existência da intenção INT-10 no catálogo faz com que a situação de "fora do catálogo" seja um resultado previsto da classificação, e não uma exceção não tratada. O agente não falha ao receber um pedido que não sabe atender: ele o classifica como tal e responde de acordo.
+
+#### Caso crítico 2: fonte indisponível ou sem evidência suficiente
+
+O caso representa a situação em que o agente compreende a solicitação e não consegue fundamentá-la. Dois problemas distintos levam a esse resultado e o diagrama os mantém separados: a fonte pode estar inacessível, por falha de comunicação ou tempo limite excedido, ou pode estar acessível e não conter evidência com pontuação suficiente para sustentar uma resposta. O primeiro é transitório e admite nova tentativa; o segundo não se resolve repetindo a consulta.
+
+<div align="center">
+  <sub>FIGURA 2.6: diagrama de sequência do caso crítico 2 (fonte indisponível ou sem evidência suficiente)</sub><br>
+  <img src="../assets/sequencia-critico-2.svg" width="100%" alt="Diagrama de sequência do caso crítico de fonte indisponível ou ausência de evidência, com tentativas de acesso e recusa de resposta sem fundamento"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Fluxo do caso crítico:**
+
+| # | Mensagem | Tipo | Origem | Destino | Requisito |
+|---|---|---|---|---|---|
+| 1 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
+| 2 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF02 |
+| 3 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF02 |
+| 4 | `buscarEvidencias(consulta, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF02, RNF02 |
+| 5 | `erroDeAcesso, codigo` | Retorno | `: FonteDeDados` | `: Agente` | RF02 |
+| 6 | `aguardarIntervalo(backoff)` | Síncrona | `: Agente` | `: Agente` | RNF07 |
+| 7 | `evidencias, caminho, score` | Retorno | `: FonteDeDados` | `: Agente` | RF02, RF03 |
+| 8 | `avaliarSuficiencia(evidencias, limiarScore)` | Síncrona | `: Agente` | `: Agente` | RF03 |
+| 9 | `registrarIndisponibilidade(fonte, codigo)` | Síncrona | `: Agente` | `: Agente` | RNF09 |
+| 10 | `informarIndisponibilidade(fonte, horario)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
+| 11 | `avisoDeIndisponibilidade` | Retorno | `: InterfaceDeChat` | Usuário | RF03, RNF08 |
+| 12 | `informarAusenciaDeEvidencia(consulta)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
+| 13 | `avisoDeAusenciaDeFonte, sugestaoDeReformulacao` | Retorno | `: InterfaceDeChat` | Usuário | RF03, RNF08 |
+| 14 | `exibirResposta(resposta, referencia, data)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
+| 15 | `resposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF03 |
+
+**Fragmentos de interação:**
+
+| Fragmento | Condição de guarda | Comportamento | Requisito |
+|---|---|---|---|
+| `loop` | `[tentativa <= 2 e fonte indisponível]` | Passos 4 a 7: a consulta é repetida até o limite de duas tentativas enquanto a fonte não responder | RNF07 |
+| `alt` de acesso | `[tempo limite excedido ou falha de acesso]` | Passos 5 e 6: o erro é devolvido ao `: Agente`, que aguarda o intervalo de espera antes da tentativa seguinte | RNF07 |
+| `alt` de acesso | `[consulta respondida]` | Passo 7: a fonte devolve as evidências, o caminho de origem e a pontuação de cada uma | RF02, RF03 |
+| `alt` de resultado | `[fonte indisponível após as tentativas]` | Passos 9 a 11: a indisponibilidade é registrada e o usuário é avisado de que a consulta não pôde ser realizada, com o horário da tentativa | RF03 |
+| `alt` de resultado | `[nenhuma evidência acima do limiarScore]` | Passos 12 e 13: o usuário é avisado de que não há fonte que sustente a resposta e recebe uma sugestão de reformulação | RF03 |
+| `alt` de resultado | `[evidências suficientes]` | Passos 14 e 15: o fluxo principal do cenário 1 se confirma e a resposta é devolvida com a referência e a data | RF03 |
+
+O passo 8 é o que sustenta o caso crítico. Ao avaliar as evidências contra um limiar antes de compor a resposta, o `: Agente` transforma "não sei" em um resultado previsto do fluxo, e não em uma falha. Sem essa avaliação, o componente responderia com o que quer que tenha retornado da consulta, ainda que irrelevante, que é precisamente o comportamento descrito pelo risco AM8, de alucinação do modelo de linguagem. O diagrama torna a garantia verificável: não existe caminho, a partir dos dois primeiros ramos do `alt` de resultado, que alcance a mensagem `exibirResposta` do passo 14.
+
+Os dois avisos ao usuário são distintos porque exigem condutas distintas. O aviso do passo 11 informa que a consulta não pôde ser realizada e é acompanhado do horário, para que o usuário saiba que vale tentar de novo mais tarde. O aviso do passo 13 informa que a consulta foi realizada e nada foi encontrado, situação em que repetir o pedido nas mesmas palavras não muda o resultado, e por isso é acompanhado de uma sugestão de reformulação. Reunir as duas situações sob uma mensagem única faria o usuário insistir quando deveria reformular, ou desistir quando deveria aguardar.
+
+O número de tentativas é limitado a duas, e não é aberto, por causa do RNF01. Cada nova tentativa consome o orçamento de tempo da resposta, e um ciclo de repetições prolongado transformaria uma falha de fonte em uma espera indefinida, que é uma experiência pior do que a informação de indisponibilidade. O intervalo de espera do passo 6 existe para não sobrecarregar uma fonte que já está em dificuldade.
+
+A inclusão do terceiro ramo, com o fluxo bem-sucedido, é intencional, ainda que ele não seja um fluxo de exceção. Sua presença mostra que os dois ramos anteriores são saídas de uma mesma decisão, tomada no passo 8, e não um fluxo paralelo ao do cenário 1. Os passos 14 e 15 reproduzem exatamente os passos finais daquele cenário.
+
+#### Parâmetros fixados pelos diagramas
+
+ Os dois diagramas introduzem parâmetros de decisão cujos valores determinam o comportamento do agente nas situações de exceção. Os valores registrados a seguir são pontos de partida do projeto e serão calibrados com dados reais durante a Sprint 3, sem que a estrutura das interações representadas seja alterada.
+
+| Parâmetro | Valor de partida | Onde é aplicado | Base de calibração |
+|---|---|---|---|
+| `limiarScore` | A definir a partir do conjunto de consultas de referência | Caso crítico 2, passo 8 | Exigência de indicação de fonte do RF03 e de explicabilidade do RNF11 |
+| Número de tentativas de acesso à fonte | 2 | Caso crítico 2, `loop` | Orçamento de tempo de resposta do RNF01 |
+| `backoff` | A definir com base no tempo de resposta observado da fonte | Caso crítico 2, passo 6 | Disponibilidade exigida pelo RNF07 |
+
+#### Rastreabilidade dos casos críticos
+
+| Caso crítico | Completa o cenário | RFs | RNFs | Riscos | Seções relacionadas |
+|---|---|---|---|---|---|
+| Caso crítico 1 | Cenário 2 (seção 2.2.2) | RF02 | RNF08, RNF09 | AM2 | 3.1 (catálogo de intenções e delimitação central) |
+| Caso crítico 2 | Cenário 1 (seção 2.2.2) | RF02, RF03 | RNF01, RNF02, RNF07, RNF08, RNF09, RNF11 | AM8 | 3.3 (algoritmo de NLP), 3.6 (modelagem dos dados) |
+
+### 2.2.4. Rastreabilidade entre requisitos, cenários e classes
 
  A rastreabilidade a seguir demonstra que cada requisito funcional está representado em ao menos um cenário e que cada cenário opera sobre classes efetivamente declaradas na modelagem estática. A verificação percorre os três eixos do artefato, ou seja, as histórias de usuário da seção 2.2, os diagramas de sequência e o diagrama de classes.
 
@@ -1746,7 +1871,324 @@ Uma nova classificação de intenção só deve ser executada quando o sistema d
 
 ### 3.3 Algoritmo de NLP e Implementação
 
-<!-- Exemplo do que incluir: algoritmo escolhido, finalidade, funcionamento, bibliotecas utilizadas e exemplo de implementação. -->
+Esta seção documenta o pipeline de Processamento de Linguagem Natural que classifica a intenção de cada solicitação. Ele é o passo comum a todos os requisitos iniciados por linguagem natural, o `classificarIntencao` que aparece nos cenários 1 e 2 da seção 3.8, e é sobre ele que incide o RNF03, que exige precisão mínima de 85% na identificação de intenções.
+
+O código está em `src/pln/`.
+
+#### 3.3.1 Finalidade e escopo
+
+O pipeline recebe **texto**, digitado pelo usuário ou transcrito pela API de Speech-to-Text descrita em 3.2, e devolve **uma das dez intenções do catálogo** definido em 3.1, acompanhada de um grau de confiança.
+
+Ele não interpreta a intenção nem executa a ação correspondente. Essa responsabilidade é do agente, conforme a separação registrada no diagrama de componentes: o pipeline transforma texto e classifica, e o que fazer com a intenção identificada é decisão de quem o consome.
+
+#### 3.3.2 Algoritmo escolhido: Naive Bayes multinomial
+
+**Decisão:** utilizar `MultinomialNB` sobre representação esparsa de termos, tanto na medição quanto no produto.
+
+O critério determinante foi **velocidade**, e ele não é conveniência de desenvolvimento: é o que viabiliza o método de escolha descrito em 3.3.3. O pipeline só pode ser configurado por medição exaustiva se cada medição for barata, porque são 11.644 delas. Medindo o custo de uma validação cruzada de 5 dobras sobre a vetorização mais cara do espaço (`bow n=1-2`, 2.540 colunas):
+
+| Classificador | Custo por validação cruzada | Varredura exaustiva completa |
+| --- | ---: | ---: |
+| **`MultinomialNB`** | **0,029 s** | **~4 min** |
+| `RidgeClassifier` | 0,185 s | ~28 min |
+| `LogisticRegression` | 12,472 s | ~616 min |
+
+A regressão logística é 430 vezes mais lenta nessa vetorização porque o solver `lbfgs` sofre com contagem bruta não normalizada. Com ela, a varredura passaria de quatro minutos para mais de dez horas, e o método deixaria de ser praticável.
+
+Os demais critérios acompanham a escolha:
+
+| Critério | Como o `MultinomialNB` atende |
+| --- | --- |
+| Volume de dados disponível | Estima uma contagem por termo e classe, sem otimização iterativa que exija muitos exemplos para convergir. O dataset atual tem 400 frases, 40 por intenção |
+| Determinismo | Sem sorteio interno nem `random_state`. Duas execuções produzem exatamente o mesmo modelo, o que torna a avaliação reprodutível |
+| RNF11, explicabilidade das sugestões | Expõe peso por termo e por classe, permitindo listar as palavras que sustentaram cada decisão |
+| RNF04 e RNF09, auditabilidade | A intenção identificada e as palavras que a determinaram podem ser registradas no log de cada interação |
+| RNF01 e RNF10, desempenho e escalabilidade | Classificação em microssegundos, e a matriz esparsa não cresce em memória proporcionalmente ao corpus |
+
+**Decisão:** o classificador do produto é o mesmo que serve de instrumento de medida no experimento.
+
+Isso não é redundância, é uma condição de validade. O pré-processamento é escolhido medindo com um classificador fixo; se o produto usasse outro, a escolha do texto teria sido feita para um modelo que não é o que roda. Chegamos a avaliar `BernoulliNB` como modelo do produto, e a medição mostrou o custo dessa separação: o melhor pré-processamento sob Bernoulli estava na posição 43 do ranking construído sob multinomial, fora da janela de candidatos que o ajuste fino recebe. Fixar o mesmo classificador nos dois lugares elimina o problema por construção.
+
+**Limitação declarada:** a confiança devolvida pelo modelo ordena bem e calibra mal. Ela serve para comparar duas frases entre si, mas não deve ser lida como "probabilidade de estar certo". Um limiar de recusa construído sobre ela, necessário para o comportamento previsto no RF02 e na intenção `fora_do_catalogo`, precisa ser calibrado empiricamente sobre dados rotulados, e não escolhido por intuição.
+
+#### 3.3.3 Por que um pipeline que combina opções, e não uma sequência fixa
+
+Antes de classificar uma frase é preciso transformá-la: minusculizar, remover acentos, remover pontuação, descartar stopwords, reduzir palavras à forma base, separar em tokens. A literatura trata várias dessas etapas como boas práticas, mas nenhuma delas tem resposta universal:
+
+- remover stopwords ajuda a classificar **assunto** e atrapalha a classificar **intenção**, porque a lista do português inclui `não`, `nem`, `sem` e `nunca`, palavras que carregam o sinal em "não atualizou o status";
+- reduzir palavras à forma base aproxima termos relacionados e, ao mesmo tempo, junta termos sem relação;
+- a **ordem** entre as etapas altera o resultado, e em alguns casos faz uma etapa parar de funcionar: a lista de stopwords vem acentuada, então filtrá-la depois de remover acentos não remove nada;
+- a **tokenização** não é detalhe de implementação, porque separar por espaço, por expressão regular ou por regra linguística produz vocabulários diferentes a partir do mesmo texto, e é o vocabulário que o classificador enxerga.
+
+**Decisão arquitetural:** o módulo não assume nada. Cada etapa é opcional, a ordem é campo da configuração e a tokenização é uma escolha explícita. Um experimento mede todas as combinações no dataset real e a escolha é feita por número.
+
+Na prática, uma configuração de pré-processamento é um objeto de dados, não uma sequência de chamadas escrita à mão:
+
+```python
+from pln.preprocessamento import (
+    ConfigPreprocessamento, ModoStopwords, ModoMorfologia, Tokenizacao, preprocessar
+)
+
+config = ConfigPreprocessamento(
+    minusculas=True,
+    remover_acentos=True,
+    remover_pontuacao=True,
+    stopwords=ModoStopwords.PRESERVAR_NEGACOES,
+    morfologia=ModoMorfologia.STEMMING,
+    tokenizacao=Tokenizacao.LINGUISTICO,
+    ordem=("minusculas", "remover_pontuacao", "morfologia", "stopwords",
+           "remover_acentos", "remover_numeros"),
+)
+
+preprocessar("O marco da Linha 6 NÃO foi atualizado em 12/03!", config)
+# 'marc linh 6 nao atual 12 03'
+```
+
+O custo dessa decisão é que o espaço de busca fica grande e a avaliação leva minutos. O benefício é que toda escolha do pipeline passa a ser justificável por medição, o que sustenta a exigência de coerência técnica deste artefato: nenhuma etapa está ligada porque "costuma ajudar".
+
+#### 3.3.4 Arquitetura em módulos
+
+Cada arquivo tem uma responsabilidade e não conhece a do outro. `preprocessamento.py` não sabe que existe vetorização, `vetorizacao.py` não sabe que existe stemming, e `experimento.py` e `classificador.py` compõem os dois primeiros sem implementar nenhum deles.
+
+| Módulo | Responsabilidade |
+| --- | --- |
+| `caminhos.py` | Caminhos de entrada e saída, declarados num lugar só |
+| `preprocessamento.py` | Texto para tokens. Seis etapas opcionais, ordem configurável, três tokenizações |
+| `vetorizacao.py` | Tokens para matriz numérica. Dois modos por duas janelas de n-grama |
+| `classificador.py` | O modelo do produto e a interface de previsão |
+| `experimento.py` | Busca do **texto**: pré-processamento × vetorização |
+| `ajuste_fino.py` | Busca dos **parâmetros do modelo**: suavização × priori × vetorização |
+| `dados/` | Datasets rotulados, com as colunas `texto` e `intencao` |
+
+O **pipeline em execução** é uma sequência linear, e é o que roda toda vez que uma solicitação chega:
+
+```mermaid
+flowchart TB
+    T["texto bruto"] --> P
+
+    subgraph P["preprocessamento.py"]
+        direction TB
+        E["6 etapas opcionais,<br/>aplicadas na ordem configurada"]
+        TK["tokenização:<br/>split, regex ou linguístico"]
+        E --> TK
+    end
+
+    P --> V["vetorizacao.py<br/>bag of words ou tf-idf,<br/>janela uni ou uni+bi"]
+    V --> C["MultinomialNB"]
+    C --> S["intenção + confiança"]
+```
+
+As **duas buscas** que configuraram esse pipeline são maquinário de projeto, e não rodam em produção. Elas encadeiam-se por arquivo, e o último passo é manual:
+
+```mermaid
+flowchart TB
+    EXP["experimento.py<br/>varia pré-processamento × vetorização<br/>MultinomialNB(alpha=1.0) fixo"]
+    CSV[("comparativo_preprocessamento.csv")]
+    AJU["ajuste_fino.py<br/>varia suavização × priori × vetorização<br/>texto fixo nos melhores do ranking"]
+    REL[("ajuste_fino.md<br/>bloco de configuração")]
+    PROD["classificador.py<br/>CONFIG_PRE_PADRAO, CONFIG_VET_PADRAO,<br/>ALPHA_PADRAO, FIT_PRIOR_PADRAO"]
+
+    EXP --> CSV --> AJU --> REL
+    REL -. "colar à mão" .-> PROD
+```
+
+**Decisão:** o pipeline do produto é um único objeto do scikit-learn, com o pré-processamento como primeira etapa.
+
+```python
+Pipeline([
+    ("preprocessamento", PreprocessadorDeTexto(config_pre)),
+    ("vetorizador", construir_vetorizador(config_vet)),
+    ("classificador", MultinomialNB(alpha=alpha, fit_prior=fit_prior)),
+])
+```
+
+Isso importa por dois motivos. Primeiro, treinar, avaliar, salvar e prever passam a operar sobre texto bruto, e não existe a possibilidade de alguém treinar com um pré-processamento e prever com outro, que é um erro comum em PLN e não levanta exceção nenhuma: o modelo apenas erra mais. Segundo, dentro da validação cruzada o `Pipeline` garante que o vocabulário e o IDF sejam aprendidos apenas nas dobras de treino, evitando vazamento de dados.
+
+#### 3.3.5 Espaço de busca
+
+| Dimensão | Opções | Combinações |
+| --- | --- | ---: |
+| Etapas booleanas (minúsculas, acentos, pontuação, números) | ligada ou desligada | 2⁴ = 16 |
+| Tratamento de stopwords | manter, remover tudo, preservar negações | 3 |
+| Normalização morfológica | nenhuma, stemming, lematização | 3 |
+| Tokenização | split, regex, linguística | 3 |
+| **Configurações de pré-processamento** | | **432** |
+| Permutações de ordem das etapas ativas | | **19.767** |
+| Vetorizações (2 modos × 2 janelas de n-grama) | | **4** |
+
+As 432 configurações de pré-processamento, combinadas com suas permutações de ordem, produzem 19.767 pares (configuração, ordem). Multiplicados pelas 4 vetorizações, chegam a **79.068 combinações**. Permutações que produzem texto idêntico são o mesmo experimento e são deduplicadas por hash do corpus, o que elimina cerca de 85% do trabalho. A varredura completa resulta em **11.644 execuções distintas** e leva aproximadamente **4 minutos**.
+
+#### 3.3.6 Como o pipeline final foi escolhido
+
+A escolha é feita por duas buscas, e cada uma fixa o que a outra varia:
+
+| Script | Varia | Fixa |
+| --- | --- | --- |
+| `experimento.py` | o **texto**: pré-processamento × vetorização | o modelo: `MultinomialNB(alpha=1.0)` |
+| `ajuste_fino.py` | os **parâmetros do modelo**: suavização × priori × vetorização | o texto: os melhores do experimento |
+
+O `ajuste_fino.py` lê o relatório que o `experimento.py` grava, então a ordem de execução é obrigatória.
+
+##### Decisões metodológicas que sustentam a validade da comparação
+
+**Decisão:** a régua é única e fixa. O `experimento.py` compara formas de preparar texto, então tudo o que vem depois precisa ser idêntico: mesmo algoritmo, mesmos parâmetros, mesma semente.
+
+**Decisão:** o espaço de vetorização contém apenas a família esparsa. Uma vetorização densa por embeddings pré-treinados chegou a ser avaliada e foi removida. O motivo não foi desempenho, e sim que vetores de embedding têm coordenadas negativas, que o `MultinomialNB` não aceita, o que obrigava a trocar de classificador naquela linha do ranking. Com o classificador variando junto com a representação, o efeito de um deixa de ser separável do do outro e a comparação fica **confundida**. Medindo a decomposição no dataset atual:
+
+| Comparação | F1 | Leitura |
+| --- | ---: | --- |
+| tfidf + MultinomialNB | 0,6354 | ponto de partida |
+| tfidf + GaussianNB | 0,4855 | **−0,1499**, só a troca de classificador |
+| embedding + GaussianNB | 0,4239 | **−0,0615**, só a troca de representação |
+| régua única, tfidf contra embedding | 0,6687 contra 0,6387 | **−0,0300**, o efeito real |
+
+O relatório reportava −0,2114 para "embedding é pior". O efeito real da representação é −0,0300, ou seja, **71% do que era atribuído à representação vinha do classificador**. Restringir o espaço à família esparsa resolve o problema pela raiz, porque uma régua atende tudo que está dentro e toda linha do relatório passa a ser interpretável sem ressalva. O custo declarado é que o experimento deixou de responder "vale a pena usar embeddings?", pergunta que passa a exigir um estudo próprio.
+
+**Decisão:** validação cruzada estratificada de 5 dobras, com semente fixa (42). Estratificada para que cada dobra contenha todas as intenções na mesma proporção, e com semente fixa para que duas configurações sejam comparáveis, e não diferentes por sorteio.
+
+**Decisão:** a métrica é F1-macro, e não acurácia. Acurácia engana com classes desbalanceadas, enquanto o macro tira média por classe, de modo que a intenção rara pesa igual à comum.
+
+**Decisão:** as comparações entre opções são pareadas. Média simples seria enviesada, porque `manter` e `nenhuma` deixam a configuração com uma etapa a menos e, portanto, com menos permutações de ordem. O pareamento compara apenas grupos idênticos em todas as demais escolhas.
+
+**Decisão:** entre configurações empatadas, vence a mais simples. "Empatadas" são as que ficam dentro de um desvio padrão da melhor, ou seja, dentro da incerteza da própria medição. O desempate é, nesta ordem: menos etapas, janela de n-grama menor, ordem padrão, maior F1. A ordem padrão vem antes do F1 de propósito, porque entre permutações do mesmo conjunto de etapas a diferença de F1 é menor que o desvio entre dobras, e escolher por ela seria escolher por ruído.
+
+##### Resultados da busca do texto
+
+Efeito de cada escolha, em comparação pareada sobre 576 configurações idênticas nas demais escolhas:
+
+| Escolha | F1 médio | vs referência |
+| --- | ---: | ---: |
+| stopwords: manter | 0,6332 | referência |
+| stopwords: remover tudo | 0,5942 | −0,0390 |
+| stopwords: preservar negações | 0,5943 | −0,0389 |
+| morfologia: nenhuma | 0,5962 | referência |
+| **morfologia: stemming** | **0,6247** | **+0,0285** |
+| morfologia: lematização | 0,6009 | +0,0047 |
+| tokenização: split | 0,5951 | referência |
+| tokenização: regex | 0,6133 | +0,0182 |
+| tokenização: linguística | 0,6134 | +0,0184 |
+
+O resultado sobre stopwords confirma a hipótese de domínio que motivou o terceiro modo: remover stopwords atrapalha, e as duas formas de removê-las são equivalentes entre si.
+
+Sobre a ordem das etapas, ela muda o texto em **1.320 de 1.728 grupos** (76%), com amplitude média de 0,0148 de F1. Usar sempre a ordem padrão custa, em média, 0,0048, uma ordem de grandeza abaixo do desvio entre dobras, o que justifica a regra de desempate adotada.
+
+##### Resultados da busca dos parâmetros
+
+Sobre os vinte melhores pré-processamentos, 960 candidatos avaliados:
+
+| Suavização (`alpha`) | F1 médio | vs melhor |
+| --- | ---: | ---: |
+| **1.0** | **0,6537** | referência |
+| 0.5 | 0,6454 | −0,0083 |
+| 2.0 | 0,6446 | −0,0091 |
+| 0.1 | 0,6190 | −0,0347 |
+
+| Vetorização | F1 médio | vs melhor |
+| --- | ---: | ---: |
+| **bow n=1** | **0,6401** | referência |
+| tfidf n=1 | 0,6276 | −0,0125 |
+| bow n=1-2 | 0,6258 | −0,0143 |
+| tfidf n=1-2 | 0,6148 | −0,0252 |
+
+As probabilidades a priori não fazem diferença nenhuma (0,6271 nos dois valores), o que é coerente com as dez intenções terem exatamente o mesmo número de exemplos. O `alpha` fica no padrão da biblioteca, 1.0, que também foi o melhor medido.
+
+##### Configuração adotada
+
+```python
+CONFIG_PRE_PADRAO = ConfigPreprocessamento(
+    remover_numeros=True,
+    morfologia=ModoMorfologia.STEMMING,
+    tokenizacao=Tokenizacao.REGEX,
+)
+CONFIG_VET_PADRAO = ConfigVetorizacao(ModoVetorizacao.BOW, n_max=1)
+ALPHA_PADRAO      = 1.0
+FIT_PRIOR_PADRAO  = True
+```
+
+F1-macro de **0,6736** em validação cruzada de 5 dobras — avaliação da configuração vencedora individualmente, não a média da busca de parâmetros (0,6537 na tabela acima, que é a média sobre todos os candidatos com alpha=1,0 nas quatro vetorizações). Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
+
+**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que 0,6736 está **17,6 pontos percentuais abaixo dos 85% exigidos pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a seção 3.9, e as duas frentes são ampliar o dataset e calibrar um limiar de recusa sobre as nove intenções conhecidas.
+
+#### 3.3.7 Bibliotecas utilizadas
+
+| Biblioteca | Versão | Papel no pipeline |
+| --- | --- | --- |
+| `scikit-learn` | 1.9.0 | Vetorizadores, `MultinomialNB`, `Pipeline`, validação cruzada e métricas |
+| `nltk` | 3.10.3 | Lista de stopwords do português, stemmer RSLP e tokenizador por expressão regular |
+| `spacy` | 3.8.15 | Tokenizador linguístico e lematizador de português (`pt_core_news_sm`) |
+| `numpy` | 2.5.2 | Operações sobre a matriz de pesos na explicação por classe |
+| `joblib` | 1.5.3 | Serialização do modelo treinado e paralelização da varredura |
+
+O tokenizador linguístico usa `spacy.blank("pt")`, que carrega apenas as regras do idioma e não exige o download de modelo. O `pt_core_news_sm` é necessário somente para a lematização.
+
+#### 3.3.8 Execução
+
+Instalação, uma vez:
+
+```bash
+pip install -e .
+python -m nltk.downloader stopwords rslp
+python -m spacy download pt_core_news_sm
+```
+
+Treinar, avaliar e salvar o modelo:
+
+```bash
+python -m pln.classificador
+```
+
+Classificar uma frase com o modelo salvo:
+
+```bash
+python -m pln.classificador --prever "Me ajuda a preencher o TAP da Linha 6?"
+# 'Me ajuda a preencher o TAP da Linha 6?'
+#   -> orientar_tap  (confiança 83.5%)
+```
+
+Reexecutar as duas buscas, nesta ordem:
+
+```bash
+python -m pln.experimento     # varredura exaustiva, ~4 min
+python -m pln.ajuste_fino     # ~40 s sobre os 5 melhores pré-processamentos
+```
+
+Ambas gravam relatórios em `resultados/`, e o segundo emite o bloco de configuração pronto para ser aplicado em `classificador.py`.
+
+Uso programático, que é como o agente consome o pipeline:
+
+```python
+from pln.caminhos import MODELO_PADRAO
+from pln.classificador import carregar_modelo, prever_intencao
+
+modelo = carregar_modelo(MODELO_PADRAO)
+intencao, confianca = prever_intencao(modelo, "Tem algum prazo vencido no lote 3?")
+# ('gerar_alertas_pendencias', 0.947)
+```
+
+Para auditoria e para o atendimento do RNF11, o modelo treinado expõe as palavras que mais distinguem cada intenção. Elas saem reduzidas ao radical porque a configuração adotada aplica stemming:
+
+```python
+from pln.classificador import listar_palavras_de_maior_peso_por_intencao
+
+listar_palavras_de_maior_peso_por_intencao(modelo, quantas=4)
+# {'orientar_tap':             [('tap', 2.71), ('term', 1.76), ('abert', 1.59), ('premiss', 1.50)],
+#  'gerar_alertas_pendencias': [('venc', 1.86), ('sem', 1.79), ('avis', 1.79), ('tem', 1.70)],
+#  ...}
+```
+
+#### 3.3.9 Testes
+
+O módulo tem 100 testes automatizados. Três deles existem especificamente para impedir defeitos que não levantam exceção e fariam a medição mentir sem falhar:
+
+| Teste | O que impede |
+| --- | --- |
+| `TesteNaoRetokeniza` | Que os padrões do scikit-learn retokenizem o texto, anulando em silêncio as etapas `minusculas` e `remover_pontuacao` e a escolha de tokenizador |
+| `TesteReguaUnica` | Que o classificador volte a mudar conforme a vetorização, reintroduzindo o confundimento descrito em 3.3.6 |
+| `TesteComparacaoPareada` | Que algum eixo deixe de render tabela, fazendo a seção correspondente sumir do relatório |
+
+```bash
+python -m unittest discover tests
+```
 
 ### 3.4 API para Recebimento de Áudios
 
@@ -1966,11 +2408,354 @@ Com essas definições, o contrato da API estabelece como o áudio entra no sist
 
 ### 3.6 Modelagem Conceitual e Lógica dos Dados
 
-<!-- Exemplo do que incluir: entidades, relacionamentos, atributos principais e diagramas dos modelos de dados. -->
+O modelo conceitual de dados apresenta os principais elementos de informação do parceiro e a forma como eles se relacionam no contexto da gestão do portfólio de projetos do Metrô de São Paulo. Nesta etapa, a modelagem se concentra nos conceitos do domínio e nas regras de associação entre eles, sem definir atributos, chaves, tipos de dados ou detalhes de implementação em banco de dados.
+
+<div align="center">
+<sub>Imagem 3.6.1 - Modelo conceitual de dados</sub><br>
+  <img src="../assets/conceitual.svg" width="75%" alt="Modelo entidade-relacionamento conceitual, com as entidades Usuário, Interação, Artefato, Projeto, Campo Artefato, Portfólio e Pendência"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+#### 3.6.1 Entidades do modelo conceitual
+
+| Entidade | Papel no domínio |
+|---|---|
+| **Usuário** | Representa o profissional autorizado a utilizar o agente para consultar informações do portfólio. |
+| **Interação** | Representa uma solicitação realizada pelo usuário, permitindo registrar e rastrear o uso do agente. |
+| **Artefato** | Representa um documento, registro ou outra fonte de informação associada a um projeto e passível de consulta pelo agente. |
+| **Projeto** | Representa um projeto acompanhado pelo PMO e concentra os artefatos e as pendências relacionados à sua execução. |
+| **Campo Artefato** | Representa uma unidade de informação que compõe um artefato, incluindo campos que podem estar preenchidos ou pendentes. |
+| **Portfólio** | Representa o agrupamento organizacional de projetos acompanhado pelo PMO. |
+| **Pendência** | Representa uma necessidade, obrigação ou item de acompanhamento originado no contexto de um projeto. |
+
+#### 3.6.2 Relacionamentos e cardinalidades
+
+| Relacionamento | Regra representada |
+|---|---|
+| **Usuário realiza Interação** | Um usuário pode realizar nenhuma ou várias interações `(0,n)`, enquanto cada interação é realizada por exatamente um usuário `(1,1)`. |
+| **Interação consulta Artefato** | Uma interação pode consultar nenhum ou vários artefatos `(0,n)`, e um artefato pode ser consultado em nenhuma ou várias interações `(0,n)`. Essa associação muitos-para-muitos permite que uma única solicitação combine diferentes fontes e que a mesma fonte sustente respostas distintas. |
+| **Artefato documenta/pertence a Projeto** | Cada artefato está associado a exatamente um projeto `(1,1)`, enquanto um projeto pode não possuir artefatos ou reunir vários deles `(0,n)`. |
+| **Artefato possui Campo Artefato** | Cada artefato possui um ou vários campos `(1,n)`, e cada campo pertence a exatamente um artefato `(1,1)`. Essa decomposição sustenta a identificação de campos ausentes e a geração de sugestões de preenchimento. |
+| **Projeto pertence a Portfólio** | Cada projeto pertence a exatamente um portfólio `(1,1)`, e cada portfólio reúne um ou vários projetos `(1,n)`. |
+| **Projeto origina Pendência** | Um projeto pode não originar pendências ou originar várias `(0,n)`, enquanto cada pendência está vinculada a exatamente um projeto `(1,1)`. |
+
+#### 3.6.3 Leitura do modelo no contexto da equipe
+
+O modelo conecta o uso do agente às informações de negócio consultadas. Quando um usuário realiza uma interação, o agente pode localizar um ou mais artefatos relacionados ao pedido. Cada artefato fornece rastreabilidade até o projeto que documenta e pode ser decomposto em campos, o que viabiliza tanto a consulta de conteúdo quanto a identificação de informações ausentes. O projeto, por sua vez, está inserido em um portfólio e pode originar pendências que serão consultadas ou utilizadas na geração de alertas.
+
+A entidade **Interação** estabelece a ligação entre o usuário e as fontes consultadas, contribuindo para os requisitos de rastreabilidade e auditabilidade. A associação entre **Interação** e **Artefato** permite registrar quais fontes fundamentaram cada resposta, enquanto a relação entre **Projeto** e **Pendência** oferece a base conceitual para o acompanhamento preventivo previsto no produto.
+
+Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico-relacional é apresentada nas subseções seguintes, que detalham os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
+
+#### 3.6.4 Modelo lógico-relacional
+
+O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas. Os atributos de cada tabela vêm da modelagem estática da seção 2.2.1, e os atributos da tabela `interacao` vêm dos elementos de auditoria exigidos pelos RNF04 e RNF09.
+
+Além dos seis relacionamentos do diagrama conceitual, o modelo lógico incorpora três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no recorte conceitual, por serem indispensáveis aos requisitos: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção de perfis de usuário (Diretor, PMO e Líder de Projeto), que sustenta o controle de acesso do RNF02 e a relação de liderança (`lidera`) prevista no RF06. Dessa forma, o modelo lógico dá continuidade simultaneamente ao modelo conceitual desta seção e ao diagrama de classes da Sprint 1.
+
+<div align="center">
+<sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
+  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, artefato, campo_artefato, pendencia, interacao, interacao_artefato, usuario_projeto e notificacao"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+A tabela a seguir registra a correspondência entre cada elemento das modelagens anteriores e a estrutura relacional que o implementa, evidenciando que nenhuma regra de negócio foi perdida na tradução:
+
+| Elemento de origem | Estrutura relacional | Regra de derivação aplicada |
+|---|---|---|
+| Entidade **Usuário** e especializações (2.2.1) | Tabela `usuario` com coluna `perfil` | Especializações sem atributos próprios colapsadas em coluna de domínio restrito por `CHECK` (decisão 1 da seção 3.6.7) |
+| Entidade **Interação** | Tabela `interacao` | Entidade para tabela; atributos definidos pelos RNF04 e RNF09 |
+| **Usuário realiza Interação** `(0,n)`–`(1,1)` | `interacao.usuario_id NOT NULL` | Um-para-muitos vira chave estrangeira no lado "muitos"; mínimo 1 vira `NOT NULL` |
+| **Interação consulta Artefato** `(0,n)`–`(0,n)` | Tabela associativa `interacao_artefato` | Muitos-para-muitos vira tabela associativa com chave primária composta |
+| **Artefato documenta/pertence a Projeto** `(1,1)`–`(0,n)` | `artefato.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
+| **Artefato possui Campo Artefato** `(1,n)`–`(1,1)` | `campo_artefato.artefato_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata e unicidade de `nome` por artefato |
+| **Projeto pertence a Portfólio** `(1,1)`–`(1,n)` | `projeto.portfolio_id NOT NULL` | Um-para-muitos vira chave estrangeira |
+| **Projeto origina Pendência** `(0,n)`–`(1,1)` | `pendencia.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
+| **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
+| **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
+| **Pendência notifica Usuário** (2.2.1) | Tabela `notificacao` | Muitos-para-muitos materializado como registro de envio, com atributo próprio `data_envio` (decisão 3 da seção 3.6.7) |
+
+As cardinalidades mínimas do lado "muitos" — um portfólio reúne ao menos um projeto `(1,n)` e um artefato possui ao menos um campo `(1,n)` — não são expressáveis por restrições declarativas simples no modelo relacional, pois exigiriam verificação no momento da inserção da linha "pai". Essas duas regras permanecem documentadas como restrições de aplicação, a serem garantidas pela camada de serviços descrita na seção 2.4.
+
+#### 3.6.5 Dicionário de dados (modelo físico)
+
+O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. Todas as chaves primárias substitutas usam `INTEGER GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais.
+
+As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente (portfólios, projetos, usuários, artefatos, campos e pendências), e o schema **`auditoria`** reúne os registros de interação, fontes consultadas e notificações, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
+
+**`portfolio`** — agrupamento de projetos de um exercício:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do portfólio |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
+| `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
+
+**`usuario`** — profissional autorizado a utilizar o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do usuário |
+| `nome` | `TEXT` | `NOT NULL` | Nome do profissional |
+| `email` | `TEXT` | `NOT NULL`, `UNIQUE` | Endereço corporativo de envio das notificações |
+| `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Papel do usuário, base do controle de acesso do RNF02 |
+
+**`projeto`** — empreendimento acompanhado pelo PMO:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do projeto |
+| `codigo` | `TEXT` | `NOT NULL`, `UNIQUE` | Código institucional do empreendimento (chave natural) |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do empreendimento |
+| `status` | `TEXT` | `NOT NULL` | Situação corrente do projeto |
+| `data_inicio` | `DATE` | — | Data de início da execução |
+| `data_termino_prevista` | `DATE` | — | Data prevista de conclusão, base da apuração de prazos |
+| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física |
+| `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
+| `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
+
+**`artefato`** — documento que integra a documentação do projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do artefato |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto documentado (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, como ata, relatório ou contrato |
+| `referencia` | `TEXT` | `NOT NULL` | Localizador do documento no repositório, exibido como fonte no RF03 |
+| `data` | `TIMESTAMPTZ` | `NOT NULL` | Data da última atualização, exibida junto à fonte no RF03 |
+| `versao` | `TEXT` | — | Versão vigente do documento |
+
+**`campo_artefato`** — campo individual de um artefato:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do campo |
+| `artefato_id` | `INTEGER` | `FK → artefato`, `NOT NULL`, `ON DELETE CASCADE` | Artefato ao qual o campo pertence (composição) |
+| `nome` | `TEXT` | `NOT NULL`, `UNIQUE (artefato_id, nome)` | Rótulo do campo dentro do artefato |
+| `valor` | `TEXT` | — | Conteúdo registrado; nulo ou vazio quando não preenchido |
+| `obrigatorio` | `BOOLEAN` | `NOT NULL`, `DEFAULT FALSE` | Indica se o preenchimento é exigido |
+| `preenchido` | `BOOLEAN` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Derivada de `valor`, elimina inconsistência entre valor e marcação (decisão 2 da seção 3.6.7) |
+
+**`pendencia`** — item em aberto originado por um projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único da pendência |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto de origem (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência, como prazo, documento ou aprovação; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `descricao` | `TEXT` | `NOT NULL` | Detalhamento do item em aberto |
+| `prazo` | `DATE` | — | Data limite para tratamento, base da notificação do RF05 |
+| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'resolvida')` | Estado corrente da pendência |
+
+**`auditoria.interacao`** — registro de auditoria de cada solicitação (RNF04 e RNF09):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Usuário que realizou a interação |
+| `data_hora` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do evento |
+| `canal` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'voz')` | Canal utilizado, conforme o RF01 |
+| `texto_solicitacao` | `TEXT` | `NOT NULL` | Texto da solicitação (original ou transcrito do áudio) |
+| `audio_referencia` | `TEXT` | `CHECK` (preenchida apenas quando `canal = 'voz'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4), vinculando o registro ao arquivo original |
+| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1 | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
+| `resultado` | `TEXT` | `NOT NULL`, `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')` | Desfecho da solicitação |
+| `categoria_erro` | `TEXT` | — | Categoria do erro, quando aplicável (RNF09) |
+| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)` | Tempo de processamento, insumo da verificação do RNF01 |
+| `feedback_usuario` | `TEXT` | — | Avaliação da resposta fornecida pelo usuário, capturada pelo componente Auditoria e Feedback da seção 2.4 |
+
+**`auditoria.interacao_artefato`** — fontes consultadas em cada interação (associativa de `consulta`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `interacao_id` | `INTEGER` | `PK` composta, `FK → interacao` | Interação que consultou a fonte |
+| `artefato_id` | `INTEGER` | `PK` composta, `FK → artefato` | Artefato que fundamentou a resposta (RF03) |
+
+**`usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
+| `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`auditoria.notificacao`** — registro dos envios da notificação proativa (materialização de `notifica`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do envio |
+| `pendencia_id` | `INTEGER` | `FK → pendencia`, `NOT NULL`, `ON DELETE CASCADE` | Pendência comunicada |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `UNIQUE (pendencia_id, usuario_id)` | Destinatário; a unicidade composta impede notificar duas vezes a mesma pendência ao mesmo usuário |
+| `data_envio` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do envio, exigido pelo RNF09 |
+
+#### 3.6.6 Definição física em SQL
+
+A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5 — na nuvem, o serviço gerenciado correspondente do provedor escolhido na seção 3.7. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+
+```sql
+CREATE SCHEMA portfolio;
+CREATE SCHEMA auditoria;
+
+CREATE TABLE portfolio.portfolio (
+    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome          TEXT    NOT NULL,
+    ano_exercicio INTEGER NOT NULL,
+    UNIQUE (nome, ano_exercicio)
+);
+
+CREATE TABLE portfolio.usuario (
+    id     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome   TEXT NOT NULL,
+    email  TEXT NOT NULL UNIQUE,
+    perfil TEXT NOT NULL CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto'))
+);
+
+CREATE TABLE portfolio.projeto (
+    id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    codigo                TEXT NOT NULL UNIQUE,
+    nome                  TEXT NOT NULL,
+    status                TEXT NOT NULL,
+    data_inicio           DATE,
+    data_termino_prevista DATE,
+    percentual_avanco     NUMERIC(5,2) NOT NULL DEFAULT 0
+                          CHECK (percentual_avanco BETWEEN 0 AND 100),
+    portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
+    lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
+);
+
+CREATE TABLE portfolio.artefato (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    referencia TEXT NOT NULL,
+    data       TIMESTAMPTZ NOT NULL,
+    versao     TEXT
+);
+
+CREATE TABLE portfolio.campo_artefato (
+    id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    artefato_id INTEGER NOT NULL REFERENCES portfolio.artefato (id) ON DELETE CASCADE,
+    nome        TEXT NOT NULL,
+    valor       TEXT,
+    obrigatorio BOOLEAN NOT NULL DEFAULT FALSE,
+    preenchido  BOOLEAN GENERATED ALWAYS AS
+                (valor IS NOT NULL AND btrim(valor) <> '') STORED,
+    UNIQUE (artefato_id, nome)
+);
+
+CREATE TABLE portfolio.pendencia (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    descricao  TEXT NOT NULL,
+    prazo      DATE,
+    situacao   TEXT NOT NULL DEFAULT 'aberta'
+               CHECK (situacao IN ('aberta', 'em_tratamento', 'resolvida'))
+);
+
+CREATE TABLE portfolio.usuario_projeto (
+    usuario_id INTEGER NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    PRIMARY KEY (usuario_id, projeto_id)
+);
+
+CREATE TABLE auditoria.interacao (
+    id                     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id             INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_hora              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    canal                  TEXT NOT NULL CHECK (canal IN ('texto', 'voz')),
+    texto_solicitacao      TEXT NOT NULL,
+    audio_referencia       TEXT CHECK (audio_referencia IS NULL OR canal = 'voz'),
+    intencao               TEXT CHECK (intencao IN (
+                               'consultar_documentos_normativos',
+                               'consultar_projeto_sintetico',
+                               'orientar_mapa_beneficios',
+                               'orientar_tap',
+                               'orientar_entregas_cronograma',
+                               'orientar_avanco_mensal',
+                               'orientar_riscos_problemas',
+                               'analisar_completude_coerencia',
+                               'gerar_alertas_pendencias',
+                               'fora_do_catalogo')),
+    resultado              TEXT NOT NULL CHECK (resultado IN
+                               ('sucesso', 'esclarecimento', 'recusada', 'falha')),
+    categoria_erro         TEXT,
+    tempo_processamento_ms INTEGER CHECK (tempo_processamento_ms >= 0),
+    feedback_usuario       TEXT
+);
+
+CREATE TABLE auditoria.interacao_artefato (
+    interacao_id INTEGER NOT NULL REFERENCES auditoria.interacao (id),
+    artefato_id  INTEGER NOT NULL REFERENCES portfolio.artefato (id),
+    PRIMARY KEY (interacao_id, artefato_id)
+);
+
+CREATE TABLE auditoria.notificacao (
+    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    pendencia_id INTEGER NOT NULL REFERENCES portfolio.pendencia (id) ON DELETE CASCADE,
+    usuario_id   INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_envio   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (pendencia_id, usuario_id)
+);
+
+-- Imutabilidade dos registros de auditoria (RNF04)
+REVOKE UPDATE, DELETE ON auditoria.interacao, auditoria.interacao_artefato,
+                        auditoria.notificacao FROM PUBLIC;
+
+-- Exceção pontual: a avaliação do usuário chega depois da resposta, portanto
+-- o papel da aplicação recebe permissão de atualização restrita a essa coluna:
+-- GRANT UPDATE (feedback_usuario) ON auditoria.interacao TO <papel_da_aplicacao>;
+
+-- Índices dos acessos frequentes dos cenários da seção 2.2.2
+CREATE INDEX idx_artefato_projeto        ON portfolio.artefato (projeto_id);
+CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_id);
+CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo);
+CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, data_hora);
+```
+
+#### 3.6.7 Decisões de modelagem e restrições de integridade
+
+As decisões estruturais do modelo, com as alternativas consideradas e as razões da escolha, são registradas a seguir.
+
+**Decisão 1 — Perfis de usuário por coluna de domínio, e não por tabelas de subtipo.** A generalização de Usuário da seção 2.2.1 poderia ser mapeada em tabelas de subtipo (`diretor`, `pmo`, `lider_projeto` com chave primária compartilhada). A opção pela coluna `perfil` com `CHECK` decorre da própria justificativa da modelagem estática: as três especializações não declaram atributos próprios, pois o que as distingue é o alcance de acesso, que é relacional. Esse alcance já está expresso no modelo lógico — o líder pela chave `projeto.lider_id` e pelo vínculo de `usuario_projeto`, e o diretor e o PMO pelo alcance consolidado sobre o portfólio, que é regra de autorização da aplicação (RNF02) e não dado armazenado. Tabelas de subtipo vazias adicionariam junções sem acrescentar informação.
+
+**Decisão 2 — `preenchido` como coluna gerada.** Se `preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, preservando o atributo declarado na seção 2.2.1 como consultável e garantindo a confiabilidade da identificação de campos pendentes, que alimenta o RF04 e o RF05.
+
+**Decisão 3 — `notificacao` como registro de envio.** A relação `notifica` poderia ser apenas derivada: os destinatários de uma pendência são os usuários que acompanham o projeto de origem. A materialização em tabela foi escolhida porque o RNF09 exige o registro dos eventos de notificação, e porque a unicidade composta `(pendencia_id, usuario_id)` dá ao Agendador do cenário 3 um critério idempotente, impedindo que a mesma pendência seja comunicada repetidamente ao mesmo usuário a cada verificação periódica.
+
+**Decisão 4 — Intenção como domínio de coluna, e não como tabela.** O catálogo de intenções da seção 3.1 poderia ser normalizado em uma tabela própria. A opção pelo `CHECK` na coluna `interacao.intencao` mantém a coerência com a delimitação do modelo conceitual, que tratou intenção como conceito da camada técnica de PLN, e não como entidade do domínio de portfólio. O custo da escolha é que a evolução do catálogo exige alteração da restrição; o benefício é não introduzir no banco uma entidade sem respaldo nas modelagens anteriores. A restrição deve ser mantida sincronizada com o catálogo da seção 3.1.
+
+**Decisão 5 — Chaves substitutas com chave natural preservada.** Todas as tabelas usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
+
+**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.interacao_artefato` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: a rastreabilidade do RNF04 prevalece sobre a conveniência da exclusão, e o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a exigência de imutabilidade dos registros perante usuários comuns. A única flexibilização é a coluna `feedback_usuario`, atualizável pelo papel da aplicação por meio de permissão em nível de coluna, pois a avaliação do usuário só existe depois de a resposta ter sido registrada.
+
+**Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de auditoria (`interacao`, `interacao_artefato` e `notificacao`) no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
+
+**Alinhamento com o estado da implementação.** Duas colunas de `auditoria.interacao` fecham lacunas registradas em outras frentes da equipe. A coluna `audio_referencia` guarda o identificador do áudio no armazenamento de objetos (o `audio_id` devolvido pela API da seção 3.4): a decisão registrada na seção 2.4 adiou a persistência do pipeline de voz exatamente porque "o PostgreSQL será provisionado e o schema de auditoria definido" em etapa posterior — este modelo define esse schema, e a coluna completa a rastreabilidade que hoje é parcial, ligando cada interação por voz ao arquivo original. A coluna `feedback_usuario` materializa a captura da avaliação do usuário atribuída ao componente Auditoria e Feedback na seção 2.4 e listada entre os registros previstos na seção 2.5.
+
+**Limitação registrada — documentos normativos.** A intenção INT-01 do catálogo da seção 3.1 consulta conceitos e normativos de gestão de portfólio, documentos que não pertencem a nenhum projeto específico. Pelo modelo conceitual e pela seção 2.2.1, todo artefato compõe exatamente um projeto, portanto a base de normativos permanece fora do modelo relacional, no repositório de arquivos independente descrito na seção 2.5. Consequência assumida: a associação `interacao_artefato` registra as fontes de respostas sobre projetos, e a fonte de uma resposta normativa é registrada de forma textual no próprio registro da interação. Se a base de normativos evoluir para dado estruturado, a modelagem de uma entidade própria — ou de um artefato sem vínculo com projeto — deverá ser reavaliada junto com o modelo conceitual, para que as duas representações não divirjam.
+
+**Normalização.** O modelo está na terceira forma normal: todas as tabelas têm chave primária definida, os atributos são atômicos e nenhum atributo não chave depende de outro atributo não chave. A única redundância existente é a coluna `preenchido`, que é derivada — e, por ser gerada pelo próprio banco, não constitui anomalia de atualização.
+
+Por fim, a tabela a seguir consolida a rastreabilidade entre as estruturas do modelo e os requisitos que elas sustentam, no mesmo formato adotado nas seções anteriores:
+
+| Estrutura do modelo | Requisitos sustentados | Papel |
+|---|---|---|
+| `usuario.perfil` | RNF02 | Base da validação de permissões por perfil |
+| `projeto.lider_id` | RF06, RNF02 | Delimita quem pode receber sugestões de alteração de cada projeto |
+| `usuario_projeto` | RF05 | Define os destinatários da notificação proativa |
+| `auditoria.notificacao` | RF05, RNF09 | Registra os envios e garante idempotência da verificação periódica |
+| `auditoria.interacao` | RNF01, RNF03, RNF04, RNF09 | Trilha de auditoria com canal, intenção, resultado e tempo de processamento |
+| `interacao.audio_referencia` | RF01, RNF06, RNF09 | Vincula a interação por voz ao arquivo de áudio original no armazenamento de objetos |
+| `interacao.feedback_usuario` | RNF04 | Registra a avaliação do usuário capturada pelo componente Auditoria e Feedback |
+| `auditoria.interacao_artefato` | RF03, RNF04, RNF11 | Registra as fontes que fundamentaram cada resposta |
+| `artefato.referencia`, `artefato.data` | RF03 | Origem e data exibidas junto a cada informação |
+| `campo_artefato.obrigatorio`, `campo_artefato.preenchido` | RF04, RF05 | Identificação dos campos pendentes de preenchimento |
+| `pendencia.prazo`, `pendencia.situacao` | RF05 | Critérios da verificação periódica do Agendador |
+
+O modelo físico definido nesta seção será populado exclusivamente com os dados sintéticos previstos na seção 1.3 e serve de base tanto para a implementação da camada de acesso a dados quanto para o processo de deploy descrito na seção 3.7.
 
 ### 3.7 Processo de Deploy em Nuvem
 
-#### 3.6.1 Arquitetura e Provedor Selecionado
+#### 3.7.1 Arquitetura e Provedor Selecionado
 
 O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **Microsoft Azure**. No MVP, o núcleo permanece independente; Copilot Studio, Power Platform, Teams e SharePoint são integrações futuras com o ambiente corporativo do parceiro.
 
@@ -2006,7 +2791,7 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 ```
 
 
-#### 3.6.2 Serviços Gratuitos e Limites
+#### 3.7.2 Serviços Gratuitos e Limites
 
 **Azure Free Tier (sempre gratuito):**
 - Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação/dia)
@@ -2025,7 +2810,7 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 **Para projeto acadêmico sem time constraint:**
 No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e suficientes. A implantação real deverá considerar licenciamento e recursos corporativos.
 
-#### 3.6.3 Etapas de Configuração e Implantação
+#### 3.7.3 Etapas de Configuração e Implantação
 
 **Passo 1 — Criar Ambientes Microsoft:**
 1. Registrar-se em [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
@@ -2065,7 +2850,7 @@ No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e 
 3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
 4. Enviar notificação para usuário via Teams
 
-#### 3.6.4 Exemplo de API (Flask)
+#### 3.7.4 Exemplo de API (Flask)
 
 
 ```python
@@ -2140,7 +2925,7 @@ EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 ```
 
-#### 3.6.5 Reprodutibilidade e Verificação
+#### 3.7.5 Reprodutibilidade e Verificação
 
 **Checklist de controle de custo:**
 - [ ] Azure App Service em tier Free (1 instância)
@@ -2180,7 +2965,7 @@ curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
 }
 ```
 
-#### 3.6.6 Próximos Passos para Produção
+#### 3.7.6 Próximos Passos para Produção
 
 Quando a solução for promovida para ambiente real do Metrô:
 
@@ -2192,17 +2977,136 @@ Quando a solução for promovida para ambiente real do Metrô:
 
 Toda a arquitetura permanece igual; apenas migram os recursos para ambientes gerenciados pelo Metrô.
 
-#### 3.6.7 Observações Finais
+#### 3.7.7 Observações Finais
 
 Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossistema Microsoft do parceiro. A reprodutibilidade será confirmada após a execução dos passos e a inclusão das evidências. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 
-### 3.8 Projeto Técnico e Arquitetural
+### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
 
-<!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
+Esta seção define como a solução será desenvolvida, integrada, testada e implantada ao longo das Sprints 3, 4 e 5. A estratégia parte do projeto técnico e arquitetural descrito nas seções anteriores e organiza a construção em incrementos: cada sprint encerra com um conjunto de componentes funcionando de forma integrada, e não com partes isoladas aguardando montagem no final do módulo.
 
-### 3.9 Estratégia de Entrega para as Sprints 3, 4 e 5
+A distribuição das entregas considera três fatores: a ordem de dependência entre os componentes, o prazo de duas semanas de cada sprint e a necessidade de manter, a cada ciclo, uma versão demonstrável da solução para o parceiro.
 
-<!-- Exemplo do que incluir: como desenvolvimento, integração, testes e deploy serão distribuídos entre as próximas sprints. -->
+#### 3.9.1 Princípios da estratégia
+
+- **Entrega incremental e integrada.** Cada componente novo entra conectado ao que já existe. Nenhuma frente é construída isoladamente para ser integrada apenas no encerramento do módulo.
+- **Fluxo principal primeiro.** A Sprint 3 concentra o caminho que atravessa toda a solução: entrada do usuário, transcrição, processamento de linguagem natural e resposta na interface. As sprints seguintes ampliam, persistem e distribuem esse fluxo.
+- **Documentação produzida junto com o código.** Cada entrega técnica é acompanhada da atualização das seções correspondentes deste documento e dos registros no diretório `docs`, evitando acúmulo de documentação no fim do ciclo.
+- **Testes acompanhando a construção.** O planejamento dos testes ocorre na mesma sprint em que o componente é construído, e a execução ocorre na sprint seguinte, de modo que nenhuma funcionalidade chegue ao encerramento sem verificação.
+- **Implantação antecipada.** O deploy em nuvem é iniciado na Sprint 4, e não no fechamento do projeto, para que eventuais problemas de ambiente sejam identificados enquanto ainda há tempo de correção.
+
+#### 3.9.2 Calendário e foco de cada sprint
+
+| Sprint | Período | Foco da sprint |
+|---|---|---|
+| Sprint 3 | 31/08/2026 a 11/09/2026 | Construção do fluxo principal: recebimento de áudio, conversão em texto, algoritmo de PLN e interface básica integrada |
+| Sprint 4 | 14/09/2026 a 25/09/2026 | Persistência em banco de dados, integrações por webhooks, implantação em nuvem e execução dos testes planejados |
+| Sprint 5 | 28/09/2026 a 09/10/2026 | Sistema de mensageria, frontend completo, integração ponta a ponta e consolidação da solução |
+
+As três sprints têm duração de duas semanas, iniciando na segunda-feira e encerrando na sexta-feira da semana seguinte. A distribuição nominal das tarefas entre os integrantes é registrada na matriz de papéis e responsabilidades do documento de [Gestão do Projeto](GestaoProjeto.md) e nas issues do GitLab, que permanecem como fonte oficial do acompanhamento.
+
+#### 3.9.3 Linha do tempo das frentes de trabalho
+
+<div align="center">
+  <sub>FIGURA 3.1 — Linha do tempo de entrega das Sprints 3, 4 e 5</sub><br>
+  <img src="../assets/linha-do-tempo-sprints.svg" width="100%" alt="Linha do tempo com as frentes de trabalho distribuídas entre as Sprints 3, 4 e 5, indicando em que sprint cada frente é construída e em quais permanece em evolução ou manutenção"><br>
+  <sup>Fonte: material produzido pelos autores com auxílio de inteligência artificial (2026).</sup>
+</div>
+
+A figura apresenta as frentes de trabalho em linhas e as sprints em colunas. As barras sólidas indicam a sprint em que a frente é efetivamente construída; as barras claras indicam preparação, evolução incremental ou manutenção do que já foi entregue.
+
+A leitura horizontal evidencia o caráter incremental da estratégia: nenhuma frente aparece isolada em uma única coluna. A API de áudio, construída na Sprint 3, permanece em manutenção e integração nas sprints seguintes; o banco de dados é preparado na Sprint 3 pela modelagem, construído na Sprint 4 e otimizado na Sprint 5; e a integração entre frontend e backend acontece progressivamente desde a Sprint 3, sendo concluída apenas na Sprint 5.
+
+#### 3.9.4 Distribuição das entregas entre as sprints
+
+A tabela relaciona cada entrega prevista para o módulo com o estado esperado ao final de cada sprint. Os estados utilizados são: **Preparação**, quando a frente é apenas planejada ou modelada; **Construção**, quando é efetivamente implementada; **Evolução**, quando recebe incrementos sobre uma base já funcional; e **Consolidação**, quando é finalizada, integrada e documentada em definitivo.
+
+| Entrega | Sprint 3 | Sprint 4 | Sprint 5 |
+|---|---|---|---|
+| API para recebimento de áudios | Construção | Evolução | Consolidação |
+| Conversão de fala em texto e algoritmo de PLN | Construção | Evolução | Consolidação |
+| Frontend | Construção (interface básica) | Evolução | Consolidação (interface completa) |
+| Integração entre frontend e backend | Preparação | Evolução | Consolidação |
+| Banco de dados | Preparação (modelagem) | Construção | Consolidação |
+| Webhooks (dois) | — | Construção | Evolução |
+| Sistema de troca de mensagens | — | Preparação | Construção |
+| Deploy da solução | Preparação (ambiente local) | Construção (nuvem) | Consolidação |
+| Testes sistêmicos | Planejamento | Execução | Complementação |
+
+#### 3.9.5 Sprint 3 — Construção do fluxo principal
+
+O objetivo da sprint é colocar em funcionamento o caminho completo entre a solicitação do usuário e a resposta apresentada na interface, ainda que com escopo reduzido de funcionalidades e sem persistência definitiva.
+
+**Design.** Refinamento do fluxo de interação a partir dos resultados da prototipação exploratória, definição dos estados de carregamento, transcrição e erro na interface, e revisão do contrato de classificação de intenções descrito na Seção 3.1.
+
+**Desenvolvimento.** Construção da API de recebimento de áudio conforme o contrato definido na Seção 3.4, integração com o serviço de conversão de fala em texto, implementação do algoritmo de PLN responsável pela identificação das intenções catalogadas e construção da interface básica que permite enviar a solicitação e visualizar o resultado.
+
+**Testes.** Cobertura por testes unitários dos componentes construídos e elaboração do plano de testes funcionais, não funcionais, de integração e de usabilidade, derivado dos requisitos das Seções 2.2 e 2.3, incluindo a definição das ferramentas e bibliotecas que serão utilizadas na execução.
+
+**Implantação.** Padronização do ambiente local de desenvolvimento por meio de containerização, garantindo que todos os integrantes executem a solução da mesma forma e preparando a imagem que será publicada na nuvem na sprint seguinte.
+
+**Condição de conclusão da sprint:**
+
+- é possível enviar uma solicitação em áudio ou texto pela interface e receber uma resposta produzida pelo sistema;
+- os erros previstos no contrato da API são tratados e comunicados ao usuário;
+- as seções técnicas correspondentes deste documento estão atualizadas;
+- o plano de testes está registrado e aprovado pela equipe.
+
+#### 3.9.6 Sprint 4 — Persistência, integrações e implantação
+
+O objetivo da sprint é dar durabilidade e alcance à solução: o que era processado em memória passa a ser armazenado, o sistema passa a reagir a eventos externos e a aplicação passa a existir em um ambiente de nuvem acessível ao parceiro.
+
+**Design.** Revisão da navegação e do retorno visual da interface a partir dos apontamentos da Sprint 3 e definição da apresentação das informações que passam a ser persistidas, como o histórico das interações.
+
+**Desenvolvimento.** Criação e população do banco de dados a partir da modelagem descrita na Seção 3.6, com implementação das operações de leitura e escrita; implementação de dois webhooks que permitam ao sistema reagir a eventos originados fora dele, com tratamento do conteúdo recebido e resposta adequada ao provedor; evolução incremental do frontend e da integração com as APIs do backend.
+
+**Testes.** Execução do plano elaborado na Sprint 3, incluindo os testes funcionais, os testes de desempenho, os testes de integração com registro das respostas dos serviços externos e a realização dos testes de usabilidade com usuários externos à turma, com produção das evidências correspondentes.
+
+**Implantação.** Configuração dos ambientes de desenvolvimento e de produção, publicação da aplicação na nuvem conforme o processo descrito na Seção 3.7 e início do monitoramento da solução implantada.
+
+**Condição de conclusão da sprint:**
+
+- as informações processadas pelo sistema são armazenadas e recuperadas do banco de dados;
+- os dois webhooks estão implementados, documentados e respondendo corretamente ao provedor;
+- a aplicação está acessível em ambiente de nuvem;
+- os testes planejados foram executados e as evidências estão registradas.
+
+#### 3.9.7 Sprint 5 — Mensageria, interface completa e consolidação
+
+O objetivo da sprint é fechar a solução: desacoplar o processamento por meio de mensageria, concluir a interface e garantir que todos os componentes operem de forma integrada e verificada.
+
+**Design.** Conclusão da interface com tratamento de responsividade e de acessibilidade, padronização dos componentes visuais e revisão da consistência entre as telas.
+
+**Desenvolvimento.** Implementação do sistema de troca de mensagens assíncronas, com produtores e consumidores configurados e integrados aos webhooks construídos na Sprint 4; finalização do frontend com a biblioteca escolhida; e conclusão da integração entre frontend e backend, com tratamento de erros e de falhas de comunicação em todos os fluxos.
+
+**Testes.** Complementação dos testes não concluídos na Sprint 4, execução dos testes unitários por componente do frontend, automação dos testes de interface e verificação da cobertura alcançada em relação aos requisitos definidos.
+
+**Implantação.** Publicação da versão final na nuvem, consolidação das instruções de configuração e do manual de implantação e uso da prova de conceito, e verificação da reprodutibilidade do processo por uma pessoa que não participou da configuração original.
+
+**Condição de conclusão da sprint:**
+
+- o processamento assíncrono opera entre os componentes por meio da tecnologia de mensageria adotada;
+- a interface está completa, responsiva e acessível, com testes automatizados;
+- todas as funcionalidades do frontend consomem as APIs do backend com tratamento de falhas;
+- a documentação final está consolidada e o processo de implantação é reprodutível.
+
+#### 3.9.8 Integração entre as frentes e ambientes
+
+A integração entre as frentes segue o fluxo Gitflow definido no documento de [Gestão de Configuração](GestaoConfiguracao.md). Cada frente é desenvolvida em uma branch própria, vinculada a uma issue, e integrada por Merge Request revisado por outro integrante. A branch `develop` concentra a integração contínua do trabalho da sprint; a branch de homologação recebe a versão estabilizada para verificação; e a branch principal recebe apenas versões concluídas e validadas.
+
+A separação entre os ambientes acompanha essa estrutura: o ambiente de desenvolvimento é executado localmente em contêineres desde a Sprint 3; o ambiente de homologação é utilizado para verificar a versão candidata antes da entrega; e o ambiente de produção, configurado na Sprint 4, hospeda a versão demonstrável ao parceiro. A automação de verificação, composta pela análise estática e pela execução da suíte de testes a cada integração, é incorporada ao repositório na Sprint 4, junto com a configuração do deploy.
+
+#### 3.9.9 Estratégia de testes ao longo das sprints
+
+A verificação é distribuída entre as três sprints, de modo que o planejamento anteceda a execução e a complementação encerre as lacunas identificadas.
+
+| Sprint | Papel na estratégia de testes | Escopo |
+|---|---|---|
+| Sprint 3 | Planejamento | Definição dos casos de teste funcionais e não funcionais derivados dos requisitos, do roteiro de usabilidade e das ferramentas e bibliotecas adotadas; testes unitários dos componentes construídos na sprint |
+| Sprint 4 | Execução | Execução dos casos planejados, com registro de evidências e logs; testes de desempenho; testes de integração com armazenamento temporário das respostas dos serviços externos; testes de usabilidade com usuários externos |
+| Sprint 5 | Complementação | Conclusão dos casos não executados, testes unitários por componente do frontend, automação dos testes de interface e análise crítica da cobertura alcançada |
+
+Os testes de integração utilizam um mecanismo de armazenamento temporário das respostas dos serviços externos, evitando requisições repetidas durante a execução da suíte e reduzindo tanto o tempo de verificação quanto a dependência da disponibilidade desses serviços.
 
 
 ## 4. Prototipação Exploratória — Design e UX
