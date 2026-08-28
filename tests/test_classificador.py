@@ -1,17 +1,13 @@
-# =============================================================================
-# test_classificador.py — Testes do classificador de intenções
-# =============================================================================
-#     python -m unittest discover tests -v
+# Testes do classificador de intenções.
 #
-# A garantia central deste arquivo é a de `TesteConfiguracaoViajaComOModelo`: o
-# pré-processamento é uma etapa do pipeline, então o objeto salvo em disco
-# carrega a própria configuração. Sem isso, treinar com um pré-processamento e
-# prever com outro é um erro possível — e é o mais difícil de diagnosticar em
-# PLN, porque não levanta exceção nenhuma: o modelo simplesmente erra mais.
-# =============================================================================
+# A garantia central é a de `TesteConfiguracaoViajaComOModelo`: o modelo salvo
+# carrega o próprio pré-processamento. Sem isso, treinar com uma configuração e
+# prever com outra é possível, e não levanta exceção: o modelo só erra mais.
 
 from __future__ import annotations
 
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -23,7 +19,6 @@ from pln.classificador import (
     CONFIG_PRE_PADRAO,
     CONFIG_VET_PADRAO,
     PreprocessadorDeTexto,
-    VarianteNB,
     avaliar_classificador,
     carregar_dataset,
     carregar_modelo,
@@ -31,10 +26,15 @@ from pln.classificador import (
     listar_palavras_de_maior_peso_por_intencao,
     prever_intencao,
     salvar_modelo,
-    variantes_compativeis,
 )
 from pln.preprocessamento import ConfigPreprocessamento, ModoStopwords, Tokenizacao, preprocessar
-from pln.vetorizacao import ConfigVetorizacao, ModoVetorizacao
+from pln.vetorizacao import (
+    ModoVetorizacao,
+    construir_pipeline_de_medicao,
+    todas_as_vetorizacoes,
+)
+
+RAIZ = Path(__file__).resolve().parent.parent
 
 TEXTOS = [
     "Qual o status do projeto?", "Qual o avanço da obra?", "Quantos documentos existem?",
@@ -84,9 +84,8 @@ class TesteConstrucao(unittest.TestCase):
         # O que este teste NÃO garante: que sejam os melhores possíveis. Eles
         # venceram um empate de 2010 configurações em 3000 — ver a ressalva de
         # saturação no cabeçalho deste módulo.
-        from pln.classificador import ALPHA_PADRAO, FIT_PRIOR_PADRAO, VARIANTE_PADRAO
+        from pln.classificador import ALPHA_PADRAO, FIT_PRIOR_PADRAO
 
-        self.assertIs(VARIANTE_PADRAO, VarianteNB.MULTINOMIAL)
         self.assertEqual(ALPHA_PADRAO, 1.0)
         self.assertIs(FIT_PRIOR_PADRAO, True)
 
@@ -183,8 +182,10 @@ class TesteDatasetPadrao(unittest.TestCase):
         # O que este teste NÃO garante: que essa seja a melhor forma de preparar
         # o texto. Ela venceu um empate de 2261 configurações, todas em F1
         # 1,0000, por ser a mais simples — ver a ressalva em classificador.py.
-        self.assertEqual(CONFIG_PRE_PADRAO.etapas_ativas_na_ordem(), ())
-        self.assertIs(CONFIG_PRE_PADRAO.tokenizacao, Tokenizacao.SPLIT)
+        self.assertEqual(
+            CONFIG_PRE_PADRAO.etapas_ativas_na_ordem(), ("remover_numeros", "morfologia")
+        )
+        self.assertIs(CONFIG_PRE_PADRAO.tokenizacao, Tokenizacao.REGEX)
         self.assertIs(CONFIG_VET_PADRAO.modo, ModoVetorizacao.BOW)
         self.assertEqual(CONFIG_VET_PADRAO.n_max, 1)
 
@@ -194,44 +195,50 @@ class TesteDatasetPadrao(unittest.TestCase):
         self.assertGreater(len(textos), 0)
 
 
-class TesteCompatibilidadeDeVariante(unittest.TestCase):
-    # A escolha da variante de Naive Bayes NÃO é livre: ela é determinada pela
-    # vetorização. Multinomial e Complement estimam P(termo|classe) somando
-    # colunas, e soma negativa não é probabilidade de nada; vetores de embedding
-    # têm coordenadas negativas por construção. Gaussiano é o caminho inverso:
-    # lê coordenada contínua e não sabe o que fazer com matriz esparsa.
-    #
-    # Sem a checagem, a combinação errada morre lá no fundo do scikit-learn com
-    # `ValueError: Negative values in data`, que não menciona nem embeddings nem
-    # Naive Bayes e manda quem lê procurar no lugar errado.
+class TesteClassificadorDoProdutoEAReguaDoExperimento(unittest.TestCase):
+    # O pré-processamento padrão foi escolhido medindo com a régua do
+    # experimento, então trocar o classificador aqui faria essa escolha valer
+    # para um modelo que não é o que roda.
 
-    EMBEDDING = ConfigVetorizacao(ModoVetorizacao.EMBEDDING, n_max=1)
-    BOW = ConfigVetorizacao(ModoVetorizacao.BOW, n_max=1)
+    def test_produto_usa_a_mesma_classe_da_regua(self):
+        do_produto = construir_classificador().named_steps["classificador"]
+        da_regua = construir_pipeline_de_medicao(CONFIG_VET_PADRAO).named_steps["classificador"]
+        self.assertIs(type(do_produto), type(da_regua))
 
-    def test_denso_so_aceita_gaussiano(self):
-        self.assertEqual(variantes_compativeis(self.EMBEDDING), (VarianteNB.GAUSSIANO,))
+    def test_treina_com_toda_vetorizacao_do_espaco(self):
+        for config_vet in todas_as_vetorizacoes():
+            with self.subTest(vetorizacao=config_vet.descrever()):
+                modelo = construir_classificador(config_vet=config_vet)
+                modelo.fit(TEXTOS, ROTULOS)
+                self.assertEqual(len(modelo.predict(["Qual o status?"])), 1)
 
-    def test_esparso_nao_aceita_gaussiano(self):
-        self.assertNotIn(VarianteNB.GAUSSIANO, variantes_compativeis(self.BOW))
 
-    def test_toda_variante_serve_a_alguma_familia(self):
-        # Uma variante que não fosse compatível com nada seria inalcançável — e
-        # continuaria aparecendo em `--variante` na linha de comando.
-        cobertas = set(variantes_compativeis(self.BOW)) | set(variantes_compativeis(self.EMBEDDING))
-        self.assertEqual(cobertas, set(VarianteNB))
+class TesteModeloSalvoCarregaDeFora(unittest.TestCase):
+    # `python -m pln.classificador` carrega o módulo como `__main__`. Chamando
+    # `main()` desse contexto, o pickle grava `PreprocessadorDeTexto` com o
+    # caminho `__main__` e o modelo só carrega de dentro do próprio CLI.
 
-    def test_combinacao_invalida_e_recusada_com_mensagem_util(self):
-        with self.assertRaises(ValueError) as caso:
-            construir_classificador(config_vet=self.EMBEDDING, variante=VarianteNB.MULTINOMIAL)
-        mensagem = str(caso.exception)
-        self.assertIn("multinomial", mensagem)
-        self.assertIn("gaussiano", mensagem, "a mensagem não diz qual variante usar")
+    def test_treina_pelo_cli_e_carrega_por_import(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            destino = Path(pasta) / "modelo.joblib"
+            treino = subprocess.run(
+                [sys.executable, "-m", "pln.classificador", "--k", "2", "--salvar", str(destino)],
+                capture_output=True, text=True, cwd=RAIZ,
+            )
+            self.assertEqual(treino.returncode, 0, treino.stderr)
 
-    def test_combinacao_valida_treina(self):
-        modelo = construir_classificador(
-            config_vet=self.EMBEDDING, variante=VarianteNB.GAUSSIANO, alpha=1e-9
-        )
-        self.assertEqual(len(modelo.fit(TEXTOS, ROTULOS).predict(["Qual o status?"])), 1)
+            leitura = subprocess.run(
+                [sys.executable, "-c",
+                 "from pln.classificador import carregar_modelo, prever_intencao;"
+                 f"m = carregar_modelo(__import__('pathlib').Path({str(destino)!r}));"
+                 "print(prever_intencao(m, 'Tem algum prazo vencido?')[0])"],
+                capture_output=True, text=True, cwd=RAIZ,
+            )
+            self.assertEqual(
+                leitura.returncode, 0,
+                "o modelo salvo pelo CLI não carrega de um processo que o importa:\n"
+                + leitura.stderr,
+            )
 
 
 if __name__ == "__main__":
