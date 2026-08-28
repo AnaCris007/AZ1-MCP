@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, BinaryIO
 
 import boto3
+from botocore.exceptions import ClientError
 
 
 @dataclass(frozen=True)
@@ -58,3 +59,12 @@ class S3AudioStorage:
             ContentType=content_type,
             Metadata=metadata,
         )
+
+    def fetch(self, *, key: str) -> bytes:
+        try:
+            response = self._client.get_object(Bucket=self._bucket_name, Key=key)
+            return response["Body"].read()
+        except ClientError as exc:
+            if exc.response["Error"]["Code"] == "NoSuchKey":
+                raise KeyError(key) from exc
+            raise

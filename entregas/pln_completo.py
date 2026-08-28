@@ -1495,7 +1495,7 @@ def todas_as_configuracoes_de_preprocessamento() -> list[ConfigPreprocessamento]
 # nada e multiplicaria o custo à toa. As desligadas são acrescentadas ao fim,
 # na ordem padrão, apenas para satisfazer a validação do dataclass.
 def permutacoes_de_ordem_a_testar(
-    base: ConfigPreprocessamento, variar_ordem: bool
+    base: ConfigPreprocessamento, variar_ordem: bool = True
 ) -> list[tuple[str, ...]]:
     ativas = base.etapas_ativas_na_ordem()
     if not variar_ordem:
@@ -1851,14 +1851,27 @@ def imprimir_varredura(
             print(f"  Perda média por usar a ordem padrão           : {analise.perda_media_da_ordem_padrao:.4f}")
 
 
+def empatadas_com_a_melhor(resultados: list[Resultado]) -> list[Resultado]:
+    melhor = resultados[0]
+    return [r for r in resultados if r.f1_medio >= melhor.f1_medio - melhor.f1_desvio]
+
+
+def escolher_recomendada(empatadas: list[Resultado]) -> Resultado:
+    return min(
+        empatadas,
+        key=lambda r: (
+            len(r.config.etapas_ativas_na_ordem()),
+            r.vetorizacao.n_max,
+            not r.e_a_ordem_padrao,
+            -r.f1_medio,
+        ),
+    )
+
+
 def imprimir_recomendacao(resultados: list[Resultado]) -> None:
     melhor = resultados[0]
-    limiar = melhor.f1_medio - melhor.f1_desvio
-    empatadas = [r for r in resultados if r.f1_medio >= limiar]
-    mais_simples = min(
-        empatadas,
-        key=lambda r: (len(r.config.etapas_ativas_na_ordem()), r.vetorizacao.n_max, -r.f1_medio),
-    )
+    empatadas = empatadas_com_a_melhor(resultados)
+    mais_simples = escolher_recomendada(empatadas)
 
     print(f"\n{'=' * LARGURA}")
     print(f"{'RECOMENDAÇÃO':^{LARGURA}}")

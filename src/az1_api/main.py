@@ -1,21 +1,45 @@
 import logging
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from routes import audio_router
+from routes import analysis_router, audio_router, chat_router, transcription_router
 from routes.audio import AudioAPIError
-from schemas.audio import ErrorResponse
+from routes.chat import ChatAPIError
+from routes.transcription import TranscriptionAPIError
+from schemas.common import ErrorResponse
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="AZ1 API")
 app.include_router(audio_router, prefix="/api/v1")
+app.include_router(transcription_router, prefix="/api/v1")
+app.include_router(analysis_router, prefix="/api/v1")
+app.include_router(chat_router, prefix="/api/v1")
+
+
+@app.exception_handler(TranscriptionAPIError)
+def transcription_api_error_handler(request: Request, exc: TranscriptionAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
 
 
 @app.exception_handler(AudioAPIError)
 def audio_api_error_handler(request: Request, exc: AudioAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
+
+
+@app.exception_handler(ChatAPIError)
+def chat_api_error_handler(request: Request, exc: ChatAPIError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
