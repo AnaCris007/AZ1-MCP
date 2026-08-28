@@ -18,3 +18,8 @@ class AudioUploadResponse(BaseModel):
     id: str
     status: AudioStatus
     message: str
+
+
+class ErrorResponse(BaseModel):
+    error: AudioErrorCode
+    message: str
