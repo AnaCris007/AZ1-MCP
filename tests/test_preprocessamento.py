@@ -1,7 +1,12 @@
-# Testes das etapas, modos, tokenização e ordem do pré-processamento.
+# =============================================================================
+# test_preprocessamento.py — Testes das etapas, modos, tokenização e ordem
+# =============================================================================
+#     python -m unittest discover tests -v
 #
-# Cada etapa é testada isolada, ligada sozinha e com as demais desligadas: se um
-# desses testes quebrar quando outra etapa mudar, houve acoplamento indevido.
+# Cada etapa é testada ISOLADA — ligada sozinha, com todas as outras
+# desligadas. É o que garante que as etapas são independentes: se um teste de
+# etapa isolada quebrar quando outra etapa mudar, houve acoplamento indevido.
+# =============================================================================
 
 from __future__ import annotations
 
@@ -35,7 +40,8 @@ class TesteEtapasIsoladas(unittest.TestCase):
         self.assertEqual(preprocessar("situação não está órgão", config), "situacao nao esta orgao")
 
     def test_remover_pontuacao_vira_espaco(self):
-        # Vira espaço, não vazio: senão "prazo,marco" colaria num token só.
+        # A pontuação vira espaço, não vazio: senão "prazo,marco" viraria um
+        # token inexistente "prazomarco".
         config = ConfigPreprocessamento(remover_pontuacao=True)
         self.assertEqual(preprocessar("prazo,marco?", config), "prazo marco")
 
@@ -48,6 +54,7 @@ class TesteEtapasIsoladas(unittest.TestCase):
 
 
 class TesteMorfologia(unittest.TestCase):
+    # Stemming e lematização buscam o mesmo fim por caminhos diferentes.
 
     FLEXOES = "vencendo vencidos vencer"
 
@@ -57,17 +64,27 @@ class TesteMorfologia(unittest.TestCase):
         self.assertEqual(len(radicais), 1, f"esperava um radical único, veio {radicais}")
 
     def test_lematizacao_normaliza_flexoes_em_frase(self):
+        # Em frase, com sintaxe disponível, o lema sai correto.
         config = ConfigPreprocessamento(morfologia=ModoMorfologia.LEMATIZACAO)
         self.assertEqual(preprocessar("Os documentos venceram ontem", config), "o documento vencer ontem")
 
     def test_lematizacao_devolve_palavra_real_e_stemming_nao(self):
+        # A diferença central entre os dois: o lema é palavra de dicionário.
         self.assertEqual(lematizar("vencendo"), "vencer")
         self.assertNotEqual(reduzir_palavra_ao_radical("vencendo"), "vencer")
 
     def test_lematizacao_depende_do_contexto(self):
-        # O lema depende do contexto, então lematizar token solto dá resultado
-        # diferente de lematizar a frase. Etapas que destroem a estrutura antes
-        # da lematização pioram os lemas, e é por isso que a ordem importa aqui.
+        # Registro executável de uma limitação real, não de um defeito nosso.
+        #
+        # A lematização NÃO é função pura do token: o lema depende da classe
+        # gramatical, e a classe depende do contexto. "vencidos" numa lista
+        # solta é etiquetado como verbo e produz o infinitivo inventado
+        # "vencir"; na frase completa é adjetivo e produz "vencido".
+        #
+        # A consequência prática é sobre ORDEM: etapas que destroem a estrutura
+        # da frase antes da lematização — a remoção de stopwords tira artigos e
+        # auxiliares — pioram a etiquetagem e, com ela, os lemas. É um efeito
+        # que o experimento mede, e é razão para lematizar cedo no pipeline.
         solto = lematizar("vencidos")
         em_frase = lematizar("Os prazos estão vencidos.")
         self.assertNotIn(solto, em_frase.split())
@@ -84,13 +101,15 @@ class TesteMorfologia(unittest.TestCase):
         self.assertEqual(len(saidas), 3, f"modos colidiram: {saidas}")
 
     def test_morfologia_e_exclusiva_por_construcao(self):
-        # São valores de um mesmo campo, não duas flags independentes.
+        # Não existe estado em que stemming e lematização estejam ativos
+        # juntos: são valores de um mesmo campo, não duas flags independentes.
         config = ConfigPreprocessamento(morfologia=ModoMorfologia.STEMMING)
         self.assertIs(config.morfologia, ModoMorfologia.STEMMING)
         self.assertEqual(config.etapas_ativas_na_ordem().count("morfologia"), 1)
 
 
 class TesteTokenizacao(unittest.TestCase):
+    # As três estratégias precisam produzir tokenizações realmente diferentes.
 
     FRASE = "O contrato R$1.500,00 do Sr. Silva venceu, sem aditivo!"
 
@@ -103,7 +122,8 @@ class TesteTokenizacao(unittest.TestCase):
         self.assertIn(",", tokens)
 
     def test_linguistico_preserva_numero_e_abreviatura(self):
-        # No tokenizador de idioma, "1.500,00" é um número e "Sr." é abreviatura.
+        # O ganho do tokenizador de idioma: "1.500,00" é um número, não sete
+        # tokens, e "Sr." é abreviatura, não palavra seguida de ponto final.
         tokens = tokenizar(self.FRASE, Tokenizacao.LINGUISTICO)
         self.assertIn("1.500,00", tokens)
         self.assertIn("Sr.", tokens)
@@ -126,8 +146,11 @@ class TesteTokenizacao(unittest.TestCase):
 
 
 class TesteModosDeStopwords(unittest.TestCase):
-    # A lista do NLTK inclui as negações. Removê-las faz "não atualizou o status"
-    # e "atualizou o status" virarem a mesma frase.
+    # A garantia mais importante do módulo, e a razão de subtrair da lista.
+    #
+    # A lista de stopwords do NLTK inclui as negações. Se elas forem removidas,
+    # "não atualizou o status" e "atualizou o status" viram a mesma frase — e o
+    # classificador perde a única evidência que separa um alerta de uma consulta.
 
     FRASE = "o projeto não tem documento e o prazo está vencido"
 
@@ -156,8 +179,8 @@ class TesteModosDeStopwords(unittest.TestCase):
                 self.assertIn(palavra, preprocessar(f"o projeto {palavra} tem prazo", config).split())
 
     def test_negacao_sobrevive_tambem_sem_acento(self):
-        # Com remover_acentos antes, "não" vira "nao": sem normalizar a lista
-        # junto, a proteção da negação deixa de valer.
+        # Com remover_acentos antes, "não" vira "nao" — a lista precisa ser
+        # normalizada junto, senão a proteção da negação não se aplicaria.
         config = ConfigPreprocessamento(
             remover_acentos=True, stopwords=ModoStopwords.PRESERVAR_NEGACOES
         )
@@ -171,6 +194,7 @@ class TesteModosDeStopwords(unittest.TestCase):
 
 
 class TesteOrdem(unittest.TestCase):
+    # A ordem é configuração, e precisa ter efeito observável.
 
     def test_ordem_padrao_e_a_declarada_em_etapas(self):
         self.assertEqual(ConfigPreprocessamento().ordem, ETAPAS)
@@ -186,8 +210,10 @@ class TesteOrdem(unittest.TestCase):
         self.assertEqual(invertida.etapas_ativas_na_ordem(), ("morfologia", "minusculas"))
 
     def test_ordem_altera_o_resultado(self):
-        # A lista de stopwords não contém "o,", então a etapa só filtra o que a
-        # remoção de pontuação já separou.
+        # Stopwords ANTES da pontuação deixa tokens grudados em vírgula
+        # escaparem. É o efeito de ordem mais direto de demonstrar: a lista de
+        # stopwords não tem como conter "o," — então a etapa só funciona depois
+        # da limpeza.
         etapas = ("remover_pontuacao", "stopwords")
         resto = tuple(e for e in ETAPAS if e not in etapas)
         base = ConfigPreprocessamento(
@@ -228,7 +254,7 @@ class TesteInvariantes(unittest.TestCase):
         self.assertEqual(preprocessar(texto, config), preprocessar(texto, config))
 
     def test_config_e_hasheavel(self):
-        # O experimento usa a config como chave de dicionário.
+        # Precisa ser: o experimento usa a config como chave de agrupamento.
         self.assertIsInstance(hash(ConfigPreprocessamento(minusculas=True)), int)
 
     def test_descricao_mostra_ordem_e_modo(self):

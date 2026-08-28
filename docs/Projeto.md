@@ -46,7 +46,7 @@
 - [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
 - [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
 - [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
-- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -485,6 +485,8 @@ O primeiro diagrama representa o fluxo atual. Suas atividades e decisões são:
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
+O agente de inteligência artificial do passo 2, disponível no Microsoft Studio, corresponde às iniciativas de IA que o Metrô já mantém e que a Matriz SWOT registra como força e oportunidade a especializar (seção 1.1). No fluxo TO-BE a seguir, esse agente é substituído pela Interface de PLN desenvolvida pela equipe, que passa a interpretar a solicitação em linguagem natural e a classificar sua intenção.
+
 O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas atividades e decisões são:
 
 1. o usuário identifica uma necessidade de informação ou de apoio a uma ação sobre o portfólio e envia um comando em linguagem natural;
@@ -503,6 +505,8 @@ O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas at
 </div>
 
 **Nota de escopo:** no diagrama original, o caminho denominado “Inserção de Informação” representa, para o MVP, apenas a geração de uma sugestão de preenchimento. Nenhuma informação é gravada nas fontes oficiais. A execução efetiva de transações permanece registrada como evolução futura na seção 1.7.
+
+**Nota sobre os tipos de intenção:** o gateway “Tipo de intenção” representa apenas os caminhos acionados por uma solicitação síncrona do usuário — consulta e apoio ao preenchimento (a transação sugestiva das seções 1.3 e 1.4). O terceiro tipo definido nessas seções, o alerta, corresponde a uma notificação proativa disparada pelo sistema a partir de prazos, riscos e pendências identificados, e não a uma resposta a uma solicitação do usuário; por isso não aparece como um caminho deste gateway específico, embora seja tratado pelo mesmo classificador de intenções.
 
 **Principais diferenças entre os fluxos:**
 
@@ -526,42 +530,42 @@ O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas at
 
 Cada feature foi avaliada em dois critérios. A importância expressa o valor para o problema e para os benefícios esperados pelo parceiro; a viabilidade representa a capacidade de entrega dentro do módulo, considerando esforço técnico, dependências externas e restrições de confidencialidade. Para tornar a priorização reproduzível, adotou-se a escala Baixa = 1, Média = 2 e Alta = 3; níveis intermediários correspondem à média dos níveis adjacentes. O score é a soma de importância e viabilidade, variando de 2 a 6. Empates são resolvidos, nesta ordem, pela maior importância e pela precedência técnica. Por isso, as funcionalidades do pipeline de Processamento de Linguagem Natural antecedem as que dependem dele. A coluna de planejamento registra o recorte do projeto, mas não altera o score.
 
-**Validação necessária:** confirmar, para cada feature, se sua origem foi o TAPI, o parceiro ou uma discussão interna da equipe e acrescentar essa informação à tabela; o repositório registra apenas as fontes gerais do brainstorming.
+**Critério de origem:** cada feature foi classificada em uma de cinco origens — **TAPI** (descrita explicitamente no termo de abertura), **Parceiro** (solicitada verbalmente em reunião ou entrevista), **Problema identificado** (deduzida diretamente da dor mapeada na seção 1.1 ou nas personas da seção 1.5), **Equipe (produto)** (proposta pelo grupo para melhorar a experiência) ou **Equipe (técnica)** (decorrente de necessidade de arquitetura, do pipeline de PLN ou de segurança). Para as features das faixas Simulação no MVP, Registro para o futuro (Ir Além) e Registro para o futuro (desejo do parceiro), a origem estava registrada em prosa nos parágrafos que seguem a tabela; para as demais, a classificação foi reconstruída a partir do restante do documento — descrição do produto (seção 1.3), problema (seção 1.1) e personas (seção 1.5) — na ausência de um registro contemporâneo ao brainstorming, e deve ser conferida pela equipe.
 
 <div align="center">
 <sub>Tabela 1.7 — Brainstorming e priorização de features</sub>
 </div>
 
-| Prioridade | Feature                                                                           | Importância | Viabilidade | Score | Planejamento                                  |
-| :--------: | --------------------------------------------------------------------------------- | :---------: | :---------: | :---: | --------------------------------------------- |
-| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | 6,0 | MVP |
-| 2 | Identificação e classificação de intenções | Alta | Alta | 6,0 | MVP |
-| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | 6,0 | MVP |
-| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | 6,0 | MVP |
-| 5 | Respostas estruturadas | Alta | Alta | 6,0 | MVP |
-| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | 6,0 | MVP |
-| 7 | Localização e consulta de documentos dos projetos | Alta | Média | 5,0 | MVP |
-| 8 | Indicação das fontes | Alta | Média | 5,0 | MVP |
-| 9 | Alertas de prazos e documentos faltantes | Alta | Média | 5,0 | MVP |
-| 10 | Identificação de campos incompletos | Alta | Média | 5,0 | MVP |
-| 11 | Sugestão de conteúdo para campos | Alta | Média | 5,0 | MVP |
-| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | 4,5 | MVP |
-| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | 4,0 | MVP |
-| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | 4,0 | MVP |
-| 15 | Controle de acesso por perfil | Alta | Média/Baixa | 4,5 | Simulação no MVP |
-| 16 | Rastreabilidade das interações | Alta | Média | 5,0 | Simulação no MVP |
-| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | 4,5 | Evolução futura |
-| 18 | Prévia de relatório de status | Média/Alta | Média | 4,5 | Evolução futura |
-| 19 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | 3,0 | Evolução futura |
-| 20 | Painel de alertas e pendências | Média | Média | 4,0 | Evolução futura |
-| 21 | Notificações automáticas | Média | Baixa | 3,0 | Evolução futura |
-| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) |
-| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) |
-| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | 3,0 | Registro para o futuro (evolução tecnológica) |
+| Prioridade | Feature                                                                           | Importância | Viabilidade | Score | Planejamento                                  | Origem |
+| :--------: | --------------------------------------------------------------------------------- | :---------: | :---------: | :---: | --------------------------------------------- | ------ |
+| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | 6,0 | MVP | TAPI |
+| 2 | Identificação e classificação de intenções | Alta | Alta | 6,0 | MVP | Equipe (técnica) |
+| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | 6,0 | MVP | TAPI |
+| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | 6,0 | MVP | Problema identificado |
+| 5 | Respostas estruturadas | Alta | Alta | 6,0 | MVP | Equipe (produto) |
+| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | 6,0 | MVP | Equipe (técnica) |
+| 7 | Localização e consulta de documentos dos projetos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 8 | Indicação das fontes | Alta | Média | 5,0 | MVP | TAPI |
+| 9 | Alertas de prazos e documentos faltantes | Alta | Média | 5,0 | MVP | Problema identificado |
+| 10 | Identificação de campos incompletos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 11 | Sugestão de conteúdo para campos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | 4,5 | MVP | Equipe (produto) |
+| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | 4,0 | MVP | Equipe (produto) |
+| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | 4,0 | MVP | Equipe (técnica) |
+| 15 | Rastreabilidade das interações | Alta | Média | 5,0 | Simulação no MVP | TAPI |
+| 16 | Controle de acesso por perfil | Alta | Média/Baixa | 4,5 | Simulação no MVP | TAPI |
+| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | 4,5 | Evolução futura | TAPI |
+| 18 | Prévia de relatório de status | Média/Alta | Média | 4,5 | Evolução futura | TAPI |
+| 19 | Painel de alertas e pendências | Média | Média | 4,0 | Evolução futura | Equipe (produto) |
+| 20 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | 3,0 | Evolução futura | Equipe (produto) |
+| 21 | Notificações automáticas | Média | Baixa | 3,0 | Evolução futura | Equipe (técnica) |
+| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) | TAPI |
+| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) | TAPI |
+| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | 3,0 | Registro para o futuro (evolução tecnológica) | Equipe (técnica) |
 
 <div align="center">
 <sup>Fonte: Material produzido pelos autores, 2026.</sup>
@@ -649,23 +653,23 @@ A principal proposta de valor da solução consiste em facilitar a interação d
 
 **Acesso rápido às informações por linguagem natural**
 
-O agente reduz a necessidade de navegação manual por diferentes documentos e estruturas de dados, permitindo que os usuários façam perguntas diretamente em linguagem natural.
+O agente elimina a navegação manual por diferentes documentos e estruturas de dados: o usuário formula a pergunta diretamente em linguagem natural e recebe resposta em até 15 segundos em pelo menos 80% das consultas, conforme o RNF01.
 
 **Redução do trabalho manual**
 
-A solução busca diminuir o tempo empregado na busca, interpretação e consolidação manual de informações relacionadas aos projetos.
+A solução reduz o tempo empregado na busca, na interpretação e na consolidação manual de informações dos projetos, substituindo a navegação por múltiplas fontes por uma única interação conversacional.
 
 **Apoio ao acompanhamento e à tomada de decisão**
 
-Ao facilitar o acesso às informações relevantes, o agente pode apoiar líderes, Escritório de Projetos e diretoria durante o acompanhamento dos projetos e a tomada de decisões.
+Ao estruturar as informações relevantes em respostas claras, o agente apoia líderes, Escritório de Projetos e diretoria no acompanhamento dos projetos e na tomada de decisões: pelo menos 80% dos participantes dos testes de usabilidade compreendem a resposta e identificam a informação solicitada sem auxílio externo, conforme o RNF08.
 
 **Maior qualidade e padronização das informações**
 
-O agente pode auxiliar os usuários durante o preenchimento e consulta de documentos, contribuindo para uma maior consistência das informações registradas.
+O agente eleva a consistência das informações registradas ao sugerir conteúdo padronizado para os campos dos documentos: pelo menos 85% das sugestões vêm acompanhadas de referência válida e justificativa compreensível, conforme o RNF11.
 
 **Assistência no cumprimento da documentação de projetos**
 
-A solução também busca auxiliar os responsáveis pelos projetos no acompanhamento e preenchimento dos documentos necessários ao longo de seu ciclo de vida.
+A solução apoia os responsáveis pelos projetos no preenchimento dos documentos exigidos ao longo do ciclo de vida do empreendimento, apresentando uma sugestão de texto para cada campo pendente sem alterar o documento de origem, conforme os critérios de aceitação do RF04.
 
 ### Relacionamento com os usuários
 
@@ -1005,8 +1009,8 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
 - **Indicadores computacionais:**
   - **Precisão da classificação de intenção:** número de solicitações corretamente classificadas dividido pelo total de solicitações do conjunto de teste. O valor-alvo é de pelo menos 85%, conforme o RNF03.
-  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas dividido pelo total de entidades presentes no conjunto de teste. **Valor-alvo a definir com a equipe** para a extração de nome do projeto, período de referência e indicador solicitado.
-  - **Taxa de correspondência entre entidade e registro:** número de consultas em que a entidade extraída foi associada ao registro correto dividido pelo total de consultas do conjunto de teste. **Valor-alvo a definir com a equipe** para a correspondência entre entidades extraídas e registros do portfólio.
+  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas dividido pelo total de entidades presentes no conjunto de teste, para a extração de nome do projeto, período de referência e indicador solicitado. O valor-alvo é de pelo menos 85%, na mesma linha da precisão mínima definida para a classificação de intenções no RNF03.
+  - **Taxa de correspondência entre entidade e registro:** número de consultas em que a entidade extraída foi associada ao registro correto dividido pelo total de consultas do conjunto de teste. O valor-alvo é de pelo menos 90%, por se tratar de uma correspondência determinística executada após a extração.
 
 ### Fluxo de negócio 2: Apoio proativo ao preenchimento e acompanhamento de pendências
 
@@ -1015,8 +1019,8 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 - **Situação proposta (TO-BE):** o sistema sugere textos para os campos pendentes a partir da interação com o usuário, mantendo o controle humano sobre o que é efetivamente registrado, e notifica proativamente o PMO sobre marcos, riscos e pendências conforme filtros configurados, sem repetir alertas já enviados.
 
 - **Indicadores computacionais:**
-  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas da fala ou do texto dividido pelo total de entidades presentes nas interações do conjunto de teste. **Valor-alvo a definir com a equipe** para a extração do campo e do conteúdo sugerido.
-  - **Precisão na detecção de alertas:** número de marcos, riscos e pendências corretamente identificados como elegíveis dividido pelo total de alertas gerados. **Valor-alvo a definir com a equipe** para a precisão dos alertas e os filtros que comporão o conjunto de teste.
+  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas da fala ou do texto dividido pelo total de entidades presentes nas interações do conjunto de teste, para a extração do campo e do conteúdo sugerido. O valor-alvo é de pelo menos 85%, na mesma linha do RNF03.
+  - **Precisão na detecção de alertas:** número de marcos, riscos e pendências corretamente identificados como elegíveis dividido pelo total de alertas gerados. O valor-alvo é de pelo menos 90%, por se tratar de uma verificação baseada em regras de prazo e status já estruturados; os filtros que comporão o conjunto de teste serão definidos na Sprint 3.
   - **Taxa de erro de palavras (Word Error Rate — WER):** soma de substituições, inserções e exclusões dividida pelo total de palavras do áudio de referência. O valor-alvo é de no máximo 15%, equivalente à taxa mínima de 85% de palavras reconhecidas corretamente definida no RNF06.
 
 ---
@@ -2216,7 +2220,7 @@ FIT_PRIOR_PADRAO  = True
 
 F1-macro de **0,6736** em validação cruzada de 5 dobras — avaliação da configuração vencedora individualmente, não a média da busca de parâmetros (0,6537 na tabela acima, que é a média sobre todos os candidatos com alpha=1,0 nas quatro vetorizações). Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
 
-**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que 0,6736 está **17,6 pontos percentuais abaixo dos 85% exigidos pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a seção 3.9, e as duas frentes são ampliar o dataset e calibrar um limiar de recusa sobre as nove intenções conhecidas.
+**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que 0,6736 está **17,6 pontos percentuais abaixo dos 85% exigidos pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a seção 3.8, e as duas frentes são ampliar o dataset e calibrar um limiar de recusa sobre as nove intenções conhecidas.
 
 #### 3.3.7 Bibliotecas utilizadas
 
@@ -2554,107 +2558,628 @@ O modelo conecta o uso do agente às informações de negócio consultadas. Quan
 
 A entidade **Interação** estabelece a ligação entre o usuário e as fontes consultadas, contribuindo para os requisitos de rastreabilidade e auditabilidade. A associação entre **Interação** e **Artefato** permite registrar quais fontes fundamentaram cada resposta, enquanto a relação entre **Projeto** e **Pendência** oferece a base conceitual para o acompanhamento preventivo previsto no produto.
 
-Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico deverá detalhar, em etapa posterior, os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
+Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico-relacional é apresentada nas subseções seguintes, que detalham os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
+
+#### 3.6.4 Modelo lógico-relacional
+
+O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas. Os atributos de cada tabela vêm da modelagem estática da seção 2.2.1, e os atributos da tabela `interacao` vêm dos elementos de auditoria exigidos pelos RNF04 e RNF09.
+
+Além dos seis relacionamentos do diagrama conceitual, o modelo lógico incorpora três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no recorte conceitual, por serem indispensáveis aos requisitos: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção de perfis de usuário (Diretor, PMO e Líder de Projeto), que sustenta o controle de acesso do RNF02 e a relação de liderança (`lidera`) prevista no RF06. Dessa forma, o modelo lógico dá continuidade simultaneamente ao modelo conceitual desta seção e ao diagrama de classes da Sprint 1.
+
+<div align="center">
+<sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
+  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, artefato, campo_artefato, pendencia, interacao, interacao_artefato, usuario_projeto e notificacao"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+A tabela a seguir registra a correspondência entre cada elemento das modelagens anteriores e a estrutura relacional que o implementa, evidenciando que nenhuma regra de negócio foi perdida na tradução:
+
+| Elemento de origem | Estrutura relacional | Regra de derivação aplicada |
+|---|---|---|
+| Entidade **Usuário** e especializações (2.2.1) | Tabela `usuario` com coluna `perfil` | Especializações sem atributos próprios colapsadas em coluna de domínio restrito por `CHECK` (decisão 1 da seção 3.6.7) |
+| Entidade **Interação** | Tabela `interacao` | Entidade para tabela; atributos definidos pelos RNF04 e RNF09 |
+| **Usuário realiza Interação** `(0,n)`–`(1,1)` | `interacao.usuario_id NOT NULL` | Um-para-muitos vira chave estrangeira no lado "muitos"; mínimo 1 vira `NOT NULL` |
+| **Interação consulta Artefato** `(0,n)`–`(0,n)` | Tabela associativa `interacao_artefato` | Muitos-para-muitos vira tabela associativa com chave primária composta |
+| **Artefato documenta/pertence a Projeto** `(1,1)`–`(0,n)` | `artefato.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
+| **Artefato possui Campo Artefato** `(1,n)`–`(1,1)` | `campo_artefato.artefato_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata e unicidade de `nome` por artefato |
+| **Projeto pertence a Portfólio** `(1,1)`–`(1,n)` | `projeto.portfolio_id NOT NULL` | Um-para-muitos vira chave estrangeira |
+| **Projeto origina Pendência** `(0,n)`–`(1,1)` | `pendencia.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
+| **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
+| **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
+| **Pendência notifica Usuário** (2.2.1) | Tabela `notificacao` | Muitos-para-muitos materializado como registro de envio, com atributo próprio `data_envio` (decisão 3 da seção 3.6.7) |
+
+As cardinalidades mínimas do lado "muitos" — um portfólio reúne ao menos um projeto `(1,n)` e um artefato possui ao menos um campo `(1,n)` — não são expressáveis por restrições declarativas simples no modelo relacional, pois exigiriam verificação no momento da inserção da linha "pai". Essas duas regras permanecem documentadas como restrições de aplicação, a serem garantidas pela camada de serviços descrita na seção 2.4.
+
+#### 3.6.5 Dicionário de dados (modelo físico)
+
+O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. Todas as chaves primárias substitutas usam `INTEGER GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais.
+
+As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente (portfólios, projetos, usuários, artefatos, campos e pendências), e o schema **`auditoria`** reúne os registros de interação, fontes consultadas e notificações, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
+
+**`portfolio`** — agrupamento de projetos de um exercício:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do portfólio |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
+| `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
+
+**`usuario`** — profissional autorizado a utilizar o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do usuário |
+| `nome` | `TEXT` | `NOT NULL` | Nome do profissional |
+| `email` | `TEXT` | `NOT NULL`, `UNIQUE` | Endereço corporativo de envio das notificações |
+| `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Papel do usuário, base do controle de acesso do RNF02 |
+
+**`projeto`** — empreendimento acompanhado pelo PMO:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do projeto |
+| `codigo` | `TEXT` | `NOT NULL`, `UNIQUE` | Código institucional do empreendimento (chave natural) |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do empreendimento |
+| `status` | `TEXT` | `NOT NULL` | Situação corrente do projeto |
+| `data_inicio` | `DATE` | — | Data de início da execução |
+| `data_termino_prevista` | `DATE` | — | Data prevista de conclusão, base da apuração de prazos |
+| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física |
+| `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
+| `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
+
+**`artefato`** — documento que integra a documentação do projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do artefato |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto documentado (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, como ata, relatório ou contrato |
+| `referencia` | `TEXT` | `NOT NULL` | Localizador do documento no repositório, exibido como fonte no RF03 |
+| `data` | `TIMESTAMPTZ` | `NOT NULL` | Data da última atualização, exibida junto à fonte no RF03 |
+| `versao` | `TEXT` | — | Versão vigente do documento |
+
+**`campo_artefato`** — campo individual de um artefato:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do campo |
+| `artefato_id` | `INTEGER` | `FK → artefato`, `NOT NULL`, `ON DELETE CASCADE` | Artefato ao qual o campo pertence (composição) |
+| `nome` | `TEXT` | `NOT NULL`, `UNIQUE (artefato_id, nome)` | Rótulo do campo dentro do artefato |
+| `valor` | `TEXT` | — | Conteúdo registrado; nulo ou vazio quando não preenchido |
+| `obrigatorio` | `BOOLEAN` | `NOT NULL`, `DEFAULT FALSE` | Indica se o preenchimento é exigido |
+| `preenchido` | `BOOLEAN` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Derivada de `valor`, elimina inconsistência entre valor e marcação (decisão 2 da seção 3.6.7) |
+
+**`pendencia`** — item em aberto originado por um projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único da pendência |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto de origem (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência, como prazo, documento ou aprovação; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `descricao` | `TEXT` | `NOT NULL` | Detalhamento do item em aberto |
+| `prazo` | `DATE` | — | Data limite para tratamento, base da notificação do RF05 |
+| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'resolvida')` | Estado corrente da pendência |
+
+**`auditoria.interacao`** — registro de auditoria de cada solicitação (RNF04 e RNF09):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Usuário que realizou a interação |
+| `data_hora` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do evento |
+| `canal` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'voz')` | Canal utilizado, conforme o RF01 |
+| `texto_solicitacao` | `TEXT` | `NOT NULL` | Texto da solicitação (original ou transcrito do áudio) |
+| `audio_referencia` | `TEXT` | `CHECK` (preenchida apenas quando `canal = 'voz'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4), vinculando o registro ao arquivo original |
+| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1 | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
+| `resultado` | `TEXT` | `NOT NULL`, `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')` | Desfecho da solicitação |
+| `categoria_erro` | `TEXT` | — | Categoria do erro, quando aplicável (RNF09) |
+| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)` | Tempo de processamento, insumo da verificação do RNF01 |
+| `feedback_usuario` | `TEXT` | — | Avaliação da resposta fornecida pelo usuário, capturada pelo componente Auditoria e Feedback da seção 2.4 |
+
+**`auditoria.interacao_artefato`** — fontes consultadas em cada interação (associativa de `consulta`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `interacao_id` | `INTEGER` | `PK` composta, `FK → interacao` | Interação que consultou a fonte |
+| `artefato_id` | `INTEGER` | `PK` composta, `FK → artefato` | Artefato que fundamentou a resposta (RF03) |
+
+**`usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
+| `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`auditoria.notificacao`** — registro dos envios da notificação proativa (materialização de `notifica`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do envio |
+| `pendencia_id` | `INTEGER` | `FK → pendencia`, `NOT NULL`, `ON DELETE CASCADE` | Pendência comunicada |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `UNIQUE (pendencia_id, usuario_id)` | Destinatário; a unicidade composta impede notificar duas vezes a mesma pendência ao mesmo usuário |
+| `data_envio` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do envio, exigido pelo RNF09 |
+
+#### 3.6.6 Definição física em SQL
+
+A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5 — na nuvem, o serviço gerenciado correspondente do provedor escolhido na seção 3.7. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+
+```sql
+CREATE SCHEMA portfolio;
+CREATE SCHEMA auditoria;
+
+CREATE TABLE portfolio.portfolio (
+    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome          TEXT    NOT NULL,
+    ano_exercicio INTEGER NOT NULL,
+    UNIQUE (nome, ano_exercicio)
+);
+
+CREATE TABLE portfolio.usuario (
+    id     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome   TEXT NOT NULL,
+    email  TEXT NOT NULL UNIQUE,
+    perfil TEXT NOT NULL CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto'))
+);
+
+CREATE TABLE portfolio.projeto (
+    id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    codigo                TEXT NOT NULL UNIQUE,
+    nome                  TEXT NOT NULL,
+    status                TEXT NOT NULL,
+    data_inicio           DATE,
+    data_termino_prevista DATE,
+    percentual_avanco     NUMERIC(5,2) NOT NULL DEFAULT 0
+                          CHECK (percentual_avanco BETWEEN 0 AND 100),
+    portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
+    lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
+);
+
+CREATE TABLE portfolio.artefato (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    referencia TEXT NOT NULL,
+    data       TIMESTAMPTZ NOT NULL,
+    versao     TEXT
+);
+
+CREATE TABLE portfolio.campo_artefato (
+    id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    artefato_id INTEGER NOT NULL REFERENCES portfolio.artefato (id) ON DELETE CASCADE,
+    nome        TEXT NOT NULL,
+    valor       TEXT,
+    obrigatorio BOOLEAN NOT NULL DEFAULT FALSE,
+    preenchido  BOOLEAN GENERATED ALWAYS AS
+                (valor IS NOT NULL AND btrim(valor) <> '') STORED,
+    UNIQUE (artefato_id, nome)
+);
+
+CREATE TABLE portfolio.pendencia (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    descricao  TEXT NOT NULL,
+    prazo      DATE,
+    situacao   TEXT NOT NULL DEFAULT 'aberta'
+               CHECK (situacao IN ('aberta', 'em_tratamento', 'resolvida'))
+);
+
+CREATE TABLE portfolio.usuario_projeto (
+    usuario_id INTEGER NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    PRIMARY KEY (usuario_id, projeto_id)
+);
+
+CREATE TABLE auditoria.interacao (
+    id                     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id             INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_hora              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    canal                  TEXT NOT NULL CHECK (canal IN ('texto', 'voz')),
+    texto_solicitacao      TEXT NOT NULL,
+    audio_referencia       TEXT CHECK (audio_referencia IS NULL OR canal = 'voz'),
+    intencao               TEXT CHECK (intencao IN (
+                               'consultar_documentos_normativos',
+                               'consultar_projeto_sintetico',
+                               'orientar_mapa_beneficios',
+                               'orientar_tap',
+                               'orientar_entregas_cronograma',
+                               'orientar_avanco_mensal',
+                               'orientar_riscos_problemas',
+                               'analisar_completude_coerencia',
+                               'gerar_alertas_pendencias',
+                               'fora_do_catalogo')),
+    resultado              TEXT NOT NULL CHECK (resultado IN
+                               ('sucesso', 'esclarecimento', 'recusada', 'falha')),
+    categoria_erro         TEXT,
+    tempo_processamento_ms INTEGER CHECK (tempo_processamento_ms >= 0),
+    feedback_usuario       TEXT
+);
+
+CREATE TABLE auditoria.interacao_artefato (
+    interacao_id INTEGER NOT NULL REFERENCES auditoria.interacao (id),
+    artefato_id  INTEGER NOT NULL REFERENCES portfolio.artefato (id),
+    PRIMARY KEY (interacao_id, artefato_id)
+);
+
+CREATE TABLE auditoria.notificacao (
+    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    pendencia_id INTEGER NOT NULL REFERENCES portfolio.pendencia (id) ON DELETE CASCADE,
+    usuario_id   INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_envio   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (pendencia_id, usuario_id)
+);
+
+-- Imutabilidade dos registros de auditoria (RNF04)
+REVOKE UPDATE, DELETE ON auditoria.interacao, auditoria.interacao_artefato,
+                        auditoria.notificacao FROM PUBLIC;
+
+-- Exceção pontual: a avaliação do usuário chega depois da resposta, portanto
+-- o papel da aplicação recebe permissão de atualização restrita a essa coluna:
+-- GRANT UPDATE (feedback_usuario) ON auditoria.interacao TO <papel_da_aplicacao>;
+
+-- Índices dos acessos frequentes dos cenários da seção 2.2.2
+CREATE INDEX idx_artefato_projeto        ON portfolio.artefato (projeto_id);
+CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_id);
+CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo);
+CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, data_hora);
+```
+
+#### 3.6.7 Decisões de modelagem e restrições de integridade
+
+As decisões estruturais do modelo, com as alternativas consideradas e as razões da escolha, são registradas a seguir.
+
+**Decisão 1 — Perfis de usuário por coluna de domínio, e não por tabelas de subtipo.** A generalização de Usuário da seção 2.2.1 poderia ser mapeada em tabelas de subtipo (`diretor`, `pmo`, `lider_projeto` com chave primária compartilhada). A opção pela coluna `perfil` com `CHECK` decorre da própria justificativa da modelagem estática: as três especializações não declaram atributos próprios, pois o que as distingue é o alcance de acesso, que é relacional. Esse alcance já está expresso no modelo lógico — o líder pela chave `projeto.lider_id` e pelo vínculo de `usuario_projeto`, e o diretor e o PMO pelo alcance consolidado sobre o portfólio, que é regra de autorização da aplicação (RNF02) e não dado armazenado. Tabelas de subtipo vazias adicionariam junções sem acrescentar informação.
+
+**Decisão 2 — `preenchido` como coluna gerada.** Se `preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, preservando o atributo declarado na seção 2.2.1 como consultável e garantindo a confiabilidade da identificação de campos pendentes, que alimenta o RF04 e o RF05.
+
+**Decisão 3 — `notificacao` como registro de envio.** A relação `notifica` poderia ser apenas derivada: os destinatários de uma pendência são os usuários que acompanham o projeto de origem. A materialização em tabela foi escolhida porque o RNF09 exige o registro dos eventos de notificação, e porque a unicidade composta `(pendencia_id, usuario_id)` dá ao Agendador do cenário 3 um critério idempotente, impedindo que a mesma pendência seja comunicada repetidamente ao mesmo usuário a cada verificação periódica.
+
+**Decisão 4 — Intenção como domínio de coluna, e não como tabela.** O catálogo de intenções da seção 3.1 poderia ser normalizado em uma tabela própria. A opção pelo `CHECK` na coluna `interacao.intencao` mantém a coerência com a delimitação do modelo conceitual, que tratou intenção como conceito da camada técnica de PLN, e não como entidade do domínio de portfólio. O custo da escolha é que a evolução do catálogo exige alteração da restrição; o benefício é não introduzir no banco uma entidade sem respaldo nas modelagens anteriores. A restrição deve ser mantida sincronizada com o catálogo da seção 3.1.
+
+**Decisão 5 — Chaves substitutas com chave natural preservada.** Todas as tabelas usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
+
+**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.interacao_artefato` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: a rastreabilidade do RNF04 prevalece sobre a conveniência da exclusão, e o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a exigência de imutabilidade dos registros perante usuários comuns. A única flexibilização é a coluna `feedback_usuario`, atualizável pelo papel da aplicação por meio de permissão em nível de coluna, pois a avaliação do usuário só existe depois de a resposta ter sido registrada.
+
+**Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de auditoria (`interacao`, `interacao_artefato` e `notificacao`) no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
+
+**Alinhamento com o estado da implementação.** Duas colunas de `auditoria.interacao` fecham lacunas registradas em outras frentes da equipe. A coluna `audio_referencia` guarda o identificador do áudio no armazenamento de objetos (o `audio_id` devolvido pela API da seção 3.4): a decisão registrada na seção 2.4 adiou a persistência do pipeline de voz exatamente porque "o PostgreSQL será provisionado e o schema de auditoria definido" em etapa posterior — este modelo define esse schema, e a coluna completa a rastreabilidade que hoje é parcial, ligando cada interação por voz ao arquivo original. A coluna `feedback_usuario` materializa a captura da avaliação do usuário atribuída ao componente Auditoria e Feedback na seção 2.4 e listada entre os registros previstos na seção 2.5.
+
+**Limitação registrada — documentos normativos.** A intenção INT-01 do catálogo da seção 3.1 consulta conceitos e normativos de gestão de portfólio, documentos que não pertencem a nenhum projeto específico. Pelo modelo conceitual e pela seção 2.2.1, todo artefato compõe exatamente um projeto, portanto a base de normativos permanece fora do modelo relacional, no repositório de arquivos independente descrito na seção 2.5. Consequência assumida: a associação `interacao_artefato` registra as fontes de respostas sobre projetos, e a fonte de uma resposta normativa é registrada de forma textual no próprio registro da interação. Se a base de normativos evoluir para dado estruturado, a modelagem de uma entidade própria — ou de um artefato sem vínculo com projeto — deverá ser reavaliada junto com o modelo conceitual, para que as duas representações não divirjam.
+
+**Normalização.** O modelo está na terceira forma normal: todas as tabelas têm chave primária definida, os atributos são atômicos e nenhum atributo não chave depende de outro atributo não chave. A única redundância existente é a coluna `preenchido`, que é derivada — e, por ser gerada pelo próprio banco, não constitui anomalia de atualização.
+
+Por fim, a tabela a seguir consolida a rastreabilidade entre as estruturas do modelo e os requisitos que elas sustentam, no mesmo formato adotado nas seções anteriores:
+
+| Estrutura do modelo | Requisitos sustentados | Papel |
+|---|---|---|
+| `usuario.perfil` | RNF02 | Base da validação de permissões por perfil |
+| `projeto.lider_id` | RF06, RNF02 | Delimita quem pode receber sugestões de alteração de cada projeto |
+| `usuario_projeto` | RF05 | Define os destinatários da notificação proativa |
+| `auditoria.notificacao` | RF05, RNF09 | Registra os envios e garante idempotência da verificação periódica |
+| `auditoria.interacao` | RNF01, RNF03, RNF04, RNF09 | Trilha de auditoria com canal, intenção, resultado e tempo de processamento |
+| `interacao.audio_referencia` | RF01, RNF06, RNF09 | Vincula a interação por voz ao arquivo de áudio original no armazenamento de objetos |
+| `interacao.feedback_usuario` | RNF04 | Registra a avaliação do usuário capturada pelo componente Auditoria e Feedback |
+| `auditoria.interacao_artefato` | RF03, RNF04, RNF11 | Registra as fontes que fundamentaram cada resposta |
+| `artefato.referencia`, `artefato.data` | RF03 | Origem e data exibidas junto a cada informação |
+| `campo_artefato.obrigatorio`, `campo_artefato.preenchido` | RF04, RF05 | Identificação dos campos pendentes de preenchimento |
+| `pendencia.prazo`, `pendencia.situacao` | RF05 | Critérios da verificação periódica do Agendador |
+
+O modelo físico definido nesta seção será populado exclusivamente com os dados sintéticos previstos na seção 1.3 e serve de base tanto para a implementação da camada de acesso a dados quanto para o processo de deploy descrito na seção 3.7.
 
 ### 3.7 Processo de Deploy em Nuvem
 
-#### 3.6.1 Arquitetura e Provedor Selecionado
+Esta seção descreve como a solução sai do ambiente de desenvolvimento e passa a executar em nuvem. Enquanto o projeto arquitetural define *o que* a solução faz e como suas responsabilidades se organizam, o processo de deploy define *onde* essas responsabilidades executam, sob qual provedor, com quais recursos e por quais caminhos de comunicação.
 
-O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **Microsoft Azure**. No MVP, o núcleo permanece independente; Copilot Studio, Power Platform, Teams e SharePoint são integrações futuras com o ambiente corporativo do parceiro.
+ O ambiente adotado é o AWS Academy, concedido pela instituição de ensino. Trata-se de um ambiente acadêmico, com crédito e catálogo de serviços limitados, o que impõe restrições de dimensionamento e de continuidade que estão registradas ao longo da seção. A implantação é tratada, portanto, como prova de conceito técnica sobre dados sintéticos, e não como operação em ambiente produtivo.
+
+#### 3.7.1 Arquitetura e Provedor Selecionado
+
+ O deploy do MVP foi definido para o **AWS Academy**, o programa educacional da Amazon Web Services disponibilizado pela instituição de ensino. A escolha se apoia em duas razões independentes.
+
+ A primeira é de **viabilidade**: o acesso é concedido pela faculdade, sem custo para a equipe e sem necessidade de cartão de crédito ou de aprovação de orçamento, o que elimina o risco de o projeto parar por indisponibilidade de infraestrutura durante as sprints.
+
+ A segunda é de **portabilidade**: toda a pilha implantada é composta por tecnologias de código aberto e por interfaces padronizadas — Docker para empacotamento, PostgreSQL para persistência, Python e FastAPI no backend, React e Next.js na interface. Nenhum componente do núcleo depende de serviço proprietário de um provedor específico. É importante registrar a distinção: a AWS não é uma plataforma de código aberto, e o argumento não é sobre o provedor, e sim sobre o que é implantado sobre ele. Como o núcleo é aberto e conteinerizado, a mesma imagem que roda no AWS Academy roda em qualquer outro provedor, o que preserva a possibilidade de a solução ser futuramente promovida para o ambiente Microsoft utilizado pelo Metrô sem reescrita de código.
+
+ Essa decisão tem uma consequência que precisa estar explícita: o ambiente de deploy do MVP deixa de coincidir com o ecossistema de produção do parceiro. A aderência ao ambiente Microsoft, prevista no TAPI, passa a ser garantida pela portabilidade da pilha e pelas integrações registradas na Seção 3.7.8, e não pelo provedor escolhido para o ambiente acadêmico.
 
 **Componentes principais:**
 
-| Componente | Serviço Microsoft | Justificativa |
-|-----------|------------------|--------------|
-| Hospedagem do modelo | Azure App Service (tier gratuito) | HTTP API nativa, escalável, integrado com ecossistema Microsoft |
-| Integração futura | Copilot Studio | Possível orquestração corporativa após o MVP independente |
-| Persistência de dados | PostgreSQL | Mantém a tecnologia de banco definida para o MVP e pode ser hospedada em serviço compatível no Azure |
-| Conversão de voz | Azure Cognitive Services (Speech-to-Text) | Free tier generoso: 5 horas/mês grátis |
-| Integração de processos | Power Automate | Automações e orquestração de workflows |
-| Ambiente completo | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários, inclui Teams, SharePoint, Entra ID |
+| Componente | Nó no diagrama | Serviço AWS | Justificativa |
+|---|---|---|---|
+| Interface web | Web App Frontend | Amazon EC2 | Executa o contêiner que serve a Chat UI construída em React, TypeScript e Next.js |
+| Núcleo da aplicação | Web App Backend | Amazon EC2 | Executa o contêiner com o pipeline de PLN, as regras de negócio e as APIs REST |
+| Empacotamento e publicação | Docker - Amazon ECR | Amazon Elastic Container Registry | Guarda as imagens de frontend e backend produzidas pelo pipeline |
+| Persistência de dados | Database - PostgreSQL | PostgreSQL | Banco relacional único, com os schemas de portfólio e de auditoria. A forma de hospedagem ainda não está definida — ver Seção 3.7.9 |
+| Armazenamento de arquivos | Amazon S3 - Bucket Storage | Amazon S3 | Conteúdo não relacional: prompts e demais artefatos do pipeline |
+| Conversão de voz | API de Transcrição | Amazon Transcribe | Converte em texto o áudio recebido pelo backend (RF01 e RNF06) |
+| Modelo de linguagem | LLM - Serviço externo | API de modelo de linguagem | Geração de respostas e apoio à recuperação de informação; consumido como serviço externo |
+| Observabilidade | Rastreabilidade | Amazon CloudWatch | Telemetria e logs técnicos, distintos do log de auditoria |
 
 **Por que essa arquitetura:**
-- **Alinhamento com parceiro** — Todo o ecossistema real de produção é Microsoft
-- **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados
-- **Controle de custo acadêmico** — as camadas gratuitas poderão ser utilizadas quando disponíveis e compatíveis com a implantação escolhida
-- **Reprodutibilidade** — os passos e parâmetros necessários serão registrados para repetição em ambiente autorizado
 
-**Arquitetura em alto nível:**  
+- **Viabilidade imediata** — o acesso ao AWS Academy é concedido pela instituição de ensino, sem custo para a equipe;
+- **Pilha de código aberto** — Docker, PostgreSQL, Python, FastAPI, React e Next.js compõem o núcleo, sem dependência de serviço proprietário;
+- **Portabilidade** — como o núcleo é conteinerizado e aberto, a mesma imagem pode ser promovida para outro provedor, inclusive para o ambiente Microsoft do parceiro;
+- **Banco único** — a persistência estruturada foi concentrada em um único banco relacional, sem introduzir base não relacional, conforme decidido na Seção 2.5;
+- **Reprodutibilidade** — os passos e parâmetros necessários são registrados na Seção 3.7.4 para repetição em ambiente autorizado.
 
+#### 3.7.2 Diagrama de Implantação
+
+ Enquanto o diagrama de componentes da Seção 2.4 responde *o que* a solução faz, organizando as responsabilidades em três camadas lógicas, o diagrama de implantação responde *onde* cada uma dessas responsabilidades passa a executar depois do deploy. É a passagem da visão lógica para a visão física: os mesmos componentes especificados nas Seções 2.2 e 2.3 reaparecem aqui distribuídos entre nós concretos de execução, cada um com um serviço de nuvem correspondente e um protocolo definido de comunicação.
+
+ A notação adotada é a de diagrama de implantação da UML. Cada cubo representa um `<<Node>>`, isto é, um ambiente de execução com identidade própria — uma máquina, um contêiner ou um serviço gerenciado. Os retângulos internos representam os elementos implantados nesse nó: `<<Component>>` para unidades com comportamento em tempo de execução e `<<Artifact>>` para arquivos entregues, como as imagens de contêiner. As linhas entre os nós são caminhos de comunicação e cada uma está rotulada com o protocolo que a percorre; as portas correspondentes estão detalhadas na tabela de caminhos de comunicação desta seção e reaparecem, como regras de firewall, na Seção 3.7.4.
+
+ A organização em nós separa três fronteiras que importam para o projeto. A primeira é a fronteira do cliente: o nó **Internet - Browser** é o único que executa fora da infraestrutura de nuvem, na máquina do profissional do PMO. A segunda é a fronteira da conta acadêmica: a **Instância de Deploy na Nuvem** reúne tudo o que a equipe provisiona e controla dentro do AWS Academy. A terceira é a fronteira do serviço externo: o nó **LLM** aparece fora da instância porque o modelo de linguagem é consumido como serviço de terceiro, o que tem consequências diretas sobre autenticação, custo e tráfego de dados — motivo pelo qual, no MVP, apenas dados sintéticos transitam por ele.
+
+##### Diagrama de implantação (UML)
+
+<div align="center">
+<sub>Imagem 3.7.1 - Diagrama de implantação (UML) — Distribuição dos artefatos da solução em nuvem</sub><br>
+  <img src="../assets/diagrama_de_deploy.svg" width="100%" alt="Diagrama de implantação UML da solução: o nó Internet - Browser contém a Chat UI e a Captura de áudio; a Instância de Deploy na Nuvem contém os nós Web App Frontend, Docker - Amazon ECR, Web App Backend com nove componentes, API de Transcrição, Database - PostgreSQL, Amazon S3 - Bucket Storage e Rastreabilidade; o nó LLM - Serviço externo aparece fora da instância de nuvem"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+##### Descrição dos nós de execução
+
+| Nó | Elementos implantados | Responsabilidade |
+|---|---|---|
+| **Internet - Browser** | Chat UI, Captura de áudio | Único nó fora da infraestrutura de nuvem: executa no navegador da máquina do profissional do PMO. A Chat UI é o código de interface baixado do Web App Frontend e executado localmente; é por ela que a solicitação é digitada e que a resposta é exibida junto da fonte consultada e da data de referência (RF02 e RF03). A Captura de áudio grava a mensagem falada e a encaminha como arquivo ao backend, atendendo ao canal de voz previsto no RF01 e à acessibilidade exigida pelo RNF06. Nenhum processamento de linguagem natural ocorre neste nó: ele apenas coleta a entrada e apresenta a saída. |
+| **Web App Frontend** (Amazon EC2) | React + TypeScript + Next.js, Assets estáticos | Hospeda a aplicação cliente e a entrega ao navegador. Os Assets estáticos reúnem os arquivos de JavaScript, folhas de estilo e fontes que compõem a Chat UI; o bloco React + TypeScript + Next.js responde pela construção e pela renderização das telas. A separação em relação ao Web App Backend mantém a aplicação cliente desacoplada do núcleo, condição do RNF05 para que outras aplicações possam futuramente consumir a mesma API. |
+| **Docker - Amazon ECR** | `<<Artifact>>` Imagens frontend + backend | Registro das imagens de contêiner produzidas pelo pipeline descrito na Seção 3.7.6. Não participa da execução: sua função é guardar a versão exata de frontend e backend que foi construída, testada e aprovada, para que as instâncias EC2 obtenham dela a imagem no momento da implantação. É esse nó que garante que a versão validada em homologação seja idêntica à promovida para produção. |
+| **Web App Backend** (Amazon EC2) | API Gateway, PLN - Compreensão, PLN - Transações e Ações, API de Recebimento de áudio, API de Transcrição, Gerador de Respostas, Auditoria e Feedback, Agendador, Lista de Tarefas | Concentra toda a camada de lógica de negócio definida na Seção 2.4. O API Gateway centraliza a entrada das solicitações e autentica o usuário antes de qualquer processamento (RNF02). A API de Recebimento de áudio aceita o arquivo enviado pelo navegador e a API de Transcrição atua como cliente do serviço de voz, de modo que áudio e texto convergem para o mesmo fluxo (RF01 e RNF06). O PLN - Compreensão classifica a intenção e extrai os parâmetros da solicitação (RNF03), encaminhando pedidos de preenchimento e alertas ao PLN - Transações e Ações (RF04, RF05 e RF06) e consultas ao Gerador de Respostas (RF02), que monta a saída e informa a fonte e a justificativa (RF03 e RNF11). O Agendador executa as verificações periódicas que não dependem de solicitação do usuário e alimenta a Lista de Tarefas com as pendências encontradas, sustentando o acompanhamento preventivo do RF05. O Auditoria e Feedback registra usuário, data, canal, intenção, fontes e resultado de cada interação (RNF04). |
+| **API de Transcrição** (Amazon Transcribe) | Speech to Text | Serviço gerenciado de conversão de fala em texto, provisionado na mesma conta. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. |
+| **Database - PostgreSQL** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback exigidos pelo RNF04. A separação em dois schemas, e não em dois bancos, atende à exigência da Seção 2.4 de proteger os logs contra alteração por usuário comum — o controle é feito por permissão — sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. A forma de hospedagem do PostgreSQL, em serviço gerenciado ou em contêiner na própria instância EC2, permanece em aberto na Seção 3.7.9. |
+| **Amazon S3 - Bucket Storage** | Armazenamento de Prompts | Armazenamento de objetos para o conteúdo que não se representa bem em modelo relacional. Guarda os prompts utilizados pelo pipeline de PLN, versionados de forma independente do código, o que permite ajustá-los sem reconstruir a imagem do backend. |
+| **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a Rastreabilidade responde à pergunta técnica de saber se o sistema está funcionando, enquanto a auditoria responde à pergunta de negócio de saber quem pediu o quê e com qual resultado (RNF04). São dados com público, retenção e requisito de imutabilidade distintos, e por isso ficam em nós distintos. |
+| **LLM - Serviço externo** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11). Por estar fora da fronteira da conta acadêmica, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
+
+##### Caminhos de comunicação
+
+| # | Origem → destino | Protocolo | Porta | Momento | Dados e motivo da conexão |
+|---|---|---|---|---|---|
+| C1 | Usuário → Internet - Browser | Interação direta | — | Execução | Solicitação digitada ou falada pelo profissional do PMO. |
+| C2 | Chat UI → Web App Frontend | HTTPS | 443 | Execução | Baixa os arquivos que compõem a interface — JavaScript, folhas de estilo e fontes — na primeira visita e a cada nova versão publicada. Enquanto não houver certificado, o acesso ocorre por HTTP na porta 80, ou diretamente na porta 3000 do processo Next.js. |
+| C3 | Chat UI → API Gateway | HTTPS/REST, JSON com JWT | 443 | Execução | Envia a solicitação em texto e recebe a resposta estruturada, mantendo a aplicação cliente desacoplada da lógica interna (RNF05). O processo do backend escuta internamente na porta 8000. |
+| C4 | Captura de áudio → API de Recebimento de áudio | HTTPS/REST, `multipart/form-data` | 443 | Execução | Envia o arquivo de áudio gravado no navegador para que a transcrição ocorra no servidor, e não no cliente. Compartilha a mesma porta de C3, por ser outro recurso da mesma API. |
+| C5 | API de Transcrição → API de Transcrição (Amazon Transcribe) | HTTPS, AWS SDK | 443 | Execução | Encaminha o áudio ao serviço de voz e recebe o texto transcrito, que segue pelo mesmo fluxo das mensagens digitadas. Conexão de saída da instância. |
+| C6 | Web App Backend → LLM - Serviço externo | HTTPS/REST | 443 | Execução | Envia o contexto recuperado e recebe a resposta gerada em linguagem natural, empregada pelo Gerador de Respostas. Única conexão que sai da fronteira da conta acadêmica. |
+| C7 | Web App Backend → Database - PostgreSQL | `PostgreSQL/TLS` — protocolo nativo do PostgreSQL sobre TLS | 5432 | Execução | Consulta os dados do portfólio para responder e para identificar pendências, e grava os registros de auditoria. Não é HTTP: o PostgreSQL usa protocolo próprio de mensagens sobre TCP, e o TLS o encapsula. |
+| C8 | Web App Backend → Amazon S3 - Bucket Storage | HTTPS, AWS SDK (`GetObject` / `PutObject`) | 443 | Execução | Lê os prompts utilizados pelo pipeline de PLN. |
+| C9 | Auditoria e Feedback → Rastreabilidade | HTTPS, AWS SDK (`PutLogEvents` / `PutMetricData`) | 443 | Execução | Publica eventos, métricas e logs técnicos para monitoramento da disponibilidade e do desempenho. |
+| C10 | Docker - Amazon ECR → Web App Frontend | `<<deploy>>` `docker pull` sobre HTTPS | 443 | Implantação | Entrega a imagem do frontend à instância no momento do deploy. |
+| C11 | Docker - Amazon ECR → Web App Backend | `<<deploy>>` `docker pull` sobre HTTPS | 443 | Implantação | Entrega a imagem do backend à instância no momento do deploy. |
+| C12 | Administrador → Instância EC2 | SSH | 22 | Operação | Acesso administrativo da equipe à instância para configuração e verificação. Não aparece no diagrama por ser um caminho de operação, e não de execução da solução; está detalhado na Seção 3.7.4. |
+
+ A coluna **Momento** separa os planos que o diagrama necessariamente sobrepõe. As conexões de **Execução** ocorrem a cada interação do usuário e trafegam dados por HTTP, pelo protocolo do banco ou por SDK. As conexões de **Implantação** ocorrem uma única vez a cada deploy, quando a instância obtém a imagem no registro e sobe o contêiner. A distinção evita a leitura equivocada de que o navegador obteria imagens de contêiner: o navegador participa apenas do primeiro plano e recebe arquivos servidos pelo Web App Frontend. A conexão de **Operação** não pertence a nenhum dos dois planos: existe para que a equipe administre a instância.
+
+ Duas observações sobre a leitura das portas. A primeira é que a porta 443 predomina porque quase toda comunicação entre nós é HTTP sobre TLS — o que muda de uma conexão para outra não é a porta, e sim o recurso chamado e o formato do corpo da mensagem, registrados na última coluna. A segunda é que a porta exposta ao exterior não coincide com a porta interna do processo: o frontend responde em 3000 e o backend em 8000 dentro do contêiner, e ambos só são alcançados de fora pelas portas publicadas na instância. Essa distinção é o que permite fechar o grupo de segurança conforme a Seção 3.7.4.
+
+##### Fluxo de uma solicitação ponta a ponta
+
+ Os três percursos a seguir descrevem como os nós do diagrama cooperam nos cenários especificados na Seção 2.2.2, e cobrem todos os elementos implantados.
+
+ **Consulta em texto.** O profissional abre o AZ1 no navegador; a Chat UI já foi baixada do Web App Frontend e executa localmente. Ao enviar a pergunta, a Chat UI faz uma requisição HTTPS ao API Gateway, no Web App Backend, que autentica o usuário e valida suas permissões antes de prosseguir (RNF02). O PLN - Compreensão classifica a solicitação como consulta e extrai os parâmetros mencionados, como o nome do projeto e o período (RNF03). O Gerador de Respostas consulta o schema `portfolio` no banco, recupera os prompts necessários no bucket S3 e aciona o LLM para redigir a resposta, que retorna à Chat UI acompanhada da fonte consultada e da data de referência (RF02 e RF03). Em paralelo, o Auditoria e Feedback grava a interação no schema `auditoria` e publica os eventos técnicos no CloudWatch (RNF04).
+
+ **Solicitação por voz.** O percurso difere apenas na entrada. A Captura de áudio grava a mensagem falada e a envia à API de Recebimento de áudio, que valida o arquivo e o repassa à API de Transcrição; esta atua como cliente do Amazon Transcribe e devolve o texto correspondente. A partir desse ponto, a solicitação segue exatamente o mesmo caminho da consulta em texto, o que atende ao RF01 sem exigir um segundo pipeline de intenções e preserva a acessibilidade prevista no RNF06.
+
+ **Alerta proativo.** Este percurso não parte do usuário. O Agendador executa verificações periódicas sobre o schema `portfolio`, identificando prazos próximos, campos incompletos e documentos ausentes. As pendências encontradas alimentam a Lista de Tarefas, e o PLN - Transações e Ações as converte em alertas e sugestões de preenchimento, apresentados ao profissional quando ele acessa a interface (RF04, RF05 e RF06). Também aqui o Auditoria e Feedback registra o alerta gerado, de modo que a origem de cada recomendação permaneça rastreável.
+
+ Em nenhum dos três percursos o agente altera de forma autônoma os registros do portfólio: a solução sugere e alerta, e a responsabilidade pelo registro e pela decisão permanece com o profissional, conforme delimitado na Seção 1.3.
+
+##### Correspondência entre os componentes lógicos e os nós de execução
+
+ A tabela a seguir fecha a rastreabilidade entre a visão lógica da Seção 2.4 e a visão física desta seção, permitindo verificar que nenhum componente especificado ficou sem lugar de execução definido.
+
+| Componente da Seção 2.4 | Nó de execução | Observação |
+|---|---|---|
+| Chat UI - Texto e Voz | Internet - Browser, servida pelo Web App Frontend | O componente executa no navegador; o Web App Frontend é o nó que o entrega. |
+| API Gateway | Web App Backend | Ponto único de entrada; concentra também a autenticação e a validação de permissões. |
+| Conversão de Áudio em Texto | Web App Backend e API de Transcrição (Amazon Transcribe) | Dividido em dois elementos: a API de Recebimento de áudio e a API de Transcrição no backend, e o Speech to Text no serviço gerenciado. |
+| Controle de Acesso | Web App Backend | Implantado junto ao API Gateway, aplicado antes de qualquer processamento de linguagem. |
+| PLN - Compreensão | Web App Backend | Classificação de intenção e extração de parâmetros. |
+| PLN - Transações e Ações | Web App Backend | Sugestões e alertas, apoiado pelo Agendador e pela Lista de Tarefas. |
+| Gerador de Respostas e Explicabilidade | Web App Backend, com apoio do LLM - Serviço externo | A composição da resposta e a indicação da fonte permanecem no backend; o LLM apoia a redação. |
+| Auditoria e Feedback | Web App Backend | Grava no schema `auditoria` e publica telemetria no nó Rastreabilidade. |
+| Repositório de Dados e Conhecimento | Database - PostgreSQL e Amazon S3 - Bucket Storage | Dados estruturados no banco; conteúdo não relacional no armazenamento de objetos. |
+| Logs de Auditoria | Database - PostgreSQL, schema `auditoria` | Separados dos dados operacionais por schema e por permissão (RNF04). |
+
+#### 3.7.3 Recursos do Ambiente Acadêmico e Limites
+
+ O AWS Academy é disponibilizado pela instituição de ensino e opera sob limites que diferem de uma conta AWS comum. Esses limites não são um detalhe administrativo: eles condicionam o porte dos recursos, o tempo em que podem permanecer ativos e a continuidade do serviço, e por isso precisam estar registrados junto da arquitetura que se apoia neles.
+
+**Limites do ambiente:**
+
+| Recurso | Limite | Consequência para o projeto |
+|---|---|---|
+| Crédito | US$ 50 por participante | Determina o porte da instância e o tempo total em que ela pode permanecer em execução. O consumo é proporcional ao tempo ligado, e não ao uso efetivo, o que torna a interrupção da instância ociosa a principal medida de contenção |
+| Duração da sessão | 4 horas por sessão de laboratório | Ao término, a instância é interrompida. O ambiente não permanece disponível entre sessões, o que impede a operação contínua |
+| Catálogo de serviços | Restrito à lista permitida pelo curso | Serviços previstos na arquitetura que não estejam liberados exigem alternativa de projeto |
+| Identidade e acesso | Papel de execução pré-definido, sem criação livre de usuários e políticas | A instância utiliza o papel fornecido pelo laboratório para acessar os demais serviços da conta |
+| Custo de acesso | Nenhum para a equipe | Concedido pela instituição, sem cartão de crédito nem aprovação de orçamento |
+
+**Serviços em uso e serviços previstos.** O ambiente foi verificado para o **Amazon EC2**, utilizado com a imagem **Amazon Linux**, que é o serviço sobre o qual a configuração descrita na Seção 3.7.4 se apoia. Os demais serviços previstos na arquitetura da Seção 3.7.2 — Amazon ECR, Amazon S3, Amazon Transcribe e Amazon CloudWatch — ainda não tiveram sua disponibilidade confirmada no catálogo do laboratório. Essa confirmação precisa preceder as etapas de implantação, porque a indisponibilidade de qualquer um deles exige uma alternativa de projeto: o registro de imagens pode ser substituído pela construção local na própria instância, o armazenamento de objetos e a telemetria podem ser acomodados no volume da instância, mas a ausência do serviço de transcrição afetaria diretamente o canal de voz previsto no RF01 e no RNF06.
+
+A região habilitada é a **us-east-1 (Norte da Virgínia)**, e todos os recursos do projeto são provisionados nela.
+
+> [PENDENTE — confirmar no catálogo do laboratório a disponibilidade do Amazon ECR, do Amazon S3, do Amazon Transcribe e do Amazon CloudWatch.]
+
+ Os recursos do AWS Academy serão utilizados enquanto forem suficientes para o MVP com dados sintéticos. A implantação em ambiente real deverá considerar licenciamento, disponibilidade contínua e recursos corporativos, conforme a Seção 3.7.8.
+
+#### 3.7.4 Configuração da Instância EC2 e Acesso
+
+ A instância Amazon EC2 é o nó que hospeda a execução da solução, e sua configuração antecede qualquer atividade de implantação: sem ambiente provisionado e acessível, não há onde publicar as imagens de contêiner nem como verificar o comportamento da aplicação. Esta seção documenta esse procedimento na ordem em que ele é executado, de modo que possa ser repetido por qualquer integrante da equipe e reproduzido em uma nova sessão do laboratório.
+
+ Os cinco passos seguem a ordem em que o ambiente foi efetivamente montado. O par de chaves e o grupo de segurança podem ser criados tanto dentro do assistente de criação da instância quanto em suas próprias telas do console; neste projeto foram criados em telas separadas, o que permite reutilizá-los em instâncias futuras sem repetir a configuração. As imagens que acompanham cada passo registram a evidência de sua execução.
+
+##### Passo 1 — Iniciar o laboratório do AWS Academy
+
+1. Acessar o AWS Academy com a credencial institucional e abrir o laboratório da disciplina
+2. Iniciar a sessão do laboratório e aguardar o indicador de ambiente disponível
+3. Abrir o console da AWS a partir do próprio laboratório, sem criar conta própria
+4. Confirmar a região habilitada e mantê-la em todos os passos seguintes, uma vez que recursos criados em regiões distintas não se comunicam entre si
+5. Registrar o crédito remanescente e o horário de início, que delimitam o tempo útil de trabalho da sessão
+
+ Duas restrições do ambiente condicionam todos os passos seguintes e convém tê-las em vista desde já: o crédito total é de **US$ 50 por participante** e a sessão do laboratório dura **4 horas**, ao fim das quais a instância é interrompida. A primeira restringe o porte e o tempo de execução dos recursos; a segunda significa que o ambiente não permanece no ar entre uma sessão e outra, com as consequências descritas ao final desta seção.
+
+<div align="center">
+<sub>Imagem 3.7.2 - Passo 1 — Laboratório do AWS Academy iniciado, com o crédito e o cronômetro da sessão visíveis</sub><br>
+  <img src="../assets/deploy/passo_1.png" width="90%" alt="Tela do Learner Lab do AWS Academy exibindo o indicador de crédito utilizado, o cronômetro da sessão e os controles Start Lab, End Lab e AWS Details"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+##### Passo 2 — Criar a instância e definir imagem, porte e armazenamento
+
+ No console do EC2, a criação começa por **Launch Instance**. Os parâmetros definidos aqui determinam o custo por hora e, portanto, quanto do crédito disponível a instância consome enquanto permanece em execução.
+
+1. Nomear a instância de forma identificável — no projeto, `az1-app`
+2. Selecionar o **Amazon Linux 2023** como imagem de máquina (AMI), cujo usuário padrão de acesso é `ec2-user`
+3. Selecionar o tipo de instância de menor porte que atenda ao MVP — no projeto, `t3.micro` —, uma vez que o consumo de crédito é proporcional ao tempo de execução e ao porte escolhido
+4. Definir o volume de disco, mantido no tamanho padrão de 8 GiB
+5. Associar à instância o papel de execução disponibilizado pelo laboratório, em **Detalhes avançados → Perfil de instância do IAM**
+
+ O quinto item merece destaque por ser o menos evidente. É o papel de execução que permite à instância chamar os demais serviços da conta — o registro de imagens, o armazenamento de objetos, a transcrição e a telemetria — sem que credenciais precisem ser gravadas dentro da máquina ou da imagem de contêiner. Sem ele, as conexões C5, C8, C9, C10 e C11 da Seção 3.7.2 falham por falta de autorização, e o diagnóstico costuma ser demorado porque o erro só aparece na primeira chamada da aplicação, muito depois da criação da instância.
+
+ O volume de 8 GiB atende à configuração atual, em que a instância hospeda apenas o sistema operacional. Ele tende a ficar apertado quando as imagens de contêiner do frontend e do backend passarem a ser armazenadas localmente, e o espaço disponível deve ser reavaliado antes dessa etapa. O volume pode ser ampliado sem recriar a instância.
+
+<div align="center">
+<sub>Imagem 3.7.3 - Passo 2 — Definição do nome, da imagem Amazon Linux 2023 e do porte da instância</sub><br>
+  <img src="../assets/deploy/passo_2.png" width="90%" alt="Assistente de criação de instância do Amazon EC2 exibindo o nome az1-app, a imagem Amazon Linux 2023 selecionada e o resumo com o tipo t3.micro e o volume de 8 GiB"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+##### Passo 3 — Criar o par de chaves de acesso
+
+ O acesso à instância é feito por chave criptográfica, e não por senha. A chave privada é o único meio de entrar na máquina: se for perdida, não há recuperação possível e a instância precisa ser recriada.
+
+1. Em **EC2 → Pares de chaves → Criar par de chaves**, nomear o par de forma que se associe à instância — no projeto, `az1-app`
+2. Selecionar **RSA** como tipo de par de chaves
+3. Selecionar o formato **`.pem`**, destinado ao uso com OpenSSH; o formato `.ppk` é necessário apenas para acesso por PuTTY
+4. Baixar a chave privada no momento da criação, pois a AWS não permite baixá-la novamente depois
+5. Restringir as permissões do arquivo, pois o cliente SSH recusa chaves com permissão aberta:
+
+```bash
+# Linux ou macOS
+chmod 400 ~/.ssh/az1-key.pem
 ```
-Usuário em Teams / Copilot Studio (Microsoft 365)
-        ↓
-  Copilot Studio (orquestração nativa)
-        ├→ Power Automate (automações)
-        ├→ Azure App Service (API do modelo NLP)
-        │       ├→ Azure SQL Database / Cosmos DB (logs, histórico)
-        │       └→ Application Insights (monitoramento)
-        ├→ Azure Cognitive Services (STT/TTS)
-        └→ SharePoint / OneDrive (documentos integrados)
+
+```powershell
+# Windows — remove a herança e concede leitura apenas ao usuário atual
+icacls .\az1-key.pem /inheritance:r
+icacls .\az1-key.pem /grant:r "$($env:USERNAME):(R)"
 ```
 
+ A chave deve ser guardada em local seguro e não deve ser compartilhada em canais de mensagem nem incluída no repositório. A definição de onde ela ficará versionada em relação ao projeto, assim como o tratamento dos demais segredos da aplicação, acompanha as etapas de implantação e está registrada ao final desta seção.
 
-#### 3.6.2 Serviços Gratuitos e Limites
+<div align="center">
+<sub>Imagem 3.7.4 - Passo 3 — Criação do par de chaves `az1-app` no formato `.pem`</sub><br>
+  <img src="../assets/deploy/passo_3.png" width="90%" alt="Tela de criação de par de chaves do Amazon EC2 exibindo o nome az1-app, o tipo RSA e o formato de arquivo .pem selecionados"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
-**Azure Free Tier (sempre gratuito):**
-- Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação/dia)
-- Azure Cognitive Services: 5.000 requisições/mês de Speech, 5.000 requisições/mês de Text
-- Application Insights: 1 GB/mês de ingestão de logs
+##### Passo 4 — Configurar as portas no grupo de segurança
 
-**Azure Free Tier (12 meses iniciais):**
-- Azure SQL Database: 1 banco com até 5 GB grátis
-- Azure Container Registry: 1 registro com 500 MB grátis
+ O grupo de segurança é o firewall da instância e traduz, em regras, os caminhos de comunicação da Seção 3.7.2. Cada porta aberta corresponde a uma conexão prevista no diagrama; portas sem conexão correspondente permanecem fechadas. A edição é feita em **EC2 → Grupos de segurança → Editar regras de entrada**.
 
-**Microsoft 365 Developer Program:**
-- Tenant completo com 25 usuários
-- Teams, SharePoint, OneDrive, Power Platform, Copilot Studio inclusos
-- Válido enquanto ativo (renovável)
+**Regras de entrada configuradas:**
 
-**Para projeto acadêmico sem time constraint:**
-No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e suficientes. A implantação real deverá considerar licenciamento e recursos corporativos.
+| Tipo | Protocolo | Porta | Origem | Conexão correspondente | Motivo |
+|---|---|---|---|---|---|
+| SSH | TCP | 22 | `0.0.0.0/0` | C12 | Acesso administrativo à instância |
+| HTTP | TCP | 80 | `0.0.0.0/0` | C2 | Entrega da Chat UI ao navegador enquanto não houver certificado emitido |
+| HTTPS | TCP | 443 | `0.0.0.0/0` | C2, C3, C4 | Entrega da interface e chamadas à API, em texto e em áudio, após a emissão do certificado |
 
-#### 3.6.3 Etapas de Configuração e Implantação
+ As regras de saída permanecem no padrão da AWS, que libera todo o tráfego originado na instância. Isso atende às conexões C5, C6, C8, C9, C10 e C11 — as chamadas da instância ao serviço de transcrição, ao modelo de linguagem, ao armazenamento de objetos, à telemetria e ao registro de imagens — sem configuração adicional.
 
-**Passo 1 — Criar Ambientes Microsoft:**
-1. Registrar-se em [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
-2. Criar tenant sandbox (instantâneo, pré-configurado)
-3. Registrar-se em [Azure Portal](https://portal.azure.com) com a mesma conta
-4. Ativar free tier credits (se aplicável)
+**Ajuste necessário na regra de SSH.** A porta 22 está aberta para `0.0.0.0/0`, e o próprio console da AWS sinaliza a condição na tela de edição. Isso significa que qualquer endereço da internet pode tentar autenticar-se na instância, o que a expõe a tentativas automatizadas de acesso. A mitigação atual é o acesso depender de chave criptográfica, e não de senha; ainda assim, a origem deve ser restringida ao endereço da equipe, em notação `/32`. O custo dessa restrição é apenas o de atualizá-la quando o endereço da equipe mudar, e ela está registrada como pendência na Seção 3.7.9.
 
-**Passo 2 — Configurar Azure para Hospedagem do Modelo:**
-1. Criar resource group `az1-nlp-dev`
-2. Criar Azure App Service (`F1 Free` para publicação compatível ou `B1 Basic`, pago, quando os requisitos exigirem)
-3. Configurar deployment via Git ou Docker (Azure Container Registry)
-4. Criar ou conectar uma instância PostgreSQL para persistência
+**Portas ainda não configuradas.** As três regras acima cobrem o estado atual, em que a instância hospeda apenas o sistema operacional. As portas a seguir serão necessárias nas etapas de implantação e devem ser abertas apenas quando os serviços correspondentes existirem, pois abrir portas sem serviço em escuta amplia a superfície exposta sem nenhum ganho:
 
-**Passo 3 — Preparar Modelo e API:**
-1. Estruturar projeto Python em `src/nlp-deploy/`
-2. Criar aplicação FastAPI com endpoint `/classify` que recebe `{"text": "..."}`
-3. Exportar modelo treinado (TF-IDF + LogReg ou BERTimbau em ONNX) para diretório `model/`
-4. Criar `requirements.txt` com dependências (flask, scikit-learn, joblib, ou onnxruntime)
+| Tipo | Porta | Origem recomendada | Conexão | Quando será necessária |
+|---|---|---|---|---|
+| TCP personalizado | 3000 | IP da equipe, em `/32` | — | Acesso direto ao processo Next.js durante os testes, antes de o frontend ser publicado nas portas 80 ou 443 |
+| TCP personalizado | 8000 | IP da equipe, em `/32` | — | Verificação do endpoint `/health` do backend antes de haver proxy |
+| PostgreSQL | 5432 | Grupo de segurança do backend | C7 | Acesso do backend ao banco. A origem deve ser o próprio grupo de segurança, e não uma faixa de endereços: assim o banco aceita conexões apenas de dentro do ambiente, independentemente do endereço que a instância receba a cada retomada de sessão, e nunca fica alcançável pela internet |
 
-**Passo 4 — Containerizar e Publicar:**
-1. Criar `Dockerfile` baseado em `python:3.11-slim`
-2. Testar localmente com `docker run`
-3. Fazer build e push para Azure Container Registry
-4. Atualizar App Service para usar imagem do ACR
+ Concluída a configuração de rede, confirmar que a instância atingiu o estado **running**, com a verificação de status concluída, e registrar o identificador e o endereço público atribuídos.
 
-**Passo 5 — Configurar Copilot Studio:**
-1. Acessar [Copilot Studio](https://copilotstudio.microsoft.com) via M365 Dev tenant
-2. Criar novo Copilot (agent)
-3. Adicionar ação customizada que chama URL do Azure App Service
-4. Configurar fluxo: receber texto → chamar API NLP → retornar intenção e confiança
-5. Testar em preview dentro do Copilot Studio
-6. Publicar para Teams
+<div align="center">
+<sub>Imagem 3.7.5 - Passo 4 — Regras de entrada configuradas no grupo de segurança da instância</sub><br>
+  <img src="../assets/deploy/passo_4.png" width="90%" alt="Tela de edição de regras de entrada do grupo de segurança do Amazon EC2 exibindo as regras HTTP na porta 80, HTTPS na porta 443 e SSH na porta 22"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
-**Passo 6 — Integração com Power Automate (Opcional):**
-1. Criar cloud flow acionado por evento (ex: novo documento no SharePoint)
-2. Chamar ação customizada do Copilot Studio ou diretamente API do Azure App Service
-3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
-4. Enviar notificação para usuário via Teams
+##### Passo 5 — Acessar a instância e confirmar o provisionamento
 
-#### 3.6.4 Exemplo de API (Flask)
+ Este passo encerra a configuração porque é o único que comprova que ela funcionou. Uma instância em estado **running** apenas indica que a máquina virtual foi iniciada; não indica que ela é alcançável. Enquanto o acesso não é estabelecido, um erro na regra da porta 22, no par de chaves ou na rede permanece invisível, e seria descoberto apenas na etapa de implantação, quando o custo de diagnosticá-lo é maior.
 
+ Há dois caminhos de acesso. O primeiro não depende de configuração local e serve para uma verificação rápida; o segundo é o que a equipe utiliza no trabalho corrente e o único que permite copiar arquivos para a instância.
+
+**Acesso pelo navegador, via EC2 Instance Connect.** Selecionar a instância no console do EC2, acionar **Conectar** e escolher a conexão pelo próprio navegador. Não exige chave nem cliente instalado, e foi o caminho utilizado para a verificação registrada na Imagem 3.7.6, em que o prompt confirma o usuário `ec2-user` e o sistema Amazon Linux 2023.
+
+**Acesso por SSH, a partir da máquina da equipe.** No Amazon Linux, o usuário padrão é `ec2-user`:
+
+```bash
+# Linux ou macOS
+ssh -i ~/.ssh/az1-key.pem ec2-user@<endereco-publico-da-instancia>
+```
+
+```powershell
+# Windows — o cliente SSH já acompanha o sistema
+ssh -i .\az1-key.pem ec2-user@<endereco-publico-da-instancia>
+```
+
+ Para transferir arquivos, o mesmo par de chaves atende:
+
+```bash
+scp -i ~/.ssh/az1-key.pem arquivo.txt ec2-user@<endereco-publico-da-instancia>:~/
+```
+
+**Quando o acesso falha,** a causa costuma estar em uma destas quatro condições, verificáveis nesta ordem:
+
+| Sintoma | Causa provável | Verificação |
+|---|---|---|
+| A conexão fica pendente e expira | A porta 22 não está liberada para o endereço de origem | Conferir a regra de entrada do grupo de segurança e o endereço público atual da máquina da equipe |
+| `Permission denied (publickey)` | Chave incorreta ou nome de usuário errado | Confirmar o par de chaves associado à instância e o uso de `ec2-user` como usuário |
+| `UNPROTECTED PRIVATE KEY FILE` | Permissões do arquivo `.pem` abertas | Reaplicar as permissões definidas no Passo 3 |
+| O endereço não responde após uma retomada | O endereço público mudou ao parar e iniciar a instância | Obter o novo endereço no console e atualizar os acessos |
+
+<div align="center">
+<sub>Imagem 3.7.6 - Passo 5 — Sessão estabelecida com a instância pelo EC2 Instance Connect</sub><br>
+  <img src="../assets/deploy/passo_5.png" width="90%" alt="Terminal do EC2 Instance Connect conectado à instância az1-app, exibindo o banner do Amazon Linux 2023 e o prompt do usuário ec2-user"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+##### Limites da sessão e retomada do ambiente
+
+ A sessão de 4 horas define o ritmo de trabalho no ambiente e tem duas consequências que não decorrem da configuração da instância, mas condicionam tudo o que se apoia nela.
+
+ A primeira é que **a instância é interrompida ao fim da sessão**. O que sobrevive à interrupção é o volume de disco, com o sistema operacional e os arquivos gravados; o que não sobrevive são os processos em execução, que precisam ser iniciados novamente a cada retomada. Isso é o que torna o item registrado na Seção 3.7.9 relevante para o Agendador: verificações periódicas pressupõem um serviço continuamente no ar, e o ambiente acadêmico não oferece essa garantia.
+
+ A segunda é que **o endereço público é reatribuído a cada retomada**. Toda configuração que referencie o endereço da instância precisa ser atualizada, e o endereço corrente deve ser reconsultado no console antes de cada acesso.
+
+> [PENDENTE — verificar se o laboratório permite associar um endereço IP elástico à instância, o que tornaria o endereço fixo entre sessões e eliminaria essa etapa.]
+
+ Ao encerrar o trabalho, a instância deve ser parada pelo console, para não consumir crédito enquanto não estiver em uso, e o crédito remanescente deve ser registrado para acompanhamento do orçamento ao longo do projeto.
+
+##### Etapas subsequentes da implantação
+
+ Concluída a configuração da instância, a implantação prossegue pelas etapas abaixo, que dependem do empacotamento das aplicações e estão especificadas nas seções indicadas. A ordem reflete a cadeia de dependências entre elas: cada etapa pressupõe a anterior.
+
+| Etapa | Especificação | Pressupõe |
+|---|---|---|
+| Preparação do sistema operacional da instância: atualização dos pacotes, instalação do `git` e configuração do fuso horário para `America/Sao_Paulo` | Seção 3.7.4 | Acesso à instância estabelecido |
+| Instalação do runtime de contêiner na instância | Seção 3.7.6 | Sistema operacional preparado |
+| Preparação do backend para empacotamento: estruturação do projeto Python em `src/nlp-deploy/`, implementação dos endpoints `/classify`, `/audio` e `/health`, exportação do modelo treinado para `model/` e declaração das dependências em `requirements.txt` | Seção 3.7.5 | Definição do classificador, registrada no item 5 da Seção 3.7.9 |
+| Construção das imagens de frontend e backend | Seção 3.7.5 e Seção 3.7.6 | Código do backend e do frontend estabilizado |
+| Criação dos repositórios e publicação das imagens no Amazon ECR | Seção 3.7.6 | Imagens construídas |
+| Provisionamento do PostgreSQL e aplicação dos schemas `portfolio` e `auditoria` | Seção 3.7.2 e Seção 3.7.9 | Decisão sobre a forma de hospedagem, registrada no item 1 da Seção 3.7.9 |
+| Criação do bucket no Amazon S3 e habilitação do serviço de transcrição | Seção 3.7.2, conexões C5 e C8 | Serviços confirmados no catálogo do laboratório |
+| Registro da cadeia de conexão do banco e das chaves de serviço como variáveis de ambiente da instância, com o par de chaves e o `.env` mantidos fora do repositório | Seção 3.7.4, Passo 3 | Serviços provisionados |
+| Subida dos contêineres e publicação das portas na instância | Seção 3.7.2, conexões C10 e C11 | Imagens publicadas no registro |
+| Configuração do pipeline de entrega contínua | Seção 3.7.6 | Imagens e ambiente de destino existentes |
+| Integração com o ecossistema Microsoft | Seção 3.7.8 | Promoção da solução para o ambiente do parceiro |
+
+#### 3.7.5 Exemplo de API (Flask)
 
 ```python
 # src/nlp-deploy/app.py
@@ -2670,9 +3195,9 @@ app = Flask(__name__)
 # Carregar modelo
 modelo = joblib.load("model/model.joblib")
 
-# Conexão com banco (Azure SQL ou Postgres)
+# Conexão com banco
 # Para dev local: sqlite:///local.db
-# Para Azure SQL: mssql+pyodbc://user:pass@server.database.windows.net/db
+# Para PostgreSQL: postgresql+psycopg://user:senha@host:5432/az1db
 DATABASE_URL = "sqlite:///./classifications.db"
 engine = create_engine(DATABASE_URL)
 
@@ -2728,30 +3253,69 @@ EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 ```
 
-#### 3.6.5 Reprodutibilidade e Verificação
+#### 3.7.6 Processo de Entrega Contínua
 
-**Checklist de controle de custo:**
-- [ ] Azure App Service em tier Free (1 instância)
-- [ ] Azure SQL Database com free tier (primeiros 12 meses)
-- [ ] Cognitive Services em free tier (limites respeitados)
-- [ ] Elegibilidade e licenciamento do ambiente Microsoft confirmados
-- [ ] Nenhum recurso em tier "Standard" ou "Premium" ativo
+O diagrama da Seção 3.7.2 descreve o **estado final** da implantação. Esta seção descreve o **caminho** até ele: o que acontece entre um commit e a imagem em execução, apoiado no fluxo de branches definido no documento de Gestão de Configuração.
 
-**Checklist de funcionalidade:**
-- [ ] Azure App Service com status "Running"
-- [ ] Endpoint `/health` retorna 200 OK
-- [ ] Endpoint `/classify` processa requisições POST
-- [ ] Copilot Studio consegue chamar API
-- [ ] Resposta do agente aparece em Teams
-- [ ] Logs aparecem em Application Insights
-- [ ] Dados são gravados em banco (se integrado)
+**Etapas do pipeline:**
+
+| Etapa | O que faz | Ferramenta |
+|---|---|---|
+| 01 — Lint | Verifica padrão de código no backend e no frontend | `ruff` · `eslint` |
+| 02 — Testes | Executa a suíte automatizada e apura a cobertura | `pytest` |
+| 03 — Build | Constrói as imagens de frontend e de backend | Docker |
+| 04 — Registro | Publica as imagens no Amazon ECR | `docker push` |
+| 05 — Deploy | Faz a instância obter a imagem e aplica as migrações do banco | `docker pull` |
+| 06 — Verificação | Confirma que a aplicação respondeu após subir | `GET /health` |
+
+**Gatilhos e destinos:**
+
+| Gatilho | Etapas executadas | Destino | Aprovação |
+|---|---|---|---|
+| `push` em `feature/*` ou `fix/*` | 01 a 03 | Nenhum ambiente | Automática — a falha bloqueia o Merge Request |
+| `merge` em `develop` | 01 a 06 | Ambiente de homologação | Automática, após Merge Request aprovado por revisor |
+| `merge` em `main` com tag `vX.Y.Z` | 01 a 06 | Ambiente de produção | Manual, por portão no pipeline |
+| `hotfix/*` a partir de `main` | 01 a 06 | Ambiente de produção | Manual, com merge de retorno obrigatório para `develop` |
+
+As quatro rotas compartilham as mesmas quatro primeiras etapas e divergem apenas no destino. É isso que torna o processo auditável: a imagem que entra em produção é exatamente a mesma que passou pelos testes e que já rodou em homologação, identificada pela tag da versão.
+
+**Rollback:** a versão anterior é restaurada fazendo a instância obter do Amazon ECR a imagem da tag imediatamente anterior e subir o contêiner novamente. Como as imagens permanecem no registro, o procedimento não depende de reconstruir o código.
+
+**Ambiente local:** antes da etapa 01, o desenvolvimento roda com `docker compose up`, que sobe backend, frontend e banco a partir das mesmas imagens usadas pelo pipeline. É essa paridade entre desenvolvimento e implantação que justifica a adoção do Docker registrada na Seção 2.5.
+
+#### 3.7.7 Reprodutibilidade e Verificação
+
+ A reprodutibilidade da implantação é verificada em duas frentes complementares. A primeira apura se o ambiente permanece dentro dos limites do crédito acadêmico; a segunda, se a solução implantada responde conforme especificado.
+
+**Controle de consumo do ambiente acadêmico:**
+
+| Verificação | Critério |
+|---|---|
+| Porte das instâncias | Dimensionadas no menor porte que atenda ao MVP |
+| Instâncias ociosas | Interrompidas quando não estiverem em uso, uma vez que o crédito é consumido por tempo de execução |
+| Armazenamento do registro de imagens | Imagens antigas removidas do Amazon ECR |
+| Consumo de crédito | Acompanhado a cada sessão do laboratório |
+| Vigência do acesso | Elegibilidade e validade do acesso ao AWS Academy confirmadas |
+
+**Verificação funcional da solução implantada:**
+
+| Verificação | Resultado esperado |
+|---|---|
+| Contêineres de frontend e backend | Em execução na instância |
+| `GET /health` | Retorna `200 OK` |
+| `POST /classify` | Processa a requisição e devolve a intenção classificada |
+| `POST /audio` | Aceita o arquivo de áudio e devolve a transcrição |
+| Chat UI | Carrega no navegador e se comunica com o backend |
+| Persistência | Registros gravados nos schemas `portfolio` e `auditoria` |
+| Armazenamento de objetos | Prompts lidos do bucket no Amazon S3 |
+| Observabilidade | Eventos e métricas visíveis no nó de Rastreabilidade |
 
 **Exemplo de requisição ponta a ponta:**
 
 > A URL abaixo é ilustrativa e deverá ser substituída pela URL real após a execução do deploy.
 
 ```bash
-curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
+curl -X POST http://<endereco-da-instancia>:8000/classify \
   -H "Content-Type: application/json" \
   -d '{"text": "Qual o prazo do marco de licenciamento ambiental da Linha 6?"}'
 ```
@@ -2768,21 +3332,42 @@ curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
 }
 ```
 
-#### 3.6.6 Próximos Passos para Produção
+#### 3.7.8 Próximos Passos para Produção
 
-Quando a solução for promovida para ambiente real do Metrô:
+ O ambiente de produção do parceiro é o ecossistema Microsoft, e o ambiente acadêmico é o AWS Academy. A promoção para produção envolve, portanto, uma troca de provedor, e não apenas uma troca de assinatura. É a portabilidade da pilha, descrita na Seção 3.7.1, que torna essa troca viável sem reescrita do núcleo.
 
-1. **Migrar banco de dados:** De Azure SQL (free 12m) para SQL Server corporativo ou similar
-2. **Copilot Studio em produção:** Usar tenant corporativo em vez de sandbox M365 Dev
-3. **Power Automate com SharePoint real:** Conectar a documentos e listas de verdade
-4. **Entra ID:** Integrar autenticação corporativa do Metrô
-5. **Compliance e segurança:** Implementar audit logs, DLP (Data Loss Prevention), conformidade com políticas corporativas
+Quando a solução for promovida para o ambiente real do Metrô:
 
-Toda a arquitetura permanece igual; apenas migram os recursos para ambientes gerenciados pelo Metrô.
+1. **Migrar as imagens:** publicar as mesmas imagens de contêiner no registro do ambiente de destino, sem alteração de código;
+2. **Migrar o banco de dados:** transferir os schemas `portfolio` e `auditoria` para a instância PostgreSQL corporativa;
+3. **Substituir os serviços gerenciados:** trocar Amazon Transcribe, Amazon S3 e Amazon CloudWatch pelos equivalentes do ambiente de destino, o que afeta apenas as camadas de integração, e não a lógica de negócio;
+4. **Copilot Studio e Power Automate:** integrar o agente ao tenant corporativo e conectar os fluxos aos documentos e listas efetivamente utilizados pelo PMO;
+5. **Microsoft Entra ID:** integrar a autenticação corporativa do Metrô ao Controle de Acesso;
+6. **Compliance e segurança:** implementar retenção de logs de auditoria, Data Loss Prevention (DLP) e conformidade com as políticas corporativas.
 
-#### 3.6.7 Observações Finais
+ A arquitetura em nós e os caminhos de comunicação permanecem os mesmos; o que muda são os serviços que ocupam cada nó.
 
-Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossistema Microsoft do parceiro. A reprodutibilidade será confirmada após a execução dos passos e a inclusão das evidências. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
+#### 3.7.9 Decisões Técnicas em Aberto
+
+O desenho da implantação expôs pontos que ainda dependem de decisão da equipe. Eles estão registrados aqui para que sejam fechados antes da implementação, e não durante ela.
+
+| # | Ponto em aberto | Impacto | Encaminhamento |
+|---|---|---|---|
+| 1 | A forma de hospedagem do PostgreSQL não está definida | Alto — muda o provisionamento, o custo em crédito e o procedimento de retomada após a expiração da sessão | Decidir entre serviço gerenciado e contêiner na própria instância EC2, verificando antes o que está liberado no laboratório |
+| 2 | O bucket S3 guarda apenas "Armazenamento de Prompts" | Médio — o RF03 exige repositório de documentos com metadados para citar a fonte | Definir se os documentos sintéticos ficam nesse mesmo nó e ajustar o rótulo |
+| 3 | O provedor do LLM não está definido | Médio — muda a fronteira de rede, a autenticação e o custo | Confirmar qual serviço será consumido e se ele está disponível no ambiente acadêmico |
+| 4 | As sessões do laboratório expiram e interrompem as instâncias | Alto — conflita com a disponibilidade contínua pressuposta pelo Agendador e pelos alertas do RF05 | Definir o procedimento de retomada e avaliar o impacto sobre as verificações periódicas |
+| 5 | Convivem no documento um classificador local e uma API de modelo de linguagem | Médio — muda o que é empacotado na imagem do backend | Definir se a classificação de intenções roda no modelo local e o LLM responde apenas pela geração |
+| 6 | A Seção 2.5 define FastAPI, mas o exemplo da Seção 3.7.5 usa Flask | Baixo — o exemplo não corresponde à pilha documentada | Reescrever o exemplo em FastAPI ou registrar a mudança de decisão na Seção 2.5 |
+| 7 | O diagrama prevê dois nós de execução, mas o ambiente acadêmico comporta consolidá-los em uma única instância | Médio — muda o consumo de crédito, o grupo de segurança e as portas publicadas | Decidir entre uma instância com dois contêineres e duas instâncias separadas, considerando o crédito disponível |
+| 8 | O endereço público da instância muda a cada retomada da sessão | Médio — invalida configurações e acessos registrados entre uma sessão e outra | Verificar se o laboratório permite associar um endereço IP elástico e, em caso negativo, definir onde o endereço corrente será registrado |
+| 9 | Apenas o Amazon EC2 teve disponibilidade confirmada no laboratório | Alto — a arquitetura da Seção 3.7.2 pressupõe também ECR, S3, Transcribe e CloudWatch | Confirmar o catálogo liberado e definir a alternativa para cada serviço indisponível, conforme discutido na Seção 3.7.3 |
+| 10 | O crédito de US$ 50 é consumido por tempo de instância ligada, e não por uso | Médio — uma instância esquecida em execução consome o crédito de toda a equipe | Definir a responsabilidade pela interrupção da instância ao fim de cada sessão e o acompanhamento periódico do saldo |
+| 11 | A regra de SSH do grupo de segurança está aberta para `0.0.0.0/0` | Alto — expõe a porta 22 da instância a tentativas de acesso de qualquer origem da internet | Restringir a origem ao endereço da equipe em notação `/32`, conforme a Seção 3.7.4, e definir quem atualiza a regra quando esse endereço mudar |
+
+#### 3.7.10 Observações Finais
+
+Este deploy foi estruturado como uma prova de conceito técnica sobre um ambiente concedido pela instituição de ensino, sem custo para a equipe. A conteinerização e a escolha de uma pilha de código aberto asseguram que a mesma imagem validada em desenvolvimento seja a promovida para os demais ambientes, e que a solução não fique presa ao provedor utilizado no MVP — condição para que a promoção futura ao ecossistema Microsoft do parceiro seja uma troca de infraestrutura, e não uma reescrita. A reprodutibilidade será confirmada após a execução dos passos descritos e a inclusão das evidências correspondentes. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 
 ### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
 
@@ -2790,7 +3375,7 @@ Esta seção define como a solução será desenvolvida, integrada, testada e im
 
 A distribuição das entregas considera três fatores: a ordem de dependência entre os componentes, o prazo de duas semanas de cada sprint e a necessidade de manter, a cada ciclo, uma versão demonstrável da solução para o parceiro.
 
-#### 3.9.1 Princípios da estratégia
+#### 3.8.1 Princípios da estratégia
 
 - **Entrega incremental e integrada.** Cada componente novo entra conectado ao que já existe. Nenhuma frente é construída isoladamente para ser integrada apenas no encerramento do módulo.
 - **Fluxo principal primeiro.** A Sprint 3 concentra o caminho que atravessa toda a solução: entrada do usuário, transcrição, processamento de linguagem natural e resposta na interface. As sprints seguintes ampliam, persistem e distribuem esse fluxo.
@@ -2798,7 +3383,7 @@ A distribuição das entregas considera três fatores: a ordem de dependência e
 - **Testes acompanhando a construção.** O planejamento dos testes ocorre na mesma sprint em que o componente é construído, e a execução ocorre na sprint seguinte, de modo que nenhuma funcionalidade chegue ao encerramento sem verificação.
 - **Implantação antecipada.** O deploy em nuvem é iniciado na Sprint 4, e não no fechamento do projeto, para que eventuais problemas de ambiente sejam identificados enquanto ainda há tempo de correção.
 
-#### 3.9.2 Calendário e foco de cada sprint
+#### 3.8.2 Calendário e foco de cada sprint
 
 | Sprint | Período | Foco da sprint |
 |---|---|---|
@@ -2808,7 +3393,7 @@ A distribuição das entregas considera três fatores: a ordem de dependência e
 
 As três sprints têm duração de duas semanas, iniciando na segunda-feira e encerrando na sexta-feira da semana seguinte. A distribuição nominal das tarefas entre os integrantes é registrada na matriz de papéis e responsabilidades do documento de [Gestão do Projeto](GestaoProjeto.md) e nas issues do GitLab, que permanecem como fonte oficial do acompanhamento.
 
-#### 3.9.3 Linha do tempo das frentes de trabalho
+#### 3.8.3 Linha do tempo das frentes de trabalho
 
 <div align="center">
   <sub>FIGURA 3.1 — Linha do tempo de entrega das Sprints 3, 4 e 5</sub><br>
@@ -2820,7 +3405,7 @@ A figura apresenta as frentes de trabalho em linhas e as sprints em colunas. As 
 
 A leitura horizontal evidencia o caráter incremental da estratégia: nenhuma frente aparece isolada em uma única coluna. A API de áudio, construída na Sprint 3, permanece em manutenção e integração nas sprints seguintes; o banco de dados é preparado na Sprint 3 pela modelagem, construído na Sprint 4 e otimizado na Sprint 5; e a integração entre frontend e backend acontece progressivamente desde a Sprint 3, sendo concluída apenas na Sprint 5.
 
-#### 3.9.4 Distribuição das entregas entre as sprints
+#### 3.8.4 Distribuição das entregas entre as sprints
 
 A tabela relaciona cada entrega prevista para o módulo com o estado esperado ao final de cada sprint. Os estados utilizados são: **Preparação**, quando a frente é apenas planejada ou modelada; **Construção**, quando é efetivamente implementada; **Evolução**, quando recebe incrementos sobre uma base já funcional; e **Consolidação**, quando é finalizada, integrada e documentada em definitivo.
 
@@ -2836,7 +3421,7 @@ A tabela relaciona cada entrega prevista para o módulo com o estado esperado ao
 | Deploy da solução | Preparação (ambiente local) | Construção (nuvem) | Consolidação |
 | Testes sistêmicos | Planejamento | Execução | Complementação |
 
-#### 3.9.5 Sprint 3 — Construção do fluxo principal
+#### 3.8.5 Sprint 3 — Construção do fluxo principal
 
 O objetivo da sprint é colocar em funcionamento o caminho completo entre a solicitação do usuário e a resposta apresentada na interface, ainda que com escopo reduzido de funcionalidades e sem persistência definitiva.
 
@@ -2855,7 +3440,7 @@ O objetivo da sprint é colocar em funcionamento o caminho completo entre a soli
 - as seções técnicas correspondentes deste documento estão atualizadas;
 - o plano de testes está registrado e aprovado pela equipe.
 
-#### 3.9.6 Sprint 4 — Persistência, integrações e implantação
+#### 3.8.6 Sprint 4 — Persistência, integrações e implantação
 
 O objetivo da sprint é dar durabilidade e alcance à solução: o que era processado em memória passa a ser armazenado, o sistema passa a reagir a eventos externos e a aplicação passa a existir em um ambiente de nuvem acessível ao parceiro.
 
@@ -2874,7 +3459,7 @@ O objetivo da sprint é dar durabilidade e alcance à solução: o que era proce
 - a aplicação está acessível em ambiente de nuvem;
 - os testes planejados foram executados e as evidências estão registradas.
 
-#### 3.9.7 Sprint 5 — Mensageria, interface completa e consolidação
+#### 3.8.7 Sprint 5 — Mensageria, interface completa e consolidação
 
 O objetivo da sprint é fechar a solução: desacoplar o processamento por meio de mensageria, concluir a interface e garantir que todos os componentes operem de forma integrada e verificada.
 
@@ -2893,13 +3478,13 @@ O objetivo da sprint é fechar a solução: desacoplar o processamento por meio 
 - todas as funcionalidades do frontend consomem as APIs do backend com tratamento de falhas;
 - a documentação final está consolidada e o processo de implantação é reprodutível.
 
-#### 3.9.8 Integração entre as frentes e ambientes
+#### 3.8.8 Integração entre as frentes e ambientes
 
 A integração entre as frentes segue o fluxo Gitflow definido no documento de [Gestão de Configuração](GestaoConfiguracao.md). Cada frente é desenvolvida em uma branch própria, vinculada a uma issue, e integrada por Merge Request revisado por outro integrante. A branch `develop` concentra a integração contínua do trabalho da sprint; a branch de homologação recebe a versão estabilizada para verificação; e a branch principal recebe apenas versões concluídas e validadas.
 
 A separação entre os ambientes acompanha essa estrutura: o ambiente de desenvolvimento é executado localmente em contêineres desde a Sprint 3; o ambiente de homologação é utilizado para verificar a versão candidata antes da entrega; e o ambiente de produção, configurado na Sprint 4, hospeda a versão demonstrável ao parceiro. A automação de verificação, composta pela análise estática e pela execução da suíte de testes a cada integração, é incorporada ao repositório na Sprint 4, junto com a configuração do deploy.
 
-#### 3.9.9 Estratégia de testes ao longo das sprints
+#### 3.8.9 Estratégia de testes ao longo das sprints
 
 A verificação é distribuída entre as três sprints, de modo que o planejamento anteceda a execução e a complementação encerre as lacunas identificadas.
 
@@ -3036,6 +3621,34 @@ O roteiro e o storyboard demonstram uma experiência proativa ao longo do tempo;
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
+##### Evolução: da simulação à interface funcional
+
+Após a exploração do protótipo simulado, a interface conversacional definida no formato da [seção 4.3.2](#432-alternativa-b-interface-de-interação-sob-demanda) evoluiu para uma **implementação funcional em React**, construída entre 25 e 26 de agosto de 2026 na branch `feat/contruir-interface`. A implementação preserva a estrutura convencional de chatbot adotada na prototipação — sidebar de conversas, histórico e campo de entrada — e mantém a identidade visual metroviária e a entrada por voz como elementos centrais da interação sob demanda.
+
+A aplicação está no diretório `frontend/` do repositório, construída com **React 19** e **Vite**, estilização com **Tailwind CSS 4** e animações com **framer-motion**. A interface é organizada em quatro abas — **Chat**, **Voz**, **Agenda** e **Tarefas** —, com modal de configurações (tema claro/escuro/sistema), compartilhamento e layout responsivo com navegação inferior no mobile. A camada `frontend/src/lib/api.js` já prepara a integração com o backend (`/api/v1/chat`, `/api/v1/audio`, `/api/v1/tasks`, `/api/v1/calendar/events`), com fallbacks quando os serviços estão indisponíveis: o chat responde com mensagem fixa e as abas de Agenda e Tarefas exibem dados sintéticos do contexto do Metrô. Para executar localmente: `cd frontend && npm ci && npm run dev`.
+
+As capturas a seguir registram a evolução em três momentos: a interface conversacional real substituindo o mockup estático, a entrada de voz com captura real de microfone e a expansão para novas telas além do escopo original do protótipo.
+
+<div align="center">
+<sub>Imagem 4.4.3 - Interface funcional em modo escuro: tela inicial do chat, com sidebar de conversas, histórico e barra de prompt</sub><br>
+  <img src="../assets/design/interface-1-tela-inicial.png" width="100%" alt="Tela inicial da interface funcional do agente AZ1, com sidebar de conversas, pergunta 'Como posso ajudar?' e barra de prompt"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+<div align="center">
+<sub>Imagem 4.4.4 - Entrada de voz ativa na barra de prompt: a onda sonora reage ao volume real do microfone, evolução em relação à gravação simulada do protótipo</sub><br>
+  <img src="../assets/design/interface-2-entrada-de-voz.png" width="100%" alt="Interface do agente AZ1 com entrada de voz ativa, exibindo o estado 'Ouvindo...' e a onda sonora na barra de prompt"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+<div align="center">
+<sub>Imagem 4.4.5 - Aba de Tarefas: expansão da interface além do escopo do protótipo, com navegação por abas (Chat, Voz, Agenda e Tarefas) e pendências priorizadas por projeto</sub><br>
+  <img src="../assets/design/interface-3-aba-tarefas.png" width="100%" alt="Aba de tarefas da interface do agente AZ1, com lista de pendências priorizadas por projeto e navegação lateral por abas"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+Diferentemente do protótipo, em que gravação, transcrição e resposta eram simuladas, a interface funcional captura o áudio do microfone de verdade para animar a onda sonora — o hook `useMicVolume` usa a Web Audio API para medir o volume da fala. Permanecem como limites do estado atual, a serem conectados nas próximas sprints junto à integração de STT/TTS: o áudio ainda não é enviado ao endpoint `/api/v1/audio` e o chat ainda não possui processamento de linguagem natural real. Essa distinção é mantida explícita porque a semelhança da interface com produtos reais gera expectativa de funcionamento real — e a documentação não deve sugerir comportamentos ainda não implementados.
+
 
 ### 4.5 Diário de Construção dos Dois Protótipos
 
@@ -3084,6 +3697,8 @@ Para manter a rastreabilidade, os registros são classificados assim:
 #### Protótipo B — Interface de Interação Sob Demanda
 
 **20/08/2026 — Início da construção.** Decidimos partir da estrutura convencional de chatbot (sidebar de conversas, histórico de mensagens, campo de entrada), sem inovação de layout, para que a investigação ficasse concentrada no comportamento do agente e não na interface em si. A identidade visual usa a sinalização do Metrô (bolachas de linha, tipografia de placa, faixas de cor) apenas como camada de reconhecimento do contexto.
+
+**Demonstração audiovisual:** [assistir ao vídeo do Protótipo B](../assets/Vídeos/Vídeo-B.mp4).
 
 <div align="center">
 <sub>Imagem 4.5.1 - Primeiro estado da interface: apenas interação por texto, ainda incompleta</sub><br>
@@ -3174,13 +3789,9 @@ As fotografias mostram os participantes, ambientes e equipamentos usados na grav
 
 ###### Evidência bruta da execução do Protótipo B
 
-Não foi localizado no repositório um vídeo contínuo e sem edição da sessão. O espaço abaixo deve ser substituído somente depois que a mídia real for anexada e verificada.
+**Registro audiovisual da execução:** [assistir ao vídeo da execução do Protótipo B](../assets/Vídeos/Vídeo-B.mp4). O vídeo registra a interação sob demanda em uma situação comum e em situações fora do escopo do mockup, evidenciando a falha do protótipo diante do pedido de dado estruturado e a improvisação necessária do facilitador. Fonte: registro bruto do grupo.
 
-> **EVIDÊNCIA NÃO ANEXADA — Execução bruta e contínua do Protótipo B.** Após a gravação, esta legenda deverá registrar a interação sob demanda em uma situação comum e em uma situação ambígua, evidenciando a falha do protótipo e a improvisação necessária. Fonte: registro bruto do grupo.
-
-**Arquivo esperado:** `docs/evidencias/prototipo-b-execucao-bruta.mp4` — **não anexado**.
-
-**Como foi rodado, segundo o registro da equipe:** a sessão ocorreu em 25 de agosto de 2026, às 9h30, na biblioteca da faculdade, com duração aproximada de 30 minutos. Roberto Filho, aluno de Engenharia de Software, representou um analista de PMO e recebeu apenas o contexto mínimo ("você é analista do PMO e precisa encontrar documentos e informações dos projetos"), sem tutorial. A primeira parte foi de uso livre; na segunda, foram propostos pedidos fora do escopo. O nome “Felipe” e as iniciais “FS” nas capturas pertencem à persona fixa do mockup, não ao participante. Não há vídeo da sessão; os resultados abaixo dependem das anotações declaradas pela equipe e de uma captura do fallback.
+**Como foi rodado:** a sessão ocorreu em 25 de agosto de 2026, às 9h30, na biblioteca da faculdade, com duração aproximada de 30 minutos. Roberto Filho, aluno de Engenharia de Software, representou um analista de PMO e recebeu apenas o contexto mínimo ("você é analista do PMO e precisa encontrar documentos e informações dos projetos"), sem tutorial. A primeira parte foi de uso livre; na segunda, foram propostos pedidos fora do escopo. O nome “Felipe” e as iniciais “FS” nas capturas pertencem à persona fixa do mockup, não ao participante. Os resultados abaixo se apoiam no vídeo da execução, nas anotações da equipe e na captura do fallback.
 
 **O que aconteceu (não o que se esperava):**
 
@@ -3194,17 +3805,14 @@ Não foi localizado no repositório um vídeo contínuo e sem edição da sessã
 
 **Improvisos registrados:** Em ambas as falhas foi necessário intervir verbalmente — explicar que a decisão sobre consultas ao banco está em aberto e que o fluxo de voz é simulado. Cada intervenção verbal indica um comportamento que o sistema real precisará definir.
 
-As falas e reações detalhadas dependem das anotações declaradas pela equipe; a captura da Imagem 4.6.1 comprova visualmente o estado de falha do protótipo, mas não registra toda a sessão.
+As falas e reações detalhadas estão registradas no vídeo da execução; a captura da Imagem 4.6.1 complementa o registro ao destacar o estado de falha do protótipo.
 
 | Evidência existente | Etapa registrada | Cenário e ação | Resposta e resultado | Falha, limite ou improvisação | Fonte |
 |---|---|---|---|---|---|
-| Estados 4.5.1 a 4.5.4 | construção | evolução da interface de texto para voz, confirmação e permissão | mostram decisões materializadas em telas | não registram uma pessoa operando o protótipo | arquivos PNG versionados |
-| Imagem 4.6.1 | estado atribuído à execução | consulta sobre ocorrências na L2 em julho | fallback genérico de busca documental | evidencia resposta inadequada ao tipo de pedido; não registra a interação completa nem a intervenção verbal | captura PNG produzida pela equipe |
-| Relato consolidado da sessão | reconstrução posterior | tentativa de áudio e consulta fora do escopo | equipe declara que precisou explicar a simulação | não há áudio, vídeo ou anotações brutas anexadas que comprovem a fala e a improvisação | seção 4.6, baseada no relato da equipe |
-
-> **EVIDÊNCIA A SER ANEXADA PELA EQUIPE:** gravar ou anexar um registro bruto da execução do Protótipo B, incluindo uma situação difícil que leve o protótipo a falhar ou exija improvisação.
-
-**Roteiro curto para produzir a evidência ausente (não executado):** realizar uma gravação contínua, simples e sem edição, de aproximadamente três a cinco minutos. Mostrar a tela e, se possível, captar a voz do participante. Primeiro, pedir um documento claramente identificável. Depois, fazer um pedido vago, como “mostre o cronograma atualizado”, sem informar o projeto. Por fim, solicitar um dado estruturado fora do fluxo documental, como “quantas ocorrências houve na L2 em julho?”. Manter a gravação quando o protótipo não souber responder e registrar qualquer explicação ou decisão improvisada pelo facilitador. Salvar o arquivo em `assets/Vídeos/` e substituir esta pendência por link, legenda, participantes, data e momentos aproximados da consulta normal, da falha e da improvisação.
+| [Vídeo B](../assets/Vídeos/Vídeo-B.mp4) | execução | uso livre, tentativa de áudio e consulta fora do escopo | registra a sessão, incluindo o percurso até o fallback e as intervenções do facilitador | materializa a falha diante do pedido de dado estruturado e a improvisação verbal | arquivo MP4 versionado em `assets/Vídeos/` |
+| Estados 4.5.1 a 4.5.4 | construção | evolução da interface de texto para voz, confirmação e permissão | mostram decisões materializadas em telas | registram a construção; a operação está registrada no vídeo da execução | arquivos PNG versionados |
+| Imagem 4.6.1 | execução | consulta sobre ocorrências na L2 em julho | fallback genérico de busca documental | evidencia a resposta inadequada ao tipo de pedido; a interação completa está no vídeo da execução | captura PNG produzida pela equipe |
+| Relato consolidado da sessão | registro da sessão | tentativa de áudio e consulta fora do escopo | equipe explica a natureza simulada dos fluxos | documenta as intervenções verbais realizadas | seção 4.6, com o vídeo da execução |
 
 <div align="center">
 <sub>Imagem 4.6.1 - Fallback exibido durante a execução, diante do pedido de dado estruturado ("quantas ocorrências teve na L2 em julho?")</sub><br>
@@ -3221,15 +3829,15 @@ A comparação separa o que está evidenciado no material do que permanece sem c
 | Início da interação | O agente inicia a recomendação | O usuário inicia a consulta | Nível de proatividade aceitável |
 | Ambiguidade central | O roteiro explicita que contexto visível não revela necessariamente intenção | Pedidos curtos podem omitir projeto, período, fonte ou tipo de informação | Quando pedir confirmação |
 | Controle do usuário | Aceitar e recusar estão representados, mas o significado da recusa não foi definido | O usuário controla o momento, mas depende dos limites do chat | Como adiar, configurar ou silenciar interações |
-| Limite ou falha | Durante a gravação, a equipe identificou a dependência exclusiva do canal visual e improvisou a Cena 10 com áudio; a Cena 9 mantém separadamente o conflito contexto–intenção em aberto | A captura mostra fallback inadequado para pedido de dado estruturado, sem registrar a sessão completa | Testar os canais do A com usuários e registrar de forma contínua o percurso de falha do B |
+| Limite ou falha | Durante a gravação, a equipe identificou a dependência exclusiva do canal visual e improvisou a Cena 10 com áudio; a Cena 9 mantém separadamente o conflito contexto–intenção em aberto | O vídeo da execução e a captura registram o fallback inadequado para pedido de dado estruturado | Testar os canais do A com usuários e repetir o percurso de falha do B com usuários do parceiro |
 | Contribuição do formato | A encenação representa passagem do tempo, mudança de atividade e interrupção | A interface concretiza pedidos, desambiguação, permissões, versões e transcrição | Como esses efeitos aparecem com usuários do Metrô |
 | Limite | Não mede reação espontânea, fadiga ou precisão | Não mede frequência de intervenções nem integração real | Método comparativo com tarefas e participantes equivalentes |
 
 **O que apareceu somente no A:** a necessidade de definir um gatilho legítimo para recomendações, um limite de frequência, o significado do feedback e a permanência do histórico. O formato não baseado em interface digital permitiu encenar tempo, mudança de atividade e interrupção — relações que uma tela estática do chat não mostraria.
 
-**O que apareceu somente no B:** a construção materializou duplicatas de documentos, pedidos vagos, bloqueio por permissão, incerteza na transcrição e a fronteira entre documento e dado estruturado. Segundo o relato posteriormente consolidado pela equipe, a tentativa de operar controles que pareciam reais também revelou expectativas incompatíveis com a simulação; essa parte não possui registro bruto anexado.
+**O que apareceu somente no B:** a construção materializou duplicatas de documentos, pedidos vagos, bloqueio por permissão, incerteza na transcrição e a fronteira entre documento e dado estruturado. A tentativa de operar controles que pareciam reais também revelou expectativas incompatíveis com a simulação; essa parte está registrada no [vídeo da execução](../assets/Vídeos/Vídeo-B.mp4).
 
-**Interpretações posteriores:** no A, a construção tornou explícita a diferença entre estar no projeto correto e compreender a tarefa atual. No B, o registro da equipe relata que a familiaridade visual reduziu o custo de aprendizagem, mas aumentou a frustração quando áudio e resposta se revelaram simulados. A primeira conclusão decorre do roteiro e do diário consolidado; a segunda depende das anotações da sessão ainda não anexadas. A exploração não permite concluir que proatividade ou interação sob demanda seja superior.
+**Interpretações posteriores:** no A, a construção tornou explícita a diferença entre estar no projeto correto e compreender a tarefa atual. No B, o registro da equipe relata que a familiaridade visual reduziu o custo de aprendizagem, mas aumentou a frustração quando áudio e resposta se revelaram simulados. A primeira conclusão decorre do roteiro e do diário consolidado; a segunda decorre do vídeo da execução e das anotações da sessão. A exploração não permite concluir que proatividade ou interação sob demanda seja superior.
 
 ### 4.8 Limites da Exploração
 
@@ -3252,7 +3860,7 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 - **Voz simulada:** nada se conclui sobre a taxa de erro do ASR com o jargão do Metrô nem sobre o comportamento com ruído de ambiente.
 - **Sem SharePoint real:** nada se conclui sobre tempo de resposta, cobertura da base documental ou permissões reais.
 - **O participante do teste foi Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO:** a formulação de pedidos de um colaborador real, com vocabulário e pressa reais, só seria observada com usuários do Metrô.
-- **A execução foi registrada por anotações e capturas de tela, sem gravação de vídeo:** o registro depende do que foi anotado no momento; reações e hesitações do participante não ficaram integralmente documentadas.
+- **Sessão única de execução:** o vídeo registra uma única sessão com um participante; padrões de uso recorrente, fadiga e preferências ao longo do tempo não podem ser inferidos de uma execução isolada.
 
 #### Limites comuns e conclusão permitida
 
@@ -3310,7 +3918,7 @@ Esta seção registra os casos e situações usados durante a construção e a e
 - A frequência de recomendações precisa ser uma política explícita; o formato atual não permite determinar um limite aceitável.
 - A construção do B mostrou que pedidos vagos exigem desambiguação e que versões, permissões e tipos de fonte alteram a resposta esperada.
 - A baixa confiança na transcrição precisa ser comunicada e tratada antes de uma busca potencialmente errada.
-- O relato da sessão B indica que uma interface visualmente realista pode criar expectativas de funcionalidades que o protótipo não executa; essa interpretação depende das anotações brutas ainda não anexadas.
+- A sessão B mostrou que uma interface visualmente realista pode criar expectativas de funcionalidades que o protótipo não executa; essa interpretação está apoiada no vídeo da execução e nas anotações da equipe.
 - A inclusão da Cena 10 durante a gravação revelou que a proatividade não precisa depender exclusivamente de uma tela. O canal por fone foi materializado na encenação como improvisação declarada, mas sua utilidade, privacidade e operação por voz ainda não foram validadas com usuários.
 
 ### 4.12 Próximos Passos
@@ -3363,6 +3971,7 @@ Os bastidores ampliam o registro visual da construção, confirmam a participaç
 
 | Evidência | Formato | Etapa registrada | O que permite comprovar | Verificação |
 |---|---|---|---|---|
+| [Vídeo B](../assets/Vídeos/Vídeo-B.mp4) | MP4, 4,2 MB | execução da sessão | registro audiovisual da execução do B, incluindo o percurso até o fallback | arquivo, assinatura MP4 e link local verificados |
 | [Imagem 4.5.1](../assets/design/estado-1-somente-texto.png) | PNG | primeiro estado | interface apenas com texto e casos documentais | arquivo, link e conteúdo visual verificados |
 | [Imagem 4.5.2](../assets/design/estado-2-emoji.png) | PNG | estado intermediário | entrada por voz e saída em áudio representadas | arquivo, link e conteúdo visual verificados |
 | [Imagem 4.5.3](../assets/design/estado-2-voz-emoji.png) | PNG | estado intermediário | transcrição e confirmação de “AMV” | arquivo, link e conteúdo visual verificados |
@@ -3370,7 +3979,7 @@ Os bastidores ampliam o registro visual da construção, confirmam a participaç
 | [Imagem 4.4.2](../assets/design/mockup-agente.png) | PNG | demonstração | visão consolidada da alternativa sob demanda | arquivo, link e conteúdo visual verificados |
 | [Imagem 4.6.1](../assets/design/execucao-fallback-dado-estruturado.png) | PNG | execução declarada | estado do fallback para pedido estruturado | arquivo, link e conteúdo visual verificados; captura isolada não comprova toda a sessão |
 
-Não há gravação audiovisual da sessão B nem anotações brutas versionadas. As imagens comprovam estados da interface, mas não comprovam sozinhas as reações e falas atribuídas ao participante.
+O vídeo da execução registra a operação do protótipo pelo participante, incluindo as reações e falas descritas na seção 4.6; as imagens comprovam os estados da interface ao longo da construção.
 
 #### Matriz consolidada de evidências
 
@@ -3383,12 +3992,12 @@ Não há gravação audiovisual da sessão B nem anotações brutas versionadas.
 | Diário A da seção 4.5 | A | construção declarada | decisões e ambiguidades sistematizadas | percurso declarado pela equipe | parcialmente reconstruído posteriormente |
 | Imagens 4.5.1 a 4.5.4 | B | construção | estados inicial, intermediários e final | evolução material do mockup | capturas sem áudio e sem pessoa operando o protótipo |
 | Imagem 4.4.2 | B | demonstração | visão consolidada do mockup | existência da alternativa sob demanda | não comprova sessão de execução |
-| Imagem 4.6.1 | B | estado atribuído à execução | fallback para pedido estruturado | existência do estado inadequado ao pedido | captura isolada, sem continuidade nem improvisação registrada |
-| Relato da seção 4.6 | B | execução declarada | tentativa de voz, pedido fora do escopo e intervenções atribuídas à equipe | acontecimentos declarados | reconstrução posterior sem notas brutas, áudio ou vídeo anexados |
+| Imagem 4.6.1 | B | execução | fallback para pedido estruturado | existência do estado inadequado ao pedido | captura estática; a continuidade está registrada no vídeo da execução |
+| Relato da seção 4.6 | B | execução | tentativa de voz, pedido fora do escopo e intervenções da equipe | acontecimentos da sessão | complementa o vídeo da execução |
 | Commits `ceac0b1`, `33d1ba0`, `03ce12a` e `bb0f4ec` | A e B | versionamento | materiais próprios em branches distintas | desenvolvimento independente antes da consolidação | não comprova sequência minuto a minuto nem construção simultânea estrita |
 | Comparação entre `49fdfea` e `f888c2d` | A | atualização documental | roteiro sem a cena de áudio e versão posterior com a nova Cena 10 | comprova que a cena foi incorporada ao documento entre 11h09 e 12h19 de 27/08 | commits posteriores à gravação; não comprovam quando a decisão surgiu |
 | Roteiro, vídeo, bastidores e commits da Cena 10 | A | execução e reconstrução | limitação do canal exclusivamente visual e solução incorporada por áudio | materializa a falha relatada e o resultado da improvisação | o momento exato da decisão é sustentado pelo relato retrospectivo da equipe |
-| Vídeo bruto contínuo do B | B | execução difícil | **não anexado** | nenhum acontecimento pode ser comprovado antes da gravação | pendência reservada na seção 4.6 |
+| [Vídeo B](../assets/Vídeos/Vídeo-B.mp4) | B | execução | sessão de execução com uso livre, tentativa de áudio e pedido fora do escopo | operação do protótipo pelo participante, falha diante do pedido de dado estruturado e improvisação do facilitador | registra uma única sessão com um participante |
 
 #### Rastreabilidade entre rubrica e evidências
 
@@ -3400,17 +4009,17 @@ Não há gravação audiovisual da sessão B nem anotações brutas versionadas.
 | Construção paralela | histórico Git, estados do B e bastidores do A | Parcialmente atendido: há materiais independentes anteriores à consolidação | falta registro contemporâneo que demonstre a ordem e impeça refinamento prévio |
 | Diário | seção 4.5 | Parcialmente atendido: decisões, ambiguidades e impossibilidades estão registradas | falta diário bruto contínuo; parte foi sistematizada depois |
 | Execução do Protótipo A | vídeo A e roteiro | Atendido com ressalva: encenação foi realizada | vídeo é editado e roteirizado |
-| Execução do Protótipo B | relato e Imagem 4.6.1 | Parcialmente atendido | falta gravação contínua ou notas brutas da sessão |
+| Execução do Protótipo B | vídeo B, relato e Imagem 4.6.1 | Atendido: a sessão de execução está registrada em vídeo | nenhuma documental |
 | Falha do Protótipo A | Cena 10, vídeo final, Figuras 4.13.1 a 4.13.3, commits `49fdfea`/`f888c2d` e seção 4.6 | Atendido com ressalva: a dependência exclusiva da interface visual foi registrada como falha e originou a solução por áudio | o momento exato da decisão é uma reconstrução retrospectiva, explicitamente identificada |
-| Falha do Protótipo B | Imagem 4.6.1 | Parcialmente atendido: estado inadequado está visível | registrar o percurso que levou ao fallback |
-| Improvisações | Cena 10 do A, vídeo final, bastidores, commits `49fdfea`/`f888c2d`, relato da equipe e relato do B | Atendido no A com ressalva e parcial no B: o resultado da mudança do A está materializado, mas a ocorrência “na hora” permanece retrospectiva | registrar de forma bruta a intervenção ocorrida no B |
+| Falha do Protótipo B | vídeo B e Imagem 4.6.1 | Atendido: o percurso que levou ao fallback está registrado em vídeo e captura | nenhuma documental |
+| Improvisações | Cena 10 do A, vídeo final, bastidores, commits `49fdfea`/`f888c2d`, vídeo B e relato do B | Atendido: o resultado da mudança do A está materializado e a intervenção do B está registrada em vídeo | no A, a ocorrência “na hora” permanece sustentada pelo relato retrospectivo |
 | Comparação | seção 4.7 | Atendido: diferenças, achados exclusivos e ausência de vencedor | preservar distinção entre evidência e interpretação |
 | Limites | seção 4.8 | Atendido: limites específicos de ambos e de usuários reais | nenhuma documental |
 | Inventário de decisões | seção 4.9 | Atendido: opções, aspectos em jogo, origem e teste futuro | nenhuma documental |
-| Repertório de situações | seção 4.10 | Atendido com ressalva: inclui sucessos e lacunas | itens atribuídos à execução do B dependem do relato da equipe |
-| Documentação visual | seções 4.4 a 4.6 e 4.13 | Atendido com ressalva: vídeo, fotografias e capturas estão referenciados | falta registro bruto contínuo da execução e improvisação do B |
+| Repertório de situações | seção 4.10 | Atendido: inclui sucessos e lacunas | nenhuma documental |
+| Documentação visual | seções 4.4 a 4.6 e 4.13 | Atendido: vídeos, fotografias e capturas estão referenciados e verificados | nenhuma documental |
 
-As evidências disponíveis comprovam a existência dos dois protótipos, seus formatos e parte relevante do processo. No A, a Cena 10 materializa a resposta improvisada à dependência exclusiva da interface visual; vídeo, roteiro, commits e bastidores sustentam partes diferentes desse registro, enquanto o momento exato da decisão permanece corretamente identificado como relato retrospectivo. A principal lacuna restante é a ausência de registro bruto contínuo da execução e da improvisação do B.
+As evidências disponíveis comprovam a existência dos dois protótipos, seus formatos e parte relevante do processo. No A, a Cena 10 materializa a resposta improvisada à dependência exclusiva da interface visual; vídeo, roteiro, commits e bastidores sustentam partes diferentes desse registro, enquanto o momento exato da decisão permanece corretamente identificado como relato retrospectivo. No B, o vídeo da execução registra a sessão em que o protótipo foi operado, incluindo a falha diante do pedido de dado estruturado e as intervenções do facilitador.
 
 ---
 
