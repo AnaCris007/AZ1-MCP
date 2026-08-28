@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <g fill="none" stroke="#1c5ca2" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.05">
+    <path d="M0,50 L60,50 L100,90 L100,150 L160,210 L240,210" />
+    <path d="M40,0 L40,70 L90,120 L190,120 L190,240" />
+    <path d="M0,190 L70,190 L110,150" />
+    <path d="M150,0 L150,60 L200,60 L240,20" />
+  </g>
+
+  <g fill="#1c5ca2" opacity="0.08">
+    <circle cx="60" cy="50" r="2.6" />
+    <circle cx="160" cy="210" r="2.6" />
+    <circle cx="40" cy="70" r="2.6" />
+    <circle cx="190" cy="120" r="2.6" />
+    <circle cx="70" cy="190" r="2.6" />
+    <circle cx="110" cy="150" r="2.6" />
+    <circle cx="150" cy="60" r="2.6" />
+    <circle cx="200" cy="60" r="2.6" />
+  </g>
+
+  <g stroke="#1c5ca2" stroke-width="1.2" opacity="0.09">
+    <circle cx="100" cy="90" r="5.5" fill="none" />
+    <circle cx="100" cy="90" r="1.6" fill="#1c5ca2" stroke="none" />
+  </g>
+
+  <g stroke="#1c5ca2" stroke-width="1" opacity="0.045">
+    <line x1="16" y1="222" x2="56" y2="222" />
+    <line x1="16" y1="227" x2="56" y2="227" />
+    <line x1="20" y1="219" x2="20" y2="230" />
+    <line x1="30" y1="219" x2="30" y2="230" />
+    <line x1="40" y1="219" x2="40" y2="230" />
+    <line x1="50" y1="219" x2="50" y2="230" />
+  </g>
+
+  <g fill="#1c5ca2" opacity="0.07">
+    <rect x="127" y="57" width="6" height="6" transform="rotate(45 130 60)" />
+  </g>
+</svg>

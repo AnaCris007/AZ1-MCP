@@ -5,3 +5,11 @@ __pycache__/
 .venv/
 venv/
 .claude
+*.egg-info/
+build/
+dist/
+.aiox-core
+
+# chaves privadas de acesso
+*.pem
+*.ppk

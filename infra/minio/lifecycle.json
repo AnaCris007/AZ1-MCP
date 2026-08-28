@@ -1,0 +1,14 @@
+{
+  "Rules": [
+    {
+      "Expiration": {
+        "Days": 7
+      },
+      "Filter": {
+        "Prefix": "incoming/"
+      },
+      "ID": "expire-incoming-after-7-days",
+      "Status": "Enabled"
+    }
+  ]
+}
