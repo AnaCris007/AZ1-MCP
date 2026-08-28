@@ -37,7 +37,7 @@ requires-python = ">=3.12"
 dependencies = [
     "av>=14.0",
     "boto3>=1.35",
-    "deepgram-sdk>=3.7",
+    "deepgram-sdk>=5.0",
     "fastapi>=0.115",
     "google-genai>=1.0",
     "joblib>=1.3",

@@ -15,7 +15,7 @@ python-multipart>=0.0.12
 uvicorn[standard]>=0.30
 av>=14.0
 boto3>=1.35
-deepgram-sdk>=3.7
+deepgram-sdk>=5.0
 
 # Dependências da API de chat (Gemini)
 google-genai>=1.0
