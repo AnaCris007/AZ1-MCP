@@ -5,8 +5,13 @@ from dataclasses import dataclass
 from fastapi import APIRouter, Depends, Query
 
 from az1_api.dependencies import get_transcriber
-from schemas.transcription import TranscriptionErrorCode, TranscriptionResponse
-from services.transcription_service import TranscribeAudio, TranscriptionError, TranscriptionErrorCode as SvcErrorCode
+from schemas.transcription import (
+    TranscriptionErrorCode,
+    TranscriptionLanguage,
+    TranscriptionResponse,
+)
+from services.transcription_service import TranscribeAudio, TranscriptionError
+from services.transcription_service import TranscriptionErrorCode as SvcErrorCode
 
 router = APIRouter(tags=["transcription"])
 
@@ -42,7 +47,10 @@ _ERROR_DETAILS = {
 @router.post("/audio/{audio_id}/transcribe", response_model=TranscriptionResponse, status_code=200)
 async def transcribe_audio(
     audio_id: str,
-    language: str = Query(default="pt-BR", description="Código BCP-47 do idioma do áudio."),
+    language: TranscriptionLanguage = Query(
+        default="pt-BR",
+        description="Idioma do áudio. Nesta versão, apenas pt-BR é suportado.",
+    ),
     transcriber: TranscribeAudio = Depends(get_transcriber),
 ) -> TranscriptionResponse:
     try:

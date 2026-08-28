@@ -1902,7 +1902,7 @@ POST /api/v1/audio/{audio_id}/transcribe
 | Parâmetro | Tipo | Obrigatório | Padrão | Descrição |
 | --- | --- | --- | --- | --- |
 | `audio_id` | string (rota) | Sim | | Identificador retornado pelo endpoint de recebimento |
-| `language` | string (query) | Não | `pt-BR` | Código BCP-47 do idioma do áudio |
+| `language` | string (query) | Não | `pt-BR` | Idioma do áudio; nesta sprint, apenas `pt-BR` é suportado |
 
 #### Autenticação
 
@@ -1926,7 +1926,7 @@ Nenhum cabeçalho de autenticação é exigido nesta versão. A autenticação c
 | --- | --- |
 | 404 | Áudio não encontrado no armazenamento (`audio_id` inexistente) |
 | 502 | Falha na transcrição: serviço externo indisponível ou retornou erro |
-| 422 | Parâmetro inválido (ex.: `language` com formato incorreto) |
+| 422 | Parâmetro inválido ou idioma diferente de `pt-BR` |
 
 #### Exemplos de requisição e resposta
 

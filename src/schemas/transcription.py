@@ -7,6 +7,8 @@ TranscriptionErrorCode = Literal[
     "transcription_failed",
 ]
 
+TranscriptionLanguage = Literal["pt-BR"]
+
 
 class TranscriptionResponse(BaseModel):
     audio_id: str

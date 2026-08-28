@@ -73,7 +73,7 @@ class TestAnalysisAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 502)
         self.assertEqual(response.json()["error"], "transcription_failed")
 
-    def test_passa_language_como_query_param(self) -> None:
+    def test_rejeita_idioma_nao_suportado(self) -> None:
         result = AnalysisResult(
             text="Hello", language="en-US", confidence=0.9,
             duration_seconds=1.0, intencao="fora_do_catalogo", confianca_pln=0.6,
@@ -82,8 +82,7 @@ class TestAnalysisAPI(unittest.TestCase):
 
         response = client.post("/api/v1/audio/aud_abc123/analyze?language=en-US")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["language"], "en-US")
+        self.assertEqual(response.status_code, 422)
 
     def test_oculta_detalhes_de_erro_inesperado(self) -> None:
         client = self._client_with(RuntimeError("erro interno"))

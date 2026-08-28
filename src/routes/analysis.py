@@ -3,10 +3,11 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Query
 
 from az1_api.dependencies import get_analyzer
+from routes.transcription import TranscriptionAPIError
 from schemas.analysis import AnalysisResponse
+from schemas.transcription import TranscriptionLanguage
 from services.analysis_service import AnalyzeAudio
 from services.transcription_service import TranscriptionError, TranscriptionErrorCode
-from routes.transcription import TranscriptionAPIError
 
 router = APIRouter(tags=["analysis"])
 
@@ -19,7 +20,10 @@ _ERROR_MAP = {
 @router.post("/audio/{audio_id}/analyze", response_model=AnalysisResponse, status_code=200)
 async def analyze_audio(
     audio_id: str,
-    language: str = Query(default="pt-BR", description="Código BCP-47 do idioma do áudio."),
+    language: TranscriptionLanguage = Query(
+        default="pt-BR",
+        description="Idioma do áudio. Nesta versão, apenas pt-BR é suportado.",
+    ),
     analyzer: AnalyzeAudio = Depends(get_analyzer),
 ) -> AnalysisResponse:
     try:
