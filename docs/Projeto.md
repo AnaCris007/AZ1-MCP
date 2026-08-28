@@ -1574,243 +1574,59 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 
 ## 2.5 Tecnologias e Ferramentas
 
-### Linguagens e Tecnologias Utilizadas
+Esta seção registra as tecnologias selecionadas para o MVP e distingue o que já está incorporado ao repositório do que será desenvolvido nas próximas etapas. A combinação dessas tecnologias por camada é apresentada na seção 3.5.
 
-O MVP será desenvolvido como uma aplicação independente da infraestrutura atualmente utilizada pelo Metrô, contemplando uma interface própria, uma camada de backend responsável pela lógica de negócio e componentes para processamento de linguagem natural, persistência de dados, consulta de documentos, controle de acesso, agendamento e notificações.
-
-| Categoria | Escolha documentada | Alternativas registradas | Justificativa e relação com a arquitetura |
+| Categoria | Tecnologia ou ferramenta | Situação | Justificativa |
 |---|---|---|---|
-| Linguagem do backend e PLN | Python | Alternativas comparadas ainda devem ser registradas pela equipe | Possui amplo ecossistema para PLN, inteligência artificial, APIs e processamento de dados. |
-| Interface web | TypeScript, React e Next.js | Alternativas comparadas ainda devem ser registradas pela equipe | Oferecem tipagem, componentização e estrutura para a aplicação cliente representada pela Chat UI. |
-| API | FastAPI e APIs REST | Alternativas comparadas ainda devem ser registradas pela equipe | Expõem o núcleo por contratos HTTP padronizados e mantêm as aplicações clientes desacopladas. |
-| Persistência estruturada | PostgreSQL e SQL | Alternativas comparadas ainda devem ser registradas pela equipe | Armazenam dados sintéticos do portfólio e registros de auditoria com consultas e controle transacional. |
-| Documentos | Repositório de arquivos com metadados | Armazenamento corporativo Microsoft, previsto apenas para evolução futura | Mantém conteúdo e referências recuperáveis sem integrar o MVP às fontes reais do parceiro. |
-| PLN e recuperação | Pipeline em Python, recuperação de informação e Retrieval-Augmented Generation (RAG) | Copilot Studio, considerado para integração futura | Permitem classificar intenções e recuperar contexto mantendo o núcleo independente do ambiente corporativo. |
-| Voz | Serviço de conversão de áudio em texto e de texto em áudio | Serviços avaliados e escolha aprovada ainda devem ser registrados pela equipe | Atende ao RF01 e ao RNF06 sem criar um pipeline de intenção separado para áudio. |
-| Agendamento e notificações | Agendador de tarefas e serviço de notificações | Alternativas comparadas ainda devem ser registradas pela equipe | Sustentam a verificação periódica e a comunicação proativa previstas no RF05. |
-| Empacotamento | Docker | Alternativas comparadas ainda devem ser registradas pela equipe | Padroniza o ambiente e reduz diferenças entre desenvolvimento e implantação. |
-| Ecossistema corporativo futuro | Microsoft Copilot Studio e Power Platform | Aplicação independente adotada no MVP | Preserva aderência ao ambiente homologado sem exigir integração real nesta etapa. |
+| Interface web | JavaScript/JSX, React e Vite | Implementada | O React permite construir a interface conversacional por componentes, enquanto o Vite fornece o ambiente de desenvolvimento e o processo de build do frontend. |
+| Estilização e componentes visuais | Tailwind CSS, Framer Motion e Lucide React | Implementadas | Apoiam, respectivamente, a estilização, as animações e a iconografia da interface. |
+| Backend e API | Python 3.12+, FastAPI, Uvicorn, Pydantic e APIs REST | Implementados | Oferecem suporte ao pipeline de PLN e permitem expor contratos HTTP validados e desacoplados da aplicação cliente. |
+| Recebimento e validação de áudio | `python-multipart` e PyAV | Implementados | Permitem receber arquivos enviados por formulário e inspecionar seu conteúdo, formato e duração. |
+| Armazenamento de objetos | MinIO, API compatível com S3 e Boto3 | Implementado para áudios | Permite armazenar arquivos em buckets sem acoplar o código a um único provedor de nuvem. |
+| PLN e classificação de intenções | scikit-learn, `MultinomialNB`, NLTK, spaCy, NumPy e Joblib | Implementados | Sustentam o pré-processamento linguístico, a vetorização, o treinamento, a classificação e a persistência do modelo. |
+| Persistência estruturada | PostgreSQL e SQL | Modelagem concluída; integração futura | O modelo relacional atende aos dados estruturados do portfólio, metadados, alertas, feedbacks e registros de auditoria. |
+| Speech-to-Text | Deepgram SDK 5+ e modelo Nova-3 | Implementado | Converte os áudios recebidos em texto antes do encaminhamento ao mesmo pipeline de intenção usado pelas mensagens digitadas. |
+| Text-to-Speech | Provedor a definir | Previsto para a próxima sprint | Permitirá gerar respostas em áudio; a escolha do serviço será registrada após a avaliação das alternativas. |
+| IA generativa | Google Gen AI SDK e modelo `gemini-3.5-flash-lite` | Implementada | Gera respostas em linguagem natural, preservando no backend as regras de negócio e a orquestração da solução. |
+| RAG e documentos | MinIO, PostgreSQL com pgvector, Gemini Embedding (`gemini-embedding-001`) e Gemini 3.5 Flash-Lite | Selecionados para implementação futura | Separam o armazenamento dos arquivos, os metadados e vetores, a recuperação semântica e a geração da resposta fundamentada. |
+| Agendamento e alertas | APScheduler, PostgreSQL e interface React | Selecionados para implementação futura | Permitem executar verificações periódicas, persistir os alertas identificados e apresentá-los na própria aplicação. |
+| Conteinerização local | Docker e Docker Compose | Implementados para o MinIO | Padronizam a execução local do armazenamento de objetos e a persistência de seus dados em volume Docker. |
+| Implantação em nuvem | AWS Academy e Amazon EC2 | Ambiente selecionado; EC2 confirmado | A AWS Academy fornece o ambiente acadêmico, e o EC2 hospedará os elementos executáveis do MVP. |
+| Serviços auxiliares de nuvem | Amazon ECR, Amazon S3 e Amazon CloudWatch | Planejados; disponibilidade a confirmar | Atendem ao registro de imagens, armazenamento de objetos e observabilidade, desde que estejam liberados no catálogo do laboratório. |
 
-As tecnologias descritas a seguir compõem a base prevista para implementação da solução.
+### Interface web
 
-### Python
+A interface própria do MVP é desenvolvida em **JavaScript/JSX** com **React** e **Vite**. O frontend permite que o usuário envie solicitações por texto ou voz e visualize respostas, fontes, sugestões, alertas e pedidos de feedback. Tailwind CSS, Framer Motion e Lucide React complementam essa camada com recursos de apresentação e interação.
 
-O **Python** será utilizado principalmente no desenvolvimento do backend, da lógica do agente e das funcionalidades relacionadas ao processamento de linguagem natural.
+### Backend, API e PLN
 
-A linguagem será utilizada em atividades como:
+O backend é desenvolvido em **Python 3.12 ou superior**, com **FastAPI** para construção das APIs REST, **Uvicorn** como servidor ASGI e **Pydantic** para validação dos dados. O envio de arquivos utiliza `python-multipart`, e a inspeção do conteúdo dos áudios utiliza **PyAV**.
 
-* orquestração das solicitações;
-* integração com serviços e APIs de inteligência artificial;
-* classificação de intenções;
-* extração de entidades;
-* execução das regras de negócio;
-* consulta às fontes de dados;
-* análise de informações dos projetos;
-* identificação de campos incompletos;
-* geração de sugestões;
-* geração de alertas;
-* execução de tarefas periódicas;
-* registro de interações e auditoria.
+O pipeline de classificação de intenções utiliza **scikit-learn**, com o algoritmo `MultinomialNB` definido na seção 3.3. NLTK e spaCy apoiam o pré-processamento linguístico, NumPy as operações numéricas e Joblib a serialização do modelo treinado.
 
-A escolha de Python está relacionada principalmente à sua ampla utilização no desenvolvimento de aplicações envolvendo inteligência artificial, processamento de linguagem natural e integração com modelos de linguagem.
+### Dados, arquivos e recuperação de informação
 
-### TypeScript
+O **PostgreSQL** foi selecionado como banco de dados relacional do MVP. Sua modelagem conceitual, lógica e física foi concluída nesta sprint, incluindo o dicionário de dados e a definição em SQL apresentados na seção 3.6. O provisionamento e a integração do banco à aplicação ocorrerão em etapa posterior. O banco deverá armazenar dados sintéticos do portfólio, usuários e permissões, metadados de documentos, feedbacks, alertas e registros de auditoria.
 
-O **TypeScript** será utilizado principalmente no desenvolvimento da interface web da aplicação.
+No ambiente local, os arquivos são armazenados no **MinIO**, serviço compatível com a API S3, acessado pelo backend por meio da biblioteca **Boto3**. O armazenamento de áudios já utiliza essa estrutura. Para a implantação na AWS, está prevista a substituição do MinIO pelo **Amazon S3**, mantendo o contrato S3 e o cliente Boto3; essa utilização depende da disponibilidade do serviço no laboratório da AWS Academy. Para o fluxo futuro de RAG, os documentos sintéticos também serão mantidos no armazenamento de objetos, enquanto seus metadados e vetores serão armazenados no PostgreSQL com a extensão **pgvector**. O modelo `gemini-embedding-001` produzirá os embeddings usados na busca semântica, e o `gemini-3.5-flash-lite` produzirá a resposta com base nos trechos recuperados.
 
-A linguagem adiciona tipagem estática ao JavaScript e contribui para maior organização, previsibilidade e manutenção do código da interface.
+### Inteligência artificial e serviços de voz
 
-### SQL
+A geração de respostas utiliza o **Google Gen AI SDK** com o modelo `gemini-3.5-flash-lite`. A aplicação mantém sua própria camada de orquestração e regras de negócio, utilizando o modelo generativo como um serviço especializado do fluxo.
 
-O **SQL** será utilizado para definição, manipulação e consulta das informações estruturadas armazenadas no banco de dados relacional.
+A conversão de áudio em texto utiliza o **Deepgram SDK 5+** com o modelo **Nova-3**, configurado para português brasileiro. Após a transcrição, o texto segue o mesmo pipeline de classificação usado nas entradas digitadas. A conversão de texto em áudio também faz parte do produto, mas será desenvolvida na próxima sprint e seu provedor ainda será definido.
 
-Entre essas informações estão dados de projetos, prazos, marcos, riscos, usuários, perfis, permissões, feedbacks e registros de auditoria.
+### Agendamento e notificações
 
-### FastAPI
+O **APScheduler** foi selecionado para iniciar verificações periódicas, como a identificação de prazos próximos, documentos faltantes e campos incompletos. Os alertas gerados serão persistidos no PostgreSQL e exibidos na interface React. Essa parte da pilha está selecionada, mas ainda não foi implementada.
 
-O **FastAPI** será utilizado como framework principal para construção do backend e das APIs da aplicação.
+### Infraestrutura local e integrações futuras
 
-O backend será responsável por intermediar a comunicação entre a interface, o agente, as fontes de dados e os demais serviços da solução.
+O **Docker Compose** executa atualmente o MinIO e mantém seus objetos em um volume Docker persistente. A API e o frontend ainda são executados diretamente nos respectivos ambientes de desenvolvimento, e o repositório ainda não contém os Dockerfiles de frontend e backend previstos pelo processo de implantação.
 
-Entre suas principais responsabilidades estarão:
+O deploy acadêmico será realizado na **Amazon Web Services**, por meio do ambiente fornecido pela **AWS Academy**. O Amazon EC2 foi confirmado como recurso de computação. Amazon ECR, Amazon S3 e Amazon CloudWatch permanecem planejados, condicionados à disponibilidade no catálogo do laboratório. A forma de hospedagem do PostgreSQL na AWS ainda será definida pelo responsável pelo deploy.
 
-* disponibilização de endpoints;
-* processamento das solicitações recebidas;
-* aplicação das regras de negócio;
-* controle de acesso;
-* comunicação com o banco de dados;
-* integração com serviços de inteligência artificial;
-* consulta aos documentos;
-* execução dos módulos de ação;
-* registro de auditoria.
-
-### React e Next.js
-
-A interface da aplicação será desenvolvida utilizando **React**, com **Next.js** como framework web.
-
-Essa camada será responsável pela interface conversacional do agente, permitindo que o usuário realize solicitações por texto ou voz e visualize:
-
-* respostas do agente;
-* informações estruturadas;
-* fontes consultadas;
-* datas de referência;
-* sugestões;
-* alertas;
-* mensagens de insuficiência de dados;
-* solicitações de feedback.
-
-A interface será desenvolvida de forma independente dos canais atualmente utilizados pelo Metrô.
-
-### PostgreSQL
-
-O **PostgreSQL** será utilizado como banco de dados relacional principal do MVP.
-
-O banco deverá armazenar informações estruturadas relacionadas a:
-
-* projetos;
-* prazos;
-* marcos;
-* riscos;
-* avanço dos projetos;
-* usuários;
-* perfis e permissões;
-* campos e artefatos dos projetos;
-* feedbacks;
-* metadados de documentos;
-* registros de auditoria;
-* informações utilizadas na geração de alertas.
-
-Inicialmente, não é prevista a utilização de um segundo banco de dados não relacional, uma vez que os dados estruturados necessários ao MVP podem ser representados adequadamente por meio de um modelo relacional.
-
-### Armazenamento e Consulta de Documentos
-
-Os documentos utilizados pelo agente serão mantidos em um **repositório de arquivos independente**, acompanhado de seus respectivos metadados.
-
-Esse repositório deverá conter documentos sintéticos que reproduzam a organização e os tipos de arquivos existentes no ambiente real do Metrô.
-
-A estrutura permitirá validar funcionalidades como:
-
-* localização de documentos;
-* consulta ao conteúdo dos documentos;
-* identificação de documentos ausentes;
-* esclarecimento de dúvidas sobre normativos;
-* indicação da fonte utilizada na resposta.
-
-Dessa forma, o MVP poderá reproduzir os principais fluxos relacionados às informações atualmente armazenadas no SharePoint sem depender diretamente da infraestrutura corporativa.
-
-### Inteligência Artificial e Processamento de Linguagem Natural
-
-O agente utilizará uma **API de inteligência artificial disponibilizada no ecossistema Microsoft** para apoiar as funcionalidades de processamento de linguagem natural e geração de conteúdo.
-
-Essa integração poderá ser utilizada em atividades como:
-
-* interpretação das solicitações;
-* identificação e classificação de intenções;
-* detecção de solicitações fora do catálogo suportado;
-* extração de entidades e parâmetros;
-* geração de respostas em linguagem natural;
-* geração de sugestões para preenchimento de campos;
-* interpretação de documentos e normativos;
-* apoio à identificação de informações relevantes nas fontes disponíveis.
-
-A aplicação manterá sua própria camada de orquestração e regras de negócio, utilizando os modelos de linguagem como um dos componentes do processamento das solicitações.
-
-### Recuperação de Informação e RAG
-
-Para funcionalidades que envolvem documentos, normativos e outras fontes textuais, poderão ser utilizadas técnicas de **Retrieval-Augmented Generation (RAG)**.
-
-Essa abordagem permite recuperar informações relevantes nas fontes disponíveis antes da geração da resposta pelo modelo de linguagem.
-
-Sua utilização poderá apoiar funcionalidades como:
-
-* consulta a documentos dos projetos;
-* esclarecimento de dúvidas sobre normativos;
-* identificação das fontes utilizadas;
-* geração de respostas fundamentadas nas informações disponíveis;
-* identificação de situações em que não existem dados suficientes para produzir uma resposta confiável.
-
-### Serviço de Voz
-
-O MVP permitirá que o usuário envie solicitações por voz.
-
-Para isso, será utilizado um serviço de **Speech-to-Text (STT)** responsável pela conversão do áudio enviado pelo usuário em texto.
-
-Após a transcrição, a solicitação seguirá o mesmo fluxo utilizado para as mensagens originalmente enviadas em texto.
-
-O serviço de voz será responsável apenas pela conversão da entrada em áudio para texto. As respostas do agente serão apresentadas textualmente na interface.
-
-### Agendamento de Tarefas
-
-O sistema possuirá um mecanismo de **agendamento de tarefas periódicas** para execução automática de verificações que não dependem de uma solicitação direta do usuário.
-
-Para o backend em Python, poderá ser utilizada uma ferramenta como o **APScheduler**.
-
-Esse mecanismo poderá ser utilizado para:
-
-* verificar prazos próximos;
-* identificar documentos faltantes;
-* identificar campos incompletos;
-* analisar periodicamente situações dos projetos;
-* iniciar a geração de alertas proativos.
-
-Dessa forma, determinadas funcionalidades do agente poderão ser executadas de maneira automática e recorrente.
-
-### Serviço de Notificações
-
-O sistema contará com um mecanismo responsável pelo envio dos alertas e notificações identificados durante as verificações automáticas.
-
-O serviço de notificações receberá as pendências encontradas pelo sistema, identificará os usuários relacionados ao projeto e encaminhará a informação pelo canal disponibilizado no MVP.
-
-Esse mecanismo apoiará principalmente funcionalidades relacionadas a:
-
-* alertas de prazo;
-* documentos faltantes;
-* campos incompletos;
-* outras pendências identificadas automaticamente.
-
-### Auditoria, Rastreabilidade e Feedback
-
-As interações realizadas com o agente deverão ser registradas para permitir rastreabilidade das operações.
-
-Os registros poderão incluir informações como:
-
-* usuário responsável pela solicitação;
-* data e horário;
-* canal utilizado;
-* intenção identificada;
-* fontes consultadas;
-* resultado da solicitação;
-* alertas gerados;
-* feedback fornecido pelo usuário.
-
-Essas informações serão armazenadas de forma estruturada e utilizadas para auditoria e análise das interações realizadas com o sistema.
-
-### APIs REST
-
-A comunicação entre a interface, o backend e serviços externos será realizada principalmente por meio de **APIs REST**.
-
-Essa abordagem permitirá separar as responsabilidades entre os diferentes componentes da aplicação e facilitar futuras integrações com outros sistemas.
-
-### Docker
-
-O **Docker** poderá ser utilizado para padronizar os ambientes de desenvolvimento e execução dos principais componentes da solução.
-
-A conteinerização permitirá executar serviços como backend e banco de dados de maneira consistente entre os ambientes utilizados pela equipe.
-
-### Integrações Futuras com o Ecossistema Microsoft
-
-Embora o MVP seja desenvolvido fora da infraestrutura corporativa atualmente utilizada pelo Metrô, sua estrutura deverá possibilitar futuras integrações com os serviços adotados pela organização.
-
-Entre as possíveis integrações futuras estão:
-
-* SharePoint;
-* Microsoft Teams;
-* Copilot Studio;
-* Power Automate;
-* Microsoft Entra ID;
-* demais serviços e APIs disponibilizados pelo ecossistema Microsoft.
-
-Durante o MVP, dados, documentos, usuários e permissões sintéticos serão utilizados para representar as informações e fluxos necessários à validação da solução, sem expor dados corporativos reais do Metrô.
+Copilot Studio, Power Automate, Microsoft Teams, SharePoint e Microsoft Entra ID permanecem como possibilidades de integração futura com o ecossistema corporativo do Metrô. Eles não compõem a pilha executável atual do MVP. Durante o desenvolvimento serão utilizados apenas dados, documentos, usuários e permissões sintéticos, sem exposição de dados corporativos reais.
 
 ---
 
@@ -2519,7 +2335,68 @@ Com essas definições, o contrato da API estabelece como o áudio entra no sist
 
 ### 3.5 Pilha de Tecnologias
 
-<!-- Exemplo do que incluir: linguagens, frameworks, bibliotecas, plataforma de execução e justificativa das escolhas. -->
+A pilha de tecnologias do MVP mantém a interface, o backend, o processamento de linguagem natural e os serviços externos desacoplados. Essa separação permite substituir aplicações clientes ou provedores externos sem reimplementar o classificador de intenções e as regras de negócio.
+
+#### 3.5.1 Pilha implementada
+
+| Camada | Tecnologias | Responsabilidade |
+|---|---|---|
+| Interface | JavaScript/JSX, React 19 e Vite 8 | Implementar a interface conversacional e gerar os artefatos estáticos do frontend. |
+| Apresentação | Tailwind CSS, Framer Motion e Lucide React | Definir estilos, animações e ícones da interface. |
+| Backend e API | Python 3.12+, FastAPI, Uvicorn, Pydantic e `python-multipart` | Expor APIs REST, validar requisições e coordenar os serviços da aplicação. |
+| Processamento de áudio | PyAV | Inspecionar o conteúdo dos arquivos e validar formato e duração. |
+| PLN | scikit-learn, `MultinomialNB`, NLTK, spaCy e NumPy | Pré-processar textos, vetorizar entradas e classificar intenções. |
+| Persistência do modelo | Joblib | Serializar e carregar o classificador treinado. |
+| Armazenamento de objetos | MinIO, API S3 e Boto3 | Armazenar e recuperar os arquivos de áudio em bucket compatível com S3. |
+| Speech-to-Text | Deepgram SDK 5+ e modelo Nova-3 | Recuperar o áudio armazenado, transcrevê-lo em português brasileiro e devolver o texto ao pipeline de PLN. |
+| IA generativa | Google Gen AI SDK e `gemini-3.5-flash-lite` | Gerar respostas em linguagem natural por meio do endpoint de chat. |
+| Infraestrutura local | Docker e Docker Compose | Executar o MinIO e preservar seus dados no volume `minio_data`. |
+
+O fluxo de áudio implementado nesta etapa é:
+
+```text
+Interface React
+      ↓ multipart/form-data
+API FastAPI
+      ↓ validação com PyAV e geração do audio_id
+Boto3
+      ↓ PutObject pelo protocolo S3
+MinIO / bucket az1-audio
+      ↓
+volume Docker minio_data
+
+POST /api/v1/audio/{audio_id}/analyze
+      ↓ GetObject com Boto3 no MinIO
+Deepgram Nova-3
+      ↓ transcrição em pt-BR
+MultinomialNB
+      ↓
+intenção classificada
+```
+
+A geração de respostas textuais já está integrada separadamente pelo endpoint `POST /api/v1/chat`, que encaminha a mensagem ao `gemini-3.5-flash-lite` por meio do Google Gen AI SDK.
+
+#### 3.5.2 Tecnologias selecionadas para as próximas etapas
+
+| Capacidade | Tecnologias selecionadas | Etapa prevista |
+|---|---|---|
+| Persistência estruturada | PostgreSQL e SQL | Modelagem conceitual, lógica e física concluída; provisionamento e integração posteriores. |
+| RAG | MinIO, PostgreSQL com pgvector, `gemini-embedding-001` e `gemini-3.5-flash-lite` | Armazenamento de documentos sintéticos, recuperação semântica e geração de respostas fundamentadas. |
+| Agendamento e alertas | APScheduler, PostgreSQL e interface React | Execução de verificações periódicas, persistência e apresentação de alertas na aplicação. |
+| Text-to-Speech | Provedor ainda não definido | Avaliação e escolha na próxima sprint. |
+| Computação em nuvem | AWS Academy e Amazon EC2 | Ambiente acadêmico selecionado e serviço de computação confirmado para o deploy do MVP. |
+| Registro de imagens | Amazon ECR | Uso planejado, condicionado à disponibilidade no catálogo do laboratório. |
+| Armazenamento de objetos em nuvem | Amazon S3 e Boto3 | Substituição planejada do MinIO no ambiente AWS, condicionada à disponibilidade do serviço. |
+| Observabilidade | Amazon CloudWatch | Uso planejado para logs técnicos e métricas, condicionado à disponibilidade do serviço. |
+| Empacotamento das aplicações | Docker | Criação futura dos Dockerfiles de frontend e backend antes da publicação na AWS. |
+
+No fluxo planejado de RAG, os documentos originais serão mantidos no MinIO. Após a extração e divisão do texto em trechos, o `gemini-embedding-001` gerará as representações vetoriais, que serão armazenadas no PostgreSQL por meio do pgvector. A pergunta do usuário será comparada a esses vetores, e os trechos mais relevantes serão enviados ao `gemini-3.5-flash-lite` para a elaboração de uma resposta fundamentada.
+
+A escolha do PostgreSQL evita introduzir um segundo banco apenas para a busca vetorial. O APScheduler, por sua vez, atende ao escopo acadêmico do MVP por permitir que as verificações periódicas sejam executadas junto ao backend Python. Caso a solução evolua para múltiplas instâncias ou maior volume de processamento, a estratégia de agendamento deverá ser reavaliada.
+
+No desenvolvimento local, o MinIO permanece como armazenamento compatível com S3. No ambiente AWS, a substituição planejada pelo Amazon S3 preserva o uso do Boto3 e o contrato de acesso a objetos. O Amazon EC2 hospedará os elementos executáveis do MVP; ECR, S3 e CloudWatch somente serão incorporados ao deploy após a confirmação de que estão liberados no laboratório da AWS Academy. A hospedagem do PostgreSQL nesse ambiente permanece em aberto.
+
+O serviço de Text-to-Speech integra a arquitetura prevista do produto, mas não é apresentado como tecnologia fechada porque seu provedor ainda será avaliado na próxima sprint. Da mesma forma, as integrações com o ecossistema Microsoft são tratadas como evolução futura e não como parte da pilha executável atual.
 
 ### 3.6 Modelagem Conceitual e Lógica dos Dados
 
