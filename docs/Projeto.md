@@ -47,6 +47,7 @@
 - [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
 - [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
 - [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.9 Projeto Técnico e Arquitetural](#39-projeto-técnico-e-arquitetural)
 
 </details>
 
@@ -1604,24 +1605,11 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 
 ### Evolução do diagrama
 
- O diagrama passou por uma revisão relevante entre a primeira versão da arquitetura e a implementação da API de recebimento de áudio. A versão anterior está reproduzida abaixo e serve de referência para acompanhar o desenvolvimento do projeto: o que mudou não foi a estética do desenho, e sim o entendimento de como o áudio entra no sistema.
-
-<div align="center">
-<sub>Imagem 2.4.2 - Diagrama de componentes (UML) — versão anterior, mantida para comparação</sub><br>
-  <img src="../assets/diagrama_componentes.svg" width="100%" alt="Versão anterior do diagrama de componentes, sem a API de recebimento de áudio, o armazenamento e os serviços de terceiros"><br>
-  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
-</div>
-
-| O que mudou | Versão anterior (Imagem 2.4.2) | Versão atual (Imagem 2.4.1) |
-|---|---|---|
-| Entrada de áudio | A Chat UI enviava tudo ao API Gateway, que encaminhava o áudio à Conversão de Áudio em Texto | A Chat UI envia o áudio a uma API de Recebimento dedicada, que valida, armazena e devolve um `audio_id` |
-| Armazenamento do áudio | Não representado — o áudio parecia trafegar direto entre componentes | Componente próprio na camada de dados, com chave `incoming/{audio_id}` e retenção de sete dias |
-| Acoplamento recebimento ↔ transcrição | Chamada direta entre os dois | Nenhuma chamada direta: o vínculo é o identificador e o armazenamento compartilhado |
-| Acesso ao armazenamento | Inexistente | Encapsulado pelo SDK boto3, isolando a aplicação da API do provedor |
-| Controle de Acesso | No caminho de todas as solicitações, como se estivesse implementado | Em traço interrompido e fora do caminho de execução, sinalizando decisão pendente |
-| Modelo de linguagem | Ausente do diagrama | Agrupamento «Serviços de Terceiros», tornando visível a dependência externa e o risco AM8 |
+ O diagrama passou por uma revisão relevante entre a primeira versão da arquitetura e a implementação da API de recebimento de áudio. As duas versões estão reproduzidas nesta seção — a Imagem 2.4.1, anterior à implementação, e a Imagem 2.4.2, em vigor — e os seis ajustes que as separam estão registrados na tabela da subseção *Ajustes feitos após a implementação da API de recebimento de áudio*. A versão anterior é mantida no documento deliberadamente, como referência para acompanhar o desenvolvimento do projeto.
 
  A comparação registra uma lição de projeto que vale além deste artefato: a primeira versão descrevia a arquitetura pretendida, e a segunda descreve a arquitetura construída. A diferença entre as duas apareceu durante a implementação, quando ficou claro que separar recebimento de transcrição simplificava as duas responsabilidades — e que o diagrama anterior sugeria como pronto um controle de acesso que ainda não existia.
+
+ A consolidação desses componentes em uma visão de projeto arquitetural, acompanhada dos diagramas de classes e de sequência revisados na Sprint 2, está na Seção 3.9.
 
 ---
 
@@ -1698,9 +1686,9 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 | Interoperabilidade e sustentabilidade tecnológica | Todos | Todas | RF01, RF02, RF04, RF05 | RNF05 | — | Cenários 1, 2, 3 | API Gateway (interface padronizada consumível por múltiplas aplicações clientes) |
 | Acessibilidade e uso de linguagem natural | Todos | Todas | RF01 | RNF06 | `Usuário` | Cenário 1 (fragmento áudio) | Chat UI, Conversão de Áudio em Texto, API Gateway |
 
-## 3. Definição Técnica e Arquitetural da Solução
+# 3. Definição Técnica e Arquitetural da Solução
 
-### 3.1 Catálogo de Intenções e Contrato de Classificação
+## 3.1 Catálogo de Intenções e Contrato de Classificação
 
 O catálogo de intenções define os tipos de solicitação que o agente deve reconhecer no MVP. A classificação ocorre após a entrada ser convertida para texto, quando aplicável, e antes da consulta às fontes ou do acionamento de qualquer processo. Solicitações que não correspondam às intenções catalogadas devem ser recusadas com uma orientação sobre as interações disponíveis.
 
@@ -1717,7 +1705,7 @@ O catálogo de intenções define os tipos de solicitação que o agente deve re
 | INT-09 | `gerar_alertas_pendencias` | Identificar situações que precisam da atenção do usuário | Lista priorizada de alertas com justificativas | Sim, com dados de demonstração |
 | INT-10 | `fora_do_catalogo` | Tratar solicitações que o protótipo não consegue executar | Explicação do limite e opções disponíveis | Sim |
 
-#### Contrato de classificação
+### Contrato de classificação
 
 Para cada solicitação, o componente de compreensão deve devolver, no mínimo:
 
@@ -1728,11 +1716,11 @@ Para cada solicitação, o componente de compreensão deve devolver, no mínimo:
 
 O agente só deve prosseguir quando a intenção estiver suficientemente identificada e os parâmetros necessários estiverem disponíveis. Em caso de ambiguidade ou informação faltante, deve solicitar esclarecimento ao usuário.
 
-#### Delimitação central
+### Delimitação central
 
 As intenções de orientação, análise e alerta produzem apenas respostas e sugestões no chat. No MVP, o agente consulta, interpreta, orienta e sugere conteúdos, mas não preenche documentos oficiais, não altera ou grava registros, não executa transações e não acessa o portfólio real do Metrô, as respostas dependem exclusivamente de documentos disponibilizados, dados sintéticos, informações fornecidas na conversa e artefatos anexados pelo usuário. Toda sugestão apresentada pelo agente deve ser revisada e confirmada pelo usuário, e o agente não deve apresentar sugestões como decisões oficiais, aprovações ou determinações de conformidade.
 
-#### Regra de classificação durante fluxos guiados
+### Regra de classificação durante fluxos guiados
 
 O classificador de intenções não deve interpretar cada resposta fornecida durante um fluxo guiado como uma nova intenção. Por exemplo, se o agente pergunta "Qual é a data de término da entrega?" e o usuário responde "31 de dezembro de 2026", essa resposta não representa uma nova intenção: o gerenciador de diálogo deve tratá-la como o preenchimento da entidade `data_termino` do processo em andamento.
 
@@ -1742,15 +1730,29 @@ Uma nova classificação de intenção só deve ser executada quando o sistema d
 - mudança de assunto em relação ao processo em andamento;
 - solicitação explícita do usuário para iniciar outro processo.
 
-### 3.2 API de Speech to Text e Text to Speech
+## 3.2 API de Speech to Text e Text to Speech
 
-#### Serviço de Speech to Text
+Esta seção documenta as duas pontas do canal de voz: a conversão de fala em texto (Speech to Text, STT), que já está implementada e integrada ao pipeline de PLN, e a conversão de texto em fala (Text to Speech, TTS), cuja escolha de provedor permanece em aberto. Ela é a contraparte externa da API interna de recebimento de áudio descrita na Seção 3.4: aquela recebe e guarda o arquivo, esta o converte em texto por meio de um serviço de terceiros.
+
+**Estado de implementação desta seção.** A tabela abaixo separa o que está em execução do que é proposta, para que nenhuma parte da especificação seja lida como pronta sem estar.
+
+| Item | Situação | Evidência no repositório |
+|---|---|---|
+| Escolha do serviço de STT | Decisão aprovada | `pyproject.toml` (`deepgram-sdk>=5.0`) e `src/services/transcription_service.py` |
+| Cliente de STT e endpoint interno de transcrição | Implementado e coberto por testes | `src/services/transcription_service.py`, `src/routes/transcription.py`, `tests/test_transcription_service.py`, `tests/test_transcription_api.py` |
+| Endpoint interno de análise (transcrição encadeada ao PLN) | Implementado e coberto por testes | `src/routes/analysis.py`, `src/services/analysis_service.py`, `tests/test_analysis_api.py` |
+| Autenticação do usuário nos endpoints de voz | Planejado, não implementado | Nenhum verificador de credencial nas rotas; ver Seção 3.4 |
+| Política de tempo limite e de repetição | **DECISÃO TÉCNICA EM ABERTO** | Nenhum tempo limite explícito é configurado no cliente |
+| Medição de Word Error Rate (WER) | Planejada para a Sprint 3 | Não há execução registrada em `resultados/` |
+| Escolha do serviço de TTS | **DECISÃO TÉCNICA EM ABERTO** | Sem dependência de TTS declarada no `pyproject.toml` |
+
+### 3.2.1 Serviço de Speech to Text
 
 **Decisão:** utilizar o **Deepgram**, modelo `nova-3`, como serviço de conversão de áudio em texto.
 
 O comparativo abaixo registra os critérios avaliados:
 
-| Critério | Deepgram nova-3 | OpenAI Whisper API | Google Cloud STT | Azure Cognitive Speech |
+| Critério | Deepgram nova-3 | OpenAI Whisper API | Google Cloud STT | Azure AI Speech |
 | --- | --- | --- | --- | --- |
 | Suporte ao português brasileiro | Sim, modelo dedicado | Sim | Sim | Sim |
 | Qualidade em vocabulário técnico | Alta, aceita keyterms de domínio | Alta | Média | Média-alta |
@@ -1760,9 +1762,52 @@ O comparativo abaixo registra os critérios avaliados:
 | SDK Python oficial | Sim (`deepgram-sdk`) | Sim (`openai`) | Sim (`google-cloud-speech`) | Sim (`azure-cognitiveservices-speech`) |
 | Facilidade de integração | Alta, cliente assíncrono nativo | Alta | Média, exige credencial GCP | Média, exige recurso Azure |
 
+> **Origem dos valores.** Os custos, créditos e faixas de latência da tabela foram levantados pela equipe nas páginas de preço e na documentação pública de cada provedor durante a Sprint 2 e servem de critério comparativo, não de compromisso de desempenho. Nenhum deles foi medido no ambiente do projeto. A latência efetiva e o custo real do Deepgram sobre o vocabulário do portfólio permanecem **PENDENTE DE EVIDÊNCIA DA EQUIPE** até a medição prevista na Sprint 3.
+
 O Deepgram foi escolhido por combinar suporte explícito a termos de domínio via parâmetro `keyterm`, relevante para vocabulário do PMO como "empreendimento", "cronograma" e "marco", com latência baixa e créditos gratuitos que viabilizam os testes desta sprint sem custo. A escolha é provisória: a abstração `AudioFetcher` em `src/services/transcription_service.py` isola o cliente do restante do código, de modo que a troca por outro provedor exige alteração apenas na camada de serviço, sem impacto nas rotas ou nos esquemas de resposta. A decisão será reavaliada antes da entrega final com base nos resultados de WER medidos sobre áudios do vocabulário do portfólio, conforme exigido pelo RNF06.
 
-#### Endpoint de transcrição
+#### Identificação do serviço externo
+
+| Item | Valor adotado | Como verificar |
+|---|---|---|
+| Nome oficial do serviço | Deepgram Speech-to-Text, recurso Listen, modo pré-gravado | [Documentação oficial](https://developers.deepgram.com/docs/pre-recorded-audio) |
+| Modelo | `nova-3` | Constante `_DEEPGRAM_MODEL` em `src/services/transcription_service.py` |
+| Versão da API | `v1` do recurso Listen, acessada pelo SDK em `client.listen.v1.media.transcribe_file` | Mesmo arquivo |
+| SDK e versão mínima | `deepgram-sdk>=5.0`, cliente `AsyncDeepgramClient` | `pyproject.toml` e `requirements.txt` |
+| URL-base | Endpoint hospedado padrão do SDK, `https://api.deepgram.com`; a aplicação não sobrescreve o host | Ausência de parâmetro de host na construção do cliente |
+| Região ou ambiente | Não parametrizada. O serviço é consumido como API hospedada pelo provedor, e o projeto não seleciona região | Ausência de parâmetro de região no código |
+| Autenticação | Chave de API do provedor, lida da variável de ambiente `DEEPGRAM_API_KEY` e inserida pelo SDK no cabeçalho de autorização da requisição | `src/az1_api/dependencies.py` e `.env.example` |
+| Idioma | `pt-BR`, único valor aceito nesta versão | Tipo `TranscriptionLanguage = Literal["pt-BR"]` em `src/schemas/transcription.py` |
+
+A chave nunca é escrita no código nem versionada: o repositório contém apenas o `.env.example`, com o nome da variável e sem valor. Nos exemplos deste documento, ela aparece como o marcador `<DEEPGRAM_API_KEY>`.
+
+#### Parâmetros enviados ao provedor
+
+A aplicação não repassa parâmetros do cliente diretamente ao provedor. Ela monta a chamada com um conjunto fixo, o que impede que uma requisição externa altere o comportamento da transcrição:
+
+| Parâmetro | Valor | Motivo |
+|---|---|---|
+| `model` | `nova-3` | Modelo escolhido na comparação acima |
+| `language` | `pt-BR` | Único idioma suportado nesta versão |
+| `smart_format` | `true` | Aplica pontuação, maiúsculas e formatação de números e datas, reduzindo o ruído de formatação que chegaria ao pré-processamento do PLN |
+| `punctuate` | `true` | Garante a pontuação mesmo quando a formatação inteligente não a inferir |
+| `keyterm` | Doze termos do domínio: `PMO`, `Metrô de São Paulo`, `empreendimento`, `cronograma`, `marco`, `risco`, `portfólio`, `programa`, `contrato`, `obra`, `pendência`, `avanço físico` | Aumenta a probabilidade de o reconhecedor acertar o vocabulário do PMO, que é justamente o que distingue as intenções do catálogo da Seção 3.1 |
+
+#### Formatos, codificação e limites de áudio
+
+Os limites vinculantes do projeto são impostos pela API interna de recebimento, descrita na Seção 3.4, e não pelo provedor: o arquivo é validado, aceito e armazenado antes de qualquer chamada externa, de modo que nenhum áudio fora do envelope abaixo chega ao Deepgram.
+
+| Item | Limite aplicado pelo AZ1 | Onde é verificado |
+|---|---|---|
+| Formatos aceitos | `.wav`, `.mp3`, `.m4a` e `.webm`, validados pela assinatura binária do arquivo | `_detect_audio_format` em `src/services/audio_service.py` |
+| Tamanho máximo | 10 MB | `MAX_FILE_SIZE_BYTES`, mesmo arquivo |
+| Duração máxima | 5 minutos | `MAX_DURATION_SECONDS`, mesmo arquivo |
+| Codificação e taxa de amostragem | Não são fixadas pela aplicação. O arquivo segue ao provedor como recebido, com o `Content-Type` detectado, e o Deepgram infere codificação e taxa a partir do contêiner | `probe_audio` e `ReceiveAudio.receive` |
+| Faixas de vídeo | Rejeitadas: um contêiner com faixa de vídeo, ou sem faixa de áudio, é recusado antes do armazenamento | `probe_audio` |
+
+Os limites do próprio provedor para tamanho e duração de arquivo pré-gravado devem ser consultados na [documentação oficial do Deepgram](https://developers.deepgram.com/docs/pre-recorded-audio) e não são reproduzidos aqui, para que o documento não fixe números que o fornecedor pode alterar sem aviso. Como o envelope do AZ1 é bem mais restrito, é ele que vale na prática.
+
+### 3.2.2 Endpoint interno de transcrição
 
 **Decisão:** expor a transcrição como um endpoint separado do recebimento do áudio, acionado por `audio_id`.
 
@@ -1774,14 +1819,16 @@ POST /api/v1/audio/{audio_id}/transcribe
 
 #### Parâmetros de entrada
 
-| Parâmetro | Tipo | Obrigatório | Padrão | Descrição |
-| --- | --- | --- | --- | --- |
-| `audio_id` | string (rota) | Sim | | Identificador retornado pelo endpoint de recebimento |
-| `language` | string (query) | Não | `pt-BR` | Idioma do áudio; nesta sprint, apenas `pt-BR` é suportado |
+| Parâmetro | Tipo | Local | Obrigatório | Padrão | Descrição |
+| --- | --- | --- | --- | --- | --- |
+| `audio_id` | string | rota | Sim | — | Identificador devolvido pelo endpoint de recebimento, no formato `aud_` seguido de 32 caracteres hexadecimais |
+| `language` | string | query | Não | `pt-BR` | Idioma do áudio; nesta versão, apenas `pt-BR` é aceito |
 
 #### Autenticação
 
-Nenhum cabeçalho de autenticação é exigido nesta versão. A autenticação com o Deepgram é feita internamente pela API, a partir da variável de ambiente `DEEPGRAM_API_KEY`.
+Nenhum cabeçalho de autenticação é exigido pela implementação atual. A autenticação com o Deepgram é feita internamente pela API, a partir da variável de ambiente `DEEPGRAM_API_KEY`.
+
+> **Divergência declarada entre contrato e implementação.** A Seção 3.4 define Bearer Token obrigatório para o canal de voz, e essa regra vale igualmente para os endpoints de transcrição e de análise. Ela ainda **não está implementada** em nenhuma das três rotas. Enquanto isso não mudar, o serviço só deve ser executado em ambiente local ou de laboratório, sem exposição pública. A implementação está prevista para a Sprint 3, junto da definição do emissor do token.
 
 #### Resposta de sucesso
 
@@ -1792,18 +1839,50 @@ Nenhum cabeçalho de autenticação é exigido nesta versão. A autenticação c
 | `audio_id` | string | Identificador do áudio transcrito |
 | `text` | string | Texto resultante da transcrição |
 | `language` | string | Idioma utilizado na transcrição |
-| `confidence` | float \| null | Grau de confiança médio reportado pelo serviço (0–1), ou `null` se não disponível |
-| `duration_seconds` | float | Duração do áudio em segundos |
+| `confidence` | float \| null | Grau de confiança médio reportado pelo serviço, de 0 a 1, ou `null` quando não disponível |
+| `duration_seconds` | float | Duração do áudio em segundos, conforme reportada pelo provedor |
 
 #### Respostas de erro
 
-| Código | Condição |
-| --- | --- |
-| 404 | Áudio não encontrado no armazenamento (`audio_id` inexistente) |
-| 502 | Falha na transcrição: serviço externo indisponível ou retornou erro |
-| 422 | Parâmetro inválido ou idioma diferente de `pt-BR` |
+Todas as respostas de erro produzidas pela aplicação seguem o mesmo corpo padronizado da Seção 3.4, com os campos `error` e `message`:
 
-#### Exemplos de requisição e resposta
+| Código HTTP | `error` | Condição | Origem |
+| --- | --- | --- | --- |
+| `404 Not Found` | `audio_not_found` | `audio_id` inexistente no armazenamento, ou já removido pela política de retenção | Aplicação |
+| `502 Bad Gateway` | `transcription_failed` | O serviço externo respondeu com erro, não respondeu ou devolveu conteúdo inesperado | Aplicação |
+| `422 Unprocessable Entity` | corpo nativo do FastAPI, no formato `{"detail": [...]}` | `language` diferente de `pt-BR` | Validação do framework |
+| `500 Internal Server Error` | `internal_error` | Falha interna não prevista | Aplicação |
+
+A escolha de `502` para a falha do provedor, e não `500`, é deliberada: distingue para o cliente um defeito do AZ1 de uma indisponibilidade de serviço de terceiro, que admite nova tentativa sobre o mesmo `audio_id` sem reenviar o arquivo.
+
+#### Tempo limite e política de repetição
+
+> **DECISÃO TÉCNICA EM ABERTO.** O cliente atual não configura tempo limite explícito nem repetição automática: qualquer exceção levantada pela chamada externa é convertida em `502 transcription_failed`. Para a Sprint 3, a equipe precisa fixar três valores e registrá-los aqui — o tempo limite da chamada, o número máximo de tentativas e o intervalo entre elas. A decisão interage diretamente com o RNF01, porque cada repetição soma ao tempo total percebido pelo usuário, e com o custo, porque uma transcrição repetida é cobrada duas vezes.
+
+### 3.2.3 Endpoint interno de análise, da voz à intenção
+
+Além do endpoint de transcrição, a solução expõe o encadeamento completo entre voz e intenção, que é o caminho efetivamente exercitado pelo canal de voz:
+
+```http
+POST /api/v1/audio/{audio_id}/analyze
+```
+
+Os parâmetros de entrada, a autenticação e as respostas de erro são idênticos aos do endpoint de transcrição, porque a análise reaproveita o mesmo serviço e converte os mesmos códigos de falha. A resposta de sucesso acrescenta dois campos ao contrato da transcrição:
+
+| Campo | Tipo | Descrição |
+| --- | --- | --- |
+| `intencao` | string | Intenção do catálogo da Seção 3.1 identificada pelo pipeline de PLN sobre o texto transcrito |
+| `confianca_pln` | float | Grau de confiança do classificador, de 0 a 1, com a ressalva de calibração registrada na Seção 3.3.3 |
+
+Este endpoint é o ponto em que as Seções 3.2, 3.3 e 3.4 se encontram: o `audio_id` vem da API de recebimento, o texto vem do provedor de STT e a intenção vem do classificador local. É também o que permite exercitar o canal de voz de ponta a ponta antes de a interface estar concluída.
+
+> **Ressalva sobre o valor de `intencao`.** Os exemplos desta seção usam os nomes do catálogo da Seção 3.1, que é o contrato-alvo do produto. O modelo atualmente versionado, porém, foi treinado sobre um conjunto de apenas três classes genéricas e devolve um desses três rótulos, conforme a divergência apurada na Seção 3.3.2. A reconciliação entre o modelo e o catálogo é trabalho da Sprint 3.
+
+### 3.2.4 Exemplos de requisição e resposta
+
+Os exemplos abaixo correspondem ao contrato definido em `src/schemas/` e às mensagens declaradas em `src/routes/transcription.py`. Os valores de `text`, `confidence` e `duration_seconds` do caminho de sucesso são ilustrativos e representam uma consulta típica do domínio; os corpos de erro são reprodução literal do que a aplicação devolve.
+
+**Exemplo 1 — Speech to Text bem-sucedido.**
 
 ```bash
 curl -X POST \
@@ -1822,7 +1901,9 @@ curl -X POST \
 }
 ```
 
-Áudio inexistente:
+A leitura da resposta é direta: `text` é o que segue para o pipeline de PLN; `confidence` é a confiança do reconhecedor de fala, e não a do classificador de intenções, que aparece apenas na resposta do endpoint de análise; `duration_seconds` é insumo de custo, porque a cobrança do provedor é por minuto de áudio.
+
+**Exemplo 2 — Speech to Text com áudio inválido ou inexistente.**
 
 ```bash
 curl -X POST \
@@ -1833,69 +1914,203 @@ curl -X POST \
 
 ```json
 {
-  "detail": "Áudio não encontrado: aud_inexistente"
+  "error": "audio_not_found",
+  "message": "Áudio não encontrado. O id informado não existe ou já expirou."
 }
 ```
 
-Falha no serviço externo:
+O mesmo corpo é devolvido quando o `audio_id` existiu mas o objeto já foi removido pela política de retenção de sete dias descrita na Seção 3.2.5. Um arquivo corrompido ou em formato não suportado nunca chega a este endpoint: ele é recusado antes, no recebimento, com `415` ou `422`, conforme a Seção 3.4.
+
+Quando o serviço externo falha — indisponibilidade, credencial inválida ou resposta malformada —, a resposta é:
 
 **Código HTTP:** `502 Bad Gateway`
 
 ```json
 {
-  "detail": "Falha na transcrição do áudio aud_067071317397468196a9b9c4cffa82c6"
+  "error": "transcription_failed",
+  "message": "Falha ao transcrever o áudio. Tente novamente em instantes."
 }
 ```
 
-#### Serviço de Text to Speech
+**Exemplo 3 — análise de ponta a ponta, do áudio à intenção.**
 
-A implementação do TTS não está no escopo desta sprint. O cliente de TTS exige que o serviço esteja escolhido e com credenciais de teste disponíveis antes de qualquer desenvolvimento, e essa avaliação ainda não foi concluída pelo grupo. Além disso, a integração ponta a ponta STT-PLN-TTS depende tanto do cliente de STT, já implementado, quanto do cliente de TTS, ainda pendente; iniciar a integração sem os dois clientes prontos resultaria em trabalho parcial que não pode ser validado.
+```bash
+curl -X POST \
+  "http://localhost:8000/api/v1/audio/aud_067071317397468196a9b9c4cffa82c6/analyze"
+```
 
-O comparativo de provedores, a documentação dos endpoints e os exemplos de uso serão incluídos nesta seção na próxima sprint, após a escolha do serviço e os primeiros testes com o vocabulário do portfólio.
+**Código HTTP:** `200 OK`
 
-### 3.3 Algoritmo de NLP e Implementação
+```json
+{
+  "audio_id": "aud_067071317397468196a9b9c4cffa82c6",
+  "text": "Qual o status atual do empreendimento Linha 6 e quais são os marcos previstos para o próximo trimestre?",
+  "language": "pt-BR",
+  "confidence": 0.9516,
+  "duration_seconds": 22.831,
+  "intencao": "consultar_projeto_sintetico",
+  "confianca_pln": 0.7412
+}
+```
 
-Esta seção documenta o pipeline de Processamento de Linguagem Natural que classifica a intenção de cada solicitação. Ele é o passo comum a todos os requisitos iniciados por linguagem natural, o `classificarIntencao` que aparece nos cenários 1 e 2 da seção 3.8, e é sobre ele que incide o RNF03, que exige precisão mínima de 85% na identificação de intenções.
+**Exemplo 4 — parâmetro inválido.**
 
-O código está em `src/pln/`.
+```bash
+curl -X POST \
+  "http://localhost:8000/api/v1/audio/aud_067071317397468196a9b9c4cffa82c6/transcribe?language=en-US"
+```
 
-#### 3.3.1 Finalidade e escopo
+**Código HTTP:** `422 Unprocessable Entity`
 
-O pipeline recebe **texto**, digitado pelo usuário ou transcrito pela API de Speech-to-Text descrita em 3.2, e devolve **uma das dez intenções do catálogo** definido em 3.1, acompanhada de um grau de confiança.
+Esta é a única resposta de erro dos endpoints de voz que mantém o corpo nativo do FastAPI, pela mesma razão explicada na Seção 3.4: a validação ocorre antes de a rota executar, no momento em que o framework converte a query no tipo `Literal["pt-BR"]`.
+
+```json
+{
+  "detail": [
+    {
+      "type": "literal_error",
+      "loc": ["query", "language"],
+      "msg": "Input should be 'pt-BR'",
+      "input": "en-US"
+    }
+  ]
+}
+```
+
+**Pseudocódigo da integração.** O trecho abaixo resume, em forma reduzida, o que `TranscribeAudio.transcribe` faz. É **exemplo conceitual** destinado a explicar o mecanismo, e não o código executável do repositório, que está em `src/services/transcription_service.py`:
+
+```python
+# Exemplo conceitual — versão reduzida de src/services/transcription_service.py
+async def transcrever(audio_id: str, language: str = "pt-BR") -> TranscriptionResult:
+    try:
+        conteudo = armazenamento.fetch(key=f"incoming/{audio_id}")   # bytes lidos do bucket
+    except KeyError:
+        raise TranscriptionError(AUDIO_NOT_FOUND)                    # vira 404 na rota
+
+    try:
+        resposta = await cliente.listen.v1.media.transcribe_file(
+            request=conteudo, model="nova-3", language=language,
+            smart_format=True, punctuate=True, keyterm=TERMOS_DO_DOMINIO,
+        )
+    except Exception:
+        raise TranscriptionError(TRANSCRIPTION_FAILED)               # vira 502 na rota
+
+    melhor = resposta.results.channels[0].alternatives[0]
+    return TranscriptionResult(
+        text=melhor.transcript or "",
+        language=language,
+        confidence=melhor.confidence,
+        duration_seconds=resposta.metadata.duration,
+    )
+```
+
+Três decisões estão visíveis nesse desenho. A primeira é que o serviço nunca recebe um caminho de arquivo nem um `UploadFile`: ele recebe um identificador e busca o conteúdo pelo `AudioFetcher`, o que permite trocar o armazenamento sem tocar na transcrição. A segunda é que toda exceção do provedor é traduzida para um erro do domínio antes de chegar à rota, de modo que nenhum detalhe do SDK vaze para o contrato HTTP. A terceira é que apenas a melhor alternativa do primeiro canal é aproveitada, decisão adequada a áudio monofônico de consulta e que precisaria ser revista se o produto passasse a tratar gravações com vários interlocutores.
+
+### 3.2.5 Privacidade, retenção e descarte do áudio
+
+| Item | Regra vigente | Situação |
+|---|---|---|
+| Local de armazenamento | Bucket compatível com S3, sob a chave `incoming/{audio_id}`; MinIO no ambiente local | Implementado |
+| Retenção | Expiração automática dos objetos do prefixo `incoming/` após **7 dias**, por regra de ciclo de vida do bucket | Implementado, em `infra/minio/lifecycle.json` |
+| Descarte | Executado pelo próprio armazenamento, sem intervenção da aplicação, o que evita que o descarte dependa de uma rotina capaz de falhar em silêncio | Implementado |
+| Retenção pelo provedor externo | O áudio é enviado ao Deepgram para transcrição. As opções de retenção e de uso do conteúdo pelo provedor precisam ser conferidas e configuradas na conta antes de qualquer uso com dado real | **PENDENTE DE VALIDAÇÃO DA EQUIPE** |
+| Criptografia em trânsito | HTTPS na chamada ao provedor. No ambiente local, o MinIO responde por HTTP dentro da própria máquina do desenvolvedor | Parcial, por se tratar de ambiente local |
+| Conteúdo nos registros de log | A aplicação não registra o conteúdo do áudio nem o texto transcrito; o `audio_id` é a única referência que aparece em log | Implementado |
+| Dados pessoais | Nenhum dado corporativo ou pessoal real transita pelo canal de voz no MVP, conforme a delimitação da Seção 1.3 | Restrição de escopo vigente |
+
+A retenção de sete dias é curta de propósito e responde a duas exigências que puxam em direções opostas. De um lado, o áudio precisa sobreviver ao ciclo da requisição, para que a retranscrição seja possível sem novo envio e para que a coluna `audio_referencia` da trilha de auditoria, definida na Seção 3.6.5, tenha a que apontar. De outro, gravação de voz é o dado mais sensível que a solução manipula, e mantê-la indefinidamente ampliaria a superfície de exposição sem ganho proporcional. Antes de qualquer uso com dado real, a janela deve ser reavaliada junto às políticas de privacidade do parceiro e às exigências da LGPD aplicáveis ao tratamento de voz.
+
+### 3.2.6 Serviço de Text to Speech
+
+> **DECISÃO TÉCNICA EM ABERTO.** A implementação do TTS não está no escopo desta sprint. O cliente de TTS exige que o serviço esteja escolhido e com credenciais de teste disponíveis antes de qualquer desenvolvimento, e essa avaliação ainda não foi concluída pelo grupo. Além disso, a integração ponta a ponta entre STT, PLN e TTS depende tanto do cliente de STT, já implementado, quanto do cliente de TTS, ainda pendente; iniciar a integração sem os dois clientes prontos resultaria em trabalho parcial que não pode ser validado.
+
+A ausência da decisão não impede fixar desde já os critérios sobre os quais ela será tomada, e é isso que a tabela abaixo faz. Os candidatos foram levantados pela equipe; nenhuma coluna de resultado é preenchida aqui, justamente porque ainda não houve medição.
+
+| Critério de avaliação | Por que importa neste projeto | Como será verificado na Sprint 3 |
+|---|---|---|
+| Qualidade da voz em português brasileiro | O usuário é um profissional do PMO ouvindo a resposta enquanto se desloca; entonação artificial compromete a compreensão de números e datas | Escuta comparativa de um mesmo texto de referência com vocabulário de portfólio |
+| Pronúncia de siglas e termos do domínio | Termos como TAP, PMO, Linha 6 e marco aparecem em quase toda resposta | Texto de teste contendo as siglas do catálogo da Seção 3.1 |
+| Latência até o primeiro áudio | Soma-se ao tempo já consumido por transcrição e classificação, e incide sobre o RNF01 | Medição do tempo até o primeiro byte de áudio devolvido |
+| Custo por caractere ou por minuto sintetizado | Determina a viabilidade do canal de voz dentro do orçamento acadêmico | Consulta à página de preço vigente do provedor no momento da decisão |
+| Existência de SDK Python oficial | A pilha do backend é Python, e um SDK oficial reduz o custo de manutenção | Verificação no índice de pacotes e na documentação oficial |
+| Possibilidade de troca de provedor | A mesma exigência de desacoplamento aplicada ao STT vale aqui | Confirmação de que o cliente cabe atrás de uma interface própria, como ocorre com o `AudioFetcher` |
+
+**Candidatos considerados:** os mesmos provedores comparados para o STT oferecem síntese de fala — Deepgram, Google Cloud, Azure AI Speech e OpenAI —, o que torna a reutilização de credencial e de SDK um critério adicional de desempate. A equipe não fechou a escolha, e nenhum deles é apresentado aqui como selecionado.
+
+> **PENDENTE DE VALIDAÇÃO DA EQUIPE.** Escolher o provedor de TTS e registrar nesta seção, na Sprint 3, os mesmos itens já documentados para o STT: nome oficial, versão da API, URL-base, autenticação, voz utilizada, formato e taxa de amostragem do áudio devolvido, respostas de sucesso e de erro com seus códigos HTTP, tempo limite e política de repetição. Os dois exemplos que faltam nesta seção — **TTS bem-sucedido** e **TTS com parâmetro inválido** — devem ser acrescentados à Seção 3.2.4, no mesmo formato dos Exemplos 1 a 4 e extraídos de execução real do cliente. Enquanto esses dois exemplos não existirem, o critério de exemplos completos de API de voz não pode ser considerado plenamente atendido.
+
+### 3.2.7 Coerência com o restante da especificação
+
+A tabela fecha o vínculo entre esta seção e os demais elementos do projeto, de modo que nenhuma decisão de voz fique isolada do requisito que a origina nem do componente que a executa.
+
+| Elemento relacionado | Vínculo com a API de voz |
+|---|---|
+| RF01 — entrada por texto ou voz | A transcrição é o que permite que a solicitação falada percorra o mesmo pipeline da digitada, sem um segundo classificador |
+| RNF01 — desempenho | O tempo da chamada externa é a maior parcela do tempo de resposta do canal de voz; a política de tempo limite em aberto incide diretamente sobre este requisito |
+| RNF03 — precisão na identificação de intenções | Um erro de transcrição vira um erro de classificação; por isso o `keyterm` cobre o vocabulário que distingue as intenções |
+| RNF04 e RNF09 — auditoria | A coluna `auditoria.interacao.audio_referencia`, definida na Seção 3.6.5, guarda o `audio_id` e liga cada interação por voz ao arquivo original |
+| RNF06 — acessibilidade | O canal de voz é o mecanismo que atende a este requisito, e o WER medido é a métrica que comprova o atendimento |
+| AM9 — degradação da transcrição em ambiente ruidoso | O risco incide exatamente sobre esta seção e permanece **Aberto**, sem medição, conforme a Seção 4.3.2 do `GestaoProjeto.md` |
+| Seção 2.4 — diagrama de componentes | A Conversão de Áudio em Texto é o componente que encapsula este serviço |
+| Seção 3.4 — API de recebimento | Fornece o `audio_id` e impõe os limites de formato, tamanho e duração que este serviço pressupõe |
+| Seção 3.9 — projeto técnico e arquitetural | Os diagramas de sequência da consulta por voz e da falha do serviço de voz representam graficamente os fluxos desta seção |
+
+## 3.3 Algoritmo de NLP e Implementação
+
+Esta seção documenta o pipeline de Processamento de Linguagem Natural que classifica a intenção de cada solicitação. Ele é o passo comum a todos os requisitos iniciados por linguagem natural, o `classificarIntencao` que aparece nos Cenários 1 e 2 dos diagramas de sequência da seção 2.2.2, e é sobre ele que incide o RNF03, que exige precisão mínima de 85% na identificação de intenções.
+
+O código está em `src/pln/`, e a integração com o canal de voz está no endpoint de análise documentado na seção 3.2.3.
+
+**Delimitação do que é PLN nesta solução.** O termo é usado aqui no sentido estrito e não como sinônimo de modelo de linguagem. O que a Seção 3.3 documenta é uma cadeia de tratamento linguístico clássica — normalização, tokenização, redução morfológica, vetorização esparsa e classificação estatística supervisionada — que roda localmente, é determinística e não envolve nenhum modelo generativo. O modelo de linguagem generativo aparece em outro ponto da solução, na composição da resposta em linguagem natural pelo endpoint `POST /api/v1/chat` (seção 3.5), e é justamente essa separação que mantém a classificação de intenções auditável e reprodutível, e circunscreve o risco AM8 de alucinação à etapa de geração.
+
+### 3.3.1 Finalidade e escopo
+
+O pipeline recebe **texto**, digitado pelo usuário ou transcrito pela API de Speech to Text descrita em 3.2, e devolve **uma intenção**, acompanhada de um grau de confiança. O contrato-alvo é o catálogo de dez intenções definido em 3.1; o modelo atualmente versionado, porém, reconhece apenas três classes genéricas, divergência apurada e documentada em 3.3.2 e cuja reconciliação é trabalho da Sprint 3.
 
 Ele não interpreta a intenção nem executa a ação correspondente. Essa responsabilidade é do agente, conforme a separação registrada no diagrama de componentes: o pipeline transforma texto e classifica, e o que fazer com a intenção identificada é decisão de quem o consome.
 
-#### 3.3.2 Algoritmo escolhido: Naive Bayes multinomial
+### 3.3.2 Divergência apurada entre esta seção, o código e o catálogo de intenções
+
+Esta subseção foi acrescentada na homologação da Sprint 2 e precede as demais porque condiciona a leitura de tudo o que vem depois. A conferência do texto original desta seção contra o que está versionado no repositório encontrou três divergências relevantes, todas verificáveis. Elas não são erro de redação: decorrem de o conteúdo ter sido escrito sobre uma rodada do experimento que foi posteriormente substituída, sem que o texto acompanhasse.
+
+| # | O que a versão anterior desta seção afirmava | O que o repositório contém | Como verificar |
+|---|---|---|---|
+| 1 | O conjunto de treino tem 400 frases, 40 por intenção, cobrindo as dez intenções do catálogo da Seção 3.1 | `src/pln/dados/intencoes_exemplos.csv` tem **300 linhas e apenas três classes**: `consulta`, `transacao` e `alerta`, com 100 exemplos cada | Contagem direta no arquivo; as três classes também aparecem em `tests/test_classificador.py` |
+| 2 | O espaço de vetorização contém apenas a família esparsa, com quatro vetorizações, e a densa por embeddings foi removida | Há **cinco vetorizações**, incluindo a densa por embeddings do `pt_core_news_md`, e quatro variantes de Naive Bayes | `ModoVetorizacao` em `src/pln/vetorizacao.py`; seção *Esparsa contra densa* em `resultados/ajuste_fino.md` |
+| 3 | A configuração adotada aplica remoção de números, stemming e tokenização por expressão regular, com F1-macro de 0,6736 | O código adota **texto cru com tokenização por espaço** (`ConfigPreprocessamento(tokenizacao=Tokenizacao.SPLIT)`), e o relatório registra **F1-macro de 1,0000** | Constantes em `src/pln/classificador.py`, linhas 216 a 220, e os relatórios de `resultados/` |
+
+**Como a divergência surgiu.** O histórico do repositório mostra que o commit `581f647` (*feat: adicionar w2vec no pln*, issue #130) substituiu o conjunto de dez intenções pelo conjunto de três classes e reintroduziu a vetorização densa, e que o commit `80a2751` (*fix: alterações no algoritmo de classificação do pln*, issue #108) devolveu o conjunto de dez intenções. Na integração dessas duas frentes à `develop`, prevaleceu a versão de três classes. O commit `7b774c4` (*fix: restaura modelo com as dez intenções atuais*, issue #79) tentou corrigir o modelo serializado, mas o estado atual de `develop` mantém as três classes, tanto no CSV quanto no `resultados/classificador.joblib`.
+
+**Consequência para os artefatos.** O catálogo de dez intenções da Seção 3.1 permanece sendo a especificação aprovada do produto, e o `CHECK` da coluna `auditoria.interacao.intencao` na Seção 3.6.6 continua escrito sobre ele. O que não corresponde a essa especificação é **o conjunto de treino e o modelo atualmente versionados**, que reconhecem apenas três classes genéricas. O texto abaixo foi corrigido para descrever o que existe, e não o que se pretendia; a reconciliação entre modelo e catálogo é trabalho da Sprint 3.
+
+> **PENDENTE DE VALIDAÇÃO DA EQUIPE.** Duas decisões precisam ser tomadas na Sprint Planning da Sprint 3, e a segunda depende da primeira: (i) confirmar que o catálogo vigente é o de dez intenções da Seção 3.1, e não o recorte de três classes; (ii) reconstruir `intencoes_exemplos.csv` sobre esse catálogo, dentro dos critérios da task T10, e reexecutar as duas buscas. Enquanto isso não ocorrer, **nenhuma métrica desta seção deve ser apresentada como evidência de atendimento do RNF03**, porque ela foi medida sobre um problema mais fácil do que o especificado. Esta divergência é o principal argumento para a task T10 e reforça o risco AM6, registrado na Seção 4.3.2 do `GestaoProjeto.md`.
+
+**Fonte de referência.** A descrição técnica detalhada e atualizada do módulo está em [`PipelinePLN.md`](PipelinePLN.md), que acompanha o código e foi a base desta correção. As subseções a seguir resumem o que interessa ao artefato de definição técnica; em caso de divergência futura, o `PipelinePLN.md` e os comentários de `src/pln/classificador.py` prevalecem, por serem versionados junto ao código que descrevem.
+
+### 3.3.3 Algoritmo escolhido: Naive Bayes multinomial
 
 **Decisão:** utilizar `MultinomialNB` sobre representação esparsa de termos, tanto na medição quanto no produto.
 
-O critério determinante foi **velocidade**, e ele não é conveniência de desenvolvimento: é o que viabiliza o método de escolha descrito em 3.3.3. O pipeline só pode ser configurado por medição exaustiva se cada medição for barata, porque são 11.644 delas. Medindo o custo de uma validação cruzada de 5 dobras sobre a vetorização mais cara do espaço (`bow n=1-2`, 2.540 colunas):
-
-| Classificador | Custo por validação cruzada | Varredura exaustiva completa |
-| --- | ---: | ---: |
-| **`MultinomialNB`** | **0,029 s** | **~4 min** |
-| `RidgeClassifier` | 0,185 s | ~28 min |
-| `LogisticRegression` | 12,472 s | ~616 min |
-
-A regressão logística é 430 vezes mais lenta nessa vetorização porque o solver `lbfgs` sofre com contagem bruta não normalizada. Com ela, a varredura passaria de quatro minutos para mais de dez horas, e o método deixaria de ser praticável.
-
-Os demais critérios acompanham a escolha:
+O módulo usava regressão logística e a troca foi feita por medição, não por preferência. Vale registrar os dois lados, porque quem alterar o classificador depois precisa saber o que está sendo trocado.
 
 | Critério | Como o `MultinomialNB` atende |
 | --- | --- |
-| Volume de dados disponível | Estima uma contagem por termo e classe, sem otimização iterativa que exija muitos exemplos para convergir. O dataset atual tem 400 frases, 40 por intenção |
+| Volume de dados disponível | Estima uma contagem por termo e classe, sem otimização iterativa que exija muitos exemplos para convergir. Com poucas centenas de frases, isso deixa de ser detalhe e passa a ser o argumento principal |
 | Determinismo | Sem sorteio interno nem `random_state`. Duas execuções produzem exatamente o mesmo modelo, o que torna a avaliação reprodutível |
+| Mesma família da régua do experimento | O classificador do produto é o mesmo que serve de instrumento de medida na varredura, o que elimina a ressalva de escolher o pré-processamento sob um modelo e usar outro em produção |
 | RNF11, explicabilidade das sugestões | Expõe peso por termo e por classe, permitindo listar as palavras que sustentaram cada decisão |
 | RNF04 e RNF09, auditabilidade | A intenção identificada e as palavras que a determinaram podem ser registradas no log de cada interação |
 | RNF01 e RNF10, desempenho e escalabilidade | Classificação em microssegundos, e a matriz esparsa não cresce em memória proporcionalmente ao corpus |
+| Custo da medição | Cada validação cruzada é barata, o que é a condição de possibilidade da varredura exaustiva descrita em 3.3.4 — um classificador com solver iterativo tornaria a busca impraticável. Na troca da regressão logística pelo Naive Bayes, o comentário de `classificador.py` registra 0,8725 de F1-macro contra 0,8443, diferença menor que o desvio entre dobras, de modo que o honesto é dizer que o modelo escolhido não perde, e não que ganha |
 
-**Decisão:** o classificador do produto é o mesmo que serve de instrumento de medida no experimento.
+**Limitação declarada — a calibração piorou com a troca.** Naive Bayes multiplica probabilidades assumindo que os termos são independentes; como não são, a mesma evidência é contada mais de uma vez e a saída satura perto de 0 e de 1. A confiança devolvida por `prever_intencao` **ordena bem e calibra mal**: serve para comparar duas frases entre si, mas não deve ser lida como "probabilidade de estar certo". Um limiar de recusa fixado sobre esse número recusa de menos. A regressão logística calibrava melhor, e foi isso que se perdeu na troca. A consequência prática está na Seção 3.3.13.
 
-Isso não é redundância, é uma condição de validade. O pré-processamento é escolhido medindo com um classificador fixo; se o produto usasse outro, a escolha do texto teria sido feita para um modelo que não é o que roda. Chegamos a avaliar `BernoulliNB` como modelo do produto, e a medição mostrou o custo dessa separação: o melhor pré-processamento sob Bernoulli estava na posição 43 do ranking construído sob multinomial, fora da janela de candidatos que o ajuste fino recebe. Fixar o mesmo classificador nos dois lugares elimina o problema por construção.
+**Limitação declarada — a suposição de independência é falsa.** Expressões como "material rodante" e "estrutura analítica" são contadas como duas evidências separadas. É o preço do modelo e não desaparece com ajuste de parâmetro.
 
-**Limitação declarada:** a confiança devolvida pelo modelo ordena bem e calibra mal. Ela serve para comparar duas frases entre si, mas não deve ser lida como "probabilidade de estar certo". Um limiar de recusa construído sobre ela, necessário para o comportamento previsto no RF02 e na intenção `fora_do_catalogo`, precisa ser calibrado empiricamente sobre dados rotulados, e não escolhido por intuição.
+**Variante e vetorização não são escolhas independentes.** A restrição é de execução, não de gosto: `bow` e `tfidf` admitem `multinomial`, `complement` e `bernoulli`, porque essas variantes estimam a probabilidade do termo somando colunas, e soma negativa não é probabilidade de nada; a vetorização por embeddings, cujas coordenadas são negativas por construção, exige `GaussianNB`. A função `variantes_compativeis()` devolve as combinações válidas e recusa as demais com mensagem explícita.
 
-#### 3.3.3 Por que um pipeline que combina opções, e não uma sequência fixa
+**Consequência metodológica dessa restrição.** Quando o relatório compara `embedding` com `tfidf`, ele compara **dois pipelines inteiros**, e não duas representações com o restante constante: parte da diferença vem da representação e parte vem do classificador, e a medição não separa as duas. Isso não invalida o número para a decisão prática, porque o que vai a produção é o pipeline inteiro; invalida a afirmação isolada de que "embeddings são piores que TF-IDF", que a medição não sustenta nessa forma. A comparação entre `bow` e `tfidf`, essa sim, é limpa: mesma régua nos dois lados.
+### 3.3.4 Por que um pipeline que combina opções, e não uma sequência fixa
 
 Antes de classificar uma frase é preciso transformá-la: minusculizar, remover acentos, remover pontuação, descartar stopwords, reduzir palavras à forma base, separar em tokens. A literatura trata várias dessas etapas como boas práticas, mas nenhuma delas tem resposta universal:
 
@@ -1904,7 +2119,7 @@ Antes de classificar uma frase é preciso transformá-la: minusculizar, remover 
 - a **ordem** entre as etapas altera o resultado, e em alguns casos faz uma etapa parar de funcionar: a lista de stopwords vem acentuada, então filtrá-la depois de remover acentos não remove nada;
 - a **tokenização** não é detalhe de implementação, porque separar por espaço, por expressão regular ou por regra linguística produz vocabulários diferentes a partir do mesmo texto, e é o vocabulário que o classificador enxerga.
 
-**Decisão arquitetural:** o módulo não assume nada. Cada etapa é opcional, a ordem é campo da configuração e a tokenização é uma escolha explícita. Um experimento mede todas as combinações no dataset real e a escolha é feita por número.
+**Decisão arquitetural:** o módulo não assume nada. Cada etapa é opcional, a ordem é campo da configuração e a tokenização é uma escolha explícita. Um experimento mede todas as combinações sobre o conjunto rotulado e a escolha é feita por número — o que só funciona enquanto o conjunto contiver casos que o modelo erre, condição hoje não satisfeita, conforme a ressalva de 3.3.7.
 
 Na prática, uma configuração de pré-processamento é um objeto de dados, não uma sequência de chamadas escrita à mão:
 
@@ -1928,9 +2143,11 @@ preprocessar("O marco da Linha 6 NÃO foi atualizado em 12/03!", config)
 # 'marc linh 6 nao atual 12 03'
 ```
 
+O exemplo é **conceitual e ilustrativo da capacidade do módulo**: ele mostra o efeito de uma configuração com stemming e preservação de negações, e não a configuração adotada em produção, que é o texto cru registrado em 3.3.7. A saída comentada evidencia três coisas de uma vez: as palavras foram reduzidas ao radical (`marco` para `marc`), a negação foi preservada apesar de `não` ser stopword, e a data foi separada em dois tokens pela remoção da pontuação.
+
 O custo dessa decisão é que o espaço de busca fica grande e a avaliação leva minutos. O benefício é que toda escolha do pipeline passa a ser justificável por medição, o que sustenta a exigência de coerência técnica deste artefato: nenhuma etapa está ligada porque "costuma ajudar".
 
-#### 3.3.4 Arquitetura em módulos
+### 3.3.5 Arquitetura em módulos
 
 Cada arquivo tem uma responsabilidade e não conhece a do outro. `preprocessamento.py` não sabe que existe vetorização, `vetorizacao.py` não sabe que existe stemming, e `experimento.py` e `classificador.py` compõem os dois primeiros sem implementar nenhum deles.
 
@@ -1938,10 +2155,10 @@ Cada arquivo tem uma responsabilidade e não conhece a do outro. `preprocessamen
 | --- | --- |
 | `caminhos.py` | Caminhos de entrada e saída, declarados num lugar só |
 | `preprocessamento.py` | Texto para tokens. Seis etapas opcionais, ordem configurável, três tokenizações |
-| `vetorizacao.py` | Tokens para matriz numérica. Dois modos por duas janelas de n-grama |
-| `classificador.py` | O modelo do produto e a interface de previsão |
+| `vetorizacao.py` | Tokens para matriz numérica. Duas famílias esparsas por duas janelas de n-grama, mais a densa por embeddings |
+| `classificador.py` | O modelo do produto, as quatro variantes de Naive Bayes e a interface de previsão |
 | `experimento.py` | Busca do **texto**: pré-processamento × vetorização |
-| `ajuste_fino.py` | Busca dos **parâmetros do modelo**: suavização × priori × vetorização |
+| `ajuste_fino.py` | Busca dos **parâmetros do modelo**: variante × suavização × priori × vetorização |
 | `dados/` | Datasets rotulados, com as colunas `texto` e `intencao` |
 
 O **pipeline em execução** é uma sequência linear, e é o que roda toda vez que uma solicitação chega:
@@ -1958,7 +2175,7 @@ flowchart TB
     end
 
     P --> V["vetorizacao.py<br/>bag of words ou tf-idf,<br/>janela uni ou uni+bi"]
-    V --> C["MultinomialNB"]
+    V --> C["MultinomialNB<br/>alpha=1.0, fit_prior=True"]
     C --> S["intenção + confiança"]
 ```
 
@@ -1968,9 +2185,9 @@ As **duas buscas** que configuraram esse pipeline são maquinário de projeto, e
 flowchart TB
     EXP["experimento.py<br/>varia pré-processamento × vetorização<br/>MultinomialNB(alpha=1.0) fixo"]
     CSV[("comparativo_preprocessamento.csv")]
-    AJU["ajuste_fino.py<br/>varia suavização × priori × vetorização<br/>texto fixo nos melhores do ranking"]
+    AJU["ajuste_fino.py<br/>varia variante × suavização × priori × vetorização<br/>texto fixo nos vinte melhores do ranking"]
     REL[("ajuste_fino.md<br/>bloco de configuração")]
-    PROD["classificador.py<br/>CONFIG_PRE_PADRAO, CONFIG_VET_PADRAO,<br/>ALPHA_PADRAO, FIT_PRIOR_PADRAO"]
+    PROD["classificador.py<br/>CONFIG_PRE_PADRAO, CONFIG_VET_PADRAO,<br/>VARIANTE_PADRAO, ALPHA_PADRAO, FIT_PRIOR_PADRAO"]
 
     EXP --> CSV --> AJU --> REL
     REL -. "colar à mão" .-> PROD
@@ -1988,7 +2205,7 @@ Pipeline([
 
 Isso importa por dois motivos. Primeiro, treinar, avaliar, salvar e prever passam a operar sobre texto bruto, e não existe a possibilidade de alguém treinar com um pré-processamento e prever com outro, que é um erro comum em PLN e não levanta exceção nenhuma: o modelo apenas erra mais. Segundo, dentro da validação cruzada o `Pipeline` garante que o vocabulário e o IDF sejam aprendidos apenas nas dobras de treino, evitando vazamento de dados.
 
-#### 3.3.5 Espaço de busca
+### 3.3.6 Espaço de busca
 
 | Dimensão | Opções | Combinações |
 | --- | --- | ---: |
@@ -1998,122 +2215,165 @@ Isso importa por dois motivos. Primeiro, treinar, avaliar, salvar e prever passa
 | Tokenização | split, regex, linguística | 3 |
 | **Configurações de pré-processamento** | | **432** |
 | Permutações de ordem das etapas ativas | | **19.767** |
-| Vetorizações (2 modos × 2 janelas de n-grama) | | **4** |
+| Vetorizações | `bow n=1`, `bow n=1-2`, `tfidf n=1`, `tfidf n=1-2` e `embedding` | **5** |
 
-As 432 configurações de pré-processamento, combinadas com suas permutações de ordem, produzem 19.767 pares (configuração, ordem). Multiplicados pelas 4 vetorizações, chegam a **79.068 combinações**. Permutações que produzem texto idêntico são o mesmo experimento e são deduplicadas por hash do corpus, o que elimina cerca de 85% do trabalho. A varredura completa resulta em **11.644 execuções distintas** e leva aproximadamente **4 minutos**.
+As 432 configurações de pré-processamento, combinadas com suas permutações de ordem, produzem 19.767 pares de configuração e ordem. Permutações que produzem texto idêntico são o mesmo experimento e são deduplicadas por hash do corpus, o que elimina cerca de 95% do trabalho. Na varredura registrada em `resultados/comparativo_preprocessamento.md`, isso resulta em **8.070 execuções distintas**.
 
-#### 3.3.6 Como o pipeline final foi escolhido
+A quinta vetorização é a densa por embeddings, que usa os vetores pré-treinados do `pt_core_news_md` — fastText treinado com CBOW, e não Word2Vec, distinção registrada no próprio código para que o nome não induza a erro. Ela só pode ser combinada com `GaussianNB`, pela restrição descrita em 3.3.3, e é por isso que a comparação entre esparsa e densa compara pipelines inteiros.
+
+### 3.3.7 Como o pipeline final foi escolhido
 
 A escolha é feita por duas buscas, e cada uma fixa o que a outra varia:
 
 | Script | Varia | Fixa |
 | --- | --- | --- |
-| `experimento.py` | o **texto**: pré-processamento × vetorização | o modelo: `MultinomialNB(alpha=1.0)` |
-| `ajuste_fino.py` | os **parâmetros do modelo**: suavização × priori × vetorização | o texto: os melhores do experimento |
+| `experimento.py` | o **texto**: pré-processamento × vetorização | o modelo: `MultinomialNB(alpha=1.0)`, que é a régua |
+| `ajuste_fino.py` | os **parâmetros do modelo**: variante × suavização × priori × vetorização | o texto: os vinte melhores do experimento |
 
 O `ajuste_fino.py` lê o relatório que o `experimento.py` grava, então a ordem de execução é obrigatória.
 
-##### Decisões metodológicas que sustentam a validade da comparação
+#### Decisões metodológicas que sustentam a validade da comparação
 
-**Decisão:** a régua é única e fixa. O `experimento.py` compara formas de preparar texto, então tudo o que vem depois precisa ser idêntico: mesmo algoritmo, mesmos parâmetros, mesma semente.
+**Decisão:** a régua é única e fixa dentro de cada família. O `experimento.py` compara formas de preparar texto, então tudo o que vem depois precisa ser idêntico: mesmo algoritmo, mesmos parâmetros, mesma semente. A exceção é a linha da vetorização densa, que exige `GaussianNB` e por isso compara pipelines inteiros — ressalva declarada em 3.3.3 e repetida no relatório.
 
-**Decisão:** o espaço de vetorização contém apenas a família esparsa. Uma vetorização densa por embeddings pré-treinados chegou a ser avaliada e foi removida. O motivo não foi desempenho, e sim que vetores de embedding têm coordenadas negativas, que o `MultinomialNB` não aceita, o que obrigava a trocar de classificador naquela linha do ranking. Com o classificador variando junto com a representação, o efeito de um deixa de ser separável do do outro e a comparação fica **confundida**. Medindo a decomposição no dataset atual:
+**Decisão:** validação cruzada estratificada de 5 dobras, com semente fixa (42). Estratificada para que cada dobra contenha todas as classes na mesma proporção, e com semente fixa para que duas configurações sejam comparáveis, e não diferentes por sorteio.
 
-| Comparação | F1 | Leitura |
-| --- | ---: | --- |
-| tfidf + MultinomialNB | 0,6354 | ponto de partida |
-| tfidf + GaussianNB | 0,4855 | **−0,1499**, só a troca de classificador |
-| embedding + GaussianNB | 0,4239 | **−0,0615**, só a troca de representação |
-| régua única, tfidf contra embedding | 0,6687 contra 0,6387 | **−0,0300**, o efeito real |
-
-O relatório reportava −0,2114 para "embedding é pior". O efeito real da representação é −0,0300, ou seja, **71% do que era atribuído à representação vinha do classificador**. Restringir o espaço à família esparsa resolve o problema pela raiz, porque uma régua atende tudo que está dentro e toda linha do relatório passa a ser interpretável sem ressalva. O custo declarado é que o experimento deixou de responder "vale a pena usar embeddings?", pergunta que passa a exigir um estudo próprio.
-
-**Decisão:** validação cruzada estratificada de 5 dobras, com semente fixa (42). Estratificada para que cada dobra contenha todas as intenções na mesma proporção, e com semente fixa para que duas configurações sejam comparáveis, e não diferentes por sorteio.
-
-**Decisão:** a métrica é F1-macro, e não acurácia. Acurácia engana com classes desbalanceadas, enquanto o macro tira média por classe, de modo que a intenção rara pesa igual à comum.
+**Decisão:** a métrica é F1-macro, e não acurácia. Acurácia engana com classes desbalanceadas, enquanto o macro tira média por classe, de modo que a classe rara pese igual à comum.
 
 **Decisão:** as comparações entre opções são pareadas. Média simples seria enviesada, porque `manter` e `nenhuma` deixam a configuração com uma etapa a menos e, portanto, com menos permutações de ordem. O pareamento compara apenas grupos idênticos em todas as demais escolhas.
 
-**Decisão:** entre configurações empatadas, vence a mais simples. "Empatadas" são as que ficam dentro de um desvio padrão da melhor, ou seja, dentro da incerteza da própria medição. O desempate é, nesta ordem: menos etapas, janela de n-grama menor, ordem padrão, maior F1. A ordem padrão vem antes do F1 de propósito, porque entre permutações do mesmo conjunto de etapas a diferença de F1 é menor que o desvio entre dobras, e escolher por ela seria escolher por ruído.
+**Decisão:** entre configurações empatadas, vence a mais simples. "Empatadas" são as que ficam dentro de um desvio padrão da melhor, ou seja, dentro da incerteza da própria medição. Uma etapa a mais que não paga o próprio custo é complexidade sem retorno.
 
-##### Resultados da busca do texto
+#### Resultados da busca do texto
 
-Efeito de cada escolha, em comparação pareada sobre 576 configurações idênticas nas demais escolhas:
+Os valores abaixo são os do relatório versionado em `resultados/comparativo_preprocessamento.md`, em comparação pareada sobre 720 configurações idênticas nas demais escolhas:
 
 | Escolha | F1 médio | vs referência |
 | --- | ---: | ---: |
-| stopwords: manter | 0,6332 | referência |
-| stopwords: remover tudo | 0,5942 | −0,0390 |
-| stopwords: preservar negações | 0,5943 | −0,0389 |
-| morfologia: nenhuma | 0,5962 | referência |
-| **morfologia: stemming** | **0,6247** | **+0,0285** |
-| morfologia: lematização | 0,6009 | +0,0047 |
-| tokenização: split | 0,5951 | referência |
-| tokenização: regex | 0,6133 | +0,0182 |
-| tokenização: linguística | 0,6134 | +0,0184 |
+| stopwords: manter | 0,9716 | referência |
+| stopwords: remover tudo | 0,9459 | −0,0257 |
+| stopwords: preservar negações | 0,9467 | −0,0249 |
+| morfologia: nenhuma | 0,9579 | referência |
+| morfologia: stemming | 0,9514 | −0,0065 |
+| morfologia: lematização | 0,9550 | −0,0028 |
+| tokenização: split | 0,9550 | referência |
+| tokenização: regex | 0,9547 | −0,0003 |
+| tokenização: linguística | 0,9547 | −0,0003 |
 
-O resultado sobre stopwords confirma a hipótese de domínio que motivou o terceiro modo: remover stopwords atrapalha, e as duas formas de removê-las são equivalentes entre si.
+Efeito das quatro etapas booleanas, no mesmo relatório:
 
-Sobre a ordem das etapas, ela muda o texto em **1.320 de 1.728 grupos** (76%), com amplitude média de 0,0148 de F1. Usar sempre a ordem padrão custa, em média, 0,0048, uma ordem de grandeza abaixo do desvio entre dobras, o que justifica a regra de desempate adotada.
+| Etapa | Com | Sem | Efeito |
+| --- | ---: | ---: | ---: |
+| remover números | 0,9529 | 0,9417 | +0,0112 |
+| remover acentos | 0,9473 | 0,9508 | −0,0036 |
+| minúsculas | 0,9468 | 0,9513 | −0,0045 |
+| remover pontuação | 0,9401 | 0,9614 | −0,0213 |
 
-##### Resultados da busca dos parâmetros
+Efeito da vetorização, em comparação pareada sobre 1.614 pré-processamentos avaliados sob as cinco vetorizações:
 
-Sobre os vinte melhores pré-processamentos, 960 candidatos avaliados:
+| Escolha | Com | Sem | Efeito |
+| --- | ---: | ---: | ---: |
+| tfidf, contra bow | 0,9839 | 0,9776 | +0,0063 |
+| bigrama, contra apenas unigrama | 0,9837 | 0,9779 | +0,0058 |
+| embedding, contra as esparsas | 0,8192 | 0,9808 | −0,1616 |
+
+Duas conclusões qualitativas se sustentam e são as mais úteis desta tabela. A primeira é que **remover pontuação atrapalha**, com o maior efeito negativo entre as etapas booleanas. A segunda é que **remover stopwords atrapalha**, e as duas formas de removê-las são praticamente equivalentes entre si — resultado que confirma a hipótese de domínio que motivou o terceiro modo, já que a lista do português inclui `não`, `nem`, `sem` e `nunca`, palavras que carregam o sinal em "não atualizou o status".
+
+Sobre a ordem das etapas, ela muda o texto em **1.280 de 2.160 grupos**, ou 59%, com amplitude média de 0,0116 de F1 e máxima de 0,0965. A ordem padrão foi a melhor em 698 desses 1.280 grupos, ou 55%.
+
+#### Resultados da busca dos parâmetros
+
+Sobre os vinte melhores pré-processamentos, 3.000 candidatos avaliados, conforme `resultados/ajuste_fino.md`:
+
+| Variante de Naive Bayes | F1 médio | vs melhor |
+| --- | ---: | ---: |
+| **`multinomial`** | **0,9989** | referência |
+| `bernoulli` | 0,9978 | −0,0011 |
+| `complement` | 0,9947 | −0,0042 |
 
 | Suavização (`alpha`) | F1 médio | vs melhor |
 | --- | ---: | ---: |
-| **1.0** | **0,6537** | referência |
-| 0.5 | 0,6454 | −0,0083 |
-| 2.0 | 0,6446 | −0,0091 |
-| 0.1 | 0,6190 | −0,0347 |
+| **0,5** | **0,9977** | referência |
+| 0,01 | 0,9977 | −0,0000 |
+| 0,05 | 0,9976 | −0,0001 |
+| 0,1 | 0,9976 | −0,0002 |
+| 1,0 | 0,9971 | −0,0006 |
+| 2,0 | 0,9951 | −0,0026 |
 
-| Vetorização | F1 médio | vs melhor |
+| Vetorização esparsa | F1 médio | vs melhor |
 | --- | ---: | ---: |
-| **bow n=1** | **0,6401** | referência |
-| tfidf n=1 | 0,6276 | −0,0125 |
-| bow n=1-2 | 0,6258 | −0,0143 |
-| tfidf n=1-2 | 0,6148 | −0,0252 |
+| **tfidf n=1-2** | **0,9988** | referência |
+| bow n=1-2 | 0,9982 | −0,0006 |
+| tfidf n=1 | 0,9965 | −0,0022 |
+| bow n=1 | 0,9950 | −0,0037 |
 
-As probabilidades a priori não fazem diferença nenhuma (0,6271 nos dois valores), o que é coerente com as dez intenções terem exatamente o mesmo número de exemplos. O `alpha` fica no padrão da biblioteca, 1.0, que também foi o melhor medido.
+As probabilidades a priori não fazem diferença nenhuma, 0,9971 nos dois valores, o que é coerente com as três classes do conjunto atual terem exatamente o mesmo número de exemplos. O `bernoulli` já foi o padrão do módulo, pelo argumento de que binarizar vence em frase curta; o argumento era plausível e a medição o colocou em segundo lugar.
 
-##### Configuração adotada
+#### Configuração adotada
+
+Estes são os valores efetivamente aplicados em `src/pln/classificador.py`, linhas 216 a 220:
 
 ```python
-CONFIG_PRE_PADRAO = ConfigPreprocessamento(
-    remover_numeros=True,
-    morfologia=ModoMorfologia.STEMMING,
-    tokenizacao=Tokenizacao.REGEX,
-)
+CONFIG_PRE_PADRAO = ConfigPreprocessamento(tokenizacao=Tokenizacao.SPLIT)
 CONFIG_VET_PADRAO = ConfigVetorizacao(ModoVetorizacao.BOW, n_max=1)
+VARIANTE_PADRAO   = VarianteNB.MULTINOMIAL
 ALPHA_PADRAO      = 1.0
 FIT_PRIOR_PADRAO  = True
 ```
 
-F1-macro de **0,6736** em validação cruzada de 5 dobras — avaliação da configuração vencedora individualmente, não a média da busca de parâmetros (0,6537 na tabela acima, que é a média sobre todos os candidatos com alpha=1,0 nas quatro vetorizações). Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
+`ConfigPreprocessamento(tokenizacao=Tokenizacao.SPLIT)` significa **texto cru**: nenhuma das seis etapas de pré-processamento ligada, com separação por espaço. A tokenização está escrita explicitamente, e não deixada no padrão da classe, porque aqui ela é uma decisão registrada e não uma omissão.
 
-**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que 0,6736 está **17,6 pontos percentuais abaixo dos 85% exigidos pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a seção 3.8, e as duas frentes são ampliar o dataset e calibrar um limiar de recusa sobre as nove intenções conhecidas.
+#### Ressalva decisiva — o benchmark está saturado
 
-#### 3.3.7 Bibliotecas utilizadas
+Esta é a ressalva mais importante da Seção 3.3, e ela precede qualquer leitura dos números acima.
 
-| Biblioteca | Versão | Papel no pipeline |
+| Sintoma | Número |
+|---|---|
+| F1-macro da melhor configuração | **1,0000, com desvio 0,0000** |
+| Configurações empatadas dentro de um desvio, na última rodada registrada no código | 2.261 de 6.456 |
+| Candidatos empatados no ajuste fino | 2.010 de 3.000 |
+| Amplitude média de F1 ao variar a ordem das etapas | 0,0064 |
+
+A medição não está errada: ela está **saturada**, e medição saturada não ordena nada. A causa está no conjunto de dados, e não no pipeline:
+
+- são **300 frases geradas por gabarito**, 100 por classe, em três classes genéricas;
+- há apenas **16 primeiras palavras distintas** entre as 300, e **77% dos exemplos são decididos pela primeira palavra sozinha** — `Registra`, `Atualiza` e `Cria` abrem transação; `Qual`, `Quem` e `Resuma` abrem consulta; `Existe`, `Há` e `Tem` abrem alerta;
+- o vocabulário de cada classe cabe em 71 a 91 palavras;
+- **20 exemplos por classe já bastam** para F1 de 0,9366, e os outros 80 por classe não acrescentam dificuldade, apenas repetição; a validação cruzada acaba colocando frases quase idênticas no treino e no teste ao mesmo tempo.
+
+**O que isso invalida e o que não invalida.** Não invalida o método nem o código: as conclusões qualitativas se mantiveram em rodadas distintas — remover pontuação atrapalha, remover stopwords atrapalha, e a ordem das etapas muda o texto em cerca de 60% dos grupos. O que se perdeu é a capacidade de **ordenar o topo**: qualquer escolha entre as configurações empatadas é arbitrária do ponto de vista da medida, e o critério que efetivamente decidiu foi a regra de parcimônia, não o desempenho.
+
+**Consequência para o RNF03.** O requisito exige 85% de precisão sobre um conjunto de teste validado pela equipe e pelo parceiro. O 1,0000 medido **não comprova esse atendimento**, por dois motivos independentes: foi obtido sobre três classes genéricas, e não sobre as dez intenções do catálogo da Seção 3.1; e foi obtido sobre um corpus que não contém casos que o modelo erre. Apresentá-lo como cumprimento do RNF03 seria o oposto do que a medição autoriza.
+
+**O conserto é o conjunto de dados, não o experimento.** São necessárias frases escritas por pessoas diferentes, com vocabulário livre, sinônimos, erros de digitação e formas indiretas de pedir a mesma coisa, do tipo "e o cronograma da 6, como está?". Enquanto o corpus for gabarito, o número vai continuar dizendo 1,0000 e vai continuar não querendo dizer nada. É exatamente esse o objeto das tasks T10 a T15 da Sprint 3, e a razão pela qual o risco AM6 permanece na faixa Alta.
+### 3.3.8 Bibliotecas utilizadas
+
+| Biblioteca | Versão mínima declarada | Papel no pipeline |
 | --- | --- | --- |
-| `scikit-learn` | 1.9.0 | Vetorizadores, `MultinomialNB`, `Pipeline`, validação cruzada e métricas |
-| `nltk` | 3.10.3 | Lista de stopwords do português, stemmer RSLP e tokenizador por expressão regular |
-| `spacy` | 3.8.15 | Tokenizador linguístico e lematizador de português (`pt_core_news_sm`) |
-| `numpy` | 2.5.2 | Operações sobre a matriz de pesos na explicação por classe |
-| `joblib` | 1.5.3 | Serialização do modelo treinado e paralelização da varredura |
+| `scikit-learn` | `>=1.4` | Vetorizadores, variantes de Naive Bayes, `Pipeline`, validação cruzada e métricas |
+| `nltk` | `>=3.8` | Lista de stopwords do português, stemmer RSLP e tokenizador por expressão regular |
+| `spacy` | `>=3.7` | Tokenizador linguístico, lematizador (`pt_core_news_sm`) e vetores pré-treinados da vetorização densa (`pt_core_news_md`) |
+| `numpy` | `>=1.26` | Operações sobre a matriz de pesos na explicação por classe |
+| `joblib` | `>=1.3` | Serialização do modelo treinado e paralelização da varredura |
 
-O tokenizador linguístico usa `spacy.blank("pt")`, que carrega apenas as regras do idioma e não exige o download de modelo. O `pt_core_news_sm` é necessário somente para a lematização.
+As versões acima são as **restrições declaradas em `pyproject.toml`**, e não as versões efetivamente instaladas. Essa distinção importa para a reprodutibilidade: o projeto declara pisos de versão, não fixações exatas, de modo que duas máquinas podem resolver versões diferentes dentro da mesma restrição. Registrar aqui números exatos que não estão no arquivo de dependências criaria uma falsa precisão.
 
-#### 3.3.8 Execução
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar à issue correspondente a saída de `pip freeze` do ambiente em que os relatórios de `resultados/` foram gerados, para que as versões efetivas fiquem registradas junto das medições que dependem delas.
+
+O tokenizador linguístico usa `spacy.blank("pt")`, que carrega apenas as regras do idioma e não exige o download de modelo. Dois modelos do spaCy são necessários apenas para funções específicas: o `pt_core_news_sm` para a lematização e o `pt_core_news_md` para os vetores da vetorização densa. Sem eles, as funções que os carregam levantam `RuntimeError` com o comando de download, e não um erro obscuro de biblioteca.
+
+### 3.3.9 Execução
 
 Instalação, uma vez:
 
 ```bash
 pip install -e .
 python -m nltk.downloader stopwords rslp
-python -m spacy download pt_core_news_sm
+python -m spacy download pt_core_news_sm   # lematização
+python -m spacy download pt_core_news_md   # vetores da vetorização densa
 ```
+
+O `pip install -e .` instala o pacote a partir do `pyproject.toml`, o que é o que faz `from pln import ...` funcionar de qualquer diretório, sem manipular o `sys.path`. Os dois comandos seguintes baixam recursos que não vêm nos pacotes.
 
 Treinar, avaliar e salvar o modelo:
 
@@ -2125,9 +2385,9 @@ Classificar uma frase com o modelo salvo:
 
 ```bash
 python -m pln.classificador --prever "Me ajuda a preencher o TAP da Linha 6?"
-# 'Me ajuda a preencher o TAP da Linha 6?'
-#   -> orientar_tap  (confiança 83.5%)
 ```
+
+> **Atenção ao rótulo devolvido.** O modelo atualmente versionado foi treinado sobre as **três classes** do conjunto descrito em 3.3.2 — `consulta`, `transacao` e `alerta` —, e é uma dessas três que o comando devolve. Ele **não** devolve as intenções do catálogo da Seção 3.1, como `orientar_tap` ou `consultar_projeto_sintetico`, porque essas intenções não estão no conjunto de treino atual. Os exemplos de resposta dos endpoints nas Seções 3.2.3 e 3.9.4 usam os nomes do catálogo por serem o contrato-alvo do produto; a correspondência entre os dois vocabulários é o que a task T10 da Sprint 3 precisa restabelecer.
 
 Reexecutar as duas buscas, nesta ordem:
 
@@ -2146,8 +2406,10 @@ from pln.classificador import carregar_modelo, prever_intencao
 
 modelo = carregar_modelo(MODELO_PADRAO)
 intencao, confianca = prever_intencao(modelo, "Tem algum prazo vencido no lote 3?")
-# ('gerar_alertas_pendencias', 0.947)
+# devolve uma das três classes do modelo atual, com a confiança associada
 ```
+
+É exatamente por essa interface que `AnalyzeAudio` consome o pipeline, conforme o diagrama de classes da Seção 3.9.2: o serviço recebe o texto transcrito, chama `prever_intencao` e devolve a intenção junto da resposta da transcrição.
 
 Para auditoria e para o atendimento do RNF11, o modelo treinado expõe as palavras que mais distinguem cada intenção. Elas saem reduzidas ao radical porque a configuração adotada aplica stemming:
 
@@ -2160,25 +2422,113 @@ listar_palavras_de_maior_peso_por_intencao(modelo, quantas=4)
 #  ...}
 ```
 
-#### 3.3.9 Testes
+### 3.3.10 Testes
 
-O módulo tem 100 testes automatizados. Três deles existem especificamente para impedir defeitos que não levantam exceção e fariam a medição mentir sem falhar:
+O módulo de PLN tem **111 testes automatizados** — 34 de pré-processamento, 21 de vetorização, 23 do classificador, 9 do experimento e 24 do ajuste fino —, aos quais se somam 4 testes da entrega única e 45 testes das camadas de serviço e de rota da API, totalizando **160 testes** no diretório `tests/`. A contagem foi apurada por leitura estática dos arquivos de teste, contando os métodos cujo nome começa por `test`; ela pode ser reproduzida por qualquer integrante com `python -m unittest discover tests` em ambiente com as dependências instaladas.
+
+Três desses testes existem especificamente para impedir defeitos que não levantam exceção e fariam a medição mentir sem falhar:
 
 | Teste | O que impede |
 | --- | --- |
 | `TesteNaoRetokeniza` | Que os padrões do scikit-learn retokenizem o texto, anulando em silêncio as etapas `minusculas` e `remover_pontuacao` e a escolha de tokenizador |
-| `TesteReguaUnica` | Que o classificador volte a mudar conforme a vetorização, reintroduzindo o confundimento descrito em 3.3.6 |
+| `TesteReguaUnica` | Que a régua de medição do experimento deixe de ser única dentro da família esparsa, reintroduzindo o confundimento descrito em 3.3.3 |
 | `TesteComparacaoPareada` | Que algum eixo deixe de render tabela, fazendo a seção correspondente sumir do relatório |
 
 ```bash
 python -m unittest discover tests
 ```
 
-### 3.4 API para Recebimento de Áudios
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar à issue correspondente a saída completa da execução da suíte (`python -m unittest discover tests`) em ambiente com todas as dependências instaladas, com a contagem de testes e o tempo total. A verificação feita nesta revisão foi estática, por leitura dos arquivos de teste; a execução não pôde ser concluída na máquina utilizada porque as dependências de `pyproject.toml` não estavam instaladas nela.
 
-Esta seção documenta a API interna responsável por receber os áudios enviados pelos usuários, estabelecendo o contrato de entrada do canal de voz da solução. As definições apresentadas determinam como o áudio entra no sistema, quais regras devem ser respeitadas antes do processamento e como o cliente deve tratar os resultados.
+### 3.3.11 Etapas do pipeline e estado de implementação
 
-#### Endpoint e método HTTP
+O pipeline de compreensão previsto para o produto tem treze etapas, das quais cinco estão implementadas nesta sprint. A tabela é a leitura honesta do que existe: separa o que roda do que está especificado, e indica onde cada etapa pendente será construída. Sem ela, a Seção 3.3 poderia ser lida como se o agente já tratasse ambiguidade e permissões, o que não é o caso.
+
+| # | Etapa | Situação | Onde está, ou onde será construída |
+|---:|---|---|---|
+| 1 | Recebimento do texto digitado ou da transcrição | **Implementada** | `POST /api/v1/audio/{audio_id}/analyze` e `POST /api/v1/chat` |
+| 2 | Normalização do texto (minúsculas, acentos, pontuação, números) | **Implementada** | `pln/preprocessamento.py`, com etapas opcionais e ordem configurável |
+| 3 | Identificação do idioma | Não implementada; o idioma é fixado em `pt-BR` por contrato, e não inferido | Reavaliar apenas se outro idioma entrar no escopo |
+| 4 | Tokenização e redução morfológica | **Implementada** | `pln/preprocessamento.py`, três tokenizações e três modos de morfologia |
+| 5 | Vetorização | **Implementada** | `pln/vetorizacao.py`, bag of words ou tf-idf, janela uni ou uni+bi |
+| 6 | Classificação da intenção | **Implementada** | `pln/classificador.py`, `MultinomialNB` |
+| 7 | Extração de entidades e parâmetros da solicitação | Não implementada | Componente PLN — Compreensão da seção 2.4; construção prevista para a Sprint 4 |
+| 8 | Verificação de ambiguidade e de baixa confiança | Não implementada; ver a seção 3.3.12 | Depende do limiar de recusa a calibrar sobre a base ampliada da Sprint 3 |
+| 9 | Solicitação de esclarecimento ao usuário | Não implementada | Gerenciador de diálogo previsto na seção 3.1, regra de fluxos guiados |
+| 10 | Verificação de permissão sobre a informação pedida | Não implementada | Componente Controle de Acesso, em traço interrompido na seção 2.4 (RNF02) |
+| 11 | Recuperação da informação nas fontes autorizadas | Não implementada | Repositório de Dados e Conhecimento; depende do banco da seção 3.6 e do RAG previsto na seção 3.5.2 |
+| 12 | Composição da resposta com indicação de fonte | Parcial: a geração de texto existe no endpoint de chat, sem fundamentação em fonte recuperada | Gerador de Respostas e Explicabilidade (RF03, RNF11) |
+| 13 | Registro de auditoria da interação | Não implementada; decisão de adiamento registrada na seção 2.4 | Schema `auditoria` da seção 3.6.5, previsto para a Sprint 3 |
+
+A leitura conjunta mostra onde está a fronteira atual do produto: **as etapas 1 a 6 formam um caminho fechado e testado, do áudio à intenção classificada**, e é exatamente esse caminho que o endpoint de análise exercita. Tudo o que vem depois da intenção — decidir se ela é confiável, pedir esclarecimento, checar permissão, buscar a informação e registrar o que aconteceu — está especificado neste documento e ainda não construído.
+
+### 3.3.12 Ambiguidade, baixa confiança e recuperação de erro
+
+A regra de negócio já está definida em dois pontos do documento: a Seção 3.1 determina que o agente só prossiga quando a intenção estiver suficientemente identificada e que peça esclarecimento em caso de ambiguidade, e a intenção `fora_do_catalogo` existe justamente para recusar o que o protótipo não executa. O que falta é o mecanismo que decide quando esse caso ocorreu.
+
+| Situação | Comportamento especificado | Comportamento atual | O que falta |
+|---|---|---|---|
+| Confiança alta em uma intenção do catálogo | Prosseguir com a intenção | Prossegue | Nada |
+| Confiança baixa, sem intenção dominante | Pedir esclarecimento ao usuário, apresentando as interações disponíveis | Devolve mesmo assim a intenção de maior probabilidade | Limiar de recusa calibrado |
+| Duas intenções com probabilidades próximas | Pedir desambiguação entre as duas | Devolve a de maior probabilidade, sem sinalizar o empate | Regra de margem mínima entre as duas primeiras |
+| Solicitação fora do catálogo | Classificar como `fora_do_catalogo` e explicar o limite | Depende inteiramente do desempenho do classificador nessa classe, que é a de pior resultado | Base com exemplos negativos, prevista nas tasks T13 e T14 da Sprint 3 |
+| Resposta dentro de fluxo guiado | Tratar como preenchimento de entidade, não como nova intenção (Seção 3.1) | Não há gerenciador de diálogo; toda entrada é classificada como intenção nova | Gerenciador de diálogo, previsto para a Sprint 4 |
+
+> **DECISÃO TÉCNICA EM ABERTO.** O limiar de recusa e a margem mínima entre a primeira e a segunda intenção não podem ser escolhidos por intuição, pela razão registrada na Seção 3.3.3: a confiança do `MultinomialNB` ordena bem e calibra mal. Os dois valores devem ser derivados empiricamente sobre a partição de teste isolada prevista na task T14, comparando a taxa de recusa correta contra a taxa de recusa indevida em cada limiar candidato. Fixá-los antes disso produziria um número sem sustentação.
+
+### 3.3.13 Métricas de avaliação
+
+A tabela distingue o que já foi medido do que ainda não foi, e por quê. Nenhum valor não medido é apresentado como meta aprovada: as metas propostas dependem de validação da equipe na Sprint 3.
+
+| Métrica | Papel na avaliação | Situação nesta sprint | Valor apurado |
+|---|---|---|---|
+| F1-macro em validação cruzada de 5 dobras | Métrica principal da escolha do pipeline; tira média por classe, de modo que a classe rara pese igual à comum | **Medida, porém saturada** | **1,0000 com desvio 0,0000**, empatada com milhares de outras configurações, sobre três classes genéricas. Não sustenta ordenação nem comprova desempenho, conforme a ressalva da Seção 3.3.7 |
+| Acurácia sobre o catálogo de dez intenções | Métrica exigida pelo RNF03, que fixa 85% de precisão mínima na identificação de intenções | **Não medida** | Depende da reconstrução do conjunto de treino sobre o catálogo da Seção 3.1, prevista nas tasks T10 a T15 |
+| Precisão e recall por intenção | Mostram se o erro se concentra em uma classe específica, o que a média esconde | **PENDENTE DE EVIDÊNCIA DA EQUIPE** | Devem ser gerados por classe na reexecução prevista na task T15 |
+| Matriz de confusão | Identifica quais pares de intenções o modelo troca entre si, insumo direto da regra de desambiguação da Seção 3.3.12 | **PENDENTE DE EVIDÊNCIA DA EQUIPE** | A gerar sobre a base ampliada |
+| Taxa de recusa correta e indevida | Avalia o comportamento da intenção `fora_do_catalogo` e do limiar em aberto | Não aplicável ainda: a base atual não contém exemplos negativos suficientes | Depende das tasks T13 e T14 |
+| Word Error Rate (WER) da transcrição | Mede a qualidade da entrada do pipeline no canal de voz; um erro de transcrição vira erro de classificação | Não medida | Depende de conjunto de áudios de referência do vocabulário do portfólio |
+| Taxa de consultas concluídas sem esclarecimento | Métrica de produto, não de modelo: mede quanto do fluxo o usuário completa sem intervenção | Não aplicável: exige fluxo conversacional completo | Prevista para a Sprint 4 |
+| Taxa de respostas com fonte declarada | Verifica o atendimento do RF03 e do RNF11 | Não aplicável: a recuperação de fontes ainda não existe | Prevista para a Sprint 4 |
+
+> **PENDENTE DE VALIDAÇÃO DA EQUIPE:** aprovar, na Sprint Planning da Sprint 3, as metas numéricas de cada métrica desta tabela. O único patamar hoje aprovado é o do RNF03, definido na Sprint 1; os demais não têm meta acordada, e por isso nenhuma foi registrada aqui.
+
+## 3.4 API para Recebimento de Áudios
+
+Esta seção documenta a API **interna** responsável por receber os áudios enviados pelos usuários, estabelecendo o contrato de entrada do canal de voz da solução. As definições apresentadas determinam como o áudio entra no sistema, quais regras devem ser respeitadas antes do processamento e como o cliente deve tratar os resultados.
+
+Ela não se confunde com a API **externa** de Speech to Text da Seção 3.2. A distinção é a que organiza todo o canal de voz e vale registrar de uma vez:
+
+| | API interna de recebimento (esta seção) | API externa de Speech to Text (Seção 3.2) |
+|---|---|---|
+| Quem constrói | A equipe | O provedor Deepgram |
+| Quem chama | A interface web, e futuramente outros canais | O backend do AZ1, nunca o navegador |
+| O que recebe | O arquivo binário de áudio, em `multipart/form-data` | Os bytes do áudio já validado, recuperados do armazenamento |
+| O que devolve | Um `audio_id` e o status do recebimento | O texto transcrito e a confiança do reconhecedor |
+| Onde falha | Validação de formato, tamanho e duração | Indisponibilidade ou erro do serviço de terceiro |
+| Contrato governado por | Este documento e `src/schemas/audio.py` | A documentação oficial do provedor |
+
+O vínculo entre as duas é o `audio_id` e o objeto gravado no armazenamento: o recebimento grava, a transcrição lê. Não existe chamada direta de uma para a outra, decisão registrada na Seção 2.4.
+
+**Estado de implementação desta seção.** O contrato abaixo foi definido por inteiro na Sprint 2; a implementação cobre a maior parte dele, e o que falta está identificado linha a linha. Nenhuma regra ainda não construída deve ser lida como vigente.
+
+| Regra do contrato | Situação | Evidência no repositório |
+|---|---|---|
+| Endpoint `POST /api/v1/audio`, resposta `201` com `id`, `status` e `message` | **Implementada** | `src/routes/audio.py`, `src/schemas/audio.py` |
+| Corpo `multipart/form-data` com o campo `audio` | **Implementada** | Parâmetro `audio: UploadFile = File(...)` na rota |
+| Rejeição de arquivo ausente, vazio ou corrompido | **Implementada** | `ReceiveAudio.receive` e `probe_audio` em `src/services/audio_service.py` |
+| Limite de 10 MB | **Implementada** | `MAX_FILE_SIZE_BYTES` |
+| Limite de 5 minutos | **Implementada** | `MAX_DURATION_SECONDS` |
+| Validação de formato pela assinatura binária, e não pela extensão ou MIME type declarados | **Implementada** | `_detect_audio_format` e `probe_audio` |
+| Corpo de erro padronizado com `error` e `message` | **Implementada** | `ErrorResponse` e os manipuladores de exceção em `src/az1_api/main.py` |
+| Armazenamento em bucket compatível com S3 sob `incoming/{audio_id}` | **Implementada** | `S3AudioStorage.store` em `src/services/storage_service.py` |
+| Cobertura por testes automatizados | **Implementada** | 4 testes de rota e 13 de serviço, em `tests/test_audio_api.py` e `tests/test_audio_service.py` |
+| **Autenticação por Bearer Token e resposta `401`** | **Planejada, não implementada** | A rota não declara nenhuma dependência de autenticação |
+| **HTTPS obrigatório** | **Planejada, não implementada** | O ambiente local serve por HTTP; ver Seção 3.7.4 |
+| **Limitação de taxa de requisições** | **DECISÃO TÉCNICA EM ABERTO** | Nenhum mecanismo de *rate limit* no código |
+| **Inspeção antivírus do arquivo** | **DECISÃO TÉCNICA EM ABERTO** | Não previsto no MVP; ver a subseção de segurança |
+
+### Endpoint e método HTTP
 
 **Decisão:** utilizar o método `POST` no endpoint abaixo:
 
@@ -2188,7 +2538,7 @@ POST /api/v1/audio
 
 O método `POST` é adequado para o envio de um novo recurso ao sistema. O prefixo `/api/v1` permite versionar a API e facilita futuras evoluções sem quebrar integrações existentes.
 
-#### Autenticação
+### Autenticação
 
 **Decisão:** utilizar autenticação por Bearer Token.
 
@@ -2198,13 +2548,13 @@ Authorization: Bearer <token>
 
 Esse mecanismo restringe o acesso à API a usuários ou serviços autenticados e segue um padrão amplamente utilizado em APIs HTTP. O token será emitido pelo mecanismo de autenticação da solução. A definição do serviço emissor, entre autenticação própria ou integração com o Copilot Studio, será consolidada na Sprint 3, quando a camada de orquestração estiver especificada.
 
-#### Formato da requisição
+### Formato da requisição
 
 **Decisão:** utilizar `multipart/form-data`.
 
 Esse formato é apropriado para o envio de arquivos binários e evita a conversão do áudio para Base64, que aumentaria desnecessariamente o tamanho da requisição.
 
-#### Parâmetros de entrada
+### Parâmetros de entrada
 
 | Parâmetro | Tipo | Obrigatório | Formato esperado | Descrição |
 | --- | --- | --- | --- | --- |
@@ -2214,7 +2564,7 @@ Nesta etapa, o endpoint precisa apenas receber o áudio. Outros parâmetros pode
 
 A extensão e o MIME type declarados pelo cliente **não são utilizados como única fonte de verdade**: ambos podem ser inconsistentes com o conteúdo real do arquivo (um cliente pode renomear um arquivo ou enviar um MIME type incorreto). Por isso, a validação de formato deve inspecionar o conteúdo binário do arquivo (assinatura/header do arquivo), e não apenas os metadados informados na requisição.
 
-#### Formatos de áudio suportados
+### Formatos de áudio suportados
 
 Inicialmente, serão aceitos os seguintes formatos:
 
@@ -2227,27 +2577,36 @@ Inicialmente, serão aceitos os seguintes formatos:
 
 Diferentes clientes podem declarar variações de MIME type para o mesmo formato — em especial para `.m4a`, que pode chegar como `audio/mp4` ou `audio/x-m4a` dependendo do navegador ou dispositivo. Todas as variações listadas acima devem ser aceitas como válidas para a respectiva extensão. Esses formatos possuem ampla compatibilidade com navegadores, dispositivos móveis e serviços de Speech-to-Text, atendendo aos principais cenários de captura de áudio do sistema.
 
-#### Tamanho máximo do arquivo
+### Tamanho máximo do arquivo
 
 Cada arquivo será limitado a **10 MB**. Esse limite evita requisições excessivamente grandes, reduz o consumo desnecessário de memória e rede e oferece margem suficiente para áudios curtos utilizados em interações por voz.
 
-#### Duração máxima
+### Duração máxima
 
 O áudio será limitado a **5 minutos**. A solução foi projetada para interações de voz e consultas, e não para o processamento de gravações extensas. O limite reduz o tempo de processamento e o uso de recursos.
 
 Caso a duração do áudio ultrapasse esse limite, a API retorna `422 Unprocessable Entity` com o erro `audio_too_long`.
 
-#### Exemplo de requisição
+### Exemplo de requisição
 
 ```bash
-curl -X POST https://api.azum.com/api/v1/audio \\
-  -H "Authorization: Bearer <token>" \\
+# Contrato-alvo, com a autenticação já implementada
+curl -X POST https://<host-da-api>/api/v1/audio \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -F "audio=@consulta.wav"
 ```
 
-O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida.
+No estado atual da implementação, em que a autenticação ainda não existe e a API roda localmente, a mesma requisição é feita sem o cabeçalho de autorização:
 
-#### Resposta de sucesso
+```bash
+# Execução local, estado atual do repositório
+curl -X POST http://localhost:8000/api/v1/audio \
+  -F "audio=@consulta.wav"
+```
+
+O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida. O host `<host-da-api>` é um marcador: nenhum endereço público foi provisionado até o encerramento desta sprint, conforme a Seção 3.7.
+
+### Resposta de sucesso
 
 **Código HTTP:** `201 Created`
 
@@ -2261,7 +2620,7 @@ O header `Content-Type: multipart/form-data` não é definido manualmente: a fla
 
 O código `201` indica que o sistema recebeu e criou um novo recurso associado ao áudio enviado. Após passar por todas as validações, o áudio é armazenado em um bucket compatível com S3 usando o `id` gerado como chave do objeto — esse `id` é o que a próxima etapa do pipeline (Speech-to-Text) utiliza para recuperar o arquivo.
 
-#### Respostas de erro
+### Respostas de erro
 
 | Código HTTP | Situação |
 | --- | --- |
@@ -2351,7 +2710,51 @@ Exemplos de respostas de erro:
 
 Os códigos HTTP e os códigos de erro padronizados facilitam o tratamento dos erros pelo frontend e tornam o comportamento da API previsível.
 
-#### Requisitos adicionais
+### Cobertura dos casos de erro previstos
+
+A tabela confronta cada situação de erro exigida pelo canal de voz com a resposta definida e com o estado da implementação. Ela evita que um caso previsto no contrato passe despercebido por não ter linha própria nas tabelas anteriores.
+
+| Situação | Resposta | Endpoint responsável | Situação da implementação |
+|---|---|---|---|
+| Arquivo ausente na requisição | `422`, corpo nativo do FastAPI | `POST /api/v1/audio` | Implementada, pelo comportamento nativo do framework |
+| Corpo que não é `multipart` válido | `400 bad_request` | `POST /api/v1/audio` | Implementada, pelo manipulador de `StarletteHTTPException` |
+| Formato de áudio não suportado | `415 unsupported_format` | `POST /api/v1/audio` | Implementada |
+| Arquivo acima de 10 MB | `413 file_too_large` | `POST /api/v1/audio` | Implementada |
+| Arquivo vazio | `422 invalid_audio` | `POST /api/v1/audio` | Implementada |
+| Arquivo corrompido, ou aceito porém ilegível | `422 invalid_audio` | `POST /api/v1/audio` | Implementada |
+| Áudio acima de 5 minutos | `422 audio_too_long` | `POST /api/v1/audio` | Implementada |
+| Usuário não autenticado | `401 unauthorized` | `POST /api/v1/audio` | **Planejada**, não implementada |
+| Usuário autenticado sem permissão sobre o recurso | `403`, código de erro a definir | Controle de Acesso, Seção 2.4 | **Planejada**, não implementada; depende do RNF02 |
+| Áudio inexistente na hora de transcrever | `404 audio_not_found` | `POST /api/v1/audio/{audio_id}/transcribe` | Implementada, Seção 3.2.2 |
+| Serviço de transcrição indisponível | `502 transcription_failed` | `POST /api/v1/audio/{audio_id}/transcribe` | Implementada, Seção 3.2.2 |
+| Tempo limite da transcrição excedido | `502 transcription_failed` | `POST /api/v1/audio/{audio_id}/transcribe` | Coberta pelo tratamento genérico de exceção; o tempo limite explícito é **DECISÃO TÉCNICA EM ABERTO**, Seção 3.2.2 |
+| Áudio compreensível porém sem fala reconhecível | Transcrição vazia devolvida com `200` | `POST /api/v1/audio/{audio_id}/transcribe` | Comportamento atual; a decisão de convertê-la em erro explícito está em aberto |
+| Erro interno inesperado | `500 internal_error` | Qualquer rota | Implementada, pelo manipulador global de exceção |
+
+### Segurança do canal de recebimento
+
+A tabela separa os controles vigentes dos previstos. A separação importa porque um controle listado como existente, mas ausente do código, produz uma falsa sensação de proteção — que é pior do que a ausência declarada.
+
+| Controle | Situação | Como está implementado, ou o que falta |
+|---|---|---|
+| Validação do conteúdo real do arquivo | **Implementado** | A assinatura binária é lida e conferida antes de qualquer uso; extensão e MIME type declarados pelo cliente não são fonte de verdade |
+| Rejeição de contêiner com faixa de vídeo | **Implementado** | Um arquivo com vídeo, ou sem áudio, é recusado como formato não suportado |
+| Limite de tamanho | **Implementado** | Verificado antes da inspeção do conteúdo, o que evita processar arquivo grande demais |
+| Limite de duração | **Implementado** | Apurado pela inspeção do contêiner, e não por metadado declarado |
+| Identificador opaco | **Implementado** | O `audio_id` é um UUID em hexadecimal prefixado por `aud_`, sem relação com o nome do arquivo original, que é descartado |
+| Descarte automático do áudio | **Implementado** | Expiração de sete dias no prefixo `incoming/`, conforme a Seção 3.2.5 |
+| Log sem conteúdo sensível | **Implementado** | Nenhuma rota registra o conteúdo do arquivo nem o texto transcrito |
+| Autenticação | **Planejado** | Bearer Token definido no contrato; emissor a definir na Sprint 3 |
+| Autorização por perfil | **Planejado** | Depende do Controle de Acesso e da coluna `usuario.perfil` da Seção 3.6.5 (RNF02) |
+| Criptografia em trânsito | **Planejado** | HTTPS exigido pelo contrato; o ambiente local ainda serve por HTTP |
+| Limitação de taxa de requisições | **DECISÃO TÉCNICA EM ABERTO** | Sem mecanismo no código. Sem autenticação e sem limite de taxa, o endpoint não deve ser exposto publicamente |
+| Inspeção antivírus do arquivo recebido | **DECISÃO TÉCNICA EM ABERTO** | Não previsto no MVP. A mitigação atual é indireta: o arquivo é validado como áudio íntegro, nunca é executado e nunca é servido de volta a outro usuário |
+| Registro de auditoria do envio | **Planejado** | Depende do schema `auditoria` da Seção 3.6.5, adiado para a Sprint 3 conforme a decisão registrada na Seção 2.4 |
+| Conformidade com a LGPD | **Restrição de escopo vigente** | Nenhum dado pessoal ou corporativo real trafega no MVP (Seção 1.3). Antes de qualquer uso real, é necessário definir base legal, prazo de retenção e direitos do titular sobre a gravação |
+
+> **Consequência prática desta tabela.** Enquanto autenticação, autorização e limitação de taxa não estiverem implementadas, a API deve ser executada apenas em ambiente local ou de laboratório com acesso restrito. A publicação em endereço público sem esses três controles é o principal risco de segurança aberto do MVP e está encaminhada na Seção 3.7.9, item 11, junto da regra de SSH aberta na instância.
+
+### Requisitos adicionais
 
 Consolidando as regras que o contrato da API precisa respeitar:
 
@@ -2364,7 +2767,7 @@ Consolidando as regras que o contrato da API precisa respeitar:
 - **Formato validado pelo conteúdo real do arquivo**, não apenas pela extensão ou MIME type informado pelo cliente.
 - **Formatos aceitos**: `.wav`, `.mp3`, `.m4a`, `.webm` (com as variações de MIME type aceitas listadas na seção de formatos suportados).
 
-#### Fluxo de processamento
+### Fluxo de processamento
 
 ```text
 Usuário
@@ -2386,11 +2789,11 @@ Speech-to-Text           mensagem de erro
 
 Com essas definições, o contrato da API estabelece como o áudio entra no sistema, quais regras devem ser respeitadas antes de seu processamento e como o cliente deve tratar tanto o caminho de sucesso quanto os casos de erro.
 
-### 3.5 Pilha de Tecnologias
+## 3.5 Pilha de Tecnologias
 
 A pilha de tecnologias do MVP mantém a interface, o backend, o processamento de linguagem natural e os serviços externos desacoplados. Essa separação permite substituir aplicações clientes ou provedores externos sem reimplementar o classificador de intenções e as regras de negócio.
 
-#### 3.5.1 Pilha implementada
+### 3.5.1 Pilha implementada
 
 | Camada | Tecnologias | Responsabilidade |
 |---|---|---|
@@ -2429,7 +2832,7 @@ intenção classificada
 
 A geração de respostas textuais já está integrada separadamente pelo endpoint `POST /api/v1/chat`, que encaminha a mensagem ao `gemini-3.5-flash-lite` por meio do Google Gen AI SDK.
 
-#### 3.5.2 Tecnologias selecionadas para as próximas etapas
+### 3.5.2 Tecnologias selecionadas para as próximas etapas
 
 | Capacidade | Tecnologias selecionadas | Etapa prevista |
 |---|---|---|
@@ -2451,7 +2854,55 @@ No desenvolvimento local, o MinIO permanece como armazenamento compatível com S
 
 O serviço de Text-to-Speech integra a arquitetura prevista do produto, mas não é apresentado como tecnologia fechada porque seu provedor ainda será avaliado na próxima sprint. Da mesma forma, as integrações com o ecossistema Microsoft são tratadas como evolução futura e não como parte da pilha executável atual.
 
-### 3.6 Modelagem Conceitual e Lógica dos Dados
+### 3.5.3 Quadro consolidado da pilha
+
+O quadro reúne, em uma única leitura, cada camada da solução com a tecnologia adotada, a razão da escolha, a alternativa considerada e a limitação assumida. As duas tabelas anteriores respondem *o que* compõe a pilha e *quando* cada peça entra; esta responde *por que* cada uma foi escolhida e *o que se perde* com ela. A coluna **Status** usa quatro valores: **Implementado**, quando existe código em execução no repositório; **Decidido**, quando a escolha está fechada e a construção ainda não começou; **Selecionado**, quando há preferência registrada mas condicionada a verificação; e **Em aberto**, quando não há decisão.
+
+| Camada | Tecnologia | Finalidade | Justificativa | Alternativa considerada | Vantagem | Limitação | Status |
+|---|---|---|---|---|---|---|---|
+| Interface web | React 19, Vite 8, JavaScript/JSX | Interface conversacional de texto e voz | Componentização adequada a um chat com estados de carregamento, transcrição e erro; Vite entrega desenvolvimento e build sem configuração extensa | Interface renderizada no próprio backend, sem framework de front | Ecossistema amplo e reaproveitável em outros canais | Exige processo de build próprio e um segundo ambiente de execução | Implementado |
+| Apresentação | Tailwind CSS, Framer Motion, Lucide React | Estilo, animação e iconografia | Reduz o esforço de padronização visual sem introduzir uma biblioteca de componentes que imponha identidade própria | Biblioteca de componentes pronta | Consistência visual a baixo custo | Marcação verbosa; a acessibilidade continua sendo responsabilidade da equipe | Implementado |
+| Backend e API | Python 3.12+, FastAPI, Uvicorn, Pydantic, `python-multipart` | Expor as APIs REST, validar entradas e orquestrar os serviços | Mesma linguagem do pipeline de PLN, o que elimina uma fronteira de processo entre API e modelo; validação por tipo já embutida | Flask, considerado no exemplo original da Seção 3.7.5 | Validação declarativa, documentação OpenAPI automática e suporte nativo a rotas assíncronas | Ecossistema assíncrono exige atenção com bibliotecas bloqueantes | Implementado |
+| Processamento de áudio | PyAV | Inspecionar o conteúdo do arquivo e apurar formato e duração reais | Único modo de validar o arquivo pelo conteúdo, e não pelos metadados declarados pelo cliente | Confiar no MIME type e na extensão informados | Fecha a principal brecha de validação do canal de voz | Depende de bibliotecas nativas do FFmpeg no ambiente de execução | Implementado |
+| PLN | scikit-learn com `MultinomialNB`, NLTK, spaCy, NumPy | Pré-processar, vetorizar e classificar a intenção | Velocidade que viabiliza a varredura exaustiva de 8.070 execuções distintas registrada na Seção 3.3.7, além de determinismo e explicabilidade | Regressão logística, `BernoulliNB`, `ComplementNB` e a vetorização densa por embeddings, todas medidas e registradas na Seção 3.3.7 | Treino e inferência em microssegundos, modelo auditável termo a termo | Medição saturada, com F1-macro de 1,0000 sobre três classes genéricas: não comprova o atendimento do RNF03, conforme a ressalva da Seção 3.3.7 | Implementado |
+| Persistência do modelo | Joblib | Serializar e carregar o classificador treinado | Formato nativo do ecossistema scikit-learn para matrizes esparsas | Reconstruir o modelo a cada inicialização | Carga rápida, sem retreinar | Arquivo acoplado à versão da biblioteca que o gerou | Implementado |
+| Armazenamento de objetos | MinIO com API S3 e Boto3 | Guardar os áudios recebidos | Contrato S3 permite trocar o provedor sem alterar o código da aplicação | Gravação em sistema de arquivos local | Mesmo cliente serve ao ambiente local e ao Amazon S3 na nuvem | Exige contêiner adicional em desenvolvimento | Implementado |
+| Speech to Text | Deepgram SDK 5+, modelo Nova-3 | Converter o áudio em texto | Suporte a termos de domínio via `keyterm`, latência baixa e créditos gratuitos, conforme a comparação da Seção 3.2.1 | OpenAI Whisper API, Google Cloud STT, Azure AI Speech | Vocabulário do PMO reconhecido com mais precisão | Dependência de serviço externo pago, com custo por minuto de áudio | Implementado |
+| IA generativa | Google Gen AI SDK, `gemini-3.5-flash-lite` | Gerar a resposta em linguagem natural no endpoint de chat | Camada gratuita suficiente para o MVP e SDK Python oficial | Consumo de outro provedor de modelo de linguagem | Resposta fluente sem infraestrutura própria de inferência | Origem do risco AM8, de alucinação; ainda sem fundamentação em fonte recuperada | Implementado |
+| Infraestrutura local | Docker e Docker Compose | Executar o MinIO e preservar seus dados | Padroniza o ambiente entre as máquinas da equipe e antecipa o empacotamento do deploy | Instalação direta na máquina de cada integrante | Paridade entre desenvolvimento e implantação | Os Dockerfiles de frontend e backend ainda não existem no repositório | Implementado para o MinIO |
+| Persistência estruturada | PostgreSQL | Guardar portfólio, projetos, artefatos, pendências e a trilha de auditoria | Modelo relacional adequado às entidades da Seção 3.6, com recursos de integridade que sustentam RNF02, RNF04 e RNF09 | Banco não relacional para os dados do portfólio | Restrições declarativas, colunas geradas e separação por schema | Provisionamento e integração ainda não realizados | Decidido |
+| Busca vetorial (RAG) | PostgreSQL com pgvector, `gemini-embedding-001` | Recuperar trechos de documentos para fundamentar a resposta | Evita introduzir um segundo banco só para busca semântica | Banco vetorial dedicado | Uma única base para dados e vetores, com uma só operação | Desempenho a verificar quando o volume de documentos crescer | Selecionado |
+| Agendamento | APScheduler | Executar as verificações periódicas de pendências do RF05 | Roda no mesmo processo Python do backend, o que atende ao porte do MVP | Agendador externo ou serviço gerenciado de nuvem | Nenhum componente novo de infraestrutura | Não sobrevive a múltiplas instâncias nem à interrupção da sessão do laboratório, conforme a Seção 3.7.9, item 4 | Selecionado |
+| Text to Speech | Provedor não definido | Converter a resposta em áudio | Critérios de avaliação registrados na Seção 3.2.6 | Deepgram, Google Cloud, Azure AI Speech e OpenAI | — | Sem decisão, o canal de voz permanece unidirecional | Em aberto |
+| Autenticação e autorização | Emissor não definido | Autenticar o usuário e aplicar o RNF02 | Contrato de Bearer Token já definido na Seção 3.4 | Autenticação própria ou integração com o Copilot Studio | — | Ausência do controle é a principal lacuna de segurança do MVP | Em aberto |
+| Computação em nuvem | AWS Academy com Amazon EC2 | Hospedar frontend e backend | Ambiente concedido pela instituição, sem custo nem necessidade de orçamento | Outros provedores com camada gratuita | Disponibilidade imediata e verificada | Crédito de US$ 50 e sessão de 4 horas, conforme a Seção 3.7.3 | Selecionado, com EC2 confirmado |
+| Registro de imagens | Amazon ECR | Guardar as imagens de contêiner do pipeline | Integra-se ao EC2 sem credencial adicional, pelo papel de execução da instância | Construção local da imagem na própria instância | Rastreabilidade entre a imagem testada e a implantada | Disponibilidade no catálogo do laboratório ainda não confirmada | Selecionado |
+| Armazenamento em nuvem | Amazon S3 com Boto3 | Substituir o MinIO no ambiente de nuvem | Preserva o contrato S3 e o cliente já implementado | Manter o MinIO em contêiner na própria instância | Troca sem alteração de código | Disponibilidade no catálogo do laboratório ainda não confirmada | Selecionado |
+| Observabilidade | Amazon CloudWatch | Coletar logs técnicos e métricas de disponibilidade | Serviço nativo do provedor, distinto do log de auditoria de negócio | Registro em arquivo na própria instância | Separa telemetria técnica de trilha de auditoria, como exige a Seção 3.7.2 | Disponibilidade no catálogo do laboratório ainda não confirmada | Selecionado |
+| Testes | `unittest` da biblioteca padrão | Verificar pré-processamento, vetorização, classificador, serviços e rotas | Não acrescenta dependência ao projeto e roda em qualquer ambiente Python | `pytest` | 160 testes executáveis sem instalação extra | Menos recursos de parametrização e de relatório | Implementado |
+| Qualidade de código | `ruff` 0.16.2 e `eslint` | Padronizar o código de backend e frontend | Verificação rápida, com regra única para formatação e análise estática | `flake8` combinado com `black` | Uma única ferramenta para as duas funções no backend | Não substitui revisão por pares | Implementado |
+| Versionamento | Git e GitLab do Inteli | Controlar versões, issues e Merge Requests | Instância institucional do módulo, onde o quadro Kanban e o dashboard já operam | — | Rastreabilidade entre commit, issue e MR | Convenções e desvios registrados no `GestaoConfiguracao.md` | Implementado |
+| Documentação | Markdown no diretório `docs`, com diagramas em SVG e Mermaid | Registrar os artefatos do módulo | Versionável junto ao código, com histórico e revisão pelo mesmo fluxo de MR | Ferramenta externa de documentação | Documento e código evoluem no mesmo commit | Diagramas em SVG exigem ferramenta externa para edição | Implementado |
+| Integração e entrega contínuas | Pipeline definido na Seção 3.7.6 | Verificar e publicar a cada integração | Automatiza lint, testes e publicação de imagem | Execução manual dos mesmos passos | Impede que código sem verificação chegue à `develop` | **Ainda não existe arquivo de configuração de CI no repositório**; a implantação está prevista para a Sprint 4 | Decidido |
+| Canais corporativos | Microsoft Teams, Copilot Studio, Power Automate, SharePoint, Entra ID | Integração futura ao ecossistema do parceiro | O parceiro já opera nesse ecossistema, o que reduz o atrito de adoção | Manter apenas a interface web própria | Aproveita a base instalada do Metrô | Fora da pilha executável atual; depende do acesso tratado no risco AM3 | Em aberto |
+
+### 3.5.4 Critérios aplicados na seleção
+
+As escolhas acima não foram feitas item a item de forma isolada. Sete critérios atravessam a pilha inteira, e vale registrá-los porque explicam decisões que, vistas separadamente, poderiam parecer arbitrárias.
+
+| Critério | Como foi aplicado |
+|---|---|
+| Compatibilidade e coesão | Backend e PLN compartilham a mesma linguagem e o mesmo processo, o que elimina serialização entre API e modelo. O contrato S3 é o mesmo no MinIO local e no Amazon S3, o que permite trocar o ambiente sem trocar o código |
+| Maturidade | Todas as bibliotecas do núcleo são estáveis e amplamente adotadas. A exceção declarada é o modelo generativo, cuja família evolui rapidamente e cujo identificador está fixado em variável de ambiente por esse motivo |
+| Escalabilidade | A representação esparsa não cresce em memória proporcionalmente ao corpus, e a classificação é da ordem de microssegundos. O ponto frágil declarado é o APScheduler, que não sobrevive a múltiplas instâncias |
+| Segurança | A validação do áudio ocorre pelo conteúdo real do arquivo, e as credenciais residem apenas em variáveis de ambiente. A lacuna reconhecida é a ausência de autenticação, autorização e limitação de taxa |
+| Curva de aprendizagem | A equipe partiu de Python e JavaScript, que já dominava. `unittest` foi mantido em lugar de uma dependência adicional de teste pela mesma razão |
+| Custo | Toda a pilha executável opera dentro de camadas gratuitas ou de créditos acadêmicos: Deepgram por crédito de conta nova, Gemini por camada gratuita, AWS pelo crédito de US$ 50 do laboratório |
+| Disponibilidade no ambiente do parceiro | O ecossistema Microsoft foi tratado como **critério de integração futura**, e não como imposição sobre a pilha atual. A conclusão registrada na Seção 3.7.1 é que a portabilidade da pilha aberta e conteinerizada preserva a possibilidade de promoção ao ambiente do parceiro, sem que o MVP fique bloqueado pelo acesso, que é justamente o risco AM3 |
+
+Sobre esse último critério, cabe explicitar o raciocínio, porque ele contraria uma conclusão automática. O fato de o parceiro operar no ecossistema Microsoft **não implica** que o MVP acadêmico deva ser construído sobre Azure. A dependência de acesso ao ambiente corporativo foi identificada como risco na Sprint 1 (AM3), e a resposta da equipe, registrada na Seção 4.3.2 do `GestaoProjeto.md`, foi eliminar a dependência em vez de aguardá-la. O que sustenta a aderência futura é a ausência de serviço proprietário no núcleo: nenhuma linha do classificador, das rotas ou dos esquemas conhece o provedor de nuvem.
+
+## 3.6 Modelagem Conceitual e Lógica dos Dados
 
 O modelo conceitual de dados apresenta os principais elementos de informação do parceiro e a forma como eles se relacionam no contexto da gestão do portfólio de projetos do Metrô de São Paulo. Nesta etapa, a modelagem se concentra nos conceitos do domínio e nas regras de associação entre eles, sem definir atributos, chaves, tipos de dados ou detalhes de implementação em banco de dados.
 
@@ -2461,7 +2912,7 @@ O modelo conceitual de dados apresenta os principais elementos de informação d
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-#### 3.6.1 Entidades do modelo conceitual
+### 3.6.1 Entidades do modelo conceitual
 
 | Entidade | Papel no domínio |
 |---|---|
@@ -2473,7 +2924,7 @@ O modelo conceitual de dados apresenta os principais elementos de informação d
 | **Portfólio** | Representa o agrupamento organizacional de projetos acompanhado pelo PMO. |
 | **Pendência** | Representa uma necessidade, obrigação ou item de acompanhamento originado no contexto de um projeto. |
 
-#### 3.6.2 Relacionamentos e cardinalidades
+### 3.6.2 Relacionamentos e cardinalidades
 
 | Relacionamento | Regra representada |
 |---|---|
@@ -2484,7 +2935,7 @@ O modelo conceitual de dados apresenta os principais elementos de informação d
 | **Projeto pertence a Portfólio** | Cada projeto pertence a exatamente um portfólio `(1,1)`, e cada portfólio reúne um ou vários projetos `(1,n)`. |
 | **Projeto origina Pendência** | Um projeto pode não originar pendências ou originar várias `(0,n)`, enquanto cada pendência está vinculada a exatamente um projeto `(1,1)`. |
 
-#### 3.6.3 Leitura do modelo no contexto da equipe
+### 3.6.3 Leitura do modelo no contexto da equipe
 
 O modelo conecta o uso do agente às informações de negócio consultadas. Quando um usuário realiza uma interação, o agente pode localizar um ou mais artefatos relacionados ao pedido. Cada artefato fornece rastreabilidade até o projeto que documenta e pode ser decomposto em campos, o que viabiliza tanto a consulta de conteúdo quanto a identificação de informações ausentes. O projeto, por sua vez, está inserido em um portfólio e pode originar pendências que serão consultadas ou utilizadas na geração de alertas.
 
@@ -2492,7 +2943,7 @@ A entidade **Interação** estabelece a ligação entre o usuário e as fontes c
 
 Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico-relacional é apresentada nas subseções seguintes, que detalham os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
 
-#### 3.6.4 Modelo lógico-relacional
+### 3.6.4 Modelo lógico-relacional
 
 O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas. Os atributos de cada tabela vêm da modelagem estática da seção 2.2.1, e os atributos da tabela `interacao` vêm dos elementos de auditoria exigidos pelos RNF04 e RNF09.
 
@@ -2522,7 +2973,7 @@ A tabela a seguir registra a correspondência entre cada elemento das modelagens
 
 As cardinalidades mínimas do lado "muitos" — um portfólio reúne ao menos um projeto `(1,n)` e um artefato possui ao menos um campo `(1,n)` — não são expressáveis por restrições declarativas simples no modelo relacional, pois exigiriam verificação no momento da inserção da linha "pai". Essas duas regras permanecem documentadas como restrições de aplicação, a serem garantidas pela camada de serviços descrita na seção 2.4.
 
-#### 3.6.5 Dicionário de dados (modelo físico)
+### 3.6.5 Dicionário de dados (modelo físico)
 
 O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. Todas as chaves primárias substitutas usam `INTEGER GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais.
 
@@ -2631,7 +3082,7 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `UNIQUE (pendencia_id, usuario_id)` | Destinatário; a unicidade composta impede notificar duas vezes a mesma pendência ao mesmo usuário |
 | `data_envio` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do envio, exigido pelo RNF09 |
 
-#### 3.6.6 Definição física em SQL
+### 3.6.6 Definição física em SQL
 
 A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5 — na nuvem, o serviço gerenciado correspondente do provedor escolhido na seção 3.7. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
 
@@ -2756,7 +3207,7 @@ CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo
 CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, data_hora);
 ```
 
-#### 3.6.7 Decisões de modelagem e restrições de integridade
+### 3.6.7 Decisões de modelagem e restrições de integridade
 
 As decisões estruturais do modelo, com as alternativas consideradas e as razões da escolha, são registradas a seguir.
 
@@ -2798,13 +3249,13 @@ Por fim, a tabela a seguir consolida a rastreabilidade entre as estruturas do mo
 
 O modelo físico definido nesta seção será populado exclusivamente com os dados sintéticos previstos na seção 1.3 e serve de base tanto para a implementação da camada de acesso a dados quanto para o processo de deploy descrito na seção 3.7.
 
-### 3.7 Processo de Deploy em Nuvem
+## 3.7 Processo de Deploy em Nuvem
 
 Esta seção descreve como a solução sai do ambiente de desenvolvimento e passa a executar em nuvem. Enquanto o projeto arquitetural define *o que* a solução faz e como suas responsabilidades se organizam, o processo de deploy define *onde* essas responsabilidades executam, sob qual provedor, com quais recursos e por quais caminhos de comunicação.
 
  O ambiente adotado é o AWS Academy, concedido pela instituição de ensino. Trata-se de um ambiente acadêmico, com crédito e catálogo de serviços limitados, o que impõe restrições de dimensionamento e de continuidade que estão registradas ao longo da seção. A implantação é tratada, portanto, como prova de conceito técnica sobre dados sintéticos, e não como operação em ambiente produtivo.
 
-#### 3.7.1 Arquitetura e Provedor Selecionado
+### 3.7.1 Arquitetura e Provedor Selecionado
 
  O deploy do MVP foi definido para o **AWS Academy**, o programa educacional da Amazon Web Services disponibilizado pela instituição de ensino. A escolha se apoia em duas razões independentes.
 
@@ -2823,8 +3274,8 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | Empacotamento e publicação | Docker - Amazon ECR | Amazon Elastic Container Registry | Guarda as imagens de frontend e backend produzidas pelo pipeline |
 | Persistência de dados | Database - PostgreSQL | PostgreSQL | Banco relacional único, com os schemas de portfólio e de auditoria. A forma de hospedagem ainda não está definida — ver Seção 3.7.9 |
 | Armazenamento de arquivos | Amazon S3 - Bucket Storage | Amazon S3 | Conteúdo não relacional: prompts e demais artefatos do pipeline |
-| Conversão de voz | API de Transcrição | Amazon Transcribe | Converte em texto o áudio recebido pelo backend (RF01 e RNF06) |
-| Modelo de linguagem | LLM - Serviço externo | API de modelo de linguagem | Geração de respostas e apoio à recuperação de informação; consumido como serviço externo |
+| Conversão de voz | API de Transcrição | Serviço externo de Speech to Text | Converte em texto o áudio recebido pelo backend (RF01 e RNF06). O provedor implementado é o **Deepgram Nova-3**, conforme a Seção 3.2.1; o desenho original deste diagrama previa o Amazon Transcribe, e a divergência está registrada no item 12 da Seção 3.7.9 |
+| Modelo de linguagem | LLM - Serviço externo | Google Gemini (`gemini-3.5-flash-lite`) | Geração de respostas em linguagem natural, consumida como serviço externo pelo endpoint `POST /api/v1/chat` |
 | Observabilidade | Rastreabilidade | Amazon CloudWatch | Telemetria e logs técnicos, distintos do log de auditoria |
 
 **Por que essa arquitetura:**
@@ -2835,7 +3286,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 - **Banco único** — a persistência estruturada foi concentrada em um único banco relacional, sem introduzir base não relacional, conforme decidido na Seção 2.5;
 - **Reprodutibilidade** — os passos e parâmetros necessários são registrados na Seção 3.7.4 para repetição em ambiente autorizado.
 
-#### 3.7.2 Diagrama de Implantação
+### 3.7.2 Diagrama de Implantação
 
  Enquanto o diagrama de componentes da Seção 2.4 responde *o que* a solução faz, organizando as responsabilidades em três camadas lógicas, o diagrama de implantação responde *onde* cada uma dessas responsabilidades passa a executar depois do deploy. É a passagem da visão lógica para a visão física: os mesmos componentes especificados nas Seções 2.2 e 2.3 reaparecem aqui distribuídos entre nós concretos de execução, cada um com um serviço de nuvem correspondente e um protocolo definido de comunicação.
 
@@ -2843,7 +3294,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 
  A organização em nós separa três fronteiras que importam para o projeto. A primeira é a fronteira do cliente: o nó **Internet - Browser** é o único que executa fora da infraestrutura de nuvem, na máquina do profissional do PMO. A segunda é a fronteira da conta acadêmica: a **Instância de Deploy na Nuvem** reúne tudo o que a equipe provisiona e controla dentro do AWS Academy. A terceira é a fronteira do serviço externo: o nó **LLM** aparece fora da instância porque o modelo de linguagem é consumido como serviço de terceiro, o que tem consequências diretas sobre autenticação, custo e tráfego de dados — motivo pelo qual, no MVP, apenas dados sintéticos transitam por ele.
 
-##### Diagrama de implantação (UML)
+#### Diagrama de implantação (UML)
 
 <div align="center">
 <sub>Imagem 3.7.1 - Diagrama de implantação (UML) — Distribuição dos artefatos da solução em nuvem</sub><br>
@@ -2851,7 +3302,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-##### Descrição dos nós de execução
+#### Descrição dos nós de execução
 
 | Nó | Elementos implantados | Responsabilidade |
 |---|---|---|
@@ -2859,13 +3310,13 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | **Web App Frontend** (Amazon EC2) | JavaScript/JSX + React + Vite, Assets estáticos | Hospeda a aplicação cliente e a entrega ao navegador. Os Assets estáticos reúnem os arquivos de JavaScript, folhas de estilo e fontes que compõem a Chat UI; o bloco JavaScript/JSX + React + Vite responde pela construção e pela renderização das telas. A separação em relação ao Web App Backend mantém a aplicação cliente desacoplada do núcleo, condição do RNF05 para que outras aplicações possam futuramente consumir a mesma API. |
 | **Docker - Amazon ECR** | `<<Artifact>>` Imagens frontend + backend | Registro das imagens de contêiner produzidas pelo pipeline descrito na Seção 3.7.6. Não participa da execução: sua função é guardar a versão exata de frontend e backend que foi construída, testada e aprovada, para que as instâncias EC2 obtenham dela a imagem no momento da implantação. É esse nó que garante que a versão validada em homologação seja idêntica à promovida para produção. |
 | **Web App Backend** (Amazon EC2) | API Gateway, PLN - Compreensão, PLN - Transações e Ações, API de Recebimento de áudio, API de Transcrição, Gerador de Respostas, Auditoria e Feedback, Agendador, Lista de Tarefas | Concentra toda a camada de lógica de negócio definida na Seção 2.4. O API Gateway centraliza a entrada das solicitações e autentica o usuário antes de qualquer processamento (RNF02). A API de Recebimento de áudio aceita o arquivo enviado pelo navegador e a API de Transcrição atua como cliente do serviço de voz, de modo que áudio e texto convergem para o mesmo fluxo (RF01 e RNF06). O PLN - Compreensão classifica a intenção e extrai os parâmetros da solicitação (RNF03), encaminhando pedidos de preenchimento e alertas ao PLN - Transações e Ações (RF04, RF05 e RF06) e consultas ao Gerador de Respostas (RF02), que monta a saída e informa a fonte e a justificativa (RF03 e RNF11). O Agendador executa as verificações periódicas que não dependem de solicitação do usuário e alimenta a Lista de Tarefas com as pendências encontradas, sustentando o acompanhamento preventivo do RF05. O Auditoria e Feedback registra usuário, data, canal, intenção, fontes e resultado de cada interação (RNF04). |
-| **API de Transcrição** (Amazon Transcribe) | Speech to Text | Serviço gerenciado de conversão de fala em texto, provisionado na mesma conta. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. |
+| **API de Transcrição** (serviço externo de Speech to Text) | Speech to Text | Serviço de conversão de fala em texto consumido por API. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. **O provedor efetivamente implementado é o Deepgram Nova-3** (Seção 3.2.1), que é externo à conta da AWS; o rótulo Amazon Transcribe presente na figura corresponde ao desenho anterior à decisão de STT e será corrigido no diagrama junto da revisão prevista no item 12 da Seção 3.7.9. Com o Deepgram, este elemento deixa de ser um nó interno da conta acadêmica e passa a ser uma dependência externa, como o nó de modelo de linguagem. |
 | **Database - PostgreSQL** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback exigidos pelo RNF04. A separação em dois schemas, e não em dois bancos, atende à exigência da Seção 2.4 de proteger os logs contra alteração por usuário comum — o controle é feito por permissão — sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. A forma de hospedagem do PostgreSQL, em serviço gerenciado ou em contêiner na própria instância EC2, permanece em aberto na Seção 3.7.9. |
 | **Amazon S3 - Bucket Storage** | Armazenamento de Prompts | Armazenamento de objetos para o conteúdo que não se representa bem em modelo relacional. Guarda os prompts utilizados pelo pipeline de PLN, versionados de forma independente do código, o que permite ajustá-los sem reconstruir a imagem do backend. |
 | **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a Rastreabilidade responde à pergunta técnica de saber se o sistema está funcionando, enquanto a auditoria responde à pergunta de negócio de saber quem pediu o quê e com qual resultado (RNF04). São dados com público, retenção e requisito de imutabilidade distintos, e por isso ficam em nós distintos. |
-| **LLM - Serviço externo** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11). Por estar fora da fronteira da conta acadêmica, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
+| **LLM - Serviço externo** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API; o provedor implementado é o Google Gemini, modelo `gemini-3.5-flash-lite`, acionado pelo endpoint `POST /api/v1/chat`. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11). Por estar fora da fronteira da conta acadêmica, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
 
-##### Caminhos de comunicação
+#### Caminhos de comunicação
 
 | # | Origem → destino | Protocolo | Porta | Momento | Dados e motivo da conexão |
 |---|---|---|---|---|---|
@@ -2886,7 +3337,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 
  Duas observações sobre a leitura das portas. A primeira é que a porta 443 predomina porque quase toda comunicação entre nós é HTTP sobre TLS — o que muda de uma conexão para outra não é a porta, e sim o recurso chamado e o formato do corpo da mensagem, registrados na última coluna. A segunda é que a porta exposta ao exterior não coincide com a porta interna do processo: o frontend responde em 3000 e o backend em 8000 dentro do contêiner, e ambos só são alcançados de fora pelas portas publicadas na instância. Essa distinção é o que permite fechar o grupo de segurança conforme a Seção 3.7.4.
 
-##### Fluxo de uma solicitação ponta a ponta
+#### Fluxo de uma solicitação ponta a ponta
 
  Os três percursos a seguir descrevem como os nós do diagrama cooperam nos cenários especificados na Seção 2.2.2, e cobrem todos os elementos implantados.
 
@@ -2898,7 +3349,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 
  Em nenhum dos três percursos o agente altera de forma autônoma os registros do portfólio: a solução sugere e alerta, e a responsabilidade pelo registro e pela decisão permanece com o profissional, conforme delimitado na Seção 1.3.
 
-##### Correspondência entre os componentes lógicos e os nós de execução
+#### Correspondência entre os componentes lógicos e os nós de execução
 
  A tabela a seguir fecha a rastreabilidade entre a visão lógica da Seção 2.4 e a visão física desta seção, permitindo verificar que nenhum componente especificado ficou sem lugar de execução definido.
 
@@ -2915,7 +3366,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | Repositório de Dados e Conhecimento | Database - PostgreSQL e Amazon S3 - Bucket Storage | Dados estruturados no banco; conteúdo não relacional no armazenamento de objetos. |
 | Logs de Auditoria | Database - PostgreSQL, schema `auditoria` | Separados dos dados operacionais por schema e por permissão (RNF04). |
 
-#### 3.7.3 Recursos do Ambiente Acadêmico e Limites
+### 3.7.3 Recursos do Ambiente Acadêmico e Limites
 
  O AWS Academy é disponibilizado pela instituição de ensino e opera sob limites que diferem de uma conta AWS comum. Esses limites não são um detalhe administrativo: eles condicionam o porte dos recursos, o tempo em que podem permanecer ativos e a continuidade do serviço, e por isso precisam estar registrados junto da arquitetura que se apoia neles.
 
@@ -2937,13 +3388,13 @@ A região habilitada é a **us-east-1 (Norte da Virgínia)**, e todos os recurso
 
  Os recursos do AWS Academy serão utilizados enquanto forem suficientes para o MVP com dados sintéticos. A implantação em ambiente real deverá considerar licenciamento, disponibilidade contínua e recursos corporativos, conforme a Seção 3.7.8.
 
-#### 3.7.4 Configuração da Instância EC2 e Acesso
+### 3.7.4 Configuração da Instância EC2 e Acesso
 
  A instância Amazon EC2 é o nó que hospeda a execução da solução, e sua configuração antecede qualquer atividade de implantação: sem ambiente provisionado e acessível, não há onde publicar as imagens de contêiner nem como verificar o comportamento da aplicação. Esta seção documenta esse procedimento na ordem em que ele é executado, de modo que possa ser repetido por qualquer integrante da equipe e reproduzido em uma nova sessão do laboratório.
 
  Os cinco passos seguem a ordem em que o ambiente foi efetivamente montado. O par de chaves e o grupo de segurança podem ser criados tanto dentro do assistente de criação da instância quanto em suas próprias telas do console; neste projeto foram criados em telas separadas, o que permite reutilizá-los em instâncias futuras sem repetir a configuração. As imagens que acompanham cada passo registram a evidência de sua execução.
 
-##### Passo 1 — Iniciar o laboratório do AWS Academy
+#### Passo 1 — Iniciar o laboratório do AWS Academy
 
 1. Acessar o AWS Academy com a credencial institucional e abrir o laboratório da disciplina
 2. Iniciar a sessão do laboratório e aguardar o indicador de ambiente disponível
@@ -2959,7 +3410,7 @@ A região habilitada é a **us-east-1 (Norte da Virgínia)**, e todos os recurso
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-##### Passo 2 — Criar a instância e definir imagem, porte e armazenamento
+#### Passo 2 — Criar a instância e definir imagem, porte e armazenamento
 
  No console do EC2, a criação começa por **Launch Instance**. Os parâmetros definidos aqui determinam o custo por hora e, portanto, quanto do crédito disponível a instância consome enquanto permanece em execução.
 
@@ -2979,7 +3430,7 @@ A região habilitada é a **us-east-1 (Norte da Virgínia)**, e todos os recurso
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-##### Passo 3 — Criar o par de chaves de acesso
+#### Passo 3 — Criar o par de chaves de acesso
 
  O acesso à instância é feito por chave criptográfica, e não por senha. A chave privada é o único meio de entrar na máquina: se for perdida, não há recuperação possível e a instância precisa ser recriada.
 
@@ -3008,7 +3459,7 @@ icacls .\az1-key.pem /grant:r "$($env:USERNAME):(R)"
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-##### Passo 4 — Configurar as portas no grupo de segurança
+#### Passo 4 — Configurar as portas no grupo de segurança
 
  O grupo de segurança é o firewall da instância e traduz, em regras, os caminhos de comunicação da Seção 3.7.2. Cada porta aberta corresponde a uma conexão prevista no diagrama; portas sem conexão correspondente permanecem fechadas. A edição é feita em **EC2 → Grupos de segurança → Editar regras de entrada**.
 
@@ -3040,7 +3491,7 @@ icacls .\az1-key.pem /grant:r "$($env:USERNAME):(R)"
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-##### Passo 5 — Acessar a instância e confirmar o provisionamento
+#### Passo 5 — Acessar a instância e confirmar o provisionamento
 
  Este passo encerra a configuração porque é o único que comprova que ela funcionou. Uma instância em estado **running** apenas indica que a máquina virtual foi iniciada; não indica que ela é alcançável. Enquanto o acesso não é estabelecido, um erro na regra da porta 22, no par de chaves ou na rede permanece invisível, e seria descoberto apenas na etapa de implantação, quando o custo de diagnosticá-lo é maior.
 
@@ -3081,7 +3532,7 @@ scp -i ~/.ssh/az1-key.pem arquivo.txt ec2-user@<endereco-publico-da-instancia>:~
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-##### Limites da sessão e retomada do ambiente
+#### Limites da sessão e retomada do ambiente
 
  A sessão de 4 horas define o ritmo de trabalho no ambiente e tem duas consequências que não decorrem da configuração da instância, mas condicionam tudo o que se apoia nela.
 
@@ -3093,7 +3544,7 @@ scp -i ~/.ssh/az1-key.pem arquivo.txt ec2-user@<endereco-publico-da-instancia>:~
 
  Ao encerrar o trabalho, a instância deve ser parada pelo console, para não consumir crédito enquanto não estiver em uso, e o crédito remanescente deve ser registrado para acompanhamento do orçamento ao longo do projeto.
 
-##### Etapas subsequentes da implantação
+#### Etapas subsequentes da implantação
 
  Concluída a configuração da instância, a implantação prossegue pelas etapas abaixo, que dependem do empacotamento das aplicações e estão especificadas nas seções indicadas. A ordem reflete a cadeia de dependências entre elas: cada etapa pressupõe a anterior.
 
@@ -3101,7 +3552,7 @@ scp -i ~/.ssh/az1-key.pem arquivo.txt ec2-user@<endereco-publico-da-instancia>:~
 |---|---|---|
 | Preparação do sistema operacional da instância: atualização dos pacotes, instalação do `git` e configuração do fuso horário para `America/Sao_Paulo` | Seção 3.7.4 | Acesso à instância estabelecido |
 | Instalação do runtime de contêiner na instância | Seção 3.7.6 | Sistema operacional preparado |
-| Preparação do backend para empacotamento: estruturação do projeto Python em `src/nlp-deploy/`, implementação dos endpoints `/classify`, `/audio` e `/health`, exportação do modelo treinado para `model/` e declaração das dependências em `requirements.txt` | Seção 3.7.5 | Definição do classificador, registrada no item 5 da Seção 3.7.9 |
+| Preparação do backend para empacotamento: escrita do `Dockerfile` sobre o pacote já declarado em `pyproject.toml`, inclusão do modelo treinado e implementação do endpoint `/health` | Seção 3.7.5 | Classificador definido e integrado, conforme o item 5 da Seção 3.7.9 |
 | Construção das imagens de frontend e backend | Seção 3.7.5 e Seção 3.7.6 | Código do backend e do frontend estabilizado |
 | Criação dos repositórios e publicação das imagens no Amazon ECR | Seção 3.7.6 | Imagens construídas |
 | Provisionamento do PostgreSQL e aplicação dos schemas `portfolio` e `auditoria` | Seção 3.7.2 e Seção 3.7.9 | Decisão sobre a forma de hospedagem, registrada no item 1 da Seção 3.7.9 |
@@ -3111,81 +3562,70 @@ scp -i ~/.ssh/az1-key.pem arquivo.txt ec2-user@<endereco-publico-da-instancia>:~
 | Configuração do pipeline de entrega contínua | Seção 3.7.6 | Imagens e ambiente de destino existentes |
 | Integração com o ecossistema Microsoft | Seção 3.7.8 | Promoção da solução para o ambiente do parceiro |
 
-#### 3.7.5 Exemplo de API (Flask)
+### 3.7.5 Empacotamento do backend e exemplo de aplicação
+
+A imagem do backend empacota a aplicação que já existe no repositório, e não uma aplicação nova escrita para o deploy. Isso importa porque o benefício declarado na Seção 3.7.6 — a imagem que vai a produção é a mesma que passou pelos testes — só é verdadeiro se o que está na imagem for exatamente o código versionado.
+
+O ponto de entrada é `src/az1_api/main.py`, que compõe a aplicação FastAPI a partir dos quatro roteadores de `src/routes/` e registra os manipuladores de exceção que produzem o corpo de erro padronizado das Seções 3.2 e 3.4. O trecho abaixo é **exemplo conceitual**, reduzido para caber na leitura, e mostra a estrutura dessa composição e o endpoint de verificação de saúde que ainda precisa ser acrescentado:
 
 ```python
-# src/nlp-deploy/app.py
-from flask import Flask, request, jsonify
-import joblib
-import uuid
-from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+# Exemplo conceitual — estrutura reduzida de src/az1_api/main.py
+from fastapi import FastAPI
+from routes import analysis_router, audio_router, chat_router, transcription_router
 
-app = Flask(__name__)
+app = FastAPI(title="AZ1 API")
 
-# Carregar modelo
-modelo = joblib.load("model/model.joblib")
+# Cada frente expõe seu próprio roteador; o prefixo de versão fica em um lugar só.
+app.include_router(audio_router, prefix="/api/v1")          # POST /api/v1/audio
+app.include_router(transcription_router, prefix="/api/v1")  # POST /api/v1/audio/{id}/transcribe
+app.include_router(analysis_router, prefix="/api/v1")       # POST /api/v1/audio/{id}/analyze
+app.include_router(chat_router, prefix="/api/v1")           # POST /api/v1/chat
 
-# Conexão com banco
-# Para dev local: sqlite:///local.db
-# Para PostgreSQL: postgresql+psycopg://user:senha@host:5432/az1db
-DATABASE_URL = "sqlite:///./classifications.db"
-engine = create_engine(DATABASE_URL)
 
-@app.route("/health", methods=["GET"])
-def health():
-    return {"status": "healthy"}, 200
-
-@app.route("/classify", methods=["POST"])
-def classify():
-    data = request.json
-    texto = data.get("text", "")
-
-    if not texto:
-        return {"error": "text field required"}, 400
-
-    # Classificação
-    probs = modelo.predict_proba([texto])[0]
-    idx = probs.argmax()
-    intencao = modelo.classes_[idx]
-    confianca = float(probs[idx])
-
-    resultado = {
-        "id": str(uuid.uuid4()),
-        "text": texto,
-        "intent": intencao,
-        "confidence": round(confianca, 4),
-        "timestamp": datetime.utcnow().isoformat()
-    }
-
-    # Gravar em banco (opcional)
-    # db.insert_classification(resultado)
-
-    return resultado, 200
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=False)
+# AINDA NÃO IMPLEMENTADO — exigido pela etapa 06 do pipeline da Seção 3.7.6.
+# O verificador precisa responder sem depender de serviço externo: ele atesta
+# que o processo subiu, não que o Deepgram ou o Gemini estão disponíveis.
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "healthy"}
 ```
+
+Duas observações sobre o exemplo. A primeira é que o endpoint `/health` está marcado como não implementado porque de fato não existe no repositório, embora seja pressuposto pela etapa de verificação do pipeline e pela regra de firewall da porta 8000 descrita na Seção 3.7.4; a lacuna está registrada no item 13 da Seção 3.7.9. A segunda é que a verificação de saúde deve ser deliberadamente rasa: se ela chamasse o serviço de transcrição, uma indisponibilidade do provedor derrubaria a instância em um rollback automático, quando o problema não está na aplicação.
+
+O modelo treinado é carregado uma única vez, no arranque, pelo provedor de dependência `get_analyzer` de `src/az1_api/dependencies.py`, e não a cada requisição. O arquivo `joblib` precisa, portanto, estar dentro da imagem — o que também significa que **publicar uma nova versão do modelo exige reconstruir a imagem**, e essa é uma consequência a considerar quando a base for reformulada na Sprint 3.
 
 **Dockerfile correspondente:**
 
 ```dockerfile
-FROM python:3.11-slim
+# Exemplo conceitual — o Dockerfile do backend ainda não existe no repositório
+FROM python:3.12-slim
+
+# O PyAV depende das bibliotecas nativas do FFmpeg; sem elas a validação de
+# áudio da Seção 3.4 falha apenas em tempo de execução, não na construção.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY src/nlp-deploy/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# O projeto adota o "src layout" declarado no pyproject.toml; instalar o pacote,
+# em vez de copiar arquivos soltos, é o que faz `from pln import ...` funcionar
+# dentro do contêiner sem manipular o sys.path.
+COPY pyproject.toml ./
+COPY src/ ./src/
+RUN pip install --no-cache-dir .
 
-COPY src/nlp-deploy/ .
+# Recursos do modelo treinado e da lista de stopwords, necessários em execução.
+RUN python -m nltk.downloader -d /usr/share/nltk_data stopwords rslp
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+CMD ["uvicorn", "az1_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-#### 3.7.6 Processo de Entrega Contínua
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** o Dockerfile acima é uma proposta derivada das dependências declaradas em `pyproject.toml` e ainda **não foi construído nem executado**. A construção da imagem, o registro do identificador gerado e a execução do contêiner com a verificação de `/health` são a evidência que fecha esta subseção, e estão previstas para a Sprint 4, conforme a Seção 3.8.6.
+
+### 3.7.6 Processo de Entrega Contínua
 
 O diagrama da Seção 3.7.2 descreve o **estado final** da implantação. Esta seção descreve o **caminho** até ele: o que acontece entre um commit e a imagem em execução, apoiado no fluxo de branches definido no documento de Gestão de Configuração.
 
@@ -3198,7 +3638,7 @@ O diagrama da Seção 3.7.2 descreve o **estado final** da implantação. Esta s
 | 03 — Build | Constrói as imagens de frontend e de backend | Docker |
 | 04 — Registro | Publica as imagens no Amazon ECR | `docker push` |
 | 05 — Deploy | Faz a instância obter a imagem e aplica as migrações do banco | `docker pull` |
-| 06 — Verificação | Confirma que a aplicação respondeu após subir | `GET /health` |
+| 06 — Verificação | Confirma que a aplicação respondeu após subir | `GET /health`, endpoint ainda a implementar |
 
 **Gatilhos e destinos:**
 
@@ -3215,7 +3655,7 @@ As quatro rotas compartilham as mesmas quatro primeiras etapas e divergem apenas
 
 **Ambiente local:** antes da etapa 01, o desenvolvimento roda com `docker compose up`, que sobe backend, frontend e banco a partir das mesmas imagens usadas pelo pipeline. É essa paridade entre desenvolvimento e implantação que justifica a adoção do Docker registrada na Seção 2.5.
 
-#### 3.7.7 Reprodutibilidade e Verificação
+### 3.7.7 Reprodutibilidade e Verificação
 
  A reprodutibilidade da implantação é verificada em duas frentes complementares. A primeira apura se o ambiente permanece dentro dos limites do crédito acadêmico; a segunda, se a solução implantada responde conforme especificado.
 
@@ -3229,42 +3669,55 @@ As quatro rotas compartilham as mesmas quatro primeiras etapas e divergem apenas
 | Consumo de crédito | Acompanhado a cada sessão do laboratório |
 | Vigência do acesso | Elegibilidade e validade do acesso ao AWS Academy confirmadas |
 
-**Verificação funcional da solução implantada:**
+**Verificação funcional da solução implantada.** O roteiro abaixo percorre as rotas efetivamente implementadas em `src/routes/`, na ordem em que uma falha isola melhor a causa: primeiro o processo, depois o armazenamento, depois cada serviço externo e, por fim, a interface.
 
-| Verificação | Resultado esperado |
-|---|---|
-| Contêineres de frontend e backend | Em execução na instância |
-| `GET /health` | Retorna `200 OK` |
-| `POST /classify` | Processa a requisição e devolve a intenção classificada |
-| `POST /audio` | Aceita o arquivo de áudio e devolve a transcrição |
-| Chat UI | Carrega no navegador e se comunica com o backend |
-| Persistência | Registros gravados nos schemas `portfolio` e `auditoria` |
-| Armazenamento de objetos | Prompts lidos do bucket no Amazon S3 |
-| Observabilidade | Eventos e métricas visíveis no nó de Rastreabilidade |
+| # | Verificação | Rota ou recurso | Resultado esperado | Situação |
+|---:|---|---|---|---|
+| 1 | Contêineres de frontend e backend | `docker ps` na instância | Ambos em execução, com as portas publicadas | A verificar após o deploy |
+| 2 | Processo do backend no ar | `GET /health` | `200 OK` com `{"status": "healthy"}` | Depende da implementação do endpoint, item 13 da Seção 3.7.9 |
+| 3 | Documentação da API gerada | `GET /docs` | Página do OpenAPI listando as quatro rotas de `/api/v1` | Disponível por padrão no FastAPI |
+| 4 | Recebimento e armazenamento do áudio | `POST /api/v1/audio` | `201 Created` com `id` no formato `aud_…`, e o objeto gravado sob `incoming/{audio_id}` | Implementada |
+| 5 | Rejeição de arquivo inválido | `POST /api/v1/audio` com um arquivo de texto renomeado para `.wav` | `415 unsupported_format` | Implementada |
+| 6 | Transcrição pelo serviço externo | `POST /api/v1/audio/{audio_id}/transcribe` | `200 OK` com `text` não vazio | Implementada; depende de `DEEPGRAM_API_KEY` na instância |
+| 7 | Encadeamento de voz e intenção | `POST /api/v1/audio/{audio_id}/analyze` | `200 OK` com `intencao` pertencente ao catálogo da Seção 3.1 | Implementada |
+| 8 | Geração de resposta em linguagem natural | `POST /api/v1/chat` | `200 OK` com `reply` preenchido | Implementada; depende de `GEMINI_API_KEY` na instância |
+| 9 | Chat UI | Navegador apontado para a porta publicada do frontend | Interface carrega e conversa com o backend | A verificar após o deploy |
+| 10 | Persistência | Consulta aos schemas `portfolio` e `auditoria` | Registros gravados e recuperáveis | Prevista para a Sprint 4, conforme a Seção 3.8.6 |
+| 11 | Armazenamento de objetos em nuvem | Bucket no Amazon S3 | Objetos gravados e lidos pelo backend | Condicionada à disponibilidade do serviço no laboratório |
+| 12 | Observabilidade | Nó de Rastreabilidade | Eventos e métricas visíveis | Condicionada à disponibilidade do serviço no laboratório |
 
-**Exemplo de requisição ponta a ponta:**
-
-> A URL abaixo é ilustrativa e deverá ser substituída pela URL real após a execução do deploy.
+**Exemplo de requisição ponta a ponta.** O percurso mínimo tem dois passos, porque o recebimento e a análise são endpoints distintos, conforme a decisão registrada na Seção 3.2.2. O endereço é um marcador e deve ser substituído pelo endereço público da instância após o deploy.
 
 ```bash
-curl -X POST http://<endereco-da-instancia>:8000/classify \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Qual o prazo do marco de licenciamento ambiental da Linha 6?"}'
+# 1) Enviar o áudio e guardar o identificador devolvido
+AUDIO_ID=$(curl -s -X POST http://<endereco-da-instancia>:8000/api/v1/audio \
+  -F "audio=@consulta.wav" | python -c "import sys,json; print(json.load(sys.stdin)['id'])")
+
+# 2) Transcrever e classificar em uma única chamada
+curl -X POST "http://<endereco-da-instancia>:8000/api/v1/audio/$AUDIO_ID/analyze"
 ```
 
-**Resposta esperada:**
+**Resposta esperada do segundo passo:**
 
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "audio_id": "aud_067071317397468196a9b9c4cffa82c6",
   "text": "Qual o prazo do marco de licenciamento ambiental da Linha 6?",
-  "intent": "consulta",
-  "confidence": 0.8734,
-  "timestamp": "2026-08-24T11:21:00.000000"
+  "language": "pt-BR",
+  "confidence": 0.9516,
+  "duration_seconds": 4.812,
+  "intencao": "consultar_projeto_sintetico",
+  "confianca_pln": 0.7412
 }
 ```
 
-#### 3.7.8 Próximos Passos para Produção
+O primeiro comando serve também de verificação indireta do armazenamento: se o bucket não estiver acessível, o passo 1 falha antes de devolver o identificador, e o passo 2 nem chega a ser executado. Já uma falha apenas no passo 2, com `502 transcription_failed`, isola o problema no serviço externo de transcrição ou na credencial configurada na instância.
+
+**Estado da execução.** Nenhum dos doze itens acima foi executado até o encerramento da Sprint 2, porque a implantação não ocorreu: apenas os cinco passos de provisionamento da instância, documentados na Seção 3.7.4, foram realizados e evidenciados.
+
+> **PENDENTE DE EVIDÊNCIA DA EQUIPE:** anexar a esta subseção, após a execução do deploy, (i) a captura do `docker ps` na instância, (ii) a saída do `GET /health`, (iii) a saída completa do percurso de duas etapas acima com um áudio real, (iv) a captura do painel da AWS com as instâncias em execução e o crédito remanescente, e (v) o identificador da imagem publicada no registro. Cada evidência deve ser nomeada no padrão `assets/deploy/pos_deploy_<n>.png` e referenciada aqui com legenda e fonte, no mesmo formato das Imagens 3.7.2 a 3.7.6.
+
+### 3.7.8 Próximos Passos para Produção
 
  O ambiente de produção do parceiro é o ecossistema Microsoft, e o ambiente acadêmico é o AWS Academy. A promoção para produção envolve, portanto, uma troca de provedor, e não apenas uma troca de assinatura. É a portabilidade da pilha, descrita na Seção 3.7.1, que torna essa troca viável sem reescrita do núcleo.
 
@@ -3279,7 +3732,7 @@ Quando a solução for promovida para o ambiente real do Metrô:
 
  A arquitetura em nós e os caminhos de comunicação permanecem os mesmos; o que muda são os serviços que ocupam cada nó.
 
-#### 3.7.9 Decisões Técnicas em Aberto
+### 3.7.9 Decisões Técnicas em Aberto
 
 O desenho da implantação expôs pontos que ainda dependem de decisão da equipe. Eles estão registrados aqui para que sejam fechados antes da implementação, e não durante ela.
 
@@ -3287,27 +3740,52 @@ O desenho da implantação expôs pontos que ainda dependem de decisão da equip
 |---|---|---|---|
 | 1 | A forma de hospedagem do PostgreSQL não está definida | Alto — muda o provisionamento, o custo em crédito e o procedimento de retomada após a expiração da sessão | Decidir entre serviço gerenciado e contêiner na própria instância EC2, verificando antes o que está liberado no laboratório |
 | 2 | O bucket S3 guarda apenas "Armazenamento de Prompts" | Médio — o RF03 exige repositório de documentos com metadados para citar a fonte | Definir se os documentos sintéticos ficam nesse mesmo nó e ajustar o rótulo |
-| 3 | O provedor do LLM não está definido | Médio — muda a fronteira de rede, a autenticação e o custo | Confirmar qual serviço será consumido e se ele está disponível no ambiente acadêmico |
+| 3 | ~~O provedor do LLM não está definido~~ **Encerrado na Sprint 2** | — | O Google Gemini (`gemini-3.5-flash-lite`) foi integrado pelo endpoint `POST /api/v1/chat` e consta da pilha da Seção 3.5.1. Resta confirmar se o tráfego de saída para o provedor é permitido a partir da instância do laboratório |
 | 4 | As sessões do laboratório expiram e interrompem as instâncias | Alto — conflita com a disponibilidade contínua pressuposta pelo Agendador e pelos alertas do RF05 | Definir o procedimento de retomada e avaliar o impacto sobre as verificações periódicas |
-| 5 | Convivem no documento um classificador local e uma API de modelo de linguagem | Médio — muda o que é empacotado na imagem do backend | Definir se a classificação de intenções roda no modelo local e o LLM responde apenas pela geração |
-| 6 | A Seção 2.5 define FastAPI, mas o exemplo da Seção 3.7.5 usa Flask | Baixo — o exemplo não corresponde à pilha documentada | Reescrever o exemplo em FastAPI ou registrar a mudança de decisão na Seção 2.5 |
+| 5 | ~~Convivem no documento um classificador local e uma API de modelo de linguagem~~ **Encerrado na Sprint 2** | — | A divisão está implementada e é verificável no código: a classificação de intenções roda no modelo local (`pln/classificador.py`, empacotado com o backend) e o modelo de linguagem responde apenas pela geração de texto no endpoint de chat. A delimitação está registrada no início da Seção 3.3 |
+| 6 | ~~A Seção 2.5 define FastAPI, mas o exemplo da Seção 3.7.5 usa Flask~~ **Encerrado na Sprint 2** | — | O exemplo da Seção 3.7.5 foi reescrito em FastAPI, coerente com a pilha da Seção 2.5 e com o código de `src/az1_api/main.py` |
 | 7 | O diagrama prevê dois nós de execução, mas o ambiente acadêmico comporta consolidá-los em uma única instância | Médio — muda o consumo de crédito, o grupo de segurança e as portas publicadas | Decidir entre uma instância com dois contêineres e duas instâncias separadas, considerando o crédito disponível |
 | 8 | O endereço público da instância muda a cada retomada da sessão | Médio — invalida configurações e acessos registrados entre uma sessão e outra | Verificar se o laboratório permite associar um endereço IP elástico e, em caso negativo, definir onde o endereço corrente será registrado |
 | 9 | Apenas o Amazon EC2 teve disponibilidade confirmada no laboratório | Alto — a arquitetura da Seção 3.7.2 pressupõe também ECR, S3, Transcribe e CloudWatch | Confirmar o catálogo liberado e definir a alternativa para cada serviço indisponível, conforme discutido na Seção 3.7.3 |
 | 10 | O crédito de US$ 50 é consumido por tempo de instância ligada, e não por uso | Médio — uma instância esquecida em execução consome o crédito de toda a equipe | Definir a responsabilidade pela interrupção da instância ao fim de cada sessão e o acompanhamento periódico do saldo |
 | 11 | A regra de SSH do grupo de segurança está aberta para `0.0.0.0/0` | Alto — expõe a porta 22 da instância a tentativas de acesso de qualquer origem da internet | Restringir a origem ao endereço da equipe em notação `/32`, conforme a Seção 3.7.4, e definir quem atualiza a regra quando esse endereço mudar |
+| 12 | O diagrama de implantação nomeia o Amazon Transcribe, mas o serviço de Speech to Text implementado é o Deepgram Nova-3 | Médio — muda a fronteira de rede, pois o Deepgram é externo à conta da AWS, e muda a autenticação, que passa a depender da variável `DEEPGRAM_API_KEY` na instância em vez do papel de execução | Atualizar o diagrama `assets/diagrama_de_deploy.svg`, movendo o elemento de transcrição para fora da fronteira da conta acadêmica, e decidir se o Amazon Transcribe permanece como alternativa avaliada |
+| 13 | Os endpoints usados nas verificações da Seção 3.7.7 (`/classify`, `/audio`, `/health`) não correspondem às rotas implementadas | Médio — a verificação pós-deploy falharia contra a aplicação real | Alinhar o roteiro de verificação às rotas de `src/routes/` e implementar o endpoint `/health`, que hoje não existe no repositório |
+| 14 | Não existe arquivo de configuração de integração contínua no repositório | Médio — o pipeline da Seção 3.7.6 está especificado, mas nenhuma etapa executa automaticamente | Criar a configuração do pipeline na Sprint 4, conforme a task T36 do planejamento, e registrar aqui a evidência da primeira execução |
 
-#### 3.7.10 Observações Finais
+### 3.7.10 Estado das evidências da implantação
+
+A Seção 3.7 é, nesta sprint, um **plano reproduzível de implantação com o provisionamento da instância já executado**, e não uma implantação concluída. A tabela separa o que tem evidência anexada do que ainda não tem, para que nenhuma etapa seja lida como realizada sem estar.
+
+| Etapa | Situação | Evidência |
+|---|---|---|
+| Passo 1 — laboratório do AWS Academy iniciado | **Executada** | Imagem 3.7.2 |
+| Passo 2 — instância `az1-app` criada, com AMI, porte e volume definidos | **Executada** | Imagem 3.7.3 |
+| Passo 3 — par de chaves `az1-app` criado no formato `.pem` | **Executada** | Imagem 3.7.4 |
+| Passo 4 — regras de entrada do grupo de segurança configuradas | **Executada** | Imagem 3.7.5 |
+| Passo 5 — acesso à instância estabelecido e confirmado | **Executada** | Imagem 3.7.6 |
+| Confirmação de ECR, S3, Transcribe e CloudWatch no catálogo | Não executada | **PENDENTE DE EVIDÊNCIA DA EQUIPE**, conforme a Seção 3.7.3 |
+| Preparação do sistema operacional e instalação do runtime de contêiner | Não executada | **PENDENTE DE EVIDÊNCIA DA EQUIPE** |
+| Construção das imagens de frontend e backend | Não executada | **PENDENTE DE EVIDÊNCIA DA EQUIPE**, conforme a Seção 3.7.5 |
+| Publicação das imagens no registro | Não executada | **PENDENTE DE EVIDÊNCIA DA EQUIPE** |
+| Provisionamento do PostgreSQL e aplicação dos schemas | Não executada | Depende do item 1 da Seção 3.7.9 |
+| Subida dos contêineres e publicação das portas | Não executada | **PENDENTE DE EVIDÊNCIA DA EQUIPE** |
+| Verificação funcional pós-deploy | Não executada | **PENDENTE DE EVIDÊNCIA DA EQUIPE**, conforme a Seção 3.7.7 |
+| Configuração do pipeline de entrega contínua | Não executada | Nenhum arquivo de CI existe no repositório; item 14 da Seção 3.7.9 |
+
+A gestão dos segredos merece registro próprio porque atravessa várias dessas etapas. O repositório versiona apenas o `.env.example`, com os nomes das variáveis e sem valores; o `.env` e o arquivo `.pem` da chave privada permanecem fora do controle de versão. Na instância, as credenciais devem ser registradas como variáveis de ambiente do serviço, e não gravadas dentro da imagem de contêiner — caso contrário, qualquer pessoa com acesso ao registro de imagens passa a ter acesso às chaves. O acesso aos demais serviços da conta é feito pelo papel de execução associado à instância no Passo 2, o que dispensa gravar credenciais da AWS na máquina.
+
+### 3.7.11 Observações Finais
 
 Este deploy foi estruturado como uma prova de conceito técnica sobre um ambiente concedido pela instituição de ensino, sem custo para a equipe. A conteinerização e a escolha de uma pilha de código aberto asseguram que a mesma imagem validada em desenvolvimento seja a promovida para os demais ambientes, e que a solução não fique presa ao provedor utilizado no MVP — condição para que a promoção futura ao ecossistema Microsoft do parceiro seja uma troca de infraestrutura, e não uma reescrita. A reprodutibilidade será confirmada após a execução dos passos descritos e a inclusão das evidências correspondentes. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 
-### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
+## 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
 
 Esta seção define como a solução será desenvolvida, integrada, testada e implantada ao longo das Sprints 3, 4 e 5. A estratégia parte do projeto técnico e arquitetural descrito nas seções anteriores e organiza a construção em incrementos: cada sprint encerra com um conjunto de componentes funcionando de forma integrada, e não com partes isoladas aguardando montagem no final do módulo.
 
 A distribuição das entregas considera três fatores: a ordem de dependência entre os componentes, o prazo de duas semanas de cada sprint e a necessidade de manter, a cada ciclo, uma versão demonstrável da solução para o parceiro.
 
-#### 3.8.1 Princípios da estratégia
+### 3.8.1 Princípios da estratégia
 
 - **Entrega incremental e integrada.** Cada componente novo entra conectado ao que já existe. Nenhuma frente é construída isoladamente para ser integrada apenas no encerramento do módulo.
 - **Fluxo principal primeiro.** A Sprint 3 concentra o caminho que atravessa toda a solução: entrada do usuário, transcrição, processamento de linguagem natural e resposta na interface. As sprints seguintes ampliam, persistem e distribuem esse fluxo.
@@ -3315,7 +3793,7 @@ A distribuição das entregas considera três fatores: a ordem de dependência e
 - **Testes acompanhando a construção.** O planejamento dos testes ocorre na mesma sprint em que o componente é construído, e a execução ocorre na sprint seguinte, de modo que nenhuma funcionalidade chegue ao encerramento sem verificação.
 - **Implantação antecipada.** O deploy em nuvem é iniciado na Sprint 4, e não no fechamento do projeto, para que eventuais problemas de ambiente sejam identificados enquanto ainda há tempo de correção.
 
-#### 3.8.2 Calendário e foco de cada sprint
+### 3.8.2 Calendário e foco de cada sprint
 
 | Sprint | Período | Foco da sprint |
 |---|---|---|
@@ -3325,7 +3803,7 @@ A distribuição das entregas considera três fatores: a ordem de dependência e
 
 As três sprints têm duração de duas semanas, iniciando na segunda-feira e encerrando na sexta-feira da semana seguinte. A distribuição nominal das tarefas entre os integrantes é registrada na matriz de papéis e responsabilidades do documento de [Gestão do Projeto](GestaoProjeto.md) e nas issues do GitLab, que permanecem como fonte oficial do acompanhamento.
 
-#### 3.8.3 Linha do tempo das frentes de trabalho
+### 3.8.3 Linha do tempo das frentes de trabalho
 
 <div align="center">
   <sub>FIGURA 3.1 — Linha do tempo de entrega das Sprints 3, 4 e 5</sub><br>
@@ -3337,7 +3815,7 @@ A figura apresenta as frentes de trabalho em linhas e as sprints em colunas. As 
 
 A leitura horizontal evidencia o caráter incremental da estratégia: nenhuma frente aparece isolada em uma única coluna. A API de áudio, construída na Sprint 3, permanece em manutenção e integração nas sprints seguintes; o banco de dados é preparado na Sprint 3 pela modelagem, construído na Sprint 4 e otimizado na Sprint 5; e a integração entre frontend e backend acontece progressivamente desde a Sprint 3, sendo concluída apenas na Sprint 5.
 
-#### 3.8.4 Distribuição das entregas entre as sprints
+### 3.8.4 Distribuição das entregas entre as sprints
 
 A tabela relaciona cada entrega prevista para o módulo com o estado esperado ao final de cada sprint. Os estados utilizados são: **Preparação**, quando a frente é apenas planejada ou modelada; **Construção**, quando é efetivamente implementada; **Evolução**, quando recebe incrementos sobre uma base já funcional; e **Consolidação**, quando é finalizada, integrada e documentada em definitivo.
 
@@ -3353,7 +3831,7 @@ A tabela relaciona cada entrega prevista para o módulo com o estado esperado ao
 | Deploy da solução | Preparação (ambiente local) | Construção (nuvem) | Consolidação |
 | Testes sistêmicos | Planejamento | Execução | Complementação |
 
-#### 3.8.5 Sprint 3 — Construção do fluxo principal
+### 3.8.5 Sprint 3 — Construção do fluxo principal
 
 O objetivo da sprint é colocar em funcionamento o caminho completo entre a solicitação do usuário e a resposta apresentada na interface, ainda que com escopo reduzido de funcionalidades e sem persistência definitiva.
 
@@ -3372,7 +3850,7 @@ O objetivo da sprint é colocar em funcionamento o caminho completo entre a soli
 - as seções técnicas correspondentes deste documento estão atualizadas;
 - o plano de testes está registrado e aprovado pela equipe.
 
-#### 3.8.6 Sprint 4 — Persistência, integrações e implantação
+### 3.8.6 Sprint 4 — Persistência, integrações e implantação
 
 O objetivo da sprint é dar durabilidade e alcance à solução: o que era processado em memória passa a ser armazenado, o sistema passa a reagir a eventos externos e a aplicação passa a existir em um ambiente de nuvem acessível ao parceiro.
 
@@ -3391,7 +3869,7 @@ O objetivo da sprint é dar durabilidade e alcance à solução: o que era proce
 - a aplicação está acessível em ambiente de nuvem;
 - os testes planejados foram executados e as evidências estão registradas.
 
-#### 3.8.7 Sprint 5 — Mensageria, interface completa e consolidação
+### 3.8.7 Sprint 5 — Mensageria, interface completa e consolidação
 
 O objetivo da sprint é fechar a solução: desacoplar o processamento por meio de mensageria, concluir a interface e garantir que todos os componentes operem de forma integrada e verificada.
 
@@ -3410,13 +3888,25 @@ O objetivo da sprint é fechar a solução: desacoplar o processamento por meio 
 - todas as funcionalidades do frontend consomem as APIs do backend com tratamento de falhas;
 - a documentação final está consolidada e o processo de implantação é reprodutível.
 
-#### 3.8.8 Integração entre as frentes e ambientes
+### 3.8.8 Integração entre as frentes e ambientes
 
 A integração entre as frentes segue o fluxo Gitflow definido no documento de [Gestão de Configuração](GestaoConfiguracao.md). Cada frente é desenvolvida em uma branch própria, vinculada a uma issue, e integrada por Merge Request revisado por outro integrante. A branch `develop` concentra a integração contínua do trabalho da sprint; a branch de homologação recebe a versão estabilizada para verificação; e a branch principal recebe apenas versões concluídas e validadas.
 
 A separação entre os ambientes acompanha essa estrutura: o ambiente de desenvolvimento é executado localmente em contêineres desde a Sprint 3; o ambiente de homologação é utilizado para verificar a versão candidata antes da entrega; e o ambiente de produção, configurado na Sprint 4, hospeda a versão demonstrável ao parceiro. A automação de verificação, composta pela análise estática e pela execução da suíte de testes a cada integração, é incorporada ao repositório na Sprint 4, junto com a configuração do deploy.
 
-#### 3.8.9 Estratégia de testes ao longo das sprints
+### 3.8.9 Quadro consolidado das três sprints
+
+O quadro reúne, em uma linha por sprint, o objetivo, as entregas, as integrações, os testes, a evidência que encerra o ciclo e as dependências. Ele condensa o que as Seções 3.8.5 a 3.8.7 desenvolvem em prosa e serve de referência rápida na Sprint Planning de cada ciclo.
+
+| Sprint | Objetivo | Entregas | Integrações | Testes | Evidência de conclusão | Dependências |
+|---|---|---|---|---|---|---|
+| **Sprint 3** (31/08 a 11/09) | Fechar o caminho da entrada do usuário até a resposta apresentada, e liquidar a dívida documental da Sprint 2 | API de recebimento de áudio concluída; adaptador de Speech to Text; pipeline de PLN integrado; interface básica; base de intenções qualificada; plano de testes; seções técnicas pendentes preenchidas | Áudio para transcrição; transcrição para classificação; interface para as APIs do backend; contêiner local para o ambiente de desenvolvimento | Testes unitários dos componentes construídos; testes de integração do caminho áudio para intenção; plano de testes funcionais, não funcionais, de integração e de usabilidade elaborado | Solicitação enviada pela interface, em texto ou áudio, produzindo resposta do sistema; erros do contrato tratados e comunicados; relatórios de `resultados/` regenerados sobre a base ampliada; plano de testes aprovado pela equipe | Contrato da API da Seção 3.4; escolha de STT da Seção 3.2; modelagem da Seção 3.6; anexos de portfólio recebidos do parceiro |
+| **Sprint 4** (14/09 a 25/09) | Dar durabilidade e alcance: persistir o que era processado em memória, reagir a eventos externos e publicar na nuvem | Banco de dados criado e populado; persistência das interações; dois webhooks; evolução do frontend; ambientes de desenvolvimento e produção configurados; aplicação publicada na nuvem | Backend para PostgreSQL, nos schemas `portfolio` e `auditoria`; backend para provedores externos por webhook; imagens de contêiner para o registro; instância para os serviços de nuvem | Execução do plano da Sprint 3: testes funcionais, de requisitos não funcionais com desempenho, de integração com respostas externas armazenadas temporariamente, e de usabilidade com cinco usuários externos | Informações gravadas e recuperadas do banco; webhooks respondendo ao provedor; aplicação acessível em endereço de nuvem; evidências dos testes registradas nas issues | Modelagem lógica e física da Seção 3.6; guia de deploy da Seção 3.7; decisão sobre hospedagem do PostgreSQL, item 1 da Seção 3.7.9; plano de testes da Sprint 3 |
+| **Sprint 5** (28/09 a 09/10) | Fechar a solução: desacoplar o processamento, concluir a interface e verificar o conjunto | Sistema de mensageria; frontend completo, responsivo e acessível; integração ponta a ponta concluída; documentação final; manual de implantação e uso | Produtores e consumidores de mensagem integrados aos webhooks da Sprint 4; frontend consumindo todas as APIs com tratamento de falha; versão final publicada na nuvem | Complementação dos casos não executados; testes unitários por componente do frontend; automação dos testes de interface; análise crítica da cobertura alcançada | Processamento assíncrono operando entre os componentes; interface completa com testes automatizados; processo de implantação reproduzido por quem não o configurou; documentação consolidada | Webhooks da Sprint 4; ambiente de nuvem em operação; resultados dos testes da Sprint 4 |
+
+Duas leituras atravessam o quadro. A primeira é que **nenhuma frente estreia na Sprint 5**: mensageria e interface completa, as duas entregas mais tardias, apoiam-se em webhooks e em telas que já existirão desde a Sprint 4. A segunda é que **a evidência de conclusão é sempre observável**, e não uma declaração de esforço: em todos os três ciclos ela é algo que alguém de fora da frente consegue executar ou conferir.
+
+### 3.8.10 Estratégia de testes ao longo das sprints
 
 A verificação é distribuída entre as três sprints, de modo que o planejamento anteceda a execução e a complementação encerre as lacunas identificadas.
 
@@ -3429,19 +3919,547 @@ A verificação é distribuída entre as três sprints, de modo que o planejamen
 Os testes de integração utilizam um mecanismo de armazenamento temporário das respostas dos serviços externos, evitando requisições repetidas durante a execução da suíte e reduzindo tanto o tempo de verificação quanto a dependência da disponibilidade desses serviços.
 
 
-## 4. Prototipação Exploratória — Design e UX
+## 3.9 Projeto Técnico e Arquitetural
 
-### 4.1 Questão de Projeto
+As Seções 3.1 a 3.8 tratam de decisões por frente: o catálogo de intenções, as APIs de voz, o algoritmo de PLN, o recebimento de áudio, a pilha, os dados, o deploy e o cronograma. Esta seção fecha o artefato consolidando essas decisões em três visões que o módulo exige e que precisam ser lidas em conjunto: **a estrutura** (diagramas de classes), **a organização em componentes** e **o comportamento** (diagramas de sequência dos casos críticos). Ela retoma e atualiza os diagramas produzidos na Sprint 1, incorporando o que a implementação desta sprint mudou.
+
+**O que esta seção acrescenta em relação à Sprint 1.** A modelagem estática da Seção 2.2.1 e os diagramas de sequência da Seção 2.2.2 foram produzidos antes de qualquer código. Depois deles, três coisas aconteceram: o modelo de dados foi derivado e detalhado até o nível físico (Seção 3.6), o canal de voz foi implementado (Seções 3.2 e 3.4) e o pipeline de PLN passou a existir com forma própria (Seção 3.3). Esta seção registra o efeito dessas três mudanças sobre a arquitetura.
+
+> **Estado de validação.** Os diagramas desta seção foram derivados do conteúdo já aprovado nas Seções 2.2, 2.4, 3.1 a 3.6 e do código presente em `src/`. Eles consolidam decisões existentes e não introduzem decisão nova. A conferência final e a aprovação formal, incluindo a substituição dos diagramas em Mermaid por versões em SVG quando a equipe julgar necessário, correspondem às tasks T05, T06 e T07 do planejamento da Sprint 3 e permanecem **PENDENTE DE VALIDAÇÃO DA EQUIPE**.
+
+### 3.9.1 Diagrama de classes do domínio
+
+**Objetivo.** Representar as entidades sobre as quais o agente atua, seus atributos e as regras de associação entre elas, em um nível independente de tecnologia.
+
+**Requisitos relacionados.** RF02 a RF06, e RNF02, RNF04 e RNF09 pelas estruturas de acesso e de auditoria.
+
+**Notação.** Diagrama de classes da UML. A composição é representada por losango preenchido, a agregação por losango vazado, a generalização por seta de ponta triangular vazada e a associação simples por linha contínua. As cardinalidades acompanham cada extremidade.
+
+```mermaid
+classDiagram
+    direction TB
+
+    class Portfolio {
+        +int id
+        +string nome
+        +int anoExercicio
+    }
+
+    class Projeto {
+        +string codigo
+        +string nome
+        +string status
+        +date dataInicio
+        +date dataTerminoPrevista
+        +float percentualAvanco
+    }
+
+    class Usuario {
+        +int id
+        +string nome
+        +string email
+    }
+
+    class Diretor
+    class PMO
+    class LiderProjeto
+
+    class Artefato {
+        +int id
+        +string tipo
+        +string referencia
+        +datetime data
+        +string versao
+    }
+
+    class CampoArtefato {
+        +int id
+        +string nome
+        +string valor
+        +boolean obrigatorio
+        +boolean preenchido
+    }
+
+    class Pendencia {
+        +int id
+        +string tipo
+        +string descricao
+        +date prazo
+        +string situacao
+    }
+
+    class Interacao {
+        +int id
+        +datetime dataHora
+        +string canal
+        +string textoSolicitacao
+        +string audioReferencia
+        +string intencao
+        +string resultado
+        +string categoriaErro
+        +int tempoProcessamentoMs
+        +string feedbackUsuario
+    }
+
+    class Notificacao {
+        +int id
+        +datetime dataEnvio
+    }
+
+    Usuario <|-- Diretor
+    Usuario <|-- PMO
+    Usuario <|-- LiderProjeto
+
+    Portfolio o-- "1..*" Projeto : contem
+    Projeto *-- "0..*" Artefato : compoe
+    Artefato *-- "1..*" CampoArtefato : compoe
+    Projeto *-- "0..*" Pendencia : origina
+
+    Usuario "0..*" -- "0..*" Projeto : acompanha
+    LiderProjeto "1" -- "1..*" Projeto : lidera
+    Diretor "0..*" -- "1" Portfolio : supervisiona
+    PMO "0..*" -- "1" Portfolio : administra
+
+    Usuario "1" -- "0..*" Interacao : realiza
+    Interacao "0..*" -- "0..*" Artefato : consulta
+    Pendencia "1" -- "0..*" Notificacao : origina
+    Usuario "1" -- "0..*" Notificacao : recebe
+```
+
+**Leitura do diagrama.** As nove classes herdadas da Sprint 1 permanecem inalteradas, com os mesmos atributos e as mesmas cardinalidades da Seção 2.2.1. Duas classes são acrescentadas nesta sprint, e ambas vêm do modelo de dados da Seção 3.6, não de uma decisão nova:
+
+| Classe acrescentada | Origem | O que passa a ser representável |
+|---|---|---|
+| `Interacao` | Tabela `auditoria.interacao` da Seção 3.6.5 | O registro de cada solicitação: quem pediu, por qual canal, qual intenção foi identificada, quanto tempo levou e qual foi o desfecho. É o que torna o RNF04 e o RNF09 verificáveis no modelo, e não apenas no texto |
+| `Notificacao` | Tabela `auditoria.notificacao` da Seção 3.6.5 | O envio efetivo de um aviso de pendência a um usuário. A associação `notifica`, que na Sprint 1 era muitos-para-muitos entre `Pendencia` e `Usuario`, ganha atributo próprio (`dataEnvio`) e por isso vira classe |
+
+A associação `Interacao consulta Artefato`, de muitos para muitos, é o que sustenta o RF03: ela registra quais fontes fundamentaram cada resposta e permite reconstruir a origem de uma informação depois de exibida.
+
+**Por que as classes de domínio não declaram operações.** A decisão foi tomada na Sprint 1, pela razão registrada ao final da Seção 2.2.1: estas classes representam a estrutura de dados do domínio de portfólio, e o comportamento do agente pertence à camada de aplicação. Mantê-la é o que impede que o diagrama de domínio se transforme em desenho de implementação. As operações estão no diagrama seguinte, que representa exatamente essa camada.
+
+**Coerência com o modelo de dados.** Cada classe corresponde a uma tabela da Seção 3.6.5, com uma exceção deliberada: as três especializações de `Usuario` não viram tabelas, e sim a coluna `usuario.perfil` restringida por `CHECK`. A justificativa está na decisão 1 da Seção 3.6.7 — as especializações não têm atributos próprios, e o que as distingue é alcance de acesso, que já está expresso pelas associações.
+
+### 3.9.2 Diagrama de classes da camada de aplicação
+
+**Objetivo.** Representar as classes efetivamente implementadas em `src/`, com suas operações e dependências, tornando visível o desenho que sustenta as decisões de desacoplamento descritas nas Seções 3.2, 3.3 e 3.4.
+
+**Requisitos relacionados.** RF01, RNF03, RNF05 e RNF06.
+
+**Notação.** Diagrama de classes da UML. As interfaces aparecem com o estereótipo `<<interface>>`; a realização de interface usa seta tracejada de ponta triangular vazada, e a dependência de uso usa seta tracejada simples.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class ReceiveAudio {
+        -AudioStorage storage
+        -Callable id_factory
+        +receive(content) AudioReceipt
+    }
+
+    class AudioStorage {
+        <<interface>>
+        +store(key, content, content_type, metadata) void
+    }
+
+    class AudioFetcher {
+        <<interface>>
+        +fetch(key) bytes
+    }
+
+    class S3AudioStorage {
+        -client
+        -string bucket_name
+        +from_settings(settings) S3AudioStorage
+        +store(key, content, content_type, metadata) void
+        +fetch(key) bytes
+    }
+
+    class TranscribeAudio {
+        -AudioFetcher fetcher
+        -AsyncDeepgramClient client
+        +transcribe(audio_id, language) TranscriptionResult
+    }
+
+    class AnalyzeAudio {
+        -TranscribeAudio transcriber
+        -Pipeline modelo
+        +analyze(audio_id, language) AnalysisResult
+    }
+
+    class AnswerChatMessage {
+        -GeminiChatModel model
+        +answer(message) ChatReply
+    }
+
+    class GeminiChatModel {
+        -Client client
+        -string model
+        +from_settings(settings) GeminiChatModel
+        +generate_reply(message) string
+    }
+
+    class ClassificadorPLN {
+        +treinar_modelo(dados) Pipeline
+        +carregar_modelo(caminho) Pipeline
+        +prever_intencao(modelo, texto) tuple
+        +listar_palavras_de_maior_peso_por_intencao(modelo, quantas) dict
+    }
+
+    class PreprocessadorDeTexto {
+        -ConfigPreprocessamento config
+        +transform(textos) list
+    }
+
+    class ConfigPreprocessamento {
+        +bool minusculas
+        +bool remover_acentos
+        +bool remover_pontuacao
+        +bool remover_numeros
+        +ModoStopwords stopwords
+        +ModoMorfologia morfologia
+        +Tokenizacao tokenizacao
+        +tuple ordem
+    }
+
+    S3AudioStorage ..|> AudioStorage
+    S3AudioStorage ..|> AudioFetcher
+    ReceiveAudio ..> AudioStorage : usa
+    TranscribeAudio ..> AudioFetcher : usa
+    AnalyzeAudio --> TranscribeAudio
+    AnalyzeAudio ..> ClassificadorPLN : usa
+    AnswerChatMessage --> GeminiChatModel
+    ClassificadorPLN ..> PreprocessadorDeTexto : compõe no Pipeline
+    PreprocessadorDeTexto --> ConfigPreprocessamento
+```
+
+**Leitura do diagrama.** Três decisões de projeto ficam visíveis na estrutura, e nenhuma delas é acidental.
+
+A primeira é que **`ReceiveAudio` e `TranscribeAudio` não se conhecem**. O recebimento depende de `AudioStorage`, a transcrição depende de `AudioFetcher`, e a mesma classe concreta `S3AudioStorage` realiza as duas interfaces. O vínculo entre recebimento e transcrição é o `audio_id` e o objeto gravado, exatamente como a Seção 2.4 registra. Consequência prática: trocar o armazenamento afeta uma classe, e trocar o provedor de transcrição afeta outra, sem que uma mudança force a outra.
+
+A segunda é que **o classificador não sabe que existe uma API**. `ClassificadorPLN` expõe funções que recebem texto e devolvem intenção, e é `AnalyzeAudio` — uma classe da camada de serviço — que encadeia transcrição e classificação. É esse desacoplamento que a oportunidade OP1 registra como concretizada na Seção 4.3.3 do `GestaoProjeto.md`.
+
+A terceira é que **o pré-processamento é parte do modelo, e não um passo anterior a ele**. `PreprocessadorDeTexto` é a primeira etapa do `Pipeline` do scikit-learn, o que elimina por construção a possibilidade de treinar com uma configuração e prever com outra — erro que, como a Seção 3.3.5 observa, não levanta exceção nenhuma e apenas faz o modelo errar mais.
+
+**Classes ainda não implementadas.** Não aparecem no diagrama, por não existirem: o Controle de Acesso (RNF02), o extrator de entidades, o gerenciador de diálogo, o Agendador do RF05 e a camada de persistência das interações. Todas estão especificadas nas Seções 2.4, 3.3.11 e 3.6 e distribuídas entre as Sprints 3 e 4 conforme a Seção 3.8.
+
+### 3.9.3 Visão de componentes com estado de implementação
+
+**Objetivo.** Mostrar a organização da solução em componentes, as dependências entre eles e, sobretudo, **quais existem e quais estão apenas especificados**.
+
+**Relação com a Seção 2.4.** O diagrama UML de componentes da solução é o da Imagem 2.4.2, e ele continua sendo a representação oficial da arquitetura lógica. O esquema abaixo não o substitui: é uma visão complementar, em notação de blocos, cuja única função é sobrepor à mesma estrutura a informação de estado de implementação, que o diagrama UML não carrega. As camadas, os nomes dos componentes e as direções de chamada são os mesmos.
+
+```mermaid
+flowchart TB
+    subgraph IHC["Interface (IHC)"]
+        UI["Chat UI — texto e voz<br/>React + Vite<br/>IMPLEMENTADO"]
+        CAP["Captura de áudio<br/>IMPLEMENTADO"]
+    end
+
+    subgraph NEG["Lógica de negócio — FastAPI"]
+        RX["API de Recebimento de Áudio<br/>POST /api/v1/audio<br/>IMPLEMENTADO"]
+        TR["Conversão de Áudio em Texto<br/>POST .../transcribe e .../analyze<br/>IMPLEMENTADO"]
+        GW["API Gateway<br/>POST /api/v1/chat<br/>PARCIAL"]
+        CA["Controle de Acesso<br/>NÃO IMPLEMENTADO"]
+        PC["PLN — Compreensão<br/>intenção: IMPLEMENTADO<br/>entidades: NÃO IMPLEMENTADO"]
+        PT["PLN — Transações e Ações<br/>NÃO IMPLEMENTADO"]
+        GR["Gerador de Respostas<br/>e Explicabilidade<br/>PARCIAL"]
+        AG["Agendador e Lista de Tarefas<br/>NÃO IMPLEMENTADO"]
+        AF["Auditoria e Feedback<br/>NÃO IMPLEMENTADO"]
+    end
+
+    subgraph DAD["Dados e serviços"]
+        AR["Armazenamento de Áudios<br/>MinIO, prefixo incoming/<br/>IMPLEMENTADO"]
+        RD["Repositório de Dados e Conhecimento<br/>PostgreSQL — MODELADO, NÃO PROVISIONADO"]
+        LG["Logs de Auditoria<br/>schema auditoria — MODELADO, NÃO PROVISIONADO"]
+    end
+
+    subgraph EXT["Serviços de terceiros"]
+        STT["Deepgram Nova-3<br/>Speech to Text<br/>INTEGRADO"]
+        LLM["Google Gemini<br/>geração de texto<br/>INTEGRADO"]
+        TTS["Text to Speech<br/>PROVEDOR EM ABERTO"]
+    end
+
+    CAP -->|"multipart/form-data"| RX
+    UI -->|"HTTPS/REST"| GW
+    RX -->|"boto3, PutObject"| AR
+    AR -->|"boto3, GetObject"| TR
+    TR -->|"HTTPS"| STT
+    TR --> PC
+    GW -.->|"previsto"| CA
+    GW --> PC
+    PC --> GR
+    PC -.->|"previsto"| PT
+    PT -.->|"previsto"| RD
+    GR -->|"HTTPS"| LLM
+    GR -.->|"previsto"| RD
+    GR --> UI
+    GR -.->|"previsto"| TTS
+    AG -.->|"previsto"| PT
+    AF -.->|"previsto"| LG
+    GW -.->|"previsto"| AF
+```
+
+**Como ler o esquema.** As setas contínuas representam chamadas que existem no código; as tracejadas, chamadas especificadas e ainda não construídas. O rótulo de cada bloco declara o estado do componente em quatro valores: **implementado**, **parcial**, **não implementado** e, para os serviços externos, **integrado** ou **em aberto**.
+
+Dois blocos merecem explicação do rótulo *parcial*. O **API Gateway** existe como ponto de entrada HTTP — o FastAPI compõe as quatro rotas sob o prefixo `/api/v1` —, mas não cumpre ainda as duas funções que a Seção 2.4 lhe atribui além do roteamento: autenticar a solicitação e registrar a interação. O **Gerador de Respostas** produz texto em linguagem natural pelo endpoint de chat, porém sem a recuperação de fontes que o RF03 e o RNF11 exigem; hoje ele responde a partir do conhecimento do próprio modelo de linguagem, e não de conteúdo recuperado do repositório, e essa distinção é justamente onde o risco AM8 se materializa.
+
+**O caminho fechado.** Lendo apenas as setas contínuas, existe um percurso completo: `Captura de áudio → API de Recebimento → Armazenamento → Conversão de Áudio em Texto → Deepgram → PLN — Compreensão`. Esse é o resultado técnico da Sprint 2, e é o que os diagramas de sequência a seguir detalham.
+
+### 3.9.4 Diagramas de sequência dos casos críticos
+
+Os três cenários principais — consulta, sugestão de preenchimento e notificação — estão na Seção 2.2.2, e dois casos críticos de exceção na Seção 2.2.3. Esta subseção acrescenta os quatro cenários que a implementação desta sprint tornou concretos ou que a auditoria identificou como ausentes, e que o canal de voz exige.
+
+Em todos eles, `:ChatUI` é o cliente no navegador, `:API` é a aplicação FastAPI, `:Armazenamento` é o bucket compatível com S3 e `:Deepgram` é o serviço externo de transcrição.
+
+#### Cenário A — Consulta por voz bem-sucedida
+
+**Objetivo.** Registrar o caminho completo entre a fala do usuário e a intenção classificada.
+**Requisitos.** RF01, RNF03, RNF06.
+**Estado.** Implementado e coberto por testes de rota e de serviço.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário PMO
+    participant UI as :ChatUI
+    participant API as :API FastAPI
+    participant ST as :Armazenamento S3 MinIO
+    participant DG as :Deepgram STT
+    participant PLN as :ClassificadorPLN
+
+    U->>UI: fala a solicitação
+    UI->>API: POST /api/v1/audio (multipart, campo audio)
+    API->>API: valida tamanho, assinatura binária e duração
+    API->>ST: PutObject incoming/{audio_id}
+    ST-->>API: gravação confirmada
+    API-->>UI: 201 Created {id, status, message}
+
+    UI->>API: POST /api/v1/audio/{audio_id}/analyze
+    API->>ST: GetObject incoming/{audio_id}
+    ST-->>API: bytes do áudio
+    API->>DG: transcribe_file(model=nova-3, language=pt-BR, keyterm=[...])
+    DG-->>API: texto + confidence + duration
+    API->>PLN: prever_intencao(modelo, texto)
+    PLN-->>API: (intencao, confianca_pln)
+    API-->>UI: 200 OK {text, confidence, intencao, confianca_pln}
+    UI-->>U: exibe a transcrição e a intenção identificada
+```
+
+**Explicação.** O fluxo tem duas requisições, e não uma, pela decisão registrada na Seção 3.2.2: separar recebimento de transcrição permite retranscrever sem reenviar o arquivo. As mensagens 3 e 4 mostram por que a validação precede o armazenamento — arquivo inválido nunca chega a ocupar o bucket nem a consumir crédito do provedor. A mensagem 12 evidencia a diferença entre `confidence`, que é do reconhecedor de fala, e `confianca_pln`, que é do classificador: são grandezas distintas e não devem ser somadas nem comparadas.
+
+**O que este cenário ainda não contém.** A autenticação do usuário, a verificação de permissão, a recuperação da informação nas fontes e o registro de auditoria. Os quatro estão especificados e ausentes do código, conforme a Seção 3.3.11.
+
+**Ressalva sobre o rótulo devolvido.** A mensagem 12 devolve uma intenção do catálogo da Seção 3.1 porque é esse o contrato-alvo. O modelo versionado hoje reconhece três classes genéricas, e não o catálogo, conforme a Seção 3.3.2: o fluxo do diagrama está implementado, mas o vocabulário de saída ainda não corresponde ao especificado.
+
+#### Cenário B — Áudio recusado na validação
+
+**Objetivo.** Registrar o tratamento dos erros de entrada do canal de voz.
+**Requisitos.** RF01; contrato da Seção 3.4.
+**Estado.** Implementado e coberto por testes.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant UI as :ChatUI
+    participant API as :API FastAPI
+    participant ST as :Armazenamento
+
+    U->>UI: envia um arquivo de áudio
+    UI->>API: POST /api/v1/audio (multipart)
+
+    alt Arquivo vazio ou corrompido
+        API-->>UI: 422 {error: invalid_audio}
+    else Arquivo acima de 10 MB
+        API-->>UI: 413 {error: file_too_large}
+    else Assinatura binária fora dos formatos aceitos
+        API-->>UI: 415 {error: unsupported_format}
+    else Duração acima de 5 minutos
+        API-->>UI: 422 {error: audio_too_long}
+    else Arquivo válido
+        API->>ST: PutObject incoming/{audio_id}
+        ST-->>API: gravação confirmada
+        API-->>UI: 201 Created {id}
+    end
+
+    UI-->>U: exibe a mensagem correspondente ao caso
+```
+
+**Explicação.** A ordem das alternativas é a ordem real das verificações no código, e ela não é arbitrária: tamanho antes de conteúdo, porque conferir um número é mais barato que abrir o contêiner; assinatura binária antes de duração, porque a duração só pode ser lida de um contêiner reconhecido. Em nenhum dos quatro ramos de erro o armazenamento é acionado. Note também que os quatro casos produzem o mesmo corpo padronizado, com `error` e `message`, o que permite ao frontend tratar todos por um único caminho de código e diferenciar a mensagem apenas pelo campo `error`.
+
+#### Cenário C — Falha do serviço de voz
+
+**Objetivo.** Registrar o comportamento quando o provedor externo de transcrição não responde ou responde com erro.
+**Requisitos.** RF01, RNF07; risco AM9.
+**Estado.** Implementado quanto à tradução do erro; a política de tempo limite e de repetição é **DECISÃO TÉCNICA EM ABERTO**.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant UI as :ChatUI
+    participant API as :API FastAPI
+    participant ST as :Armazenamento
+    participant DG as :Deepgram STT
+
+    U->>UI: solicita a transcrição do áudio enviado
+    UI->>API: POST /api/v1/audio/{audio_id}/transcribe
+
+    alt audio_id inexistente ou expirado
+        API->>ST: GetObject incoming/{audio_id}
+        ST-->>API: chave não encontrada
+        API-->>UI: 404 {error: audio_not_found}
+    else Serviço externo indisponível ou com erro
+        API->>ST: GetObject incoming/{audio_id}
+        ST-->>API: bytes do áudio
+        API->>DG: transcribe_file(...)
+        DG--xAPI: erro, tempo esgotado ou resposta inesperada
+        API-->>UI: 502 {error: transcription_failed}
+        Note over UI,U: O áudio permanece no armazenamento por 7 dias,<br/>de modo que a mesma chamada pode ser repetida<br/>sem novo envio do arquivo
+    end
+
+    UI-->>U: informa a falha e oferece nova tentativa
+```
+
+**Explicação.** A escolha de `502`, e não `500`, é o que permite à interface oferecer nova tentativa: o código informa ao cliente que o defeito está a montante, e não na aplicação. A nota do diagrama registra a consequência arquitetural da retenção de sete dias definida na Seção 3.2.5 — é ela que torna a repetição barata, porque o arquivo não precisa ser reenviado. O que falta neste cenário é a repetição automática com recuo progressivo: hoje, a nova tentativa depende de ação do usuário.
+
+#### Cenário D — Solicitação ambígua ou fora do catálogo
+
+**Objetivo.** Registrar o comportamento previsto quando o classificador não identifica a intenção com confiança suficiente.
+**Requisitos.** RF02, RNF03; catálogo da Seção 3.1, intenção `fora_do_catalogo`.
+**Estado.** **Não implementado.** Este diagrama representa o comportamento especificado, e não o atual; hoje a aplicação devolve sempre a intenção de maior probabilidade, conforme a Seção 3.3.12.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant UI as :ChatUI
+    participant API as :API FastAPI
+    participant PLN as :ClassificadorPLN
+    participant DLG as :GerenciadorDeDialogo
+    participant AUD as :AuditoriaEFeedback
+
+    U->>UI: "e aquele negócio da Linha 6?"
+    UI->>API: POST /api/v1/chat {message}
+    API->>PLN: prever_intencao(modelo, texto)
+    PLN-->>API: (intencao, confianca)
+
+    alt confiança acima do limiar e margem suficiente sobre a segunda intenção
+        API->>API: prossegue com a intenção identificada
+        API-->>UI: 200 OK, resposta da intenção
+    else confiança abaixo do limiar
+        API->>DLG: solicitar esclarecimento(candidatas)
+        DLG-->>API: pergunta de desambiguação
+        API->>AUD: registrar(resultado = "esclarecimento")
+        API-->>UI: 200 OK, pergunta de esclarecimento
+        UI-->>U: "Você quer o status do projeto ou as pendências em aberto?"
+    else intenção classificada como fora_do_catalogo
+        API->>AUD: registrar(resultado = "recusada")
+        API-->>UI: 200 OK, explicação do limite
+        UI-->>U: apresenta as interações disponíveis
+    end
+```
+
+**Explicação.** O diagrama existe justamente porque a regra de negócio já está definida na Seção 3.1 e o mecanismo que a executa não. Ele torna explícito o que precisa ser construído: um limiar de confiança, uma margem mínima entre a primeira e a segunda intenção candidata, e um componente que formule a pergunta de desambiguação. Os dois primeiros são números a calibrar sobre a partição de teste isolada prevista na task T14 da Sprint 3, e não devem ser escolhidos por intuição, pela razão de calibração registrada na Seção 3.3.3. Note ainda que os três ramos registram desfechos distintos na auditoria — `sucesso`, `esclarecimento` e `recusada` —, valores que já existem no `CHECK` da coluna `auditoria.interacao.resultado` definida na Seção 3.6.5.
+
+#### Cenário E — Usuário sem permissão sobre a informação solicitada
+
+**Objetivo.** Registrar o comportamento previsto quando o usuário autenticado pede informação fora do seu alcance de acesso.
+**Requisitos.** RNF02, RNF09.
+**Estado.** **Não implementado.** O Controle de Acesso aparece em traço interrompido na Seção 2.4 exatamente por isso.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor L as Líder de Projeto
+    participant UI as :ChatUI
+    participant GW as :APIGateway
+    participant CA as :ControleDeAcesso
+    participant PLN as :PLNCompreensao
+    participant RD as :RepositorioDeDados
+    participant AUD as :AuditoriaEFeedback
+
+    L->>UI: "qual o avanço de todos os projetos do portfólio?"
+    UI->>GW: POST /api/v1/chat com cabeçalho Authorization Bearer
+    GW->>CA: autenticar(token)
+
+    alt Token ausente ou inválido
+        CA-->>GW: credencial inválida
+        GW-->>UI: 401 {error: unauthorized}
+    else Token válido
+        CA-->>GW: usuário autenticado, perfil = lider_projeto
+        GW->>PLN: classificar e extrair parâmetros
+        PLN-->>GW: intencao = consultar_projeto_sintetico, escopo = portfólio
+        GW->>CA: autorizar(usuario, escopo)
+        CA-->>GW: negado — o perfil alcança apenas os projetos que lidera
+        GW->>AUD: registrar(resultado = "recusada", categoria = "autorizacao")
+        GW-->>UI: 403, sem revelar dados do escopo negado
+        UI-->>L: informa a restrição e oferece o escopo permitido
+    end
+```
+
+**Explicação.** O diagrama separa duas verificações que costumam ser confundidas: **autenticação**, que responde quem é o usuário e ocorre antes de qualquer processamento, e **autorização**, que responde se ele alcança aquele dado e só pode ocorrer depois de a intenção e o escopo terem sido extraídos. Daí as duas chamadas distintas ao Controle de Acesso, nas mensagens 3 e 8. A resposta `403` é deliberadamente pobre em conteúdo: informar quantos projetos existem no portfólio, ainda que sem os dados, já seria vazamento de informação. O alcance de cada perfil não é um atributo, e sim uma relação — `lidera` para o líder, `supervisiona` e `administra` para diretor e PMO —, exatamente como a Seção 2.2.1 justifica, e é sobre essas associações que a autorização é calculada.
+
+#### Cobertura dos cenários
+
+| Cenário | Onde está documentado | Estado |
+|---|---|---|
+| Consulta textual bem-sucedida | Seção 2.2.2, cenário 1 | Especificado; parcialmente implementado pelo endpoint de chat |
+| Sugestão de preenchimento de documento | Seção 2.2.2, cenário 2 | Especificado; não implementado |
+| Notificação proativa de pendências | Seção 2.2.2, cenário 3 | Especificado; não implementado |
+| Intenção fora do catálogo ou fora do limite de atuação | Seção 2.2.3, caso crítico 1, e Cenário D desta seção | Especificado; não implementado |
+| Fonte indisponível ou sem evidência suficiente | Seção 2.2.3, caso crítico 2 | Especificado; não implementado |
+| **Consulta por voz bem-sucedida** | **Cenário A desta seção** | **Implementado** |
+| **Áudio recusado na validação** | **Cenário B desta seção** | **Implementado** |
+| **Falha do serviço de voz** | **Cenário C desta seção** | **Implementado quanto ao tratamento do erro** |
+| **Usuário sem permissão** | **Cenário E desta seção** | **Especificado; não implementado** |
+
+### 3.9.5 Matriz de rastreabilidade técnica
+
+A matriz fecha o artefato ligando cada requisito ao mecanismo que o realiza. Ela permite verificar as ausências que importam: requisito sem componente, endpoint sem requisito, entidade sem uso, diagrama sem cenário e RNF sem mecanismo técnico. A coluna **Sprint** indica o ciclo em que o item é construído, conforme a Seção 3.8.
+
+| RF/RNF | API | NLP | Entidade | Componente | Sequência | Teste | Sprint |
+|---|---|---|---|---|---|---|---|
+| RF01 — solicitações por áudio e texto | `POST /api/v1/audio`, `POST .../transcribe`, `POST .../analyze`, `POST /api/v1/chat` | Entrada do pipeline: a transcrição alimenta o mesmo classificador do texto digitado | `Interacao.canal`, `Interacao.audioReferencia` | Chat UI, Captura de áudio, API de Recebimento, Conversão de Áudio em Texto | 2.2.2 cenário 1; 3.9.4 cenários A, B e C | `test_audio_api`, `test_audio_service`, `test_transcription_api`, `test_transcription_service`, `test_analysis_api` | Construída na 2; concluída na 3 |
+| RF02 — consultar dados de projetos | `POST /api/v1/chat`; consulta a fontes prevista | Classificação de `consultar_projeto_sintetico` e extração de parâmetros (pendente) | `Projeto`, `Portfolio`, `Artefato` | PLN — Compreensão, Gerador de Respostas, Repositório de Dados | 2.2.2 cenário 1; 3.9.4 cenário D | Plano de testes funcionais, task T30 | 3 e 4 |
+| RF03 — apresentar a fonte da informação | Campo de fontes na resposta, a definir | Seleção das fontes que fundamentam a resposta | `Artefato.referencia`, `Artefato.data`, associação `Interacao consulta Artefato` | Gerador de Respostas e Explicabilidade, Repositório de Dados | 2.2.2 cenário 1; 2.2.3 caso crítico 2 | Plano de testes funcionais, task T30 | 4 |
+| RF04 — sugerir preenchimento de documentos | Endpoint a definir | Classificação das intenções `orientar_*` e `analisar_completude_coerencia` | `CampoArtefato.obrigatorio`, `CampoArtefato.preenchido` | PLN — Transações e Ações | 2.2.2 cenário 2 | Plano de testes funcionais, task T30 | 4 |
+| RF05 — notificar pendências | Sem endpoint: fluxo iniciado pelo Agendador | Classificação de `gerar_alertas_pendencias` para a consulta correspondente | `Pendencia`, `Notificacao`, associação `acompanha` | Agendador, Lista de Tarefas, PLN — Transações e Ações | 2.2.2 cenário 3 | Plano de testes funcionais, task T30 | 4 e 5 |
+| RF06 — atualizar cadastro por instrução | Endpoint de escrita a definir | Extração de campos e valores da instrução | `Projeto`, `LiderProjeto`, `projeto.lider_id` | PLN — Transações e Ações, Controle de Acesso | 2.2.2 cenário 2 (variação) | Plano de testes funcionais, task T30 | 5 |
+| RNF01 — desempenho | Tempo de resposta de todas as rotas | Classificação em microssegundos; o custo dominante é a chamada externa | `Interacao.tempoProcessamentoMs` | API Gateway, Conversão de Áudio em Texto | 3.9.4 cenário A | Teste de desempenho, task T31 | 4 |
+| RNF02 — controle de acesso | Cabeçalho `Authorization`, respostas `401` e `403` | Não se aplica | `usuario.perfil`, `projeto.lider_id`, `usuario_projeto` | Controle de Acesso, API Gateway | 3.9.4 cenário E | Teste de autorização, task T31 | 3 e 4 |
+| RNF03 — precisão na identificação de intenções | Campo `confianca_pln` da resposta de análise | `MultinomialNB` sobre vetorização esparsa; medição saturada em 1,0000 sobre três classes genéricas, sem valor comprobatório | `Interacao.intencao` | PLN — Compreensão | 3.9.4 cenários A e D | `test_classificador`, `test_experimento`, `test_ajuste_fino` | Instrumento construído na 2; medição válida pendente para a 3 |
+| RNF04 — rastreabilidade | Registro de toda requisição | Intenção e termos de maior peso registráveis | `auditoria.interacao`, `auditoria.interacao_artefato` | Auditoria e Feedback, Logs de Auditoria | 2.2.2 cenário 1, automensagem `log()` | Inspeção dos registros gerados | 3 |
+| RNF05 — interoperabilidade | Contrato REST versionado em `/api/v1` | Núcleo de PLN sem dependência da camada de API | Não se aplica | API Gateway | 3.9.4 cenário A | Acionamento por dois clientes distintos | 4 e 5 |
+| RNF06 — qualidade da transcrição | `POST .../transcribe`, campo `confidence` | Entrada do pipeline; `keyterm` cobre o vocabulário do domínio | `Interacao.audioReferencia` | Conversão de Áudio em Texto, Deepgram | 3.9.4 cenários A e C | Medição de WER, prevista para a 3 | 3 |
+| RNF07 — disponibilidade | `GET /health`, a implementar | Não se aplica | Não se aplica | Rastreabilidade (CloudWatch) | 3.9.4 cenário C | Monitoração de disponibilidade | 4 |
+| RNF08 — usabilidade das respostas | Formato da resposta devolvida | Não se aplica | Não se aplica | Chat UI, Gerador de Respostas | 2.2.2 cenário 1 | Teste de usabilidade com SUS, task T34 | 3 e 4 |
+| RNF09 — auditabilidade das interações | Todas as rotas | Intenção e desfecho registrados por interação | `auditoria.interacao`, `auditoria.notificacao` | Auditoria e Feedback | 3.9.4 cenários D e E | Inspeção dos registros e teste de acesso negado | 3 e 4 |
+| RNF10 — escalabilidade | Todas as rotas sob carga | Matriz esparsa que não cresce proporcionalmente ao corpus | Não se aplica | Web App Backend | Não aplicável | Teste de carga progressiva, task T31 | 4 |
+| RNF11 — explicabilidade | Justificativa e fontes na resposta | `listar_palavras_de_maior_peso_por_intencao` expõe os termos que sustentaram a decisão | `auditoria.interacao_artefato` | Gerador de Respostas e Explicabilidade | 2.2.2 cenário 2 | `test_classificador`; validação junto aos usuários | 4 |
+
+**Ausências identificadas na verificação da matriz.** A leitura por coluna expõe cinco lacunas, todas já encaminhadas neste documento e no planejamento da Sprint 3:
+
+1. **RF03, RF04, RF05 e RF06 não têm endpoint definido.** São os quatro requisitos cuja construção começa na Sprint 4; o contrato precisa ser definido antes, e a definição está entre as tasks daquele ciclo.
+2. **RNF02 não tem mecanismo implementado.** É a lacuna de maior consequência: sem ela, os endpoints não podem ser expostos publicamente, conforme registrado na Seção 3.4.
+3. **RNF07 depende de um endpoint que não existe.** O `GET /health` é pressuposto pelo pipeline da Seção 3.7.6 e está no item 13 da Seção 3.7.9.
+4. **Nenhum endpoint está sem requisito de origem.** As quatro rotas implementadas rastreiam para RF01 e RF02.
+5. **Nenhuma entidade do modelo está sem uso.** Todas as onze tabelas da Seção 3.6.5 aparecem em pelo menos uma linha desta matriz, o que confirma que o modelo de dados não excede o necessário para sustentar os casos de uso.
+
+# 4. Prototipação Exploratória — Design e UX
+
+## 4.1 Questão de Projeto
 
 **Até onde o agente de IA deve ajudar proativamente o usuário durante sua rotina de trabalho e em quais situações deve permanecer em silêncio?**
 
 A questão permanece em aberto porque uma IA excessivamente proativa pode interromper, recomendar conteúdo inadequado ou reduzir a sensação de controle, enquanto uma IA totalmente reativa pode deixar informações relevantes ocultas quando o usuário não sabe o que perguntar. A decisão afeta quem inicia a interação, quando ela ocorre e como contexto e intenção são considerados. A prototipação permite tornar visíveis consequências que uma discussão abstrata não evidencia, sem exigir uma escolha final nesta etapa.
 
-### 4.2 Alternativas Divergentes
+## 4.2 Alternativas Divergentes
 
 Para investigar diferentes formas de interação entre o usuário e o agente de IA durante a rotina de trabalho, foram propostas duas alternativas que apresentam comportamentos distintos quanto à iniciativa do agente e à forma de acesso às informações dos projetos.
 
-#### 4.2.1 Alternativa A: Interação Proativa e Contextual
+### 4.2.1 Alternativa A: Interação Proativa e Contextual
 
 Nesta alternativa, o agente acompanha o contexto das atividades realizadas pelo usuário durante sua rotina de trabalho e identifica informações e documentos do banco de dados que possam ser relevantes para a atividade em andamento. Ao encontrar conteúdos potencialmente úteis, o agente apresenta uma recomendação, permitindo que o usuário escolha se deseja ou não acessá-los.
 
@@ -3451,7 +4469,7 @@ O agente apenas recomenda: não altera documentos nem aplica informações autom
 
 Ao final do período de trabalho, as informações consideradas relevantes podem ser organizadas em um ambiente integrado ao Microsoft Teams, junto ao chatbot do agente, permitindo visualizar conteúdos priorizados, pendências identificadas e possíveis próximos passos.
 
-#### 4.2.2 Alternativa B: Interação Sob Demanda
+### 4.2.2 Alternativa B: Interação Sob Demanda
 
 Nesta alternativa, o agente não apresenta recomendações durante as atividades do usuário. A interação ocorre somente quando o próprio usuário identifica uma necessidade e inicia uma consulta ao agente, informando o que deseja encontrar ou compreender sobre determinado projeto.
 
@@ -3461,7 +4479,7 @@ Essa alternativa busca explorar uma experiência com menor nível de intervenç�
 
 A alternativa reduz interrupções e mantém o momento da interação predominantemente sob controle do usuário. Em contrapartida, exige que a pessoa reconheça a própria necessidade e consiga formular uma consulta; informações importantes podem permanecer ocultas quando ela não sabe o que perguntar. Por isso, a interação sob demanda é uma alternativa defensável, e não uma versão deliberadamente limitada da solução.
 
-#### Divergência entre as alternativas
+### Divergência entre as alternativas
 
 As alternativas diferem principalmente em **quem inicia a interação**. Na Alternativa A, o agente identifica oportunidades de apoio e apresenta recomendações de forma proativa durante a atividade. Na Alternativa B, o agente permanece disponível, mas só realiza a busca e apresenta informações após uma solicitação explícita do usuário.
 
@@ -3476,7 +4494,7 @@ As alternativas diferem principalmente em **quem inicia a interação**. Na Alte
 
 Essas diferenças alteram o esforço para encontrar informações, a frequência de interrupções e o controle percebido. Nenhuma alternativa é considerada definitiva ou superior; a exploração compara consequências e mantém a decisão em aberto.
 
-### 4.3 Formatos de Prototipação
+## 4.3 Formatos de Prototipação
 
 Para explorar as duas alternativas propostas, foram escolhidos formatos que permitem observar aspectos diferentes da interação. Ambos são instrumentos de investigação e não representam versões finais da solução.
 
@@ -3485,7 +4503,7 @@ Para explorar as duas alternativas propostas, foram escolhidos formatos que perm
 | A — proativo e contextual | vídeo, roteiro, encenação por integrantes e animações de recomendação | roteiro percorrido e comportamento encenado ao longo de uma rotina simulada | quando uma recomendação aparece, interrompe, é aceita ou recusada | reação espontânea, detecção real de contexto, frequência acumulada e precisão |
 | B — sob demanda | mockups PNG de uma interface conversacional com texto e voz simulada | estados visuais construídos e sessão de uso declarada pela equipe | como pedidos são formulados e como ambiguidades, permissões e fontes aparecem na interface | PLN, voz, fontes, permissões e latência em funcionamento real |
 
-#### 4.3.1 Alternativa A: Vídeo e Encenação da Interação Proativa
+### 4.3.1 Alternativa A: Vídeo e Encenação da Interação Proativa
 
 A alternativa de interação proativa e contextual foi explorada por meio de um **vídeo encenado**, representando um usuário durante sua rotina de trabalho enquanto o agente acompanha o contexto das atividades realizadas.
 
@@ -3495,7 +4513,7 @@ O formato foi escolhido por permitir representar a experiência ao longo do temp
 
 O vídeo não busca representar uma interface final ou tecnicamente implementada. Seu formato principal é a **encenação do comportamento ao longo do tempo**: as telas e animações funcionam como adereços narrativos para tornar a recomendação perceptível. Por isso, ele é tratado como formato não baseado em uma interface digital funcional. O formato permite explorar ritmo, interrupção, aceitação e recusa, mas não consegue representar detecção real de contexto, reação espontânea ou precisão técnica.
 
-#### 4.3.2 Alternativa B: Interface de Interação Sob Demanda
+### 4.3.2 Alternativa B: Interface de Interação Sob Demanda
 
 A alternativa de interação sob demanda foi explorada por meio de uma **interface gráfica conversacional**, na qual o usuário inicia a interação com o agente quando identifica a necessidade de consultar alguma informação relacionada aos projetos.
 
@@ -3507,19 +4525,19 @@ Esse formato permite investigar **como o usuário formula suas necessidades em l
 
 A prototipação por interface gráfica também permite representar e explorar situações como consultas ambíguas, perguntas por texto ou voz, necessidade de esclarecimento e apresentação das fontes utilizadas pelo agente.
 
-#### Relação dos formatos com a questão de projeto
+### Relação dos formatos com a questão de projeto
 
 Os dois formatos permitem investigar a questão definida na [seção 4.1](#41-questão-de-projeto) a partir de formas distintas de interação entre o usuário e o agente. O vídeo encenado permite explorar uma experiência proativa e contextual, na qual o agente acompanha a rotina de trabalho e pode recomendar informações e documentos sem depender de uma solicitação inicial. Já a interface gráfica conversacional permite explorar uma experiência sob demanda, em que o usuário inicia a interação por texto ou voz e recebe respostas em linguagem natural a partir de suas solicitações.
 
 A exploração dos dois formatos permite observar diferenças relacionadas à iniciativa do agente, ao controle do usuário, à interrupção e ao esforço para acessar informações. A encenação investiga o comportamento distribuído ao longo de uma rotina; a interface torna concretos pedidos, ambiguidades e respostas. O objetivo não é determinar qual alternativa é superior, mas compreender consequências e limitações de cada uma.
 
-### 4.4 Construção dos Protótipos
+## 4.4 Construção dos Protótipos
 
 Nesta seção serão apresentados os dois protótipos construídos a partir das alternativas definidas na [seção 4.2](#42-alternativas-divergentes), juntamente com os registros visuais de sua construção.
 
-#### 4.4.1 Construção do Protótipo A: Interação Proativa e Contextual
+### 4.4.1 Construção do Protótipo A: Interação Proativa e Contextual
 
-##### Demonstração do Protótipo A
+#### Demonstração do Protótipo A
 
 O Protótipo A foi materializado por uma encenação em vídeo, seguindo o [roteiro completo](RoteiroPrototipoA.md). A sequência abaixo funciona como storyboard do comportamento representado e permite percorrer a alternativa mesmo sem depender do arquivo de vídeo editado:
 
@@ -3543,9 +4561,9 @@ flowchart LR
 
 O roteiro e o storyboard demonstram uma experiência proativa ao longo do tempo; não representam uma interface implementada nem comprovam integração com Microsoft Teams ou bases corporativas. O arquivo final e os registros brutos da gravação devem ser mantidos como evidências complementares, conforme delimitado na [seção 4.13](#413-registros-visuais).
 
-#### 4.4.2 Construção do Protótipo B: Interação Sob Demanda
+### 4.4.2 Construção do Protótipo B: Interação Sob Demanda
 
-##### Demonstração do Protótipo B
+#### Demonstração do Protótipo B
 
 <div align="center">
 <sub>Imagem 4.4.2 - Mockup da interface gráfica conversacional do agente — Interação Sob Demanda</sub><br>
@@ -3553,7 +4571,7 @@ O roteiro e o storyboard demonstram uma experiência proativa ao longo do tempo;
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-##### Evolução: da simulação à interface funcional
+#### Evolução: da simulação à interface funcional
 
 Após a exploração do protótipo simulado, a interface conversacional definida no formato da [seção 4.3.2](#432-alternativa-b-interface-de-interação-sob-demanda) evoluiu para uma **implementação funcional em React**, construída entre 25 e 26 de agosto de 2026 na branch `feat/contruir-interface`. A implementação preserva a estrutura convencional de chatbot adotada na prototipação — sidebar de conversas, histórico e campo de entrada — e mantém a identidade visual metroviária e a entrada por voz como elementos centrais da interação sob demanda.
 
@@ -3582,7 +4600,7 @@ As capturas a seguir registram a evolução em três momentos: a interface conve
 Diferentemente do protótipo, em que gravação, transcrição e resposta eram simuladas, a interface funcional captura o áudio do microfone de verdade para animar a onda sonora — o hook `useMicVolume` usa a Web Audio API para medir o volume da fala. Permanecem como limites do estado atual, a serem conectados nas próximas sprints junto à integração de STT/TTS: o áudio ainda não é enviado ao endpoint `/api/v1/audio` e o chat ainda não possui processamento de linguagem natural real. Essa distinção é mantida explícita porque a semelhança da interface com produtos reais gera expectativa de funcionamento real — e a documentação não deve sugerir comportamentos ainda não implementados.
 
 
-### 4.5 Diário de Construção dos Dois Protótipos
+## 4.5 Diário de Construção dos Dois Protótipos
 
 Esta seção consolida decisões, ambiguidades, dúvidas e limitações associadas à construção dos protótipos. **Parte do diário foi sistematizada posteriormente com base no roteiro, nos registros visuais, no histórico Git e nas lembranças da equipe. Por isso, ele não substitui integralmente um registro bruto e contínuo produzido durante a construção.**
 
@@ -3597,7 +4615,7 @@ Para manter a rastreabilidade, os registros são classificados assim:
 | Evidência versionada | arquivo ou estado intermediário cuja existência pode ser verificada no repositório |
 | Reconstrução posterior | interpretação apoiada em roteiro, imagens, commits ou memória, sem anotação bruta contemporânea anexada |
 
-#### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
+### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
 
 **18/08/2026 — Definição do problema a ser explorado.** Antes de pensar em uma solução, partimos do problema enfrentado pelo usuário: a dificuldade de localizar informações relevantes entre atas, relatórios, cronogramas e outros documentos que mudam ao longo do projeto. A questão inicial não era como desenhar uma interface, mas como reduzir esse esforço sem retirar do usuário o controle sobre seu trabalho.
 
@@ -3626,7 +4644,7 @@ Para manter a rastreabilidade, os registros são classificados assim:
 **Limitações observadas.** O vídeo permitiu percorrer e comunicar a experiência de uma interação proativa, mas não permite medir a tolerância de usuários reais às interrupções, comprovar que o agente identifica corretamente o contexto, validar como diferentes motivos de recusa seriam interpretados nem reproduzir as integrações reais com Microsoft Teams e bases corporativas. A execução conforme o roteiro também não representa, por si só, o teste até a falha exigido pelo artefato.
 
 
-#### Protótipo B — Interface de Interação Sob Demanda
+### Protótipo B — Interface de Interação Sob Demanda
 
 **20/08/2026 — Início da construção.** Decidimos partir da estrutura convencional de chatbot (sidebar de conversas, histórico de mensagens, campo de entrada), sem inovação de layout, para que a investigação ficasse concentrada no comportamento do agente e não na interface em si. A identidade visual usa a sinalização do Metrô (bolachas de linha, tipografia de placa, faixas de cor) apenas como camada de reconhecimento do contexto.
 
@@ -3666,11 +4684,11 @@ Para manter a rastreabilidade, os registros são classificados assim:
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-### 4.6 Execução dos Protótipos
+## 4.6 Execução dos Protótipos
 
 Esta seção registra como cada protótipo foi colocado em operação, incluindo situações difíceis, falhas, improvisos e lacunas encontradas durante a execução.
 
-#### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
+### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
 
 **Registro disponível:** o [roteiro](RoteiroPrototipoA.md) identifica Karol e Matheus como participantes, e o [vídeo versionado](../assets/Vídeos/Vídeo-A.mp4) registra a encenação da alternativa. Segundo o diário consolidado pela equipe, o roteiro foi lido, ensaiado e gravado em 25 de agosto de 2026. Neste formato, “rodar” significa percorrer as cenas, representar o aparecimento da recomendação e encenar as escolhas de aceitar e recusar.
 
@@ -3684,7 +4702,7 @@ Esta seção registra como cada protótipo foi colocado em operação, incluindo
 | Recomendações ao longo do dia | A narrativa distribui intervenções durante a rotina | Frequência, prioridade e intervalo aceitáveis não foram testados |
 | Consulta posterior no Teams | O roteiro apresenta histórico e resumo diário | Conteúdo, retenção e tratamento de informações sensíveis não foram definidos |
 
-##### Falha e improvisação observadas no Protótipo A
+#### Falha e improvisação observadas no Protótipo A
 
 O roteiro apresenta um limite potencial na Cena 9: diante do conflito entre contexto visível e intenção, deixa de especificar se o agente deveria recomendar, aguardar, pedir confirmação ou permanecer silencioso. Isso continua sendo um limite antecipado, e não uma falha provocada. Durante a gravação, porém, a equipe declara ter encontrado outra limitação concreta: a alternativa dependia da recomendação visual e exigia que a pessoa consultasse uma interface.
 
@@ -3700,7 +4718,7 @@ O roteiro apresenta um limite potencial na Cena 9: diante do conflito entre cont
 
 A improvisação revela uma limitação real do comportamento inicialmente representado, mas não substitui o teste do conflito contexto–intenção até a falha. Também não valida tecnicamente uso de fone, reconhecimento de voz, privacidade ou adequação do canal em ambientes reais.
 
-##### Falha não prevista durante a execução do Protótipo A
+#### Falha não prevista durante a execução do Protótipo A
 
 Durante a gravação, a equipe identificou uma falha no roteiro então existente: toda recomendação proativa dependia de um elemento visual, obrigando o usuário a interromper a atividade e olhar para uma interface. Essa limitação não havia sido resolvida no roteiro utilizado como base e impedia representar situações em que a pessoa estivesse com as mãos ou a atenção ocupadas. Para continuar a gravação, a equipe improvisou a Cena 10, propondo o fone de ouvido como canal alternativo.
 
@@ -3715,11 +4733,11 @@ Durante a gravação, a equipe identificou uma falha no roteiro então existente
 
 As fotografias mostram os participantes, ambientes e equipamentos usados na gravação e, por isso, corroboram o contexto em que a improvisação foi relatada. O vídeo e o roteiro registram o resultado incorporado à encenação, enquanto o Git preserva uma versão sem a cena de áudio e outra posterior com ela. Nenhum desses elementos, isoladamente, registra a conversa exata em que a decisão foi tomada; esse momento permanece sustentado pelo relato retrospectivo da equipe.
 
-#### Protótipo B — Interface de Interação Sob Demanda
+### Protótipo B — Interface de Interação Sob Demanda
 
-##### Registro bruto da construção e execução do Protótipo B
+#### Registro bruto da construção e execução do Protótipo B
 
-###### Evidência bruta da execução do Protótipo B
+##### Evidência bruta da execução do Protótipo B
 
 **Registro audiovisual da execução:** [assistir ao vídeo da execução do Protótipo B](../assets/Vídeos/Vídeo-B.mp4). O vídeo registra a interação sob demanda em uma situação comum e em situações fora do escopo do mockup, evidenciando a falha do protótipo diante do pedido de dado estruturado e a improvisação necessária do facilitador. Fonte: registro bruto do grupo.
 
@@ -3752,7 +4770,7 @@ As falas e reações detalhadas estão registradas no vídeo da execução; a ca
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-### 4.7 Comparação entre as Alternativas
+## 4.7 Comparação entre as Alternativas
 
 A comparação separa o que está evidenciado no material do que permanece sem comprovação e não escolhe uma alternativa vencedora.
 
@@ -3771,11 +4789,11 @@ A comparação separa o que está evidenciado no material do que permanece sem c
 
 **Interpretações posteriores:** no A, a construção tornou explícita a diferença entre estar no projeto correto e compreender a tarefa atual. No B, o registro da equipe relata que a familiaridade visual reduziu o custo de aprendizagem, mas aumentou a frustração quando áudio e resposta se revelaram simulados. A primeira conclusão decorre do roteiro e do diário consolidado; a segunda decorre do vídeo da execução e das anotações da sessão. A exploração não permite concluir que proatividade ou interação sob demanda seja superior.
 
-### 4.8 Limites da Exploração
+## 4.8 Limites da Exploração
 
 Esta seção explicita o que cada protótipo **não** permite concluir e o que ainda dependeria de testes com usuários reais.
 
-#### Limites do Protótipo A — Vídeo Encenado
+### Limites do Protótipo A — Vídeo Encenado
 
 - **Comportamento roteirizado:** as falas e reações foram previstas; não é possível concluir como uma pessoa reagiria espontaneamente a interrupções.
 - **Detecção de contexto simulada:** a troca de projeto é representada pelos atores; não há mecanismo que comprove quando o contexto realmente mudou.
@@ -3786,7 +4804,7 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 - **Sem usuários do parceiro:** tolerância a interrupções, privacidade percebida e utilidade contextual só podem ser conhecidas com profissionais do Metrô em uma rotina próxima da real.
 - **Evidência bruta limitada:** o vídeo editado, o histórico do roteiro e três fotografias de bastidores sustentam o resultado da improvisação do canal de áudio. Como não há gravação contínua da conversa em que a decisão foi tomada, sua ocorrência durante a gravação depende do relato retrospectivo da equipe e não permite reconstruir hesitações e falas exatas.
 
-#### Limites do Protótipo B — Interface de Interação Sob Demanda
+### Limites do Protótipo B — Interface de Interação Sob Demanda
 
 - **Respostas fixas por palavra-chave:** não há PLN real, então nada se conclui sobre a qualidade de interpretação dos pedidos.
 - **Voz simulada:** nada se conclui sobre a taxa de erro do ASR com o jargão do Metrô nem sobre o comportamento com ruído de ambiente.
@@ -3794,7 +4812,7 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 - **O participante do teste foi Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO:** a formulação de pedidos de um colaborador real, com vocabulário e pressa reais, só seria observada com usuários do Metrô.
 - **Sessão única de execução:** o vídeo registra uma única sessão com um participante; padrões de uso recorrente, fadiga e preferências ao longo do tempo não podem ser inferidos de uma execução isolada.
 
-#### Limites comuns e conclusão permitida
+### Limites comuns e conclusão permitida
 
 - Nenhum protótipo utiliza dados reais do Metrô ou opera no ambiente real de trabalho.
 - Não há recuperação documental, inferência de intenção, permissões ou integração com Teams/SharePoint em funcionamento nos protótipos.
@@ -3803,7 +4821,7 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 - Para responder a essas questões seriam necessários testes moderados com profissionais do parceiro, tarefas equivalentes, registros brutos e métricas de utilidade, interrupção e sucesso.
 - A exploração **não permite determinar qual alternativa é superior**.
 
-### 4.9 Inventário de Decisões em Aberto
+## 4.9 Inventário de Decisões em Aberto
 
 Esta seção reúne as decisões de design e comportamento do agente que a construção dos protótipos revelou, mas que permanecem sem resposta definitiva. Para cada uma, registram-se as opções consideradas e o que está em jogo.
 
@@ -3823,7 +4841,7 @@ Esta seção reúne as decisões de design e comportamento do agente que a const
 | P-B05 | Dado estruturado vs. documento | consultar banco | devolver documento-fonte | declarar limite | cobertura do agente e expectativa | captura do fallback, Imagem 4.6.1 | criar fluxos separados e testar pedidos equivalentes |
 | P-B06 | Acesso negado | ocultar existência | oferecer solicitação | mostrar apenas metadados | transparência vs. exposição sensível | estado final, Imagem 4.5.4 | revisão de segurança e teste com perfis distintos |
 
-### 4.10 Repertório de Situações
+## 4.10 Repertório de Situações
 
 Esta seção registra os casos e situações usados durante a construção e a execução dos protótipos, com destaque para aqueles que não foram atendidos.
 
@@ -3843,7 +4861,7 @@ Esta seção registra os casos e situações usados durante a construção e a e
 | S-B05 | tentativa de gravar e ouvir áudio | uso livre relatado pela equipe | controles eram simulados | não atendida; exigiu explicação verbal | reação depende do registro textual da equipe | B |
 | S-B06 | “quantas ocorrências teve na L2 em julho?” | pedido de dado estruturado | fallback alega busca sem fonte real | não atendida; captura disponível | fluxo confunde dado e documento | B |
 
-### 4.11 Aprendizados da Exploração
+## 4.11 Aprendizados da Exploração
 
 - A construção do A tornou explícito que **contexto** (projeto, tela, atividade e histórico observáveis) não equivale à **intenção** (objetivo que a pessoa pretende alcançar naquele momento).
 - Aceitar e recusar não bastam para definir o comportamento: “não” pode significar irrelevância, momento inadequado ou rejeição permanente.
@@ -3853,7 +4871,7 @@ Esta seção registra os casos e situações usados durante a construção e a e
 - A sessão B mostrou que uma interface visualmente realista pode criar expectativas de funcionalidades que o protótipo não executa; essa interpretação está apoiada no vídeo da execução e nas anotações da equipe.
 - A inclusão da Cena 10 durante a gravação revelou que a proatividade não precisa depender exclusivamente de uma tela. O canal por fone foi materializado na encenação como improvisação declarada, mas sua utilidade, privacidade e operação por voz ainda não foram validadas com usuários.
 
-### 4.12 Próximos Passos
+## 4.12 Próximos Passos
 
 | Decisão a investigar | Método proposto | Evidência esperada |
 |---|---|---|
@@ -3863,11 +4881,11 @@ Esta seção registra os casos e situações usados durante a construção e a e
 | P-B02 a P-B04 — voz | teste controlado com siglas, ruído e respostas de diferentes extensões | transcrições, correções, tempo e preferência de saída |
 | Comparação A × B | aplicar tarefas equivalentes com profissionais do parceiro | medidas comparáveis de utilidade, interrupção, esforço e controle percebido |
 
-### 4.13 Registros Visuais
+## 4.13 Registros Visuais
 
 Esta seção reúne evidências de naturezas diferentes — fotografias de bastidores, vídeo editado, roteiro, storyboard e capturas de tela. Cada item é classificado conforme aquilo que realmente comprova; materiais de planejamento e reconstruções posteriores não são apresentados como registros brutos de execução.
 
-#### Registros do Protótipo A
+### Registros do Protótipo A
 
 | Evidência | Formato | Etapa registrada | O que permite comprovar | Verificação |
 |---|---|---|---|---|
@@ -3899,7 +4917,7 @@ Esta seção reúne evidências de naturezas diferentes — fotografias de basti
 
 Os bastidores ampliam o registro visual da construção, confirmam a participação declarada no roteiro e mostram os diferentes ambientes e equipamentos utilizados na gravação. As imagens não registram o momento de falha ou improvisação.
 
-#### Registros do Protótipo B
+### Registros do Protótipo B
 
 | Evidência | Formato | Etapa registrada | O que permite comprovar | Verificação |
 |---|---|---|---|---|
@@ -3913,7 +4931,7 @@ Os bastidores ampliam o registro visual da construção, confirmam a participaç
 
 O vídeo da execução registra a operação do protótipo pelo participante, incluindo as reações e falas descritas na seção 4.6; as imagens comprovam os estados da interface ao longo da construção.
 
-#### Matriz consolidada de evidências
+### Matriz consolidada de evidências
 
 | Evidência | Protótipo | Etapa | O que registra | O que comprova | Limitação da evidência |
 |---|---|---|---|---|---|
@@ -3931,7 +4949,7 @@ O vídeo da execução registra a operação do protótipo pelo participante, in
 | Roteiro, vídeo, bastidores e commits da Cena 10 | A | execução e reconstrução | limitação do canal exclusivamente visual e solução incorporada por áudio | materializa a falha relatada e o resultado da improvisação | o momento exato da decisão é sustentado pelo relato retrospectivo da equipe |
 | [Vídeo B](../assets/Vídeos/Vídeo-B.mp4) | B | execução | sessão de execução com uso livre, tentativa de áudio e pedido fora do escopo | operação do protótipo pelo participante, falha diante do pedido de dado estruturado e improvisação do facilitador | registra uma única sessão com um participante |
 
-#### Rastreabilidade entre rubrica e evidências
+### Rastreabilidade entre rubrica e evidências
 
 | Critério da rubrica | Evidência relacionada | Situação atual | Pendência |
 |---|---|---|---|
