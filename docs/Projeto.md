@@ -1524,44 +1524,76 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 
 ## 2.4 Visão Inicial da Solução Técnica
 
- A visão técnica apresentada nesta seção traduz, em um esboço preliminar de arquitetura, os fluxos de negócio descritos na seção 2.1 e os requisitos funcionais e não funcionais especificados nas seções 2.2 e 2.3. O diagrama a seguir representa a solução como um conjunto de blocos conectados, organizados em três camadas: interface humano-computador, lógica de negócio e acesso a dados e serviços.
+ A visão técnica apresentada nesta seção traduz, em arquitetura, os fluxos de negócio descritos na seção 2.1 e os requisitos funcionais e não funcionais especificados nas seções 2.2 e 2.3. A solução é representada como um conjunto de componentes conectados, organizados em camadas.
+
+ A seção está ordenada cronologicamente: apresenta primeiro a versão inicial do diagrama, em seguida os ajustes feitos a partir da implementação da API de recebimento de áudio, e por fim a versão atual, que é a que descreve a arquitetura em vigor. A intenção é que a leitura acompanhe a evolução do entendimento da equipe, e não apenas o resultado a que ela chegou.
 
  A divisão dos componentes de compreensão de linguagem segue o padrão adotado tanto por frameworks open-source de assistentes conversacionais, como o Rasa (RASA, 2024), quanto pela própria plataforma de bots da Microsoft (MICROSOFT, 2024), ecossistema já utilizado pelo parceiro por meio do Copilot Studio. Em ambos os casos, a compreensão da mensagem do usuário é dividida entre um componente de classificação de intenção, responsável por identificar o que o usuário deseja, e um componente de extração de parâmetros, responsável por capturar os dados específicos mencionados na solicitação, como o nome do projeto ou o período de referência.
 
-### Diagrama de componentes (UML)
+### Versão inicial do diagrama de componentes
+
+ A primeira versão do diagrama foi produzida antes da implementação, a partir dos requisitos e dos fluxos de negócio. Ela organizava a solução em três camadas — interface humano-computador, lógica de negócio, e dados e serviços — e tratava a entrada por voz como um desvio dentro do próprio fluxo de texto: a Chat UI enviava tudo ao API Gateway, que encaminhava o áudio à Conversão de Áudio em Texto quando a solicitação chegava falada.
 
 <div align="center">
-<sub>Imagem 2.4.1 - Diagrama de componentes (UML) — Visão inicial da solução técnica</sub><br>
-  <img src="../assets/diagrama_componentes.svg" width="100%" alt="Diagrama de componentes UML da solução, organizado em três camadas: interface, lógica de negócio e dados e serviços"><br>
+<sub>Imagem 2.4.1 - Diagrama de componentes (UML) — versão inicial, anterior à implementação</sub><br>
+  <img src="../assets/diagrama_componentes.svg" width="100%" alt="Versão inicial do diagrama de componentes, sem a API de recebimento de áudio, o armazenamento e os serviços de terceiros"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-<p align="center">
-  Para melhor visualização do diagrama, acesse o arquivo no <a href="https://drive.google.com/file/d/154cjwt0ZTBpfKCDS-TIXnqn2YJdOKqlL/view?usp=sharing">Google Drive</a>.
-</p>
+### Ajustes feitos após a implementação da API de recebimento de áudio
+
+ A construção da API de recebimento mostrou que o desenho anterior descrevia uma arquitetura pretendida, não a construída. O que mudou não foi a estética do diagrama, e sim o entendimento de como o áudio entra no sistema. A tabela abaixo registra os seis ajustes e serve de referência para acompanhar o desenvolvimento do projeto.
+
+| O que mudou | Como estava (Imagem 2.4.1) | Como ficou (Imagem 2.4.2) |
+|---|---|---|
+| Entrada de áudio | A Chat UI enviava tudo ao API Gateway, que encaminhava o áudio à Conversão de Áudio em Texto | A Chat UI envia o áudio a uma API de Recebimento dedicada, que valida, armazena e devolve um `audio_id` |
+| Armazenamento do áudio | Não representado — o áudio parecia trafegar direto entre componentes | Componente próprio na camada de dados, com chave `incoming/{audio_id}` e retenção de sete dias |
+| Acoplamento recebimento ↔ transcrição | Chamada direta entre os dois | Nenhuma chamada direta: o vínculo é o identificador e o armazenamento compartilhado |
+| Acesso ao armazenamento | Inexistente | Encapsulado pelo SDK boto3, isolando a aplicação da API do provedor |
+| Controle de Acesso | No caminho de todas as solicitações, como se estivesse implementado | Em traço interrompido e fora do caminho de execução, sinalizando decisão pendente |
+| Modelo de linguagem | Ausente do diagrama | Agrupamento «Serviços de Terceiros», tornando visível a dependência externa e o risco AM8 |
+
+ Os dois últimos ajustes seguem o mesmo princípio, aplicado em direções opostas: o diagrama deve mostrar aquilo de que a solução depende e não deve mostrar como pronto aquilo que ainda não existe. O Controle de Acesso saiu do caminho de execução porque não está implementado; o modelo de linguagem entrou porque, embora a equipe não o construa, o fluxo de geração de respostas depende dele.
+
+### Versão atual do diagrama de componentes
+
+ A versão atual mantém as três camadas originais e acrescenta um agrupamento à parte para os serviços de terceiros, que a solução consome mas não constrói. A separação é deliberada: o critério não é quem desenvolve o componente, e sim de quem a solução depende. Um serviço de terceiros que participa do fluxo de execução é parte da arquitetura, com custo, latência e modo de falha próprios, ainda que a equipe só escreva o contrato de consumo. Omiti-lo esconderia, por exemplo, a origem do risco AM8 (alucinação do modelo de linguagem), registrado na seção 1.9.2.
+
+<div align="center">
+<sub>Imagem 2.4.2 - Diagrama de componentes (UML) — versão atual da solução técnica</sub><br>
+  <img src="../assets/diagrama_de_componentes.svg" width="100%" alt="Versão atual do diagrama de componentes UML, organizado em três camadas — interface, lógica de negócio e dados e serviços — mais um agrupamento de serviços de terceiros"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
 ### Descrição das camadas
 
 | Camada | Componentes | Responsabilidade |
 |---|---|---|
-| **Interface (IHC)** | Chat UI - Texto e Voz | Recebe a solicitação do usuário nos dois canais previstos pelo RF01 e exibe a resposta estruturada ao final do processamento. |
-| **Lógica de negócio** | API Gateway, Conversão de Áudio em Texto, Controle de Acesso, PLN — Compreensão (Intenção e Parâmetros), PLN — Transações e Ações, Gerador de Respostas e Explicabilidade, Auditoria e Feedback | O API Gateway centraliza a entrada das solicitações e as encaminha para a Conversão de Áudio em Texto quando a entrada ocorre por voz (RF01 e RNF06). Em seguida, o Controle de Acesso autentica o usuário e valida suas permissões (RNF02). O componente PLN — Compreensão identifica a intenção e extrai os parâmetros (RNF03), direcionando solicitações de preenchimento ao componente PLN — Transações e Ações (RF04 e RF06), alertas ao mesmo componente (RF05) e consultas ao Gerador de Respostas (RF02). O Gerador de Respostas monta a saída final e informa as fontes (RF03), além da justificativa quando aplicável (RNF11). Auditoria e Feedback registra os elementos definidos no RNF04 e captura a avaliação do usuário. |
-| **Dados e serviços** | Repositório de Dados e Conhecimento, Logs de Auditoria | O Repositório de Dados e Conhecimento reúne os dados sintéticos estruturados do portfólio, o catálogo de intenções e a base de normativos empregados nas consultas (RF02), na indicação de fontes (RF03), nas sugestões (RF04 e RF06) e nos alertas (RF05). Os Logs de Auditoria armazenam separadamente os registros de interação e feedback protegidos contra alteração por usuários comuns (RNF04), pois possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais. |
+| **Interface (IHC)** | Chat UI - Texto e Voz | Recebe a solicitação do usuário nos dois canais previstos pelo RF01 e exibe a resposta estruturada ao final do processamento. Nas entradas por voz, é ela quem envia o arquivo à API de Recebimento de Áudio e quem recebe de volta o identificador da gravação. |
+| **Lógica de negócio** | API de Recebimento de Áudio, SDK boto3, Conversão de Áudio em Texto, API Gateway, Controle de Acesso, PLN — Compreensão (Intenção e Parâmetros), PLN — Transações e Ações, Gerador de Respostas e Explicabilidade, Auditoria e Feedback | A API de Recebimento de Áudio é a porta de entrada do canal de voz: valida presença, tamanho, formato e duração do arquivo, delega a gravação ao SDK boto3 e devolve um `audio_id` (RF01 e RNF06). Ela não transcreve. O SDK boto3 encapsula o acesso ao armazenamento compatível com S3, isolando o restante da aplicação da API do provedor. A Conversão de Áudio em Texto recupera o áudio pelo identificador e devolve a transcrição. O API Gateway centraliza a entrada das solicitações em texto. O componente PLN — Compreensão identifica a intenção e extrai os parâmetros (RNF03), direcionando solicitações de preenchimento ao componente PLN — Transações e Ações (RF04 e RF06), alertas ao mesmo componente (RF05) e consultas ao Gerador de Respostas (RF02). O Gerador de Respostas monta a saída final e informa as fontes (RF03), além da justificativa quando aplicável (RNF11). Auditoria e Feedback registra os elementos definidos no RNF04 e captura a avaliação do usuário. O Controle de Acesso permanece no diagrama como decisão arquitetural registrada para o RNF02, mas aparece em traço interrompido porque não está implementado no MVP. |
+| **Dados e serviços** | Armazenamento de Áudios, Repositório de Dados e Conhecimento, Logs de Auditoria | O Armazenamento de Áudios guarda as gravações recebidas em um bucket compatível com S3 (MinIO no ambiente local), sob a chave `incoming/{audio_id}`, e é o ponto de contato entre o recebimento e a transcrição: um grava, o outro lê. Os objetos em `incoming/` expiram automaticamente após sete dias, de modo que o áudio bruto não se acumula além do necessário. O Repositório de Dados e Conhecimento reúne os dados sintéticos estruturados do portfólio, o catálogo de intenções e a base de normativos empregados nas consultas (RF02), na indicação de fontes (RF03), nas sugestões (RF04 e RF06) e nos alertas (RF05). Os Logs de Auditoria armazenam separadamente os registros de interação e feedback protegidos contra alteração por usuários comuns (RNF04), pois possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais. |
+| **Serviços de terceiros** | Serviços de LLMs | Modelo de linguagem consumido pelo Gerador de Respostas para compor respostas fundamentadas nas fontes recuperadas (RF03 e RNF11). A equipe não implementa nem hospeda esse componente: define apenas o contrato de consumo. Sua presença no diagrama registra a dependência externa e é onde se materializa o risco AM8. |
 
 ### Conexões entre componentes
 
 | Origem → destino | Protocolo ou mecanismo | Dados e motivo da conexão |
 |---|---|---|
-| Chat UI → API Gateway | HTTPS/REST | Envia texto ou áudio por uma interface única, desacoplando a aplicação cliente da lógica interna. |
-| API Gateway → Conversão de Áudio em Texto | Chamada de serviço por HTTPS/REST | Encaminha somente entradas de voz para transcrição, preservando um fluxo comum a partir do texto. |
-| Conversão de Áudio em Texto → Controle de Acesso | Chamada interna | Entrega o texto transcrito ao mesmo controle aplicado às entradas digitadas. |
-| API Gateway → Controle de Acesso | Chamada interna | Impede que solicitações em texto prossigam sem autenticação e autorização. |
-| Controle de Acesso → PLN — Compreensão | Chamada interna | Encaminha apenas solicitações autorizadas para classificação de intenção e extração de parâmetros. |
+| Chat UI → API de Recebimento de Áudio | HTTPS/REST, `multipart/form-data` | Envia o arquivo de áudio. É o único caminho de entrada do canal de voz. |
+| API de Recebimento de Áudio → Chat UI | Resposta HTTPS `201 Created` | Devolve o `audio_id` no formato `aud_<uuid>`, que passa a ser a única referência à gravação. |
+| API de Recebimento de Áudio → SDK boto3 | Chamada de biblioteca | Delega a gravação do objeto, mantendo a rota livre de detalhes da API de armazenamento. |
+| SDK boto3 → Armazenamento de Áudios | API S3 sobre HTTP | Grava o áudio validado sob a chave `incoming/{audio_id}`, preservando o `Content-Type` detectado e a metadata `audio-format`. |
+| Armazenamento de Áudios → Conversão de Áudio em Texto | API S3 sobre HTTP | Entrega o conteúdo do áudio recuperado pela chave `incoming/{audio_id}`. Exige acesso de leitura ao mesmo bucket usado pelo recebimento. |
+| Conversão de Áudio em Texto → Chat UI | Retorno da chamada | Devolve o texto transcrito para conferência do usuário antes do processamento, conforme o RF01. |
+| Conversão de Áudio em Texto → PLN — Compreensão | Chamada interna | Encaminha a transcrição para o mesmo tratamento aplicado às entradas digitadas. |
+| Chat UI → API Gateway | HTTPS/REST | Envia as solicitações digitadas, sem passar pelo canal de voz. |
+| API Gateway → Controle de Acesso | Chamada interna (previsto) | Autenticação e autorização das solicitações (RNF02). Conexão registrada como decisão arquitetural; não existe no MVP. |
+| API Gateway → PLN — Compreensão | Chamada interna | Encaminha a solicitação em texto para classificação de intenção e extração de parâmetros. |
 | PLN — Compreensão → PLN — Transações e Ações | Chamada interna | Direciona intenções de sugestão e alerta para suas regras de negócio. |
 | PLN — Compreensão → Gerador de Respostas | Chamada interna | Direciona consultas reconhecidas para composição da resposta. |
 | PLN — Transações e Ações → Repositório de Dados | Consulta SQL e acesso ao repositório de documentos | Recupera campos e pendências sem alterar as fontes no MVP. |
 | PLN — Transações e Ações → Gerador de Respostas | Chamada interna | Formata sugestões e alertas no mesmo padrão das consultas. |
 | Gerador de Respostas → Repositório de Dados | Consulta SQL e recuperação de documentos | Obtém dados, metadados e referências necessários à resposta. |
+| Gerador de Respostas → Serviços de LLMs | HTTPS/REST | Envia o contexto recuperado e obtém o texto da resposta. É a dependência externa do fluxo de geração. |
 | Gerador de Respostas → Chat UI | Resposta HTTPS/REST | Devolve conteúdo, fonte e data para exibição no canal de origem. |
 | Gerador de Respostas → Auditoria e Feedback | Chamada interna | Registra a resposta apresentada e associa eventual feedback. |
 | API Gateway → Auditoria e Feedback | Chamada interna | Registra usuário, data, hora, canal e solicitação desde a entrada. |
@@ -1569,6 +1601,27 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 | Auditoria e Feedback → Logs de Auditoria | Persistência SQL | Mantém registros separados dos dados operacionais para facilitar controle de acesso e auditoria. |
 
 **Decisão de Sprint 2 — persistência do pipeline de voz adiada para Sprint 3:** o resultado do pipeline de áudio — transcrição e intenção classificada — trafega inteiramente em memória durante o ciclo de vida da requisição HTTP e não é gravado em nenhum banco de dados. O arquivo de áudio permanece no armazenamento de objetos (MinIO), mas a transcrição e a intenção reconhecida são descartadas após a resposta ser devolvida ao cliente. A persistência dessas interações, via componente Auditoria e Feedback nos Logs de Auditoria, está planejada para a Sprint 3, quando o PostgreSQL será provisionado e o schema de auditoria definido. Até lá, rastreabilidade parcial é garantida pelo `audio_id`, que vincula cada requisição ao arquivo de áudio correspondente no MinIO.
+
+### Evolução do diagrama
+
+ O diagrama passou por uma revisão relevante entre a primeira versão da arquitetura e a implementação da API de recebimento de áudio. A versão anterior está reproduzida abaixo e serve de referência para acompanhar o desenvolvimento do projeto: o que mudou não foi a estética do desenho, e sim o entendimento de como o áudio entra no sistema.
+
+<div align="center">
+<sub>Imagem 2.4.2 - Diagrama de componentes (UML) — versão anterior, mantida para comparação</sub><br>
+  <img src="../assets/diagrama_componentes.svg" width="100%" alt="Versão anterior do diagrama de componentes, sem a API de recebimento de áudio, o armazenamento e os serviços de terceiros"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+| O que mudou | Versão anterior (Imagem 2.4.2) | Versão atual (Imagem 2.4.1) |
+|---|---|---|
+| Entrada de áudio | A Chat UI enviava tudo ao API Gateway, que encaminhava o áudio à Conversão de Áudio em Texto | A Chat UI envia o áudio a uma API de Recebimento dedicada, que valida, armazena e devolve um `audio_id` |
+| Armazenamento do áudio | Não representado — o áudio parecia trafegar direto entre componentes | Componente próprio na camada de dados, com chave `incoming/{audio_id}` e retenção de sete dias |
+| Acoplamento recebimento ↔ transcrição | Chamada direta entre os dois | Nenhuma chamada direta: o vínculo é o identificador e o armazenamento compartilhado |
+| Acesso ao armazenamento | Inexistente | Encapsulado pelo SDK boto3, isolando a aplicação da API do provedor |
+| Controle de Acesso | No caminho de todas as solicitações, como se estivesse implementado | Em traço interrompido e fora do caminho de execução, sinalizando decisão pendente |
+| Modelo de linguagem | Ausente do diagrama | Agrupamento «Serviços de Terceiros», tornando visível a dependência externa e o risco AM8 |
+
+ A comparação registra uma lição de projeto que vale além deste artefato: a primeira versão descrevia a arquitetura pretendida, e a segunda descreve a arquitetura construída. A diferença entre as duas apareceu durante a implementação, quando ficou claro que separar recebimento de transcrição simplificava as duas responsabilidades — e que o diagrama anterior sugeria como pronto um controle de acesso que ainda não existia.
 
 ---
 
@@ -2757,7 +2810,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 
  A primeira é de **viabilidade**: o acesso é concedido pela faculdade, sem custo para a equipe e sem necessidade de cartão de crédito ou de aprovação de orçamento, o que elimina o risco de o projeto parar por indisponibilidade de infraestrutura durante as sprints.
 
- A segunda é de **portabilidade**: toda a pilha implantada é composta por tecnologias de código aberto e por interfaces padronizadas — Docker para empacotamento, PostgreSQL para persistência, Python e FastAPI no backend, React e Next.js na interface. Nenhum componente do núcleo depende de serviço proprietário de um provedor específico. É importante registrar a distinção: a AWS não é uma plataforma de código aberto, e o argumento não é sobre o provedor, e sim sobre o que é implantado sobre ele. Como o núcleo é aberto e conteinerizado, a mesma imagem que roda no AWS Academy roda em qualquer outro provedor, o que preserva a possibilidade de a solução ser futuramente promovida para o ambiente Microsoft utilizado pelo Metrô sem reescrita de código.
+ A segunda é de **portabilidade**: toda a pilha implantada é composta por tecnologias de código aberto e por interfaces padronizadas — Docker para empacotamento, PostgreSQL para persistência, Python e FastAPI no backend, JavaScript/JSX, React e Vite na interface. Nenhum componente do núcleo depende de serviço proprietário de um provedor específico. É importante registrar a distinção: a AWS não é uma plataforma de código aberto, e o argumento não é sobre o provedor, e sim sobre o que é implantado sobre ele. Como o núcleo é aberto e conteinerizado, a mesma imagem que roda no AWS Academy roda em qualquer outro provedor, o que preserva a possibilidade de a solução ser futuramente promovida para o ambiente Microsoft utilizado pelo Metrô sem reescrita de código.
 
  Essa decisão tem uma consequência que precisa estar explícita: o ambiente de deploy do MVP deixa de coincidir com o ecossistema de produção do parceiro. A aderência ao ambiente Microsoft, prevista no TAPI, passa a ser garantida pela portabilidade da pilha e pelas integrações registradas na Seção 3.7.8, e não pelo provedor escolhido para o ambiente acadêmico.
 
@@ -2765,7 +2818,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 
 | Componente | Nó no diagrama | Serviço AWS | Justificativa |
 |---|---|---|---|
-| Interface web | Web App Frontend | Amazon EC2 | Executa o contêiner que serve a Chat UI construída em React, TypeScript e Next.js |
+| Interface web | Web App Frontend | Amazon EC2 | Executa o contêiner que serve a Chat UI construída em JavaScript/JSX, React e Vite |
 | Núcleo da aplicação | Web App Backend | Amazon EC2 | Executa o contêiner com o pipeline de PLN, as regras de negócio e as APIs REST |
 | Empacotamento e publicação | Docker - Amazon ECR | Amazon Elastic Container Registry | Guarda as imagens de frontend e backend produzidas pelo pipeline |
 | Persistência de dados | Database - PostgreSQL | PostgreSQL | Banco relacional único, com os schemas de portfólio e de auditoria. A forma de hospedagem ainda não está definida — ver Seção 3.7.9 |
@@ -2777,7 +2830,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 **Por que essa arquitetura:**
 
 - **Viabilidade imediata** — o acesso ao AWS Academy é concedido pela instituição de ensino, sem custo para a equipe;
-- **Pilha de código aberto** — Docker, PostgreSQL, Python, FastAPI, React e Next.js compõem o núcleo, sem dependência de serviço proprietário;
+- **Pilha de código aberto** — Docker, PostgreSQL, Python, FastAPI, JavaScript/JSX, React e Vite compõem o núcleo, sem dependência de serviço proprietário;
 - **Portabilidade** — como o núcleo é conteinerizado e aberto, a mesma imagem pode ser promovida para outro provedor, inclusive para o ambiente Microsoft do parceiro;
 - **Banco único** — a persistência estruturada foi concentrada em um único banco relacional, sem introduzir base não relacional, conforme decidido na Seção 2.5;
 - **Reprodutibilidade** — os passos e parâmetros necessários são registrados na Seção 3.7.4 para repetição em ambiente autorizado.
@@ -2803,7 +2856,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | Nó | Elementos implantados | Responsabilidade |
 |---|---|---|
 | **Internet - Browser** | Chat UI, Captura de áudio | Único nó fora da infraestrutura de nuvem: executa no navegador da máquina do profissional do PMO. A Chat UI é o código de interface baixado do Web App Frontend e executado localmente; é por ela que a solicitação é digitada e que a resposta é exibida junto da fonte consultada e da data de referência (RF02 e RF03). A Captura de áudio grava a mensagem falada e a encaminha como arquivo ao backend, atendendo ao canal de voz previsto no RF01 e à acessibilidade exigida pelo RNF06. Nenhum processamento de linguagem natural ocorre neste nó: ele apenas coleta a entrada e apresenta a saída. |
-| **Web App Frontend** (Amazon EC2) | React + TypeScript + Next.js, Assets estáticos | Hospeda a aplicação cliente e a entrega ao navegador. Os Assets estáticos reúnem os arquivos de JavaScript, folhas de estilo e fontes que compõem a Chat UI; o bloco React + TypeScript + Next.js responde pela construção e pela renderização das telas. A separação em relação ao Web App Backend mantém a aplicação cliente desacoplada do núcleo, condição do RNF05 para que outras aplicações possam futuramente consumir a mesma API. |
+| **Web App Frontend** (Amazon EC2) | JavaScript/JSX + React + Vite, Assets estáticos | Hospeda a aplicação cliente e a entrega ao navegador. Os Assets estáticos reúnem os arquivos de JavaScript, folhas de estilo e fontes que compõem a Chat UI; o bloco JavaScript/JSX + React + Vite responde pela construção e pela renderização das telas. A separação em relação ao Web App Backend mantém a aplicação cliente desacoplada do núcleo, condição do RNF05 para que outras aplicações possam futuramente consumir a mesma API. |
 | **Docker - Amazon ECR** | `<<Artifact>>` Imagens frontend + backend | Registro das imagens de contêiner produzidas pelo pipeline descrito na Seção 3.7.6. Não participa da execução: sua função é guardar a versão exata de frontend e backend que foi construída, testada e aprovada, para que as instâncias EC2 obtenham dela a imagem no momento da implantação. É esse nó que garante que a versão validada em homologação seja idêntica à promovida para produção. |
 | **Web App Backend** (Amazon EC2) | API Gateway, PLN - Compreensão, PLN - Transações e Ações, API de Recebimento de áudio, API de Transcrição, Gerador de Respostas, Auditoria e Feedback, Agendador, Lista de Tarefas | Concentra toda a camada de lógica de negócio definida na Seção 2.4. O API Gateway centraliza a entrada das solicitações e autentica o usuário antes de qualquer processamento (RNF02). A API de Recebimento de áudio aceita o arquivo enviado pelo navegador e a API de Transcrição atua como cliente do serviço de voz, de modo que áudio e texto convergem para o mesmo fluxo (RF01 e RNF06). O PLN - Compreensão classifica a intenção e extrai os parâmetros da solicitação (RNF03), encaminhando pedidos de preenchimento e alertas ao PLN - Transações e Ações (RF04, RF05 e RF06) e consultas ao Gerador de Respostas (RF02), que monta a saída e informa a fonte e a justificativa (RF03 e RNF11). O Agendador executa as verificações periódicas que não dependem de solicitação do usuário e alimenta a Lista de Tarefas com as pendências encontradas, sustentando o acompanhamento preventivo do RF05. O Auditoria e Feedback registra usuário, data, canal, intenção, fontes e resultado de cada interação (RNF04). |
 | **API de Transcrição** (Amazon Transcribe) | Speech to Text | Serviço gerenciado de conversão de fala em texto, provisionado na mesma conta. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. |
@@ -2817,7 +2870,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | # | Origem → destino | Protocolo | Porta | Momento | Dados e motivo da conexão |
 |---|---|---|---|---|---|
 | C1 | Usuário → Internet - Browser | Interação direta | — | Execução | Solicitação digitada ou falada pelo profissional do PMO. |
-| C2 | Chat UI → Web App Frontend | HTTPS | 443 | Execução | Baixa os arquivos que compõem a interface — JavaScript, folhas de estilo e fontes — na primeira visita e a cada nova versão publicada. Enquanto não houver certificado, o acesso ocorre por HTTP na porta 80, ou diretamente na porta 3000 do processo Next.js. |
+| C2 | Chat UI → Web App Frontend | HTTPS | 443 | Execução | Baixa os arquivos que compõem a interface — JavaScript, folhas de estilo e fontes — na primeira visita e a cada nova versão publicada. Enquanto não houver certificado, o acesso ocorre por HTTP na porta 80, ou diretamente na porta 5173 do servidor de desenvolvimento do Vite. |
 | C3 | Chat UI → API Gateway | HTTPS/REST, JSON com JWT | 443 | Execução | Envia a solicitação em texto e recebe a resposta estruturada, mantendo a aplicação cliente desacoplada da lógica interna (RNF05). O processo do backend escuta internamente na porta 8000. |
 | C4 | Captura de áudio → API de Recebimento de áudio | HTTPS/REST, `multipart/form-data` | 443 | Execução | Envia o arquivo de áudio gravado no navegador para que a transcrição ocorra no servidor, e não no cliente. Compartilha a mesma porta de C3, por ser outro recurso da mesma API. |
 | C5 | API de Transcrição → API de Transcrição (Amazon Transcribe) | HTTPS, AWS SDK | 443 | Execução | Encaminha o áudio ao serviço de voz e recebe o texto transcrito, que segue pelo mesmo fluxo das mensagens digitadas. Conexão de saída da instância. |
@@ -2975,7 +3028,7 @@ icacls .\az1-key.pem /grant:r "$($env:USERNAME):(R)"
 
 | Tipo | Porta | Origem recomendada | Conexão | Quando será necessária |
 |---|---|---|---|---|
-| TCP personalizado | 3000 | IP da equipe, em `/32` | — | Acesso direto ao processo Next.js durante os testes, antes de o frontend ser publicado nas portas 80 ou 443 |
+| TCP personalizado | 5173 | IP da equipe, em `/32` | — | Acesso direto ao servidor de desenvolvimento do Vite durante os testes, antes de o frontend ser publicado nas portas 80 ou 443 |
 | TCP personalizado | 8000 | IP da equipe, em `/32` | — | Verificação do endpoint `/health` do backend antes de haver proxy |
 | PostgreSQL | 5432 | Grupo de segurança do backend | C7 | Acesso do backend ao banco. A origem deve ser o próprio grupo de segurança, e não uma faixa de endereços: assim o banco aceita conexões apenas de dentro do ambiente, independentemente do endereço que a instância receba a cada retomada de sessão, e nunca fica alcançável pela internet |
 
