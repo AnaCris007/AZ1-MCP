@@ -2,9 +2,6 @@ import logging
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
-
-load_dotenv()
-
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -13,6 +10,8 @@ from routes.audio import AudioAPIError
 from routes.chat import ChatAPIError
 from routes.transcription import TranscriptionAPIError
 from schemas.common import ErrorResponse
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

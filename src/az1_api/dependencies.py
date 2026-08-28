@@ -28,6 +28,7 @@ def get_transcriber() -> TranscribeAudio:
 @lru_cache
 def get_analyzer() -> AnalyzeAudio:
     import sys
+
     import pln.classificador as _pln_mod
     from pln.caminhos import MODELO_PADRAO
     from pln.classificador import carregar_modelo
