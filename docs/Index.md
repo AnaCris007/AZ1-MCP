@@ -34,7 +34,6 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
 | Os papéis de cada integrante e a evidência da rotação | [GestaoProjeto.md, Matriz de Papéis da Sprint 2](./GestaoProjeto.md#44-matriz-de-papéis-e-responsabilidades-da-sprint-2) |
 | O planejamento da Sprint 3, com estimativas, DoR e DoD | [GestaoProjeto.md, Planejamento da Sprint 3](./GestaoProjeto.md#47-planejamento-da-sprint-3) |
-| Os Merge Requests da Sprint 2 e sua rastreabilidade | [GestaoProjeto.md, Merge Requests da Sprint 2](./GestaoProjeto.md#48-merge-requests-da-sprint-2) |
 | O Gitflow, as branches, os commits e os MRs | [GestaoConfiguracao.md](./GestaoConfiguracao.md) |
 | Se a política de versionamento é seguida na prática | [GestaoConfiguracao.md, Coerência entre Política e Prática](./GestaoConfiguracao.md#7-coerência-entre-política-e-prática) |
 

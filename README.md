@@ -54,11 +54,7 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 │   ├── GestaoProjeto.md
 │   ├── Index.md
 │   └── Projeto.md
-├── entregas/
-│   └── pln_completo.py       # o pipeline em UM arquivo — gerado, não editar
-├── resultados/               # comparativos e modelo treinado — saída gerada
-├── scripts/
-│   └── gerar_pln_completo.py # gera entregas/pln_completo.py a partir de src/pln
+├── resultados/      # comparativos e modelo treinado, saída gerada
 ├── src/
 │   ├── database/    # scripts SQL
 │   ├── pln/         # pipeline de linguagem natural
@@ -102,9 +98,9 @@ python -m unittest discover tests  # 106 testes
 - `src/schemas/`: modelos Pydantic de request/response da API.
 - `src/services/`: casos de uso e integração com armazenamento S3-compatível.
 - `src/az1_api/main.py`: ponto de entrada da aplicação FastAPI.
-- `resultados/` e `entregas/`: saída gerada. Nada ali é editado à mão — `resultados/` vem de
-  `python -m pln.experimento`, e `entregas/pln_completo.py` de
-  `python scripts/gerar_pln_completo.py`.
+- `resultados/`: saída gerada. Nada ali é editado à mão. Os comparativos vêm de
+  `python -m pln.experimento` e `python -m pln.ajuste_fino`, e o modelo treinado de
+  `python -m pln.classificador`.
 
 ##  Rodando a API
 

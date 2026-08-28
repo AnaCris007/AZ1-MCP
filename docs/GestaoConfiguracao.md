@@ -402,7 +402,6 @@ git push -u origin hotfix/corrigir-falha-classificador
 | Issue | [Issue #16](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/issues/16) | Task refinada com DoR, DoD, labels, milestone e assignee |
 | Branch | [docs/brainstorming-features](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/tree/docs/brainstorming-features) | Nomenclatura padronizada e origem em `develop` |
 | Merge Request | [MR !11](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/11) | Vínculo com a issue, reviewer designado e revisão real |
-| Merge Requests da Sprint 2 | [Seção 4.8 do `GestaoProjeto.md`](./GestaoProjeto.md#48-merge-requests-da-sprint-2) | Os 26 MRs do ciclo, com branch, autoria, issues, data e quem concluiu cada merge |
 | Aderência da política à prática | [Seção 7.2 deste documento](#72-quadro-de-aderência) | Confronto item a item entre o que a política define e o que o repositório registra |
 | Histórico de commits | [Commits da branch](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/commits/docs/brainstorming-features) | Commits semânticos em português com `#N` distribuídos ao longo da sprint |
 
