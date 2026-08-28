@@ -9,3 +9,7 @@ venv/
 build/
 dist/
 .aiox-core
+
+# chaves privadas de acesso
+*.pem
+*.ppk

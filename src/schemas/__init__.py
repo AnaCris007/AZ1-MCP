@@ -1,5 +1,3 @@
-from .audio import AudioUploadResponse
-from .chat import ChatRequest, ChatResponse
-from .common import ErrorResponse
+from .audio import AudioUploadResponse, ErrorResponse
 
-__all__ = ["AudioUploadResponse", "ChatRequest", "ChatResponse", "ErrorResponse"]
+__all__ = ["AudioUploadResponse", "ErrorResponse"]
