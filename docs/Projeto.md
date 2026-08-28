@@ -46,7 +46,7 @@
 - [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
 - [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
 - [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
-- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -2445,11 +2445,317 @@ O modelo conecta o uso do agente às informações de negócio consultadas. Quan
 
 A entidade **Interação** estabelece a ligação entre o usuário e as fontes consultadas, contribuindo para os requisitos de rastreabilidade e auditabilidade. A associação entre **Interação** e **Artefato** permite registrar quais fontes fundamentaram cada resposta, enquanto a relação entre **Projeto** e **Pendência** oferece a base conceitual para o acompanhamento preventivo previsto no produto.
 
-Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico deverá detalhar, em etapa posterior, os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
+Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico-relacional é apresentada nas subseções seguintes, que detalham os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
+
+#### 3.6.4 Modelo lógico-relacional
+
+O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas. Os atributos de cada tabela vêm da modelagem estática da seção 2.2.1, e os atributos da tabela `interacao` vêm dos elementos de auditoria exigidos pelos RNF04 e RNF09.
+
+Além dos seis relacionamentos do diagrama conceitual, o modelo lógico incorpora três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no recorte conceitual, por serem indispensáveis aos requisitos: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção de perfis de usuário (Diretor, PMO e Líder de Projeto), que sustenta o controle de acesso do RNF02 e a relação de liderança (`lidera`) prevista no RF06. Dessa forma, o modelo lógico dá continuidade simultaneamente ao modelo conceitual desta seção e ao diagrama de classes da Sprint 1.
+
+<div align="center">
+<sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
+  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, artefato, campo_artefato, pendencia, interacao, interacao_artefato, usuario_projeto e notificacao"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+A tabela a seguir registra a correspondência entre cada elemento das modelagens anteriores e a estrutura relacional que o implementa, evidenciando que nenhuma regra de negócio foi perdida na tradução:
+
+| Elemento de origem | Estrutura relacional | Regra de derivação aplicada |
+|---|---|---|
+| Entidade **Usuário** e especializações (2.2.1) | Tabela `usuario` com coluna `perfil` | Especializações sem atributos próprios colapsadas em coluna de domínio restrito por `CHECK` (decisão 1 da seção 3.6.7) |
+| Entidade **Interação** | Tabela `interacao` | Entidade para tabela; atributos definidos pelos RNF04 e RNF09 |
+| **Usuário realiza Interação** `(0,n)`–`(1,1)` | `interacao.usuario_id NOT NULL` | Um-para-muitos vira chave estrangeira no lado "muitos"; mínimo 1 vira `NOT NULL` |
+| **Interação consulta Artefato** `(0,n)`–`(0,n)` | Tabela associativa `interacao_artefato` | Muitos-para-muitos vira tabela associativa com chave primária composta |
+| **Artefato documenta/pertence a Projeto** `(1,1)`–`(0,n)` | `artefato.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
+| **Artefato possui Campo Artefato** `(1,n)`–`(1,1)` | `campo_artefato.artefato_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata e unicidade de `nome` por artefato |
+| **Projeto pertence a Portfólio** `(1,1)`–`(1,n)` | `projeto.portfolio_id NOT NULL` | Um-para-muitos vira chave estrangeira |
+| **Projeto origina Pendência** `(0,n)`–`(1,1)` | `pendencia.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
+| **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
+| **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
+| **Pendência notifica Usuário** (2.2.1) | Tabela `notificacao` | Muitos-para-muitos materializado como registro de envio, com atributo próprio `data_envio` (decisão 3 da seção 3.6.7) |
+
+As cardinalidades mínimas do lado "muitos" — um portfólio reúne ao menos um projeto `(1,n)` e um artefato possui ao menos um campo `(1,n)` — não são expressáveis por restrições declarativas simples no modelo relacional, pois exigiriam verificação no momento da inserção da linha "pai". Essas duas regras permanecem documentadas como restrições de aplicação, a serem garantidas pela camada de serviços descrita na seção 2.4.
+
+#### 3.6.5 Dicionário de dados (modelo físico)
+
+O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. Todas as chaves primárias substitutas usam `INTEGER GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais.
+
+As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente (portfólios, projetos, usuários, artefatos, campos e pendências), e o schema **`auditoria`** reúne os registros de interação, fontes consultadas e notificações, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
+
+**`portfolio`** — agrupamento de projetos de um exercício:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do portfólio |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
+| `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
+
+**`usuario`** — profissional autorizado a utilizar o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do usuário |
+| `nome` | `TEXT` | `NOT NULL` | Nome do profissional |
+| `email` | `TEXT` | `NOT NULL`, `UNIQUE` | Endereço corporativo de envio das notificações |
+| `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Papel do usuário, base do controle de acesso do RNF02 |
+
+**`projeto`** — empreendimento acompanhado pelo PMO:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do projeto |
+| `codigo` | `TEXT` | `NOT NULL`, `UNIQUE` | Código institucional do empreendimento (chave natural) |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do empreendimento |
+| `status` | `TEXT` | `NOT NULL` | Situação corrente do projeto |
+| `data_inicio` | `DATE` | — | Data de início da execução |
+| `data_termino_prevista` | `DATE` | — | Data prevista de conclusão, base da apuração de prazos |
+| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física |
+| `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
+| `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
+
+**`artefato`** — documento que integra a documentação do projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do artefato |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto documentado (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, como ata, relatório ou contrato |
+| `referencia` | `TEXT` | `NOT NULL` | Localizador do documento no repositório, exibido como fonte no RF03 |
+| `data` | `TIMESTAMPTZ` | `NOT NULL` | Data da última atualização, exibida junto à fonte no RF03 |
+| `versao` | `TEXT` | — | Versão vigente do documento |
+
+**`campo_artefato`** — campo individual de um artefato:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do campo |
+| `artefato_id` | `INTEGER` | `FK → artefato`, `NOT NULL`, `ON DELETE CASCADE` | Artefato ao qual o campo pertence (composição) |
+| `nome` | `TEXT` | `NOT NULL`, `UNIQUE (artefato_id, nome)` | Rótulo do campo dentro do artefato |
+| `valor` | `TEXT` | — | Conteúdo registrado; nulo ou vazio quando não preenchido |
+| `obrigatorio` | `BOOLEAN` | `NOT NULL`, `DEFAULT FALSE` | Indica se o preenchimento é exigido |
+| `preenchido` | `BOOLEAN` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Derivada de `valor`, elimina inconsistência entre valor e marcação (decisão 2 da seção 3.6.7) |
+
+**`pendencia`** — item em aberto originado por um projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único da pendência |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto de origem (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência, como prazo, documento ou aprovação; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `descricao` | `TEXT` | `NOT NULL` | Detalhamento do item em aberto |
+| `prazo` | `DATE` | — | Data limite para tratamento, base da notificação do RF05 |
+| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'resolvida')` | Estado corrente da pendência |
+
+**`auditoria.interacao`** — registro de auditoria de cada solicitação (RNF04 e RNF09):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Usuário que realizou a interação |
+| `data_hora` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do evento |
+| `canal` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'voz')` | Canal utilizado, conforme o RF01 |
+| `texto_solicitacao` | `TEXT` | `NOT NULL` | Texto da solicitação (original ou transcrito do áudio) |
+| `audio_referencia` | `TEXT` | `CHECK` (preenchida apenas quando `canal = 'voz'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4), vinculando o registro ao arquivo original |
+| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1 | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
+| `resultado` | `TEXT` | `NOT NULL`, `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')` | Desfecho da solicitação |
+| `categoria_erro` | `TEXT` | — | Categoria do erro, quando aplicável (RNF09) |
+| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)` | Tempo de processamento, insumo da verificação do RNF01 |
+| `feedback_usuario` | `TEXT` | — | Avaliação da resposta fornecida pelo usuário, capturada pelo componente Auditoria e Feedback da seção 2.4 |
+
+**`auditoria.interacao_artefato`** — fontes consultadas em cada interação (associativa de `consulta`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `interacao_id` | `INTEGER` | `PK` composta, `FK → interacao` | Interação que consultou a fonte |
+| `artefato_id` | `INTEGER` | `PK` composta, `FK → artefato` | Artefato que fundamentou a resposta (RF03) |
+
+**`usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
+| `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`auditoria.notificacao`** — registro dos envios da notificação proativa (materialização de `notifica`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do envio |
+| `pendencia_id` | `INTEGER` | `FK → pendencia`, `NOT NULL`, `ON DELETE CASCADE` | Pendência comunicada |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `UNIQUE (pendencia_id, usuario_id)` | Destinatário; a unicidade composta impede notificar duas vezes a mesma pendência ao mesmo usuário |
+| `data_envio` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do envio, exigido pelo RNF09 |
+
+#### 3.6.6 Definição física em SQL
+
+A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5 — na nuvem, o serviço gerenciado correspondente do provedor escolhido na seção 3.7. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+
+```sql
+CREATE SCHEMA portfolio;
+CREATE SCHEMA auditoria;
+
+CREATE TABLE portfolio.portfolio (
+    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome          TEXT    NOT NULL,
+    ano_exercicio INTEGER NOT NULL,
+    UNIQUE (nome, ano_exercicio)
+);
+
+CREATE TABLE portfolio.usuario (
+    id     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome   TEXT NOT NULL,
+    email  TEXT NOT NULL UNIQUE,
+    perfil TEXT NOT NULL CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto'))
+);
+
+CREATE TABLE portfolio.projeto (
+    id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    codigo                TEXT NOT NULL UNIQUE,
+    nome                  TEXT NOT NULL,
+    status                TEXT NOT NULL,
+    data_inicio           DATE,
+    data_termino_prevista DATE,
+    percentual_avanco     NUMERIC(5,2) NOT NULL DEFAULT 0
+                          CHECK (percentual_avanco BETWEEN 0 AND 100),
+    portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
+    lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
+);
+
+CREATE TABLE portfolio.artefato (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    referencia TEXT NOT NULL,
+    data       TIMESTAMPTZ NOT NULL,
+    versao     TEXT
+);
+
+CREATE TABLE portfolio.campo_artefato (
+    id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    artefato_id INTEGER NOT NULL REFERENCES portfolio.artefato (id) ON DELETE CASCADE,
+    nome        TEXT NOT NULL,
+    valor       TEXT,
+    obrigatorio BOOLEAN NOT NULL DEFAULT FALSE,
+    preenchido  BOOLEAN GENERATED ALWAYS AS
+                (valor IS NOT NULL AND btrim(valor) <> '') STORED,
+    UNIQUE (artefato_id, nome)
+);
+
+CREATE TABLE portfolio.pendencia (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    descricao  TEXT NOT NULL,
+    prazo      DATE,
+    situacao   TEXT NOT NULL DEFAULT 'aberta'
+               CHECK (situacao IN ('aberta', 'em_tratamento', 'resolvida'))
+);
+
+CREATE TABLE portfolio.usuario_projeto (
+    usuario_id INTEGER NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    PRIMARY KEY (usuario_id, projeto_id)
+);
+
+CREATE TABLE auditoria.interacao (
+    id                     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id             INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_hora              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    canal                  TEXT NOT NULL CHECK (canal IN ('texto', 'voz')),
+    texto_solicitacao      TEXT NOT NULL,
+    audio_referencia       TEXT CHECK (audio_referencia IS NULL OR canal = 'voz'),
+    intencao               TEXT CHECK (intencao IN (
+                               'consultar_documentos_normativos',
+                               'consultar_projeto_sintetico',
+                               'orientar_mapa_beneficios',
+                               'orientar_tap',
+                               'orientar_entregas_cronograma',
+                               'orientar_avanco_mensal',
+                               'orientar_riscos_problemas',
+                               'analisar_completude_coerencia',
+                               'gerar_alertas_pendencias',
+                               'fora_do_catalogo')),
+    resultado              TEXT NOT NULL CHECK (resultado IN
+                               ('sucesso', 'esclarecimento', 'recusada', 'falha')),
+    categoria_erro         TEXT,
+    tempo_processamento_ms INTEGER CHECK (tempo_processamento_ms >= 0),
+    feedback_usuario       TEXT
+);
+
+CREATE TABLE auditoria.interacao_artefato (
+    interacao_id INTEGER NOT NULL REFERENCES auditoria.interacao (id),
+    artefato_id  INTEGER NOT NULL REFERENCES portfolio.artefato (id),
+    PRIMARY KEY (interacao_id, artefato_id)
+);
+
+CREATE TABLE auditoria.notificacao (
+    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    pendencia_id INTEGER NOT NULL REFERENCES portfolio.pendencia (id) ON DELETE CASCADE,
+    usuario_id   INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_envio   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (pendencia_id, usuario_id)
+);
+
+-- Imutabilidade dos registros de auditoria (RNF04)
+REVOKE UPDATE, DELETE ON auditoria.interacao, auditoria.interacao_artefato,
+                        auditoria.notificacao FROM PUBLIC;
+
+-- Exceção pontual: a avaliação do usuário chega depois da resposta, portanto
+-- o papel da aplicação recebe permissão de atualização restrita a essa coluna:
+-- GRANT UPDATE (feedback_usuario) ON auditoria.interacao TO <papel_da_aplicacao>;
+
+-- Índices dos acessos frequentes dos cenários da seção 2.2.2
+CREATE INDEX idx_artefato_projeto        ON portfolio.artefato (projeto_id);
+CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_id);
+CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo);
+CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, data_hora);
+```
+
+#### 3.6.7 Decisões de modelagem e restrições de integridade
+
+As decisões estruturais do modelo, com as alternativas consideradas e as razões da escolha, são registradas a seguir.
+
+**Decisão 1 — Perfis de usuário por coluna de domínio, e não por tabelas de subtipo.** A generalização de Usuário da seção 2.2.1 poderia ser mapeada em tabelas de subtipo (`diretor`, `pmo`, `lider_projeto` com chave primária compartilhada). A opção pela coluna `perfil` com `CHECK` decorre da própria justificativa da modelagem estática: as três especializações não declaram atributos próprios, pois o que as distingue é o alcance de acesso, que é relacional. Esse alcance já está expresso no modelo lógico — o líder pela chave `projeto.lider_id` e pelo vínculo de `usuario_projeto`, e o diretor e o PMO pelo alcance consolidado sobre o portfólio, que é regra de autorização da aplicação (RNF02) e não dado armazenado. Tabelas de subtipo vazias adicionariam junções sem acrescentar informação.
+
+**Decisão 2 — `preenchido` como coluna gerada.** Se `preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, preservando o atributo declarado na seção 2.2.1 como consultável e garantindo a confiabilidade da identificação de campos pendentes, que alimenta o RF04 e o RF05.
+
+**Decisão 3 — `notificacao` como registro de envio.** A relação `notifica` poderia ser apenas derivada: os destinatários de uma pendência são os usuários que acompanham o projeto de origem. A materialização em tabela foi escolhida porque o RNF09 exige o registro dos eventos de notificação, e porque a unicidade composta `(pendencia_id, usuario_id)` dá ao Agendador do cenário 3 um critério idempotente, impedindo que a mesma pendência seja comunicada repetidamente ao mesmo usuário a cada verificação periódica.
+
+**Decisão 4 — Intenção como domínio de coluna, e não como tabela.** O catálogo de intenções da seção 3.1 poderia ser normalizado em uma tabela própria. A opção pelo `CHECK` na coluna `interacao.intencao` mantém a coerência com a delimitação do modelo conceitual, que tratou intenção como conceito da camada técnica de PLN, e não como entidade do domínio de portfólio. O custo da escolha é que a evolução do catálogo exige alteração da restrição; o benefício é não introduzir no banco uma entidade sem respaldo nas modelagens anteriores. A restrição deve ser mantida sincronizada com o catálogo da seção 3.1.
+
+**Decisão 5 — Chaves substitutas com chave natural preservada.** Todas as tabelas usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
+
+**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.interacao_artefato` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: a rastreabilidade do RNF04 prevalece sobre a conveniência da exclusão, e o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a exigência de imutabilidade dos registros perante usuários comuns. A única flexibilização é a coluna `feedback_usuario`, atualizável pelo papel da aplicação por meio de permissão em nível de coluna, pois a avaliação do usuário só existe depois de a resposta ter sido registrada.
+
+**Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de auditoria (`interacao`, `interacao_artefato` e `notificacao`) no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
+
+**Alinhamento com o estado da implementação.** Duas colunas de `auditoria.interacao` fecham lacunas registradas em outras frentes da equipe. A coluna `audio_referencia` guarda o identificador do áudio no armazenamento de objetos (o `audio_id` devolvido pela API da seção 3.4): a decisão registrada na seção 2.4 adiou a persistência do pipeline de voz exatamente porque "o PostgreSQL será provisionado e o schema de auditoria definido" em etapa posterior — este modelo define esse schema, e a coluna completa a rastreabilidade que hoje é parcial, ligando cada interação por voz ao arquivo original. A coluna `feedback_usuario` materializa a captura da avaliação do usuário atribuída ao componente Auditoria e Feedback na seção 2.4 e listada entre os registros previstos na seção 2.5.
+
+**Limitação registrada — documentos normativos.** A intenção INT-01 do catálogo da seção 3.1 consulta conceitos e normativos de gestão de portfólio, documentos que não pertencem a nenhum projeto específico. Pelo modelo conceitual e pela seção 2.2.1, todo artefato compõe exatamente um projeto, portanto a base de normativos permanece fora do modelo relacional, no repositório de arquivos independente descrito na seção 2.5. Consequência assumida: a associação `interacao_artefato` registra as fontes de respostas sobre projetos, e a fonte de uma resposta normativa é registrada de forma textual no próprio registro da interação. Se a base de normativos evoluir para dado estruturado, a modelagem de uma entidade própria — ou de um artefato sem vínculo com projeto — deverá ser reavaliada junto com o modelo conceitual, para que as duas representações não divirjam.
+
+**Normalização.** O modelo está na terceira forma normal: todas as tabelas têm chave primária definida, os atributos são atômicos e nenhum atributo não chave depende de outro atributo não chave. A única redundância existente é a coluna `preenchido`, que é derivada — e, por ser gerada pelo próprio banco, não constitui anomalia de atualização.
+
+Por fim, a tabela a seguir consolida a rastreabilidade entre as estruturas do modelo e os requisitos que elas sustentam, no mesmo formato adotado nas seções anteriores:
+
+| Estrutura do modelo | Requisitos sustentados | Papel |
+|---|---|---|
+| `usuario.perfil` | RNF02 | Base da validação de permissões por perfil |
+| `projeto.lider_id` | RF06, RNF02 | Delimita quem pode receber sugestões de alteração de cada projeto |
+| `usuario_projeto` | RF05 | Define os destinatários da notificação proativa |
+| `auditoria.notificacao` | RF05, RNF09 | Registra os envios e garante idempotência da verificação periódica |
+| `auditoria.interacao` | RNF01, RNF03, RNF04, RNF09 | Trilha de auditoria com canal, intenção, resultado e tempo de processamento |
+| `interacao.audio_referencia` | RF01, RNF06, RNF09 | Vincula a interação por voz ao arquivo de áudio original no armazenamento de objetos |
+| `interacao.feedback_usuario` | RNF04 | Registra a avaliação do usuário capturada pelo componente Auditoria e Feedback |
+| `auditoria.interacao_artefato` | RF03, RNF04, RNF11 | Registra as fontes que fundamentaram cada resposta |
+| `artefato.referencia`, `artefato.data` | RF03 | Origem e data exibidas junto a cada informação |
+| `campo_artefato.obrigatorio`, `campo_artefato.preenchido` | RF04, RF05 | Identificação dos campos pendentes de preenchimento |
+| `pendencia.prazo`, `pendencia.situacao` | RF05 | Critérios da verificação periódica do Agendador |
+
+O modelo físico definido nesta seção será populado exclusivamente com os dados sintéticos previstos na seção 1.3 e serve de base tanto para a implementação da camada de acesso a dados quanto para o processo de deploy descrito na seção 3.7.
 
 ### 3.7 Processo de Deploy em Nuvem
 
-#### 3.6.1 Arquitetura e Provedor Selecionado
+#### 3.7.1 Arquitetura e Provedor Selecionado
 
 O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **Microsoft Azure**. No MVP, o núcleo permanece independente; Copilot Studio, Power Platform, Teams e SharePoint são integrações futuras com o ambiente corporativo do parceiro.
 
@@ -2485,7 +2791,7 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 ```
 
 
-#### 3.6.2 Serviços Gratuitos e Limites
+#### 3.7.2 Serviços Gratuitos e Limites
 
 **Azure Free Tier (sempre gratuito):**
 - Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação/dia)
@@ -2504,7 +2810,7 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 **Para projeto acadêmico sem time constraint:**
 No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e suficientes. A implantação real deverá considerar licenciamento e recursos corporativos.
 
-#### 3.6.3 Etapas de Configuração e Implantação
+#### 3.7.3 Etapas de Configuração e Implantação
 
 **Passo 1 — Criar Ambientes Microsoft:**
 1. Registrar-se em [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
@@ -2544,7 +2850,7 @@ No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e 
 3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
 4. Enviar notificação para usuário via Teams
 
-#### 3.6.4 Exemplo de API (Flask)
+#### 3.7.4 Exemplo de API (Flask)
 
 
 ```python
@@ -2619,7 +2925,7 @@ EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 ```
 
-#### 3.6.5 Reprodutibilidade e Verificação
+#### 3.7.5 Reprodutibilidade e Verificação
 
 **Checklist de controle de custo:**
 - [ ] Azure App Service em tier Free (1 instância)
@@ -2659,7 +2965,7 @@ curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
 }
 ```
 
-#### 3.6.6 Próximos Passos para Produção
+#### 3.7.6 Próximos Passos para Produção
 
 Quando a solução for promovida para ambiente real do Metrô:
 
@@ -2671,7 +2977,7 @@ Quando a solução for promovida para ambiente real do Metrô:
 
 Toda a arquitetura permanece igual; apenas migram os recursos para ambientes gerenciados pelo Metrô.
 
-#### 3.6.7 Observações Finais
+#### 3.7.7 Observações Finais
 
 Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossistema Microsoft do parceiro. A reprodutibilidade será confirmada após a execução dos passos e a inclusão das evidências. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 
