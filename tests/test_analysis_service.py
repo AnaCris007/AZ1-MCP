@@ -1,0 +1,78 @@
+from __future__ import annotations
+
+import unittest
+from unittest.mock import AsyncMock, MagicMock
+
+import numpy as np
+
+from services.analysis_service import AnalysisResult, AnalyzeAudio
+from services.transcription_service import TranscriptionError, TranscriptionErrorCode, TranscriptionResult
+
+
+def _make_transcriber(*, text: str = "texto", confidence: float | None = 0.9, duration: float = 3.0, language: str = "pt-BR") -> MagicMock:
+    transcriber = MagicMock()
+    transcriber.transcribe = AsyncMock(
+        return_value=TranscriptionResult(
+            text=text,
+            language=language,
+            confidence=confidence,
+            duration_seconds=duration,
+        )
+    )
+    return transcriber
+
+
+def _make_modelo(*, intencao: str = "consultar_status", confianca: float = 0.88) -> MagicMock:
+    modelo = MagicMock()
+    modelo.predict_proba.return_value = np.array([[confianca]])
+    modelo.named_steps = {"classificador": MagicMock(classes_=np.array([intencao]))}
+    return modelo
+
+
+class TestAnalyzeAudio(unittest.IsolatedAsyncioTestCase):
+    async def test_retorna_resultado_completo(self) -> None:
+        transcriber = _make_transcriber(text="Qual o status da Linha 6?", confidence=0.95, duration=4.5)
+        modelo = _make_modelo(intencao="consultar_status", confianca=0.91)
+        service = AnalyzeAudio(transcriber=transcriber, modelo=modelo)
+
+        result = await service.analyze(audio_id="aud_abc")
+
+        self.assertIsInstance(result, AnalysisResult)
+        self.assertEqual(result.text, "Qual o status da Linha 6?")
+        self.assertEqual(result.intencao, "consultar_status")
+        self.assertAlmostEqual(result.confianca_pln, 0.91)
+        self.assertAlmostEqual(result.confidence, 0.95)
+        self.assertAlmostEqual(result.duration_seconds, 4.5)
+
+    async def test_repassa_language_para_transcricao(self) -> None:
+        transcriber = _make_transcriber(language="en-US")
+        service = AnalyzeAudio(transcriber=transcriber, modelo=_make_modelo())
+
+        result = await service.analyze(audio_id="aud_abc", language="en-US")
+
+        transcriber.transcribe.assert_awaited_once_with(audio_id="aud_abc", language="en-US")
+        self.assertEqual(result.language, "en-US")
+
+    async def test_propaga_transcription_error(self) -> None:
+        transcriber = MagicMock()
+        transcriber.transcribe = AsyncMock(
+            side_effect=TranscriptionError(TranscriptionErrorCode.AUDIO_NOT_FOUND)
+        )
+        service = AnalyzeAudio(transcriber=transcriber, modelo=_make_modelo())
+
+        with self.assertRaises(TranscriptionError) as ctx:
+            await service.analyze(audio_id="aud_inexistente")
+
+        self.assertEqual(ctx.exception.code, TranscriptionErrorCode.AUDIO_NOT_FOUND)
+
+    async def test_confidence_pode_ser_none(self) -> None:
+        transcriber = _make_transcriber(confidence=None)
+        service = AnalyzeAudio(transcriber=transcriber, modelo=_make_modelo())
+
+        result = await service.analyze(audio_id="aud_abc")
+
+        self.assertIsNone(result.confidence)
+
+
+if __name__ == "__main__":
+    unittest.main()

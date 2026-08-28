@@ -1,3 +1,21 @@
+# Dependências do gitlab-issue-kit
 requests>=2.31
 python-dotenv>=1.0
 PyYAML>=6.0
+
+# Dependências do pipeline de PLN (src/pln)
+nltk>=3.8
+scikit-learn>=1.4
+spacy>=3.7
+
+# Dependências da API de recebimento de áudio
+fastapi>=0.115
+pydantic>=2
+python-multipart>=0.0.12
+uvicorn[standard]>=0.30
+av>=14.0
+boto3>=1.35
+deepgram-sdk>=5.0
+
+# Dependências da API de chat (Gemini)
+google-genai>=1.0

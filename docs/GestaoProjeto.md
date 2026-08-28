@@ -41,6 +41,7 @@
   - [2.1.5 Comunicação oficial](#215-comunicação-oficial)
   - [2.1.6 Dailies e demais rituais](#216-dailies-e-demais-rituais)
   - [2.1.7 Acordos adicionais](#217-acordos-adicionais)
+  - [2.1.8 Histórico de revisões do contrato](#218-histórico-de-revisões-do-contrato)
 - [2.2 Gestão do Processo de Desenvolvimento](#22-gestão-do-processo-de-desenvolvimento)
   - [2.2.1 Fluxo de trabalho](#221-fluxo-de-trabalho)
   - [2.2.2 Política de atualização do GitLab](#222-política-de-atualização-do-gitlab)
@@ -68,6 +69,42 @@
 
 </details>
 
+<details>
+<summary><strong>4. Sprint 2</strong></summary>
+
+- [4.1 Visão geral da entrega](#41-visão-geral-da-entrega)
+- [4.2 Análise e retrospectiva da Sprint 2](#42-análise-e-retrospectiva-da-sprint-2)
+  - [4.2.1 Síntese da sprint](#421-síntese-da-sprint)
+  - [4.2.2 Pontos fortes](#422-pontos-fortes)
+  - [4.2.3 Pontos fracos](#423-pontos-fracos)
+  - [4.2.4 Ações de melhoria](#424-ações-de-melhoria)
+  - [4.2.5 Alinhamento com o Escritório de Projetos](#425-alinhamento-com-o-escritório-de-projetos)
+- [4.3 Matriz de Risco do Projeto](#43-matriz-de-risco-do-projeto)
+  - [4.3.1 Critério de severidade](#431-critério-de-severidade)
+  - [4.3.2 Revisão das ameaças na Sprint 2](#432-revisão-das-ameaças-na-sprint-2)
+  - [4.3.3 Revisão das oportunidades na Sprint 2](#433-revisão-das-oportunidades-na-sprint-2)
+  - [4.3.4 Novos itens identificados na Sprint 2](#434-novos-itens-identificados-na-sprint-2)
+  - [4.3.5 Efetividade das respostas aplicadas](#435-efetividade-das-respostas-aplicadas)
+  - [4.3.6 Quadro consolidado e representação visual](#436-quadro-consolidado-e-representação-visual)
+  - [4.3.7 Análise dos três itens mais críticos](#437-análise-dos-três-itens-mais-críticos)
+  - [4.3.8 Histórico de acompanhamento](#438-histórico-de-acompanhamento)
+- [4.4 Matriz de Papéis e Responsabilidades da Sprint 2](#44-matriz-de-papéis-e-responsabilidades-da-sprint-2)
+  - [4.4.1 Papéis, responsabilidades e rotação](#441-papéis-responsabilidades-e-rotação)
+  - [4.4.2 Critérios de distribuição](#442-critérios-de-distribuição)
+  - [4.4.3 Evidência versionada da rotação](#443-evidência-versionada-da-rotação)
+- [4.5 Revisão do Contrato de Convivência, SLA e Rituais](#45-revisão-do-contrato-de-convivência-sla-e-rituais)
+- [4.6 Revisão da Gestão do Processo de Desenvolvimento](#46-revisão-da-gestão-do-processo-de-desenvolvimento)
+- [4.7 Planejamento da Sprint 3](#47-planejamento-da-sprint-3)
+  - [4.7.1 Objetivo da sprint](#471-objetivo-da-sprint)
+  - [4.7.2 Priorização e sequenciamento](#472-priorização-e-sequenciamento)
+  - [4.7.3 Escala de estimativas](#473-escala-de-estimativas)
+  - [4.7.4 Lista de tasks estimadas](#474-lista-de-tasks-estimadas)
+  - [4.7.5 Detalhamento das tasks](#475-detalhamento-das-tasks)
+  - [4.7.6 Artefato, evidência e designação por task](#476-artefato-evidência-e-designação-por-task)
+  - [4.7.7 Registro das tasks no Kanban](#477-registro-das-tasks-no-kanban)
+
+</details>
+
 ---
 
 # 1. Introdução
@@ -78,7 +115,7 @@ Este documento reúne as práticas permanentes de gestão adotadas pela equipe a
 
 ## 1.2 Organização evolutiva do documento
 
-O documento está dividido em duas grandes partes. A primeira, composta pela Seção 2, reúne os acordos e práticas permanentes que se aplicam a todo o módulo: o Contrato de Convivência, a Gestão do Processo de Desenvolvimento e o mecanismo de Acompanhamento Contínuo dos Riscos. Essas diretrizes não são reescritas a cada sprint — eventuais ajustes são incorporados sem apagar o histórico dos acordos anteriores, de modo que a evolução dos combinados fique registrada. A segunda parte, composta pelas Seções 3 a 7, reúne os registros específicos de cada sprint: a síntese e a retrospectiva, a revisão dos riscos, a matriz de papéis e responsabilidades e o planejamento da sprint seguinte. Cada sprint preserva seus próprios registros, sem sobrescrever os das sprints anteriores, o que permite acompanhar a evolução da equipe ao longo do módulo. A gestão de configuração, por sua vez, está documentada em arquivo separado, o GestaoConfiguracao.md, que define o fluxo gitflow, as políticas de branches e os procedimentos de criação, mesclagem e exclusão.
+O documento está dividido em duas grandes partes. A primeira, composta pela Seção 2, reúne os acordos e práticas permanentes que se aplicam a todo o módulo: o Contrato de Convivência, a Gestão do Processo de Desenvolvimento e o mecanismo de Acompanhamento Contínuo dos Riscos. Essas diretrizes não são reescritas a cada sprint, e eventuais ajustes são incorporados sem apagar o histórico dos acordos anteriores, de modo que a evolução dos combinados fique registrada. A segunda parte, composta pelas Seções 3 a 7, reúne os registros específicos de cada sprint: a síntese e a retrospectiva, a revisão dos riscos, a matriz de papéis e responsabilidades e o planejamento da sprint seguinte. Cada sprint preserva seus próprios registros, sem sobrescrever os das sprints anteriores, o que permite acompanhar a evolução da equipe ao longo do módulo. A gestão de configuração, por sua vez, está documentada em arquivo separado, o GestaoConfiguracao.md, que define o fluxo gitflow, as políticas de branches e os procedimentos de criação, mesclagem e exclusão.
 
 ---
 
@@ -147,6 +184,29 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 
  A abertura dos Merge Requests de promoção para a branch `main` é revezada entre os integrantes, seguindo uma lógica semelhante à rotação de Scrum Master. Essa rotação distribui a responsabilidade, evita a centralização do processo e amplia o conhecimento da equipe sobre o fluxo de entrega. A promoção deve respeitar o fluxo de branches e os critérios de aprovação definidos no documento `GestaoConfiguracao.md`.
 
+### 2.1.8 Histórico de revisões do contrato
+
+ O contrato é revisado a cada retrospectiva, conforme a Seção 2.2.4. Esta tabela registra cada revisão e seu desfecho, de modo que a manutenção dos acordos permaneça rastreável ao longo do módulo, tenha havido alteração ou não.
+
+| Sprint | Desfecho da revisão | Itens alterados | Registro da revisão |
+|---|---|---|---|
+| 1 | Contrato firmado | Não se aplica | Seção 3.2 |
+| 2 | Revisado e mantido integralmente | Nenhum | Seção 4.5 |
+
+ Como nenhuma regra do contrato foi alterada até aqui, a tabela de histórico por regra permanece sem linhas de alteração. Ela é mantida com a estrutura definida, para que a primeira mudança já entre no formato correto:
+
+| Regra | Versão anterior | Versão atual | Motivo | Evidência de aceite |
+|---|---|---|---|---|
+| — | — | — | Nenhuma regra do contrato foi alterada nas Sprints 1 e 2 | Não se aplica |
+
+ **O que mudou fora do contrato.** A única regra efetivamente revisada na Sprint 2 não pertence ao contrato, e sim à tabela de ações: o critério de verificação da rotação de revisores. Ela está registrada com sua justificativa na Seção 4.2.4, e não aqui, para que a distinção entre acordo de convivência e critério de acompanhamento permaneça clara.
+
+| Regra | Versão anterior | Versão atual | Motivo | Evidência de aceite |
+|---|---|---|---|---|
+| Critério de rotação de revisores (Seção 4.2.4, não pertence ao contrato) | Nenhum integrante revisa mais de dois MRs seguidos sem que outro assuma | Todos os integrantes revisam ao menos uma entrega de outra pessoa, e nenhuma entrega é revisada pelo próprio autor | A noção de entregas seguidas não é bem definida quando MRs de frentes distintas são integrados em ordens sobrepostas, e o critério anterior penalizava o arranjo que melhora a revisão | Decisão registrada na retrospectiva da Sprint 2 e documentada na Seção 4.2.4; **PENDENTE DE EVIDÊNCIA DA EQUIPE** quanto ao registro do aceite coletivo no canal oficial |
+
+ **Sobre o aceite coletivo.** As Seções 4.5 e 4.6 registram que a revisão do contrato e das políticas ocorreu na retrospectiva desta sprint e que a conclusão foi mantê-los. O documento não afirma, porém, que existe registro formal do aceite de cada integrante, porque essa comprovação depende do histórico do canal oficial e não foi anexada. Enquanto ela não existir, o aceite é uma declaração da equipe, e está assim identificado.
+
 ---
 
 ## 2.2 Gestão do Processo de Desenvolvimento
@@ -185,6 +245,34 @@ Issues sem milestone, sem assignee ou sem labels são consideradas não conforme
 
  Antes de solicitar revisão, o autor sincroniza sua branch de trabalho com `develop`, verifica o resultado localmente e resolve eventuais conflitos. Conflitos não devem ser resolvidos diretamente nas branches protegidas. Quando a resolução alterar conteúdo produzido por outro integrante ou envolver decisão técnica, o autor consulta o responsável pelo conteúdo antes de concluir o ajuste e registra a decisão no Merge Request. Os comandos e o procedimento detalhado estão definidos no documento `GestaoConfiguracao.md`.
 
+### 2.2.7 Quadro consolidado das políticas
+
+O quadro reúne, em uma leitura só, as políticas descritas nas seções anteriores, com a regra que cada uma estabelece, quem responde por ela, a frequência ou o prazo de resposta acordado, a evidência que comprova o cumprimento e a consequência do descumprimento. Ele não substitui as seções: existe para que a verificação de aderência, feita a cada retrospectiva, tenha um instrumento objetivo.
+
+| Política | Regra | Responsável | Frequência ou SLA | Evidência | Consequência do descumprimento |
+|---|---|---|---|---|---|
+| Criação de tasks (2.2.1) | Toda task nasce como issue com título no infinitivo, descrição, objetivo, DoR, DoD, labels, responsável e milestone preenchidos | Equipe, na Sprint Planning | Uma vez por sprint, no início do ciclo | Issues criadas com todos os campos no Kanban do GitLab | A issue não é movida para `backlog` e a task não pode ser iniciada |
+| Estimativa (2.2.1) | Toda task é estimada em t-shirt; acima de G, deve ser decomposta antes de entrar no backlog | Equipe, na Sprint Planning | Uma vez por sprint | Campo de estimativa preenchido na issue | A task volta para refinamento antes de entrar no backlog |
+| Atualização do Kanban (2.2.2) | Cada integrante move os próprios cards assim que o estado real muda | Cada integrante, pelos próprios cards | Continuamente, com atualização obrigatória antes de cada daily | Histórico de movimentação do card | Card sinalizado na daily seguinte; a task é tratada como bloqueada até ser atualizada |
+| Cards em revisão (2.2.2) | O autor acompanha o prazo da revisão e cobra o revisor designado | Autor da task | Card parado mais de dois dias sem interação deve ser sinalizado | Comentário no MR ou registro na daily | O impedimento é levado à daily e, persistindo, à retrospectiva |
+| Commits (2.2.3) | Conventional Commits em português, descrição no infinitivo, máximo de 72 caracteres, referência `#N`, uma intenção por commit, distribuídos ao longo da sprint | Cada integrante | A cada commit | Histórico do repositório e aferição registrada na Seção 5.3 do `GestaoConfiguracao.md` | Commit não conforme é apontado na revisão do MR; o histórico já integrado não é reescrito, e o desvio é registrado na retrospectiva |
+| Branches (2.2.1) | Branch criada a partir de `develop`, com prefixo válido e descrição em kebab-case, vinculada a uma issue | Cada integrante | A cada nova task | Nome da branch no repositório | O MR não é aceito até a branch ser renomeada ou recriada |
+| Revisão por pares (2.2.4) | Toda entrega é revisada por integrante diferente do autor, que registra ao menos um comentário e verifica o DoD | Revisor designado na Sprint Planning | Antes de cada merge | Comentário e aprovação registrados no MR | O merge não é realizado; o card permanece em `waiting review` |
+| Merge Requests (4.1 do `GestaoConfiguracao.md`) | MR aponta para a branch correta e contém `Closes #N`, o que foi feito, como testar, labels e milestone | Autor do MR | A cada MR | Descrição do MR no GitLab | O revisor devolve o MR ao autor antes de revisar o conteúdo |
+| Proteção de branches (4.5 do `GestaoConfiguracao.md`) | `main`, `hmg` e `develop` não recebem commit direto | Todos | Permanente | Ausência de commit direto no histórico das branches protegidas | O push é recusado pela proteção configurada no GitLab |
+| Testes (2.2.5) | A entrega só é concluída com os critérios de aceitação verificados e, quando houver código, com a suíte passando | Autor da task | A cada entrega | Execução da suíte registrada na issue ou no MR | O DoD não é considerado atendido e o card não vai para `closed` |
+| Documentação (2.2.5) | A documentação relacionada é atualizada junto da entrega, quando aplicável | Autor da task | A cada entrega | Alteração nos arquivos de `docs` no mesmo MR | O DoD não é considerado atendido |
+| Critérios de início e conclusão (2.2.5) | DoR atendido para iniciar, DoD comprovado para encerrar | Autor da task, verificado pelo revisor | A cada transição de estado | Checklist da issue preenchido | O card retorna ao estado anterior |
+| Registro de decisões (2.1.5) | Decisões internas ficam no canal interno; decisões com o corpo docente, no canal institucional; decisões de escopo, processo ou arquitetura são consolidadas na documentação ou na issue | Quem propõe a decisão | No momento da decisão | Mensagem no canal correspondente e registro no artefato | A decisão é retomada na daily seguinte para registro |
+| Bloqueios (2.1.5) | Impedimento que interrompe uma task é sinalizado imediatamente e recebe primeira resposta no mesmo período de trabalho | Quem está bloqueado | Resposta dentro do período de trabalho corrente | Mensagem no canal e registro na issue | O bloqueio é escalado na daily seguinte e, persistindo, ao orientador |
+| Atrasos (2.1.3) | Primeiro atraso gera feedback na daily; persistência gera alinhamento formal na retrospectiva; descumprimento do acordo formal aciona o orientador | Equipe | Conforme o gatilho de cada etapa | Registro na daily, na retrospectiva e, se necessário, no canal institucional | Escalonamento para a etapa seguinte do fluxo de conflitos |
+| Rastreabilidade (5.1 do `GestaoConfiguracao.md`) | Branch, commit e MR vinculados a uma issue | Cada integrante | A cada alteração autoral | Referência `#N` no commit e `Closes #N` no MR | O MR não é aceito sem o vínculo |
+| Revisão das políticas (2.2.4) | As políticas e o contrato são revisados a cada retrospectiva, com o desfecho registrado | Scrum Master da sprint | Uma vez por sprint | Seção de revisão da sprint neste documento e linha na Seção 2.1.8 | A revisão pendente é o primeiro item da retrospectiva seguinte |
+
+**Como esta tabela deve ser lida.** Ela registra **política documentada**, e não prática comprovada. A aferição da prática observada em cada sprint é feita em seção própria: para a Sprint 2, na Seção 4.6, que classifica a aderência de cada política em Alta ou Parcial com a evidência correspondente, e na Seção 5.3 do `GestaoConfiguracao.md`, que mede a conformidade dos commits regra a regra. Onde a prática não pôde ser verificada com os dados disponíveis, isso está declarado, e não suprido por estimativa.
+
+---
+
 ## 2.3 Acompanhamento Contínuo dos Riscos
 
 
@@ -194,9 +282,10 @@ Issues sem milestone, sem assignee ou sem labels são consideradas não conforme
 |---|---|
 | Periodicidade da revisão | Uma vez por sprint, durante a retrospectiva |
 | Responsável pelo acompanhamento | Scrum Master da sprint |
-| Ritual de revisão | Retrospectiva de sprint — item fixo de pauta |
+| Ritual de revisão | Retrospectiva de sprint, como item fixo de pauta |
 | Local de registro das atualizações | Tabela de revisão de riscos na seção da sprint correspondente (ex.: 3.2.5 para a Sprint 1) |
-| Critério para escalonamento | Risco materializado ou com probabilidade elevada para Alta e impacto Alto ou Muito Alto — comunicação imediata à orientadora |
+| Critério para escalonamento | Risco materializado ou com probabilidade elevada para Alta e impacto Alto ou Muito Alto, com comunicação imediata à orientadora |
+
 ---
 
 # 3. Sprint 1
@@ -212,7 +301,7 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 | Aspecto | Registro |
 |---|---|
 | Objetivo da sprint | Estabelecer o entendimento inicial do projeto, consolidando a visão de negócio, a proposta de solução e a especificação técnica preliminar |
-| Entregas planejadas | Artefato de entendimento de negócio (Projeto.md — negócios), artefato de especificação técnica (Projeto.md — técnico) e artefato de gestão do projeto (GestaoProjeto.md) |
+| Entregas planejadas | Artefato de entendimento de negócio (Projeto.md, parte de negócios), artefato de especificação técnica (Projeto.md, parte técnica) e artefato de gestão do projeto (GestaoProjeto.md) |
 | Entregas concluídas | Artefato de entendimento de negócio, artefato de especificação técnica e artefato de gestão do projeto |
 | Resultado geral | Sprint concluída com todas as entregas planejadas realizadas. A equipe demonstrou boa organização e comunicação ao longo do ciclo, com pontos de melhoria identificados para a Sprint 2 |
 
@@ -347,4 +436,545 @@ Tasks com esforço estimado acima de G devem ser decompostas antes de entrar no 
 
 ### 3.4.4 Registro das tasks no Kanban
 
- A tabela da Seção 3.4.2 apresenta as macroatividades e sua ordem lógica. O detalhamento de cada task da Sprint 2 — descrição, tipo, prioridade, estimativa t-shirt, responsável, revisor, dependências, DoR e DoD — está registrado individualmente nas issues do GitLab, que constituem a fonte oficial para o acompanhamento do planejamento e da execução conforme os critérios definidos na Seção 2.2.
+ A tabela da Seção 3.4.2 apresenta as macroatividades e sua ordem lógica. O detalhamento de cada task da Sprint 2, que abrange descrição, tipo, prioridade, estimativa t-shirt, responsável, revisor, dependências, DoR e DoD, está registrado individualmente nas issues do GitLab, que constituem a fonte oficial para o acompanhamento do planejamento e da execução conforme os critérios definidos na Seção 2.2.
+
+---
+
+# 4. Sprint 2
+
+## 4.1 Visão geral da entrega
+
+Esta seção reúne os componentes do artefato de gestão entregues na Sprint 2: a retrospectiva do ciclo, a verificação das ações de melhoria definidas na Sprint 1, a revisão dos riscos, a matriz de papéis e responsabilidades e o planejamento da Sprint 3. Os acordos permanentes registrados na Seção 2 continuam válidos e não foram reescritos; os ajustes decorrentes desta retrospectiva estão indicados nas seções correspondentes, preservando o histórico anterior conforme a convenção definida na Seção 1.2.
+
+## 4.2 Análise e retrospectiva da Sprint 2
+
+### 4.2.1 Síntese da sprint
+
+| Aspecto | Registro |
+|---|---|
+| Objetivo da sprint | Aprofundar o entendimento do usuário e materializar a proposta de UX/UI, definir a estratégia técnica e arquitetural da solução e evoluir as práticas de gestão da equipe |
+| Entregas planejadas | Artefato de Design Compreensivo, artefato de Estratégia Técnica da Solução e artefato de Gestão de Projetos Evolutiva |
+| Entregas concluídas | Prototipação exploratória de design e UX (`Projeto.md`, Seção 4), definição técnica e arquitetural da solução (`Projeto.md`, Seção 3) e gestão de projetos evolutiva (esta seção e as atualizações do `GestaoConfiguracao.md`) |
+| Entregas complementares | Primeira implementação executável do pipeline de PLN em `src/pln`, com 111 testes automatizados do módulo, comparativos de pré-processamento e ajuste fino registrados em `resultados/`, além do contrato, do schema e do endpoint da API de recebimento de áudio, do adaptador de Speech to Text e do endpoint de chat, que somam outros 45 testes, e de 4 testes da entrega única do pipeline. O diretório `tests/` contém 160 testes ao todo, apurados por contagem dos métodos iniciados por `test` |
+| Volume de trabalho versionado | Commits autorais registrados por todos os sete integrantes ao longo do ciclo, distribuídos em vários dias de trabalho e integrados por Merge Request |
+| Resultado geral | Sprint concluída com as entregas planejadas realizadas e com avanço além do escopo previsto na frente técnica. A rastreabilidade dos commits, apontada como lacuna na Sprint 1, foi corrigida integralmente, e a autoria distribuiu-se entre os sete integrantes. Permanecem pontos de melhoria na cadência do trabalho ao longo do ciclo e no preenchimento de quatro seções do artefato de solução técnica |
+
+### 4.2.2 Pontos fortes
+
+| Ponto forte | Evidência | Impacto no desempenho |
+|---|---|---|
+| Correção integral da rastreabilidade dos commits | Todos os commits autorais da sprint referenciam a issue correspondente com `#N` e seguem um tipo válido de Conventional Commits, sem exceção, ao contrário do que ocorreu na Sprint 1. Aferição registrada na Seção 5.3 do `GestaoConfiguracao.md` | Restabeleceu a rastreabilidade entre commit e task, que é o primeiro princípio de gestão de configuração definido pela equipe, e eliminou a não conformidade apontada na avaliação da Sprint 1 |
+| Antecipação da frente de implementação | O pipeline de PLN foi implementado e versionado em `src/pln`, com 111 testes automatizados do módulo, varredura de 8.070 execuções distintas de pré-processamento e vetorização e ajuste fino sobre 3.000 candidatos, com os relatórios em `resultados/` | Transformou decisões técnicas que seriam apenas descritas em código executável e mensurável, reduzindo o risco de a Sprint 3 começar sem base técnica construída. A ressalva é que a medição resultante está saturada e não sustenta conclusão sobre desempenho, conforme a Seção 3.3.7 do `Projeto.md` |
+| Adoção efetiva do fluxo de homologação | A promoção para `main` ocorreu por `develop` → `hmg` → `main`, com Merge Request e aprovação em cada etapa, conforme o fluxo oficial do módulo | Alinhou a prática ao fluxo institucional e permitiu corrigir o `GestaoConfiguracao.md`, que descrevia um fluxo sem a etapa de homologação |
+| Uso consistente de branches vinculadas a issues | As 25 branches distintas da sprint usam os prefixos `docs/`, `feat/`, `feature/` e `fix/` com descrição em kebab-case, e todas correspondem a uma issue do Kanban. Verificação registrada na Seção 7.2 do `GestaoConfiguracao.md`, com um único desvio de forma: `docs/diario-de-construcao-prototipo-B` termina com letra maiúscula | Manteve a leitura do histórico compreensível e permitiu associar cada Merge Request à task que o originou sem consulta externa |
+
+### 4.2.3 Pontos fracos
+
+| Ponto fraco | Evidência | Impacto | Causa provável |
+|---|---|---|---|
+| Concentração do trabalho na reta final da sprint | Apuração sobre os 94 commits autorais únicos registrados entre 15/08 e 28/08: 27/08 concentrou 39 commits, ou **41,5% do total**, e os três dias de maior volume, 25, 26 e 27 de agosto, somaram 75 commits, ou **79,8%**. Os quatro primeiros dias do ciclo somaram 8 commits, ou 8,5%. Houve melhora em relação à Sprint 1, com registro em mais dias distintos, mas a distribuição permanece fortemente desigual | Concentra a revisão em uma janela curta e reduz a margem para tratar impedimentos descobertos tarde. O valor apurado já excede o limite de 40% fixado como critério para a Sprint 3 | Tasks de documentação extensas não decompostas antes de entrar em `doing`, com o commit ocorrendo apenas ao concluir a entrega inteira |
+| Não conformidade de forma na mensagem dos commits | Na mesma apuração, **36,2% dos commits** começam a descrição no infinitivo, forma exigida pela Seção 5.2 do `GestaoConfiguracao.md`, e **83,0%** respeitam o limite de 72 caracteres na primeira linha. As duas outras regras, referência `#N` e tipo válido de Conventional Commits, são atendidas em 100% dos casos | Enfraquece uma convenção definida pela própria equipe, ainda que sem prejuízo à rastreabilidade, que depende da referência `#N` e está integralmente atendida | Ausência de verificação automática no momento do commit; a regra é conhecida, mas depende de atenção manual a cada mensagem |
+| Entregas de gestão sem revisor designado | As entregas do `GestaoProjeto.md` e do `GestaoConfiguracao.md` foram atribuídas a um responsável na planning, mas ficaram sem revisor designado, ao contrário das demais entregas da sprint | Contraria a Seção 2.2.4, que exige revisão por integrante diferente do autor para toda entrega, e deixa os artefatos de gestão sem a verificação cruzada aplicada ao restante do trabalho | Atribuição das entregas de gestão feita fora do bloco em que os revisores das demais frentes foram definidos, sem retomada posterior |
+| Seções do artefato de solução técnica sem preenchimento ao final do ciclo | Na conferência de 27/08, quatro seções do `Projeto.md` seguiam com o comentário de instrução do template no lugar do conteúdo: 3.2, sobre as APIs de voz; 3.5, sobre a pilha de tecnologias; 3.6, sobre a modelagem de dados; e 3.8, sobre a estratégia de entrega. As quatro foram preenchidas em 27 e 28/08, e a Seção 3.9, de Projeto Técnico e Arquitetural, foi criada na homologação | Comprometia os critérios de documentação preenchida e de remoção das instruções do template, ambos verificados pelo Escritório de Projetos. O conteúdo foi entregue, mas com margem nula para revisão por pares antes do encerramento | Concentração da produção documental na reta final, mesmo padrão do primeiro ponto fraco, agravado por quatro entregas que permaneceram sem responsável designado |
+
+### 4.2.4 Ações de melhoria
+
+**Verificação das ações definidas na Sprint 1**
+
+A tabela retoma as ações registradas na Seção 3.2.4 e confronta cada uma com o respectivo critério de verificação, conforme previsto na Seção 2.2.4.
+
+> **Nota de formato.** A partir da Sprint 2, a tabela de ações de melhoria passou a declarar também a evidência esperada de cada ação, conforme o formato exigido pelo Escritório de Projetos. As ações da Sprint 1, registradas na Seção 3.2.4, foram formuladas antes dessa padronização e são mantidas na forma original, para preservar o registro histórico; a verificação abaixo supre a coluna ausente ao apontar a evidência de cada uma.
+
+| Ação da Sprint 1 | Critério de verificação estabelecido | Situação | Evidência |
+|---|---|---|---|
+| Definir na planning o revisor de cada MR, garantindo rotação entre os integrantes | Todos os MRs da sprint têm revisores distintos e nenhum integrante revisou mais de dois MRs seguidos sem que outro assumisse | **Atendida quanto ao objetivo; critério revisado** | O objetivo da ação foi cumprido, e a verificação agora é por dado da API do GitLab, e não por autodeclaração. Sobre os 28 MRs mesclados da sprint: todos têm revisor designado, em **nenhum** deles o revisor coincide com o autor, e os **sete integrantes revisaram ao menos uma entrega de outra pessoa** (Karol Barbosa 7, Felipe Simão 5, Matheus Silva 4, Tobias Viana 4, Paulo Fernandes 3, Rui Facó 3, Ana Jardim 2). A segunda metade do critério, que limitava a dois o número de revisões seguidas por integrante, não é atendida — a maior sequência do mesmo revisor é de três MRs — e foi substituída na retrospectiva pelos motivos registrados abaixo |
+| Atualizar o Kanban diariamente antes da daily, com movimentação dos cards para a coluna correspondente ao estado real da task | Nenhum card permanece na mesma coluna por mais de dois dias sem comentário de atualização ou label BLOCK | **Atendida** | A equipe registra que nenhum card permaneceu mais de um dia na mesma coluna durante a sprint, e que o quadro foi atualizado antes das dailies conforme a política da Seção 2.2.2. O critério de dois dias foi cumprido com folga |
+
+ **Revisão do critério de rotação de revisores.** O critério fixado na Sprint 1 limitava a dois o número de entregas seguidas revisadas pelo mesmo integrante. A retrospectiva concluiu que ele não mede o que pretendia medir, por duas razões. A primeira é que a noção de entregas seguidas não é bem definida no fluxo real da equipe: Merge Requests de frentes distintas são abertos e integrados em ordens sobrepostas, de modo que não existe uma sequência única contra a qual verificar o limite, e o resultado da aferição muda conforme a ordenação escolhida. A segunda é que o critério penaliza justamente o arranjo que melhora a revisão: quando uma frente encadeia decisões dependentes, como a questão de projeto, as alternativas divergentes e a escolha dos formatos de prototipação, o revisor que acompanhou a primeira decisão é quem tem contexto para avaliar as seguintes, e trocá-lo por obrigação normativa reduz a qualidade da revisão em nome de uma métrica.
+
+ O objetivo original permanece válido e continua sendo distribuir o conhecimento entre os integrantes e garantir olhar externo sobre toda entrega. O que muda é a forma de verificá-lo: a cobertura das revisões substitui a sequência delas. O novo critério consta da primeira linha da tabela abaixo e, aferido sobre a Sprint 2, é atendido, enquanto o critério anterior não era. A equipe registra essa diferença de forma explícita, em vez de apresentar apenas o resultado favorável.
+
+**Ações de melhoria para a Sprint 3**
+
+A tabela segue o formato exigido pelo Escritório de Projetos: cada ação declara o problema que trata, quem acompanha, o prazo, a evidência que a comprova e o critério objetivo de verificação. As duas primeiras foram aprovadas na retrospectiva; as duas últimas foram propostas na homologação dos artefatos, em 28/08, e dependem de aprovação na Sprint Planning.
+
+| Problema | Ação | Responsável pelo acompanhamento | Prazo | Evidência esperada | Critério de verificação | Status |
+|---|---|---|---|---|---|---|
+| Concentração dos commits e da produção documental nos últimos dias do ciclo, que originou também as seções não preenchidas do `Projeto.md`. Apuração da Sprint 2: 41,5% dos commits em um único dia | Distribuir o trabalho ao longo da sprint, com commit autoral diário por integrante e abertura do Merge Request assim que a primeira parte utilizável da entrega estiver pronta | Cada integrante, acompanhado pelo Scrum Master | Ao longo de toda a Sprint 3 | Histograma de commits por dia da sprint, extraído do histórico e anexado à issue da retrospectiva | Nenhum dia de trabalho do grupo concentra mais de 40% dos commits da sprint, e nenhum integrante fica mais de dois dias consecutivos sem commit autoral | Não iniciada |
+| Documento descrevendo um estado do repositório já superado, como ocorreu com a branch `hmg` na Sprint 1 e com as seções técnicas do `Projeto.md` nesta sprint | Conferir os artefatos contra o estado real do repositório na data da entrega, e não na data da escrita, registrando a data da verificação | Scrum Master da Sprint 3 | No último dia da Sprint 3, antes da Sprint Review | Tabela de alinhamento com o Escritório de Projetos revisada e datada, anexada à issue de conferência | A tabela é revisada e datada no dia da entrega, e nenhuma afirmação sobre o repositório diverge do que ele contém naquele momento | Não iniciada |
+
+ As demais constatações da Seção 4.2.3 não geraram ação própria porque já constam do planejamento como escopo da Sprint 3, e não como mudança de comportamento a acompanhar: o preenchimento das quatro seções técnicas do `Projeto.md` corresponde às tasks T03 a T08, e a instalação do hook que recusa mensagens de commit fora do padrão corresponde à task T37, ambas na Seção 4.7.4. A designação de revisor para as entregas de gestão, por sua vez, é tratada na Sprint Planning conforme a Seção 4.7.7.
+
+### 4.2.5 Alinhamento com o Escritório de Projetos
+
+Esta tabela registra a situação dos critérios aferida contra o repositório em **28/08/2026**, na homologação dos artefatos, e substitui a conferência de 27/08. A verificação deve ser repetida na data da entrega, conforme a segunda ação da Seção 4.2.4. Os estados seguem a mesma convenção da Seção 3.2.6: **Atendido** para itens presentes e adequados, **Em construção** para itens iniciados que ainda exigem revisão e **Próximas sprints** para entregas previstas para etapas posteriores.
+
+Quatro itens mudaram de estado entre as duas conferências, todos por correção aplicada na homologação: o preenchimento das seções técnicas, a remoção dos comentários de instrução, a uniformização dos níveis de cabeçalho e a verificação dos links. O item do histórico de lançamentos permanece pendente por depender de alteração no `README.md`, que não foi objeto desta revisão.
+
+| Categoria | Item | Critério | Situação | Evidência ou encaminhamento |
+|---|---:|---|---|---|
+| README | 1 | Nome do projeto presente? | Atendido | O título principal do README apresenta o nome AZ1. |
+| README | 2 | Nome do grupo presente? | Atendido | O identificador G01 está apresentado logo abaixo do título do projeto. |
+| README | 3 | Integrantes descritos? | Atendido | Os sete integrantes estão relacionados na seção Integrantes. |
+| README | 4 | Links dos integrantes presentes e corretos? | Atendido | Cada integrante possui um link para seu perfil no LinkedIn. |
+| README | 5 | Apresenta descrição curta do projeto? | Atendido | A seção Descrição apresenta o propósito do AZ1, suas funcionalidades, o público atendido e os limites do MVP. |
+| README | 6 | Apresenta estrutura de pastas conforme o modelo? | Atendido | A árvore do README foi atualizada na Sprint 2 e representa a estrutura atual, incluindo `assets`, `docs`, `entregas`, `resultados`, `scripts`, `src`, `tests` e os arquivos de configuração da raiz. |
+| README | 8 | Apresenta histórico de lançamentos? | Atendido | A seção Histórico de lançamentos está presente. |
+| README | 9 | Histórico de lançamentos adequado? | **Em construção** | A versão 0.1.0 registra a Sprint 1 em 14/08/2026. A entrada 0.2.0 e as três seguintes permanecem com a data `DD/MM/2026`, e a de 0.2.0 deve ser preenchida com a data e os artefatos da Sprint 2 antes da entrega. Corresponde à task T02 do planejamento da Sprint 3. |
+| README | 10 | Apresenta licença? | Atendido | A seção Licença está presente no final do arquivo. |
+| README | 11 | Inteli consta na licença? | Atendido | O Inteli está citado na atribuição da licença. |
+| README | 12 | Nome do grupo ou dos integrantes presentes na licença? | Atendido | A licença identifica nominalmente os sete integrantes responsáveis pelo projeto. |
+| README | 13 | Links dos integrantes ou do grupo corretos na licença? | Atendido | Os nomes dos integrantes estão vinculados aos respectivos perfis do LinkedIn, e o nome do projeto aponta para o repositório oficial. |
+| README | 15 | Não apresenta nenhuma outra imagem além da logo do Inteli? | Atendido | O README utiliza somente a logo institucional do Inteli. |
+| README | 16 | Instruções iniciais removidas? | Atendido | As orientações e os caminhos genéricos do template foram substituídos por conteúdo específico do AZ1. |
+| Documentação | 1 | Apresenta pasta `documentos`, `docs` ou `documents` na raiz do projeto? | Atendido | A pasta `docs` está presente na raiz. |
+| Documentação | 2 | Apresenta arquivo `Index.md` preenchido que indexa todos os documentos da pasta `docs`? | Atendido | O `Index.md` relaciona os quatro documentos da pasta além de si próprio: `Projeto.md`, `GestaoProjeto.md`, `GestaoConfiguracao.md` e `RoteiroPrototipoA.md`. A árvore de estrutura e a relação de artefatos visuais foram atualizadas na mesma conferência. |
+| Documentação | 3 | Documentação encontrada? | Atendido | A documentação principal está em `docs/Projeto.md`, com os documentos de gestão e o `RoteiroPrototipoA.md` como complementos. |
+| Documentação | 4 | Sumário de todos os documentos `.md` navegáveis? | Atendido | Os documentos principais possuem sumários com links internos, e o `Index.md` centraliza a navegação. |
+| Documentação | 5 | Instruções e observações dos documentos removidas? | **Atendido** | Verificação de 28/08: nenhum comentário de instrução do template permanece em qualquer arquivo da pasta `docs`. Os quatro que restavam no `Projeto.md` foram substituídos pelo conteúdo das respectivas seções. |
+| Documentação | 6 | Links acessíveis? | Atendido | Verificação de 28/08: os 46 caminhos de assets referenciados nos documentos da pasta `docs` existem no repositório, e os 140 links com âncora, internos e entre documentos, resolvem para cabeçalhos existentes, conferidos pela mesma regra de geração de âncora usada pela plataforma. |
+| Documentação | 7 | Não compartilha dados sensíveis? | Atendido | Não foram identificadas credenciais ou dados corporativos sensíveis na documentação. O arquivo `.env.example` contém apenas nomes de variáveis, sem valores reais. |
+| Documentação | 8 | Possui referências bibliográficas, se for o caso? | Atendido | As fontes utilizadas estão registradas na seção Fontes do `Projeto.md`. |
+| Documentação | 9 | Formatação adequada? | **Atendido** | O nível de cabeçalho das Seções 3 e 4 foi uniformizado para `#`, igualando-se às Seções 1, 2, 5 e 6, com as subseções promovidas na mesma proporção. As 207 tabelas dos documentos foram verificadas quanto à consistência de colunas e ao espaçamento exigido antes e depois, sem divergência. Corresponde à task T01, executada na homologação. |
+| Documentação | 10 | Apresenta todas as seções preenchidas? | **Atendido** | As quatro seções pendentes em 27/08 — 3.2, 3.5, 3.6 e 3.8 — estão preenchidas, e a Seção 3.9, de Projeto Técnico e Arquitetural, foi criada com os diagramas de classes, de componentes e de sequência e a matriz de rastreabilidade técnica. As informações que dependem de confirmação da equipe ou de evidência ainda não produzida estão explicitamente marcadas como **PENDENTE DE VALIDAÇÃO DA EQUIPE**, **PENDENTE DE EVIDÊNCIA DA EQUIPE** ou **DECISÃO TÉCNICA EM ABERTO**. |
+| Documentação | 11 | Arquivos de instrução `.txt` ou não relevantes para o projeto foram removidos? | Atendido | A pasta `docs` contém apenas os seis arquivos Markdown relevantes para a entrega atual: `Index.md`, `Projeto.md`, `GestaoProjeto.md`, `GestaoConfiguracao.md`, `PipelinePLN.md` e `RoteiroPrototipoA.md`. |
+| Documentação | 12 | Links acessíveis sem solicitação de permissão? | Atendido | A navegação principal utiliza caminhos relativos dentro do próprio repositório. |
+| Aplicação | 1 | Possui pasta `src`? | Atendido | A pasta `src` está presente na raiz do projeto. |
+| Aplicação | 2 | Possui pasta para a lógica ou codificação da aplicação? | **Atendido** | A lógica está implementada em `src/pln`, com pré-processamento, vetorização, classificador, ajuste fino e experimento, além dos contratos de entrada em `src/schemas` e os scripts de banco em `src/database`. Item que estava marcado como *Próximas sprints* na Seção 3.2.6. |
+| Aplicação | 3 | Possui arquivo `README.md` com informações sobre como executar a aplicação? | **Atendido** | O `README.md` da raiz documenta instalação e execução, o `src/pln/README.md` descreve o módulo e a Seção 3.3 do `Projeto.md` detalha o algoritmo, o espaço de busca, as bibliotecas, a execução e os testes. Item que estava marcado como *Próximas sprints* na Seção 3.2.6. |
+
+---
+
+## 4.3 Matriz de Risco do Projeto
+
+ A partir desta sprint, a matriz de risco atualizada passa a ser registrada e mantida neste documento. O `Projeto.md` preserva, na Seção 1.9, a versão original produzida no artefato de entendimento de negócio, que permanece como registro histórico da identificação inicial e não é mais alterada. Toda revisão posterior, seja de status, de probabilidade e impacto, de inclusão de novos itens ou de avaliação da efetividade das respostas, passa a ocorrer aqui, na seção da sprint correspondente.
+
+ Duas correções de escopo foram necessárias nesta migração. A primeira é que a revisão registrada na Seção 3.2.5, referente à Sprint 1, contemplou apenas dez dos doze itens da matriz original: as ameaças **AM8**, Alucinação do modelo de linguagem, e **AM9**, Degradação da qualidade da transcrição em ambiente ruidoso, não constavam daquela tabela. Ambas são retomadas aqui. A segunda é que a Seção 3.2.5 identificava os responsáveis por papel, como Scrum Master e Product Owner, enquanto a Seção 1.9.4 do `Projeto.md` os identificava nominalmente. Como o papel de Scrum Master é rotativo, a identificação nominal é a que preserva a rastreabilidade ao longo do módulo, e é a adotada a partir desta sprint.
+
+### 4.3.1 Critério de severidade
+
+ O critério permanece o definido na Seção 1.9.1 do `Projeto.md` e não foi alterado. A severidade combina probabilidade e impacto em uma escala única de 0 a 10:
+
+$$
+S = 10 \times \frac{P \times I - 0{,}1}{4{,}4}
+$$
+
+ Em que **P** é a probabilidade em formato decimal e **I** é o impacto convertido para a escala de 1 a 5, em que Muito Baixo vale 1, Baixo vale 2, Moderado vale 3, Alto vale 4 e Muito Alto vale 5. As faixas de criticidade são: 0,0 a 2,0 Muito Baixa; 2,01 a 4,0 Baixa; 4,01 a 6,0 Moderada; 6,01 a 8,0 Alta; e 8,01 a 10,0 Muito Alta.
+
+ Os status adotados na revisão são **Aberto**, para itens identificados e ainda sem tratamento em curso; **Em Monitoramento**, para itens com resposta ativa e acompanhamento periódico; **Mitigado**, para itens cuja resposta reduziu a exposição de forma comprovada; **Materializado**, para itens que efetivamente ocorreram; e **Encerrado**, para itens que deixaram de ser aplicáveis ao projeto.
+
+### 4.3.2 Revisão das ameaças na Sprint 2
+
+| ID | Ameaça | Situação apurada na Sprint 2 | Probabilidade S1 → S2 | Impacto S1 → S2 | Sev. S1 → S2 | Criticidade | Responsável | Status |
+|---|---|---|:--:|:--:|:--:|---|---|---|
+| AM1 | Comunicação interna do grupo | Não materializado. Os canais e SLAs da Seção 2.1.5 permaneceram em uso, sem escalação ao orientador | 30% → 30% | Alto → Alto | 2,50 → 2,50 | Baixa | Tobias Viana | Em Monitoramento |
+| AM2 | Baixa acurácia na identificação de intenções | Não materializado e ainda não submetido a condição realista. O catálogo foi definido e o classificador implementado, mas a medição de acurácia sobre linguagem espontânea depende da base ampliada prevista para a Sprint 3 | 30% → 30% | Muito Alto → Muito Alto | 3,18 → 3,18 | Baixa | Ana Cristina Jardim | Em Monitoramento |
+| AM3 | Atraso na liberação de acesso ao ambiente Microsoft | **Mitigado.** A solicitação formal foi apresentada presencialmente na Sprint Review, com apoio da orientadora. O parceiro informou que a liberação pode demorar, e a equipe decidiu não condicionar o desenvolvimento a esse acesso, optando por construir ambiente próprio. O atraso continua provável, mas deixou de afetar o caminho crítico do projeto | 70% → 70% | Moderado → **Baixo** | 4,55 → **2,95** | Baixa | Rui Facó | **Mitigado** |
+| AM4 | Atraso no fornecimento de informações pelo Metrô | Não materializado. O parceiro encaminhou quatro anexos durante a sprint, referentes a partida de portfólio, balanço de portfólio, relatório anual de fechamento de portfólio e relatório anual de fechamento de projeto ou programa | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Karol Barbosa Rocha | Em Monitoramento |
+| AM5 | Não conclusão do projeto dentro do prazo | Não materializado. Sprint 2 entregue com as entregas planejadas realizadas e com antecipação da frente de implementação | 10% → 10% | Muito Alto → Muito Alto | 0,91 → 0,91 | Muito Baixa | Felipe Simão | Em Monitoramento |
+| AM6 | Dados insuficientes ou inadequados para validação do agente | Não materializado, por decisão da equipe na retrospectiva. A base atual foi construída para validar o funcionamento do pipeline de ponta a ponta e cumpre esse papel. O que ela ainda não permite é comparar entre si as escolhas de preparação do texto, por ter sido gerada por gabarito e não oferecer variação suficiente para separar as configurações, ressalva já registrada na Seção 3.3 do `Projeto.md`. A base será reformulada na Sprint 3, e a reavaliação do risco fica para aquele ciclo | 70% → 70% | Alto → Alto | 6,14 → 6,14 | Alta | Matheus Ferreira | Em Monitoramento |
+| AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | Não materializado. Todos os sete integrantes registraram commits autorais na sprint e assumiram tasks com responsável e revisor definidos, conforme a Seção 4.4.1 | 50% → 50% | Moderado → Moderado | 3,18 → 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
+| AM8 | Alucinação do modelo de linguagem | Não aplicável nesta sprint e não avaliado. A classificação de intenções foi implementada com regressão logística e Naive Bayes sobre vetorização clássica, sem modelo generativo no caminho. O risco volta a ser exposto quando houver geração de resposta em linguagem natural | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Ana Cristina Jardim | Aberto |
+| AM9 | Degradação da qualidade da transcrição em ambiente ruidoso | Não avaliado. A definição da API de Speech to Text ficou sob responsabilidade de Matheus Ferreira e ainda não foi integrada à branch de destino, de modo que a transcrição não pôde ser exercitada nesta sprint | 50% → 50% | Moderado → Moderado | 3,18 → 3,18 | Baixa | Matheus Ferreira | Aberto |
+
+### 4.3.3 Revisão das oportunidades na Sprint 2
+
+| ID | Oportunidade | Situação apurada na Sprint 2 | Probabilidade S1 → S2 | Impacto S1 → S2 | Sev. S1 → S2 | Criticidade | Responsável | Status |
+|---|---|---|:--:|:--:|:--:|---|---|---|
+| OP1 | Reutilização e evolução da solução | **Materializado.** O núcleo de PLN foi implementado como módulo isolado em `src/pln`, sem dependência da camada de API, e `scripts/gerar_pln_completo.py` gera a entrega única a partir dele. O desacoplamento deixou de ser intenção de arquitetura e passou a ser verificável no código | 70% → **90%** | Alto → Alto | 6,14 → **7,95** | **Alta** | Felipe Simão | **Materializado** |
+| OP2 | Expansão do agente para novas funcionalidades de gestão de portfólio | Em aproveitamento. O backlog complementar foi revisado ao final da sprint e a equipe definiu a estratégia de implementação para as Sprints 3, 4 e 5, registrada em Merge Request próprio, o que estabelece a capacidade disponível para novas funcionalidades em cada ciclo | 50% → 50% | Moderado → Moderado | 3,18 → 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
+| OP3 | Validação com dados e cenários mais próximos da realidade | Em acompanhamento. A prototipação exploratória registrada na Seção 4 do `Projeto.md` incluiu execução com participante externo, ampliando o repertório de situações reais consideradas no design. A calibração da base com material do parceiro fica para a Sprint 3, junto com a reformulação prevista em AM6 | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Matheus Ferreira | Em Monitoramento |
+
+### 4.3.4 Novos itens identificados na Sprint 2
+
+ Três itens novos foram identificados a partir da experiência desta sprint e aprovados na retrospectiva, com os responsáveis confirmados pela equipe. Os dois primeiros decorrem de fatos observados no próprio ciclo e já registrados na Seção 4.2.3; o terceiro decorre do avanço da frente técnica além do escopo previsto.
+
+| ID | Item | Origem da identificação | Probabilidade | Impacto | Severidade | Criticidade | Responsável | Status |
+|---|---|---|:--:|:--:|:--:|---|---|---|
+| AM10 | Acúmulo de dívida documental por concentração de trabalho no fim da sprint | A produção concentrou-se nos últimos dias do ciclo, e a conferência de 27/08 encontrou quatro seções técnicas do `Projeto.md` (3.2, 3.5, 3.6 e 3.8) ainda com o comentário de instrução do template, além da ausência de uma seção que abrigue o projeto arquitetural | 70% | Moderado | 4,55 | Moderada | Karol Barbosa Rocha | Materializado |
+| AM11 | Divergência entre a documentação e o estado real do repositório | A Seção 2.1 do `GestaoConfiguracao.md` afirmava que a branch `hmg` não existia; a branch passou a existir cerca de quinze minutos depois da escrita e tornou-se o caminho efetivo de promoção para `main`, sem que o documento fosse corrigido durante a Sprint 1 | 70% | Moderado | 4,55 | Moderada | Tobias Viana | Materializado |
+| OP4 | Antecipação da frente de implementação | O pipeline de PLN foi implementado, testado e medido dentro da Sprint 2, com 111 testes automatizados do módulo e relatórios de varredura e ajuste fino, embora a implementação estivesse prevista para as sprints seguintes | 70% | Alto | 6,14 | Alta | Ana Cristina Jardim | Em Monitoramento |
+
+### 4.3.5 Efetividade das respostas aplicadas
+
+ A tabela avalia as respostas definidas na Seção 3.2.5 para a Sprint 1, conforme o que foi observado nesta sprint. A avaliação considera se a resposta foi executada e se produziu o efeito pretendido, que são coisas distintas.
+
+| ID | Resposta definida na Sprint 1 | Executada? | Produziu o efeito pretendido? | Evidência |
+|---|---|---|---|---|
+| AM1 | Manter as boas práticas de comunicação e revisar o documento de acordos na retrospectiva | Sim | Sim | Nenhuma escalação ao orientador foi necessária; a revisão do contrato está registrada na Seção 4.5 |
+| AM2 | Iniciar a definição do catálogo de intenções na Sprint 2 com base nos exemplos do TAPI | Sim | Parcialmente | O catálogo foi definido e refinado nas issues #131 e #154; a medição de acurácia em condição realista depende da base prevista para a Sprint 3 |
+| AM3 | Encaminhar solicitação formal com apoio da orientadora no início da Sprint 2 | Sim | Sim, por caminho distinto do previsto | A solicitação foi apresentada presencialmente na Sprint Review, com apoio da orientadora. Diante da indicação de que a liberação pode demorar, a equipe eliminou a dependência em vez de aguardar o acesso, o que reduziu o impacto do risco de Moderado para Baixo |
+| AM4 | Manter canal ativo com o parceiro e antecipar solicitações de artefatos | Sim | Sim | Quatro anexos recebidos do parceiro durante a sprint, referentes a partida de portfólio, balanço de portfólio, relatório anual de fechamento de portfólio e relatório anual de fechamento de projeto ou programa |
+| AM5 | Manter o escopo priorizado e o ritmo de entregas incrementais | Sim | Sim | Sprint 2 entregue com as entregas planejadas realizadas |
+| AM6 | Definir critérios de composição da base sintética na Sprint 2 | Sim | A verificar na Sprint 3 | A base foi construída e permitiu validar o funcionamento do pipeline de ponta a ponta. A equipe registra que o conjunto atende ao propósito de validação inicial e que sua adequação como instrumento de comparação será avaliada sobre a base reformulada na Sprint 3 |
+| AM7 | Manter a distribuição equilibrada de tasks e documentar o conhecimento das frentes críticas | Sim | Sim | Todos os sete integrantes assumiram tasks com responsável e revisor definidos, conforme a Seção 4.4.1 |
+| OP1 | Documentar as decisões de arquitetura que sustentam o desacoplamento desde a Sprint 2 | Parcialmente | Sim | O desacoplamento foi implementado e é verificável no código; o registro na Seção 3.8 do `Projeto.md`, destinada ao projeto arquitetural, fica para a Sprint 3 |
+| OP2 | Manter backlog priorizado e avaliar capacidade ao final de cada sprint | Sim | Sim | Backlog revisado ao final da sprint e estratégia de implementação das Sprints 3, 4 e 5 definida em Merge Request próprio |
+| OP3 | Utilizar os materiais recebidos para calibrar a base sintética | Não | Não | Os quatro anexos recebidos do parceiro ainda não foram incorporados à base, que permanece integralmente sintética. A calibração está prevista nas tasks da Seção 4.7.4 |
+
+ A leitura conjunta mostra que as respostas de natureza processual e de relacionamento com o parceiro foram cumpridas e produziram efeito, com destaque para AM3, em que a equipe substituiu a espera pela eliminação da dependência. A exceção é OP3: os materiais chegaram, mas não foram usados para calibrar a base, e essa lacuna se conecta diretamente à reformulação prevista em AM6.
+
+### 4.3.6 Quadro consolidado e representação visual
+
+ O quadro reúne os quinze itens em acompanhamento ao final da Sprint 2, sendo onze ameaças e quatro oportunidades, ordenados por severidade decrescente:
+
+| ID | Item | Categoria | Probabilidade | Impacto | Severidade | Criticidade | Responsável | Status |
+|---|---|---|---:|---|---:|---|---|---|
+| OP1 | Reutilização e evolução da solução | Arquitetura | 90% | Alto | 7,95 | Alta | Felipe Simão | Materializado |
+| AM6 | Dados insuficientes ou inadequados para validação do agente | Dados | 70% | Alto | 6,14 | Alta | Matheus Ferreira | Em Monitoramento |
+| OP4 | Antecipação da frente de implementação | Cronograma | 70% | Alto | 6,14 | Alta | Ana Cristina Jardim | Em Monitoramento |
+| AM10 | Acúmulo de dívida documental por concentração no fim da sprint | Processo | 70% | Moderado | 4,55 | Moderada | Karol Barbosa Rocha | Materializado |
+| AM11 | Divergência entre a documentação e o estado real do repositório | Processo | 70% | Moderado | 4,55 | Moderada | Tobias Viana | Materializado |
+| AM4 | Atraso no fornecimento de informações pelo Metrô | Dados e Stakeholders | 50% | Alto | 4,32 | Moderada | Karol Barbosa Rocha | Em Monitoramento |
+| AM8 | Alucinação do modelo de linguagem | Técnico | 50% | Alto | 4,32 | Moderada | Ana Cristina Jardim | Aberto |
+| OP3 | Validação com dados e cenários mais próximos da realidade | Dados | 50% | Alto | 4,32 | Moderada | Matheus Ferreira | Em Monitoramento |
+| AM2 | Baixa acurácia na identificação de intenções | Técnico | 30% | Muito Alto | 3,18 | Baixa | Ana Cristina Jardim | Em Monitoramento |
+| AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | Equipe | 50% | Moderado | 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
+| AM9 | Degradação da qualidade da transcrição em ambiente ruidoso | Técnico | 50% | Moderado | 3,18 | Baixa | Matheus Ferreira | Aberto |
+| OP2 | Expansão do agente para novas funcionalidades de gestão de portfólio | Escopo | 50% | Moderado | 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
+| AM3 | Atraso na liberação de acesso ao ambiente Microsoft | Stakeholders | 70% | Baixo | 2,95 | Baixa | Rui Facó | Mitigado |
+| AM1 | Comunicação interna do grupo | Comunicação | 30% | Alto | 2,50 | Baixa | Tobias Viana | Em Monitoramento |
+| AM5 | Não conclusão do projeto dentro do prazo | Cronograma | 10% | Muito Alto | 0,91 | Muito Baixa | Felipe Simão | Em Monitoramento |
+
+<div align="center">
+  <sub>FIGURA 4.3 - Matriz de probabilidade e impacto atualizada na Sprint 2</sub><br>
+  <img src="../assets/negócios/matriz-de-risco-sprint-2.svg" width="100%" alt="Matriz de probabilidade e impacto do projeto atualizada na Sprint 2"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+ Comparada à matriz da Sprint 1, a representação registra três movimentos. OP1 sobe para a faixa de 90% e passa a ser o item de maior severidade do projeto, invertendo a posição de topo, que na Sprint 1 era ocupada por uma ameaça. AM3 desce de Moderado para Baixo no eixo de impacto, efeito da decisão de eliminar a dependência do ambiente do parceiro. E surge um agrupamento novo na faixa de 70% com impacto Moderado, composto por AM10 e AM11, ambas de natureza processual e ambas materializadas nesta sprint.
+
+### 4.3.7 Análise dos três itens mais críticos
+
+ O critério de seleção permanece o da Seção 1.9.5 do `Projeto.md`: a ordenação por severidade, por ser a única medida que expressa probabilidade e impacto em escala comum e cuja regra de cálculo é reproduzível por qualquer leitor. Sob esse critério, os três itens de maior severidade ao final da Sprint 2 são:
+
+| Item | Descrição resumida | Severidade | Criticidade | Variação desde a Sprint 1 |
+|---|---|---:|---|---|
+| OP1 | Reutilização e evolução da solução | 7,95 | Alta | 6,14 → 7,95 (+1,81) |
+| AM6 | Dados insuficientes ou inadequados para validação do agente | 6,14 | Alta | 6,14 → 6,14 (estável) |
+| OP4 | Antecipação da frente de implementação | 6,14 | Alta | Novo item |
+
+ A **OP1** assume o topo da priorização porque deixou de ser uma intenção de arquitetura e passou a ser um fato verificável. O núcleo de PLN está implementado como módulo isolado, sem dependência da camada de API, e existe um script que gera a entrega única a partir dele. Isso responde diretamente à premissa registrada pelo parceiro de que a plataforma de gestão de portfólio pode ser substituída no futuro. Uma oportunidade no topo da ordenação indica prioridade de aproveitamento, e não de correção: o esforço da Sprint 3 é preservar essa separação à medida que a transcrição, a persistência e o frontend forem acoplados ao núcleo, e registrar as decisões de arquitetura que a sustentam na Seção 3.8 do `Projeto.md`, hoje a única lacuna dessa frente.
+
+ A **AM6** permanece na faixa Alta sem alteração de nota, e essa estabilidade é deliberada. O que o risco descreve é a adequação do conjunto de dados como instrumento de validação, e não o desempenho do modelo, que foi medido e atende ao esperado para esta etapa. A base atual foi gerada por gabarito e serviu ao propósito para o qual foi construída, que era exercitar o pipeline de ponta a ponta; o que ela não oferece é variação suficiente para que a comparação entre escolhas de preparação do texto produza uma ordenação confiável. A ressalva está registrada em detalhe na Seção 3.3 do `Projeto.md`.
+
+ A equipe optou por não elevar a probabilidade porque o conjunto nunca pretendeu ser instrumento definitivo de medição e será reformulado na Sprint 3. A consequência prática é delimitada: o desempenho do modelo permanece válido, e o que fica pendente de sustentação são as decisões de pré-processamento derivadas da varredura, até que a base contenha casos que o classificador erre. É por isso que a qualificação da base aparece entre as primeiras tasks da Seção 4.7.4.
+
+ A **OP4** entra diretamente na faixa Alta por alterar a margem de manobra do projeto. Ter o pipeline implementado e medido uma sprint antes do previsto libera capacidade para a Sprint 3 atacar a integração ponta a ponta e a qualificação da base, em vez de começar a construção do zero. O aproveitamento dessa folga não é automático: depende de o planejamento alocar a capacidade liberada nas frentes que hoje representam risco, e não em escopo novo.
+
+ Vale registrar o deslocamento em relação à Sprint 1. Naquela análise, os três itens mais críticos eram AM6, OP1 e AM3, e a conclusão apontava que dois decorriam de decisões internas e um dependia de terceiros. Nesta sprint, AM3 sai da lista por efeito de uma decisão deliberada da equipe, que eliminou a dependência externa em vez de aguardá-la, e os três itens de topo passam a ser integralmente internos, sendo dois deles oportunidades. A leitura prática é que a exposição do projeto migrou de fatores externos para a capacidade da equipe de aproveitar o que já construiu.
+
+### 4.3.8 Histórico de acompanhamento
+
+A tabela permite verificar a evolução de cada item desde sua identificação. Ela é acrescida de colunas a cada sprint, sem sobrescrever os registros anteriores, de modo que a trajetória de um risco fique legível em uma única leitura.
+
+| ID | Identificado em | Severidade e status na Sprint 1 | Severidade e status na Sprint 2 | Tendência |
+|---|---|---|---|---|
+| AM1 | Sprint 1 | 2,50 / Em Monitoramento | 2,50 / Em Monitoramento | Estável |
+| AM2 | Sprint 1 | 3,18 / Aberto | 3,18 / Em Monitoramento | Estável, com tratamento iniciado |
+| AM3 | Sprint 1 | 4,55 / Aberto | **2,95 / Mitigado** | **Redução por eliminação da dependência** |
+| AM4 | Sprint 1 | 4,32 / Aberto | 4,32 / Em Monitoramento | Estável, com resposta efetiva |
+| AM5 | Sprint 1 | 0,91 / Aberto | 0,91 / Em Monitoramento | Estável |
+| AM6 | Sprint 1 | 6,14 / Aberto | 6,14 / Em Monitoramento | Estável, com reavaliação suspensa até a Sprint 3 |
+| AM7 | Sprint 1 | 3,18 / Em Monitoramento | 3,18 / Em Monitoramento | Estável |
+| AM8 | Sprint 1 | Não revisado na Seção 3.2.5 | 4,32 / Aberto | Retomado no acompanhamento |
+| AM9 | Sprint 1 | Não revisado na Seção 3.2.5 | 3,18 / Aberto | Retomado no acompanhamento |
+| AM10 | **Sprint 2** | Não aplicável | 4,55 / Materializado | Novo item |
+| AM11 | **Sprint 2** | Não aplicável | 4,55 / Materializado | Novo item |
+| OP1 | Sprint 1 | 6,14 / Em Monitoramento | **7,95 / Materializado** | **Oportunidade concretizada** |
+| OP2 | Sprint 1 | 3,18 / Aberto | 3,18 / Em Monitoramento | Estável, com tratamento iniciado |
+| OP3 | Sprint 1 | 4,32 / Em Monitoramento | 4,32 / Em Monitoramento | Estável, resposta não executada |
+| OP4 | **Sprint 2** | Não aplicável | 6,14 / Em Monitoramento | Novo item |
+
+#### Registro das alterações de valor
+
+A tabela acima mostra o estado de cada item por sprint; esta registra, item a item, **o que mudou de um ciclo para o outro e por quê**, incluindo os valores anteriores de probabilidade e impacto. Só constam aqui os itens cujos valores efetivamente se alteraram ou que entraram no acompanhamento nesta sprint. Os demais permanecem com os valores da Sprint 1, e a ausência de linha significa exatamente isso.
+
+| ID | Sprint | P anterior | I anterior | Severidade anterior | Novo valor | Status | Motivo da alteração | Evidência |
+|---|---|---:|---|---:|---:|---|---|---|
+| AM3 | 2 | 70% | Moderado | 4,55 | **2,95** (70%, Baixo) | Mitigado | A equipe decidiu não condicionar o desenvolvimento ao acesso ao ambiente do parceiro e construir ambiente próprio. O atraso continua provável, mas deixou de afetar o caminho crítico, o que reduz o impacto e não a probabilidade | Solicitação apresentada na Sprint Review com apoio da orientadora; escolha do AWS Academy registrada na Seção 3.7.1 do `Projeto.md` |
+| OP1 | 2 | 70% | Alto | 6,14 | **7,95** (90%, Alto) | Materializado | O desacoplamento deixou de ser intenção de arquitetura e passou a ser verificável no código, o que eleva a probabilidade de a oportunidade se concretizar | Módulo `src/pln` sem dependência da camada de API, e `scripts/gerar_pln_completo.py` gerando a entrega única a partir dele |
+| AM8 | 2 | 50% | Alto | 4,32 | 4,32, sem alteração | Aberto | Não houve reavaliação de valor: o item apenas voltou ao acompanhamento, por não constar da revisão da Sprint 1 | Seção 1.9.2 do `Projeto.md` e Seção 4.3.2 deste documento |
+| AM9 | 2 | 50% | Moderado | 3,18 | 3,18, sem alteração | Aberto | Mesmo caso de AM8: retomada de item ausente da revisão anterior, sem reavaliação | Seção 1.9.2 do `Projeto.md` e Seção 4.3.2 deste documento |
+| AM10 | 2 | Não aplicável | Não aplicável | Não aplicável | 4,55 (70%, Moderado) | Materializado | Item novo, decorrente da concentração da produção no fim do ciclo | Conferência de 27/08, com quatro seções técnicas do `Projeto.md` sem preenchimento |
+| AM11 | 2 | Não aplicável | Não aplicável | Não aplicável | 4,55 (70%, Moderado) | Materializado | Item novo, decorrente da divergência entre documentação e repositório na Sprint 1 | Seção 2.1 do `GestaoConfiguracao.md` e criação da branch `hmg` no mesmo dia |
+| OP4 | 2 | Não aplicável | Não aplicável | Não aplicável | 6,14 (70%, Alto) | Em Monitoramento | Item novo, decorrente da antecipação da frente de implementação | Módulo de PLN implementado e medido dentro da Sprint 2, com relatórios em `resultados/` |
+
+Duas leituras se destacam neste registro. A primeira é que **a única redução de exposição da sprint veio de uma decisão de projeto, e não da passagem do tempo**: em AM3, a equipe eliminou a dependência externa em vez de aguardá-la, e o efeito apareceu no eixo do impacto, não no da probabilidade. A segunda é que **as duas materializações da sprint são ambas de processo** — AM10 e AM11 —, e nenhuma delas é de natureza técnica ou de relacionamento com o parceiro. A exposição do projeto, nesta etapa, está mais no modo de trabalhar do que no problema a resolver.
+
+---
+
+## 4.4 Matriz de Papéis e Responsabilidades da Sprint 2
+
+### 4.4.1 Papéis, responsabilidades e rotação
+
+ A tabela registra o papel principal assumido por cada integrante nesta sprint, as responsabilidades exercidas e as entregas produzidas, confrontados com o papel exercido na Sprint 1 para evidenciar a rotação. As atribuições correspondem à distribuição aprovada na Sprint Planning, com responsável e revisor definidos por entrega.
+
+| Integrante | Papel na Sprint 1 | Papel principal na Sprint 2 | Artefato ou task sob responsabilidade | Principais responsabilidades e entregas | Revisões que assumiu | Natureza da rotação |
+|---|---|---|---|---|---|---|
+| Ana Cristina Jardim | Gestão de riscos e requisitos funcionais | Algoritmo de PLN e artefatos de gestão | Algoritmo de NLP e implementação; `GestaoProjeto.md` e `GestaoConfiguracao.md` | Implementar o pipeline de pré-processamento configurável, a vetorização e o classificador; conduzir a varredura de configurações e o ajuste fino; produzir os artefatos de gestão de projeto e de configuração | API de Speech to Text e Text to Speech | De especificação de negócio para implementação técnica e gestão |
+| Felipe Simão | Contexto da indústria e perfil do líder de projeto | Prototipação exploratória e modelagem de dados | Protótipos A e B, Seções 4.4 a 4.11 do `Projeto.md`; modelagem conceitual e lógica | Construir e executar os protótipos em conjunto com Karol, registrar o diário de construção, a comparação entre alternativas, o inventário de decisões em aberto e o repertório de situações; modelar entidades e relacionamentos com Rui Facó | Questão de projeto, alternativas divergentes e formatos de prototipação | De pesquisa de contexto para design, validação com usuário e modelagem |
+| Karol Barbosa Rocha | Perfil do diretor e requisitos não funcionais | Prototipação exploratória e organização documental | Questão de projeto, alternativas divergentes, formatos, protótipo A, Seções 4.1 a 4.4 do `Projeto.md` | Formular a questão de projeto e as alternativas divergentes, definir os formatos de prototipação, construir e executar os protótipos, estruturar as seções e o sumário do documento | Modelagem de dados e processo de deploy | De especificação de requisitos para design e curadoria documental |
+| Matheus Ferreira da Silva | Perfil do PMO, Business Drivers e visão técnica inicial | APIs de Speech to Text e Text to Speech | Seção 3.2 do `Projeto.md`; execução dos protótipos; correções na documentação do pipeline de PLN | Selecionar e detalhar as APIs de conversão de áudio em texto e de texto em áudio, com endpoints, autenticação, parâmetros, formatos e respostas; participar da execução dos dois protótipos; corrigir a documentação do pipeline | Algoritmo de NLP e implementação | De pesquisa de usuário e visão técnica para especificação de APIs de voz |
+| Paulo Henrique Bueno Fernandes | Entendimento do problema e visão do produto | API de recebimento de áudios | Seção 3.4 do `Projeto.md` e endpoint da API, issues #131, #135 e #154 | Documentar o contrato da API, implementar o endpoint com validação de duração, formato e assinatura, e a persistência do áudio em bucket compatível com S3; revisar o backlog complementar e a estratégia de entrega | Pilha de tecnologias | De definição de produto para implementação de backend |
+| Rui Facó | Definição do MVP e tecnologias | Pilha de tecnologias e contratos de entrada | Pilha de tecnologias; `src/schemas/audio.py`, issue #153; modelagem de dados | Selecionar e justificar as tecnologias de interface, backend, PLN, banco, armazenamento, infraestrutura e testes; definir o schema de validação da API de áudio; modelar os dados com Felipe Simão | API de recebimento de áudios | Continuidade na frente de tecnologias, com entrada em implementação de contratos e modelagem |
+| Tobias Viana | Modelagem do fluxo de negócio | Processo de deploy em nuvem | Seção 3.7 do `Projeto.md`, issues #119, #122 e #129 | Definir a estratégia técnica de implantação, selecionar a plataforma, especificar os ambientes e produzir o guia reproduzível de deploy | Modelagem conceitual e lógica dos dados | De modelagem de processos para infraestrutura e implantação |
+
+ A rotação está evidenciada para os sete integrantes: nenhum repetiu na Sprint 2 a entrega que fez na Sprint 1, e a mudança atravessou fronteiras de disciplina na maioria dos casos. Três integrantes migraram de frentes de negócio para implementação, dois migraram para design e validação com usuário, um migrou para infraestrutura e um assumiu os artefatos de gestão. O único caso de continuidade parcial é o de Rui Facó, cuja frente de tecnologias dá sequência ao trabalho de seleção iniciado na Sprint 1; a rotação, nesse caso, ocorreu pela natureza da entrega, que deixou de ser documental e passou a incluir a implementação do contrato de entrada da API e a modelagem de dados.
+
+ Quatro entregas do artefato de solução técnica permaneceram sem responsável designado ao final da sprint: os três diagramas UML, de classes, de componentes e de sequência, e a revisão de coerência com a Sprint 1. Como consequência, a Seção 3 do `Projeto.md` não chegou a receber uma subseção de Projeto Técnico e Arquitetural que abrigasse esses diagramas. A definição dos responsáveis é a primeira providência da Sprint Planning da Sprint 3, e as tasks correspondentes constam da Seção 4.7.4.
+
+### 4.4.2 Critérios de distribuição
+
+ A distribuição da Sprint 2 seguiu os critérios definidos na Seção 3.3.2, que são complexidade, dependências entre entregas e separação entre autoria e revisão, acrescidos de um critério novo decorrente da abertura da frente de implementação: cada integrante recebeu ao menos uma entrega em disciplina distinta da que exerceu na Sprint 1, de modo que a rotação não fosse apenas de assunto, mas de tipo de trabalho. É o que a coluna de natureza da rotação registra.
+
+ A distribuição por artefato ficou equilibrada, com todos os sete integrantes assumindo autoria de ao menos uma entrega e revisão de ao menos uma entrega de outro integrante. O histórico de commits confirma o equilíbrio, com registro autoral de todos os sete integrantes ao longo da sprint. O que a Seção 4.2.3 registra como ponto fraco não é a distribuição entre pessoas, e sim a distribuição ao longo do tempo.
+
+### 4.4.3 Evidência versionada da rotação
+
+ A Seção 4.4.1 registra a **atribuição** aprovada na Sprint Planning. Esta tabela registra o **trabalho versionado**, apurado sobre os commits autorais das 25 branches integradas na sprint. As duas informações são complementares e não medem a mesma coisa: a primeira diz de quem era a responsabilidade pela entrega, a segunda diz onde cada pessoa efetivamente escreveu. A comparação entre elas é o que torna a rotação verificável por terceiros, e não apenas declarada.
+
+| Integrante | Commits autorais | Branches em que trabalhou | Merge Requests que originou | Issues referenciadas nos seus commits |
+|---|---:|---:|---|---|
+| Matheus Ferreira da Silva | 16 | 2 | `!37`, `!44` | #84, #100, #101, #102, #104, #132 |
+| Karol Barbosa Rocha | 15 | 7 | `!25`, `!26`, `!27`, `!30`, `!34`, `!41`, `!49` | #86, #119, #126, #138, #145, #147, #149, #150 |
+| Rui Facó | 14 | 5 | `!31`, `!35`, `!44`, `!45`, `!47` | #79, #116, #152, #153, #161 |
+| Felipe Simão | 14 | 3 | `!33`, `!43`, `!48` | #105, #117, #137, #144 |
+| Ana Cristina Jardim | 13 | 6 | `!29`, `!32`, `!36`, `!37`, `!40`, `!42` | #72, #108, #109, #124, #127, #130, #131, #140, #146 |
+| Paulo Henrique Bueno Fernandes | 13 | 7 | `!28`, `!32`, `!35`, `!39`, `!46`, `!48`, `!50` | #90, #93, #111, #112, #117, #131, #135, #154 |
+| Tobias Viana | 9 | 2 | `!30`, `!38`, `!49` | #85, #86, #119, #121, #122, #129 |
+
+ A soma das colunas não fecha com o total de branches nem de MRs, e isso é informação, não erro: **sete branches tiveram mais de um autor**, e as pessoas aparecem em cada uma delas. O caso mais expressivo é a `feat/integrar-stt-tts`, com 18 commits de Matheus e Rui, seguido da `docs/modelo-logico-relacional`, da `feat/construir-api-de-audio` e da `docs/deploy`, todas com dois autores. Coautoria em branch é evidência direta de trabalho conjunto, distinta da revisão por pares, e nenhuma das duas substitui a outra.
+
+**Correspondência com a atribuição declarada.** A apuração confirma a atribuição da Seção 4.4.1 em todos os sete casos: cada integrante tem commits nas issues da frente que lhe foi atribuída. O que ela acrescenta é que **a maioria trabalhou também fora da própria frente**. Paulo Henrique, atribuído à API de recebimento de áudios, tem commits em interface (#90, #112), integração do chat (#111), modelagem lógica (#117) e revisão de artefatos (#93). Ana Cristina, atribuída ao algoritmo de PLN e aos artefatos de gestão, tem commits em catálogo de intenções (#131), diagramas de casos críticos (#124) e estratégia de entrega (#127). Karol, atribuída à prototipação, tem commits em deploy (#119) e diagramas (#86). Essa dispersão não contradiz a matriz: a atribuição define quem responde pela entrega, não quem pode contribuir com ela.
+
+**Equilíbrio.** A distribuição dos commits é homogênea: entre 9 e 16 registros por integrante, com a média em 13,4 e diferença de sete commits entre o extremo superior e o inferior. Nenhum integrante ficou sem entrega, e nenhum concentrou parcela desproporcional. A ressalva metodológica é a mesma da Seção 5.3 do `GestaoConfiguracao.md`: commit é medida grosseira de esforço, e a leitura válida desta coluna é a ausência de concentração, não a equivalência de carga.
+
+**Centralização e sobrecarga.** Não há indício de centralização em nenhuma das três dimensões apuradas. Na autoria, o integrante com mais commits responde por 17,0% do total. Na conclusão de merges, o mais ativo responde por 6 dos 26, conforme a Seção 4.8.3. Na abrangência, os sete integrantes trabalharam em pelo menos duas branches distintas. O que a apuração **não** alcança é a distribuição das revisões, que depende de dados da plataforma e permanece não verificável, conforme a Seção 4.8.1.
+
+**Multidisciplinaridade.** Cinco dos sete integrantes têm commits em pelo menos duas naturezas distintas de trabalho — documentação e código, ou documentação e infraestrutura. As exceções são Matheus, concentrado na frente de voz e na documentação do pipeline, e Tobias, concentrado em deploy e diagramas. Nos dois casos, a frente atribuída era, ela própria, disciplina nova em relação à Sprint 1, de modo que a rotação ocorreu entre sprints, ainda que não dentro desta.
+
+**Oportunidade de melhoria para a Sprint 3.** Duas providências decorrem desta apuração. A primeira é que a matriz de atribuição passe a registrar também as contribuições fora da frente principal, já que elas ocorreram em cinco dos sete casos e hoje ficam invisíveis no documento. A segunda é que a designação de revisores da Sprint 3 leve em conta a concentração de contexto: quem trabalhou em uma frente tem contexto para revisá-la, mas revisar apenas o que se conhece reduz a difusão de conhecimento que a rotação existe para produzir. O critério de cobertura registrado na Seção 4.2.4 já endereça isso, e a Seção 4.7.7 o aplica ao planejamento.
+
+---
+
+## 4.5 Revisão do Contrato de Convivência, SLA e Rituais
+
+ O Contrato de Convivência registrado na Seção 2.1 foi revisado na retrospectiva desta sprint, conforme previsto na Seção 2.2.4. A revisão percorreu os sete itens do contrato e avaliou, para cada um, se a regra foi cumprida, se produziu o efeito esperado e se precisava de ajuste. **A conclusão da equipe foi manter o contrato integralmente, sem alteração de regras.** O registro da revisão consta da Seção 2.1.8.
+
+| Item do contrato | Cumprido na Sprint 2? | Avaliação | Decisão |
+|---|---|---|---|
+| 2.1.1 Regra de Ouro | Sim | As entregas foram concluídas dentro do prazo acordado, com a Sprint Review realizada sem pendência de escopo | Mantida sem alteração |
+| 2.1.2 Resolução de impasses | Não acionado | Não houve impasse que exigisse votação ou roleta nesta sprint | Mantida sem alteração |
+| 2.1.3 Gestão de conflitos | Não acionado | Nenhuma etapa do fluxo de conflitos foi acionada | Mantida sem alteração |
+| 2.1.4 Quadro Kanban | Sim | Nenhum card permaneceu mais de um dia na mesma coluna, resultado dentro do limite de dois dias fixado como critério na Sprint 1 | Mantida sem alteração |
+| 2.1.5 Comunicação oficial | Sim | Canais e SLAs em uso, sem necessidade de escalação ao orientador | Mantida sem alteração |
+| 2.1.6 Dailies e demais rituais | Sim | Os rituais ocorreram conforme o formato acordado, e a atualização do quadro precedeu as dailies | Mantida sem alteração |
+| 2.1.7 Acordos adicionais | Sim | O fluxo de revisão e merge foi seguido, com revisor designado e distinto do autor em todas as entregas, e os sete integrantes revisaram ao menos uma entrega de outra pessoa | Mantida sem alteração |
+
+ A equipe avaliou que os desvios observados nesta sprint não decorrem de lacuna nas regras, e sim de execução. A cadência de commits e a integração tempestiva das branches já estão previstas nas Seções 2.2.3 e 2.2.1 respectivamente, de modo que reescrever o contrato não alteraria o comportamento. A única regra efetivamente revisada nesta sprint foi o critério de verificação da rotação de revisores, que não pertence ao contrato e sim à tabela de ações da Seção 4.2.4, onde a mudança está registrada com sua justificativa. O tratamento adotado foi registrar cada desvio como ação de melhoria verificável na Seção 4.2.4, onde existe responsável, prazo e critério de conclusão, em vez de acrescentar texto normativo a um acordo que já cobre o caso.
+
+---
+
+## 4.6 Revisão da Gestão do Processo de Desenvolvimento
+
+ As políticas registradas na Seção 2.2 foram revisadas nesta retrospectiva, em coerência com a decisão sobre o contrato registrada na Seção 4.5. A revisão observou o que os dados da sprint mostram sobre a aderência de cada política. **A conclusão foi manter as políticas sem alteração**, tratando os desvios por ação de melhoria.
+
+| Política | Aderência observada na Sprint 2 | Evidência | Decisão |
+|---|---|---|---|
+| 2.2.1 Fluxo de trabalho | Parcial | Todas as branches seguem os prefixos definidos e correspondem a uma issue, e as 26 integrações da sprint ocorreram por Merge Request, conforme a Seção 4.8.2. Na conferência de 27/08 parte das entregas concluídas ainda estava em branch não mesclada; em 28/08 todos os Merge Requests do ciclo estavam integrados à `develop`. A promoção para `hmg` e `main`, contudo, não foi executada | Mantida sem alteração; tratada pela primeira ação da Seção 4.2.4 e pela ação de encerramento de ciclo da Seção 4.8.5 |
+| 2.2.2 Política de atualização do GitLab | Alta | Nenhum card permaneceu mais de um dia na mesma coluna, e o quadro foi atualizado antes das dailies | Mantida sem alteração |
+| 2.2.3 Política de commits | Parcial | Conformidade integral em referência à issue e tipo Conventional Commits; desvios recorrentes na descrição no infinitivo e no limite de 72 caracteres; commits concentrados nos últimos dias do ciclo | Mantida sem alteração; tratada pela segunda e pela quarta ações da Seção 4.2.4 |
+| 2.2.4 Revisão e melhoria contínua | Alta | As ações da Sprint 1 foram retomadas e verificadas na Seção 4.2.4, e o contrato e as políticas foram revisados nesta retrospectiva | Mantida sem alteração |
+| 2.2.5 Critérios de início e conclusão | Parcial | Quatro seções técnicas do `Projeto.md` seguiam sem preenchimento em 27/08, e quatro entregas do artefato de solução técnica ficaram sem responsável designado. As quatro seções foram preenchidas até 28/08 e a Seção 3.9 foi criada, mas o preenchimento ocorreu fora do fluxo normal de DoR e DoD, sem responsável designado na planning, que é exatamente o desvio que esta linha registra | Mantida sem alteração; tratada pela primeira ação da Seção 4.2.4 |
+| 2.2.6 Atualização de branches e conflitos | Alta | Não foram observados commits diretos em branches protegidas nem resolução de conflito fora de branch de trabalho | Mantida sem alteração |
+
+ O padrão que a revisão evidencia é consistente com o do contrato: onde houve desvio, a política já previa o comportamento correto. A política de commits, por exemplo, afirma na Seção 2.2.3 que a concentração de commits no último dia é anti-padrão, e a de fluxo de trabalho descreve na Seção 2.2.1 a abertura do Merge Request ao concluir o desenvolvimento. O que faltou foi cumprimento, não definição. Por isso o tratamento desta sprint concentra-se nas ações verificáveis da Seção 4.2.4, cujo resultado será aferido na retrospectiva da Sprint 3.
+
+ As convenções de gestão de configuração correspondentes estão registradas no `GestaoConfiguracao.md`, cuja atualização desta sprint incorporou a branch `hmg` ao fluxo documentado e acrescentou os exemplos práticos das Seções 6.4 e 6.5.
+
+---
+
+## 4.7 Planejamento da Sprint 3
+
+### 4.7.1 Objetivo da sprint
+
+ A Sprint 3 compreende dois artefatos. O primeiro registra o desenvolvimento e a documentação técnica da solução, demonstrando a construção progressiva do sistema conforme a estratégia de entrega definida na Sprint 2, com backend, algoritmo de NLP, integrações, banco de dados, frontend e deploy articulados de forma funcional e coerente com o projeto arquitetural. O segundo planeja os testes funcionais e não funcionais que validam o comportamento esperado do sistema, cobrindo funcionalidade, requisitos não funcionais, integração e usabilidade.
+
+ Dentro dessa moldura, o objetivo desta equipe na Sprint 3 é entregar o caminho completo da voz até a intenção classificada e persistida, com interface básica para exercitá-lo, e produzir o plano de testes que sustentará a validação nas sprints seguintes. Somam-se a esses dois objetivos a liquidação da dívida documental da Sprint 2 e a qualificação da base de dados, que condiciona a medição de acurácia tratada no risco AM6.
+
+ As entregas previstas para a Sprint 3 no enunciado são a API de recebimento de áudios, o início da implementação do algoritmo de NLP com a conversão Speech to Text integrada, e o frontend básico. As entregas de banco de dados e deploy têm início nesta sprint e conclusão na Sprint 4; webhooks, mensageria e o frontend completo pertencem às Sprints 4 e 5.
+
+### 4.7.2 Priorização e sequenciamento
+
+ A ordem das frentes decorre de quatro critérios, nesta hierarquia: liquidar dívida antes de criar escopo novo, remover o bloqueio que impede medir o produto, resolver dependências técnicas antes das frentes que dependem delas, e iniciar cedo o que é independente.
+
+| Ordem | Frente | Prioridade | Dependência | Justificativa |
+|---|---|---|---|---|
+| 1 | Liquidação da dívida documental da Sprint 2 | Alta | Nenhuma | As quatro seções técnicas pendentes em 27/08 e a Seção 3.9 foram concluídas na homologação de 28/08. Permanece nesta posição o que ficou dependente de decisão ou de evidência: a escolha do provedor de TTS, a política de tempo limite da transcrição, a reconciliação entre modelo e catálogo de intenções e as evidências do deploy. Risco AM10 materializado; acumular agrava e trava as frentes que dependem dessas definições |
+| 2 | Qualificação da base de intenções | Alta | Nenhuma | Enquanto a base não oferecer dificuldade, nenhuma métrica do classificador sustenta conclusão. Trata AM6 e a lacuna de OP3, que os quatro anexos recebidos do parceiro permitem fechar |
+| 3 | API de recebimento de áudios | Alta | Frente 1 | Entrega própria da Sprint 3 no enunciado; é a porta de entrada de todo o fluxo |
+| 4 | Speech to Text e integração com o pipeline de NLP | Alta | Frentes 2 e 3 | Entrega própria da Sprint 3; fecha o caminho da voz até a intenção classificada, que é o núcleo da proposta |
+| 5 | Banco de dados e persistência das interações | Média | Frente 4 | Início previsto para a Sprint 3 com conclusão na Sprint 4; sustenta auditoria e histórico |
+| 6 | Frontend básico | Média | Frente 3 | Entrega própria da Sprint 3; depende do contrato da API estar estável, mas pode avançar em paralelo à frente 4 |
+| 7 | Plano de testes funcionais, não funcionais, de integração e de usabilidade | Alta | Frentes 3 e 4 parcialmente estabilizadas | Segundo artefato da sprint; o roteiro de usabilidade exige recrutamento de cinco usuários externos e precisa começar cedo |
+| 8 | Configuração de ambientes e deploy | Média | Frentes 4 e 5 | Início previsto para a Sprint 3 com conclusão na Sprint 4 |
+| 9 | Gestão, configuração e conferência final | Alta | Nenhuma | Entrega independente; deve iniciar no começo da sprint, conforme a lição da Seção 4.2.3 |
+
+### 4.7.3 Escala de estimativas
+
+| Tamanho | Esforço estimado |
+|---|---|
+| PP | Até 15 minutos |
+| P | Até 30 minutos |
+| M | De 30 a 60 minutos |
+| G | De 60 a 120 minutos |
+
+ A escala permanece a definida na Seção 3.4.3 e não foi alterada. Tasks acima de G devem ser decompostas antes de entrar no backlog, regra que orientou a separação dos três diagramas UML, do plano de testes e das frentes de transcrição, persistência e frontend em tasks distintas.
+
+### 4.7.4 Lista de tasks estimadas
+
+| ID | Task | Tipo | Estimativa | Prioridade | Depende de |
+|---|---|---|:--:|---|---|
+| T01 | Uniformizar o nível de cabeçalho das Seções 3 e 4 do `Projeto.md` | docs | PP | Alta | Nenhuma |
+| T02 | Preencher o histórico de lançamentos do `README.md` com a versão 0.2.0 da Sprint 2 | docs | P | Alta | Nenhuma |
+| T03 | Preencher a Seção 3.5, sobre a Pilha de Tecnologias | docs | M | Alta | Nenhuma |
+| T04 | Preencher a Seção 3.6, sobre a Modelagem Conceitual e Lógica dos Dados | docs | G | Alta | Nenhuma |
+| T05 | Criar a seção de Projeto Técnico e Arquitetural no `Projeto.md` e nela atualizar o diagrama UML de classes | docs | G | Alta | T04 |
+| T06 | Atualizar o diagrama UML de componentes na nova seção de Projeto Técnico e Arquitetural | docs | G | Alta | T05 |
+| T07 | Atualizar os diagramas UML de sequência dos casos críticos na nova seção | docs | G | Alta | T05 |
+| T08 | Preencher a Seção 3.8, sobre a Estratégia de Entrega para as Sprints 3, 4 e 5 | docs | M | Alta | Nenhuma |
+| T09 | Revisar a coerência entre a definição técnica atualizada e os artefatos da Sprint 1 | docs | M | Alta | T03, T04, T08 |
+| T10 | Definir os critérios de composição da base ampliada de intenções | docs | M | Alta | Nenhuma |
+| T11 | Incorporar à base os quatro anexos de portfólio recebidos do parceiro | feat | G | Alta | T10 |
+| T12 | Ampliar a base com variação linguística e casos ambíguos entre intenções | feat | G | Alta | T10 |
+| T13 | Acrescentar à base exemplos fora do catálogo, para permitir rejeição | feat | M | Alta | T10 |
+| T14 | Separar partição de teste que não participe do ajuste de hiperparâmetros | feat | M | Alta | T11, T12, T13 |
+| T15 | Reexecutar a varredura e o ajuste fino sobre a base ampliada | test | G | Alta | T14 |
+| T16 | Finalizar o endpoint de upload de áudio com os formatos especificados e tratamento de erros | feat | G | Alta | T01 |
+| T17 | Documentar a API de recebimento de áudios com exemplos de requisição e códigos de resposta | docs | M | Alta | T16 |
+| T18 | Implementar o adaptador de Speech to Text conforme a Seção 3.2 | feat | G | Alta | T01 |
+| T19 | Cobrir o adaptador de Speech to Text com testes de sucesso e de falha | test | M | Alta | T18 |
+| T20 | Integrar a saída da transcrição à entrada do pipeline de PLN | feat | G | Alta | T15, T18 |
+| T21 | Integrar o pipeline de PLN à API de recebimento de áudios | feat | G | Alta | T16, T20 |
+| T22 | Atualizar a discussão sobre a escolha do algoritmo de NLP, com vantagens e limitações | docs | M | Alta | T15 |
+| T23 | Documentar a implementação e a integração do NLP com exemplos de entrada e saída | docs | M | Alta | T21 |
+| T24 | Criar os scripts de criação do banco conforme a modelagem lógica | feat | M | Média | T04 |
+| T25 | Popular o banco com dados pertinentes e validar leitura e escrita | feat | M | Média | T24 |
+| T26 | Persistir as interações do fluxo de áudio no banco | feat | G | Média | T21, T25 |
+| T27 | Implementar a interface básica de entrada de texto e de áudio | feat | G | Média | T17 |
+| T28 | Integrar a interface às APIs do backend, com validações e feedback ao usuário | feat | G | Média | T27 |
+| T29 | Documentar a estrutura, os componentes e as instruções de uso da interface | docs | M | Média | T28 |
+| T30 | Planejar os testes de funcionalidade a partir dos requisitos funcionais | docs | G | Alta | T21 |
+| T31 | Planejar os testes de requisitos não funcionais, incluindo desempenho | docs | G | Alta | T21 |
+| T32 | Implementar o módulo VHS de caching das respostas da API externa | feat | G | Alta | T18 |
+| T33 | Planejar os testes de integração entre componentes internos e serviços externos | docs | G | Alta | T32 |
+| T34 | Elaborar o roteiro de teste de usabilidade com SUS para cinco usuários externos | docs | G | Alta | T28 |
+| T35 | Registrar as ferramentas e bibliotecas escolhidas para os testes | docs | P | Alta | T30, T31, T33 |
+| T36 | Configurar os ambientes de desenvolvimento e produção | ci | G | Média | T26 |
+| T37 | Instalar o hook local de `commit-msg` e documentá-lo no `GestaoConfiguracao.md` | chore | P | Alta | Nenhuma |
+| T38 | Registrar a retrospectiva da Sprint 3, a revisão dos riscos e a matriz de papéis | docs | G | Alta | Nenhuma |
+| T39 | Conferir os artefatos contra o repositório na data da entrega | docs | M | Alta | T38 |
+| T40 | Planejar a Sprint 4 no Kanban | docs | M | Alta | T38 |
+
+### 4.7.5 Detalhamento das tasks
+
+| ID | Descrição | DoR | DoD |
+|---|---|---|---|
+| T01 | Elevar as Seções 3 e 4 do `Projeto.md` de `##` para `#`, alinhando-as às Seções 1, 2, 5 e 6, e ajustar o sumário conforme necessário | Nenhum | Níveis de cabeçalho uniformes entre seções de mesmo grau e todas as âncoras internas resolvendo |
+| T02 | Substituir a entrada `0.2.0 - DD/MM/2026` do histórico de lançamentos pelos artefatos e pela data efetiva da Sprint 2 | Data da entrega definida | Histórico de lançamentos sem data ou artefato genérico do template |
+| T03 | Consolidar as tecnologias de interface, backend, NLP, banco, armazenamento, infraestrutura, testes e monitoramento, com justificativa de confiabilidade e escalabilidade | Decisões de tecnologia da Sprint 2 registradas nas issues | Seção 3.5 preenchida, sem comentário de template, coerente com `pyproject.toml` e `requirements.txt` |
+| T04 | Identificar entidades e relacionamentos, definir tabelas, atributos, chaves e cardinalidades, e descrever a implementação na tecnologia escolhida | Requisitos funcionais da Seção 2.2 revisados | Seção 3.6 preenchida com os modelos conceitual, lógico e físico |
+| T05 | Criar a seção de Projeto Técnico e Arquitetural, que a Seção 3 do `Projeto.md` não possui, e nela representar as principais classes do sistema com atributos, métodos, cardinalidades e relacionamentos | T04 concluída e responsável designado | Seção criada, diagrama versionado em `assets` e explicado no texto |
+| T06 | Representar a estrutura da solução e as interações entre frontend, backend, banco, NLP, APIs de voz e sistemas do parceiro, atualizando o diagrama de componentes da Sprint 1 | T05 concluída | Diagrama versionado em `assets` e explicado na nova seção |
+| T07 | Representar a ordem das interações nos casos críticos: consulta por texto, consulta por voz, tratamento de ambiguidade e notificação de pendências | T05 concluída | Diagramas versionados em `assets` e explicados na nova seção |
+| T08 | Definir funcionalidades, integrações, testes, validações, implantações, dependências e resultados esperados para cada uma das Sprints 3, 4 e 5 | Planejamento desta seção aprovado na planning | Seção 3.8 preenchida, com marcos por sprint e critérios de transição |
+| T09 | Verificar o alinhamento entre business drivers, requisitos funcionais e não funcionais, arquitetura inicial, tecnologias previstas e definição técnica atualizada | T03, T04 e T08 concluídas | Divergências corrigidas ou registradas, com responsável designado |
+| T10 | Definir por escrito o que torna a base um instrumento válido de avaliação: variação linguística mínima, proporção de casos ambíguos e presença de exemplos fora do catálogo | Materialização de AM6 compreendida pela equipe e anexos do parceiro disponíveis | Critérios registrados na Seção 3.3 do `Projeto.md` e aprovados em revisão por par |
+| T11 | Extrair dos quatro anexos de portfólio recebidos do Metrô as situações e o vocabulário reais a incorporar à base, tratando a lacuna registrada em OP3 | T10 concluída e anexos catalogados | Base contendo exemplos derivados de material real, com a origem de cada bloco identificada |
+| T12 | Ampliar `intencoes_exemplos.csv` com paráfrases, variação de registro e casos limítrofes entre as três intenções | T10 concluída | Base ampliada e versionada, com a proporção de casos ambíguos declarada e a varredura de configurações deixando de empatar no topo |
+| T13 | Acrescentar exemplos que não pertencem a nenhuma intenção do catálogo, para permitir a rejeição | T10 concluída | Base contendo a classe de rejeição e o classificador avaliado também sobre ela |
+| T14 | Reservar uma partição de teste isolada, que não participe da varredura nem do ajuste de hiperparâmetros | T11, T12 e T13 concluídas | Partição separada por semente fixa e documentada; scripts de experimento e ajuste fino sem acesso a ela |
+| T15 | Reexecutar `experimento.py` e `ajuste_fino.py` sobre a base ampliada e atualizar os relatórios de `resultados/` | T14 concluída | Relatórios regenerados, com métricas distintas entre configurações e recomendação justificada |
+| T16 | Concluir o endpoint de upload com suporte aos formatos especificados, validações e tratamento de erros | Contrato da Seção 3.4 estável | Endpoint aceitando os formatos previstos, com respostas de erro cobertas por teste |
+| T17 | Documentar endpoints, parâmetros de entrada, formatos aceitos, exemplos de requisição com headers e payloads, códigos de resposta e estrutura da resposta | T16 concluída | Seção do `Projeto.md` preenchida, com exemplos reproduzíveis de sucesso e de erro |
+| T18 | Implementar o adaptador que encapsula o serviço de transcrição atrás de uma interface própria, conforme a API definida na Seção 3.2 | Seção 3.2 publicada na `develop` e credenciais disponíveis | Adaptador implementado sem acoplar o sistema ao fornecedor, com o contrato documentado |
+| T19 | Escrever os testes do adaptador, incluindo falha do serviço e áudio inválido | T18 concluída | Testes passando na suíte, cobrindo caminho feliz e ao menos dois casos de erro |
+| T20 | Encadear transcrição e classificação, de modo que um áudio produza uma intenção | T15 e T18 concluídas | Fluxo áudio para texto para intenção funcionando, coberto por teste de integração |
+| T21 | Conectar o pipeline ao endpoint de recebimento, com contrato de entrada e saída definido | T16 e T20 concluídas | Requisição de ponta a ponta retornando a intenção classificada, coberta por teste de integração |
+| T22 | Atualizar a discussão sobre o algoritmo escolhido, com características, vantagens e limitações medidas sobre a base ampliada | T15 concluída | Seção atualizada e coerente com os relatórios de `resultados/` |
+| T23 | Documentar bibliotecas, frameworks, processo de integração e exemplos de dados de entrada e saída, com casos de sucesso e de falha | T21 concluída | Documentação reproduzível por quem não participou da implementação |
+| T24 | Escrever os scripts de criação de tabelas, índices e tipos em `src/database` | T04 concluída | Scripts versionados e executáveis em ambiente limpo |
+| T25 | Popular o banco com dados pertinentes e validar operações de leitura e escrita | T24 concluída | Banco populado, com consultas de verificação documentadas |
+| T26 | Gravar as interações do fluxo: áudio recebido, transcrição, intenção classificada e resposta | T21 e T25 concluídas | Interações persistidas e recuperáveis, com teste cobrindo gravação e leitura |
+| T27 | Construir a interface básica para entrada de texto ou áudio, envio e exibição de resultados | Contrato da API estável e decisão de design da Sprint 2 registrada | Interface renderizando, enviando e exibindo o resultado do processamento |
+| T28 | Conectar a interface às APIs do backend, com validações de entrada e feedback ao usuário | T27 concluída | Estados de carregamento, sucesso e erro implementados e verificados |
+| T29 | Descrever estrutura e componentes da interface, a integração com as APIs e as instruções de uso e teste | T28 concluída | Documentação permitindo que outro integrante execute a interface sem apoio |
+| T30 | Derivar dos requisitos funcionais os testes correspondentes, com propósito, instruções de execução e cenários positivos e negativos | T21 concluída e requisitos da Seção 2.2 revisados | Plano cobrindo os RFs definidos, com discussão explícita da abrangência |
+| T31 | Derivar dos requisitos não funcionais os testes correspondentes, sendo obrigatório o de desempenho | T21 concluída e requisitos da Seção 2.3 revisados | Plano cobrindo os RNFs, com teste de desempenho detalhado e abrangência justificada |
+| T32 | Implementar o mecanismo de caching que armazena temporariamente as respostas da API externa, evitando requisições repetidas | T18 concluída | Módulo funcionando, com política de expiração definida e coberto por teste |
+| T33 | Planejar a validação entre componentes internos e serviços externos, descrevendo interações, reação a erros, ferramentas e validação de resultados | T32 concluída | Plano de integração cobrindo cenários positivos e negativos, com o uso do módulo VHS descrito |
+| T34 | Elaborar o roteiro de usabilidade com cenários, perfis de participantes e método de avaliação, para ao menos cinco usuários externos à turma | T28 concluída e método aprovado pelo professor | Roteiro completo, com questionário SUS e critérios de recrutamento e diversidade definidos |
+| T35 | Registrar as ferramentas e bibliotecas escolhidas para cada categoria de teste, com justificativa | T30, T31 e T33 concluídas | Relação registrada no `Projeto.md` e coerente com as dependências do repositório |
+| T36 | Configurar os ambientes de desenvolvimento e produção e documentar variáveis, credenciais e publicação | T26 concluída e guia da Sprint 2 disponível | Ambientes configurados, guia corrigido onde divergiu da prática e evidência registrada na issue |
+| T37 | Criar o hook que valida tipo, infinitivo, limite de 72 caracteres e referência `#N`, e documentar a instalação | Convenção da Seção 5.2 do `GestaoConfiguracao.md` revisada | Hook funcionando localmente, instruções documentadas e verificadas por outro integrante |
+| T38 | Produzir a Seção 5 do `GestaoProjeto.md` com retrospectiva, riscos, papéis e planejamento da Sprint 4 | Sprint 3 em fase de encerramento | Seção 5 completa, com ações verificáveis, matriz de risco atualizada e rotação de papéis evidenciada |
+| T39 | Conferir a tabela de alinhamento com o Escritório de Projetos contra o repositório, na data da entrega | T38 concluída | Tabela revisada e datada no dia da entrega, com as divergências corrigidas ou registradas |
+| T40 | Registrar as tasks da Sprint 4 no Kanban, com estimativa, responsável, revisor, DoR e DoD | T38 concluída | Todas as issues da Sprint 4 criadas com milestone, labels, assignee e revisor definidos |
+
+### 4.7.6 Artefato, evidência e designação por task
+
+As Seções 4.7.4 e 4.7.5 declaram, para cada task, o título, o tipo, a prioridade, a estimativa, as dependências, o DoR e o DoD — sendo o DoD o critério de aceite verificado no encerramento. Esta tabela completa o registro com os três elementos restantes exigidos pelo Escritório de Projetos: **em que artefato a task incide**, **qual evidência comprova a conclusão** e **quem responde por ela**.
+
+A coluna de designação está deliberadamente em branco. A distribuição de responsáveis e revisores é decidida na Sprint Planning, e preenchê-la aqui, antes da reunião, seria registrar como acordado algo que a equipe ainda não acordou. A Seção 4.7.7 define o critério que a designação deve observar.
+
+| ID | Artefato relacionado | Evidência esperada de conclusão | Responsável | Revisor |
+|---|---|---|---|---|
+| T01 | `docs/Projeto.md` | Diff do MR mostrando os cabeçalhos uniformizados e o sumário navegando sem âncora quebrada | A designar na planning | A designar na planning |
+| T02 | `README.md` | Seção de histórico de lançamentos com a data e os artefatos da Sprint 2 | A designar na planning | A designar na planning |
+| T03 | `docs/Projeto.md`, Seção 3.5 | Seção preenchida e coerente com `pyproject.toml` e `requirements.txt` | A designar na planning | A designar na planning |
+| T04 | `docs/Projeto.md`, Seção 3.6 | Modelos conceitual, lógico e físico publicados, com diagramas em `assets` | A designar na planning | A designar na planning |
+| T05 | `docs/Projeto.md`, Seção 3.9.1, e `assets/` | Diagrama de classes versionado e explicado no texto | A designar na planning | A designar na planning |
+| T06 | `docs/Projeto.md`, Seção 3.9.3, e `assets/` | Diagrama de componentes versionado e explicado no texto | A designar na planning | A designar na planning |
+| T07 | `docs/Projeto.md`, Seção 3.9.4, e `assets/` | Diagramas de sequência dos casos críticos versionados e explicados | A designar na planning | A designar na planning |
+| T08 | `docs/Projeto.md`, Seção 3.8 | Seção com marcos por sprint e critérios de transição | A designar na planning | A designar na planning |
+| T09 | `docs/Projeto.md`, Seções 1, 2 e 3 | Registro das divergências encontradas, corrigidas ou com responsável designado | A designar na planning | A designar na planning |
+| T10 | `docs/Projeto.md`, Seção 3.3, e `src/pln/dados/` | Critérios de composição da base escritos e aprovados em revisão por par | A designar na planning | A designar na planning |
+| T11 | `src/pln/dados/intencoes_exemplos.csv` | Base com exemplos derivados dos quatro anexos do parceiro, com a origem de cada bloco identificada | A designar na planning | A designar na planning |
+| T12 | `src/pln/dados/intencoes_exemplos.csv` | Base ampliada com a proporção de casos ambíguos declarada, e varredura deixando de empatar no topo | A designar na planning | A designar na planning |
+| T13 | `src/pln/dados/intencoes_exemplos.csv` | Base contendo a classe de rejeição, com o classificador avaliado também sobre ela | A designar na planning | A designar na planning |
+| T14 | `src/pln/` e `tests/` | Partição de teste separada por semente fixa e documentada, inacessível aos scripts de busca | A designar na planning | A designar na planning |
+| T15 | `resultados/` | Relatórios regenerados, com métricas distintas entre configurações e recomendação justificada | A designar na planning | A designar na planning |
+| T16 | `src/routes/audio.py` e `src/services/audio_service.py` | Endpoint aceitando os formatos previstos, com respostas de erro cobertas por teste | A designar na planning | A designar na planning |
+| T17 | `docs/Projeto.md`, Seção 3.4 | Exemplos reproduzíveis de sucesso e de erro publicados na seção | A designar na planning | A designar na planning |
+| T18 | `src/services/transcription_service.py` | Adaptador implementado sem acoplar o sistema ao fornecedor, com o contrato documentado | A designar na planning | A designar na planning |
+| T19 | `tests/test_transcription_service.py` | Testes passando, cobrindo caminho feliz e ao menos dois casos de erro | A designar na planning | A designar na planning |
+| T20 | `src/services/analysis_service.py` | Fluxo de áudio para texto para intenção coberto por teste de integração | A designar na planning | A designar na planning |
+| T21 | `src/routes/` e `src/services/` | Requisição de ponta a ponta devolvendo a intenção classificada, coberta por teste | A designar na planning | A designar na planning |
+| T22 | `docs/Projeto.md`, Seção 3.3 | Seção atualizada e coerente com os relatórios de `resultados/` | A designar na planning | A designar na planning |
+| T23 | `docs/Projeto.md`, Seção 3.3, e `src/pln/README.md` | Documentação reproduzível por quem não participou da implementação | A designar na planning | A designar na planning |
+| T24 | `src/database/` | Scripts versionados e executáveis em ambiente limpo | A designar na planning | A designar na planning |
+| T25 | `src/database/` | Banco populado, com consultas de verificação documentadas | A designar na planning | A designar na planning |
+| T26 | `src/services/` e `src/database/` | Interações persistidas e recuperáveis, com teste cobrindo gravação e leitura | A designar na planning | A designar na planning |
+| T27 | `frontend/` | Interface renderizando, enviando e exibindo o resultado do processamento | A designar na planning | A designar na planning |
+| T28 | `frontend/` | Estados de carregamento, sucesso e erro implementados e verificados | A designar na planning | A designar na planning |
+| T29 | `docs/` e `frontend/README` | Documentação permitindo que outro integrante execute a interface sem apoio | A designar na planning | A designar na planning |
+| T30 | Artefato de testes da Sprint 3 | Plano cobrindo os requisitos funcionais, com discussão explícita da abrangência | A designar na planning | A designar na planning |
+| T31 | Artefato de testes da Sprint 3 | Plano cobrindo os requisitos não funcionais, com o teste de desempenho detalhado | A designar na planning | A designar na planning |
+| T32 | `src/` e `tests/` | Módulo funcionando, com política de expiração definida e coberto por teste | A designar na planning | A designar na planning |
+| T33 | Artefato de testes da Sprint 3 | Plano de integração com cenários positivos e negativos, descrevendo o uso do módulo de caching | A designar na planning | A designar na planning |
+| T34 | Artefato de testes da Sprint 3 | Roteiro completo, com questionário SUS e critérios de recrutamento e diversidade | A designar na planning | A designar na planning |
+| T35 | `docs/Projeto.md` | Relação registrada e coerente com as dependências do repositório | A designar na planning | A designar na planning |
+| T36 | `infra/` e configuração de CI | Ambientes configurados, guia corrigido onde divergiu da prática e evidência na issue | A designar na planning | A designar na planning |
+| T37 | `docs/GestaoConfiguracao.md`, Seção 6.5 | Hook funcionando localmente, com instruções verificadas por outro integrante | A designar na planning | A designar na planning |
+| T38 | `docs/GestaoProjeto.md`, Seção 5 | Seção completa, com ações verificáveis, riscos atualizados e rotação evidenciada | A designar na planning | A designar na planning |
+| T39 | `docs/GestaoProjeto.md` e `README.md` | Tabela de alinhamento revisada e datada no dia da entrega | A designar na planning | A designar na planning |
+| T40 | Kanban do GitLab | Issues da Sprint 4 criadas com milestone, labels, assignee e revisor definidos | A designar na planning | A designar na planning |
+
+### 4.7.7 Registro das tasks no Kanban
+
+ As tabelas das Seções 4.7.4, 4.7.5 e 4.7.6 constituem o planejamento aprovado na Sprint Planning. Cada task é registrada como uma issue no GitLab, com o mesmo identificador no título, e recebe descrição, tipo, prioridade, estimativa t-shirt, responsável, revisor, dependências, DoR e DoD conforme registrado acima. A designação de responsável e revisor observa o critério de cobertura registrado na Seção 4.2.4, segundo o qual nenhuma entrega é revisada por seu próprio autor, todos os integrantes revisam ao menos uma entrega e toda frente com mais de três entregas conta com ao menos dois revisores distintos. A designação contempla também as quatro entregas que ficaram sem responsável na Sprint 2, conforme a Seção 4.4.1.
+
+ O quadro Kanban do GitLab permanece a fonte oficial para o acompanhamento da execução, nos termos da Seção 2.2.2, e este documento registra o planejamento tal como aprovado, permitindo comparar o previsto com o realizado na retrospectiva da Sprint 3.
+
+---
