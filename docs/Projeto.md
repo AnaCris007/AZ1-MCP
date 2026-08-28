@@ -757,6 +757,8 @@ Dessa forma, o valor econômico da solução está associado principalmente à e
 
 A matriz de riscos é uma ferramenta amplamente utilizada na gestão de projetos para identificar e monitorar os riscos de um projeto. Nesse contexto, os riscos podem representar tanto ameaças, associadas a possíveis efeitos negativos sobre o projeto, quanto oportunidades, relacionadas a eventos que podem gerar impactos positivos.
 
+ > **Nota de versionamento (Sprint 2).** Esta seção preserva a matriz de risco tal como produzida no artefato de entendimento de negócio da Sprint 1 e não é mais alterada. A partir da Sprint 2, o acompanhamento da matriz, que abrange revisão de status, reavaliação de probabilidade, impacto e severidade, inclusão de novos itens, avaliação da efetividade das respostas e análise dos itens mais críticos, passa a ser registrado e mantido no [GestaoProjeto.md](./GestaoProjeto.md#43-matriz-de-risco-do-projeto), na seção da sprint correspondente.
+
 No contexto deste projeto, foram identificados e analisados 12 riscos, sendo 9 ameaças e 3 oportunidades. Cada risco foi avaliado considerando dois fatores principais, probabilidade de ocorrência e impacto, os quais constituem os dois eixos da matriz de riscos apresentada a seguir. Para facilitar sua identificação, as ameaças foram representadas pela nomenclatura AMnº, enquanto as oportunidades foram identificadas como OPnº. Cada risco é detalhado individualmente nas subseções seguintes, e o conjunto é consolidado ao final em um quadro resumo acompanhado da representação visual da matriz.
 
 ### 1.9.1. Critério de severidade
