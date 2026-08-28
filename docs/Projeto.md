@@ -46,8 +46,7 @@
 - [3.5 Pilha de Tecnologias](#35-pilha-de-tecnologias)
 - [3.6 Modelagem Conceitual e Lógica dos Dados](#36-modelagem-conceitual-e-lógica-dos-dados)
 - [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
-- [3.8 Projeto Técnico e Arquitetural](#38-projeto-técnico-e-arquitetural)
-- [3.9 Estratégia de Entrega para as Sprints 3, 4 e 5](#39-estratégia-de-entrega-para-as-sprints-3-4-e-5)
+- [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 
 </details>
 
@@ -61,12 +60,12 @@
 - [4.5 Diário de Construção dos Dois Protótipos](#45-diário-de-construção-dos-dois-protótipos)
 - [4.6 Execução dos Protótipos](#46-execução-dos-protótipos)
 - [4.7 Comparação entre as Alternativas](#47-comparação-entre-as-alternativas)
-- [4.8 Limites dos Protótipos](#48-limites-dos-protótipos)
+- [4.8 Limites da Exploração](#48-limites-da-exploração)
 - [4.9 Inventário de Decisões em Aberto](#49-inventário-de-decisões-em-aberto)
 - [4.10 Repertório de Situações](#410-repertório-de-situações)
-- [4.11 Registros Visuais](#411-registros-visuais)
-
-</details>
+- [4.11 Aprendizados da Exploração](#411-aprendizados-da-exploração)
+- [4.12 Próximos Passos](#412-próximos-passos)
+- [4.13 Registros Visuais](#413-registros-visuais)
 
 </details>
 
@@ -486,6 +485,8 @@ O primeiro diagrama representa o fluxo atual. Suas atividades e decisões são:
   <sup>Fonte: material produzido pelos autores (2026).</sup>
 </div>
 
+O agente de inteligência artificial do passo 2, disponível no Microsoft Studio, corresponde às iniciativas de IA que o Metrô já mantém e que a Matriz SWOT registra como força e oportunidade a especializar (seção 1.1). No fluxo TO-BE a seguir, esse agente é substituído pela Interface de PLN desenvolvida pela equipe, que passa a interpretar a solicitação em linguagem natural e a classificar sua intenção.
+
 O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas atividades e decisões são:
 
 1. o usuário identifica uma necessidade de informação ou de apoio a uma ação sobre o portfólio e envia um comando em linguagem natural;
@@ -504,6 +505,8 @@ O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas at
 </div>
 
 **Nota de escopo:** no diagrama original, o caminho denominado “Inserção de Informação” representa, para o MVP, apenas a geração de uma sugestão de preenchimento. Nenhuma informação é gravada nas fontes oficiais. A execução efetiva de transações permanece registrada como evolução futura na seção 1.7.
+
+**Nota sobre os tipos de intenção:** o gateway “Tipo de intenção” representa apenas os caminhos acionados por uma solicitação síncrona do usuário — consulta e apoio ao preenchimento (a transação sugestiva das seções 1.3 e 1.4). O terceiro tipo definido nessas seções, o alerta, corresponde a uma notificação proativa disparada pelo sistema a partir de prazos, riscos e pendências identificados, e não a uma resposta a uma solicitação do usuário; por isso não aparece como um caminho deste gateway específico, embora seja tratado pelo mesmo classificador de intenções.
 
 **Principais diferenças entre os fluxos:**
 
@@ -527,42 +530,42 @@ O segundo diagrama representa o mesmo fluxo com a solução incorporada. Suas at
 
 Cada feature foi avaliada em dois critérios. A importância expressa o valor para o problema e para os benefícios esperados pelo parceiro; a viabilidade representa a capacidade de entrega dentro do módulo, considerando esforço técnico, dependências externas e restrições de confidencialidade. Para tornar a priorização reproduzível, adotou-se a escala Baixa = 1, Média = 2 e Alta = 3; níveis intermediários correspondem à média dos níveis adjacentes. O score é a soma de importância e viabilidade, variando de 2 a 6. Empates são resolvidos, nesta ordem, pela maior importância e pela precedência técnica. Por isso, as funcionalidades do pipeline de Processamento de Linguagem Natural antecedem as que dependem dele. A coluna de planejamento registra o recorte do projeto, mas não altera o score.
 
-[PENDENTE — confirmar, para cada feature, se sua origem foi o TAPI, o parceiro ou uma discussão interna da equipe e acrescentar essa informação à tabela; o repositório registra apenas as fontes gerais do brainstorming.]
+**Critério de origem:** cada feature foi classificada em uma de cinco origens — **TAPI** (descrita explicitamente no termo de abertura), **Parceiro** (solicitada verbalmente em reunião ou entrevista), **Problema identificado** (deduzida diretamente da dor mapeada na seção 1.1 ou nas personas da seção 1.5), **Equipe (produto)** (proposta pelo grupo para melhorar a experiência) ou **Equipe (técnica)** (decorrente de necessidade de arquitetura, do pipeline de PLN ou de segurança). Para as features das faixas Simulação no MVP, Registro para o futuro (Ir Além) e Registro para o futuro (desejo do parceiro), a origem estava registrada em prosa nos parágrafos que seguem a tabela; para as demais, a classificação foi reconstruída a partir do restante do documento — descrição do produto (seção 1.3), problema (seção 1.1) e personas (seção 1.5) — na ausência de um registro contemporâneo ao brainstorming, e deve ser conferida pela equipe.
 
 <div align="center">
 <sub>Tabela 1.7 — Brainstorming e priorização de features</sub>
 </div>
 
-| Prioridade | Feature                                                                           | Importância | Viabilidade | Score | Planejamento                                  |
-| :--------: | --------------------------------------------------------------------------------- | :---------: | :---------: | :---: | --------------------------------------------- |
-| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | 6,0 | MVP |
-| 2 | Identificação e classificação de intenções | Alta | Alta | 6,0 | MVP |
-| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | 6,0 | MVP |
-| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | 6,0 | MVP |
-| 5 | Respostas estruturadas | Alta | Alta | 6,0 | MVP |
-| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | 6,0 | MVP |
-| 7 | Localização e consulta de documentos dos projetos | Alta | Média | 5,0 | MVP |
-| 8 | Indicação das fontes | Alta | Média | 5,0 | MVP |
-| 9 | Alertas de prazos e documentos faltantes | Alta | Média | 5,0 | MVP |
-| 10 | Identificação de campos incompletos | Alta | Média | 5,0 | MVP |
-| 11 | Sugestão de conteúdo para campos | Alta | Média | 5,0 | MVP |
-| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | 4,5 | MVP |
-| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | 4,0 | MVP |
-| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | 4,0 | MVP |
-| 15 | Controle de acesso por perfil | Alta | Média/Baixa | 4,5 | Simulação no MVP |
-| 16 | Rastreabilidade das interações | Alta | Média | 5,0 | Simulação no MVP |
-| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | 4,5 | Evolução futura |
-| 18 | Prévia de relatório de status | Média/Alta | Média | 4,5 | Evolução futura |
-| 19 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | 3,0 | Evolução futura |
-| 20 | Painel de alertas e pendências | Média | Média | 4,0 | Evolução futura |
-| 21 | Notificações automáticas | Média | Baixa | 3,0 | Evolução futura |
-| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) |
-| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) |
-| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) |
-| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | 3,0 | Registro para o futuro (evolução tecnológica) |
+| Prioridade | Feature                                                                           | Importância | Viabilidade | Score | Planejamento                                  | Origem |
+| :--------: | --------------------------------------------------------------------------------- | :---------: | :---------: | :---: | --------------------------------------------- | ------ |
+| 1 | Consulta em linguagem natural por voz e texto | Alta | Alta | 6,0 | MVP | TAPI |
+| 2 | Identificação e classificação de intenções | Alta | Alta | 6,0 | MVP | Equipe (técnica) |
+| 3 | Detecção de solicitações fora do catálogo de intenções | Alta | Alta | 6,0 | MVP | TAPI |
+| 4 | Consulta a informações estruturadas dos projetos (prazos, marcos, riscos, avanço) | Alta | Alta | 6,0 | MVP | Problema identificado |
+| 5 | Respostas estruturadas | Alta | Alta | 6,0 | MVP | Equipe (produto) |
+| 6 | Aviso de dados insuficientes para resposta confiável | Alta | Alta | 6,0 | MVP | Equipe (técnica) |
+| 7 | Localização e consulta de documentos dos projetos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 8 | Indicação das fontes | Alta | Média | 5,0 | MVP | TAPI |
+| 9 | Alertas de prazos e documentos faltantes | Alta | Média | 5,0 | MVP | Problema identificado |
+| 10 | Identificação de campos incompletos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 11 | Sugestão de conteúdo para campos | Alta | Média | 5,0 | MVP | Problema identificado |
+| 12 | Esclarecimento de dúvidas sobre conceitos e normativos de gestão de portfólio | Média/Alta | Média | 4,5 | MVP | Equipe (produto) |
+| 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | 4,0 | MVP | Equipe (produto) |
+| 14 | Registro de feedback do usuário sobre as respostas | Média | Média | 4,0 | MVP | Equipe (técnica) |
+| 15 | Rastreabilidade das interações | Alta | Média | 5,0 | Simulação no MVP | TAPI |
+| 16 | Controle de acesso por perfil | Alta | Média/Baixa | 4,5 | Simulação no MVP | TAPI |
+| 17 | Análises comparativas entre projetos | Alta | Média/Baixa | 4,5 | Evolução futura | TAPI |
+| 18 | Prévia de relatório de status | Média/Alta | Média | 4,5 | Evolução futura | TAPI |
+| 19 | Painel de alertas e pendências | Média | Média | 4,0 | Evolução futura | Equipe (produto) |
+| 20 | Fluxo guiado de criação de projetos (sugestões por etapas) | Média | Baixa | 3,0 | Evolução futura | Equipe (produto) |
+| 21 | Notificações automáticas | Média | Baixa | 3,0 | Evolução futura | Equipe (técnica) |
+| 22 | Integração com o portfólio real do Metrô (SharePoint, Listas, Power BI) | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) | TAPI |
+| 23 | Execução efetiva de transações com confirmação do usuário | Alta | Baixa | 4,0 | Registro para o futuro (Ir Além) | TAPI |
+| 24 | Prévia de apresentação mensal para a diretoria | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 25 | Prévia do relatório de fechamento do portfólio e dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 26 | Identificação de conexões com estratégia e indicadores | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 27 | Consultas sobre faturas e pagamentos dos projetos | Média | Baixa | 3,0 | Registro para o futuro (desejo do parceiro) | Parceiro |
+| 28 | Adoção de serviços de IA generativa homologados | Média | Baixa | 3,0 | Registro para o futuro (evolução tecnológica) | Equipe (técnica) |
 
 <div align="center">
 <sup>Fonte: Material produzido pelos autores, 2026.</sup>
@@ -650,23 +653,23 @@ A principal proposta de valor da solução consiste em facilitar a interação d
 
 **Acesso rápido às informações por linguagem natural**
 
-O agente reduz a necessidade de navegação manual por diferentes documentos e estruturas de dados, permitindo que os usuários façam perguntas diretamente em linguagem natural.
+O agente elimina a navegação manual por diferentes documentos e estruturas de dados: o usuário formula a pergunta diretamente em linguagem natural e recebe resposta em até 15 segundos em pelo menos 80% das consultas, conforme o RNF01.
 
 **Redução do trabalho manual**
 
-A solução busca diminuir o tempo empregado na busca, interpretação e consolidação manual de informações relacionadas aos projetos.
+A solução reduz o tempo empregado na busca, na interpretação e na consolidação manual de informações dos projetos, substituindo a navegação por múltiplas fontes por uma única interação conversacional.
 
 **Apoio ao acompanhamento e à tomada de decisão**
 
-Ao facilitar o acesso às informações relevantes, o agente pode apoiar líderes, Escritório de Projetos e diretoria durante o acompanhamento dos projetos e a tomada de decisões.
+Ao estruturar as informações relevantes em respostas claras, o agente apoia líderes, Escritório de Projetos e diretoria no acompanhamento dos projetos e na tomada de decisões: pelo menos 80% dos participantes dos testes de usabilidade compreendem a resposta e identificam a informação solicitada sem auxílio externo, conforme o RNF08.
 
 **Maior qualidade e padronização das informações**
 
-O agente pode auxiliar os usuários durante o preenchimento e consulta de documentos, contribuindo para uma maior consistência das informações registradas.
+O agente eleva a consistência das informações registradas ao sugerir conteúdo padronizado para os campos dos documentos: pelo menos 85% das sugestões vêm acompanhadas de referência válida e justificativa compreensível, conforme o RNF11.
 
 **Assistência no cumprimento da documentação de projetos**
 
-A solução também busca auxiliar os responsáveis pelos projetos no acompanhamento e preenchimento dos documentos necessários ao longo de seu ciclo de vida.
+A solução apoia os responsáveis pelos projetos no preenchimento dos documentos exigidos ao longo do ciclo de vida do empreendimento, apresentando uma sugestão de texto para cada campo pendente sem alterar o documento de origem, conforme os critérios de aceitação do RF04.
 
 ### Relacionamento com os usuários
 
@@ -1006,8 +1009,8 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
 - **Indicadores computacionais:**
   - **Precisão da classificação de intenção:** número de solicitações corretamente classificadas dividido pelo total de solicitações do conjunto de teste. O valor-alvo é de pelo menos 85%, conforme o RNF03.
-  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas dividido pelo total de entidades presentes no conjunto de teste. [PENDENTE — confirmar com a equipe o valor-alvo para a extração de nome do projeto, período de referência e indicador solicitado.]
-  - **Taxa de correspondência entre entidade e registro:** número de consultas em que a entidade extraída foi associada ao registro correto dividido pelo total de consultas do conjunto de teste. [PENDENTE — confirmar com a equipe o valor-alvo para a correspondência entre entidades extraídas e registros do portfólio.]
+  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas dividido pelo total de entidades presentes no conjunto de teste, para a extração de nome do projeto, período de referência e indicador solicitado. O valor-alvo é de pelo menos 85%, na mesma linha da precisão mínima definida para a classificação de intenções no RNF03.
+  - **Taxa de correspondência entre entidade e registro:** número de consultas em que a entidade extraída foi associada ao registro correto dividido pelo total de consultas do conjunto de teste. O valor-alvo é de pelo menos 90%, por se tratar de uma correspondência determinística executada após a extração.
 
 ### Fluxo de negócio 2: Apoio proativo ao preenchimento e acompanhamento de pendências
 
@@ -1016,8 +1019,8 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 - **Situação proposta (TO-BE):** o sistema sugere textos para os campos pendentes a partir da interação com o usuário, mantendo o controle humano sobre o que é efetivamente registrado, e notifica proativamente o PMO sobre marcos, riscos e pendências conforme filtros configurados, sem repetir alertas já enviados.
 
 - **Indicadores computacionais:**
-  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas da fala ou do texto dividido pelo total de entidades presentes nas interações do conjunto de teste. [PENDENTE — confirmar com a equipe o valor-alvo para a extração do campo e do conteúdo sugerido.]
-  - **Precisão na detecção de alertas:** número de marcos, riscos e pendências corretamente identificados como elegíveis dividido pelo total de alertas gerados. [PENDENTE — confirmar com a equipe o valor-alvo da precisão dos alertas e os filtros que comporão o conjunto de teste.]
+  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas da fala ou do texto dividido pelo total de entidades presentes nas interações do conjunto de teste, para a extração do campo e do conteúdo sugerido. O valor-alvo é de pelo menos 85%, na mesma linha do RNF03.
+  - **Precisão na detecção de alertas:** número de marcos, riscos e pendências corretamente identificados como elegíveis dividido pelo total de alertas gerados. O valor-alvo é de pelo menos 90%, por se tratar de uma verificação baseada em regras de prazo e status já estruturados; os filtros que comporão o conjunto de teste serão definidos na Sprint 3.
   - **Taxa de erro de palavras (Word Error Rate — WER):** soma de substituições, inserções e exclusões dividida pelo total de palavras do áudio de referência. O valor-alvo é de no máximo 15%, equivalente à taxa mínima de 85% de palavras reconhecidas corretamente definida no RNF06.
 
 ---
@@ -1132,7 +1135,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 | Cenário 2 | Sugerir preenchimento de documento | Usuário | RF04 |
 | Cenário 3 | Notificar pendências | Agendador (sistema) | RF05 |
 
- Os três cenários representam o fluxo principal de cada requisito, sem o tratamento de exceções, que fica previsto para a sprint seguinte. O RF06, de prioridade baixa e viabilidade ainda em avaliação, não recebeu cenário nesta sprint, conforme registrado na seção 2.2.3.
+ Os três cenários representam o fluxo principal de cada requisito, sem o tratamento de exceções, que fica previsto para a sprint seguinte. Os fluxos de exceção de dois desses cenários foram modelados na seção 2.2.3, como diagramas de sequência dos casos críticos. O RF06, de prioridade baixa e viabilidade ainda em avaliação, não recebeu cenário nesta sprint, conforme registrado na seção 2.2.4.
 
 #### Linhas de vida adotadas
 
@@ -1170,7 +1173,7 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
 #### Cenário 1: consultar informações do projeto
 
-&emsp; O cenário representa o fluxo mais frequente do agente, no qual o usuário formula uma pergunta sobre um projeto e recebe a resposta acompanhada da indicação de origem. É o cenário de maior alcance, por percorrer a cadeia completa de consulta, do recebimento da solicitação em linguagem natural (RF01), passando pela consulta aos dados do projeto (RF02), até a devolução da resposta fundamentada com a indicação da fonte (RF03). O diagrama apresenta somente o fluxo principal; a recusa de pedidos fora do catálogo de intenções e o ciclo de esclarecimento diante de parâmetros faltantes, ambos previstos pelo RF02, não estão representados neste cenário.
+&emsp; O cenário representa o fluxo mais frequente do agente, no qual o usuário formula uma pergunta sobre um projeto e recebe a resposta acompanhada da indicação de origem. É o cenário de maior alcance, por percorrer a cadeia completa de consulta, do recebimento da solicitação em linguagem natural (RF01), passando pela consulta aos dados do projeto (RF02), até a devolução da resposta fundamentada com a indicação da fonte (RF03). O diagrama apresenta somente o fluxo principal; a recusa de pedidos fora do catálogo de intenções e o ciclo de esclarecimento diante de parâmetros faltantes, ambos previstos pelo RF02, não estão representados neste cenário. A recusa de pedidos fora do catálogo é modelada no caso crítico 1 da seção 2.2.3; o ciclo de esclarecimento diante de parâmetros faltantes não recebeu diagrama próprio.
 
 <div align="center">
   <sub>FIGURA 2.2: diagrama de sequência do cenário 1 (consultar informações do projeto)</sub><br>
@@ -1293,7 +1296,135 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 
  É também o único cenário em que uma mensagem assíncrona chega ao ator. O disparo do `: Agendador` e a entrega pelo `: ServicoDeNotificacao` não bloqueiam o remetente à espera de resposta, ao contrário das consultas à `: FonteDeDados`, que são síncronas porque o `: Agente` depende do resultado para prosseguir. A notação evita a leitura equivocada de que a notificação seria o retorno de alguma solicitação do usuário, que neste cenário não existe.
 
-### 2.2.3. Rastreabilidade entre requisitos, cenários e classes
+### 2.2.3. Casos críticos: diagramas de sequência dos fluxos de exceção
+
+ Um caso crítico é o cenário cuja falha compromete o objetivo da solução, seja porque o usuário deixa de obter a informação de que precisa, seja porque passa a receber uma informação em que não pode confiar. O critério de seleção é o impacto, e não a frequência: uma situação rara pode ser crítica quando seu efeito é grave, e uma situação frequente pode não ser crítica quando o usuário a corrige sem prejuízo.
+
+ Por esse critério, os casos críticos da solução são os próprios cenários modelados na seção anterior, que concentram o valor entregue pelo agente. Aqueles diagramas, porém, representam apenas o fluxo principal de cada um. Os dois diagramas apresentados a seguir completam essa modelagem, representando os fluxos de exceção que decidem o comportamento do agente quando o caminho principal não se confirma. Foram elaborados na Sprint 2 e estão posicionados aqui, e não no capítulo de definição técnica, para que cada cenário e sua contrapartida de exceção possam ser lidos em sequência.
+
+ A escolha dos fluxos de exceção seguiu o impacto sobre a confiança do usuário na solução e a correspondência com riscos já mapeados na seção 1.9.
+
+| Caso crítico | Fluxo de exceção representado | Cenário de origem | Requisitos | Risco tratado |
+|---|---|---|---|---|
+| Caso crítico 1 | A solicitação é compreendida, mas está fora do catálogo de intenções ou exige uma ação vedada ao MVP, e o agente recusa e orienta | Cenário 2 | RF02 | AM2 (baixa acurácia na identificação de intenções) |
+| Caso crítico 2 | A fonte está indisponível ou não há evidência suficiente, e o agente informa o limite em vez de responder sem fundamento | Cenário 1 | RF02, RF03 | AM8 (alucinação do modelo de linguagem) |
+
+ Os dois diagramas reutilizam integralmente as linhas de vida e as convenções de notação declaradas na seção 2.2.2, incluindo a distinção entre mensagem síncrona, assíncrona e retorno. Nenhuma linha de vida nova foi introduzida: os fluxos de exceção percorrem os mesmos componentes do fluxo principal, o que é, em si, um resultado do projeto arquitetural, pois demonstra que o tratamento de erro não exige uma estrutura paralela à da operação normal.
+
+ Três termos aparecem nos diagramas e não constavam dos cenários anteriores. `confianca` é o grau de certeza devolvido pelo componente que produziu o resultado, no caso a classificação da intenção. `limiarScore` é a pontuação mínima abaixo da qual uma evidência não é aceita como fundamento de resposta. `backoff` é o intervalo de espera aplicado entre duas tentativas de acesso a uma fonte que falhou. Os valores desses parâmetros são tratados ao final desta seção.
+
+#### Caso crítico 1: intenção fora do catálogo ou fora do limite de atuação
+
+O caso representa a situação em que o agente compreende exatamente o que foi pedido e, ainda assim, não atende. Isso ocorre por dois motivos distintos, que o diagrama separa em fragmentos alternativos. No primeiro, o texto não corresponde a nenhuma das intenções catalogadas na seção 3.1 e é classificado como `fora_do_catalogo` (INT-10). No segundo, a intenção é reconhecida, mas sua execução exigiria uma ação vedada ao MVP pela delimitação central da seção 3.1, como gravar em um documento oficial ou acessar o portfólio real do Metrô.
+
+<div align="center">
+  <sub>FIGURA 2.5: diagrama de sequência do caso crítico 1 (intenção fora do catálogo ou fora do limite de atuação)</sub><br>
+  <img src="../assets/sequencia-critico-1.svg" width="100%" alt="Diagrama de sequência do caso crítico de intenção fora do catálogo, com os fluxos de recusa por intenção não catalogada e por ação vedada ao MVP"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Fluxo do caso crítico:**
+
+| # | Mensagem | Tipo | Origem | Destino | Requisito |
+|---|---|---|---|---|---|
+| 1 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
+| 2 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF02 |
+| 3 | `classificarIntencao(texto)` | Síncrona | `: PipelinePLN` | `: Intencao` | RF02 |
+| 4 | `intencaoIdentificada, confianca, foraDoCatalogo` | Retorno | `: Intencao` | `: PipelinePLN` | RF02 |
+| 5 | `registrarSolicitacaoNaoAtendida(texto)` | Síncrona | `: PipelinePLN` | `: PipelinePLN` | RNF09 |
+| 6 | `obterIntencoesDisponiveis()` | Síncrona | `: PipelinePLN` | `: Intencao` | RF02 |
+| 7 | `intencoesDisponiveis` | Retorno | `: Intencao` | `: PipelinePLN` | RF02 |
+| 8 | `informarForaDoCatalogo(intencoesDisponiveis)` | Síncrona | `: PipelinePLN` | `: InterfaceDeChat` | RF02 |
+| 9 | `explicacaoDoLimite, opcoesDisponiveis` | Retorno | `: InterfaceDeChat` | Usuário | RF02, RNF08 |
+| 10 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF02 |
+| 11 | `verificarDelimitacao(intencao)` | Síncrona | `: Agente` | `: Agente` | RF02 |
+| 12 | `informarRestricaoDeEscopo(motivo, alternativa)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF02 |
+| 13 | `restricaoDeEscopo, alternativa` | Retorno | `: InterfaceDeChat` | Usuário | RF02, RNF08 |
+
+**Fragmentos de interação:**
+
+| Fragmento | Condição de guarda | Comportamento | Requisito |
+|---|---|---|---|
+| `alt` | `[foraDoCatalogo = verdadeiro (INT-10)]` | Passos 5 a 9: a solicitação é registrada, o catálogo é consultado e o usuário recebe a explicação do limite junto com as interações disponíveis | RF02 |
+| `alt` | `[intenção catalogada, porém exige ação vedada ao MVP]` | Passos 10 a 13: o `: Agente` verifica a delimitação, interrompe a execução e devolve ao usuário o motivo da restrição e a alternativa disponível | RF02 |
+
+As duas recusas ocorrem em pontos diferentes da arquitetura, e essa é a principal informação que o diagrama transmite. A primeira é resolvida pelo `: Intencao`, que decide apenas com o texto, porque a pergunta é se aquilo corresponde a alguma intenção catalogada. A segunda só pode ser resolvida pelo `: Agente`, no passo 11, porque depende do efeito que a execução produziria, e não da forma como a solicitação foi escrita. Uma mesma frase pode ser catalogada e ainda assim inadmissível, e a distinção não está disponível no momento da classificação.
+
+Nenhum dos dois ramos emite mensagem à `: FonteDeDados`. A ausência é deliberada e expressa graficamente que uma solicitação recusada não produz efeito algum sobre os dados, do mesmo modo como o cenário 2 usou essa ausência para representar que o agente não altera o documento de origem. É a tradução, em notação de sequência, da delimitação central da seção 3.1.
+
+A recusa nunca é silenciosa. Os passos 9 e 13 sempre acompanham a negativa de uma orientação, seja a lista de interações disponíveis, seja a alternativa admitida pelo escopo. Um agente que apenas informa não ser capaz de atender transfere ao usuário o encargo de descobrir o que pode ser pedido, o que contraria o critério de compreensibilidade do RNF08 e, na prática, leva ao abandono da ferramenta.
+
+O registro do passo 5 tem uma função que ultrapassa a auditoria. O conjunto das solicitações classificadas como `fora_do_catalogo` é o insumo mais direto para decidir quais intenções incorporar ao catálogo nas próximas sprints, e sustenta a oportunidade OP2, de expansão do agente para novas funcionalidades de gestão de portfólio, registrada na seção 1.9.
+
+Cabe observar que a existência da intenção INT-10 no catálogo faz com que a situação de "fora do catálogo" seja um resultado previsto da classificação, e não uma exceção não tratada. O agente não falha ao receber um pedido que não sabe atender: ele o classifica como tal e responde de acordo.
+
+#### Caso crítico 2: fonte indisponível ou sem evidência suficiente
+
+O caso representa a situação em que o agente compreende a solicitação e não consegue fundamentá-la. Dois problemas distintos levam a esse resultado e o diagrama os mantém separados: a fonte pode estar inacessível, por falha de comunicação ou tempo limite excedido, ou pode estar acessível e não conter evidência com pontuação suficiente para sustentar uma resposta. O primeiro é transitório e admite nova tentativa; o segundo não se resolve repetindo a consulta.
+
+<div align="center">
+  <sub>FIGURA 2.6: diagrama de sequência do caso crítico 2 (fonte indisponível ou sem evidência suficiente)</sub><br>
+  <img src="../assets/sequencia-critico-2.svg" width="100%" alt="Diagrama de sequência do caso crítico de fonte indisponível ou ausência de evidência, com tentativas de acesso e recusa de resposta sem fundamento"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+**Fluxo do caso crítico:**
+
+| # | Mensagem | Tipo | Origem | Destino | Requisito |
+|---|---|---|---|---|---|
+| 1 | `enviarSolicitacao(texto)` | Síncrona | Usuário | `: InterfaceDeChat` | RF01 |
+| 2 | `processarSolicitacao(texto, idUsuario)` | Síncrona | `: InterfaceDeChat` | `: PipelinePLN` | RF02 |
+| 3 | `executarIntencao(intencao, entidades, idUsuario)` | Assíncrona | `: PipelinePLN` | `: Agente` | RF02 |
+| 4 | `buscarEvidencias(consulta, idUsuario)` | Síncrona | `: Agente` | `: FonteDeDados` | RF02, RNF02 |
+| 5 | `erroDeAcesso, codigo` | Retorno | `: FonteDeDados` | `: Agente` | RF02 |
+| 6 | `aguardarIntervalo(backoff)` | Síncrona | `: Agente` | `: Agente` | RNF07 |
+| 7 | `evidencias, caminho, score` | Retorno | `: FonteDeDados` | `: Agente` | RF02, RF03 |
+| 8 | `avaliarSuficiencia(evidencias, limiarScore)` | Síncrona | `: Agente` | `: Agente` | RF03 |
+| 9 | `registrarIndisponibilidade(fonte, codigo)` | Síncrona | `: Agente` | `: Agente` | RNF09 |
+| 10 | `informarIndisponibilidade(fonte, horario)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
+| 11 | `avisoDeIndisponibilidade` | Retorno | `: InterfaceDeChat` | Usuário | RF03, RNF08 |
+| 12 | `informarAusenciaDeEvidencia(consulta)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
+| 13 | `avisoDeAusenciaDeFonte, sugestaoDeReformulacao` | Retorno | `: InterfaceDeChat` | Usuário | RF03, RNF08 |
+| 14 | `exibirResposta(resposta, referencia, data)` | Síncrona | `: Agente` | `: InterfaceDeChat` | RF03 |
+| 15 | `resposta, referencia, data` | Retorno | `: InterfaceDeChat` | Usuário | RF03 |
+
+**Fragmentos de interação:**
+
+| Fragmento | Condição de guarda | Comportamento | Requisito |
+|---|---|---|---|
+| `loop` | `[tentativa <= 2 e fonte indisponível]` | Passos 4 a 7: a consulta é repetida até o limite de duas tentativas enquanto a fonte não responder | RNF07 |
+| `alt` de acesso | `[tempo limite excedido ou falha de acesso]` | Passos 5 e 6: o erro é devolvido ao `: Agente`, que aguarda o intervalo de espera antes da tentativa seguinte | RNF07 |
+| `alt` de acesso | `[consulta respondida]` | Passo 7: a fonte devolve as evidências, o caminho de origem e a pontuação de cada uma | RF02, RF03 |
+| `alt` de resultado | `[fonte indisponível após as tentativas]` | Passos 9 a 11: a indisponibilidade é registrada e o usuário é avisado de que a consulta não pôde ser realizada, com o horário da tentativa | RF03 |
+| `alt` de resultado | `[nenhuma evidência acima do limiarScore]` | Passos 12 e 13: o usuário é avisado de que não há fonte que sustente a resposta e recebe uma sugestão de reformulação | RF03 |
+| `alt` de resultado | `[evidências suficientes]` | Passos 14 e 15: o fluxo principal do cenário 1 se confirma e a resposta é devolvida com a referência e a data | RF03 |
+
+O passo 8 é o que sustenta o caso crítico. Ao avaliar as evidências contra um limiar antes de compor a resposta, o `: Agente` transforma "não sei" em um resultado previsto do fluxo, e não em uma falha. Sem essa avaliação, o componente responderia com o que quer que tenha retornado da consulta, ainda que irrelevante, que é precisamente o comportamento descrito pelo risco AM8, de alucinação do modelo de linguagem. O diagrama torna a garantia verificável: não existe caminho, a partir dos dois primeiros ramos do `alt` de resultado, que alcance a mensagem `exibirResposta` do passo 14.
+
+Os dois avisos ao usuário são distintos porque exigem condutas distintas. O aviso do passo 11 informa que a consulta não pôde ser realizada e é acompanhado do horário, para que o usuário saiba que vale tentar de novo mais tarde. O aviso do passo 13 informa que a consulta foi realizada e nada foi encontrado, situação em que repetir o pedido nas mesmas palavras não muda o resultado, e por isso é acompanhado de uma sugestão de reformulação. Reunir as duas situações sob uma mensagem única faria o usuário insistir quando deveria reformular, ou desistir quando deveria aguardar.
+
+O número de tentativas é limitado a duas, e não é aberto, por causa do RNF01. Cada nova tentativa consome o orçamento de tempo da resposta, e um ciclo de repetições prolongado transformaria uma falha de fonte em uma espera indefinida, que é uma experiência pior do que a informação de indisponibilidade. O intervalo de espera do passo 6 existe para não sobrecarregar uma fonte que já está em dificuldade.
+
+A inclusão do terceiro ramo, com o fluxo bem-sucedido, é intencional, ainda que ele não seja um fluxo de exceção. Sua presença mostra que os dois ramos anteriores são saídas de uma mesma decisão, tomada no passo 8, e não um fluxo paralelo ao do cenário 1. Os passos 14 e 15 reproduzem exatamente os passos finais daquele cenário.
+
+#### Parâmetros fixados pelos diagramas
+
+ Os dois diagramas introduzem parâmetros de decisão cujos valores determinam o comportamento do agente nas situações de exceção. Os valores registrados a seguir são pontos de partida do projeto e serão calibrados com dados reais durante a Sprint 3, sem que a estrutura das interações representadas seja alterada.
+
+| Parâmetro | Valor de partida | Onde é aplicado | Base de calibração |
+|---|---|---|---|
+| `limiarScore` | A definir a partir do conjunto de consultas de referência | Caso crítico 2, passo 8 | Exigência de indicação de fonte do RF03 e de explicabilidade do RNF11 |
+| Número de tentativas de acesso à fonte | 2 | Caso crítico 2, `loop` | Orçamento de tempo de resposta do RNF01 |
+| `backoff` | A definir com base no tempo de resposta observado da fonte | Caso crítico 2, passo 6 | Disponibilidade exigida pelo RNF07 |
+
+#### Rastreabilidade dos casos críticos
+
+| Caso crítico | Completa o cenário | RFs | RNFs | Riscos | Seções relacionadas |
+|---|---|---|---|---|---|
+| Caso crítico 1 | Cenário 2 (seção 2.2.2) | RF02 | RNF08, RNF09 | AM2 | 3.1 (catálogo de intenções e delimitação central) |
+| Caso crítico 2 | Cenário 1 (seção 2.2.2) | RF02, RF03 | RNF01, RNF02, RNF07, RNF08, RNF09, RNF11 | AM8 | 3.3 (algoritmo de NLP), 3.6 (modelagem dos dados) |
+
+### 2.2.4. Rastreabilidade entre requisitos, cenários e classes
 
  A rastreabilidade a seguir demonstra que cada requisito funcional está representado em ao menos um cenário e que cada cenário opera sobre classes efetivamente declaradas na modelagem estática. A verificação percorre os três eixos do artefato, ou seja, as histórias de usuário da seção 2.2, os diagramas de sequência e o diagrama de classes.
 
@@ -1361,7 +1492,7 @@ Os valores-alvo ainda não acordados estão identificados como **a validar com o
 | **RNF06 — Qualidade da transcrição de áudio**              | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural     | Acurácia em reconhecimento de fala | O componente de conversão de áudio em texto deve alcançar uma taxa mínima de 85% de palavras reconhecidas corretamente em um conjunto de áudios representativo do contexto do projeto.                                                                                                     | Testar com áudios do vocabulário de projetos e medir a taxa de erro de palavras (WER) contra transcrições de referência.                                        |
 | **RNF07 — Disponibilidade da solução**                     | Como usuário, quero que o agente esteja disponível durante o período de trabalho para realizar consultas sempre que necessário.                                   | Continuidade operacional e eficiência                     | Confiabilidade e disponibilidade   | A solução deve apresentar disponibilidade mínima de 99% durante o horário de operação definido pelo parceiro, desconsiderando manutenções previamente comunicadas.                                                                                                                          | Monitorar uptime da aplicação e infraestrutura durante período de operação.                                                                                     |
 | **RNF08 — Usabilidade das respostas**                      | Como usuário, quero receber respostas claras e organizadas para compreender rapidamente a situação dos projetos, independentemente do meu conhecimento técnico.   | Transparência e apoio à tomada de decisão                 | Usabilidade e compreensibilidade   | Em testes com representantes das personas, pelo menos 80% dos participantes devem compreender a resposta e identificar a informação solicitada sem auxílio externo.                                                                                                                         | Conduzir testes de usabilidade com representantes das personas e validar compreensão.                                                                           |
-| **RNF09 — Auditabilidade das interações**  | Como responsável pela gestão e governança da solução, quero consultar registros das interações realizadas pelo agente para acompanhar seu funcionamento, investigar falhas e verificar a origem das respostas apresentadas. | Rastreabilidade e transparência | Auditabilidade | O sistema deve registrar eventos relevantes das interações realizadas com o agente, permitindo rastrear consultas, respostas, fontes utilizadas, solicitações de esclarecimento, notificações e falhas ocorridas durante o processamento. Os registros mínimos são: identificador único do evento, data e horário, tipo de interação, canal utilizado, requisito ou operação executada, resultado da operação, fonte consultada (quando aplicável), código ou categoria do erro (quando aplicável), identificador técnico do usuário (respeitando as regras de privacidade e acesso) e tempo de processamento. **PENDENTE DE VALIDAÇÃO DA EQUIPE:** definir o período de retenção dos registros de auditoria e os perfis autorizados a consultá-los. | (1) Dado que uma consulta seja processada, quando o processamento for finalizado, então o sistema deve registrar a data, o canal, a operação e as fontes utilizadas. (2) Dado que ocorra uma falha, quando o erro for tratado, então o sistema deve registrar a categoria do erro sem armazenar senhas, tokens ou dados sensíveis. (3) Dado que um usuário sem permissão tente acessar os registros, quando a solicitação for realizada, então o sistema deve negar o acesso. Forma de verificação: inspeção dos registros gerados, testes de acesso autorizado e não autorizado, verificação da ausência de dados sensíveis. |
+| **RNF09 — Auditabilidade das interações**  | Como responsável pela gestão e governança da solução, quero consultar registros das interações realizadas pelo agente para acompanhar seu funcionamento, investigar falhas e verificar a origem das respostas apresentadas. | Rastreabilidade e transparência | Auditabilidade | O sistema deve registrar eventos relevantes das interações realizadas com o agente, permitindo rastrear consultas, respostas, fontes utilizadas, solicitações de esclarecimento, notificações e falhas ocorridas durante o processamento. Os registros mínimos são: identificador único do evento, data e horário, tipo de interação, canal utilizado, requisito ou operação executada, resultado da operação, fonte consultada (quando aplicável), código ou categoria do erro (quando aplicável), identificador técnico do usuário (respeitando as regras de privacidade e acesso) e tempo de processamento. **Validação necessária pela equipe:** definir o período de retenção dos registros de auditoria e os perfis autorizados a consultá-los. | (1) Dado que uma consulta seja processada, quando o processamento for finalizado, então o sistema deve registrar a data, o canal, a operação e as fontes utilizadas. (2) Dado que ocorra uma falha, quando o erro for tratado, então o sistema deve registrar a categoria do erro sem armazenar senhas, tokens ou dados sensíveis. (3) Dado que um usuário sem permissão tente acessar os registros, quando a solicitação for realizada, então o sistema deve negar o acesso. Forma de verificação: inspeção dos registros gerados, testes de acesso autorizado e não autorizado, verificação da ausência de dados sensíveis. |
 | **RNF10 — Escalabilidade do agente**                       | Como administrador da solução, quero que o agente seja capaz de processar aumentos de volume de consultas e dados sem degradação significativa de desempenho.     | Continuidade operacional e sustentabilidade técnica       | Escalabilidade e performance       | O agente deve suportar aumento de até 10x no volume de consultas simultâneas mantendo a latência em até 20 segundos para 95% das requisições; o pipeline deve processar datasets sinteticamente maiores sem aumento proporcional de memória.                                                | Realizar testes de carga progressivos, aumentando gradualmente o volume de consultas e medir latência, throughput e uso de recursos.                            |
 | **RNF11 — Explicabilidade das sugestões de preenchimento** | Como responsável por documentos, quero compreender as razões pelas quais o agente sugeriu determinados valores ou conteúdos.                                      | Transparência e confiabilidade dos dados sugeridos        | Explicabilidade e rastreabilidade  | Cada sugestão de preenchimento deve indicar explicitamente a fonte dos dados utilizados e o raciocínio por trás da sugestão; pelo menos 85% das sugestões devem ser acompanhadas de referências válidas e justificativa compreensível.                                                      | Verificar que todas as sugestões apresentadas incluem fontes identificáveis e justificativas claras; validar compreensão junto aos usuários.                    |
 
@@ -1445,15 +1576,15 @@ O MVP será desenvolvido como uma aplicação independente da infraestrutura atu
 
 | Categoria | Escolha documentada | Alternativas registradas | Justificativa e relação com a arquitetura |
 |---|---|---|---|
-| Linguagem do backend e PLN | Python | [PENDENTE — registrar as alternativas comparadas pela equipe.] | Possui amplo ecossistema para PLN, inteligência artificial, APIs e processamento de dados. |
-| Interface web | TypeScript, React e Next.js | [PENDENTE — registrar as alternativas comparadas pela equipe.] | Oferecem tipagem, componentização e estrutura para a aplicação cliente representada pela Chat UI. |
-| API | FastAPI e APIs REST | [PENDENTE — registrar as alternativas comparadas pela equipe.] | Expõem o núcleo por contratos HTTP padronizados e mantêm as aplicações clientes desacopladas. |
-| Persistência estruturada | PostgreSQL e SQL | [PENDENTE — registrar as alternativas comparadas pela equipe.] | Armazenam dados sintéticos do portfólio e registros de auditoria com consultas e controle transacional. |
+| Linguagem do backend e PLN | Python | Alternativas comparadas ainda devem ser registradas pela equipe | Possui amplo ecossistema para PLN, inteligência artificial, APIs e processamento de dados. |
+| Interface web | TypeScript, React e Next.js | Alternativas comparadas ainda devem ser registradas pela equipe | Oferecem tipagem, componentização e estrutura para a aplicação cliente representada pela Chat UI. |
+| API | FastAPI e APIs REST | Alternativas comparadas ainda devem ser registradas pela equipe | Expõem o núcleo por contratos HTTP padronizados e mantêm as aplicações clientes desacopladas. |
+| Persistência estruturada | PostgreSQL e SQL | Alternativas comparadas ainda devem ser registradas pela equipe | Armazenam dados sintéticos do portfólio e registros de auditoria com consultas e controle transacional. |
 | Documentos | Repositório de arquivos com metadados | Armazenamento corporativo Microsoft, previsto apenas para evolução futura | Mantém conteúdo e referências recuperáveis sem integrar o MVP às fontes reais do parceiro. |
 | PLN e recuperação | Pipeline em Python, recuperação de informação e Retrieval-Augmented Generation (RAG) | Copilot Studio, considerado para integração futura | Permitem classificar intenções e recuperar contexto mantendo o núcleo independente do ambiente corporativo. |
-| Voz | Serviço de conversão de áudio em texto e de texto em áudio | [PENDENTE — registrar os serviços avaliados e a escolha aprovada.] | Atende ao RF01 e ao RNF06 sem criar um pipeline de intenção separado para áudio. |
-| Agendamento e notificações | Agendador de tarefas e serviço de notificações | [PENDENTE — registrar as alternativas comparadas pela equipe.] | Sustentam a verificação periódica e a comunicação proativa previstas no RF05. |
-| Empacotamento | Docker | [PENDENTE — registrar as alternativas comparadas pela equipe.] | Padroniza o ambiente e reduz diferenças entre desenvolvimento e implantação. |
+| Voz | Serviço de conversão de áudio em texto e de texto em áudio | Serviços avaliados e escolha aprovada ainda devem ser registrados pela equipe | Atende ao RF01 e ao RNF06 sem criar um pipeline de intenção separado para áudio. |
+| Agendamento e notificações | Agendador de tarefas e serviço de notificações | Alternativas comparadas ainda devem ser registradas pela equipe | Sustentam a verificação periódica e a comunicação proativa previstas no RF05. |
+| Empacotamento | Docker | Alternativas comparadas ainda devem ser registradas pela equipe | Padroniza o ambiente e reduz diferenças entre desenvolvimento e implantação. |
 | Ecossistema corporativo futuro | Microsoft Copilot Studio e Power Platform | Aplicação independente adotada no MVP | Preserva aderência ao ambiente homologado sem exigir integração real nesta etapa. |
 
 As tecnologias descritas a seguir compõem a base prevista para implementação da solução.
@@ -1744,7 +1875,324 @@ Uma nova classificação de intenção só deve ser executada quando o sistema d
 
 ### 3.3 Algoritmo de NLP e Implementação
 
-<!-- Exemplo do que incluir: algoritmo escolhido, finalidade, funcionamento, bibliotecas utilizadas e exemplo de implementação. -->
+Esta seção documenta o pipeline de Processamento de Linguagem Natural que classifica a intenção de cada solicitação. Ele é o passo comum a todos os requisitos iniciados por linguagem natural, o `classificarIntencao` que aparece nos cenários 1 e 2 da seção 3.8, e é sobre ele que incide o RNF03, que exige precisão mínima de 85% na identificação de intenções.
+
+O código está em `src/pln/`.
+
+#### 3.3.1 Finalidade e escopo
+
+O pipeline recebe **texto**, digitado pelo usuário ou transcrito pela API de Speech-to-Text descrita em 3.2, e devolve **uma das dez intenções do catálogo** definido em 3.1, acompanhada de um grau de confiança.
+
+Ele não interpreta a intenção nem executa a ação correspondente. Essa responsabilidade é do agente, conforme a separação registrada no diagrama de componentes: o pipeline transforma texto e classifica, e o que fazer com a intenção identificada é decisão de quem o consome.
+
+#### 3.3.2 Algoritmo escolhido: Naive Bayes multinomial
+
+**Decisão:** utilizar `MultinomialNB` sobre representação esparsa de termos, tanto na medição quanto no produto.
+
+O critério determinante foi **velocidade**, e ele não é conveniência de desenvolvimento: é o que viabiliza o método de escolha descrito em 3.3.3. O pipeline só pode ser configurado por medição exaustiva se cada medição for barata, porque são 11.644 delas. Medindo o custo de uma validação cruzada de 5 dobras sobre a vetorização mais cara do espaço (`bow n=1-2`, 2.540 colunas):
+
+| Classificador | Custo por validação cruzada | Varredura exaustiva completa |
+| --- | ---: | ---: |
+| **`MultinomialNB`** | **0,029 s** | **~4 min** |
+| `RidgeClassifier` | 0,185 s | ~28 min |
+| `LogisticRegression` | 12,472 s | ~616 min |
+
+A regressão logística é 430 vezes mais lenta nessa vetorização porque o solver `lbfgs` sofre com contagem bruta não normalizada. Com ela, a varredura passaria de quatro minutos para mais de dez horas, e o método deixaria de ser praticável.
+
+Os demais critérios acompanham a escolha:
+
+| Critério | Como o `MultinomialNB` atende |
+| --- | --- |
+| Volume de dados disponível | Estima uma contagem por termo e classe, sem otimização iterativa que exija muitos exemplos para convergir. O dataset atual tem 400 frases, 40 por intenção |
+| Determinismo | Sem sorteio interno nem `random_state`. Duas execuções produzem exatamente o mesmo modelo, o que torna a avaliação reprodutível |
+| RNF11, explicabilidade das sugestões | Expõe peso por termo e por classe, permitindo listar as palavras que sustentaram cada decisão |
+| RNF04 e RNF09, auditabilidade | A intenção identificada e as palavras que a determinaram podem ser registradas no log de cada interação |
+| RNF01 e RNF10, desempenho e escalabilidade | Classificação em microssegundos, e a matriz esparsa não cresce em memória proporcionalmente ao corpus |
+
+**Decisão:** o classificador do produto é o mesmo que serve de instrumento de medida no experimento.
+
+Isso não é redundância, é uma condição de validade. O pré-processamento é escolhido medindo com um classificador fixo; se o produto usasse outro, a escolha do texto teria sido feita para um modelo que não é o que roda. Chegamos a avaliar `BernoulliNB` como modelo do produto, e a medição mostrou o custo dessa separação: o melhor pré-processamento sob Bernoulli estava na posição 43 do ranking construído sob multinomial, fora da janela de candidatos que o ajuste fino recebe. Fixar o mesmo classificador nos dois lugares elimina o problema por construção.
+
+**Limitação declarada:** a confiança devolvida pelo modelo ordena bem e calibra mal. Ela serve para comparar duas frases entre si, mas não deve ser lida como "probabilidade de estar certo". Um limiar de recusa construído sobre ela, necessário para o comportamento previsto no RF02 e na intenção `fora_do_catalogo`, precisa ser calibrado empiricamente sobre dados rotulados, e não escolhido por intuição.
+
+#### 3.3.3 Por que um pipeline que combina opções, e não uma sequência fixa
+
+Antes de classificar uma frase é preciso transformá-la: minusculizar, remover acentos, remover pontuação, descartar stopwords, reduzir palavras à forma base, separar em tokens. A literatura trata várias dessas etapas como boas práticas, mas nenhuma delas tem resposta universal:
+
+- remover stopwords ajuda a classificar **assunto** e atrapalha a classificar **intenção**, porque a lista do português inclui `não`, `nem`, `sem` e `nunca`, palavras que carregam o sinal em "não atualizou o status";
+- reduzir palavras à forma base aproxima termos relacionados e, ao mesmo tempo, junta termos sem relação;
+- a **ordem** entre as etapas altera o resultado, e em alguns casos faz uma etapa parar de funcionar: a lista de stopwords vem acentuada, então filtrá-la depois de remover acentos não remove nada;
+- a **tokenização** não é detalhe de implementação, porque separar por espaço, por expressão regular ou por regra linguística produz vocabulários diferentes a partir do mesmo texto, e é o vocabulário que o classificador enxerga.
+
+**Decisão arquitetural:** o módulo não assume nada. Cada etapa é opcional, a ordem é campo da configuração e a tokenização é uma escolha explícita. Um experimento mede todas as combinações no dataset real e a escolha é feita por número.
+
+Na prática, uma configuração de pré-processamento é um objeto de dados, não uma sequência de chamadas escrita à mão:
+
+```python
+from pln.preprocessamento import (
+    ConfigPreprocessamento, ModoStopwords, ModoMorfologia, Tokenizacao, preprocessar
+)
+
+config = ConfigPreprocessamento(
+    minusculas=True,
+    remover_acentos=True,
+    remover_pontuacao=True,
+    stopwords=ModoStopwords.PRESERVAR_NEGACOES,
+    morfologia=ModoMorfologia.STEMMING,
+    tokenizacao=Tokenizacao.LINGUISTICO,
+    ordem=("minusculas", "remover_pontuacao", "morfologia", "stopwords",
+           "remover_acentos", "remover_numeros"),
+)
+
+preprocessar("O marco da Linha 6 NÃO foi atualizado em 12/03!", config)
+# 'marc linh 6 nao atual 12 03'
+```
+
+O custo dessa decisão é que o espaço de busca fica grande e a avaliação leva minutos. O benefício é que toda escolha do pipeline passa a ser justificável por medição, o que sustenta a exigência de coerência técnica deste artefato: nenhuma etapa está ligada porque "costuma ajudar".
+
+#### 3.3.4 Arquitetura em módulos
+
+Cada arquivo tem uma responsabilidade e não conhece a do outro. `preprocessamento.py` não sabe que existe vetorização, `vetorizacao.py` não sabe que existe stemming, e `experimento.py` e `classificador.py` compõem os dois primeiros sem implementar nenhum deles.
+
+| Módulo | Responsabilidade |
+| --- | --- |
+| `caminhos.py` | Caminhos de entrada e saída, declarados num lugar só |
+| `preprocessamento.py` | Texto para tokens. Seis etapas opcionais, ordem configurável, três tokenizações |
+| `vetorizacao.py` | Tokens para matriz numérica. Dois modos por duas janelas de n-grama |
+| `classificador.py` | O modelo do produto e a interface de previsão |
+| `experimento.py` | Busca do **texto**: pré-processamento × vetorização |
+| `ajuste_fino.py` | Busca dos **parâmetros do modelo**: suavização × priori × vetorização |
+| `dados/` | Datasets rotulados, com as colunas `texto` e `intencao` |
+
+O **pipeline em execução** é uma sequência linear, e é o que roda toda vez que uma solicitação chega:
+
+```mermaid
+flowchart TB
+    T["texto bruto"] --> P
+
+    subgraph P["preprocessamento.py"]
+        direction TB
+        E["6 etapas opcionais,<br/>aplicadas na ordem configurada"]
+        TK["tokenização:<br/>split, regex ou linguístico"]
+        E --> TK
+    end
+
+    P --> V["vetorizacao.py<br/>bag of words ou tf-idf,<br/>janela uni ou uni+bi"]
+    V --> C["MultinomialNB"]
+    C --> S["intenção + confiança"]
+```
+
+As **duas buscas** que configuraram esse pipeline são maquinário de projeto, e não rodam em produção. Elas encadeiam-se por arquivo, e o último passo é manual:
+
+```mermaid
+flowchart TB
+    EXP["experimento.py<br/>varia pré-processamento × vetorização<br/>MultinomialNB(alpha=1.0) fixo"]
+    CSV[("comparativo_preprocessamento.csv")]
+    AJU["ajuste_fino.py<br/>varia suavização × priori × vetorização<br/>texto fixo nos melhores do ranking"]
+    REL[("ajuste_fino.md<br/>bloco de configuração")]
+    PROD["classificador.py<br/>CONFIG_PRE_PADRAO, CONFIG_VET_PADRAO,<br/>ALPHA_PADRAO, FIT_PRIOR_PADRAO"]
+
+    EXP --> CSV --> AJU --> REL
+    REL -. "colar à mão" .-> PROD
+```
+
+**Decisão:** o pipeline do produto é um único objeto do scikit-learn, com o pré-processamento como primeira etapa.
+
+```python
+Pipeline([
+    ("preprocessamento", PreprocessadorDeTexto(config_pre)),
+    ("vetorizador", construir_vetorizador(config_vet)),
+    ("classificador", MultinomialNB(alpha=alpha, fit_prior=fit_prior)),
+])
+```
+
+Isso importa por dois motivos. Primeiro, treinar, avaliar, salvar e prever passam a operar sobre texto bruto, e não existe a possibilidade de alguém treinar com um pré-processamento e prever com outro, que é um erro comum em PLN e não levanta exceção nenhuma: o modelo apenas erra mais. Segundo, dentro da validação cruzada o `Pipeline` garante que o vocabulário e o IDF sejam aprendidos apenas nas dobras de treino, evitando vazamento de dados.
+
+#### 3.3.5 Espaço de busca
+
+| Dimensão | Opções | Combinações |
+| --- | --- | ---: |
+| Etapas booleanas (minúsculas, acentos, pontuação, números) | ligada ou desligada | 2⁴ = 16 |
+| Tratamento de stopwords | manter, remover tudo, preservar negações | 3 |
+| Normalização morfológica | nenhuma, stemming, lematização | 3 |
+| Tokenização | split, regex, linguística | 3 |
+| **Configurações de pré-processamento** | | **432** |
+| Permutações de ordem das etapas ativas | | **19.767** |
+| Vetorizações (2 modos × 2 janelas de n-grama) | | **4** |
+
+As 432 configurações de pré-processamento, combinadas com suas permutações de ordem, produzem 19.767 pares (configuração, ordem). Multiplicados pelas 4 vetorizações, chegam a **79.068 combinações**. Permutações que produzem texto idêntico são o mesmo experimento e são deduplicadas por hash do corpus, o que elimina cerca de 85% do trabalho. A varredura completa resulta em **11.644 execuções distintas** e leva aproximadamente **4 minutos**.
+
+#### 3.3.6 Como o pipeline final foi escolhido
+
+A escolha é feita por duas buscas, e cada uma fixa o que a outra varia:
+
+| Script | Varia | Fixa |
+| --- | --- | --- |
+| `experimento.py` | o **texto**: pré-processamento × vetorização | o modelo: `MultinomialNB(alpha=1.0)` |
+| `ajuste_fino.py` | os **parâmetros do modelo**: suavização × priori × vetorização | o texto: os melhores do experimento |
+
+O `ajuste_fino.py` lê o relatório que o `experimento.py` grava, então a ordem de execução é obrigatória.
+
+##### Decisões metodológicas que sustentam a validade da comparação
+
+**Decisão:** a régua é única e fixa. O `experimento.py` compara formas de preparar texto, então tudo o que vem depois precisa ser idêntico: mesmo algoritmo, mesmos parâmetros, mesma semente.
+
+**Decisão:** o espaço de vetorização contém apenas a família esparsa. Uma vetorização densa por embeddings pré-treinados chegou a ser avaliada e foi removida. O motivo não foi desempenho, e sim que vetores de embedding têm coordenadas negativas, que o `MultinomialNB` não aceita, o que obrigava a trocar de classificador naquela linha do ranking. Com o classificador variando junto com a representação, o efeito de um deixa de ser separável do do outro e a comparação fica **confundida**. Medindo a decomposição no dataset atual:
+
+| Comparação | F1 | Leitura |
+| --- | ---: | --- |
+| tfidf + MultinomialNB | 0,6354 | ponto de partida |
+| tfidf + GaussianNB | 0,4855 | **−0,1499**, só a troca de classificador |
+| embedding + GaussianNB | 0,4239 | **−0,0615**, só a troca de representação |
+| régua única, tfidf contra embedding | 0,6687 contra 0,6387 | **−0,0300**, o efeito real |
+
+O relatório reportava −0,2114 para "embedding é pior". O efeito real da representação é −0,0300, ou seja, **71% do que era atribuído à representação vinha do classificador**. Restringir o espaço à família esparsa resolve o problema pela raiz, porque uma régua atende tudo que está dentro e toda linha do relatório passa a ser interpretável sem ressalva. O custo declarado é que o experimento deixou de responder "vale a pena usar embeddings?", pergunta que passa a exigir um estudo próprio.
+
+**Decisão:** validação cruzada estratificada de 5 dobras, com semente fixa (42). Estratificada para que cada dobra contenha todas as intenções na mesma proporção, e com semente fixa para que duas configurações sejam comparáveis, e não diferentes por sorteio.
+
+**Decisão:** a métrica é F1-macro, e não acurácia. Acurácia engana com classes desbalanceadas, enquanto o macro tira média por classe, de modo que a intenção rara pesa igual à comum.
+
+**Decisão:** as comparações entre opções são pareadas. Média simples seria enviesada, porque `manter` e `nenhuma` deixam a configuração com uma etapa a menos e, portanto, com menos permutações de ordem. O pareamento compara apenas grupos idênticos em todas as demais escolhas.
+
+**Decisão:** entre configurações empatadas, vence a mais simples. "Empatadas" são as que ficam dentro de um desvio padrão da melhor, ou seja, dentro da incerteza da própria medição. O desempate é, nesta ordem: menos etapas, janela de n-grama menor, ordem padrão, maior F1. A ordem padrão vem antes do F1 de propósito, porque entre permutações do mesmo conjunto de etapas a diferença de F1 é menor que o desvio entre dobras, e escolher por ela seria escolher por ruído.
+
+##### Resultados da busca do texto
+
+Efeito de cada escolha, em comparação pareada sobre 576 configurações idênticas nas demais escolhas:
+
+| Escolha | F1 médio | vs referência |
+| --- | ---: | ---: |
+| stopwords: manter | 0,6332 | referência |
+| stopwords: remover tudo | 0,5942 | −0,0390 |
+| stopwords: preservar negações | 0,5943 | −0,0389 |
+| morfologia: nenhuma | 0,5962 | referência |
+| **morfologia: stemming** | **0,6247** | **+0,0285** |
+| morfologia: lematização | 0,6009 | +0,0047 |
+| tokenização: split | 0,5951 | referência |
+| tokenização: regex | 0,6133 | +0,0182 |
+| tokenização: linguística | 0,6134 | +0,0184 |
+
+O resultado sobre stopwords confirma a hipótese de domínio que motivou o terceiro modo: remover stopwords atrapalha, e as duas formas de removê-las são equivalentes entre si.
+
+Sobre a ordem das etapas, ela muda o texto em **1.320 de 1.728 grupos** (76%), com amplitude média de 0,0148 de F1. Usar sempre a ordem padrão custa, em média, 0,0048, uma ordem de grandeza abaixo do desvio entre dobras, o que justifica a regra de desempate adotada.
+
+##### Resultados da busca dos parâmetros
+
+Sobre os vinte melhores pré-processamentos, 960 candidatos avaliados:
+
+| Suavização (`alpha`) | F1 médio | vs melhor |
+| --- | ---: | ---: |
+| **1.0** | **0,6537** | referência |
+| 0.5 | 0,6454 | −0,0083 |
+| 2.0 | 0,6446 | −0,0091 |
+| 0.1 | 0,6190 | −0,0347 |
+
+| Vetorização | F1 médio | vs melhor |
+| --- | ---: | ---: |
+| **bow n=1** | **0,6401** | referência |
+| tfidf n=1 | 0,6276 | −0,0125 |
+| bow n=1-2 | 0,6258 | −0,0143 |
+| tfidf n=1-2 | 0,6148 | −0,0252 |
+
+As probabilidades a priori não fazem diferença nenhuma (0,6271 nos dois valores), o que é coerente com as dez intenções terem exatamente o mesmo número de exemplos. O `alpha` fica no padrão da biblioteca, 1.0, que também foi o melhor medido.
+
+##### Configuração adotada
+
+```python
+CONFIG_PRE_PADRAO = ConfigPreprocessamento(
+    remover_numeros=True,
+    morfologia=ModoMorfologia.STEMMING,
+    tokenizacao=Tokenizacao.REGEX,
+)
+CONFIG_VET_PADRAO = ConfigVetorizacao(ModoVetorizacao.BOW, n_max=1)
+ALPHA_PADRAO      = 1.0
+FIT_PRIOR_PADRAO  = True
+```
+
+F1-macro de **0,6736** em validação cruzada de 5 dobras — avaliação da configuração vencedora individualmente, não a média da busca de parâmetros (0,6537 na tabela acima, que é a média sobre todos os candidatos com alpha=1,0 nas quatro vetorizações). Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
+
+**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que 0,6736 está **17,6 pontos percentuais abaixo dos 85% exigidos pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a seção 3.8, e as duas frentes são ampliar o dataset e calibrar um limiar de recusa sobre as nove intenções conhecidas.
+
+#### 3.3.7 Bibliotecas utilizadas
+
+| Biblioteca | Versão | Papel no pipeline |
+| --- | --- | --- |
+| `scikit-learn` | 1.9.0 | Vetorizadores, `MultinomialNB`, `Pipeline`, validação cruzada e métricas |
+| `nltk` | 3.10.3 | Lista de stopwords do português, stemmer RSLP e tokenizador por expressão regular |
+| `spacy` | 3.8.15 | Tokenizador linguístico e lematizador de português (`pt_core_news_sm`) |
+| `numpy` | 2.5.2 | Operações sobre a matriz de pesos na explicação por classe |
+| `joblib` | 1.5.3 | Serialização do modelo treinado e paralelização da varredura |
+
+O tokenizador linguístico usa `spacy.blank("pt")`, que carrega apenas as regras do idioma e não exige o download de modelo. O `pt_core_news_sm` é necessário somente para a lematização.
+
+#### 3.3.8 Execução
+
+Instalação, uma vez:
+
+```bash
+pip install -e .
+python -m nltk.downloader stopwords rslp
+python -m spacy download pt_core_news_sm
+```
+
+Treinar, avaliar e salvar o modelo:
+
+```bash
+python -m pln.classificador
+```
+
+Classificar uma frase com o modelo salvo:
+
+```bash
+python -m pln.classificador --prever "Me ajuda a preencher o TAP da Linha 6?"
+# 'Me ajuda a preencher o TAP da Linha 6?'
+#   -> orientar_tap  (confiança 83.5%)
+```
+
+Reexecutar as duas buscas, nesta ordem:
+
+```bash
+python -m pln.experimento     # varredura exaustiva, ~4 min
+python -m pln.ajuste_fino     # ~40 s sobre os 5 melhores pré-processamentos
+```
+
+Ambas gravam relatórios em `resultados/`, e o segundo emite o bloco de configuração pronto para ser aplicado em `classificador.py`.
+
+Uso programático, que é como o agente consome o pipeline:
+
+```python
+from pln.caminhos import MODELO_PADRAO
+from pln.classificador import carregar_modelo, prever_intencao
+
+modelo = carregar_modelo(MODELO_PADRAO)
+intencao, confianca = prever_intencao(modelo, "Tem algum prazo vencido no lote 3?")
+# ('gerar_alertas_pendencias', 0.947)
+```
+
+Para auditoria e para o atendimento do RNF11, o modelo treinado expõe as palavras que mais distinguem cada intenção. Elas saem reduzidas ao radical porque a configuração adotada aplica stemming:
+
+```python
+from pln.classificador import listar_palavras_de_maior_peso_por_intencao
+
+listar_palavras_de_maior_peso_por_intencao(modelo, quantas=4)
+# {'orientar_tap':             [('tap', 2.71), ('term', 1.76), ('abert', 1.59), ('premiss', 1.50)],
+#  'gerar_alertas_pendencias': [('venc', 1.86), ('sem', 1.79), ('avis', 1.79), ('tem', 1.70)],
+#  ...}
+```
+
+#### 3.3.9 Testes
+
+O módulo tem 100 testes automatizados. Três deles existem especificamente para impedir defeitos que não levantam exceção e fariam a medição mentir sem falhar:
+
+| Teste | O que impede |
+| --- | --- |
+| `TesteNaoRetokeniza` | Que os padrões do scikit-learn retokenizem o texto, anulando em silêncio as etapas `minusculas` e `remover_pontuacao` e a escolha de tokenizador |
+| `TesteReguaUnica` | Que o classificador volte a mudar conforme a vetorização, reintroduzindo o confundimento descrito em 3.3.6 |
+| `TesteComparacaoPareada` | Que algum eixo deixe de render tabela, fazendo a seção correspondente sumir do relatório |
+
+```bash
+python -m unittest discover tests
+```
 
 ### 3.4 API para Recebimento de Áudios
 
@@ -1964,7 +2412,350 @@ Com essas definições, o contrato da API estabelece como o áudio entra no sist
 
 ### 3.6 Modelagem Conceitual e Lógica dos Dados
 
-<!-- Exemplo do que incluir: entidades, relacionamentos, atributos principais e diagramas dos modelos de dados. -->
+O modelo conceitual de dados apresenta os principais elementos de informação do parceiro e a forma como eles se relacionam no contexto da gestão do portfólio de projetos do Metrô de São Paulo. Nesta etapa, a modelagem se concentra nos conceitos do domínio e nas regras de associação entre eles, sem definir atributos, chaves, tipos de dados ou detalhes de implementação em banco de dados.
+
+<div align="center">
+<sub>Imagem 3.6.1 - Modelo conceitual de dados</sub><br>
+  <img src="../assets/conceitual.svg" width="75%" alt="Modelo entidade-relacionamento conceitual, com as entidades Usuário, Interação, Artefato, Projeto, Campo Artefato, Portfólio e Pendência"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+#### 3.6.1 Entidades do modelo conceitual
+
+| Entidade | Papel no domínio |
+|---|---|
+| **Usuário** | Representa o profissional autorizado a utilizar o agente para consultar informações do portfólio. |
+| **Interação** | Representa uma solicitação realizada pelo usuário, permitindo registrar e rastrear o uso do agente. |
+| **Artefato** | Representa um documento, registro ou outra fonte de informação associada a um projeto e passível de consulta pelo agente. |
+| **Projeto** | Representa um projeto acompanhado pelo PMO e concentra os artefatos e as pendências relacionados à sua execução. |
+| **Campo Artefato** | Representa uma unidade de informação que compõe um artefato, incluindo campos que podem estar preenchidos ou pendentes. |
+| **Portfólio** | Representa o agrupamento organizacional de projetos acompanhado pelo PMO. |
+| **Pendência** | Representa uma necessidade, obrigação ou item de acompanhamento originado no contexto de um projeto. |
+
+#### 3.6.2 Relacionamentos e cardinalidades
+
+| Relacionamento | Regra representada |
+|---|---|
+| **Usuário realiza Interação** | Um usuário pode realizar nenhuma ou várias interações `(0,n)`, enquanto cada interação é realizada por exatamente um usuário `(1,1)`. |
+| **Interação consulta Artefato** | Uma interação pode consultar nenhum ou vários artefatos `(0,n)`, e um artefato pode ser consultado em nenhuma ou várias interações `(0,n)`. Essa associação muitos-para-muitos permite que uma única solicitação combine diferentes fontes e que a mesma fonte sustente respostas distintas. |
+| **Artefato documenta/pertence a Projeto** | Cada artefato está associado a exatamente um projeto `(1,1)`, enquanto um projeto pode não possuir artefatos ou reunir vários deles `(0,n)`. |
+| **Artefato possui Campo Artefato** | Cada artefato possui um ou vários campos `(1,n)`, e cada campo pertence a exatamente um artefato `(1,1)`. Essa decomposição sustenta a identificação de campos ausentes e a geração de sugestões de preenchimento. |
+| **Projeto pertence a Portfólio** | Cada projeto pertence a exatamente um portfólio `(1,1)`, e cada portfólio reúne um ou vários projetos `(1,n)`. |
+| **Projeto origina Pendência** | Um projeto pode não originar pendências ou originar várias `(0,n)`, enquanto cada pendência está vinculada a exatamente um projeto `(1,1)`. |
+
+#### 3.6.3 Leitura do modelo no contexto da equipe
+
+O modelo conecta o uso do agente às informações de negócio consultadas. Quando um usuário realiza uma interação, o agente pode localizar um ou mais artefatos relacionados ao pedido. Cada artefato fornece rastreabilidade até o projeto que documenta e pode ser decomposto em campos, o que viabiliza tanto a consulta de conteúdo quanto a identificação de informações ausentes. O projeto, por sua vez, está inserido em um portfólio e pode originar pendências que serão consultadas ou utilizadas na geração de alertas.
+
+A entidade **Interação** estabelece a ligação entre o usuário e as fontes consultadas, contribuindo para os requisitos de rastreabilidade e auditabilidade. A associação entre **Interação** e **Artefato** permite registrar quais fontes fundamentaram cada resposta, enquanto a relação entre **Projeto** e **Pendência** oferece a base conceitual para o acompanhamento preventivo previsto no produto.
+
+Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico-relacional é apresentada nas subseções seguintes, que detalham os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
+
+#### 3.6.4 Modelo lógico-relacional
+
+O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas. Os atributos de cada tabela vêm da modelagem estática da seção 2.2.1, e os atributos da tabela `interacao` vêm dos elementos de auditoria exigidos pelos RNF04 e RNF09.
+
+Além dos seis relacionamentos do diagrama conceitual, o modelo lógico incorpora três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no recorte conceitual, por serem indispensáveis aos requisitos: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção de perfis de usuário (Diretor, PMO e Líder de Projeto), que sustenta o controle de acesso do RNF02 e a relação de liderança (`lidera`) prevista no RF06. Dessa forma, o modelo lógico dá continuidade simultaneamente ao modelo conceitual desta seção e ao diagrama de classes da Sprint 1.
+
+<div align="center">
+<sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
+  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, artefato, campo_artefato, pendencia, interacao, interacao_artefato, usuario_projeto e notificacao"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+A tabela a seguir registra a correspondência entre cada elemento das modelagens anteriores e a estrutura relacional que o implementa, evidenciando que nenhuma regra de negócio foi perdida na tradução:
+
+| Elemento de origem | Estrutura relacional | Regra de derivação aplicada |
+|---|---|---|
+| Entidade **Usuário** e especializações (2.2.1) | Tabela `usuario` com coluna `perfil` | Especializações sem atributos próprios colapsadas em coluna de domínio restrito por `CHECK` (decisão 1 da seção 3.6.7) |
+| Entidade **Interação** | Tabela `interacao` | Entidade para tabela; atributos definidos pelos RNF04 e RNF09 |
+| **Usuário realiza Interação** `(0,n)`–`(1,1)` | `interacao.usuario_id NOT NULL` | Um-para-muitos vira chave estrangeira no lado "muitos"; mínimo 1 vira `NOT NULL` |
+| **Interação consulta Artefato** `(0,n)`–`(0,n)` | Tabela associativa `interacao_artefato` | Muitos-para-muitos vira tabela associativa com chave primária composta |
+| **Artefato documenta/pertence a Projeto** `(1,1)`–`(0,n)` | `artefato.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
+| **Artefato possui Campo Artefato** `(1,n)`–`(1,1)` | `campo_artefato.artefato_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata e unicidade de `nome` por artefato |
+| **Projeto pertence a Portfólio** `(1,1)`–`(1,n)` | `projeto.portfolio_id NOT NULL` | Um-para-muitos vira chave estrangeira |
+| **Projeto origina Pendência** `(0,n)`–`(1,1)` | `pendencia.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
+| **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
+| **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
+| **Pendência notifica Usuário** (2.2.1) | Tabela `notificacao` | Muitos-para-muitos materializado como registro de envio, com atributo próprio `data_envio` (decisão 3 da seção 3.6.7) |
+
+As cardinalidades mínimas do lado "muitos" — um portfólio reúne ao menos um projeto `(1,n)` e um artefato possui ao menos um campo `(1,n)` — não são expressáveis por restrições declarativas simples no modelo relacional, pois exigiriam verificação no momento da inserção da linha "pai". Essas duas regras permanecem documentadas como restrições de aplicação, a serem garantidas pela camada de serviços descrita na seção 2.4.
+
+#### 3.6.5 Dicionário de dados (modelo físico)
+
+O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. Todas as chaves primárias substitutas usam `INTEGER GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais.
+
+As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente (portfólios, projetos, usuários, artefatos, campos e pendências), e o schema **`auditoria`** reúne os registros de interação, fontes consultadas e notificações, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
+
+**`portfolio`** — agrupamento de projetos de um exercício:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do portfólio |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
+| `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
+
+**`usuario`** — profissional autorizado a utilizar o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do usuário |
+| `nome` | `TEXT` | `NOT NULL` | Nome do profissional |
+| `email` | `TEXT` | `NOT NULL`, `UNIQUE` | Endereço corporativo de envio das notificações |
+| `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Papel do usuário, base do controle de acesso do RNF02 |
+
+**`projeto`** — empreendimento acompanhado pelo PMO:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do projeto |
+| `codigo` | `TEXT` | `NOT NULL`, `UNIQUE` | Código institucional do empreendimento (chave natural) |
+| `nome` | `TEXT` | `NOT NULL` | Denominação do empreendimento |
+| `status` | `TEXT` | `NOT NULL` | Situação corrente do projeto |
+| `data_inicio` | `DATE` | — | Data de início da execução |
+| `data_termino_prevista` | `DATE` | — | Data prevista de conclusão, base da apuração de prazos |
+| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física |
+| `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
+| `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
+
+**`artefato`** — documento que integra a documentação do projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do artefato |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto documentado (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, como ata, relatório ou contrato |
+| `referencia` | `TEXT` | `NOT NULL` | Localizador do documento no repositório, exibido como fonte no RF03 |
+| `data` | `TIMESTAMPTZ` | `NOT NULL` | Data da última atualização, exibida junto à fonte no RF03 |
+| `versao` | `TEXT` | — | Versão vigente do documento |
+
+**`campo_artefato`** — campo individual de um artefato:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do campo |
+| `artefato_id` | `INTEGER` | `FK → artefato`, `NOT NULL`, `ON DELETE CASCADE` | Artefato ao qual o campo pertence (composição) |
+| `nome` | `TEXT` | `NOT NULL`, `UNIQUE (artefato_id, nome)` | Rótulo do campo dentro do artefato |
+| `valor` | `TEXT` | — | Conteúdo registrado; nulo ou vazio quando não preenchido |
+| `obrigatorio` | `BOOLEAN` | `NOT NULL`, `DEFAULT FALSE` | Indica se o preenchimento é exigido |
+| `preenchido` | `BOOLEAN` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Derivada de `valor`, elimina inconsistência entre valor e marcação (decisão 2 da seção 3.6.7) |
+
+**`pendencia`** — item em aberto originado por um projeto:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único da pendência |
+| `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto de origem (composição) |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência, como prazo, documento ou aprovação; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `descricao` | `TEXT` | `NOT NULL` | Detalhamento do item em aberto |
+| `prazo` | `DATE` | — | Data limite para tratamento, base da notificação do RF05 |
+| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'resolvida')` | Estado corrente da pendência |
+
+**`auditoria.interacao`** — registro de auditoria de cada solicitação (RNF04 e RNF09):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Usuário que realizou a interação |
+| `data_hora` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do evento |
+| `canal` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'voz')` | Canal utilizado, conforme o RF01 |
+| `texto_solicitacao` | `TEXT` | `NOT NULL` | Texto da solicitação (original ou transcrito do áudio) |
+| `audio_referencia` | `TEXT` | `CHECK` (preenchida apenas quando `canal = 'voz'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4), vinculando o registro ao arquivo original |
+| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1 | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
+| `resultado` | `TEXT` | `NOT NULL`, `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')` | Desfecho da solicitação |
+| `categoria_erro` | `TEXT` | — | Categoria do erro, quando aplicável (RNF09) |
+| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)` | Tempo de processamento, insumo da verificação do RNF01 |
+| `feedback_usuario` | `TEXT` | — | Avaliação da resposta fornecida pelo usuário, capturada pelo componente Auditoria e Feedback da seção 2.4 |
+
+**`auditoria.interacao_artefato`** — fontes consultadas em cada interação (associativa de `consulta`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `interacao_id` | `INTEGER` | `PK` composta, `FK → interacao` | Interação que consultou a fonte |
+| `artefato_id` | `INTEGER` | `PK` composta, `FK → artefato` | Artefato que fundamentou a resposta (RF03) |
+
+**`usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
+| `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`auditoria.notificacao`** — registro dos envios da notificação proativa (materialização de `notifica`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador único do envio |
+| `pendencia_id` | `INTEGER` | `FK → pendencia`, `NOT NULL`, `ON DELETE CASCADE` | Pendência comunicada |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `UNIQUE (pendencia_id, usuario_id)` | Destinatário; a unicidade composta impede notificar duas vezes a mesma pendência ao mesmo usuário |
+| `data_envio` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do envio, exigido pelo RNF09 |
+
+#### 3.6.6 Definição física em SQL
+
+A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5 — na nuvem, o serviço gerenciado correspondente do provedor escolhido na seção 3.7. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+
+```sql
+CREATE SCHEMA portfolio;
+CREATE SCHEMA auditoria;
+
+CREATE TABLE portfolio.portfolio (
+    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome          TEXT    NOT NULL,
+    ano_exercicio INTEGER NOT NULL,
+    UNIQUE (nome, ano_exercicio)
+);
+
+CREATE TABLE portfolio.usuario (
+    id     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome   TEXT NOT NULL,
+    email  TEXT NOT NULL UNIQUE,
+    perfil TEXT NOT NULL CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto'))
+);
+
+CREATE TABLE portfolio.projeto (
+    id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    codigo                TEXT NOT NULL UNIQUE,
+    nome                  TEXT NOT NULL,
+    status                TEXT NOT NULL,
+    data_inicio           DATE,
+    data_termino_prevista DATE,
+    percentual_avanco     NUMERIC(5,2) NOT NULL DEFAULT 0
+                          CHECK (percentual_avanco BETWEEN 0 AND 100),
+    portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
+    lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
+);
+
+CREATE TABLE portfolio.artefato (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    referencia TEXT NOT NULL,
+    data       TIMESTAMPTZ NOT NULL,
+    versao     TEXT
+);
+
+CREATE TABLE portfolio.campo_artefato (
+    id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    artefato_id INTEGER NOT NULL REFERENCES portfolio.artefato (id) ON DELETE CASCADE,
+    nome        TEXT NOT NULL,
+    valor       TEXT,
+    obrigatorio BOOLEAN NOT NULL DEFAULT FALSE,
+    preenchido  BOOLEAN GENERATED ALWAYS AS
+                (valor IS NOT NULL AND btrim(valor) <> '') STORED,
+    UNIQUE (artefato_id, nome)
+);
+
+CREATE TABLE portfolio.pendencia (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    tipo       TEXT NOT NULL,
+    descricao  TEXT NOT NULL,
+    prazo      DATE,
+    situacao   TEXT NOT NULL DEFAULT 'aberta'
+               CHECK (situacao IN ('aberta', 'em_tratamento', 'resolvida'))
+);
+
+CREATE TABLE portfolio.usuario_projeto (
+    usuario_id INTEGER NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
+    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    PRIMARY KEY (usuario_id, projeto_id)
+);
+
+CREATE TABLE auditoria.interacao (
+    id                     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id             INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_hora              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    canal                  TEXT NOT NULL CHECK (canal IN ('texto', 'voz')),
+    texto_solicitacao      TEXT NOT NULL,
+    audio_referencia       TEXT CHECK (audio_referencia IS NULL OR canal = 'voz'),
+    intencao               TEXT CHECK (intencao IN (
+                               'consultar_documentos_normativos',
+                               'consultar_projeto_sintetico',
+                               'orientar_mapa_beneficios',
+                               'orientar_tap',
+                               'orientar_entregas_cronograma',
+                               'orientar_avanco_mensal',
+                               'orientar_riscos_problemas',
+                               'analisar_completude_coerencia',
+                               'gerar_alertas_pendencias',
+                               'fora_do_catalogo')),
+    resultado              TEXT NOT NULL CHECK (resultado IN
+                               ('sucesso', 'esclarecimento', 'recusada', 'falha')),
+    categoria_erro         TEXT,
+    tempo_processamento_ms INTEGER CHECK (tempo_processamento_ms >= 0),
+    feedback_usuario       TEXT
+);
+
+CREATE TABLE auditoria.interacao_artefato (
+    interacao_id INTEGER NOT NULL REFERENCES auditoria.interacao (id),
+    artefato_id  INTEGER NOT NULL REFERENCES portfolio.artefato (id),
+    PRIMARY KEY (interacao_id, artefato_id)
+);
+
+CREATE TABLE auditoria.notificacao (
+    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    pendencia_id INTEGER NOT NULL REFERENCES portfolio.pendencia (id) ON DELETE CASCADE,
+    usuario_id   INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    data_envio   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (pendencia_id, usuario_id)
+);
+
+-- Imutabilidade dos registros de auditoria (RNF04)
+REVOKE UPDATE, DELETE ON auditoria.interacao, auditoria.interacao_artefato,
+                        auditoria.notificacao FROM PUBLIC;
+
+-- Exceção pontual: a avaliação do usuário chega depois da resposta, portanto
+-- o papel da aplicação recebe permissão de atualização restrita a essa coluna:
+-- GRANT UPDATE (feedback_usuario) ON auditoria.interacao TO <papel_da_aplicacao>;
+
+-- Índices dos acessos frequentes dos cenários da seção 2.2.2
+CREATE INDEX idx_artefato_projeto        ON portfolio.artefato (projeto_id);
+CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_id);
+CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo);
+CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, data_hora);
+```
+
+#### 3.6.7 Decisões de modelagem e restrições de integridade
+
+As decisões estruturais do modelo, com as alternativas consideradas e as razões da escolha, são registradas a seguir.
+
+**Decisão 1 — Perfis de usuário por coluna de domínio, e não por tabelas de subtipo.** A generalização de Usuário da seção 2.2.1 poderia ser mapeada em tabelas de subtipo (`diretor`, `pmo`, `lider_projeto` com chave primária compartilhada). A opção pela coluna `perfil` com `CHECK` decorre da própria justificativa da modelagem estática: as três especializações não declaram atributos próprios, pois o que as distingue é o alcance de acesso, que é relacional. Esse alcance já está expresso no modelo lógico — o líder pela chave `projeto.lider_id` e pelo vínculo de `usuario_projeto`, e o diretor e o PMO pelo alcance consolidado sobre o portfólio, que é regra de autorização da aplicação (RNF02) e não dado armazenado. Tabelas de subtipo vazias adicionariam junções sem acrescentar informação.
+
+**Decisão 2 — `preenchido` como coluna gerada.** Se `preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, preservando o atributo declarado na seção 2.2.1 como consultável e garantindo a confiabilidade da identificação de campos pendentes, que alimenta o RF04 e o RF05.
+
+**Decisão 3 — `notificacao` como registro de envio.** A relação `notifica` poderia ser apenas derivada: os destinatários de uma pendência são os usuários que acompanham o projeto de origem. A materialização em tabela foi escolhida porque o RNF09 exige o registro dos eventos de notificação, e porque a unicidade composta `(pendencia_id, usuario_id)` dá ao Agendador do cenário 3 um critério idempotente, impedindo que a mesma pendência seja comunicada repetidamente ao mesmo usuário a cada verificação periódica.
+
+**Decisão 4 — Intenção como domínio de coluna, e não como tabela.** O catálogo de intenções da seção 3.1 poderia ser normalizado em uma tabela própria. A opção pelo `CHECK` na coluna `interacao.intencao` mantém a coerência com a delimitação do modelo conceitual, que tratou intenção como conceito da camada técnica de PLN, e não como entidade do domínio de portfólio. O custo da escolha é que a evolução do catálogo exige alteração da restrição; o benefício é não introduzir no banco uma entidade sem respaldo nas modelagens anteriores. A restrição deve ser mantida sincronizada com o catálogo da seção 3.1.
+
+**Decisão 5 — Chaves substitutas com chave natural preservada.** Todas as tabelas usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
+
+**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.interacao_artefato` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: a rastreabilidade do RNF04 prevalece sobre a conveniência da exclusão, e o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a exigência de imutabilidade dos registros perante usuários comuns. A única flexibilização é a coluna `feedback_usuario`, atualizável pelo papel da aplicação por meio de permissão em nível de coluna, pois a avaliação do usuário só existe depois de a resposta ter sido registrada.
+
+**Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de auditoria (`interacao`, `interacao_artefato` e `notificacao`) no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
+
+**Alinhamento com o estado da implementação.** Duas colunas de `auditoria.interacao` fecham lacunas registradas em outras frentes da equipe. A coluna `audio_referencia` guarda o identificador do áudio no armazenamento de objetos (o `audio_id` devolvido pela API da seção 3.4): a decisão registrada na seção 2.4 adiou a persistência do pipeline de voz exatamente porque "o PostgreSQL será provisionado e o schema de auditoria definido" em etapa posterior — este modelo define esse schema, e a coluna completa a rastreabilidade que hoje é parcial, ligando cada interação por voz ao arquivo original. A coluna `feedback_usuario` materializa a captura da avaliação do usuário atribuída ao componente Auditoria e Feedback na seção 2.4 e listada entre os registros previstos na seção 2.5.
+
+**Limitação registrada — documentos normativos.** A intenção INT-01 do catálogo da seção 3.1 consulta conceitos e normativos de gestão de portfólio, documentos que não pertencem a nenhum projeto específico. Pelo modelo conceitual e pela seção 2.2.1, todo artefato compõe exatamente um projeto, portanto a base de normativos permanece fora do modelo relacional, no repositório de arquivos independente descrito na seção 2.5. Consequência assumida: a associação `interacao_artefato` registra as fontes de respostas sobre projetos, e a fonte de uma resposta normativa é registrada de forma textual no próprio registro da interação. Se a base de normativos evoluir para dado estruturado, a modelagem de uma entidade própria — ou de um artefato sem vínculo com projeto — deverá ser reavaliada junto com o modelo conceitual, para que as duas representações não divirjam.
+
+**Normalização.** O modelo está na terceira forma normal: todas as tabelas têm chave primária definida, os atributos são atômicos e nenhum atributo não chave depende de outro atributo não chave. A única redundância existente é a coluna `preenchido`, que é derivada — e, por ser gerada pelo próprio banco, não constitui anomalia de atualização.
+
+Por fim, a tabela a seguir consolida a rastreabilidade entre as estruturas do modelo e os requisitos que elas sustentam, no mesmo formato adotado nas seções anteriores:
+
+| Estrutura do modelo | Requisitos sustentados | Papel |
+|---|---|---|
+| `usuario.perfil` | RNF02 | Base da validação de permissões por perfil |
+| `projeto.lider_id` | RF06, RNF02 | Delimita quem pode receber sugestões de alteração de cada projeto |
+| `usuario_projeto` | RF05 | Define os destinatários da notificação proativa |
+| `auditoria.notificacao` | RF05, RNF09 | Registra os envios e garante idempotência da verificação periódica |
+| `auditoria.interacao` | RNF01, RNF03, RNF04, RNF09 | Trilha de auditoria com canal, intenção, resultado e tempo de processamento |
+| `interacao.audio_referencia` | RF01, RNF06, RNF09 | Vincula a interação por voz ao arquivo de áudio original no armazenamento de objetos |
+| `interacao.feedback_usuario` | RNF04 | Registra a avaliação do usuário capturada pelo componente Auditoria e Feedback |
+| `auditoria.interacao_artefato` | RF03, RNF04, RNF11 | Registra as fontes que fundamentaram cada resposta |
+| `artefato.referencia`, `artefato.data` | RF03 | Origem e data exibidas junto a cada informação |
+| `campo_artefato.obrigatorio`, `campo_artefato.preenchido` | RF04, RF05 | Identificação dos campos pendentes de preenchimento |
+| `pendencia.prazo`, `pendencia.situacao` | RF05 | Critérios da verificação periódica do Agendador |
+
+O modelo físico definido nesta seção será populado exclusivamente com os dados sintéticos previstos na seção 1.3 e serve de base tanto para a implementação da camada de acesso a dados quanto para o processo de deploy descrito na seção 3.7.
 
 ### 3.7 Processo de Deploy em Nuvem
 
@@ -2469,22 +3260,141 @@ O desenho da implantação expôs pontos que ainda dependem de decisão da equip
 
 Este deploy foi estruturado como uma prova de conceito técnica sobre um ambiente concedido pela instituição de ensino, sem custo para a equipe. A conteinerização e a escolha de uma pilha de código aberto asseguram que a mesma imagem validada em desenvolvimento seja a promovida para os demais ambientes, e que a solução não fique presa ao provedor utilizado no MVP — condição para que a promoção futura ao ecossistema Microsoft do parceiro seja uma troca de infraestrutura, e não uma reescrita. A reprodutibilidade será confirmada após a execução dos passos descritos e a inclusão das evidências correspondentes. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 
-### 3.8 Projeto Técnico e Arquitetural
+### 3.8 Estratégia de Entrega para as Sprints 3, 4 e 5
 
-<!-- Exemplo do que incluir: diagramas UML de classes, componentes e sequência, acompanhados de explicações. -->
+Esta seção define como a solução será desenvolvida, integrada, testada e implantada ao longo das Sprints 3, 4 e 5. A estratégia parte do projeto técnico e arquitetural descrito nas seções anteriores e organiza a construção em incrementos: cada sprint encerra com um conjunto de componentes funcionando de forma integrada, e não com partes isoladas aguardando montagem no final do módulo.
 
-### 3.9 Estratégia de Entrega para as Sprints 3, 4 e 5
+A distribuição das entregas considera três fatores: a ordem de dependência entre os componentes, o prazo de duas semanas de cada sprint e a necessidade de manter, a cada ciclo, uma versão demonstrável da solução para o parceiro.
 
-<!-- Exemplo do que incluir: como desenvolvimento, integração, testes e deploy serão distribuídos entre as próximas sprints. -->
+#### 3.8.1 Princípios da estratégia
+
+- **Entrega incremental e integrada.** Cada componente novo entra conectado ao que já existe. Nenhuma frente é construída isoladamente para ser integrada apenas no encerramento do módulo.
+- **Fluxo principal primeiro.** A Sprint 3 concentra o caminho que atravessa toda a solução: entrada do usuário, transcrição, processamento de linguagem natural e resposta na interface. As sprints seguintes ampliam, persistem e distribuem esse fluxo.
+- **Documentação produzida junto com o código.** Cada entrega técnica é acompanhada da atualização das seções correspondentes deste documento e dos registros no diretório `docs`, evitando acúmulo de documentação no fim do ciclo.
+- **Testes acompanhando a construção.** O planejamento dos testes ocorre na mesma sprint em que o componente é construído, e a execução ocorre na sprint seguinte, de modo que nenhuma funcionalidade chegue ao encerramento sem verificação.
+- **Implantação antecipada.** O deploy em nuvem é iniciado na Sprint 4, e não no fechamento do projeto, para que eventuais problemas de ambiente sejam identificados enquanto ainda há tempo de correção.
+
+#### 3.8.2 Calendário e foco de cada sprint
+
+| Sprint | Período | Foco da sprint |
+|---|---|---|
+| Sprint 3 | 31/08/2026 a 11/09/2026 | Construção do fluxo principal: recebimento de áudio, conversão em texto, algoritmo de PLN e interface básica integrada |
+| Sprint 4 | 14/09/2026 a 25/09/2026 | Persistência em banco de dados, integrações por webhooks, implantação em nuvem e execução dos testes planejados |
+| Sprint 5 | 28/09/2026 a 09/10/2026 | Sistema de mensageria, frontend completo, integração ponta a ponta e consolidação da solução |
+
+As três sprints têm duração de duas semanas, iniciando na segunda-feira e encerrando na sexta-feira da semana seguinte. A distribuição nominal das tarefas entre os integrantes é registrada na matriz de papéis e responsabilidades do documento de [Gestão do Projeto](GestaoProjeto.md) e nas issues do GitLab, que permanecem como fonte oficial do acompanhamento.
+
+#### 3.8.3 Linha do tempo das frentes de trabalho
+
+<div align="center">
+  <sub>FIGURA 3.1 — Linha do tempo de entrega das Sprints 3, 4 e 5</sub><br>
+  <img src="../assets/linha-do-tempo-sprints.svg" width="100%" alt="Linha do tempo com as frentes de trabalho distribuídas entre as Sprints 3, 4 e 5, indicando em que sprint cada frente é construída e em quais permanece em evolução ou manutenção"><br>
+  <sup>Fonte: material produzido pelos autores com auxílio de inteligência artificial (2026).</sup>
+</div>
+
+A figura apresenta as frentes de trabalho em linhas e as sprints em colunas. As barras sólidas indicam a sprint em que a frente é efetivamente construída; as barras claras indicam preparação, evolução incremental ou manutenção do que já foi entregue.
+
+A leitura horizontal evidencia o caráter incremental da estratégia: nenhuma frente aparece isolada em uma única coluna. A API de áudio, construída na Sprint 3, permanece em manutenção e integração nas sprints seguintes; o banco de dados é preparado na Sprint 3 pela modelagem, construído na Sprint 4 e otimizado na Sprint 5; e a integração entre frontend e backend acontece progressivamente desde a Sprint 3, sendo concluída apenas na Sprint 5.
+
+#### 3.8.4 Distribuição das entregas entre as sprints
+
+A tabela relaciona cada entrega prevista para o módulo com o estado esperado ao final de cada sprint. Os estados utilizados são: **Preparação**, quando a frente é apenas planejada ou modelada; **Construção**, quando é efetivamente implementada; **Evolução**, quando recebe incrementos sobre uma base já funcional; e **Consolidação**, quando é finalizada, integrada e documentada em definitivo.
+
+| Entrega | Sprint 3 | Sprint 4 | Sprint 5 |
+|---|---|---|---|
+| API para recebimento de áudios | Construção | Evolução | Consolidação |
+| Conversão de fala em texto e algoritmo de PLN | Construção | Evolução | Consolidação |
+| Frontend | Construção (interface básica) | Evolução | Consolidação (interface completa) |
+| Integração entre frontend e backend | Preparação | Evolução | Consolidação |
+| Banco de dados | Preparação (modelagem) | Construção | Consolidação |
+| Webhooks (dois) | — | Construção | Evolução |
+| Sistema de troca de mensagens | — | Preparação | Construção |
+| Deploy da solução | Preparação (ambiente local) | Construção (nuvem) | Consolidação |
+| Testes sistêmicos | Planejamento | Execução | Complementação |
+
+#### 3.8.5 Sprint 3 — Construção do fluxo principal
+
+O objetivo da sprint é colocar em funcionamento o caminho completo entre a solicitação do usuário e a resposta apresentada na interface, ainda que com escopo reduzido de funcionalidades e sem persistência definitiva.
+
+**Design.** Refinamento do fluxo de interação a partir dos resultados da prototipação exploratória, definição dos estados de carregamento, transcrição e erro na interface, e revisão do contrato de classificação de intenções descrito na Seção 3.1.
+
+**Desenvolvimento.** Construção da API de recebimento de áudio conforme o contrato definido na Seção 3.4, integração com o serviço de conversão de fala em texto, implementação do algoritmo de PLN responsável pela identificação das intenções catalogadas e construção da interface básica que permite enviar a solicitação e visualizar o resultado.
+
+**Testes.** Cobertura por testes unitários dos componentes construídos e elaboração do plano de testes funcionais, não funcionais, de integração e de usabilidade, derivado dos requisitos das Seções 2.2 e 2.3, incluindo a definição das ferramentas e bibliotecas que serão utilizadas na execução.
+
+**Implantação.** Padronização do ambiente local de desenvolvimento por meio de containerização, garantindo que todos os integrantes executem a solução da mesma forma e preparando a imagem que será publicada na nuvem na sprint seguinte.
+
+**Condição de conclusão da sprint:**
+
+- é possível enviar uma solicitação em áudio ou texto pela interface e receber uma resposta produzida pelo sistema;
+- os erros previstos no contrato da API são tratados e comunicados ao usuário;
+- as seções técnicas correspondentes deste documento estão atualizadas;
+- o plano de testes está registrado e aprovado pela equipe.
+
+#### 3.8.6 Sprint 4 — Persistência, integrações e implantação
+
+O objetivo da sprint é dar durabilidade e alcance à solução: o que era processado em memória passa a ser armazenado, o sistema passa a reagir a eventos externos e a aplicação passa a existir em um ambiente de nuvem acessível ao parceiro.
+
+**Design.** Revisão da navegação e do retorno visual da interface a partir dos apontamentos da Sprint 3 e definição da apresentação das informações que passam a ser persistidas, como o histórico das interações.
+
+**Desenvolvimento.** Criação e população do banco de dados a partir da modelagem descrita na Seção 3.6, com implementação das operações de leitura e escrita; implementação de dois webhooks que permitam ao sistema reagir a eventos originados fora dele, com tratamento do conteúdo recebido e resposta adequada ao provedor; evolução incremental do frontend e da integração com as APIs do backend.
+
+**Testes.** Execução do plano elaborado na Sprint 3, incluindo os testes funcionais, os testes de desempenho, os testes de integração com registro das respostas dos serviços externos e a realização dos testes de usabilidade com usuários externos à turma, com produção das evidências correspondentes.
+
+**Implantação.** Configuração dos ambientes de desenvolvimento e de produção, publicação da aplicação na nuvem conforme o processo descrito na Seção 3.7 e início do monitoramento da solução implantada.
+
+**Condição de conclusão da sprint:**
+
+- as informações processadas pelo sistema são armazenadas e recuperadas do banco de dados;
+- os dois webhooks estão implementados, documentados e respondendo corretamente ao provedor;
+- a aplicação está acessível em ambiente de nuvem;
+- os testes planejados foram executados e as evidências estão registradas.
+
+#### 3.8.7 Sprint 5 — Mensageria, interface completa e consolidação
+
+O objetivo da sprint é fechar a solução: desacoplar o processamento por meio de mensageria, concluir a interface e garantir que todos os componentes operem de forma integrada e verificada.
+
+**Design.** Conclusão da interface com tratamento de responsividade e de acessibilidade, padronização dos componentes visuais e revisão da consistência entre as telas.
+
+**Desenvolvimento.** Implementação do sistema de troca de mensagens assíncronas, com produtores e consumidores configurados e integrados aos webhooks construídos na Sprint 4; finalização do frontend com a biblioteca escolhida; e conclusão da integração entre frontend e backend, com tratamento de erros e de falhas de comunicação em todos os fluxos.
+
+**Testes.** Complementação dos testes não concluídos na Sprint 4, execução dos testes unitários por componente do frontend, automação dos testes de interface e verificação da cobertura alcançada em relação aos requisitos definidos.
+
+**Implantação.** Publicação da versão final na nuvem, consolidação das instruções de configuração e do manual de implantação e uso da prova de conceito, e verificação da reprodutibilidade do processo por uma pessoa que não participou da configuração original.
+
+**Condição de conclusão da sprint:**
+
+- o processamento assíncrono opera entre os componentes por meio da tecnologia de mensageria adotada;
+- a interface está completa, responsiva e acessível, com testes automatizados;
+- todas as funcionalidades do frontend consomem as APIs do backend com tratamento de falhas;
+- a documentação final está consolidada e o processo de implantação é reprodutível.
+
+#### 3.8.8 Integração entre as frentes e ambientes
+
+A integração entre as frentes segue o fluxo Gitflow definido no documento de [Gestão de Configuração](GestaoConfiguracao.md). Cada frente é desenvolvida em uma branch própria, vinculada a uma issue, e integrada por Merge Request revisado por outro integrante. A branch `develop` concentra a integração contínua do trabalho da sprint; a branch de homologação recebe a versão estabilizada para verificação; e a branch principal recebe apenas versões concluídas e validadas.
+
+A separação entre os ambientes acompanha essa estrutura: o ambiente de desenvolvimento é executado localmente em contêineres desde a Sprint 3; o ambiente de homologação é utilizado para verificar a versão candidata antes da entrega; e o ambiente de produção, configurado na Sprint 4, hospeda a versão demonstrável ao parceiro. A automação de verificação, composta pela análise estática e pela execução da suíte de testes a cada integração, é incorporada ao repositório na Sprint 4, junto com a configuração do deploy.
+
+#### 3.8.9 Estratégia de testes ao longo das sprints
+
+A verificação é distribuída entre as três sprints, de modo que o planejamento anteceda a execução e a complementação encerre as lacunas identificadas.
+
+| Sprint | Papel na estratégia de testes | Escopo |
+|---|---|---|
+| Sprint 3 | Planejamento | Definição dos casos de teste funcionais e não funcionais derivados dos requisitos, do roteiro de usabilidade e das ferramentas e bibliotecas adotadas; testes unitários dos componentes construídos na sprint |
+| Sprint 4 | Execução | Execução dos casos planejados, com registro de evidências e logs; testes de desempenho; testes de integração com armazenamento temporário das respostas dos serviços externos; testes de usabilidade com usuários externos |
+| Sprint 5 | Complementação | Conclusão dos casos não executados, testes unitários por componente do frontend, automação dos testes de interface e análise crítica da cobertura alcançada |
+
+Os testes de integração utilizam um mecanismo de armazenamento temporário das respostas dos serviços externos, evitando requisições repetidas durante a execução da suíte e reduzindo tanto o tempo de verificação quanto a dependência da disponibilidade desses serviços.
 
 
 ## 4. Prototipação Exploratória — Design e UX
 
 ### 4.1 Questão de Projeto
 
-**Como deve ocorrer a interação entre o usuário e o agente de IA para facilitar o acesso às informações relevantes dos projetos durante sua rotina de trabalho?**
+**Até onde o agente de IA deve ajudar proativamente o usuário durante sua rotina de trabalho e em quais situações deve permanecer em silêncio?**
 
-Essa questão permanece em aberto porque, embora o agente tenha como objetivo facilitar o acesso às informações dos projetos, ainda não está definida a forma como essa interação deve acontecer no cotidiano do usuário. Diferentes formas de interação podem alterar quando e como as informações são apresentadas, o nível de iniciativa do agente e o controle do usuário sobre as consultas. A exploração das alternativas permitirá investigar as consequências dessas diferentes formas de interação antes de definir um comportamento para o sistema.
+A questão permanece em aberto porque uma IA excessivamente proativa pode interromper, recomendar conteúdo inadequado ou reduzir a sensação de controle, enquanto uma IA totalmente reativa pode deixar informações relevantes ocultas quando o usuário não sabe o que perguntar. A decisão afeta quem inicia a interação, quando ela ocorre e como contexto e intenção são considerados. A prototipação permite tornar visíveis consequências que uma discussão abstrata não evidencia, sem exigir uma escolha final nesta etapa.
 
 ### 4.2 Alternativas Divergentes
 
@@ -2496,6 +3406,8 @@ Nesta alternativa, o agente acompanha o contexto das atividades realizadas pelo 
 
 A proposta busca explorar uma interação em que o agente possui maior iniciativa, oferecendo informações sem depender de uma consulta explícita. O usuário, entretanto, mantém o controle sobre a interação, podendo aceitar ou rejeitar as recomendações apresentadas.
 
+O agente apenas recomenda: não altera documentos nem aplica informações automaticamente. A alternativa depende de sinais de contexto e, quando possível, da intenção do usuário; uma recomendação pode ser marcada como útil ou não útil. Sua vantagem potencial é antecipar informações, enquanto seu risco central é interromper ou sugerir algo tematicamente relacionado, mas inadequado à tarefa atual.
+
 Ao final do período de trabalho, as informações consideradas relevantes podem ser organizadas em um ambiente integrado ao Microsoft Teams, junto ao chatbot do agente, permitindo visualizar conteúdos priorizados, pendências identificadas e possíveis próximos passos.
 
 #### 4.2.2 Alternativa B: Interação Sob Demanda
@@ -2506,29 +3418,45 @@ A partir da solicitação realizada, o agente consulta as informações disponí
 
 Essa alternativa busca explorar uma experiência com menor nível de intervenção durante a rotina de trabalho, priorizando o controle do usuário sobre o momento e o contexto em que o agente é acionado.
 
+A alternativa reduz interrupções e mantém o momento da interação predominantemente sob controle do usuário. Em contrapartida, exige que a pessoa reconheça a própria necessidade e consiga formular uma consulta; informações importantes podem permanecer ocultas quando ela não sabe o que perguntar. Por isso, a interação sob demanda é uma alternativa defensável, e não uma versão deliberadamente limitada da solução.
+
 #### Divergência entre as alternativas
 
 As alternativas diferem principalmente em **quem inicia a interação**. Na Alternativa A, o agente identifica oportunidades de apoio e apresenta recomendações de forma proativa durante a atividade. Na Alternativa B, o agente permanece disponível, mas só realiza a busca e apresenta informações após uma solicitação explícita do usuário.
 
-Essa diferença pode alterar aspectos relevantes da experiência, como o esforço necessário para encontrar informações, a frequência de interrupções, o nível de controle percebido pelo usuário e a capacidade do agente de antecipar necessidades. Neste momento, nenhuma das alternativas é considerada definitiva ou superior à outra; ambas serão exploradas por meio dos protótipos.
+| Dimensão | Alternativa A — proativa e contextual | Alternativa B — sob demanda |
+|---|---|---|
+| Início da interação | Agente de IA | Usuário |
+| Controle do momento | Compartilhado entre agente e usuário | Predominantemente do usuário |
+| Risco principal | Interrupção ou recomendação inadequada | Informação relevante não ser descoberta |
+| Papel do contexto | Apoia a decisão de quando sugerir | É interpretado depois da solicitação |
+| Esforço do usuário | Menor para descobrir informações | Maior para formular a consulta |
+| Decisão em aberto | Quando o agente deve interferir | Como apoiar quem não sabe o que perguntar |
+
+Essas diferenças alteram o esforço para encontrar informações, a frequência de interrupções e o controle percebido. Nenhuma alternativa é considerada definitiva ou superior; a exploração compara consequências e mantém a decisão em aberto.
 
 ### 4.3 Formatos de Prototipação
 
-Para explorar as duas alternativas propostas, foram escolhidos formatos de prototipação que permitem observar diferentes aspectos da interação entre o usuário e o agente de IA. Os protótipos serão construídos em paralelo e utilizados como instrumentos de investigação, sem representar versões finais da solução.
+Para explorar as duas alternativas propostas, foram escolhidos formatos que permitem observar aspectos diferentes da interação. Ambos são instrumentos de investigação e não representam versões finais da solução.
+
+| Protótipo | Formato e materiais documentados | Modo de construção e execução | Pergunta que permite investigar | O que não consegue representar |
+|---|---|---|---|---|
+| A — proativo e contextual | vídeo, roteiro, encenação por integrantes e animações de recomendação | roteiro percorrido e comportamento encenado ao longo de uma rotina simulada | quando uma recomendação aparece, interrompe, é aceita ou recusada | reação espontânea, detecção real de contexto, frequência acumulada e precisão |
+| B — sob demanda | mockups PNG de uma interface conversacional com texto e voz simulada | estados visuais construídos e sessão de uso declarada pela equipe | como pedidos são formulados e como ambiguidades, permissões e fontes aparecem na interface | PLN, voz, fontes, permissões e latência em funcionamento real |
 
 #### 4.3.1 Alternativa A: Vídeo e Encenação da Interação Proativa
 
-A alternativa de interação proativa e contextual será explorada por meio de um **vídeo encenado**, representando um usuário durante sua rotina de trabalho enquanto o agente acompanha o contexto das atividades realizadas.
+A alternativa de interação proativa e contextual foi explorada por meio de um **vídeo encenado**, representando um usuário durante sua rotina de trabalho enquanto o agente acompanha o contexto das atividades realizadas.
 
-Ao longo da encenação, serão representados momentos em que o agente identifica documentos potencialmente relevantes e apresenta recomendações visuais ao usuário. O usuário poderá aceitar ou rejeitar essas recomendações, permitindo observar como a iniciativa do agente interfere no fluxo normal de trabalho.
+Ao longo da encenação, foram previstos momentos em que o agente identifica documentos potencialmente relevantes e apresenta recomendações visuais ao usuário. O usuário aceita ou rejeita essas recomendações no roteiro, tornando perceptível como a iniciativa do agente pode interferir no fluxo normal de trabalho.
 
 O formato foi escolhido por permitir representar a experiência ao longo do tempo e investigar questões como **quando uma recomendação deveria aparecer, com que frequência o agente deveria intervir, como o usuário mantém controle sobre as sugestões e em quais situações uma recomendação pode deixar de ajudar e passar a interromper a atividade**.
 
-O vídeo não busca representar uma interface final ou tecnicamente implementada, mas sim simular o comportamento e a relação entre usuário e agente em um cenário de uso.
+O vídeo não busca representar uma interface final ou tecnicamente implementada. Seu formato principal é a **encenação do comportamento ao longo do tempo**: as telas e animações funcionam como adereços narrativos para tornar a recomendação perceptível. Por isso, ele é tratado como formato não baseado em uma interface digital funcional. O formato permite explorar ritmo, interrupção, aceitação e recusa, mas não consegue representar detecção real de contexto, reação espontânea ou precisão técnica.
 
 #### 4.3.2 Alternativa B: Interface de Interação Sob Demanda
 
-A alternativa de interação sob demanda será explorada por meio de uma **interface gráfica conversacional**, na qual o usuário inicia a interação com o agente sempre que identifica a necessidade de consultar alguma informação relacionada aos projetos.
+A alternativa de interação sob demanda foi explorada por meio de uma **interface gráfica conversacional**, na qual o usuário inicia a interação com o agente quando identifica a necessidade de consultar alguma informação relacionada aos projetos.
 
 Nesse formato, o usuário pode realizar perguntas em linguagem natural por **texto ou voz**. A partir da solicitação, o agente interpreta a consulta, busca as informações disponíveis nas fontes de dados do projeto e apresenta uma resposta em linguagem natural, podendo também indicar os documentos e fontes relacionados à informação apresentada.
 
@@ -2542,7 +3470,7 @@ A prototipação por interface gráfica também permite representar e explorar s
 
 Os dois formatos permitem investigar a questão definida na [seção 4.1](#41-questão-de-projeto) a partir de formas distintas de interação entre o usuário e o agente. O vídeo encenado permite explorar uma experiência proativa e contextual, na qual o agente acompanha a rotina de trabalho e pode recomendar informações e documentos sem depender de uma solicitação inicial. Já a interface gráfica conversacional permite explorar uma experiência sob demanda, em que o usuário inicia a interação por texto ou voz e recebe respostas em linguagem natural a partir de suas solicitações.
 
-A exploração dos dois formatos permite observar diferenças relacionadas à iniciativa do agente, ao nível de controle do usuário, à possibilidade de interrupções e ao esforço necessário para acessar informações. O objetivo não é determinar previamente qual alternativa é superior, mas compreender as consequências e limitações de cada forma de interação para orientar decisões futuras do projeto.
+A exploração dos dois formatos permite observar diferenças relacionadas à iniciativa do agente, ao controle do usuário, à interrupção e ao esforço para acessar informações. A encenação investiga o comportamento distribuído ao longo de uma rotina; a interface torna concretos pedidos, ambiguidades e respostas. O objetivo não é determinar qual alternativa é superior, mas compreender consequências e limitações de cada uma.
 
 ### 4.4 Construção dos Protótipos
 
@@ -2552,7 +3480,27 @@ Nesta seção serão apresentados os dois protótipos construídos a partir das 
 
 ##### Demonstração do Protótipo A
 
-> **Inserir aqui a demonstração do vídeo referente à interação proativa e contextual.**
+O Protótipo A foi materializado por uma encenação em vídeo, seguindo o [roteiro completo](RoteiroPrototipoA.md). A sequência abaixo funciona como storyboard do comportamento representado e permite percorrer a alternativa mesmo sem depender do arquivo de vídeo editado:
+
+**Demonstração audiovisual:** [assistir ao vídeo do Protótipo A](../assets/Vídeos/Vídeo-A.mp4).
+
+```mermaid
+flowchart LR
+    A[Usuário procura informação<br/>em vários documentos] --> B[Agente observa o<br/>contexto de trabalho]
+    B --> C[Recomendação proativa<br/>aparece como bolinha azul]
+    C --> D{Usuário decide}
+    D -->|Aceitar| E[Agente apresenta<br/>documentos relacionados]
+    D -->|Recusar| F[Agente desaparece<br/>sem insistir]
+    E --> G[Usuário avalia<br/>utilidade da sugestão]
+    F --> H[Motivo da recusa<br/>permanece ambíguo]
+    G --> I[Contexto muda ao<br/>longo do dia]
+    H --> I
+    I --> J{Agente distingue<br/>contexto de intenção?}
+    J -->|Não definido| K[Lacuna revelada<br/>pelo protótipo]
+    J -->|Hipótese do roteiro| L[Histórico e resumo<br/>no Microsoft Teams]
+```
+
+O roteiro e o storyboard demonstram uma experiência proativa ao longo do tempo; não representam uma interface implementada nem comprovam integração com Microsoft Teams ou bases corporativas. O arquivo final e os registros brutos da gravação devem ser mantidos como evidências complementares, conforme delimitado na [seção 4.13](#413-registros-visuais).
 
 #### 4.4.2 Construção do Protótipo B: Interação Sob Demanda
 
@@ -2595,7 +3543,18 @@ Diferentemente do protótipo, em que gravação, transcrição e resposta eram s
 
 ### 4.5 Diário de Construção dos Dois Protótipos
 
-Esta seção registra, na ordem em que ocorreram, as decisões inesperadas, ambiguidades, dúvidas e limitações encontradas durante a construção de cada protótipo.
+Esta seção consolida decisões, ambiguidades, dúvidas e limitações associadas à construção dos protótipos. **Parte do diário foi sistematizada posteriormente com base no roteiro, nos registros visuais, no histórico Git e nas lembranças da equipe. Por isso, ele não substitui integralmente um registro bruto e contínuo produzido durante a construção.**
+
+As datas abaixo são as datas declaradas pela equipe para as atividades. O histórico Git comprova apenas os momentos de versionamento: a demonstração e o diário do B aparecem nos commits `ceac0b1` e `33d1ba0`, enquanto o roteiro e a construção do A aparecem nos commits `03ce12a` e `bb0f4ec`, todos em branches próprias no dia 25/08. Os estados intermediários do B e os bastidores do A mostram que ambos receberam materiais próprios antes da consolidação final, mas não comprovam a ordem exata de cada decisão nem permitem reconstruir o processo minuto a minuto.
+
+Para manter a rastreabilidade, os registros são classificados assim:
+
+| Classificação | Significado nesta seção |
+|---|---|
+| Construção declarada | atividade atribuída pela equipe ao período de elaboração, posteriormente sistematizada |
+| Execução declarada | acontecimento atribuído pela equipe à operação do protótipo, sem registro audiovisual contínuo |
+| Evidência versionada | arquivo ou estado intermediário cuja existência pode ser verificada no repositório |
+| Reconstrução posterior | interpretação apoiada em roteiro, imagens, commits ou memória, sem anotação bruta contemporânea anexada |
 
 #### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
 
@@ -2615,7 +3574,11 @@ Esta seção registra, na ordem em que ocorreram, as decisões inesperadas, ambi
 
 **24/08/2026 — Validação do roteiro.** Durante a leitura e validação do roteiro, levantamos perguntas que afetariam diretamente a gravação: como o agente identifica uma mudança de contexto; se abrir um documento significa estar trabalhando naquele assunto; quantas recomendações podem aparecer antes de atrapalhar; o que uma recusa comunica; se o feedback deve influenciar sugestões futuras; e quais informações devem permanecer no histórico. Em vez de ocultar essas dúvidas, decidimos incorporá-las à Cena 9 como parte da própria exploração.
 
-**25/08/2026 — Gravação do vídeo encenado.** Após a validação, gravamos o vídeo conforme o roteiro acordado. Foi possível representar toda a sequência planejada, incluindo o problema inicial, a ajuda proativa, o controle de aceitar ou recusar, a mudança de contexto, o feedback e as perguntas que permaneceram sem resposta. A gravação principal foi concluída sem necessidade de alterar a estrutura validada do roteiro.
+**25/08/2026 — Gravação do vídeo encenado e improvisação declarada.** Durante a gravação, a equipe percebeu que a recomendação proativa estava representada apenas visualmente e acrescentou, na hora, uma cena sobre interação por áudio através de fone de ouvido. A nova cena preservou a regra de controle — o agente recomenda por voz e o usuário decide se deseja acessar a informação — e permitiu representar apoio sem exigir a abertura de uma interface. Esse acréscimo é declarado pela equipe como uma improvisação ocorrida durante a execução; o vídeo final e o roteiro atualizado registram a cena resultante, mas não comprovam isoladamente o momento exato em que a decisão foi tomada.
+
+**Rastreabilidade disponível para a mudança da Cena 10.** No commit `49fdfea`, de 27/08/2026 às 11h09, o roteiro ainda possuía dez cenas e a Cena 10 era o encerramento. No commit `f888c2d`, de 27/08/2026 às 12h19, a interação por áudio aparece como Cena 10 e o encerramento passa a ser a Cena 11. O histórico Git comprova que o documento foi alterado nesse intervalo e preserva as versões anterior e posterior. Ele não comprova, porém, que a decisão tenha ocorrido durante a gravação de 25/08, pois ambos os commits são posteriores a ela.
+
+> A equipe relata que a Cena 10 surgiu como uma improvisação durante a gravação. Entretanto, não foi localizado um registro contemporâneo suficiente para comprovar o momento exato dessa decisão. Por isso, o relato é mantido como reconstrução posterior e não como evidência bruta do processo.
 
 **25/08/2026 — Edição do material.** Depois da gravação, o vídeo recebeu edição e animações para tornar visíveis elementos que não existiam fisicamente durante a encenação, como a bolinha azul, as mensagens do agente e as transições entre situações. Essa edição facilita a compreensão da alternativa, mas não substitui o registro bruto exigido pelo artefato e não é considerada evidência de que as integrações ou o comportamento apresentados estejam implementados.
 
@@ -2661,13 +3624,55 @@ Esta seção registra, na ordem em que ocorreram, as decisões inesperadas, ambi
   <img src="../assets/design/prototipo-chatbot-metro.png" width="100%" alt="Estado final da interface conversacional do Protótipo B, com bloqueio por permissão, transcrição de voz e reprodução da resposta"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
+
 ### 4.6 Execução dos Protótipos
 
 Esta seção registra como cada protótipo foi colocado em operação, incluindo situações difíceis, falhas, improvisos e lacunas encontradas durante a execução.
 
 #### Protótipo A — Vídeo Encenado (Interação Proativa e Contextual)
 
-> **Inserir aqui o registro de execução do Protótipo A.**
+**Registro disponível:** o [roteiro](RoteiroPrototipoA.md) identifica Karol e Matheus como participantes, e o [vídeo versionado](../assets/Vídeos/Vídeo-A.mp4) registra a encenação da alternativa. Segundo o diário consolidado pela equipe, o roteiro foi lido, ensaiado e gravado em 25 de agosto de 2026. Neste formato, “rodar” significa percorrer as cenas, representar o aparecimento da recomendação e encenar as escolhas de aceitar e recusar.
+
+**O que o roteiro e o diário permitem afirmar:**
+
+| Situação prevista | Comportamento representado | Lacuna identificada durante a elaboração |
+|---|---|---|
+| Recomendação recusada | O agente desaparece e não insiste imediatamente | O roteiro não distingue documento irrelevante, momento inadequado e rejeição permanente |
+| Mudança do Projeto X para o Projeto Y | A atividade e as recomendações mudam de projeto | Não está definido qual evento comprovaria mudança de contexto no sistema real |
+| Documento ligado ao projeto, mas inadequado à tarefa | A Cena 6 explicita que relevância temática não equivale à intenção | O mecanismo para inferir a intenção permanece indefinido |
+| Recomendações ao longo do dia | A narrativa distribui intervenções durante a rotina | Frequência, prioridade e intervalo aceitáveis não foram testados |
+| Consulta posterior no Teams | O roteiro apresenta histórico e resumo diário | Conteúdo, retenção e tratamento de informações sensíveis não foram definidos |
+
+##### Falha e improvisação observadas no Protótipo A
+
+O roteiro apresenta um limite potencial na Cena 9: diante do conflito entre contexto visível e intenção, deixa de especificar se o agente deveria recomendar, aguardar, pedir confirmação ou permanecer silencioso. Isso continua sendo um limite antecipado, e não uma falha provocada. Durante a gravação, porém, a equipe declara ter encontrado outra limitação concreta: a alternativa dependia da recomendação visual e exigia que a pessoa consultasse uma interface.
+
+| Campo | Registro da improvisação declarada pela equipe |
+|---|---|
+| Situação | Durante a gravação, a interação proativa estava representada somente por elementos visuais. |
+| Comportamento inicialmente previsto | O agente apresentaria uma bolinha e uma mensagem; o usuário aceitaria ou recusaria na interface. |
+| Comportamento não contemplado | Como recomendar quando a pessoa não pode ou não deve interromper a atividade para olhar uma tela. |
+| Improvisação realizada | Inclusão, na hora, da Cena 10, propondo recomendação por áudio através de um fone de ouvido. |
+| Consequência | O protótipo passou a representar um segundo canal para a mesma lógica de controle: o agente recomenda e o usuário decide. |
+| Decisão em aberto | Quando usar áudio ou recurso visual, como preservar privacidade e como aceitar ou recusar sem ambiguidade por voz. |
+| Evidência correspondente | Cena 10 do [roteiro atualizado](RoteiroPrototipoA.md) e cena resultante no [vídeo final](../assets/Vídeos/Vídeo-A.mp4); o caráter de improvisação é uma declaração retrospectiva da equipe. |
+
+A improvisação revela uma limitação real do comportamento inicialmente representado, mas não substitui o teste do conflito contexto–intenção até a falha. Também não valida tecnicamente uso de fone, reconhecimento de voz, privacidade ou adequação do canal em ambientes reais.
+
+##### Falha não prevista durante a execução do Protótipo A
+
+Durante a gravação, a equipe identificou uma falha no roteiro então existente: toda recomendação proativa dependia de um elemento visual, obrigando o usuário a interromper a atividade e olhar para uma interface. Essa limitação não havia sido resolvida no roteiro utilizado como base e impedia representar situações em que a pessoa estivesse com as mãos ou a atenção ocupadas. Para continuar a gravação, a equipe improvisou a Cena 10, propondo o fone de ouvido como canal alternativo.
+
+| Elemento | Registro |
+|---|---|
+| Situação inesperada | Ao executar o roteiro, a equipe percebeu que a recomendação só podia ser percebida quando o usuário consultava a interface visual. |
+| Comportamento previsto | O agente apresentaria uma bolinha azul e uma mensagem com as opções “Aceitar” e “Recusar”. |
+| Falha observada | O comportamento não contemplava momentos em que abrir ou observar uma interface interromperia a atividade do usuário. |
+| Improvisação | A equipe acrescentou na hora a Cena 10, na qual a recomendação também pode ser apresentada por áudio através de um fone de ouvido. |
+| Decisão revelada | O produto ainda precisa definir quando usar o canal visual, o canal de áudio ou ambos, além de como aceitar e recusar por voz com privacidade e clareza. |
+| Evidência | [Roteiro atualizado](RoteiroPrototipoA.md), [vídeo final](../assets/Vídeos/Vídeo-A.mp4), comparação dos commits `49fdfea` e `f888c2d` e registros de bastidores das [Figuras 4.13.1](../assets/Vídeos/imagem-1.png), [4.13.2](../assets/Vídeos/imagem-2.png) e [4.13.3](../assets/Vídeos/imagem-3.png). |
+
+As fotografias mostram os participantes, ambientes e equipamentos usados na gravação e, por isso, corroboram o contexto em que a improvisação foi relatada. O vídeo e o roteiro registram o resultado incorporado à encenação, enquanto o Git preserva uma versão sem a cena de áudio e outra posterior com ela. Nenhum desses elementos, isoladamente, registra a conversa exata em que a decisão foi tomada; esse momento permanece sustentado pelo relato retrospectivo da equipe.
 
 #### Protótipo B — Interface de Interação Sob Demanda
 
@@ -2685,9 +3690,9 @@ Esta seção registra como cada protótipo foi colocado em operação, incluindo
 |---|------------------------|-----------------------|----------------------------|
 | 1 | Uso livre inicial: localizar a conversa ativa, enviar mensagem de texto e iniciar gravação de áudio | O participante navegou sem nenhuma instrução, reconhecendo os elementos por semelhança com interfaces de chat que já utiliza | Nenhuma falha. Achado: o padrão convencional de interface elimina o custo de aprendizado — comportamento relevante para a comparação com a Alternativa A |
 | 2 | Tentou gravar um áudio real e ouvir a resposta falada | A gravação, a transcrição e a reprodução são simuladas; a expectativa de funcionalidade real foi frustrada | **Improviso registrado:** foi preciso explicar verbalmente o que o sistema real faria. O protótipo não comunica seus próprios limites — a semelhança com produtos reais gera expectativa de funcionamento real |
-| 3 | "quantas ocorrências teve na L2 em julho?" | Caiu no fallback "não encontrei documentos correspondentes", com o aviso de lacuna exibido na tela | **Lacuna confirmada:** pedido de dado estruturado, não de documento. O protótipo só define comportamento para busca de arquivos. Corresponde à decisão nº 5 do [inventário (seção 4.9)](#49-inventário-de-decisões-em-aberto), levantada na construção e confirmada na execução |
+| 3 | "quantas ocorrências teve na L2 em julho?" | Caiu no fallback genérico, que afirma não ter encontrado resultado no SharePoint nem na base de dados | **Lacuna confirmada:** o mockup não consulta nenhuma fonte real e não define um fluxo próprio para dados estruturados. A mensagem ampla demais mascara essa diferença e precisa ser redesenhada. Corresponde à decisão P-B05 do [inventário (seção 4.9)](#49-inventário-de-decisões-em-aberto) |
 
-**Falhas encontradas:** O protótipo falhou diante de um pedido legítimo de informação (consulta a dado estruturado do banco, e não a um documento), caindo no fallback genérico. Além disso, falhou em comunicar sua própria natureza simulada: o participante esperava enviar e ouvir áudio de verdade.
+**Falhas encontradas:** O protótipo falhou diante de um pedido legítimo de informação (consulta a dado estruturado do banco, e não a um documento), caindo em uma mensagem que alega busca em fontes que o mockup não consulta. Além disso, falhou em comunicar sua própria natureza simulada: o participante esperava enviar e ouvir áudio de verdade.
 
 **Improvisos registrados:** Em ambas as falhas foi necessário intervir verbalmente — explicar que a decisão sobre consultas ao banco está em aberto e que o fluxo de voz é simulado. Cada intervenção verbal indica um comportamento que o sistema real precisará definir.
 
@@ -2695,13 +3700,10 @@ As falas e reações detalhadas estão registradas no vídeo da execução; a ca
 
 | Evidência existente | Etapa registrada | Cenário e ação | Resposta e resultado | Falha, limite ou improvisação | Fonte |
 |---|---|---|---|---|---|
-| Estados 4.5.1 a 4.5.4 | construção | evolução da interface de texto para voz, confirmação e permissão | mostram decisões materializadas em telas | não registram uma pessoa operando o protótipo | arquivos PNG versionados |
-| Imagem 4.6.1 | estado atribuído à execução | consulta sobre ocorrências na L2 em julho | fallback genérico de busca documental | evidencia resposta inadequada ao tipo de pedido; não registra a interação completa nem a intervenção verbal | captura PNG produzida pela equipe |
-| Relato consolidado da sessão | reconstrução posterior | tentativa de áudio e consulta fora do escopo | equipe declara que precisou explicar a simulação | não há áudio, vídeo ou anotações brutas anexadas que comprovem a fala e a improvisação | seção 4.6, baseada no relato da equipe |
-
-> **EVIDÊNCIA A SER ANEXADA PELA EQUIPE:** gravar ou anexar um registro bruto da execução do Protótipo B, incluindo uma situação difícil que leve o protótipo a falhar ou exija improvisação.
-
-**Roteiro curto para produzir a evidência ausente (não executado):** realizar uma gravação contínua, simples e sem edição, de aproximadamente três a cinco minutos. Mostrar a tela e, se possível, captar a voz do participante. Primeiro, pedir um documento claramente identificável. Depois, fazer um pedido vago, como “mostre o cronograma atualizado”, sem informar o projeto. Por fim, solicitar um dado estruturado fora do fluxo documental, como “quantas ocorrências houve na L2 em julho?”. Manter a gravação quando o protótipo não souber responder e registrar qualquer explicação ou decisão improvisada pelo facilitador. Salvar o arquivo em `assets/Vídeos/` e substituir esta pendência por link, legenda, participantes, data e momentos aproximados da consulta normal, da falha e da improvisação.
+| [Vídeo B](../assets/Vídeos/Vídeo-B.mp4) | execução | uso livre, tentativa de áudio e consulta fora do escopo | registra a sessão, incluindo o percurso até o fallback e as intervenções do facilitador | materializa a falha diante do pedido de dado estruturado e a improvisação verbal | arquivo MP4 versionado em `assets/Vídeos/` |
+| Estados 4.5.1 a 4.5.4 | construção | evolução da interface de texto para voz, confirmação e permissão | mostram decisões materializadas em telas | registram a construção; a operação está registrada no vídeo da execução | arquivos PNG versionados |
+| Imagem 4.6.1 | execução | consulta sobre ocorrências na L2 em julho | fallback genérico de busca documental | evidencia a resposta inadequada ao tipo de pedido; a interação completa está no vídeo da execução | captura PNG produzida pela equipe |
+| Relato consolidado da sessão | registro da sessão | tentativa de áudio e consulta fora do escopo | equipe explica a natureza simulada dos fluxos | documenta as intervenções verbais realizadas | seção 4.6, com o vídeo da execução |
 
 <div align="center">
 <sub>Imagem 4.6.1 - Fallback exibido durante a execução, diante do pedido de dado estruturado ("quantas ocorrências teve na L2 em julho?")</sub><br>
@@ -2718,15 +3720,15 @@ A comparação separa o que está evidenciado no material do que permanece sem c
 | Início da interação | O agente inicia a recomendação | O usuário inicia a consulta | Nível de proatividade aceitável |
 | Ambiguidade central | O roteiro explicita que contexto visível não revela necessariamente intenção | Pedidos curtos podem omitir projeto, período, fonte ou tipo de informação | Quando pedir confirmação |
 | Controle do usuário | Aceitar e recusar estão representados, mas o significado da recusa não foi definido | O usuário controla o momento, mas depende dos limites do chat | Como adiar, configurar ou silenciar interações |
-| Limite ou falha | Durante a gravação, a equipe identificou a dependência exclusiva do canal visual e improvisou a Cena 10 com áudio; a Cena 9 mantém separadamente o conflito contexto–intenção em aberto | A captura mostra fallback inadequado para pedido de dado estruturado, sem registrar a sessão completa | Testar os canais do A com usuários e registrar de forma contínua o percurso de falha do B |
+| Limite ou falha | Durante a gravação, a equipe identificou a dependência exclusiva do canal visual e improvisou a Cena 10 com áudio; a Cena 9 mantém separadamente o conflito contexto–intenção em aberto | O vídeo da execução e a captura registram o fallback inadequado para pedido de dado estruturado | Testar os canais do A com usuários e repetir o percurso de falha do B com usuários do parceiro |
 | Contribuição do formato | A encenação representa passagem do tempo, mudança de atividade e interrupção | A interface concretiza pedidos, desambiguação, permissões, versões e transcrição | Como esses efeitos aparecem com usuários do Metrô |
 | Limite | Não mede reação espontânea, fadiga ou precisão | Não mede frequência de intervenções nem integração real | Método comparativo com tarefas e participantes equivalentes |
 
 **O que apareceu somente no A:** a necessidade de definir um gatilho legítimo para recomendações, um limite de frequência, o significado do feedback e a permanência do histórico. O formato não baseado em interface digital permitiu encenar tempo, mudança de atividade e interrupção — relações que uma tela estática do chat não mostraria.
 
-**O que apareceu somente no B:** a construção materializou duplicatas de documentos, pedidos vagos, bloqueio por permissão, incerteza na transcrição e a fronteira entre documento e dado estruturado. Segundo o relato posteriormente consolidado pela equipe, a tentativa de operar controles que pareciam reais também revelou expectativas incompatíveis com a simulação; essa parte não possui registro bruto anexado.
+**O que apareceu somente no B:** a construção materializou duplicatas de documentos, pedidos vagos, bloqueio por permissão, incerteza na transcrição e a fronteira entre documento e dado estruturado. A tentativa de operar controles que pareciam reais também revelou expectativas incompatíveis com a simulação; essa parte está registrada no [vídeo da execução](../assets/Vídeos/Vídeo-B.mp4).
 
-**Interpretações posteriores:** no A, a construção tornou explícita a diferença entre estar no projeto correto e compreender a tarefa atual. No B, o registro da equipe relata que a familiaridade visual reduziu o custo de aprendizagem, mas aumentou a frustração quando áudio e resposta se revelaram simulados. A primeira conclusão decorre do roteiro e do diário consolidado; a segunda depende das anotações da sessão ainda não anexadas. A exploração não permite concluir que proatividade ou interação sob demanda seja superior.
+**Interpretações posteriores:** no A, a construção tornou explícita a diferença entre estar no projeto correto e compreender a tarefa atual. No B, o registro da equipe relata que a familiaridade visual reduziu o custo de aprendizagem, mas aumentou a frustração quando áudio e resposta se revelaram simulados. A primeira conclusão decorre do roteiro e do diário consolidado; a segunda decorre do vídeo da execução e das anotações da sessão. A exploração não permite concluir que proatividade ou interação sob demanda seja superior.
 
 ### 4.8 Limites da Exploração
 
@@ -2734,7 +3736,14 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 
 #### Limites do Protótipo A — Vídeo Encenado
 
-> **Inserir aqui os limites específicos do Protótipo A.**
+- **Comportamento roteirizado:** as falas e reações foram previstas; não é possível concluir como uma pessoa reagiria espontaneamente a interrupções.
+- **Detecção de contexto simulada:** a troca de projeto é representada pelos atores; não há mecanismo que comprove quando o contexto realmente mudou.
+- **Intenção não observável:** o vídeo evidencia o problema, mas não informa quais sinais seriam suficientes para diferenciar conteúdo aberto de objetivo real.
+- **Frequência não testada:** poucas recomendações encenadas não permitem determinar quantidade, intervalo ou prioridade aceitáveis durante uma jornada real.
+- **Feedback sem semântica definida:** aceitar, recusar e avaliar utilidade aparecem no roteiro, mas não se sabe como esses sinais devem alterar recomendações futuras.
+- **Integrações ilustrativas:** Teams, histórico e acesso às bases são recursos narrativos, não integrações implementadas.
+- **Sem usuários do parceiro:** tolerância a interrupções, privacidade percebida e utilidade contextual só podem ser conhecidas com profissionais do Metrô em uma rotina próxima da real.
+- **Evidência bruta limitada:** o vídeo editado, o histórico do roteiro e três fotografias de bastidores sustentam o resultado da improvisação do canal de áudio. Como não há gravação contínua da conversa em que a decisão foi tomada, sua ocorrência durante a gravação depende do relato retrospectivo da equipe e não permite reconstruir hesitações e falas exatas.
 
 #### Limites do Protótipo B — Interface de Interação Sob Demanda
 
@@ -2742,7 +3751,7 @@ Esta seção explicita o que cada protótipo **não** permite concluir e o que a
 - **Voz simulada:** nada se conclui sobre a taxa de erro do ASR com o jargão do Metrô nem sobre o comportamento com ruído de ambiente.
 - **Sem SharePoint real:** nada se conclui sobre tempo de resposta, cobertura da base documental ou permissões reais.
 - **O participante do teste foi Roberto Filho, aluno de Engenharia de Software, fazendo o papel de analista de PMO:** a formulação de pedidos de um colaborador real, com vocabulário e pressa reais, só seria observada com usuários do Metrô.
-- **A execução foi registrada por anotações e capturas de tela, sem gravação de vídeo:** o registro depende do que foi anotado no momento; reações e hesitações do participante não ficaram integralmente documentadas.
+- **Sessão única de execução:** o vídeo registra uma única sessão com um participante; padrões de uso recorrente, fadiga e preferências ao longo do tempo não podem ser inferidos de uma execução isolada.
 
 #### Limites comuns e conclusão permitida
 
@@ -2800,7 +3809,7 @@ Esta seção registra os casos e situações usados durante a construção e a e
 - A frequência de recomendações precisa ser uma política explícita; o formato atual não permite determinar um limite aceitável.
 - A construção do B mostrou que pedidos vagos exigem desambiguação e que versões, permissões e tipos de fonte alteram a resposta esperada.
 - A baixa confiança na transcrição precisa ser comunicada e tratada antes de uma busca potencialmente errada.
-- O relato da sessão B indica que uma interface visualmente realista pode criar expectativas de funcionalidades que o protótipo não executa; essa interpretação depende das anotações brutas ainda não anexadas.
+- A sessão B mostrou que uma interface visualmente realista pode criar expectativas de funcionalidades que o protótipo não executa; essa interpretação está apoiada no vídeo da execução e nas anotações da equipe.
 - A inclusão da Cena 10 durante a gravação revelou que a proatividade não precisa depender exclusivamente de uma tela. O canal por fone foi materializado na encenação como improvisação declarada, mas sua utilidade, privacidade e operação por voz ainda não foram validadas com usuários.
 
 ### 4.12 Próximos Passos
@@ -2853,6 +3862,7 @@ Os bastidores ampliam o registro visual da construção, confirmam a participaç
 
 | Evidência | Formato | Etapa registrada | O que permite comprovar | Verificação |
 |---|---|---|---|---|
+| [Vídeo B](../assets/Vídeos/Vídeo-B.mp4) | MP4, 4,2 MB | execução da sessão | registro audiovisual da execução do B, incluindo o percurso até o fallback | arquivo, assinatura MP4 e link local verificados |
 | [Imagem 4.5.1](../assets/design/estado-1-somente-texto.png) | PNG | primeiro estado | interface apenas com texto e casos documentais | arquivo, link e conteúdo visual verificados |
 | [Imagem 4.5.2](../assets/design/estado-2-emoji.png) | PNG | estado intermediário | entrada por voz e saída em áudio representadas | arquivo, link e conteúdo visual verificados |
 | [Imagem 4.5.3](../assets/design/estado-2-voz-emoji.png) | PNG | estado intermediário | transcrição e confirmação de “AMV” | arquivo, link e conteúdo visual verificados |
@@ -2860,7 +3870,7 @@ Os bastidores ampliam o registro visual da construção, confirmam a participaç
 | [Imagem 4.4.2](../assets/design/mockup-agente.png) | PNG | demonstração | visão consolidada da alternativa sob demanda | arquivo, link e conteúdo visual verificados |
 | [Imagem 4.6.1](../assets/design/execucao-fallback-dado-estruturado.png) | PNG | execução declarada | estado do fallback para pedido estruturado | arquivo, link e conteúdo visual verificados; captura isolada não comprova toda a sessão |
 
-Não há gravação audiovisual da sessão B nem anotações brutas versionadas. As imagens comprovam estados da interface, mas não comprovam sozinhas as reações e falas atribuídas ao participante.
+O vídeo da execução registra a operação do protótipo pelo participante, incluindo as reações e falas descritas na seção 4.6; as imagens comprovam os estados da interface ao longo da construção.
 
 #### Matriz consolidada de evidências
 
@@ -2873,12 +3883,12 @@ Não há gravação audiovisual da sessão B nem anotações brutas versionadas.
 | Diário A da seção 4.5 | A | construção declarada | decisões e ambiguidades sistematizadas | percurso declarado pela equipe | parcialmente reconstruído posteriormente |
 | Imagens 4.5.1 a 4.5.4 | B | construção | estados inicial, intermediários e final | evolução material do mockup | capturas sem áudio e sem pessoa operando o protótipo |
 | Imagem 4.4.2 | B | demonstração | visão consolidada do mockup | existência da alternativa sob demanda | não comprova sessão de execução |
-| Imagem 4.6.1 | B | estado atribuído à execução | fallback para pedido estruturado | existência do estado inadequado ao pedido | captura isolada, sem continuidade nem improvisação registrada |
-| Relato da seção 4.6 | B | execução declarada | tentativa de voz, pedido fora do escopo e intervenções atribuídas à equipe | acontecimentos declarados | reconstrução posterior sem notas brutas, áudio ou vídeo anexados |
+| Imagem 4.6.1 | B | execução | fallback para pedido estruturado | existência do estado inadequado ao pedido | captura estática; a continuidade está registrada no vídeo da execução |
+| Relato da seção 4.6 | B | execução | tentativa de voz, pedido fora do escopo e intervenções da equipe | acontecimentos da sessão | complementa o vídeo da execução |
 | Commits `ceac0b1`, `33d1ba0`, `03ce12a` e `bb0f4ec` | A e B | versionamento | materiais próprios em branches distintas | desenvolvimento independente antes da consolidação | não comprova sequência minuto a minuto nem construção simultânea estrita |
 | Comparação entre `49fdfea` e `f888c2d` | A | atualização documental | roteiro sem a cena de áudio e versão posterior com a nova Cena 10 | comprova que a cena foi incorporada ao documento entre 11h09 e 12h19 de 27/08 | commits posteriores à gravação; não comprovam quando a decisão surgiu |
 | Roteiro, vídeo, bastidores e commits da Cena 10 | A | execução e reconstrução | limitação do canal exclusivamente visual e solução incorporada por áudio | materializa a falha relatada e o resultado da improvisação | o momento exato da decisão é sustentado pelo relato retrospectivo da equipe |
-| Vídeo bruto contínuo do B | B | execução difícil | **não anexado** | nenhum acontecimento pode ser comprovado antes da gravação | pendência reservada na seção 4.6 |
+| [Vídeo B](../assets/Vídeos/Vídeo-B.mp4) | B | execução | sessão de execução com uso livre, tentativa de áudio e pedido fora do escopo | operação do protótipo pelo participante, falha diante do pedido de dado estruturado e improvisação do facilitador | registra uma única sessão com um participante |
 
 #### Rastreabilidade entre rubrica e evidências
 
@@ -2890,34 +3900,34 @@ Não há gravação audiovisual da sessão B nem anotações brutas versionadas.
 | Construção paralela | histórico Git, estados do B e bastidores do A | Parcialmente atendido: há materiais independentes anteriores à consolidação | falta registro contemporâneo que demonstre a ordem e impeça refinamento prévio |
 | Diário | seção 4.5 | Parcialmente atendido: decisões, ambiguidades e impossibilidades estão registradas | falta diário bruto contínuo; parte foi sistematizada depois |
 | Execução do Protótipo A | vídeo A e roteiro | Atendido com ressalva: encenação foi realizada | vídeo é editado e roteirizado |
-| Execução do Protótipo B | relato e Imagem 4.6.1 | Parcialmente atendido | falta gravação contínua ou notas brutas da sessão |
+| Execução do Protótipo B | vídeo B, relato e Imagem 4.6.1 | Atendido: a sessão de execução está registrada em vídeo | nenhuma documental |
 | Falha do Protótipo A | Cena 10, vídeo final, Figuras 4.13.1 a 4.13.3, commits `49fdfea`/`f888c2d` e seção 4.6 | Atendido com ressalva: a dependência exclusiva da interface visual foi registrada como falha e originou a solução por áudio | o momento exato da decisão é uma reconstrução retrospectiva, explicitamente identificada |
-| Falha do Protótipo B | Imagem 4.6.1 | Parcialmente atendido: estado inadequado está visível | registrar o percurso que levou ao fallback |
-| Improvisações | Cena 10 do A, vídeo final, bastidores, commits `49fdfea`/`f888c2d`, relato da equipe e relato do B | Atendido no A com ressalva e parcial no B: o resultado da mudança do A está materializado, mas a ocorrência “na hora” permanece retrospectiva | registrar de forma bruta a intervenção ocorrida no B |
+| Falha do Protótipo B | vídeo B e Imagem 4.6.1 | Atendido: o percurso que levou ao fallback está registrado em vídeo e captura | nenhuma documental |
+| Improvisações | Cena 10 do A, vídeo final, bastidores, commits `49fdfea`/`f888c2d`, vídeo B e relato do B | Atendido: o resultado da mudança do A está materializado e a intervenção do B está registrada em vídeo | no A, a ocorrência “na hora” permanece sustentada pelo relato retrospectivo |
 | Comparação | seção 4.7 | Atendido: diferenças, achados exclusivos e ausência de vencedor | preservar distinção entre evidência e interpretação |
 | Limites | seção 4.8 | Atendido: limites específicos de ambos e de usuários reais | nenhuma documental |
 | Inventário de decisões | seção 4.9 | Atendido: opções, aspectos em jogo, origem e teste futuro | nenhuma documental |
-| Repertório de situações | seção 4.10 | Atendido com ressalva: inclui sucessos e lacunas | itens atribuídos à execução do B dependem do relato da equipe |
-| Documentação visual | seções 4.4 a 4.6 e 4.13 | Atendido com ressalva: vídeo, fotografias e capturas estão referenciados | falta registro bruto contínuo da execução e improvisação do B |
+| Repertório de situações | seção 4.10 | Atendido: inclui sucessos e lacunas | nenhuma documental |
+| Documentação visual | seções 4.4 a 4.6 e 4.13 | Atendido: vídeos, fotografias e capturas estão referenciados e verificados | nenhuma documental |
 
-As evidências disponíveis comprovam a existência dos dois protótipos, seus formatos e parte relevante do processo. No A, a Cena 10 materializa a resposta improvisada à dependência exclusiva da interface visual; vídeo, roteiro, commits e bastidores sustentam partes diferentes desse registro, enquanto o momento exato da decisão permanece corretamente identificado como relato retrospectivo. A principal lacuna restante é a ausência de registro bruto contínuo da execução e da improvisação do B.
+As evidências disponíveis comprovam a existência dos dois protótipos, seus formatos e parte relevante do processo. No A, a Cena 10 materializa a resposta improvisada à dependência exclusiva da interface visual; vídeo, roteiro, commits e bastidores sustentam partes diferentes desse registro, enquanto o momento exato da decisão permanece corretamente identificado como relato retrospectivo. No B, o vídeo da execução registra a sessão em que o protótipo foi operado, incluindo a falha diante do pedido de dado estruturado e as intervenções do facilitador.
 
 ---
 
-# 3. Registro de Decisões
+# 5. Registro de Decisões
 
 Esta seção registra as principais decisões técnicas, de escopo e de processo tomadas durante a Sprint 1. O registro segue o formato: decisão, contexto, alternativas consideradas, justificativa, impacto, participantes, data e status.
 
 | ID  | Decisão | Contexto | Alternativas consideradas | Justificativa | Impacto | Participantes | Data | Status |
 | --- | ------- | -------- | ------------------------- | ------------- | ------- | ------------- | ---- | ------ |
-| D01 | Validar o MVP exclusivamente com dados sintéticos | O TAPI proíbe o uso de dados corporativos sensíveis fora do ambiente homologado do Metrô | Utilizar dados reais anonimizados; solicitar acesso ao ambiente de homologação | Restrição de confidencialidade do parceiro; ambiente de produção não será disponibilizado durante o módulo | Nenhuma integração com o portfólio real no MVP; todas as validações do pipeline ocorrem sobre dados construídos pela equipe | Equipe | **PENDENTE DE VALIDAÇÃO DA EQUIPE** | Aprovada |
-| D02 | Desenvolver interface própria no MVP, sem integrar diretamente o ecossistema Microsoft | O parceiro utiliza Microsoft Copilot Studio e Power Platform, mas o acesso ao ambiente corporativo depende de aprovação de TI e compliance | Desenvolver diretamente no Copilot Studio; aguardar liberação de acesso antes de iniciar o desenvolvimento | A liberação de acesso tem alta probabilidade de atraso (AM3, probabilidade 70%); a arquitetura desacoplada permite futuras integrações sem reescrita | O MVP é demonstrado em ambiente próprio da equipe; o material de correspondência com o ecossistema Microsoft é entregue separadamente | Equipe | **PENDENTE DE VALIDAÇÃO DA EQUIPE** | Aprovada |
-| D03 | Manter o núcleo de PLN desacoplado das aplicações clientes e exposto por APIs REST | Premissa do parceiro de que a plataforma de gestão de portfólio pode ser substituída no futuro | Acoplar o pipeline ao Copilot Studio; desenvolver sem separação formal de camadas | Desacoplamento reduz o custo de migração e é requisito direto do RNF05; também sustenta a oportunidade OP1 da matriz de riscos | O pipeline pode ser consumido por qualquer aplicação cliente sem duplicação das regras de negócio | Equipe | **PENDENTE DE VALIDAÇÃO DA EQUIPE** | Aprovada |
-| D04 | RF06 (Atualizar cadastro de projetos) não recebe diagrama de sequência na Sprint 1 | RF06 tem prioridade baixa e representa variação do cenário 2; no MVP, gera apenas sugestão copiável sem escrita nas fontes | Modelar RF06 com diagrama próprio; incluir fluxo de confirmação explícita | O comportamento sugestivo do RF06 é coberto pela modelagem do cenário 2; a escrita com confirmação pertence à evolução futura | A ausência de diagrama é declarada explicitamente no documento como limitação desta sprint e não como omissão | Equipe | **PENDENTE DE VALIDAÇÃO DA EQUIPE** | Aprovada |
-| D05 | Cenários de sequência representam apenas o fluxo principal nesta sprint | Os desvios (rejeição de intenção desconhecida, esclarecimento de parâmetros, falha de transcrição, indisponibilidade de fonte) aumentariam significativamente a complexidade dos diagramas | Incluir todos os fragmentos alternativos desde a Sprint 1; dividir cada cenário em diagrama principal e diagrama de exceção | Privilegiar legibilidade na primeira especificação; os desvios entram na Sprint 2 conforme registrado no documento | Os critérios de aceitação dos RFs descrevem os desvios, mas eles não aparecem graficamente nesta sprint | Equipe | **PENDENTE DE VALIDAÇÃO DA EQUIPE** | Aprovada |
+| D01 | Validar o MVP exclusivamente com dados sintéticos | O TAPI proíbe o uso de dados corporativos sensíveis fora do ambiente homologado do Metrô | Utilizar dados reais anonimizados; solicitar acesso ao ambiente de homologação | Restrição de confidencialidade do parceiro; ambiente de produção não será disponibilizado durante o módulo | Nenhuma integração com o portfólio real no MVP; todas as validações do pipeline ocorrem sobre dados construídos pela equipe | Equipe | **Data a confirmar pela equipe** | Aprovada |
+| D02 | Desenvolver interface própria no MVP, sem integrar diretamente o ecossistema Microsoft | O parceiro utiliza Microsoft Copilot Studio e Power Platform, mas o acesso ao ambiente corporativo depende de aprovação de TI e compliance | Desenvolver diretamente no Copilot Studio; aguardar liberação de acesso antes de iniciar o desenvolvimento | A liberação de acesso tem alta probabilidade de atraso (AM3, probabilidade 70%); a arquitetura desacoplada permite futuras integrações sem reescrita | O MVP é demonstrado em ambiente próprio da equipe; o material de correspondência com o ecossistema Microsoft é entregue separadamente | Equipe | **Data a confirmar pela equipe** | Aprovada |
+| D03 | Manter o núcleo de PLN desacoplado das aplicações clientes e exposto por APIs REST | Premissa do parceiro de que a plataforma de gestão de portfólio pode ser substituída no futuro | Acoplar o pipeline ao Copilot Studio; desenvolver sem separação formal de camadas | Desacoplamento reduz o custo de migração e é requisito direto do RNF05; também sustenta a oportunidade OP1 da matriz de riscos | O pipeline pode ser consumido por qualquer aplicação cliente sem duplicação das regras de negócio | Equipe | **Data a confirmar pela equipe** | Aprovada |
+| D04 | RF06 (Atualizar cadastro de projetos) não recebe diagrama de sequência na Sprint 1 | RF06 tem prioridade baixa e representa variação do cenário 2; no MVP, gera apenas sugestão copiável sem escrita nas fontes | Modelar RF06 com diagrama próprio; incluir fluxo de confirmação explícita | O comportamento sugestivo do RF06 é coberto pela modelagem do cenário 2; a escrita com confirmação pertence à evolução futura | A ausência de diagrama é declarada explicitamente no documento como limitação desta sprint e não como omissão | Equipe | **Data a confirmar pela equipe** | Aprovada |
+| D05 | Cenários de sequência representam apenas o fluxo principal nesta sprint | Os desvios (rejeição de intenção desconhecida, esclarecimento de parâmetros, falha de transcrição, indisponibilidade de fonte) aumentariam significativamente a complexidade dos diagramas | Incluir todos os fragmentos alternativos desde a Sprint 1; dividir cada cenário em diagrama principal e diagrama de exceção | Privilegiar legibilidade na primeira especificação; os desvios entram na Sprint 2 conforme registrado no documento | Os critérios de aceitação dos RFs descrevem os desvios, mas eles não aparecem graficamente nesta sprint | Equipe | **Data a confirmar pela equipe** | Aprovada |
 | D06 | RNF09 substituído de "Tratamento de ambiguidades" para "Auditabilidade das interações" | A equipe não possuía informações suficientes para sustentar metas mensuráveis para o RNF09 original; o componente de auditoria já estava presente na arquitetura (seção 2.4) sem requisito formal correspondente | Manter o RNF09 original com metas pendentes; remover o requisito sem substituição | Auditabilidade é exigência direta das restrições de rastreabilidade do parceiro e estava prevista na arquitetura sem cobertura por requisito não funcional | O RNF09 de auditabilidade passou a cobrir o componente "Auditoria e Feedback" da solução técnica; o tratamento de ambiguidades permanece como comportamento descrito nos critérios de aceitação do RF02 | Equipe | 2026-08-14 | Aprovada |
 
-# 4. Fontes
+# 6. Fontes
 
 - ANPTrilhos. [Balanço do Setor Metroferroviário 2024](https://anptrilhos.org.br/balanco-metroferroviario-2024-transporte-sobre-trilhos-cresce-e-transporta-257-bilhoes-de-passageiros/). Acesso em ago. 2026.
 - Microsoft. [Design effective language understanding — Microsoft Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/language-understanding). Acesso em ago. 2026.

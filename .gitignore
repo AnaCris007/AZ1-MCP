@@ -8,4 +8,8 @@ venv/
 *.egg-info/
 build/
 dist/
-*pem
+.aiox-core
+
+# chaves privadas de acesso
+*.pem
+*.ppk
