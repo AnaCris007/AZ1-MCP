@@ -1967,78 +1967,55 @@ Com essas definições, o contrato da API estabelece como o áudio entra no sist
 <!-- Exemplo do que incluir: entidades, relacionamentos, atributos principais e diagramas dos modelos de dados. -->
 
 ### 3.7 Processo de Deploy em Nuvem
-### 3.6 Processo de Deploy em Nuvem
 
-Esta seção descreve como a solução sai do ambiente de desenvolvimento e passa a executar em nuvem: qual provedor foi escolhido e por quê (3.6.1), como os artefatos se distribuem entre os nós de execução (3.6.2), quais serviços gratuitos sustentam o ambiente acadêmico (3.6.3), quais passos reproduzem a implantação do zero (3.6.4), qual o contrato da API implantada (3.6.5), como cada alteração de código chega aos ambientes (3.6.6) e como verificar que tudo subiu corretamente (3.6.7). As seções 3.6.8 e 3.6.9 registram, respectivamente, o caminho para produção e as decisões técnicas ainda em aberto.
+Esta seção descreve como a solução sai do ambiente de desenvolvimento e passa a executar em nuvem. Enquanto o projeto arquitetural define *o que* a solução faz e como suas responsabilidades se organizam, o processo de deploy define *onde* essas responsabilidades executam, sob qual provedor, com quais recursos e por quais caminhos de comunicação.
 
-#### 3.6.1 Arquitetura e Provedor Selecionado
+ O ambiente adotado é o AWS Academy, concedido pela instituição de ensino. Trata-se de um ambiente acadêmico, com crédito e catálogo de serviços limitados, o que impõe restrições de dimensionamento e de continuidade que estão registradas ao longo da seção. A implantação é tratada, portanto, como prova de conceito técnica sobre dados sintéticos, e não como operação em ambiente produtivo.
 
-O deploy do pipeline de Processamento de Linguagem Natural foi definido para o **Microsoft Azure**. No MVP, o núcleo permanece independente; Copilot Studio, Power Platform, Teams e SharePoint são integrações futuras com o ambiente corporativo do parceiro.
+#### 3.7.1 Arquitetura e Provedor Selecionado
+
+ O deploy do MVP foi definido para o **AWS Academy**, o programa educacional da Amazon Web Services disponibilizado pela instituição de ensino. A escolha se apoia em duas razões independentes.
+
+ A primeira é de **viabilidade**: o acesso é concedido pela faculdade, sem custo para a equipe e sem necessidade de cartão de crédito ou de aprovação de orçamento, o que elimina o risco de o projeto parar por indisponibilidade de infraestrutura durante as sprints.
+
+ A segunda é de **portabilidade**: toda a pilha implantada é composta por tecnologias de código aberto e por interfaces padronizadas — Docker para empacotamento, PostgreSQL para persistência, Python e FastAPI no backend, React e Next.js na interface. Nenhum componente do núcleo depende de serviço proprietário de um provedor específico. É importante registrar a distinção: a AWS não é uma plataforma de código aberto, e o argumento não é sobre o provedor, e sim sobre o que é implantado sobre ele. Como o núcleo é aberto e conteinerizado, a mesma imagem que roda no AWS Academy roda em qualquer outro provedor, o que preserva a possibilidade de a solução ser futuramente promovida para o ambiente Microsoft utilizado pelo Metrô sem reescrita de código.
+
+ Essa decisão tem uma consequência que precisa estar explícita: o ambiente de deploy do MVP deixa de coincidir com o ecossistema de produção do parceiro. A aderência ao ambiente Microsoft, prevista no TAPI, passa a ser garantida pela portabilidade da pilha e pelas integrações registradas na Seção 3.7.8, e não pelo provedor escolhido para o ambiente acadêmico.
 
 **Componentes principais:**
 
-| Componente | Serviço Microsoft | Justificativa |
-|-----------|------------------|--------------|
-| Hospedagem do modelo | Azure App Service (tier gratuito) | HTTP API nativa, escalável, integrado com ecossistema Microsoft |
-| Integração futura | Copilot Studio | Possível orquestração corporativa após o MVP independente |
-| Persistência de dados | PostgreSQL | Mantém a tecnologia de banco definida para o MVP e pode ser hospedada em serviço compatível no Azure |
-| Conversão de voz | Azure Cognitive Services (Speech-to-Text) | Free tier generoso: 5 horas/mês grátis |
-| Integração de processos | Power Automate | Automações e orquestração de workflows |
-| Ambiente completo | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários, inclui Teams, SharePoint, Entra ID |
-| Componente | Nó no diagrama | Serviço Microsoft | Justificativa |
+| Componente | Nó no diagrama | Serviço AWS | Justificativa |
 |---|---|---|---|
-| Interface web | Web App Frontend | Azure App Service | Serve a Chat UI construída em React, TypeScript e Next.js |
-| Núcleo da aplicação | Web App Backend | Azure App Service | Hospeda o pipeline de PLN, as regras de negócio e as APIs REST |
-| Empacotamento e publicação | Docker - Azure Container | Azure Container Registry | Guarda as imagens de frontend e backend utilizadas na implantação |
-| Persistência de dados | Database - Azure Storage | Azure SQL Database (free tier 12 meses) | Banco relacional único, com os schemas de portfólio e de auditoria |
-| Armazenamento de arquivos | Bucket Storage | Azure Blob Storage | Conteúdo não relacional: prompts e documentos sintéticos |
-| Conversão de voz | API de Transcrição | Azure AI Speech (Speech to Text) | Free tier de 5 horas de áudio por mês |
-| Modelo de linguagem | LLM | API de modelo de linguagem | Geração de respostas e apoio à recuperação de informação |
-| Observabilidade | Rastreabilidade | Application Insights | Telemetria e logs técnicos, distintos do log de auditoria |
-| Ambiente completo | — | Microsoft 365 Developer Program | Tenant sandbox com 25 usuários; base da integração futura |
+| Interface web | Web App Frontend | Amazon EC2 | Executa o contêiner que serve a Chat UI construída em React, TypeScript e Next.js |
+| Núcleo da aplicação | Web App Backend | Amazon EC2 | Executa o contêiner com o pipeline de PLN, as regras de negócio e as APIs REST |
+| Empacotamento e publicação | Docker - Amazon ECR | Amazon Elastic Container Registry | Guarda as imagens de frontend e backend produzidas pelo pipeline |
+| Persistência de dados | Database - PostgreSQL | PostgreSQL | Banco relacional único, com os schemas de portfólio e de auditoria. A forma de hospedagem ainda não está definida — ver Seção 3.7.9 |
+| Armazenamento de arquivos | Amazon S3 - Bucket Storage | Amazon S3 | Conteúdo não relacional: prompts e demais artefatos do pipeline |
+| Conversão de voz | API de Transcrição | Amazon Transcribe | Converte em texto o áudio recebido pelo backend (RF01 e RNF06) |
+| Modelo de linguagem | LLM - Serviço externo | API de modelo de linguagem | Geração de respostas e apoio à recuperação de informação; consumido como serviço externo |
+| Observabilidade | Rastreabilidade | Amazon CloudWatch | Telemetria e logs técnicos, distintos do log de auditoria |
 
 **Por que essa arquitetura:**
-- **Alinhamento com parceiro** — Todo o ecossistema real de produção é Microsoft
-- **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados
-- **Controle de custo acadêmico** — as camadas gratuitas poderão ser utilizadas quando disponíveis e compatíveis com a implantação escolhida
-- **Reprodutibilidade** — os passos e parâmetros necessários serão registrados para repetição em ambiente autorizado
 
-**Arquitetura em alto nível:**  
+- **Viabilidade imediata** — o acesso ao AWS Academy é concedido pela instituição de ensino, sem custo para a equipe;
+- **Pilha de código aberto** — Docker, PostgreSQL, Python, FastAPI, React e Next.js compõem o núcleo, sem dependência de serviço proprietário;
+- **Portabilidade** — como o núcleo é conteinerizado e aberto, a mesma imagem pode ser promovida para outro provedor, inclusive para o ambiente Microsoft do parceiro;
+- **Banco único** — a persistência estruturada foi concentrada em um único banco relacional, sem introduzir base não relacional, conforme decidido na Seção 2.5;
+- **Reprodutibilidade** — os passos e parâmetros necessários são registrados na Seção 3.7.4 para repetição em ambiente autorizado.
 
-```
-Usuário em Teams / Copilot Studio (Microsoft 365)
-        ↓
-  Copilot Studio (orquestração nativa)
-        ├→ Power Automate (automações)
-        ├→ Azure App Service (API do modelo NLP)
-        │       ├→ Azure SQL Database / Cosmos DB (logs, histórico)
-        │       └→ Application Insights (monitoramento)
-        ├→ Azure Cognitive Services (STT/TTS)
-        └→ SharePoint / OneDrive (documentos integrados)
-```
-
-
-#### 3.6.2 Serviços Gratuitos e Limites
-
-- **Alinhamento com o parceiro** — todo o ecossistema real de produção do Metrô é Microsoft;
-- **Integração nativa** — Copilot Studio, Power Automate, Teams e SharePoint funcionam sem adaptadores customizados quando a solução for promovida;
-- **Custo zero acadêmico** — Azure Free Tier e M365 Developer Program cobrem o ambiente de desenvolvimento sem cobrança;
-- **Reprodutibilidade** — qualquer integrante com conta Microsoft consegue replicar o ambiente em sandbox;
-- **Banco único** — a persistência estruturada foi concentrada em um único banco relacional, sem introduzir base não relacional, conforme decidido na Seção 2.5.
-
-#### 3.6.2 Diagrama de Implantação
+#### 3.7.2 Diagrama de Implantação
 
  Enquanto o diagrama de componentes da Seção 2.4 responde *o que* a solução faz, organizando as responsabilidades em três camadas lógicas, o diagrama de implantação responde *onde* cada uma dessas responsabilidades passa a executar depois do deploy. É a passagem da visão lógica para a visão física: os mesmos componentes especificados nas Seções 2.2 e 2.3 reaparecem aqui distribuídos entre nós concretos de execução, cada um com um serviço de nuvem correspondente e um protocolo definido de comunicação.
 
- A notação adotada é a de diagrama de implantação da UML, no mesmo padrão empregado pela documentação de arquitetura da Microsoft para soluções hospedadas em Azure. Cada cubo representa um `<<Node>>`, isto é, um ambiente de execução com identidade própria — uma máquina, um contêiner ou um serviço gerenciado. Os retângulos internos representam os elementos implantados nesse nó: `<<Component>>` para unidades com comportamento em tempo de execução e `<<Artifact>>` para arquivos entregues, como as imagens de contêiner. As linhas entre os nós são caminhos de comunicação, e o rótulo de cada uma indica o protocolo empregado.
+ A notação adotada é a de diagrama de implantação da UML. Cada cubo representa um `<<Node>>`, isto é, um ambiente de execução com identidade própria — uma máquina, um contêiner ou um serviço gerenciado. Os retângulos internos representam os elementos implantados nesse nó: `<<Component>>` para unidades com comportamento em tempo de execução e `<<Artifact>>` para arquivos entregues, como as imagens de contêiner. As linhas entre os nós são caminhos de comunicação e cada uma está rotulada com o protocolo que a percorre; as portas correspondentes estão detalhadas na tabela de caminhos de comunicação desta seção e reaparecem, como regras de firewall, na Seção 3.7.4.
 
- A organização em nós separa três fronteiras que importam para o projeto. A primeira é a fronteira do cliente: o nó **Internet - Browser** é o único que executa fora da infraestrutura de nuvem, na máquina do profissional do PMO. A segunda é a fronteira da assinatura: a **Instância de Deploy na Nuvem** reúne tudo o que a equipe provisiona e controla. A terceira é a fronteira do serviço externo: o nó **LLM** aparece fora da instância porque o modelo de linguagem é consumido como serviço de terceiro, o que tem consequências diretas sobre autenticação, custo e tráfego de dados — motivo pelo qual, no MVP, apenas dados sintéticos transitam por ele.
+ A organização em nós separa três fronteiras que importam para o projeto. A primeira é a fronteira do cliente: o nó **Internet - Browser** é o único que executa fora da infraestrutura de nuvem, na máquina do profissional do PMO. A segunda é a fronteira da conta acadêmica: a **Instância de Deploy na Nuvem** reúne tudo o que a equipe provisiona e controla dentro do AWS Academy. A terceira é a fronteira do serviço externo: o nó **LLM** aparece fora da instância porque o modelo de linguagem é consumido como serviço de terceiro, o que tem consequências diretas sobre autenticação, custo e tráfego de dados — motivo pelo qual, no MVP, apenas dados sintéticos transitam por ele.
 
 ##### Diagrama de implantação (UML)
 
 <div align="center">
-<sub>Imagem 3.6.1 - Diagrama de implantação (UML) — Distribuição dos artefatos da solução em nuvem</sub><br>
-  <img src="../assets/diagrama_de_deploy.drawio.svg" width="100%" alt="Diagrama de implantação UML da solução: o nó Internet - Browser contém a Chat UI e a Captura de áudio; a Instância de Deploy na Nuvem contém os nós Web App Frontend, Docker - Azure Container, Web App Backend com nove componentes, API de Transcrição, Database - Azure Storage, Bucket Storage e Rastreabilidade; o nó LLM aparece fora da instância de nuvem"><br>
+<sub>Imagem 3.7.1 - Diagrama de implantação (UML) — Distribuição dos artefatos da solução em nuvem</sub><br>
+  <img src="../assets/diagrama_de_deploy.svg" width="100%" alt="Diagrama de implantação UML da solução: o nó Internet - Browser contém a Chat UI e a Captura de áudio; a Instância de Deploy na Nuvem contém os nós Web App Frontend, Docker - Amazon ECR, Web App Backend com nove componentes, API de Transcrição, Database - PostgreSQL, Amazon S3 - Bucket Storage e Rastreabilidade; o nó LLM - Serviço externo aparece fora da instância de nuvem"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -2047,40 +2024,43 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 | Nó | Elementos implantados | Responsabilidade |
 |---|---|---|
 | **Internet - Browser** | Chat UI, Captura de áudio | Único nó fora da infraestrutura de nuvem: executa no navegador da máquina do profissional do PMO. A Chat UI é o código de interface baixado do Web App Frontend e executado localmente; é por ela que a solicitação é digitada e que a resposta é exibida junto da fonte consultada e da data de referência (RF02 e RF03). A Captura de áudio grava a mensagem falada e a encaminha como arquivo ao backend, atendendo ao canal de voz previsto no RF01 e à acessibilidade exigida pelo RNF06. Nenhum processamento de linguagem natural ocorre neste nó: ele apenas coleta a entrada e apresenta a saída. |
-| **Web App Frontend** | React + TypeScript + Next.js, Assets estáticos | Hospeda a aplicação cliente e a entrega ao navegador. Os Assets estáticos reúnem os arquivos de JavaScript, folhas de estilo e fontes que compõem a Chat UI; o bloco React + TypeScript + Next.js responde pela construção e pela renderização dessas telas. A separação em relação ao Web App Backend mantém a aplicação cliente desacoplada do núcleo, condição do RNF05 para que outras aplicações possam futuramente consumir a mesma API. |
-| **Docker - Azure Container** | `<<Artifact>>` Imagens frontend + backend | Registro das imagens de contêiner produzidas pelo pipeline descrito na Seção 3.6.6. Não participa da execução: sua função é guardar a versão exata de frontend e backend que foi construída, testada e aprovada, para que os dois Web Apps obtenham dela a imagem no momento da implantação. É esse nó que garante que a versão validada em homologação seja idêntica à promovida para produção. |
-| **Web App Backend** | API Gateway, Controle de Acesso implícito no Gateway, PLN - Compreensão, PLN - Transações e Ações, API de Recebimento de áudio, API de Transcrição, Gerador de Respostas, Auditoria e Feedback, Agendador, Lista de Tarefas | Concentra toda a camada de lógica de negócio definida na Seção 2.4. O API Gateway centraliza a entrada das solicitações e autentica o usuário antes de qualquer processamento (RNF02). A API de Recebimento de áudio aceita o arquivo enviado pelo navegador e a API de Transcrição atua como cliente do serviço de voz, de modo que áudio e texto convergem para o mesmo fluxo (RF01 e RNF06). O PLN - Compreensão classifica a intenção e extrai os parâmetros da solicitação (RNF03), encaminhando pedidos de preenchimento e alertas ao PLN - Transações e Ações (RF04, RF05 e RF06) e consultas ao Gerador de Respostas (RF02), que monta a saída e informa a fonte e a justificativa (RF03 e RNF11). O Agendador executa as verificações periódicas que não dependem de solicitação do usuário e alimenta a Lista de Tarefas com as pendências encontradas, sustentando o acompanhamento preventivo do RF05. O Auditoria e Feedback registra usuário, data, canal, intenção, fontes e resultado de cada interação (RNF04). |
-| **API de Transcrição** | Speech to Text | Serviço gerenciado de conversão de fala em texto, provisionado na mesma assinatura. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. |
-| **Database - Azure Storage** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback exigidos pelo RNF04. A separação em dois schemas, e não em dois bancos, atende à exigência da Seção 2.4 de proteger os logs contra alteração por usuário comum — o controle é feito por permissão — sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. |
-| **Bucket Storage** | Armazenamento de Prompts | Armazenamento de objetos para o conteúdo que não se representa bem em modelo relacional. Guarda os prompts utilizados pelo pipeline de PLN, versionados de forma independente do código, o que permite ajustá-los sem reconstruir a imagem do backend. |
-| **Rastreabilidade** | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois Web Apps. Não se confunde com o schema `auditoria`: a Rastreabilidade responde à pergunta técnica de saber se o sistema está funcionando, enquanto a auditoria responde à pergunta de negócio de saber quem pediu o quê e com qual resultado (RNF04). São dados com público, retenção e requisito de imutabilidade distintos, e por isso ficam em nós distintos. |
-| **LLM** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11). Por estar fora da fronteira da assinatura, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
+| **Web App Frontend** (Amazon EC2) | React + TypeScript + Next.js, Assets estáticos | Hospeda a aplicação cliente e a entrega ao navegador. Os Assets estáticos reúnem os arquivos de JavaScript, folhas de estilo e fontes que compõem a Chat UI; o bloco React + TypeScript + Next.js responde pela construção e pela renderização das telas. A separação em relação ao Web App Backend mantém a aplicação cliente desacoplada do núcleo, condição do RNF05 para que outras aplicações possam futuramente consumir a mesma API. |
+| **Docker - Amazon ECR** | `<<Artifact>>` Imagens frontend + backend | Registro das imagens de contêiner produzidas pelo pipeline descrito na Seção 3.7.6. Não participa da execução: sua função é guardar a versão exata de frontend e backend que foi construída, testada e aprovada, para que as instâncias EC2 obtenham dela a imagem no momento da implantação. É esse nó que garante que a versão validada em homologação seja idêntica à promovida para produção. |
+| **Web App Backend** (Amazon EC2) | API Gateway, PLN - Compreensão, PLN - Transações e Ações, API de Recebimento de áudio, API de Transcrição, Gerador de Respostas, Auditoria e Feedback, Agendador, Lista de Tarefas | Concentra toda a camada de lógica de negócio definida na Seção 2.4. O API Gateway centraliza a entrada das solicitações e autentica o usuário antes de qualquer processamento (RNF02). A API de Recebimento de áudio aceita o arquivo enviado pelo navegador e a API de Transcrição atua como cliente do serviço de voz, de modo que áudio e texto convergem para o mesmo fluxo (RF01 e RNF06). O PLN - Compreensão classifica a intenção e extrai os parâmetros da solicitação (RNF03), encaminhando pedidos de preenchimento e alertas ao PLN - Transações e Ações (RF04, RF05 e RF06) e consultas ao Gerador de Respostas (RF02), que monta a saída e informa a fonte e a justificativa (RF03 e RNF11). O Agendador executa as verificações periódicas que não dependem de solicitação do usuário e alimenta a Lista de Tarefas com as pendências encontradas, sustentando o acompanhamento preventivo do RF05. O Auditoria e Feedback registra usuário, data, canal, intenção, fontes e resultado de cada interação (RNF04). |
+| **API de Transcrição** (Amazon Transcribe) | Speech to Text | Serviço gerenciado de conversão de fala em texto, provisionado na mesma conta. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. |
+| **Database - PostgreSQL** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback exigidos pelo RNF04. A separação em dois schemas, e não em dois bancos, atende à exigência da Seção 2.4 de proteger os logs contra alteração por usuário comum — o controle é feito por permissão — sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. A forma de hospedagem do PostgreSQL, em serviço gerenciado ou em contêiner na própria instância EC2, permanece em aberto na Seção 3.7.9. |
+| **Amazon S3 - Bucket Storage** | Armazenamento de Prompts | Armazenamento de objetos para o conteúdo que não se representa bem em modelo relacional. Guarda os prompts utilizados pelo pipeline de PLN, versionados de forma independente do código, o que permite ajustá-los sem reconstruir a imagem do backend. |
+| **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a Rastreabilidade responde à pergunta técnica de saber se o sistema está funcionando, enquanto a auditoria responde à pergunta de negócio de saber quem pediu o quê e com qual resultado (RNF04). São dados com público, retenção e requisito de imutabilidade distintos, e por isso ficam em nós distintos. |
+| **LLM - Serviço externo** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11). Por estar fora da fronteira da conta acadêmica, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
 
 ##### Caminhos de comunicação
 
-| Origem → destino | Protocolo ou mecanismo | Momento | Dados e motivo da conexão |
-|---|---|---|---|
-| Usuário → Internet - Browser | Interação direta | Execução | Solicitação digitada ou falada pelo profissional do PMO. |
-| Chat UI → Web App Frontend | HTTPS | Execução | Baixa os arquivos que compõem a interface — JavaScript, folhas de estilo e fontes — na primeira visita e a cada nova versão publicada. |
-| Captura de áudio → API de Recebimento de áudio | HTTPS/REST | Execução | Envia o arquivo de áudio gravado no navegador para que a transcrição ocorra no servidor, e não no cliente. |
-| Chat UI → API Gateway | HTTPS/REST | Execução | Envia a solicitação em texto e recebe a resposta estruturada, mantendo a aplicação cliente desacoplada da lógica interna (RNF05). |
-| API de Recebimento de áudio → API de Transcrição | HTTPS/REST | Execução | Encaminha o áudio ao serviço de voz e recebe o texto transcrito, que segue pelo mesmo fluxo das mensagens digitadas. |
-| Web App Backend → LLM | HTTPS/REST | Execução | Envia o contexto recuperado e recebe a resposta gerada em linguagem natural, empregada pelo Gerador de Respostas. |
-| Web App Backend → Database - Azure Storage | SQL sobre TLS | Execução | Consulta os dados do portfólio para responder e para identificar pendências, e grava os registros de auditoria. |
-| Web App Backend → Bucket Storage | HTTPS com SDK | Execução | Lê os prompts utilizados pelo pipeline de PLN. |
-| Auditoria e Feedback → Rastreabilidade | Telemetria | Execução | Publica eventos, métricas e logs técnicos para monitoramento da disponibilidade e do desempenho. |
-| Docker - Azure Container → Web App Frontend | `docker pull` | Implantação | Entrega a imagem do frontend ao App Service no momento do deploy. |
-| Docker - Azure Container → Web App Backend | `docker pull` | Implantação | Entrega a imagem do backend ao App Service no momento do deploy. |
+| # | Origem → destino | Protocolo | Porta | Momento | Dados e motivo da conexão |
+|---|---|---|---|---|---|
+| C1 | Usuário → Internet - Browser | Interação direta | — | Execução | Solicitação digitada ou falada pelo profissional do PMO. |
+| C2 | Chat UI → Web App Frontend | HTTPS | 443 | Execução | Baixa os arquivos que compõem a interface — JavaScript, folhas de estilo e fontes — na primeira visita e a cada nova versão publicada. Enquanto não houver certificado, o acesso ocorre por HTTP na porta 80, ou diretamente na porta 3000 do processo Next.js. |
+| C3 | Chat UI → API Gateway | HTTPS/REST, JSON com JWT | 443 | Execução | Envia a solicitação em texto e recebe a resposta estruturada, mantendo a aplicação cliente desacoplada da lógica interna (RNF05). O processo do backend escuta internamente na porta 8000. |
+| C4 | Captura de áudio → API de Recebimento de áudio | HTTPS/REST, `multipart/form-data` | 443 | Execução | Envia o arquivo de áudio gravado no navegador para que a transcrição ocorra no servidor, e não no cliente. Compartilha a mesma porta de C3, por ser outro recurso da mesma API. |
+| C5 | API de Transcrição → API de Transcrição (Amazon Transcribe) | HTTPS, AWS SDK | 443 | Execução | Encaminha o áudio ao serviço de voz e recebe o texto transcrito, que segue pelo mesmo fluxo das mensagens digitadas. Conexão de saída da instância. |
+| C6 | Web App Backend → LLM - Serviço externo | HTTPS/REST | 443 | Execução | Envia o contexto recuperado e recebe a resposta gerada em linguagem natural, empregada pelo Gerador de Respostas. Única conexão que sai da fronteira da conta acadêmica. |
+| C7 | Web App Backend → Database - PostgreSQL | `PostgreSQL/TLS` — protocolo nativo do PostgreSQL sobre TLS | 5432 | Execução | Consulta os dados do portfólio para responder e para identificar pendências, e grava os registros de auditoria. Não é HTTP: o PostgreSQL usa protocolo próprio de mensagens sobre TCP, e o TLS o encapsula. |
+| C8 | Web App Backend → Amazon S3 - Bucket Storage | HTTPS, AWS SDK (`GetObject` / `PutObject`) | 443 | Execução | Lê os prompts utilizados pelo pipeline de PLN. |
+| C9 | Auditoria e Feedback → Rastreabilidade | HTTPS, AWS SDK (`PutLogEvents` / `PutMetricData`) | 443 | Execução | Publica eventos, métricas e logs técnicos para monitoramento da disponibilidade e do desempenho. |
+| C10 | Docker - Amazon ECR → Web App Frontend | `<<deploy>>` `docker pull` sobre HTTPS | 443 | Implantação | Entrega a imagem do frontend à instância no momento do deploy. |
+| C11 | Docker - Amazon ECR → Web App Backend | `<<deploy>>` `docker pull` sobre HTTPS | 443 | Implantação | Entrega a imagem do backend à instância no momento do deploy. |
+| C12 | Administrador → Instância EC2 | SSH | 22 | Operação | Acesso administrativo da equipe à instância para configuração e verificação. Não aparece no diagrama por ser um caminho de operação, e não de execução da solução; está detalhado na Seção 3.7.4. |
 
- A coluna **Momento** separa os dois planos que o diagrama necessariamente sobrepõe. As conexões de **Execução** ocorrem a cada interação do usuário e trafegam dados por HTTP, SQL ou SDK. As conexões de **Implantação** ocorrem uma única vez a cada deploy, quando o App Service obtém a imagem no registro e sobe o contêiner. A distinção evita a leitura equivocada de que o navegador obteria imagens de contêiner: o navegador participa apenas do primeiro plano e recebe arquivos servidos pelo Web App Frontend.
+ A coluna **Momento** separa os planos que o diagrama necessariamente sobrepõe. As conexões de **Execução** ocorrem a cada interação do usuário e trafegam dados por HTTP, pelo protocolo do banco ou por SDK. As conexões de **Implantação** ocorrem uma única vez a cada deploy, quando a instância obtém a imagem no registro e sobe o contêiner. A distinção evita a leitura equivocada de que o navegador obteria imagens de contêiner: o navegador participa apenas do primeiro plano e recebe arquivos servidos pelo Web App Frontend. A conexão de **Operação** não pertence a nenhum dos dois planos: existe para que a equipe administre a instância.
+
+ Duas observações sobre a leitura das portas. A primeira é que a porta 443 predomina porque quase toda comunicação entre nós é HTTP sobre TLS — o que muda de uma conexão para outra não é a porta, e sim o recurso chamado e o formato do corpo da mensagem, registrados na última coluna. A segunda é que a porta exposta ao exterior não coincide com a porta interna do processo: o frontend responde em 3000 e o backend em 8000 dentro do contêiner, e ambos só são alcançados de fora pelas portas publicadas na instância. Essa distinção é o que permite fechar o grupo de segurança conforme a Seção 3.7.4.
 
 ##### Fluxo de uma solicitação ponta a ponta
 
  Os três percursos a seguir descrevem como os nós do diagrama cooperam nos cenários especificados na Seção 2.2.2, e cobrem todos os elementos implantados.
 
- **Consulta em texto.** O profissional abre o AZ1 no navegador; a Chat UI já foi baixada do Web App Frontend e executa localmente. Ao enviar a pergunta, a Chat UI faz uma requisição HTTPS ao API Gateway, no Web App Backend, que autentica o usuário e valida suas permissões antes de prosseguir (RNF02). O PLN - Compreensão classifica a solicitação como consulta e extrai os parâmetros mencionados, como o nome do projeto e o período (RNF03). O Gerador de Respostas consulta o schema `portfolio` no banco, recupera os prompts necessários no Bucket Storage e aciona o LLM para redigir a resposta, que retorna à Chat UI acompanhada da fonte consultada e da data de referência (RF02 e RF03). Em paralelo, o Auditoria e Feedback grava a interação no schema `auditoria` e publica os eventos técnicos na Rastreabilidade (RNF04).
+ **Consulta em texto.** O profissional abre o AZ1 no navegador; a Chat UI já foi baixada do Web App Frontend e executa localmente. Ao enviar a pergunta, a Chat UI faz uma requisição HTTPS ao API Gateway, no Web App Backend, que autentica o usuário e valida suas permissões antes de prosseguir (RNF02). O PLN - Compreensão classifica a solicitação como consulta e extrai os parâmetros mencionados, como o nome do projeto e o período (RNF03). O Gerador de Respostas consulta o schema `portfolio` no banco, recupera os prompts necessários no bucket S3 e aciona o LLM para redigir a resposta, que retorna à Chat UI acompanhada da fonte consultada e da data de referência (RF02 e RF03). Em paralelo, o Auditoria e Feedback grava a interação no schema `auditoria` e publica os eventos técnicos no CloudWatch (RNF04).
 
- **Solicitação por voz.** O percurso difere apenas na entrada. A Captura de áudio grava a mensagem falada e a envia à API de Recebimento de áudio, que valida o arquivo e o repassa à API de Transcrição; esta atua como cliente do serviço Speech to Text e devolve o texto correspondente. A partir desse ponto, a solicitação segue exatamente o mesmo caminho da consulta em texto, o que atende ao RF01 sem exigir um segundo pipeline de intenções e preserva a acessibilidade prevista no RNF06.
+ **Solicitação por voz.** O percurso difere apenas na entrada. A Captura de áudio grava a mensagem falada e a envia à API de Recebimento de áudio, que valida o arquivo e o repassa à API de Transcrição; esta atua como cliente do Amazon Transcribe e devolve o texto correspondente. A partir desse ponto, a solicitação segue exatamente o mesmo caminho da consulta em texto, o que atende ao RF01 sem exigir um segundo pipeline de intenções e preserva a acessibilidade prevista no RNF06.
 
  **Alerta proativo.** Este percurso não parte do usuário. O Agendador executa verificações periódicas sobre o schema `portfolio`, identificando prazos próximos, campos incompletos e documentos ausentes. As pendências encontradas alimentam a Lista de Tarefas, e o PLN - Transações e Ações as converte em alertas e sugestões de preenchimento, apresentados ao profissional quando ele acessa a interface (RF04, RF05 e RF06). Também aqui o Auditoria e Feedback registra o alerta gerado, de modo que a origem de cada recomendação permaneça rastreável.
 
@@ -2094,103 +2074,212 @@ Usuário em Teams / Copilot Studio (Microsoft 365)
 |---|---|---|
 | Chat UI - Texto e Voz | Internet - Browser, servida pelo Web App Frontend | O componente executa no navegador; o Web App Frontend é o nó que o entrega. |
 | API Gateway | Web App Backend | Ponto único de entrada; concentra também a autenticação e a validação de permissões. |
-| Conversão de Áudio em Texto | Web App Backend e API de Transcrição | Dividido em dois elementos: a API de Recebimento de áudio e a API de Transcrição no backend, e o Speech to Text no serviço gerenciado. |
+| Conversão de Áudio em Texto | Web App Backend e API de Transcrição (Amazon Transcribe) | Dividido em dois elementos: a API de Recebimento de áudio e a API de Transcrição no backend, e o Speech to Text no serviço gerenciado. |
 | Controle de Acesso | Web App Backend | Implantado junto ao API Gateway, aplicado antes de qualquer processamento de linguagem. |
 | PLN - Compreensão | Web App Backend | Classificação de intenção e extração de parâmetros. |
 | PLN - Transações e Ações | Web App Backend | Sugestões e alertas, apoiado pelo Agendador e pela Lista de Tarefas. |
-| Gerador de Respostas e Explicabilidade | Web App Backend, com apoio do LLM | A composição da resposta e a indicação da fonte permanecem no backend; o LLM apoia a redação. |
-| Auditoria e Feedback | Web App Backend | Grava no schema `auditoria` e publica telemetria na Rastreabilidade. |
-| Repositório de Dados e Conhecimento | Database - Azure Storage e Bucket Storage | Dados estruturados no banco; conteúdo não relacional no armazenamento de objetos. |
-| Logs de Auditoria | Database - Azure Storage, schema `auditoria` | Separados dos dados operacionais por schema e por permissão (RNF04). |
+| Gerador de Respostas e Explicabilidade | Web App Backend, com apoio do LLM - Serviço externo | A composição da resposta e a indicação da fonte permanecem no backend; o LLM apoia a redação. |
+| Auditoria e Feedback | Web App Backend | Grava no schema `auditoria` e publica telemetria no nó Rastreabilidade. |
+| Repositório de Dados e Conhecimento | Database - PostgreSQL e Amazon S3 - Bucket Storage | Dados estruturados no banco; conteúdo não relacional no armazenamento de objetos. |
+| Logs de Auditoria | Database - PostgreSQL, schema `auditoria` | Separados dos dados operacionais por schema e por permissão (RNF04). |
 
-#### 3.6.3 Serviços Gratuitos e Limites
+#### 3.7.3 Recursos do Ambiente Acadêmico e Limites
 
-**Azure Free Tier (sempre gratuito):**
+ O AWS Academy é disponibilizado pela instituição de ensino e opera sob limites que diferem de uma conta AWS comum. Esses limites não são um detalhe administrativo: eles condicionam o porte dos recursos, o tempo em que podem permanecer ativos e a continuidade do serviço, e por isso precisam estar registrados junto da arquitetura que se apoia neles.
 
-- Azure App Service: 1 aplicação Web grátis (até 60 minutos de computação por dia)
-- Azure AI Speech: 5 horas de áudio por mês no tier F0
-- Application Insights: 1 GB por mês de ingestão de logs
+**Limites do ambiente:**
 
-**Azure Free Tier (12 meses iniciais):**
+| Recurso | Limite | Consequência para o projeto |
+|---|---|---|
+| Crédito | US$ 50 por participante | Determina o porte da instância e o tempo total em que ela pode permanecer em execução. O consumo é proporcional ao tempo ligado, e não ao uso efetivo, o que torna a interrupção da instância ociosa a principal medida de contenção |
+| Duração da sessão | 4 horas por sessão de laboratório | Ao término, a instância é interrompida. O ambiente não permanece disponível entre sessões, o que impede a operação contínua |
+| Catálogo de serviços | Restrito à lista permitida pelo curso | Serviços previstos na arquitetura que não estejam liberados exigem alternativa de projeto |
+| Identidade e acesso | Papel de execução pré-definido, sem criação livre de usuários e políticas | A instância utiliza o papel fornecido pelo laboratório para acessar os demais serviços da conta |
+| Custo de acesso | Nenhum para a equipe | Concedido pela instituição, sem cartão de crédito nem aprovação de orçamento |
 
-- Azure SQL Database: 1 banco com até 5 GB grátis
-- Azure Container Registry: 1 registro com 500 MB grátis
-- Azure Blob Storage: cota gratuita de armazenamento e transações
+**Serviços em uso e serviços previstos.** O ambiente foi verificado para o **Amazon EC2**, utilizado com a imagem **Amazon Linux**, que é o serviço sobre o qual a configuração descrita na Seção 3.7.4 se apoia. Os demais serviços previstos na arquitetura da Seção 3.7.2 — Amazon ECR, Amazon S3, Amazon Transcribe e Amazon CloudWatch — ainda não tiveram sua disponibilidade confirmada no catálogo do laboratório. Essa confirmação precisa preceder as etapas de implantação, porque a indisponibilidade de qualquer um deles exige uma alternativa de projeto: o registro de imagens pode ser substituído pela construção local na própria instância, o armazenamento de objetos e a telemetria podem ser acomodados no volume da instância, mas a ausência do serviço de transcrição afetaria diretamente o canal de voz previsto no RF01 e no RNF06.
 
-**Microsoft 365 Developer Program:**
+A região habilitada é a **us-east-1 (Norte da Virgínia)**, e todos os recursos do projeto são provisionados nela.
 
-- Tenant completo com 25 usuários
-- Teams, SharePoint, OneDrive, Power Platform e Copilot Studio inclusos
-- Válido enquanto ativo (renovável)
+> [PENDENTE — confirmar no catálogo do laboratório a disponibilidade do Amazon ECR, do Amazon S3, do Amazon Transcribe e do Amazon CloudWatch.]
 
-**Para projeto acadêmico sem time constraint:**
-No projeto acadêmico, as camadas gratuitas serão usadas quando disponíveis e suficientes. A implantação real deverá considerar licenciamento e recursos corporativos.
-**Para o projeto acadêmico:**
-Utilizar Azure Free Tier somado ao M365 Developer Program. Para produção real, migrar para planos pagos mantendo a mesma arquitetura e as mesmas imagens.
+ Os recursos do AWS Academy serão utilizados enquanto forem suficientes para o MVP com dados sintéticos. A implantação em ambiente real deverá considerar licenciamento, disponibilidade contínua e recursos corporativos, conforme a Seção 3.7.8.
 
-#### 3.6.4 Etapas de Configuração e Implantação
+#### 3.7.4 Configuração da Instância EC2 e Acesso
 
-**Passo 1 — Criar os ambientes Microsoft:**
+ A instância Amazon EC2 é o nó que hospeda a execução da solução, e sua configuração antecede qualquer atividade de implantação: sem ambiente provisionado e acessível, não há onde publicar as imagens de contêiner nem como verificar o comportamento da aplicação. Esta seção documenta esse procedimento na ordem em que ele é executado, de modo que possa ser repetido por qualquer integrante da equipe e reproduzido em uma nova sessão do laboratório.
 
-1. Registrar-se no [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
-2. Criar o tenant sandbox (instantâneo, pré-configurado)
-3. Registrar-se no [Azure Portal](https://portal.azure.com) com a mesma conta
-4. Ativar os créditos de free tier, se aplicável
+ Os cinco passos seguem a ordem em que o ambiente foi efetivamente montado. O par de chaves e o grupo de segurança podem ser criados tanto dentro do assistente de criação da instância quanto em suas próprias telas do console; neste projeto foram criados em telas separadas, o que permite reutilizá-los em instâncias futuras sem repetir a configuração. As imagens que acompanham cada passo registram a evidência de sua execução.
 
-**Passo 2 — Configurar Azure para Hospedagem do Modelo:**
-1. Criar resource group `az1-nlp-dev`
-2. Criar Azure App Service (`F1 Free` para publicação compatível ou `B1 Basic`, pago, quando os requisitos exigirem)
-3. Configurar deployment via Git ou Docker (Azure Container Registry)
-4. Criar ou conectar uma instância PostgreSQL para persistência
-**Passo 2 — Provisionar a infraestrutura:**
+##### Passo 1 — Iniciar o laboratório do AWS Academy
 
-1. Criar o resource group `az1-nlp-dev`
-2. Criar o App Service Plan e os dois Web Apps: frontend e backend
-3. Criar o Azure Container Registry que abrigará as imagens
-4. Criar o Azure SQL Database e aplicar os schemas `portfolio` e `auditoria`
-5. Criar a conta de Blob Storage
-6. Provisionar o recurso de Azure AI Speech e o acesso ao modelo de linguagem
-7. Criar o recurso de Application Insights e vinculá-lo aos dois Web Apps
+1. Acessar o AWS Academy com a credencial institucional e abrir o laboratório da disciplina
+2. Iniciar a sessão do laboratório e aguardar o indicador de ambiente disponível
+3. Abrir o console da AWS a partir do próprio laboratório, sem criar conta própria
+4. Confirmar a região habilitada e mantê-la em todos os passos seguintes, uma vez que recursos criados em regiões distintas não se comunicam entre si
+5. Registrar o crédito remanescente e o horário de início, que delimitam o tempo útil de trabalho da sessão
 
-**Passo 3 — Preparar Modelo e API:**
-1. Estruturar projeto Python em `src/nlp-deploy/`
-2. Criar aplicação FastAPI com endpoint `/classify` que recebe `{"text": "..."}`
-3. Exportar modelo treinado (TF-IDF + LogReg ou BERTimbau em ONNX) para diretório `model/`
-4. Criar `requirements.txt` com dependências (flask, scikit-learn, joblib, ou onnxruntime)
-**Passo 3 — Preparar o backend:**
+ Duas restrições do ambiente condicionam todos os passos seguintes e convém tê-las em vista desde já: o crédito total é de **US$ 50 por participante** e a sessão do laboratório dura **4 horas**, ao fim das quais a instância é interrompida. A primeira restringe o porte e o tempo de execução dos recursos; a segunda significa que o ambiente não permanece no ar entre uma sessão e outra, com as consequências descritas ao final desta seção.
 
-1. Estruturar o projeto Python em `src/nlp-deploy/`
-2. Implementar os endpoints do Web App Backend, incluindo `/classify`, `/audio` e `/health`
-3. Exportar o modelo treinado para o diretório `model/`
-4. Declarar as dependências em `requirements.txt`
+<div align="center">
+<sub>Imagem 3.7.2 - Passo 1 — Laboratório do AWS Academy iniciado, com o crédito e o cronômetro da sessão visíveis</sub><br>
+  <img src="../assets/deploy/passo_1.png" width="90%" alt="Tela do Learner Lab do AWS Academy exibindo o indicador de crédito utilizado, o cronômetro da sessão e os controles Start Lab, End Lab e AWS Details"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
-**Passo 4 — Containerizar e publicar:**
+##### Passo 2 — Criar a instância e definir imagem, porte e armazenamento
 
-1. Criar o `Dockerfile` baseado em `python:3.11-slim`
-2. Testar localmente com `docker run` ou `docker compose up`
-3. Fazer o build e o push das imagens para o Azure Container Registry
-4. Apontar cada Web App para a imagem correspondente no registro
+ No console do EC2, a criação começa por **Launch Instance**. Os parâmetros definidos aqui determinam o custo por hora e, portanto, quanto do crédito disponível a instância consome enquanto permanece em execução.
 
-**Passo 5 — Configurar variáveis e segredos:**
+1. Nomear a instância de forma identificável — no projeto, `az1-app`
+2. Selecionar o **Amazon Linux 2023** como imagem de máquina (AMI), cujo usuário padrão de acesso é `ec2-user`
+3. Selecionar o tipo de instância de menor porte que atenda ao MVP — no projeto, `t3.micro` —, uma vez que o consumo de crédito é proporcional ao tempo de execução e ao porte escolhido
+4. Definir o volume de disco, mantido no tamanho padrão de 8 GiB
+5. Associar à instância o papel de execução disponibilizado pelo laboratório, em **Detalhes avançados → Perfil de instância do IAM**
 
-1. Registrar a cadeia de conexão do banco e as chaves dos serviços nas configurações do App Service
-2. Não versionar segredos: o `.env` permanece fora do repositório, conforme o `.gitignore`
+ O quinto item merece destaque por ser o menos evidente. É o papel de execução que permite à instância chamar os demais serviços da conta — o registro de imagens, o armazenamento de objetos, a transcrição e a telemetria — sem que credenciais precisem ser gravadas dentro da máquina ou da imagem de contêiner. Sem ele, as conexões C5, C8, C9, C10 e C11 da Seção 3.7.2 falham por falta de autorização, e o diagnóstico costuma ser demorado porque o erro só aparece na primeira chamada da aplicação, muito depois da criação da instância.
 
-**Passo 6 — Integração com Power Automate (Opcional):**
-1. Criar cloud flow acionado por evento (ex: novo documento no SharePoint)
-2. Chamar ação customizada do Copilot Studio ou diretamente API do Azure App Service
-3. Registrar resultado em lista do SharePoint ou tabela de SQL Database
-4. Enviar notificação para usuário via Teams
+ O volume de 8 GiB atende à configuração atual, em que a instância hospeda apenas o sistema operacional. Ele tende a ficar apertado quando as imagens de contêiner do frontend e do backend passarem a ser armazenadas localmente, e o espaço disponível deve ser reavaliado antes dessa etapa. O volume pode ser ampliado sem recriar a instância.
 
-#### 3.6.4 Exemplo de API (Flask)
+<div align="center">
+<sub>Imagem 3.7.3 - Passo 2 — Definição do nome, da imagem Amazon Linux 2023 e do porte da instância</sub><br>
+  <img src="../assets/deploy/passo_2.png" width="90%" alt="Assistente de criação de instância do Amazon EC2 exibindo o nome az1-app, a imagem Amazon Linux 2023 selecionada e o resumo com o tipo t3.micro e o volume de 8 GiB"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
 
-**Passo 6 — Integração futura com o ecossistema Microsoft (fora do escopo do MVP):**
+##### Passo 3 — Criar o par de chaves de acesso
 
-1. Criar o agente no Copilot Studio e adicionar uma ação que chame a URL do backend
-2. Criar fluxos no Power Automate acionados por eventos do SharePoint
-3. Publicar o agente no Teams e integrar a autenticação ao Microsoft Entra ID
+ O acesso à instância é feito por chave criptográfica, e não por senha. A chave privada é o único meio de entrar na máquina: se for perdida, não há recuperação possível e a instância precisa ser recriada.
 
-#### 3.6.5 Exemplo de API (Flask)
+1. Em **EC2 → Pares de chaves → Criar par de chaves**, nomear o par de forma que se associe à instância — no projeto, `az1-app`
+2. Selecionar **RSA** como tipo de par de chaves
+3. Selecionar o formato **`.pem`**, destinado ao uso com OpenSSH; o formato `.ppk` é necessário apenas para acesso por PuTTY
+4. Baixar a chave privada no momento da criação, pois a AWS não permite baixá-la novamente depois
+5. Restringir as permissões do arquivo, pois o cliente SSH recusa chaves com permissão aberta:
+
+```bash
+# Linux ou macOS
+chmod 400 ~/.ssh/az1-key.pem
+```
+
+```powershell
+# Windows — remove a herança e concede leitura apenas ao usuário atual
+icacls .\az1-key.pem /inheritance:r
+icacls .\az1-key.pem /grant:r "$($env:USERNAME):(R)"
+```
+
+ A chave deve ser guardada em local seguro e não deve ser compartilhada em canais de mensagem nem incluída no repositório. A definição de onde ela ficará versionada em relação ao projeto, assim como o tratamento dos demais segredos da aplicação, acompanha as etapas de implantação e está registrada ao final desta seção.
+
+<div align="center">
+<sub>Imagem 3.7.4 - Passo 3 — Criação do par de chaves `az1-app` no formato `.pem`</sub><br>
+  <img src="../assets/deploy/passo_3.png" width="90%" alt="Tela de criação de par de chaves do Amazon EC2 exibindo o nome az1-app, o tipo RSA e o formato de arquivo .pem selecionados"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+##### Passo 4 — Configurar as portas no grupo de segurança
+
+ O grupo de segurança é o firewall da instância e traduz, em regras, os caminhos de comunicação da Seção 3.7.2. Cada porta aberta corresponde a uma conexão prevista no diagrama; portas sem conexão correspondente permanecem fechadas. A edição é feita em **EC2 → Grupos de segurança → Editar regras de entrada**.
+
+**Regras de entrada configuradas:**
+
+| Tipo | Protocolo | Porta | Origem | Conexão correspondente | Motivo |
+|---|---|---|---|---|---|
+| SSH | TCP | 22 | `0.0.0.0/0` | C12 | Acesso administrativo à instância |
+| HTTP | TCP | 80 | `0.0.0.0/0` | C2 | Entrega da Chat UI ao navegador enquanto não houver certificado emitido |
+| HTTPS | TCP | 443 | `0.0.0.0/0` | C2, C3, C4 | Entrega da interface e chamadas à API, em texto e em áudio, após a emissão do certificado |
+
+ As regras de saída permanecem no padrão da AWS, que libera todo o tráfego originado na instância. Isso atende às conexões C5, C6, C8, C9, C10 e C11 — as chamadas da instância ao serviço de transcrição, ao modelo de linguagem, ao armazenamento de objetos, à telemetria e ao registro de imagens — sem configuração adicional.
+
+**Ajuste necessário na regra de SSH.** A porta 22 está aberta para `0.0.0.0/0`, e o próprio console da AWS sinaliza a condição na tela de edição. Isso significa que qualquer endereço da internet pode tentar autenticar-se na instância, o que a expõe a tentativas automatizadas de acesso. A mitigação atual é o acesso depender de chave criptográfica, e não de senha; ainda assim, a origem deve ser restringida ao endereço da equipe, em notação `/32`. O custo dessa restrição é apenas o de atualizá-la quando o endereço da equipe mudar, e ela está registrada como pendência na Seção 3.7.9.
+
+**Portas ainda não configuradas.** As três regras acima cobrem o estado atual, em que a instância hospeda apenas o sistema operacional. As portas a seguir serão necessárias nas etapas de implantação e devem ser abertas apenas quando os serviços correspondentes existirem, pois abrir portas sem serviço em escuta amplia a superfície exposta sem nenhum ganho:
+
+| Tipo | Porta | Origem recomendada | Conexão | Quando será necessária |
+|---|---|---|---|---|
+| TCP personalizado | 3000 | IP da equipe, em `/32` | — | Acesso direto ao processo Next.js durante os testes, antes de o frontend ser publicado nas portas 80 ou 443 |
+| TCP personalizado | 8000 | IP da equipe, em `/32` | — | Verificação do endpoint `/health` do backend antes de haver proxy |
+| PostgreSQL | 5432 | Grupo de segurança do backend | C7 | Acesso do backend ao banco. A origem deve ser o próprio grupo de segurança, e não uma faixa de endereços: assim o banco aceita conexões apenas de dentro do ambiente, independentemente do endereço que a instância receba a cada retomada de sessão, e nunca fica alcançável pela internet |
+
+ Concluída a configuração de rede, confirmar que a instância atingiu o estado **running**, com a verificação de status concluída, e registrar o identificador e o endereço público atribuídos.
+
+<div align="center">
+<sub>Imagem 3.7.5 - Passo 4 — Regras de entrada configuradas no grupo de segurança da instância</sub><br>
+  <img src="../assets/deploy/passo_4.png" width="90%" alt="Tela de edição de regras de entrada do grupo de segurança do Amazon EC2 exibindo as regras HTTP na porta 80, HTTPS na porta 443 e SSH na porta 22"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+##### Passo 5 — Acessar a instância e confirmar o provisionamento
+
+ Este passo encerra a configuração porque é o único que comprova que ela funcionou. Uma instância em estado **running** apenas indica que a máquina virtual foi iniciada; não indica que ela é alcançável. Enquanto o acesso não é estabelecido, um erro na regra da porta 22, no par de chaves ou na rede permanece invisível, e seria descoberto apenas na etapa de implantação, quando o custo de diagnosticá-lo é maior.
+
+ Há dois caminhos de acesso. O primeiro não depende de configuração local e serve para uma verificação rápida; o segundo é o que a equipe utiliza no trabalho corrente e o único que permite copiar arquivos para a instância.
+
+**Acesso pelo navegador, via EC2 Instance Connect.** Selecionar a instância no console do EC2, acionar **Conectar** e escolher a conexão pelo próprio navegador. Não exige chave nem cliente instalado, e foi o caminho utilizado para a verificação registrada na Imagem 3.7.6, em que o prompt confirma o usuário `ec2-user` e o sistema Amazon Linux 2023.
+
+**Acesso por SSH, a partir da máquina da equipe.** No Amazon Linux, o usuário padrão é `ec2-user`:
+
+```bash
+# Linux ou macOS
+ssh -i ~/.ssh/az1-key.pem ec2-user@<endereco-publico-da-instancia>
+```
+
+```powershell
+# Windows — o cliente SSH já acompanha o sistema
+ssh -i .\az1-key.pem ec2-user@<endereco-publico-da-instancia>
+```
+
+ Para transferir arquivos, o mesmo par de chaves atende:
+
+```bash
+scp -i ~/.ssh/az1-key.pem arquivo.txt ec2-user@<endereco-publico-da-instancia>:~/
+```
+
+**Quando o acesso falha,** a causa costuma estar em uma destas quatro condições, verificáveis nesta ordem:
+
+| Sintoma | Causa provável | Verificação |
+|---|---|---|
+| A conexão fica pendente e expira | A porta 22 não está liberada para o endereço de origem | Conferir a regra de entrada do grupo de segurança e o endereço público atual da máquina da equipe |
+| `Permission denied (publickey)` | Chave incorreta ou nome de usuário errado | Confirmar o par de chaves associado à instância e o uso de `ec2-user` como usuário |
+| `UNPROTECTED PRIVATE KEY FILE` | Permissões do arquivo `.pem` abertas | Reaplicar as permissões definidas no Passo 3 |
+| O endereço não responde após uma retomada | O endereço público mudou ao parar e iniciar a instância | Obter o novo endereço no console e atualizar os acessos |
+
+<div align="center">
+<sub>Imagem 3.7.6 - Passo 5 — Sessão estabelecida com a instância pelo EC2 Instance Connect</sub><br>
+  <img src="../assets/deploy/passo_5.png" width="90%" alt="Terminal do EC2 Instance Connect conectado à instância az1-app, exibindo o banner do Amazon Linux 2023 e o prompt do usuário ec2-user"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+##### Limites da sessão e retomada do ambiente
+
+ A sessão de 4 horas define o ritmo de trabalho no ambiente e tem duas consequências que não decorrem da configuração da instância, mas condicionam tudo o que se apoia nela.
+
+ A primeira é que **a instância é interrompida ao fim da sessão**. O que sobrevive à interrupção é o volume de disco, com o sistema operacional e os arquivos gravados; o que não sobrevive são os processos em execução, que precisam ser iniciados novamente a cada retomada. Isso é o que torna o item registrado na Seção 3.7.9 relevante para o Agendador: verificações periódicas pressupõem um serviço continuamente no ar, e o ambiente acadêmico não oferece essa garantia.
+
+ A segunda é que **o endereço público é reatribuído a cada retomada**. Toda configuração que referencie o endereço da instância precisa ser atualizada, e o endereço corrente deve ser reconsultado no console antes de cada acesso.
+
+> [PENDENTE — verificar se o laboratório permite associar um endereço IP elástico à instância, o que tornaria o endereço fixo entre sessões e eliminaria essa etapa.]
+
+ Ao encerrar o trabalho, a instância deve ser parada pelo console, para não consumir crédito enquanto não estiver em uso, e o crédito remanescente deve ser registrado para acompanhamento do orçamento ao longo do projeto.
+
+##### Etapas subsequentes da implantação
+
+ Concluída a configuração da instância, a implantação prossegue pelas etapas abaixo, que dependem do empacotamento das aplicações e estão especificadas nas seções indicadas. A ordem reflete a cadeia de dependências entre elas: cada etapa pressupõe a anterior.
+
+| Etapa | Especificação | Pressupõe |
+|---|---|---|
+| Preparação do sistema operacional da instância: atualização dos pacotes, instalação do `git` e configuração do fuso horário para `America/Sao_Paulo` | Seção 3.7.4 | Acesso à instância estabelecido |
+| Instalação do runtime de contêiner na instância | Seção 3.7.6 | Sistema operacional preparado |
+| Preparação do backend para empacotamento: estruturação do projeto Python em `src/nlp-deploy/`, implementação dos endpoints `/classify`, `/audio` e `/health`, exportação do modelo treinado para `model/` e declaração das dependências em `requirements.txt` | Seção 3.7.5 | Definição do classificador, registrada no item 5 da Seção 3.7.9 |
+| Construção das imagens de frontend e backend | Seção 3.7.5 e Seção 3.7.6 | Código do backend e do frontend estabilizado |
+| Criação dos repositórios e publicação das imagens no Amazon ECR | Seção 3.7.6 | Imagens construídas |
+| Provisionamento do PostgreSQL e aplicação dos schemas `portfolio` e `auditoria` | Seção 3.7.2 e Seção 3.7.9 | Decisão sobre a forma de hospedagem, registrada no item 1 da Seção 3.7.9 |
+| Criação do bucket no Amazon S3 e habilitação do serviço de transcrição | Seção 3.7.2, conexões C5 e C8 | Serviços confirmados no catálogo do laboratório |
+| Registro da cadeia de conexão do banco e das chaves de serviço como variáveis de ambiente da instância, com o par de chaves e o `.env` mantidos fora do repositório | Seção 3.7.4, Passo 3 | Serviços provisionados |
+| Subida dos contêineres e publicação das portas na instância | Seção 3.7.2, conexões C10 e C11 | Imagens publicadas no registro |
+| Configuração do pipeline de entrega contínua | Seção 3.7.6 | Imagens e ambiente de destino existentes |
+| Integração com o ecossistema Microsoft | Seção 3.7.8 | Promoção da solução para o ambiente do parceiro |
+
+#### 3.7.5 Exemplo de API (Flask)
 
 ```python
 # src/nlp-deploy/app.py
@@ -2206,9 +2295,9 @@ app = Flask(__name__)
 # Carregar modelo
 modelo = joblib.load("model/model.joblib")
 
-# Conexão com banco (Azure SQL)
+# Conexão com banco
 # Para dev local: sqlite:///local.db
-# Para Azure SQL: mssql+pyodbc://user:pass@server.database.windows.net/db
+# Para PostgreSQL: postgresql+psycopg://user:senha@host:5432/az1db
 DATABASE_URL = "sqlite:///./classifications.db"
 engine = create_engine(DATABASE_URL)
 
@@ -2264,9 +2353,9 @@ EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
 ```
 
-#### 3.6.6 Processo de Entrega Contínua
+#### 3.7.6 Processo de Entrega Contínua
 
-O diagrama da Seção 3.6.2 descreve o **estado final** da implantação. Esta seção descreve o **caminho** até ele: o que acontece entre um commit e a imagem em execução, apoiado no fluxo de branches definido no documento de Gestão de Configuração.
+O diagrama da Seção 3.7.2 descreve o **estado final** da implantação. Esta seção descreve o **caminho** até ele: o que acontece entre um commit e a imagem em execução, apoiado no fluxo de branches definido no documento de Gestão de Configuração.
 
 **Etapas do pipeline:**
 
@@ -2275,8 +2364,8 @@ O diagrama da Seção 3.6.2 descreve o **estado final** da implantação. Esta s
 | 01 — Lint | Verifica padrão de código no backend e no frontend | `ruff` · `eslint` |
 | 02 — Testes | Executa a suíte automatizada e apura a cobertura | `pytest` |
 | 03 — Build | Constrói as imagens de frontend e de backend | Docker |
-| 04 — Registro | Publica as imagens no Azure Container Registry | `docker push` |
-| 05 — Deploy | Faz o Web App buscar a imagem e aplica as migrações do banco | `docker pull` |
+| 04 — Registro | Publica as imagens no Amazon ECR | `docker push` |
+| 05 — Deploy | Faz a instância obter a imagem e aplica as migrações do banco | `docker pull` |
 | 06 — Verificação | Confirma que a aplicação respondeu após subir | `GET /health` |
 
 **Gatilhos e destinos:**
@@ -2290,41 +2379,43 @@ O diagrama da Seção 3.6.2 descreve o **estado final** da implantação. Esta s
 
 As quatro rotas compartilham as mesmas quatro primeiras etapas e divergem apenas no destino. É isso que torna o processo auditável: a imagem que entra em produção é exatamente a mesma que passou pelos testes e que já rodou em homologação, identificada pela tag da versão.
 
+**Rollback:** a versão anterior é restaurada fazendo a instância obter do Amazon ECR a imagem da tag imediatamente anterior e subir o contêiner novamente. Como as imagens permanecem no registro, o procedimento não depende de reconstruir o código.
+
 **Ambiente local:** antes da etapa 01, o desenvolvimento roda com `docker compose up`, que sobe backend, frontend e banco a partir das mesmas imagens usadas pelo pipeline. É essa paridade entre desenvolvimento e implantação que justifica a adoção do Docker registrada na Seção 2.5.
 
-#### 3.6.7 Reprodutibilidade e Verificação
+#### 3.7.7 Reprodutibilidade e Verificação
 
-**Checklist de controle de custo:**
-- [ ] Azure App Service em tier Free (1 instância)
-- [ ] Azure SQL Database com free tier (primeiros 12 meses)
-- [ ] Cognitive Services em free tier (limites respeitados)
-- [ ] Elegibilidade e licenciamento do ambiente Microsoft confirmados
-**Checklist de custo (garantir zero spend):**
+ A reprodutibilidade da implantação é verificada em duas frentes complementares. A primeira apura se o ambiente permanece dentro dos limites do crédito acadêmico; a segunda, se a solução implantada responde conforme especificado.
 
-- [ ] Azure App Service em tier gratuito
-- [ ] Azure SQL Database com free tier ativo
-- [ ] Azure AI Speech em free tier, com os limites respeitados
-- [ ] Azure Container Registry dentro da cota gratuita
-- [ ] M365 Developer Program ativo (sandbox, sem custo)
-- [ ] Nenhum recurso em tier "Standard" ou "Premium" ativo
+**Controle de consumo do ambiente acadêmico:**
 
-**Checklist de funcionalidade:**
+| Verificação | Critério |
+|---|---|
+| Porte das instâncias | Dimensionadas no menor porte que atenda ao MVP |
+| Instâncias ociosas | Interrompidas quando não estiverem em uso, uma vez que o crédito é consumido por tempo de execução |
+| Armazenamento do registro de imagens | Imagens antigas removidas do Amazon ECR |
+| Consumo de crédito | Acompanhado a cada sessão do laboratório |
+| Vigência do acesso | Elegibilidade e validade do acesso ao AWS Academy confirmadas |
 
-- [ ] Os dois Web Apps com status "Running"
-- [ ] Endpoint `/health` retorna 200 OK
-- [ ] Endpoint `/classify` processa requisições POST
-- [ ] Endpoint `/audio` aceita arquivo e devolve a transcrição
-- [ ] A Chat UI carrega no navegador e conversa com o backend
-- [ ] Dados são gravados nos schemas `portfolio` e `auditoria`
-- [ ] Arquivos são gravados e lidos no Bucket Storage
-- [ ] Logs aparecem em Application Insights
+**Verificação funcional da solução implantada:**
+
+| Verificação | Resultado esperado |
+|---|---|
+| Contêineres de frontend e backend | Em execução na instância |
+| `GET /health` | Retorna `200 OK` |
+| `POST /classify` | Processa a requisição e devolve a intenção classificada |
+| `POST /audio` | Aceita o arquivo de áudio e devolve a transcrição |
+| Chat UI | Carrega no navegador e se comunica com o backend |
+| Persistência | Registros gravados nos schemas `portfolio` e `auditoria` |
+| Armazenamento de objetos | Prompts lidos do bucket no Amazon S3 |
+| Observabilidade | Eventos e métricas visíveis no nó de Rastreabilidade |
 
 **Exemplo de requisição ponta a ponta:**
 
 > A URL abaixo é ilustrativa e deverá ser substituída pela URL real após a execução do deploy.
 
 ```bash
-curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
+curl -X POST http://<endereco-da-instancia>:8000/classify \
   -H "Content-Type: application/json" \
   -d '{"text": "Qual o prazo do marco de licenciamento ambiental da Linha 6?"}'
 ```
@@ -2341,37 +2432,42 @@ curl -X POST https://az1-nlp-dev.azurewebsites.net/classify \
 }
 ```
 
-#### 3.6.8 Próximos Passos para Produção
+#### 3.7.8 Próximos Passos para Produção
+
+ O ambiente de produção do parceiro é o ecossistema Microsoft, e o ambiente acadêmico é o AWS Academy. A promoção para produção envolve, portanto, uma troca de provedor, e não apenas uma troca de assinatura. É a portabilidade da pilha, descrita na Seção 3.7.1, que torna essa troca viável sem reescrita do núcleo.
 
 Quando a solução for promovida para o ambiente real do Metrô:
 
-1. **Migrar o banco de dados:** do Azure SQL Database em free tier para a instância corporativa;
-2. **Copilot Studio em produção:** usar o tenant corporativo em vez do sandbox do M365 Developer Program;
-3. **Power Automate com SharePoint real:** conectar aos documentos e listas efetivamente utilizados pelo PMO;
-4. **Microsoft Entra ID:** integrar a autenticação corporativa do Metrô ao Controle de Acesso;
-5. **Compliance e segurança:** implementar retenção de logs de auditoria, Data Loss Prevention (DLP) e conformidade com as políticas corporativas.
+1. **Migrar as imagens:** publicar as mesmas imagens de contêiner no registro do ambiente de destino, sem alteração de código;
+2. **Migrar o banco de dados:** transferir os schemas `portfolio` e `auditoria` para a instância PostgreSQL corporativa;
+3. **Substituir os serviços gerenciados:** trocar Amazon Transcribe, Amazon S3 e Amazon CloudWatch pelos equivalentes do ambiente de destino, o que afeta apenas as camadas de integração, e não a lógica de negócio;
+4. **Copilot Studio e Power Automate:** integrar o agente ao tenant corporativo e conectar os fluxos aos documentos e listas efetivamente utilizados pelo PMO;
+5. **Microsoft Entra ID:** integrar a autenticação corporativa do Metrô ao Controle de Acesso;
+6. **Compliance e segurança:** implementar retenção de logs de auditoria, Data Loss Prevention (DLP) e conformidade com as políticas corporativas.
 
-Toda a arquitetura permanece igual; apenas os recursos migram para ambientes gerenciados pelo Metrô, e as mesmas imagens são promovidas sem alteração de código.
+ A arquitetura em nós e os caminhos de comunicação permanecem os mesmos; o que muda são os serviços que ocupam cada nó.
 
-#### 3.6.7 Observações Finais
-
-Este deploy foi planejado como uma prova de conceito técnica alinhada ao ecossistema Microsoft do parceiro. A reprodutibilidade será confirmada após a execução dos passos e a inclusão das evidências. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
-#### 3.6.9 Decisões Técnicas em Aberto
+#### 3.7.9 Decisões Técnicas em Aberto
 
 O desenho da implantação expôs pontos que ainda dependem de decisão da equipe. Eles estão registrados aqui para que sejam fechados antes da implementação, e não durante ela.
 
 | # | Ponto em aberto | Impacto | Encaminhamento |
 |---|---|---|---|
-| 1 | A Seção 2.5 nomeia PostgreSQL; esta seção adota o Azure SQL Database | Alto — muda o driver, a sintaxe das migrações e o nó do diagrama | Confirmar o Azure SQL e corrigir a Seção 2.5, ou o inverso |
-| 2 | O nó do banco está rotulado como "Database - Azure Storage" | Médio — Azure Storage não é banco relacional; o nome mistura dois serviços | Renomear o nó para "Azure SQL Database", já que o Bucket Storage cobre o armazenamento de arquivos |
-| 3 | O Bucket Storage guarda apenas "Armazenamento de Prompts" | Médio — o RF03 exige repositório de documentos com metadados para citar a fonte | Definir se os documentos sintéticos ficam nesse mesmo nó e ajustar o rótulo |
-| 4 | O nó de LLM está fora da instância de nuvem | Médio — muda a fronteira de rede, a autenticação e o custo | Confirmar se o modelo é externo ou se será o Azure OpenAI, hospedado na mesma assinatura |
-| 5 | O tier do App Service ainda não está definido | Médio — slots de implantação, usados para publicação e rollback, não existem nos tiers gratuito e básico | Confirmar o tier disponível; sem slots, o rollback passa a ser o redeploy da tag anterior |
-| 6 | Convivem no documento um classificador local e uma API de IA | Médio — muda o que é empacotado na imagem do backend | Definir se a classificação de intenções roda no modelo local e o LLM responde apenas pela geração |
+| 1 | A forma de hospedagem do PostgreSQL não está definida | Alto — muda o provisionamento, o custo em crédito e o procedimento de retomada após a expiração da sessão | Decidir entre serviço gerenciado e contêiner na própria instância EC2, verificando antes o que está liberado no laboratório |
+| 2 | O bucket S3 guarda apenas "Armazenamento de Prompts" | Médio — o RF03 exige repositório de documentos com metadados para citar a fonte | Definir se os documentos sintéticos ficam nesse mesmo nó e ajustar o rótulo |
+| 3 | O provedor do LLM não está definido | Médio — muda a fronteira de rede, a autenticação e o custo | Confirmar qual serviço será consumido e se ele está disponível no ambiente acadêmico |
+| 4 | As sessões do laboratório expiram e interrompem as instâncias | Alto — conflita com a disponibilidade contínua pressuposta pelo Agendador e pelos alertas do RF05 | Definir o procedimento de retomada e avaliar o impacto sobre as verificações periódicas |
+| 5 | Convivem no documento um classificador local e uma API de modelo de linguagem | Médio — muda o que é empacotado na imagem do backend | Definir se a classificação de intenções roda no modelo local e o LLM responde apenas pela geração |
+| 6 | A Seção 2.5 define FastAPI, mas o exemplo da Seção 3.7.5 usa Flask | Baixo — o exemplo não corresponde à pilha documentada | Reescrever o exemplo em FastAPI ou registrar a mudança de decisão na Seção 2.5 |
+| 7 | O diagrama prevê dois nós de execução, mas o ambiente acadêmico comporta consolidá-los em uma única instância | Médio — muda o consumo de crédito, o grupo de segurança e as portas publicadas | Decidir entre uma instância com dois contêineres e duas instâncias separadas, considerando o crédito disponível |
+| 8 | O endereço público da instância muda a cada retomada da sessão | Médio — invalida configurações e acessos registrados entre uma sessão e outra | Verificar se o laboratório permite associar um endereço IP elástico e, em caso negativo, definir onde o endereço corrente será registrado |
+| 9 | Apenas o Amazon EC2 teve disponibilidade confirmada no laboratório | Alto — a arquitetura da Seção 3.7.2 pressupõe também ECR, S3, Transcribe e CloudWatch | Confirmar o catálogo liberado e definir a alternativa para cada serviço indisponível, conforme discutido na Seção 3.7.3 |
+| 10 | O crédito de US$ 50 é consumido por tempo de instância ligada, e não por uso | Médio — uma instância esquecida em execução consome o crédito de toda a equipe | Definir a responsabilidade pela interrupção da instância ao fim de cada sessão e o acompanhamento periódico do saldo |
+| 11 | A regra de SSH do grupo de segurança está aberta para `0.0.0.0/0` | Alto — expõe a porta 22 da instância a tentativas de acesso de qualquer origem da internet | Restringir a origem ao endereço da equipe em notação `/32`, conforme a Seção 3.7.4, e definir quem atualiza a regra quando esse endereço mudar |
 
-#### 3.6.10 Observações Finais
+#### 3.7.10 Observações Finais
 
-Este deploy foi estruturado como uma prova de conceito técnica, reprodutível e alinhada ao ecossistema Microsoft do parceiro. A utilização do Microsoft 365 Developer Program e do Azure Free Tier garante custo zero para o ambiente acadêmico, e a conteinerização assegura que a mesma imagem validada em desenvolvimento seja a promovida para produção, reduzindo o risco e a complexidade da migração para o ambiente real do Metrô.
+Este deploy foi estruturado como uma prova de conceito técnica sobre um ambiente concedido pela instituição de ensino, sem custo para a equipe. A conteinerização e a escolha de uma pilha de código aberto asseguram que a mesma imagem validada em desenvolvimento seja a promovida para os demais ambientes, e que a solução não fique presa ao provedor utilizado no MVP — condição para que a promoção futura ao ecossistema Microsoft do parceiro seja uma troca de infraestrutura, e não uma reescrita. A reprodutibilidade será confirmada após a execução dos passos descritos e a inclusão das evidências correspondentes. Uma futura promoção para produção exigirá ajustes de configuração, segurança, licenciamento e integração com o ambiente real do Metrô.
 
 ### 3.8 Projeto Técnico e Arquitetural
 
