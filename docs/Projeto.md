@@ -1584,13 +1584,15 @@ Esta seção registra as tecnologias selecionadas para o MVP e distingue o que j
 | Recebimento e validação de áudio | `python-multipart` e PyAV | Implementados | Permitem receber arquivos enviados por formulário e inspecionar seu conteúdo, formato e duração. |
 | Armazenamento de objetos | MinIO, API compatível com S3 e Boto3 | Implementado para áudios | Permite armazenar arquivos em buckets sem acoplar o código a um único provedor de nuvem. |
 | PLN e classificação de intenções | scikit-learn, `MultinomialNB`, NLTK, spaCy, NumPy e Joblib | Implementados | Sustentam o pré-processamento linguístico, a vetorização, o treinamento, a classificação e a persistência do modelo. |
-| Persistência estruturada | PostgreSQL e SQL | Selecionada; modelagem nesta sprint | O modelo relacional atende aos dados estruturados do portfólio, metadados, alertas, feedbacks e registros de auditoria. |
-| Speech-to-Text | API da Deepgram | Selecionada | Converte os áudios recebidos em texto antes do encaminhamento ao mesmo pipeline de intenção usado pelas mensagens digitadas. |
+| Persistência estruturada | PostgreSQL e SQL | Modelagem concluída; integração futura | O modelo relacional atende aos dados estruturados do portfólio, metadados, alertas, feedbacks e registros de auditoria. |
+| Speech-to-Text | Deepgram SDK 5+ e modelo Nova-3 | Implementado | Converte os áudios recebidos em texto antes do encaminhamento ao mesmo pipeline de intenção usado pelas mensagens digitadas. |
 | Text-to-Speech | Provedor a definir | Previsto para a próxima sprint | Permitirá gerar respostas em áudio; a escolha do serviço será registrada após a avaliação das alternativas. |
-| IA generativa | API Gemini, modelo `gemini-3.5-flash-lite` | Selecionada | Será utilizada para geração de respostas e conteúdo, preservando no backend as regras de negócio e a orquestração da solução. |
+| IA generativa | Google Gen AI SDK e modelo `gemini-3.5-flash-lite` | Implementada | Gera respostas em linguagem natural, preservando no backend as regras de negócio e a orquestração da solução. |
 | RAG e documentos | MinIO, PostgreSQL com pgvector, Gemini Embedding (`gemini-embedding-001`) e Gemini 3.5 Flash-Lite | Selecionados para implementação futura | Separam o armazenamento dos arquivos, os metadados e vetores, a recuperação semântica e a geração da resposta fundamentada. |
 | Agendamento e alertas | APScheduler, PostgreSQL e interface React | Selecionados para implementação futura | Permitem executar verificações periódicas, persistir os alertas identificados e apresentá-los na própria aplicação. |
 | Conteinerização local | Docker e Docker Compose | Implementados para o MinIO | Padronizam a execução local do armazenamento de objetos e a persistência de seus dados em volume Docker. |
+| Implantação em nuvem | AWS Academy e Amazon EC2 | Ambiente selecionado; EC2 confirmado | A AWS Academy fornece o ambiente acadêmico, e o EC2 hospedará os elementos executáveis do MVP. |
+| Serviços auxiliares de nuvem | Amazon ECR, Amazon S3 e Amazon CloudWatch | Planejados; disponibilidade a confirmar | Atendem ao registro de imagens, armazenamento de objetos e observabilidade, desde que estejam liberados no catálogo do laboratório. |
 
 ### Interface web
 
@@ -1604,15 +1606,15 @@ O pipeline de classificação de intenções utiliza **scikit-learn**, com o alg
 
 ### Dados, arquivos e recuperação de informação
 
-O **PostgreSQL** foi selecionado como banco de dados relacional do MVP. Nesta sprint será realizada sua modelagem conceitual e lógica; a integração do banco à aplicação ocorrerá em etapa posterior. O banco deverá armazenar dados sintéticos do portfólio, usuários e permissões, metadados de documentos, feedbacks, alertas e registros de auditoria.
+O **PostgreSQL** foi selecionado como banco de dados relacional do MVP. Sua modelagem conceitual, lógica e física foi concluída nesta sprint, incluindo o dicionário de dados e a definição em SQL apresentados na seção 3.6. O provisionamento e a integração do banco à aplicação ocorrerão em etapa posterior. O banco deverá armazenar dados sintéticos do portfólio, usuários e permissões, metadados de documentos, feedbacks, alertas e registros de auditoria.
 
-Os arquivos são armazenados no **MinIO**, serviço compatível com a API S3, acessado pelo backend por meio da biblioteca **Boto3**. O armazenamento de áudios já utiliza essa estrutura. Para o fluxo futuro de RAG, os documentos sintéticos também serão mantidos no MinIO, enquanto seus metadados e vetores serão armazenados no PostgreSQL com a extensão **pgvector**. O modelo `gemini-embedding-001` produzirá os embeddings usados na busca semântica, e o `gemini-3.5-flash-lite` produzirá a resposta com base nos trechos recuperados.
+No ambiente local, os arquivos são armazenados no **MinIO**, serviço compatível com a API S3, acessado pelo backend por meio da biblioteca **Boto3**. O armazenamento de áudios já utiliza essa estrutura. Para a implantação na AWS, está prevista a substituição do MinIO pelo **Amazon S3**, mantendo o contrato S3 e o cliente Boto3; essa utilização depende da disponibilidade do serviço no laboratório da AWS Academy. Para o fluxo futuro de RAG, os documentos sintéticos também serão mantidos no armazenamento de objetos, enquanto seus metadados e vetores serão armazenados no PostgreSQL com a extensão **pgvector**. O modelo `gemini-embedding-001` produzirá os embeddings usados na busca semântica, e o `gemini-3.5-flash-lite` produzirá a resposta com base nos trechos recuperados.
 
 ### Inteligência artificial e serviços de voz
 
-A geração de respostas utilizará a **API Gemini** com o modelo `gemini-3.5-flash-lite`. A aplicação manterá sua própria camada de orquestração e regras de negócio, utilizando o modelo generativo como um serviço especializado do fluxo.
+A geração de respostas utiliza o **Google Gen AI SDK** com o modelo `gemini-3.5-flash-lite`. A aplicação mantém sua própria camada de orquestração e regras de negócio, utilizando o modelo generativo como um serviço especializado do fluxo.
 
-A conversão de áudio em texto utilizará a **API da Deepgram**. Após a transcrição, o texto seguirá o mesmo pipeline de classificação usado nas entradas digitadas. A conversão de texto em áudio também faz parte do produto, mas será desenvolvida na próxima sprint e seu provedor ainda será definido.
+A conversão de áudio em texto utiliza o **Deepgram SDK 5+** com o modelo **Nova-3**, configurado para português brasileiro. Após a transcrição, o texto segue o mesmo pipeline de classificação usado nas entradas digitadas. A conversão de texto em áudio também faz parte do produto, mas será desenvolvida na próxima sprint e seu provedor ainda será definido.
 
 ### Agendamento e notificações
 
@@ -1620,7 +1622,9 @@ O **APScheduler** foi selecionado para iniciar verificações periódicas, como 
 
 ### Infraestrutura local e integrações futuras
 
-O **Docker Compose** executa atualmente o MinIO e mantém seus objetos em um volume Docker persistente. A API e o frontend ainda são executados diretamente nos respectivos ambientes de desenvolvimento.
+O **Docker Compose** executa atualmente o MinIO e mantém seus objetos em um volume Docker persistente. A API e o frontend ainda são executados diretamente nos respectivos ambientes de desenvolvimento, e o repositório ainda não contém os Dockerfiles de frontend e backend previstos pelo processo de implantação.
+
+O deploy acadêmico será realizado na **Amazon Web Services**, por meio do ambiente fornecido pela **AWS Academy**. O Amazon EC2 foi confirmado como recurso de computação. Amazon ECR, Amazon S3 e Amazon CloudWatch permanecem planejados, condicionados à disponibilidade no catálogo do laboratório. A forma de hospedagem do PostgreSQL na AWS ainda será definida pelo responsável pelo deploy.
 
 Copilot Studio, Power Automate, Microsoft Teams, SharePoint e Microsoft Entra ID permanecem como possibilidades de integração futura com o ecossistema corporativo do Metrô. Eles não compõem a pilha executável atual do MVP. Durante o desenvolvimento serão utilizados apenas dados, documentos, usuários e permissões sintéticos, sem exposição de dados corporativos reais.
 
@@ -2344,6 +2348,8 @@ A pilha de tecnologias do MVP mantém a interface, o backend, o processamento de
 | PLN | scikit-learn, `MultinomialNB`, NLTK, spaCy e NumPy | Pré-processar textos, vetorizar entradas e classificar intenções. |
 | Persistência do modelo | Joblib | Serializar e carregar o classificador treinado. |
 | Armazenamento de objetos | MinIO, API S3 e Boto3 | Armazenar e recuperar os arquivos de áudio em bucket compatível com S3. |
+| Speech-to-Text | Deepgram SDK 5+ e modelo Nova-3 | Recuperar o áudio armazenado, transcrevê-lo em português brasileiro e devolver o texto ao pipeline de PLN. |
+| IA generativa | Google Gen AI SDK e `gemini-3.5-flash-lite` | Gerar respostas em linguagem natural por meio do endpoint de chat. |
 | Infraestrutura local | Docker e Docker Compose | Executar o MinIO e preservar seus dados no volume `minio_data`. |
 
 O fluxo de áudio implementado nesta etapa é:
@@ -2352,28 +2358,43 @@ O fluxo de áudio implementado nesta etapa é:
 Interface React
       ↓ multipart/form-data
 API FastAPI
-      ↓ validação com PyAV
+      ↓ validação com PyAV e geração do audio_id
 Boto3
-      ↓ protocolo S3
+      ↓ PutObject pelo protocolo S3
 MinIO / bucket az1-audio
       ↓
 volume Docker minio_data
+
+POST /api/v1/audio/{audio_id}/analyze
+      ↓ GetObject com Boto3 no MinIO
+Deepgram Nova-3
+      ↓ transcrição em pt-BR
+MultinomialNB
+      ↓
+intenção classificada
 ```
+
+A geração de respostas textuais já está integrada separadamente pelo endpoint `POST /api/v1/chat`, que encaminha a mensagem ao `gemini-3.5-flash-lite` por meio do Google Gen AI SDK.
 
 #### 3.5.2 Tecnologias selecionadas para as próximas etapas
 
 | Capacidade | Tecnologias selecionadas | Etapa prevista |
 |---|---|---|
-| Persistência estruturada | PostgreSQL e SQL | Modelagem conceitual e lógica nesta sprint; integração posterior. |
-| Speech-to-Text | API da Deepgram | Integração ao fluxo de áudio após o armazenamento e a validação do arquivo. |
-| IA generativa | API Gemini com `gemini-3.5-flash-lite` | Geração de respostas, sugestões e conteúdo. |
+| Persistência estruturada | PostgreSQL e SQL | Modelagem conceitual, lógica e física concluída; provisionamento e integração posteriores. |
 | RAG | MinIO, PostgreSQL com pgvector, `gemini-embedding-001` e `gemini-3.5-flash-lite` | Armazenamento de documentos sintéticos, recuperação semântica e geração de respostas fundamentadas. |
 | Agendamento e alertas | APScheduler, PostgreSQL e interface React | Execução de verificações periódicas, persistência e apresentação de alertas na aplicação. |
 | Text-to-Speech | Provedor ainda não definido | Avaliação e escolha na próxima sprint. |
+| Computação em nuvem | AWS Academy e Amazon EC2 | Ambiente acadêmico selecionado e serviço de computação confirmado para o deploy do MVP. |
+| Registro de imagens | Amazon ECR | Uso planejado, condicionado à disponibilidade no catálogo do laboratório. |
+| Armazenamento de objetos em nuvem | Amazon S3 e Boto3 | Substituição planejada do MinIO no ambiente AWS, condicionada à disponibilidade do serviço. |
+| Observabilidade | Amazon CloudWatch | Uso planejado para logs técnicos e métricas, condicionado à disponibilidade do serviço. |
+| Empacotamento das aplicações | Docker | Criação futura dos Dockerfiles de frontend e backend antes da publicação na AWS. |
 
 No fluxo planejado de RAG, os documentos originais serão mantidos no MinIO. Após a extração e divisão do texto em trechos, o `gemini-embedding-001` gerará as representações vetoriais, que serão armazenadas no PostgreSQL por meio do pgvector. A pergunta do usuário será comparada a esses vetores, e os trechos mais relevantes serão enviados ao `gemini-3.5-flash-lite` para a elaboração de uma resposta fundamentada.
 
 A escolha do PostgreSQL evita introduzir um segundo banco apenas para a busca vetorial. O APScheduler, por sua vez, atende ao escopo acadêmico do MVP por permitir que as verificações periódicas sejam executadas junto ao backend Python. Caso a solução evolua para múltiplas instâncias ou maior volume de processamento, a estratégia de agendamento deverá ser reavaliada.
+
+No desenvolvimento local, o MinIO permanece como armazenamento compatível com S3. No ambiente AWS, a substituição planejada pelo Amazon S3 preserva o uso do Boto3 e o contrato de acesso a objetos. O Amazon EC2 hospedará os elementos executáveis do MVP; ECR, S3 e CloudWatch somente serão incorporados ao deploy após a confirmação de que estão liberados no laboratório da AWS Academy. A hospedagem do PostgreSQL nesse ambiente permanece em aberto.
 
 O serviço de Text-to-Speech integra a arquitetura prevista do produto, mas não é apresentado como tecnologia fechada porque seu provedor ainda será avaliado na próxima sprint. Da mesma forma, as integrações com o ecossistema Microsoft são tratadas como evolução futura e não como parte da pilha executável atual.
 
