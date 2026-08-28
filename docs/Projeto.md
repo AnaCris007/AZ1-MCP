@@ -67,6 +67,7 @@
 - [4.11 Aprendizados da Exploração](#411-aprendizados-da-exploração)
 - [4.12 Próximos Passos](#412-próximos-passos)
 - [4.13 Registros Visuais](#413-registros-visuais)
+- [4.14 Próximos Passos para uma Interface Funcional](#414-próximos-passos-para-uma-interface-funcional)
 
 </details>
 
@@ -4970,6 +4971,55 @@ O vídeo da execução registra a operação do protótipo pelo participante, in
 | Documentação visual | seções 4.4 a 4.6 e 4.13 | Atendido: vídeos, fotografias e capturas estão referenciados e verificados | nenhuma documental |
 
 As evidências disponíveis comprovam a existência dos dois protótipos, seus formatos e parte relevante do processo. No A, a Cena 10 materializa a resposta improvisada à dependência exclusiva da interface visual; vídeo, roteiro, commits e bastidores sustentam partes diferentes desse registro, enquanto o momento exato da decisão permanece corretamente identificado como relato retrospectivo. No B, o vídeo da execução registra a sessão em que o protótipo foi operado, incluindo a falha diante do pedido de dado estruturado e as intervenções do facilitador.
+
+## 4.14 Próximos Passos para uma Interface Funcional
+
+Esta seção projeta a transição entre o material exploratório documentado nas seções 4.4 a 4.13 e uma interface funcional, integrada ao ambiente de trabalho já utilizado pelas pessoas que atuam no Metrô. Nenhum dos dois protótipos foi construído para operar nesse ambiente: o Protótipo A é uma encenação em vídeo que **vendeu a ideia** da interação proativa, tornando visível ao longo do tempo um comportamento que ainda não existe em nenhum sistema real; o Protótipo B é uma interface gráfica com respostas simuladas, que tornou concreto o formato de uma consulta sob demanda sem consultar nenhuma fonte real. A comparação da [seção 4.7](#47-comparação-entre-as-alternativas) não elegeu uma alternativa vencedora, e os limites da [seção 4.8](#48-limites-da-exploração) mostram que perguntas sobre frequência, fadiga, confiança e precisão só podem ser respondidas em operação real. Por isso, o passo seguinte não é escolher entre A e B, mas **consolidar** o que cada exploração validou em uma única interface embutida no ambiente real de trabalho.
+
+### 4.14.1 O que cada protótipo leva à implementação real
+
+| Elemento validado | Origem | O que seria incorporado à interface real | Decisão do inventário ([seção 4.9](#49-inventário-de-decisões-em-aberto)) a resolver antes |
+|---|---|---|---|
+| Recomendação proativa por contexto de atividade | Protótipo A | Canal de sugestões que aparece sem consulta explícita, dentro da própria ferramenta de trabalho | P-A01 (gatilho), P-A02 (frequência) |
+| Aceitar/recusar como sinal de controle | Protótipo A | Ações de aceitar e recusar associadas a um significado explícito, não apenas ao desaparecimento da sugestão | P-A03 (significado da recusa), P-A05 (uso do feedback) |
+| Canal alternativo ao visual | Protótipo A (Cena 10, improvisada) | Opção de notificação por áudio para quem está com as mãos ou a atenção ocupadas | P-A07 (canal) |
+| Consulta em linguagem natural por texto ou voz | Protótipo B | Campo de pergunta ao agente, disponível a qualquer momento dentro da mesma tela de trabalho | P-B02 a P-B04 (transcrição e resposta por voz) |
+| Diferenciação entre documento e dado estruturado | Protótipo B (falha da seção 4.6) | Dois fluxos de resposta distintos: um para documentos e outro para consultas ao banco de dados de projetos | P-B05 |
+| Bloqueio por permissão | Protótipo B | Controle de acesso real, ligado ao perfil da pessoa autenticada, em vez da simulação da Imagem 4.5.4 | P-B06 |
+
+### 4.14.2 Onde a interface deveria viver
+
+Em vez de uma tela nova e isolada, como a interface de chat do Protótipo B, a interface funcional deveria ser **embutida na ferramenta que as pessoas do Metrô já usam para acompanhar projetos**, aparecendo como um painel disponível durante a própria rotina de trabalho. Essa escolha reduz o custo de aprendizado observado durante a execução do Protótipo B: o primeiro item da tabela "O que aconteceu" da [seção 4.6](#46-execução-dos-protótipos) registra que o participante reconheceu os elementos de interface por semelhança com produtos que já utiliza. Também aproxima o canal proativo do Protótipo A do momento em que a pessoa já está trabalhando, sem depender de um segundo aplicativo.
+
+<div align="center">
+<sub>Imagem 4.14.1 - Próximos passos: proposta de um assistente de IA embutido na ferramenta de acompanhamento de projetos do Metrô.</sub><br>
+  <img src="../assets/design/assistida.png" width="100%" alt="Proposta de assistente de IA embutido em uma ferramenta de acompanhamento de projetos"><br>
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+A imagem representa a ideia dessa proposta, ainda não implementada.
+
+### 4.14.3 Passos propostos para a implementação
+
+| Ordem | Passo | Resolve |
+|---|---|---|
+| 1 | Priorizar e decidir os itens do inventário da seção 4.9 que bloqueiam a construção, a começar por P-A01, P-A02, P-B05 e P-B06 | Transforma decisões em aberto em requisitos de comportamento |
+| 2 | Substituir respostas simuladas por integração real com SharePoint, o banco de dados de projetos e o Microsoft Teams | Elimina a limitação apontada nas seções 4.8 e 4.13: nenhum protótipo utiliza dados reais |
+| 3 | Implementar controle de acesso ligado ao perfil autenticado da pessoa, em vez do bloqueio simulado da Imagem 4.5.4 | Resolve P-B06 e trata a exposição de dados sensíveis de projetos do Metrô |
+| 4 | Construir o canal de PLN e, quando necessário, o reconhecimento de voz, para tratar pedidos como os das situações S-B04 e S-B06 do [repertório da seção 4.10](#410-repertório-de-situações) | Substitui as respostas fixas por palavra-chave do mockup |
+| 5 | Definir e implementar a política de frequência e o gatilho da recomendação proativa como configuração real, não como roteiro encenado | Resolve P-A01 e P-A02 |
+| 6 | Rodar um piloto controlado com um pequeno grupo de profissionais do Metrô operando a interface embutida durante a rotina real de trabalho, com instrumentação de uso | Produz o teste com usuários reais apontado como pendente em toda a seção 4.8 |
+| 7 | Revisar o inventário da seção 4.9 com os resultados do piloto antes de decidir sobre expansão | Fecha o ciclo entre exploração, decisão e validação |
+
+O piloto do passo 6 é o único ponto desta proposta capaz de responder às perguntas que os dois protótipos deixaram em aberto (tolerância a interrupções, fadiga, confiança na resposta e utilidade percebida), porque depende de pessoas do Metrô usando a interface durante o próprio trabalho, e não de uma encenação ou de uma sessão única com um participante externo.
+
+### 4.14.4 Conclusão e Decisão
+
+A decisão tomada ao final da exploração é que a interface funcional a ser implementada é a representada na Imagem 4.14.1: um painel embutido na ferramenta de acompanhamento de projetos que a equipe do Metrô já utiliza. Essa interface puxa as informações dos projetos por meio da IA, buscando documentos e dados estruturados, e por cima dessas informações apresenta recomendações proativas.
+
+O vídeo do Protótipo A mostrou como essa interação vai funcionar: quando o agente recomenda, como o usuário aceita ou recusa e como a proatividade se comporta ao longo da rotina de trabalho. Esta documentação mostra como essa interação será implementada, com a Imagem 4.14.1 como exemplo concreto da interface.
+
+O próximo passo é implementar essa interface, seguindo os passos da seção 4.14.3, e abrir seu uso para as pessoas do Metrô.
 
 ---
 
