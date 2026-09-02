@@ -1650,7 +1650,7 @@ Esta seção registra as tecnologias selecionadas para o MVP e distingue o que j
 | PLN e classificação de intenções | scikit-learn, `MultinomialNB`, NLTK, spaCy, NumPy e Joblib | Implementados | Sustentam o pré-processamento linguístico, a vetorização, o treinamento, a classificação e a persistência do modelo. |
 | Persistência estruturada | PostgreSQL e SQL | Modelagem concluída; integração futura | O modelo relacional atende aos dados estruturados do portfólio, metadados, alertas, feedbacks e registros de auditoria. |
 | Speech-to-Text | Deepgram SDK 5+ e modelo Nova-3 | Implementado | Converte os áudios recebidos em texto antes do encaminhamento ao mesmo pipeline de intenção usado pelas mensagens digitadas. |
-| Text-to-Speech | Provedor a definir | Previsto para a próxima sprint | Permitirá gerar respostas em áudio; a escolha do serviço será registrada após a avaliação das alternativas. |
+| Text-to-Speech | Google Gen AI SDK, Gemini TTS e voz `Kore` | Implementado | Converte sob demanda as respostas textuais em áudio WAV, mantendo o texto como fallback em caso de falha. |
 | IA generativa | Google Gen AI SDK e modelo `gemini-3.5-flash-lite` | Implementada | Gera respostas em linguagem natural, preservando no backend as regras de negócio e a orquestração da solução. |
 | RAG e documentos | MinIO, PostgreSQL com pgvector, Gemini Embedding (`gemini-embedding-001`) e Gemini 3.5 Flash-Lite | Selecionados para implementação futura | Separam o armazenamento dos arquivos, os metadados e vetores, a recuperação semântica e a geração da resposta fundamentada. |
 | Agendamento e alertas | APScheduler, PostgreSQL e interface React | Selecionados para implementação futura | Permitem executar verificações periódicas, persistir os alertas identificados e apresentá-los na própria aplicação. |
@@ -1678,7 +1678,7 @@ No ambiente local, os arquivos são armazenados no **MinIO**, serviço compatív
 
 A geração de respostas utiliza o **Google Gen AI SDK** com o modelo `gemini-3.5-flash-lite`. A aplicação mantém sua própria camada de orquestração e regras de negócio, utilizando o modelo generativo como um serviço especializado do fluxo.
 
-A conversão de áudio em texto utiliza o **Deepgram SDK 5+** com o modelo **Nova-3**, configurado para português brasileiro. Após a transcrição, o texto segue o mesmo pipeline de classificação usado nas entradas digitadas. A conversão de texto em áudio também faz parte do produto, mas será desenvolvida na próxima sprint e seu provedor ainda será definido.
+A conversão de áudio em texto utiliza o **Deepgram SDK 5+** com o modelo **Nova-3**, configurado para português brasileiro. Após a transcrição, o texto segue o mesmo pipeline de classificação usado nas entradas digitadas. Para a saída por voz, o backend utiliza o **Gemini Text-to-Speech** com a voz `Kore`: a resposta é sintetizada sob demanda, encapsulada como WAV e reproduzida pelo frontend sem substituir o conteúdo textual.
 
 ### Agendamento e notificações
 
@@ -1755,7 +1755,7 @@ Uma nova classificação de intenção só deve ser executada quando o sistema d
 
 ## 3.2 API de Speech to Text e Text to Speech
 
-Esta seção documenta as duas pontas do canal de voz: a conversão de fala em texto (Speech to Text, STT), que já está implementada e integrada ao pipeline de PLN, e a conversão de texto em fala (Text to Speech, TTS), cuja escolha de provedor permanece em aberto. Ela é a contraparte externa da API interna de recebimento de áudio descrita na Seção 3.4: aquela recebe e guarda o arquivo, esta o converte em texto por meio de um serviço de terceiros.
+Esta seção documenta as duas pontas do canal de voz: a conversão de fala em texto (Speech to Text, STT), implementada com Deepgram e integrada ao pipeline de PLN, e a conversão de texto em fala (Text to Speech, TTS), implementada com Gemini e integrada ao frontend básico. A API interna de recebimento descrita na Seção 3.4 recebe e guarda o áudio enviado pelo usuário; o STT o converte em texto; após o processamento, o TTS permite que a resposta textual do agente seja ouvida sob demanda. O texto permanece como resposta principal e como fallback quando a síntese de voz falha.
 
 **Estado de implementação desta seção.** A tabela abaixo separa o que está em execução do que é proposta, para que nenhuma parte da especificação seja lida como pronta sem estar.
 
@@ -1767,7 +1767,7 @@ Esta seção documenta as duas pontas do canal de voz: a conversão de fala em t
 | Autenticação do usuário nos endpoints de voz | Planejado, não implementado | Nenhum verificador de credencial nas rotas; ver Seção 3.4 |
 | Política de tempo limite e de repetição | **DECISÃO TÉCNICA EM ABERTO** | Nenhum tempo limite explícito é configurado no cliente |
 | Medição de Word Error Rate (WER) | Planejada para a Sprint 3 | Não há execução registrada em `resultados/` |
-| Escolha do serviço de TTS | **DECISÃO TÉCNICA EM ABERTO** | Sem dependência de TTS declarada no `pyproject.toml` |
+| Escolha e implementação do serviço de TTS | Implementado e coberto por testes | `src/services/gemini_speech_service.py`, `src/services/speech_service.py`, `src/routes/speech.py`, `tests/test_speech_service.py` e `tests/test_speech_api.py` |
 
 ### 3.2.1 Serviço de Speech to Text
 
@@ -2000,6 +2000,51 @@ Esta é a única resposta de erro dos endpoints de voz que mantém o corpo nativ
 }
 ```
 
+**Exemplo 5 — Text to Speech bem-sucedido.**
+
+```bash
+curl -X POST \
+  "http://localhost:8010/api/v1/text-to-speech" \
+  -H "Content-Type: application/json" \
+  --output resposta.wav \
+  -d '{"text":"O empreendimento está dentro do prazo.","voice":"Kore","format":"wav"}'
+```
+
+**Código HTTP:** `200 OK`
+
+```http
+Content-Type: audio/wav
+Content-Disposition: inline; filename="speech.wav"
+```
+
+O corpo é binário e começa com a assinatura `RIFF` de um arquivo WAV; por isso não há corpo JSON no caminho de sucesso. No exemplo, `--output resposta.wav` grava o conteúdo para reprodução local. A porta `8010` corresponde à configuração de desenvolvimento consumida pelo proxy do Vite em `src/frontend/vite.config.js`.
+
+**Exemplo 6 — Text to Speech com formato inválido.**
+
+```bash
+curl -X POST \
+  "http://localhost:8010/api/v1/text-to-speech" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Teste de formato.","voice":"Kore","format":"mp3"}'
+```
+
+**Código HTTP:** `422 Unprocessable Entity`
+
+```json
+{
+  "detail": [
+    {
+      "type": "literal_error",
+      "loc": ["body", "format"],
+      "msg": "Input should be 'wav'",
+      "input": "mp3"
+    }
+  ]
+}
+```
+
+O framework rejeita o formato antes de chamar o Gemini, porque `SpeechAudioFormat` admite somente o literal `wav`. O mesmo mecanismo recusa vozes diferentes de `Kore` nesta versão.
+
 **Pseudocódigo da integração.** O trecho abaixo resume, em forma reduzida, o que `TranscribeAudio.transcribe` faz. É **exemplo conceitual** destinado a explicar o mecanismo, e não o código executável do repositório, que está em `src/services/transcription_service.py`:
 
 ```python
@@ -2045,22 +2090,69 @@ A retenção de sete dias é curta de propósito e responde a duas exigências q
 
 ### 3.2.6 Serviço de Text to Speech
 
-> **DECISÃO TÉCNICA EM ABERTO.** A implementação do TTS não está no escopo desta sprint. O cliente de TTS exige que o serviço esteja escolhido e com credenciais de teste disponíveis antes de qualquer desenvolvimento, e essa avaliação ainda não foi concluída pelo grupo. Além disso, a integração ponta a ponta entre STT, PLN e TTS depende tanto do cliente de STT, já implementado, quanto do cliente de TTS, ainda pendente; iniciar a integração sem os dois clientes prontos resultaria em trabalho parcial que não pode ser validado.
+**Decisão:** utilizar a **API Gemini Text-to-Speech**, por meio do SDK oficial `google-genai`, para sintetizar em áudio as respostas textuais do agente. O projeto já utilizava o Gemini no serviço de chat e já declarava o SDK e a variável `GEMINI_API_KEY`; a escolha evita introduzir uma segunda credencial para geração de conteúdo e mantém o cliente externo na mesma família tecnológica. O Gemini TTS também aceita português e oferece vozes predefinidas. Como o recurso e o modelo utilizados estão em *preview*, a decisão deve ser reavaliada antes de uma implantação de produção.
 
-A ausência da decisão não impede fixar desde já os critérios sobre os quais ela será tomada, e é isso que a tabela abaixo faz. Os candidatos foram levantados pela equipe; nenhuma coluna de resultado é preenchida aqui, justamente porque ainda não houve medição.
+O TTS é complementar ao Speech to Text exigido para a entrada por voz. Sua inclusão fecha o ciclo de interação: o usuário pode falar para o agente por meio do STT e, após o processamento, ouvir a resposta por meio do TTS. A síntese não ocorre automaticamente; o frontend só solicita o áudio quando o usuário aciona **Ouvir resposta**, o que evita consumo de cota sem intenção explícita e respeita as restrições de reprodução automática dos navegadores.
 
-| Critério de avaliação | Por que importa neste projeto | Como será verificado na Sprint 3 |
+#### Identificação do serviço e decisões adotadas
+
+| Item | Valor adotado | Evidência no repositório |
 |---|---|---|
-| Qualidade da voz em português brasileiro | O usuário é um profissional do PMO ouvindo a resposta enquanto se desloca; entonação artificial compromete a compreensão de números e datas | Escuta comparativa de um mesmo texto de referência com vocabulário de portfólio |
-| Pronúncia de siglas e termos do domínio | Termos como TAP, PMO, Linha 6 e marco aparecem em quase toda resposta | Texto de teste contendo as siglas do catálogo da Seção 3.1 |
-| Latência até o primeiro áudio | Soma-se ao tempo já consumido por transcrição e classificação, e incide sobre o RNF01 | Medição do tempo até o primeiro byte de áudio devolvido |
-| Custo por caractere ou por minuto sintetizado | Determina a viabilidade do canal de voz dentro do orçamento acadêmico | Consulta à página de preço vigente do provedor no momento da decisão |
-| Existência de SDK Python oficial | A pilha do backend é Python, e um SDK oficial reduz o custo de manutenção | Verificação no índice de pacotes e na documentação oficial |
-| Possibilidade de troca de provedor | A mesma exigência de desacoplamento aplicada ao STT vale aqui | Confirmação de que o cliente cabe atrás de uma interface própria, como ocorre com o `AudioFetcher` |
+| Serviço externo | Gemini Text-to-Speech | `src/services/gemini_speech_service.py` |
+| SDK | `google-genai>=1.0` | `pyproject.toml` e `requirements.txt` |
+| Modelo padrão | `gemini-2.5-flash-preview-tts` | `DEFAULT_TTS_MODEL` e variável opcional `GEMINI_TTS_MODEL` |
+| Autenticação externa | Chave lida de `GEMINI_API_KEY` | `get_speech_generator` em `src/az1_api/dependencies.py` |
+| Voz | `Kore`, única voz exposta pelo contrato atual | `SpeechVoice` em `src/schemas/speech.py` |
+| Idioma | Inferido pelo modelo a partir do texto; o fluxo do AZ1 utiliza português | Conteúdo textual enviado ao provedor |
+| Saída do provedor | PCM mono, 24 kHz, amostras de 16 bits | Constantes de conversão em `src/services/speech_service.py` |
+| Saída da API interna | WAV (`audio/wav`) | `GeneratedSpeech` e `pcm_to_wav` |
+| Armazenamento | Nenhum; o áudio é mantido temporariamente em memória | Serviço e componente `ChatMessage` |
 
-**Candidatos considerados:** os mesmos provedores comparados para o STT oferecem síntese de fala — Deepgram, Google Cloud, Azure AI Speech e OpenAI —, o que torna a reutilização de credencial e de SDK um critério adicional de desempate. A equipe não fechou a escolha, e nenhum deles é apresentado aqui como selecionado.
+A aplicação não expõe a chave ao navegador. `GeminiSpeechModel` recebe o texto e a voz, chama o provedor e devolve os bytes PCM. A classe `GenerateSpeech` depende do protocolo interno `SpeechModel`, valida a entrada e encapsula o PCM em um contêiner WAV. Essa separação impede que a rota e o frontend dependam diretamente do SDK e permite substituir o fornecedor com a implementação de outro adaptador.
 
-> **PENDENTE DE VALIDAÇÃO DA EQUIPE.** Escolher o provedor de TTS e registrar nesta seção, na Sprint 3, os mesmos itens já documentados para o STT: nome oficial, versão da API, URL-base, autenticação, voz utilizada, formato e taxa de amostragem do áudio devolvido, respostas de sucesso e de erro com seus códigos HTTP, tempo limite e política de repetição. Os dois exemplos que faltam nesta seção — **TTS bem-sucedido** e **TTS com parâmetro inválido** — devem ser acrescentados à Seção 3.2.4, no mesmo formato dos Exemplos 1 a 4 e extraídos de execução real do cliente. Enquanto esses dois exemplos não existirem, o critério de exemplos completos de API de voz não pode ser considerado plenamente atendido.
+#### Endpoint interno de síntese
+
+```http
+POST /api/v1/text-to-speech
+Content-Type: application/json
+```
+
+| Campo | Tipo | Obrigatório | Padrão | Regra |
+|---|---|---:|---|---|
+| `text` | string | Sim | — | Após a remoção de espaços nas extremidades, deve possuir de 1 a 4.000 caracteres |
+| `voice` | string | Não | `Kore` | Nesta versão, somente `Kore` é aceita |
+| `format` | string | Não | `wav` | Nesta versão, somente `wav` é aceito |
+
+Em caso de sucesso, o endpoint devolve `200 OK`, o corpo binário do áudio, `Content-Type: audio/wav` e `Content-Disposition: inline; filename="speech.wav"`. O áudio não é codificado em Base64 nem armazenado no S3: o frontend o recebe como `Blob`, cria uma URL temporária com `URL.createObjectURL`, reproduz e revoga a URL quando o componente é removido.
+
+#### Respostas de erro e fallback
+
+| Código HTTP | `error` | Condição | Comportamento no frontend |
+|---|---|---|---|
+| `422 Unprocessable Entity` | `empty_text` | Texto vazio ou composto apenas por espaços | Mantém a resposta textual e informa que o áudio não pôde ser gerado |
+| `422 Unprocessable Entity` | `text_too_long` | Texto com mais de 4.000 caracteres | Mantém a resposta textual e informa a falha |
+| `422 Unprocessable Entity` | corpo de validação do FastAPI | Voz ou formato fora dos literais permitidos, ou campo obrigatório ausente | Mantém a resposta textual e informa a falha |
+| `502 Bad Gateway` | `speech_generation_failed` | Erro do Gemini, credencial inválida, resposta vazia ou conteúdo inesperado | Mantém a resposta textual e permite nova tentativa |
+| `500 Internal Server Error` | `internal_error` | Falha interna não prevista | Mantém a resposta textual e não expõe detalhes internos |
+
+O tratamento de `502` diferencia a indisponibilidade do fornecedor de um defeito interno do AZ1. A interface bloqueia o botão enquanto a geração está em andamento, evitando solicitações concorrentes para a mesma mensagem. Se a síntese falhar, a resposta textual não é removida, pois ela é o resultado principal do agente e o áudio é um recurso complementar.
+
+> **Limitação vigente.** O cliente ainda não define tempo limite nem repetição automática próprios; exceções do SDK são convertidas em `502 speech_generation_failed`. A política deve ser estabelecida antes de produção, considerando latência, custo de uma segunda geração e o RNF01. A autenticação do usuário no endpoint interno também permanece pendente, assim como nos demais endpoints de voz; por isso a execução atual deve permanecer em ambiente local ou controlado.
+
+#### Integração com o frontend
+
+A função `generateSpeech`, em `src/frontend/src/lib/api.js`, envia o conteúdo de uma resposta do agente ao endpoint e lê o retorno como `Blob`. O componente `ChatMessage` apresenta o botão apenas para mensagens do agente e controla os estados `idle`, `loading`, `playing` e `paused`. Durante a geração, o botão exibe **Gerando áudio...**; durante a reprodução, passa a **Pausar**. A geração acontece uma vez por instância da mensagem e o áudio já carregado pode ser retomado sem nova chamada ao provedor.
+
+#### Testes implementados
+
+Os testes não chamam o serviço externo nem consomem cota. Um modelo falso implementa o mesmo protocolo usado pelo adaptador real, permitindo verificar o comportamento da aplicação de forma determinística.
+
+| Arquivo | Cobertura |
+|---|---|
+| `tests/test_speech_service.py` | Remoção de espaços, encaminhamento de texto e voz, conversão PCM–WAV, texto vazio, limite de 4.000 caracteres, resposta vazia e falha do provedor |
+| `tests/test_speech_api.py` | Resposta `200` com `audio/wav`, voz e formato inválidos e mapeamento dos erros controlados para `422` e `502` |
+
+Na validação da implementação, os oito testes específicos de TTS passaram. O frontend também foi submetido ao `oxlint` e ao build de produção do Vite; o build foi concluído, e os avisos de lint encontrados pertencem a componentes preexistentes não alterados por esta implementação. A reprodução real foi exercitada manualmente pela equipe no frontend com uma resposta em português. Essa validação comprova o caminho funcional, mas ainda não registra métricas de latência, custo ou qualidade de pronúncia e não substitui o teste automatizado do adaptador contra um ambiente controlado do provedor.
 
 ### 3.2.7 Coerência com o restante da especificação
 
@@ -2068,13 +2160,13 @@ A tabela fecha o vínculo entre esta seção e os demais elementos do projeto, d
 
 | Elemento relacionado | Vínculo com a API de voz |
 |---|---|
-| RF01 — entrada por texto ou voz | A transcrição é o que permite que a solicitação falada percorra o mesmo pipeline da digitada, sem um segundo classificador |
+| RF01 — entrada por texto ou voz | A transcrição permite que a solicitação falada percorra o mesmo pipeline da digitada; o TTS complementa o fluxo ao oferecer a reprodução da resposta, sem substituir o texto |
 | RNF01 — desempenho | O tempo da chamada externa é a maior parcela do tempo de resposta do canal de voz; a política de tempo limite em aberto incide diretamente sobre este requisito |
 | RNF03 — precisão na identificação de intenções | Um erro de transcrição vira um erro de classificação; por isso o `keyterm` cobre o vocabulário que distingue as intenções |
 | RNF04 e RNF09 — auditoria | A coluna `auditoria.interacao.audio_referencia`, definida na Seção 3.6.5, guarda o `audio_id` e liga cada interação por voz ao arquivo original |
-| RNF06 — acessibilidade | O canal de voz é o mecanismo que atende a este requisito, e o WER medido é a métrica que comprova o atendimento |
+| RNF06 — acessibilidade | O STT oferece entrada por voz e o TTS oferece saída auditiva sob demanda; o texto permanece disponível e o controle possui rótulo acessível. WER, latência e avaliação de pronúncia ainda precisam ser medidos |
 | AM9 — degradação da transcrição em ambiente ruidoso | O risco incide exatamente sobre esta seção e permanece **Aberto**, sem medição, conforme a Seção 4.3.2 do `GestaoProjeto.md` |
-| Seção 2.4 — diagrama de componentes | A Conversão de Áudio em Texto é o componente que encapsula este serviço |
+| Seção 2.4 — diagrama de componentes | A Conversão de Áudio em Texto encapsula o STT; a rota e o serviço de síntese encapsulam o TTS e devolvem WAV ao frontend |
 | Seção 3.4 — API de recebimento | Fornece o `audio_id` e impõe os limites de formato, tamanho e duração que este serviço pressupõe |
 | Seção 3.9 — projeto técnico e arquitetural | Os diagramas de sequência da consulta por voz e da falha do serviço de voz representam graficamente os fluxos desta seção |
 
@@ -2824,7 +2916,6 @@ A geração de respostas textuais já está integrada separadamente pelo endpoin
 | Persistência estruturada | PostgreSQL e SQL | Modelagem conceitual, lógica e física concluída; provisionamento e integração posteriores. |
 | RAG | MinIO, PostgreSQL com pgvector, `gemini-embedding-001` e `gemini-3.5-flash-lite` | Armazenamento de documentos sintéticos, recuperação semântica e geração de respostas fundamentadas. |
 | Agendamento e alertas | APScheduler, PostgreSQL e interface React | Execução de verificações periódicas, persistência e apresentação de alertas na aplicação. |
-| Text-to-Speech | Provedor ainda não definido | Avaliação e escolha na próxima sprint. |
 | Computação em nuvem | AWS Academy e Amazon EC2 | Ambiente acadêmico selecionado e serviço de computação confirmado para o deploy do MVP. |
 | Registro de imagens | Amazon ECR | Uso planejado, condicionado à disponibilidade no catálogo do laboratório. |
 | Armazenamento de objetos em nuvem | Amazon S3 e Boto3 | Substituição planejada do MinIO no ambiente AWS, condicionada à disponibilidade do serviço. |
@@ -2837,7 +2928,7 @@ A escolha do PostgreSQL evita introduzir um segundo banco apenas para a busca ve
 
 No desenvolvimento local, o MinIO permanece como armazenamento compatível com S3. No ambiente AWS, a substituição planejada pelo Amazon S3 preserva o uso do Boto3 e o contrato de acesso a objetos. O Amazon EC2 hospedará os elementos executáveis do MVP; ECR, S3 e CloudWatch somente serão incorporados ao deploy após a confirmação de que estão liberados no laboratório da AWS Academy. A hospedagem do PostgreSQL nesse ambiente permanece em aberto.
 
-O serviço de Text-to-Speech integra a arquitetura prevista do produto, mas não é apresentado como tecnologia fechada porque seu provedor ainda será avaliado na próxima sprint. Da mesma forma, as integrações com o ecossistema Microsoft são tratadas como evolução futura e não como parte da pilha executável atual.
+O serviço de Text-to-Speech já integra a pilha executável com Gemini TTS, conforme o contrato e as limitações registrados na Seção 3.2.6. As integrações com o ecossistema Microsoft, por sua vez, continuam tratadas como evolução futura e não fazem parte da pilha executável atual.
 
 ### 3.5.3 Quadro consolidado da pilha
 
@@ -2858,7 +2949,7 @@ O quadro reúne, em uma única leitura, cada camada da solução com a tecnologi
 | Persistência estruturada | PostgreSQL | Guardar portfólio, projetos, artefatos, pendências e a trilha de auditoria | Modelo relacional adequado às entidades da Seção 3.6, com recursos de integridade que sustentam RNF02, RNF04 e RNF09 | Banco não relacional para os dados do portfólio | Restrições declarativas, colunas geradas e separação por schema | Provisionamento e integração ainda não realizados | Decidido |
 | Busca vetorial (RAG) | PostgreSQL com pgvector, `gemini-embedding-001` | Recuperar trechos de documentos para fundamentar a resposta | Evita introduzir um segundo banco só para busca semântica | Banco vetorial dedicado | Uma única base para dados e vetores, com uma só operação | Desempenho a verificar quando o volume de documentos crescer | Selecionado |
 | Agendamento | APScheduler | Executar as verificações periódicas de pendências do RF05 | Roda no mesmo processo Python do backend, o que atende ao porte do MVP | Agendador externo ou serviço gerenciado de nuvem | Nenhum componente novo de infraestrutura | Não sobrevive a múltiplas instâncias nem à interrupção da sessão do laboratório, conforme a Seção 3.7.9, item 4 | Selecionado |
-| Text to Speech | Provedor não definido | Converter a resposta em áudio | Critérios de avaliação registrados na Seção 3.2.6 | Deepgram, Google Cloud, Azure AI Speech e OpenAI | — | Sem decisão, o canal de voz permanece unidirecional | Em aberto |
+| Text to Speech | Google Gen AI SDK, `gemini-2.5-flash-preview-tts`, voz `Kore` | Converter sob demanda a resposta em áudio WAV | Reutiliza o SDK e a credencial já empregados pelo chat, oferece suporte a português e permanece isolado por um protocolo interno | Deepgram, Google Cloud, Azure AI Speech e OpenAI | Fecha o ciclo de voz sem expor a credencial ao frontend | Modelo em *preview*; timeout, repetição e autenticação do usuário ainda pendentes | Implementado |
 | Autenticação e autorização | Emissor não definido | Autenticar o usuário e aplicar o RNF02 | Contrato de Bearer Token já definido na Seção 3.4 | Autenticação própria ou integração com o Copilot Studio | — | Ausência do controle é a principal lacuna de segurança do MVP | Em aberto |
 | Computação em nuvem | AWS Academy com Amazon EC2 | Hospedar frontend e backend | Ambiente concedido pela instituição, sem custo nem necessidade de orçamento | Outros provedores com camada gratuita | Disponibilidade imediata e verificada | Crédito de US$ 50 e sessão de 4 horas, conforme a Seção 3.7.3 | Selecionado, com EC2 confirmado |
 | Registro de imagens | Amazon ECR | Guardar as imagens de contêiner do pipeline | Integra-se ao EC2 sem credencial adicional, pelo papel de execução da instância | Construção local da imagem na própria instância | Rastreabilidade entre a imagem testada e a implantada | Disponibilidade no catálogo do laboratório ainda não confirmada | Selecionado |
@@ -4162,7 +4253,7 @@ flowchart TB
     subgraph EXT["Serviços de terceiros"]
         STT["Deepgram Nova-3<br/>Speech to Text<br/>INTEGRADO"]
         LLM["Google Gemini<br/>geração de texto<br/>INTEGRADO"]
-        TTS["Text to Speech<br/>PROVEDOR EM ABERTO"]
+        TTS["Gemini TTS<br/>Text to Speech<br/>INTEGRADO"]
     end
 
     CAP -->|"multipart/form-data"| RX
@@ -4179,7 +4270,8 @@ flowchart TB
     GR -->|"HTTPS"| LLM
     GR -.->|"previsto"| RD
     GR --> UI
-    GR -.->|"previsto"| TTS
+    GW -->|"HTTPS, sob demanda"| TTS
+    TTS -->|"WAV"| UI
     AG -.->|"previsto"| PT
     AF -.->|"previsto"| LG
     GW -.->|"previsto"| AF
@@ -4582,7 +4674,7 @@ As capturas a seguir registram a evolução em três momentos: a interface conve
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-Diferentemente do protótipo, em que gravação, transcrição e resposta eram simuladas, a interface funcional captura o áudio do microfone de verdade para animar a onda sonora — o hook `useMicVolume` usa a Web Audio API para medir o volume da fala. Permanecem como limites do estado atual, a serem conectados nas próximas sprints junto à integração de STT/TTS: o áudio ainda não é enviado ao endpoint `/api/v1/audio` e o chat ainda não possui processamento de linguagem natural real. Essa distinção é mantida explícita porque a semelhança da interface com produtos reais gera expectativa de funcionamento real — e a documentação não deve sugerir comportamentos ainda não implementados.
+Diferentemente do protótipo, em que gravação, transcrição e resposta eram simuladas, a interface funcional captura o áudio do microfone de verdade para animar a onda sonora — o hook `useMicVolume` usa a Web Audio API para medir o volume da fala. O Text-to-Speech já está conectado às respostas do agente por meio do botão **Ouvir resposta**. Permanecem como limites do estado atual a entrada por voz ponta a ponta — o áudio capturado ainda não é enviado ao endpoint `/api/v1/audio` — e a integração completa dessa entrada ao processamento do chat. Essa distinção é mantida explícita porque a semelhança da interface com produtos reais gera expectativa de funcionamento real, e a documentação não deve sugerir comportamentos ainda não implementados.
 
 
 ## 4.5 Diário de Construção dos Dois Protótipos
