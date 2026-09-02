@@ -1,12 +1,19 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-export function useMicVolume() {
+export function useMicVolume({ onRecordingComplete } = {}) {
   const [volume, setVolume] = useState(0)
   const [permissionDenied, setPermissionDenied] = useState(false)
   const audioCtxRef = useRef(null)
   const analyserRef = useRef(null)
   const streamRef = useRef(null)
   const rafRef = useRef(null)
+  const mediaRecorderRef = useRef(null)
+  const chunksRef = useRef([])
+  const onRecordingCompleteRef = useRef(onRecordingComplete)
+
+  useEffect(() => {
+    onRecordingCompleteRef.current = onRecordingComplete
+  })
 
   const tick = useCallback(() => {
     const analyser = analyserRef.current
@@ -37,6 +44,21 @@ export function useMicVolume() {
     rafRef.current = requestAnimationFrame(simulateTick)
   }, [])
 
+  const cleanupStream = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    rafRef.current = null
+
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+
+    audioCtxRef.current?.close()
+    audioCtxRef.current = null
+
+    analyserRef.current = null
+    mediaRecorderRef.current = null
+    setVolume(0)
+  }, [])
+
   const start = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -52,27 +74,36 @@ export function useMicVolume() {
       source.connect(analyser)
       analyserRef.current = analyser
 
+      chunksRef.current = []
+      const recorder = new MediaRecorder(stream)
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data)
+      }
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType })
+        cleanupStream()
+        onRecordingCompleteRef.current?.(blob)
+      }
+      mediaRecorderRef.current = recorder
+      recorder.start()
+
       setPermissionDenied(false)
       tick()
     } catch {
       setPermissionDenied(true)
       rafRef.current = requestAnimationFrame(simulateTick)
     }
-  }, [tick, simulateTick])
+  }, [tick, simulateTick, cleanupStream])
 
   const stop = useCallback(() => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current)
-    rafRef.current = null
-
-    streamRef.current?.getTracks().forEach((track) => track.stop())
-    streamRef.current = null
-
-    audioCtxRef.current?.close()
-    audioCtxRef.current = null
-
-    analyserRef.current = null
-    setVolume(0)
-  }, [])
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop()
+      return
+    }
+    const wasDenied = permissionDenied
+    cleanupStream()
+    if (wasDenied) onRecordingCompleteRef.current?.(null)
+  }, [cleanupStream, permissionDenied])
 
   return { volume, permissionDenied, start, stop }
 }

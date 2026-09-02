@@ -10,9 +10,11 @@ export default function PromptBar({
   onSubmit,
   isListening,
   onToggleListening,
+  isTranscribing,
+  onRecordingComplete,
 }) {
   const inputRef = useRef(null)
-  const { volume, start, stop } = useMicVolume()
+  const { volume, start, stop } = useMicVolume({ onRecordingComplete })
 
   useEffect(() => {
     if (isListening) {
@@ -42,6 +44,10 @@ export default function PromptBar({
             </span>
             <Waveform volume={volume} />
           </>
+        ) : isTranscribing ? (
+          <span className="flex-1 text-[15px] text-text-secondary">
+            Transcrevendo áudio...
+          </span>
         ) : (
           <textarea
             ref={inputRef}
@@ -57,8 +63,9 @@ export default function PromptBar({
         <button
           type="button"
           onClick={onToggleListening}
+          disabled={isTranscribing}
           aria-label={isListening ? 'Parar gravação' : 'Ativar microfone'}
-          className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors ${
+          className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
             isListening
               ? 'bg-black/5 dark:bg-white/10'
               : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/10'

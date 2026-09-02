@@ -13,7 +13,7 @@ import TopBar from '../components/TopBar/TopBar'
 import metroMapPattern from '../assets/metro-map-pattern.svg'
 import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
-import { sendMessage } from '../lib/api'
+import { sendAudio, sendMessage, transcribeAudio } from '../lib/api'
 
 const FALLBACK_REPLY =
   'Estou aqui para ajudar. Em breve estarei conectado aos serviços de fala e processamento de linguagem natural para responder de forma completa.'
@@ -41,6 +41,7 @@ export default function AgentPage() {
   const [messages, setMessages] = useState([])
   const [inputValue, setInputValue] = useState('')
   const [isListening, setIsListening] = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [shareCopied, setShareCopied] = useState(false)
   const scrollRef = useRef(null)
@@ -85,6 +86,36 @@ export default function AgentPage() {
         setMessages((prev) => [...prev, { role: 'agent', content: FALLBACK_REPLY }])
       })
       .finally(() => setIsProcessing(false))
+  }
+
+  const handleRecordingComplete = (blob) => {
+    if (!blob || blob.size === 0) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'agent',
+          content:
+            'Não consegui acessar o microfone. Verifique as permissões do navegador.',
+        },
+      ])
+      return
+    }
+
+    setIsTranscribing(true)
+    sendAudio(blob)
+      .then((upload) => transcribeAudio(upload.id))
+      .then((transcription) => {
+        if (transcription.text.trim()) {
+          submitMessage(transcription.text)
+        }
+      })
+      .catch(() => {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'agent', content: 'Não consegui transcrever o áudio. Tente novamente.' },
+        ])
+      })
+      .finally(() => setIsTranscribing(false))
   }
 
   const handleNewConversation = () => {
@@ -305,6 +336,8 @@ export default function AgentPage() {
                 onSubmit={() => submitMessage(inputValue)}
                 isListening={isListening}
                 onToggleListening={handleToggleListening}
+                isTranscribing={isTranscribing}
+                onRecordingComplete={handleRecordingComplete}
               />
             </div>
           )}

@@ -16,6 +16,19 @@ export async function sendAudio(audioBlob) {
   return response.json()
 }
 
+export async function transcribeAudio(audioId, language = 'pt-BR') {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/audio/${audioId}/transcribe?language=${language}`,
+    { method: 'POST' },
+  )
+
+  if (!response.ok) {
+    throw new Error(`Falha ao transcrever áudio: ${response.status}`)
+  }
+
+  return response.json()
+}
+
 export async function sendMessage(text, conversationId) {
   const response = await fetch(`${API_BASE_URL}/api/v1/chat`, {
     method: 'POST',
