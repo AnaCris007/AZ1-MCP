@@ -71,8 +71,30 @@
 
 </details>
 
-- [5. Registro de Decisões](#5-registro-de-decisões)
-- [6. Fontes](#6-fontes)
+<details>
+<summary><strong>5. Desenvolvimento e Documentação Técnica do Projeto</strong></summary>
+
+- [5.1 Webhooks](#51-webhooks)
+- [5.2 Módulo VHS](#52-módulo-vhs)
+- [5.3 Sistema de Troca de Mensagens](#53-sistema-de-troca-de-mensagens)
+- [5.4 Integração entre Frontend e Backend](#54-integração-entre-frontend-e-backend)
+
+</details>
+
+<details>
+<summary><strong>6. Planejamento de Testes Sistêmicos</strong></summary>
+
+- [6.1 Estratégia, Ferramentas e Bibliotecas Planejadas](#61-estratégia-ferramentas-e-bibliotecas-planejadas)
+- [6.2 Planejamento dos Testes de Funcionalidade](#62-planejamento-dos-testes-de-funcionalidade)
+- [6.3 Planejamento dos Testes de Requisitos Não Funcionais](#63-planejamento-dos-testes-de-requisitos-não-funcionais)
+- [6.4 Planejamento dos Testes de Integração](#64-planejamento-dos-testes-de-integração)
+- [6.5 Planejamento dos Testes de Usabilidade](#65-planejamento-dos-testes-de-usabilidade)
+- [6.6 Matriz de Cobertura Planejada](#66-matriz-de-cobertura-planejada)
+
+</details>
+
+- [7. Registro de Decisões](#7-registro-de-decisões)
+- [8. Fontes](#8-fontes)
 
 ---
 
@@ -4985,7 +5007,123 @@ O próximo passo é implementar essa interface, seguindo os passos da seção 4.
 
 ---
 
-# 5. Registro de Decisões
+# 5. Desenvolvimento e Documentação Técnica do Projeto
+
+## 5.1 Webhooks
+
+### 5.1.1 Definição dos Webhooks
+
+### 5.1.2 Rotas e Endpoints
+
+### 5.1.3 Estrutura dos Dados Recebidos
+
+### 5.1.4 Processamento e Armazenamento
+
+### 5.1.5 Respostas e Tratamento de Erros
+
+### 5.1.6 Exemplos e Testes
+
+## 5.2 Módulo VHS
+
+### 5.2.1 Objetivo e Tecnologia Utilizada
+
+### 5.2.2 Configuração do Cache
+
+### 5.2.3 Gravação e Reprodução das Respostas Externas
+
+### 5.2.4 Integração com os Serviços Externos
+
+### 5.2.5 Casos de Uso e Testes
+
+## 5.3 Sistema de Troca de Mensagens
+
+### 5.3.1 Tecnologia de Mensageria
+
+### 5.3.2 Configuração de Filas, Tópicos ou Canais
+
+### 5.3.3 Produtores
+
+### 5.3.4 Consumidores
+
+### 5.3.5 Integração com os Webhooks
+
+### 5.3.6 Tratamento de Falhas
+
+### 5.3.7 Casos de Uso e Testes
+
+## 5.4 Integração entre Frontend e Backend
+
+### 5.4.1 Arquitetura da Integração
+
+### 5.4.2 Configuração e Contratos das APIs
+
+### 5.4.3 Fluxos Integrados
+
+### 5.4.4 Tratamento de Erros e Falhas de Comunicação
+
+### 5.4.5 Testes de Integração
+
+---
+
+# 6. Planejamento de Testes Sistêmicos
+
+## 6.1 Estratégia, Ferramentas e Bibliotecas Planejadas
+
+## 6.2 Planejamento dos Testes de Funcionalidade
+
+### 6.2.1 Propósito e Rastreabilidade com os Requisitos Funcionais
+
+### 6.2.2 Cenários Positivos e Negativos Planejados
+
+### 6.2.3 Procedimentos de Teste
+
+### 6.2.4 Resultados Esperados
+
+### 6.2.5 Abrangência Planejada
+
+## 6.3 Planejamento dos Testes de Requisitos Não Funcionais
+
+### 6.3.1 Propósito e Rastreabilidade com os RNFs
+
+### 6.3.2 Planejamento dos Testes de Desempenho
+
+### 6.3.3 Cenários Positivos e Negativos Planejados
+
+### 6.3.4 Procedimentos de Teste
+
+### 6.3.5 Resultados Esperados
+
+### 6.3.6 Abrangência Planejada
+
+## 6.4 Planejamento dos Testes de Integração
+
+### 6.4.1 Integrações entre Componentes Internos
+
+### 6.4.2 Integrações com Serviços Externos
+
+### 6.4.3 Uso Planejado do Módulo VHS
+
+### 6.4.4 Cenários Positivos e Negativos Planejados
+
+### 6.4.5 Procedimentos, Ferramentas e Validação Esperada
+
+## 6.5 Planejamento dos Testes de Usabilidade
+
+### 6.5.1 Objetivo do Teste
+
+### 6.5.2 Perfis, Diversidade e Seleção dos Participantes
+
+### 6.5.3 Cenários e Roteiro Planejados
+
+### 6.5.4 Aplicação Planejada do SUS
+
+### 6.5.5 Critérios para Análise dos Resultados
+
+## 6.6 Matriz de Cobertura Planejada
+
+---
+
+# 7. Registro de Decisões
 
 Esta seção registra as principais decisões técnicas, de escopo e de processo tomadas durante a Sprint 1. O registro segue o formato: decisão, contexto, alternativas consideradas, justificativa, impacto, participantes, data e status.
 
@@ -4998,7 +5136,7 @@ Esta seção registra as principais decisões técnicas, de escopo e de processo
 | D05 | Cenários de sequência representam apenas o fluxo principal nesta sprint | Os desvios (rejeição de intenção desconhecida, esclarecimento de parâmetros, falha de transcrição, indisponibilidade de fonte) aumentariam significativamente a complexidade dos diagramas | Incluir todos os fragmentos alternativos desde a Sprint 1; dividir cada cenário em diagrama principal e diagrama de exceção | Privilegiar legibilidade na primeira especificação; os desvios entram na Sprint 2 conforme registrado no documento | Os critérios de aceitação dos RFs descrevem os desvios, mas eles não aparecem graficamente nesta sprint | Equipe | **Data a confirmar pela equipe** | Aprovada |
 | D06 | RNF09 substituído de "Tratamento de ambiguidades" para "Auditabilidade das interações" | A equipe não possuía informações suficientes para sustentar metas mensuráveis para o RNF09 original; o componente de auditoria já estava presente na arquitetura (seção 2.4) sem requisito formal correspondente | Manter o RNF09 original com metas pendentes; remover o requisito sem substituição | Auditabilidade é exigência direta das restrições de rastreabilidade do parceiro e estava prevista na arquitetura sem cobertura por requisito não funcional | O RNF09 de auditabilidade passou a cobrir o componente "Auditoria e Feedback" da solução técnica; o tratamento de ambiguidades permanece como comportamento descrito nos critérios de aceitação do RF02 | Equipe | 2026-08-14 | Aprovada |
 
-# 6. Fontes
+# 8. Fontes
 
 - ANPTrilhos. [Balanço do Setor Metroferroviário 2024](https://anptrilhos.org.br/balanco-metroferroviario-2024-transporte-sobre-trilhos-cresce-e-transporta-257-bilhoes-de-passageiros/). Acesso em ago. 2026.
 - Microsoft. [Design effective language understanding — Microsoft Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/language-understanding). Acesso em ago. 2026.
