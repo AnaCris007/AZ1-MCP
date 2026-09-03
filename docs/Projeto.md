@@ -5138,6 +5138,37 @@ Cada critério de aceitação da Seção 2.2 é uma frase que reúne mais de uma
 | | C3.3 — A data da última atualização do documento é exibida | CT-RF03-01, CT-RF03-05 |
 | | C3.4 — Quando a resposta combina mais de uma fonte, todas são listadas | CT-RF03-02 |
 | | C3.5 — Dado sem origem identificável não é apresentado como fundamentado | CT-RF03-04 |
+| **RF04** | C4.1 — Há uma sugestão de texto para cada campo pendente | CT-RF04-01, CT-RF04-05 |
+| | C4.2 — Cada sugestão pode ser copiada individualmente | CT-RF04-02 |
+| | C4.3 — O documento de origem não é alterado | CT-RF04-03 |
+| | C4.4 — Cada sugestão indica fonte e justificativa, conforme o RNF11 | CT-RF04-04 |
+| | C4.5 — Documento fora do conjunto suportado produz informação de limitação | CT-RF04-06 |
+| **RF05** | C5.1 — Nova pendência gera notificação sem solicitação prévia do usuário | CT-RF05-01 |
+| | C5.2 — A notificação informa o projeto e a pendência | CT-RF05-01 |
+| | C5.3 — A notificação alcança apenas quem acompanha o projeto | CT-RF05-02, CT-RF05-04 |
+| | C5.4 — Pendência já notificada não gera notificação repetida | CT-RF05-03 |
+| | C5.5 — Pendência com dados incompletos não produz notificação malformada | CT-RF05-05 |
+| **RF06** | C6.1 — A instrução identifica o projeto e os campos afetados, com valores compatíveis com o tipo de cada campo | CT-RF06-01, CT-RF06-05 |
+| | C6.2 — Os valores a gravar são apresentados ao usuário antes da gravação | CT-RF06-01 |
+| | C6.3 — A alteração só é efetivada após confirmação explícita | CT-RF06-02, CT-RF06-03 |
+| | C6.4 — Autor e data da alteração são registrados | CT-RF06-02 |
+| | C6.5 — Alteração por quem não lidera o projeto é recusada | CT-RF06-04 |
+
+Nenhuma condição ficou sem caso e nenhum caso ficou sem condição de origem. É essa correspondência, e não a contagem de casos, que sustenta a discussão de abrangência da Seção 6.2.5.
+
+#### Rastreabilidade com os requisitos não funcionais
+
+Alguns casos funcionais tocam requisitos não funcionais sem, no entanto, medi-los. A distinção é deliberada: o caso funcional verifica que o comportamento **existe**; o teste da Seção 6.3 verifica que ele atinge o **valor-alvo**. A tabela registra esses pontos de contato para que a Seção 6.3 não os replique.
+
+| Caso funcional | RNF tocado | O que o caso funcional verifica | O que fica para a Seção 6.3 |
+|---|---|---|---|
+| CT-RF01-02 | RNF06 — Qualidade da transcrição | Que a transcrição é produzida e devolvida com idioma, confiança e duração | A taxa de erro de palavras contra transcrições de referência |
+| CT-RF02-03 | RNF03 — Precisão na identificação de intenções | Que o classificador atribui uma classe do catálogo a cada entrada | A acurácia mínima de 85% sobre a partição de teste isolada |
+| CT-RF02-10 | RNF02 — Controle de acesso | Que o dado não é devolvido a perfil sem alcance | O bloqueio de 80% das tentativas em até 15 segundos |
+| CT-RF03-01 a CT-RF03-05 | RNF11 — Explicabilidade | Que fonte e data acompanham o dado | A proporção de 85% de sugestões com referência válida |
+| CT-RF04-04 | RNF11 — Explicabilidade | Que a sugestão traz fonte e justificativa | A compreensibilidade da justificativa, aferida na Seção 6.5 |
+| Todos | RNF04 e RNF09 — Rastreabilidade e auditabilidade | — | O registro de cada interação com os atributos mínimos exigidos |
+
 ### 6.2.2 Cenários Positivos e Negativos Planejados
 
 #### Critério de composição
