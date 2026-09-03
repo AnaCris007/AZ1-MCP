@@ -5071,10 +5071,124 @@ O próximo passo é implementar essa interface, seguindo os passos da seção 4.
 
 ## 6.2 Planejamento dos Testes de Funcionalidade
 
+Esta seção deriva dos requisitos funcionais da Seção 2.2 o conjunto de casos de teste que verificam se a solução faz o que foi especificado. Ela cumpre o papel atribuído à Sprint 3 pela Seção 3.8.10: **planejar** os casos, não executá-los. A execução ocorre na Sprint 4 e a complementação na Sprint 5, conforme a mesma seção.
+
+O planejamento cobre os seis requisitos funcionais, e não apenas os que já possuem implementação. Cada caso carrega uma marca de estado que declara se ele pode ser executado sobre o repositório atual ou se depende de um componente ainda por construir. Essa marca é o que impede que o plano seja lido como um retrato do que funciona: um caso planejado sobre um componente inexistente continua sendo um compromisso de verificação, mas não é evidência de nada até que a construção o alcance.
+
 ### 6.2.1 Propósito e Rastreabilidade com os Requisitos Funcionais
 
+#### Propósito e delimitação em relação aos testes já existentes
+
+O repositório já contém 145 testes automatizados, executados por `python -m unittest discover tests`. Eles são **testes de unidade e de contrato de componente**: verificam que `probe_audio` rejeita um arquivo corrompido, que a rota devolve `413` quando o serviço levanta `FILE_TOO_LARGE`, que o pré-processamento aplica o radicalizador na ordem esperada. Seu objeto é a peça isolada, e a referência contra a qual eles julgam é a decisão de implementação.
+
+Os testes de funcionalidade planejados aqui têm outro objeto e outra referência. O objeto é o **comportamento observável pelo usuário**, atravessando as peças que forem necessárias; a referência é o **critério de aceitação escrito na Seção 2.2**, e não a implementação. A distinção é prática: um teste de unidade pode passar sobre um componente que cumpre perfeitamente seu contrato interno enquanto o critério de aceitação do requisito permanece descumprido. É exatamente o caso do RF01 no estado atual do repositório, como a subseção seguinte demonstra.
+
+A consequência é que os dois conjuntos não se substituem. Os testes de unidade permanecem como a rede que protege a refatoração; os testes de funcionalidade são a evidência que se apresenta ao parceiro de que o requisito foi atendido.
+
+#### Convenção de identificação
+
+Cada caso recebe o identificador `CT-RFxx-nn`, em que `RFxx` é o requisito de origem e `nn` é o número sequencial dentro daquele requisito. O identificador é estável: uma vez atribuído, não é reaproveitado nem renumerado, ainda que o caso seja descartado, de modo que a evidência registrada em uma issue continue localizável depois de o plano evoluir.
+
+Os casos são classificados em dois eixos:
+
+| Eixo | Valores | Significado |
+|---|---|---|
+| Tipo | **Positivo** | Verifica que o sistema faz o que deve fazer quando as condições são favoráveis |
+| | **Negativo** | Verifica que o sistema recusa, informa ou trata corretamente uma condição adversa. A aprovação exige comportamento previsto, não ausência de erro |
+| Nível | **API** | Executado contra os endpoints da Seção 3.4, sem interface |
+| | **Integração** | Percorre mais de um componente encadeado, como áudio para transcrição para intenção |
+| | **Interface** | Exige a interface web, executado manualmente ou por automação de navegador na Sprint 5 |
+| | **Conjunto** | Avaliado sobre um lote de entradas, e não sobre uma execução isolada |
+
+#### Estado de implementação de cada requisito
+
+A tabela confronta cada requisito funcional com o que existe no repositório na data desta redação. Ela é o insumo que determina em qual sprint cada caso se torna executável, e foi levantada por inspeção do código, e não por leitura das seções anteriores deste documento.
+
+| RF | Estado | O que existe | O que falta para o critério de aceitação |
+|---|---|---|---|
+| **RF01** | **Parcialmente implementado** | `POST /api/v1/audio` com validação de formato, tamanho e duração (`src/routes/audio.py`); `POST /api/v1/audio/{audio_id}/transcribe` integrado ao Deepgram (`src/routes/transcription.py`); `POST /api/v1/chat` devolvendo resposta textual (`src/routes/chat.py`) | A interface não envia áudio: `sendAudio` existe em `src/frontend/src/lib/api.js` e nenhum componente a utiliza; a transcrição não é apresentada ao usuário antes do processamento, que é a parte central do critério |
+| **RF02** | **Parcialmente implementado** | Classificação de intenção sobre as dez classes do catálogo da Seção 3.1, incluindo `fora_do_catalogo`, exposta por `POST /api/v1/audio/{audio_id}/analyze` (`src/routes/analysis.py`) e apoiada em 400 exemplos rotulados | Extração de entidades, correspondência entre entidade e registro, consulta às fontes e ciclo de esclarecimento de parâmetro faltante. O `POST /api/v1/chat` responde por modelo de linguagem sem fundamentação nas fontes |
+| **RF03** | **Não implementado** | — | Nenhum schema de resposta em `src/schemas/` transporta documento de origem, referência ou data; `ChatResponse` contém apenas `reply` |
+| **RF04** | **Não implementado** | As intenções INT-03 a INT-07 estão no catálogo e na base de treinamento | A execução da intenção: leitura dos campos pendentes de um artefato e geração de sugestão por campo |
+| **RF05** | **Não implementado** | — | Persistência de `Pendência`, agendador de verificação e serviço de notificação, todos previstos para a Sprint 4 |
+| **RF06** | **Não implementado** | — | Escrita nas fontes, que a Seção 3.1 declara fora do escopo do MVP e a decisão D04 registra como evolução futura |
+
+Dos seis requisitos, portanto, **nenhum está integralmente implementado**, dois possuem caminho parcial verificável e quatro dependem de construção. O plano registra isso de frente porque a alternativa — planejar como se tudo existisse — produziria um artefato que só se descobre irreal no momento da execução, na Sprint 4, quando já não há folga para reagir.
+
+#### Decomposição dos critérios de aceitação em condições verificáveis
+
+Cada critério de aceitação da Seção 2.2 é uma frase que reúne mais de uma exigência. A verificação exige separá-las, porque um caso de teste que tenta cobrir a frase inteira não distingue qual parte falhou. A tabela apresenta essa decomposição e indica os casos que respondem por cada condição.
+
+| RF | Condição verificável extraída do critério | Casos |
+|---|---|---|
+| **RF01** | C1.1 — Solicitação em áudio é convertida em texto | CT-RF01-01, CT-RF01-02 |
+| | C1.2 — A transcrição é apresentada ao usuário **antes** do processamento | CT-RF01-03 |
+| | C1.3 — Solicitação em texto é processada diretamente | CT-RF01-04 |
+| | C1.4 — A resposta é apresentada em texto, qualquer que seja o formato de entrada | CT-RF01-05 |
+| | C1.5 — Entradas inválidas são recusadas com o erro previsto no contrato da Seção 3.4 | CT-RF01-06 a CT-RF01-14 |
+| | C1.6 — A falha do canal é comunicada ao usuário, e não mascarada | CT-RF01-15 |
+| **RF02** | C2.1 — O sistema identifica a que tipo de solicitação a mensagem se refere | CT-RF02-01, CT-RF02-02, CT-RF02-03 |
+| | C2.2 — O sistema identifica a que projeto e a que dado a solicitação se refere | CT-RF02-04 |
+| | C2.3 — O sistema consulta as fontes e retorna os dados solicitados | CT-RF02-05 |
+| | C2.4 — Quando não é possível identificar projeto ou dado, o sistema solicita o dado faltante antes de consultar as fontes | CT-RF02-06, CT-RF02-09 |
+| | C2.5 — Quando a solicitação está fora do catálogo, o sistema informa a limitação **sem consultar as fontes** | CT-RF02-07 |
+| | C2.6 — O sistema não devolve dado sobre projeto inexistente nem sobre projeto fora do alcance do perfil | CT-RF02-08, CT-RF02-10 |
+| **RF03** | C3.1 — Todo dado de negócio é acompanhado do documento de origem | CT-RF03-01 |
+| | C3.2 — A referência exibida permite localizar o documento no repositório | CT-RF03-03 |
+| | C3.3 — A data da última atualização do documento é exibida | CT-RF03-01, CT-RF03-05 |
+| | C3.4 — Quando a resposta combina mais de uma fonte, todas são listadas | CT-RF03-02 |
+| | C3.5 — Dado sem origem identificável não é apresentado como fundamentado | CT-RF03-04 |
 ### 6.2.2 Cenários Positivos e Negativos Planejados
 
+#### Critério de composição
+
+O plano não distribui casos positivos e negativos em proporção fixa. A distribuição acompanha a superfície de erro efetivamente especificada de cada requisito: o RF01 concentra nove casos negativos porque o contrato da Seção 3.4 define, um a um, sete códigos de erro com código HTTP e mensagem próprios, e cada um deles é uma promessa verificável; o RF03, ao contrário, tem dois negativos porque seu critério descreve principalmente uma obrigação de presença, e não um conjunto de recusas.
+
+Um caso negativo só é aprovado quando o sistema apresenta o **comportamento previsto** para a condição adversa. Ausência de exceção não é aprovação: um endpoint que aceita um arquivo corrompido e devolve `201` falha o caso negativo correspondente, ainda que não tenha quebrado.
+
+#### Quadro geral dos casos planejados
+
+A coluna **Sprint** indica em que ciclo o caso se torna executável, conforme o estado levantado na Seção 6.2.1. A coluna **Estado** distingue três situações: *Executável* significa que o caso pode ser escrito e rodado sobre o repositório atual; *Executável em parte* significa que uma parcela da condição é verificável hoje e o restante depende de construção, com a delimitação indicada na ficha correspondente; *Planejado* significa que o componente sob teste ainda não existe.
+
+| ID | RF | Condição | Tipo | Nível | Sprint | Estado |
+|---|---|---|---|---|---|---|
+| CT-RF01-01 | RF01 | C1.1 | Positivo | API | 4 | Executável |
+| CT-RF01-02 | RF01 | C1.1 | Positivo | Integração | 4 | Executável |
+| CT-RF01-03 | RF01 | C1.2 | Positivo | Interface | 5 | Planejado |
+| CT-RF01-04 | RF01 | C1.3 | Positivo | API | 4 | Executável |
+| CT-RF01-05 | RF01 | C1.4 | Positivo | Integração | 4 | Executável em parte |
+| CT-RF01-06 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-07 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-08 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-09 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-10 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-11 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-12 | RF01 | C1.5 | Negativo | Integração | 4 | Executável |
+| CT-RF01-13 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-14 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-15 | RF01 | C1.6 | Negativo | Interface | 5 | Planejado |
+| CT-RF02-01 | RF02 | C2.1 | Positivo | API | 4 | Executável |
+| CT-RF02-02 | RF02 | C2.1 | Positivo | API | 4 | Executável |
+| CT-RF02-03 | RF02 | C2.1 | Positivo | Conjunto | 4 | Executável |
+| CT-RF02-04 | RF02 | C2.2 | Positivo | Integração | 4 | Planejado |
+| CT-RF02-05 | RF02 | C2.3 | Positivo | Integração | 4 | Planejado |
+| CT-RF02-06 | RF02 | C2.4 | Positivo | Integração | 5 | Planejado |
+| CT-RF02-07 | RF02 | C2.5 | Negativo | Integração | 4 | Executável em parte |
+| CT-RF02-08 | RF02 | C2.6 | Negativo | Integração | 4 | Planejado |
+| CT-RF02-09 | RF02 | C2.4 | Negativo | Integração | 5 | Planejado |
+| CT-RF02-10 | RF02 | C2.6 | Negativo | API | 5 | Planejado |
+| CT-RF03-01 | RF03 | C3.1, C3.3 | Positivo | Integração | 4 | Planejado |
+| CT-RF03-02 | RF03 | C3.4 | Positivo | Integração | 4 | Planejado |
+| CT-RF03-03 | RF03 | C3.2 | Positivo | Interface | 4 | Planejado |
+| CT-RF03-04 | RF03 | C3.5 | Negativo | Integração | 4 | Planejado |
+| CT-RF03-05 | RF03 | C3.3 | Negativo | Integração | 4 | Planejado |
+#### Distribuição consolidada
+
+| RF | Positivos | Negativos | Total | Executáveis na Sprint 4 | Planejados para as próximas sprints |
+|---|---:|---:|---:|---:|---:|
+| RF01 | 5 | 10 | 15 | 13 | 2 |
+| RF02 | 6 | 4 | 10 | 4 | 6 |
+| RF03 | 3 | 2 | 5 | 0 | 5 |
 ### 6.2.3 Procedimentos de Teste
 
 ### 6.2.4 Resultados Esperados
