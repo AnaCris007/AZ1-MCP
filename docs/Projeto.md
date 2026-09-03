@@ -5480,6 +5480,46 @@ Nenhum caso é considerado aprovado por inspeção de código. A aprovação exi
 
 ### 6.2.5 Abrangência Planejada
 
+#### O que o plano cobre
+
+O plano cobre os seis requisitos funcionais da Seção 2.2 e as trinta e duas condições verificáveis extraídas de seus critérios de aceitação, sem deixar condição sem caso nem caso sem condição de origem. Cobre também a parte provocável do contrato de erro da Seção 3.4: cinco dos sete códigos padronizados possuem caso próprio, aos quais se somam os dois códigos da transcrição e os dois do chat, totalizando nove casos negativos sobre o canal de entrada. Ficam de fora `unauthorized`, que depende da autenticação ainda não construída, e `internal_error`, que por definição não é provocável por entrada do cliente. É essa densidade que faz do RF01 o requisito de verificação mais forte do conjunto.
+
+A cobertura é maior onde a especificação é mais precisa. Isso não é acidental: um critério que enumera códigos de erro, limites numéricos e formatos aceitos permite escrever um resultado esperado inequívoco, ao passo que um critério redigido em termos de comportamento desejado, como "apresentar sugestões para os campos pendentes", só se converte em caso verificável depois que a equipe fixa o que conta como sugestão adequada. O plano registra essa assimetria em vez de disfarçá-la distribuindo casos uniformemente entre os requisitos.
+
+#### O que o plano deliberadamente não cobre
+
+| Aspecto | Razão de não estar coberto | Onde é tratado |
+|---|---|---|
+| Autenticação e autorização de acesso à API | A Seção 3.4 declara a autenticação por Bearer Token como planejada e não implementada; a rota não possui dependência de autenticação | CT-RF02-10 e CT-RF06-04 dependem dessa construção; a medição do bloqueio pertence ao RNF02, na Seção 6.3 |
+| Fidelidade da transcrição | O caso funcional verifica que a transcrição ocorre, não o quanto ela acerta | Teste de RNF06 na Seção 6.3 |
+| Tempo de resposta e comportamento sob carga | Fora do objeto do teste funcional | RNF01 e RNF10, na Seção 6.3 |
+| Compreensibilidade das respostas pelos usuários | Exige participante externo e instrumento próprio | RNF08 e RNF11, na Seção 6.5, com aplicação do SUS |
+| Contrato com Deepgram e Gemini | O plano funcional consome as respostas armazenadas, sem exercitar o serviço ao vivo | Seção 6.4.2 |
+| Persistência e recuperação das interações | Depende do banco construído na Sprint 4 | Seção 6.4.1 |
+| Registro de auditoria de cada interação | Requisito não funcional transversal | RNF04 e RNF09, na Seção 6.3 |
+
+#### Limites reconhecidos
+
+Três limites afetam a força das conclusões que a execução deste plano poderá sustentar, e o registro deles faz parte do plano.
+
+**A base de avaliação do classificador.** Os casos CT-RF02-01 a CT-RF02-03 dependem da partição de teste isolada prevista na task T14. A base atual, de 400 exemplos igualmente distribuídos entre as dez intenções, foi gerada por gabarito, e a Seção 3.3.7 já registra que a medição sobre ela está saturada. Executar esses casos sobre a base atual produziria aprovação sem informação, porque o conjunto não contém casos que o classificador erre. Esse limite é a materialização do risco AM6 e é a dependência mais crítica de todo o plano: sem a base reformulada, o RF02 fica sem verificação significativa da sua condição C2.1.
+
+**A proporção do plano que depende de construção.** Vinte e nove dos quarenta e seis casos, ou 63%, incidem sobre componentes que não existem. O plano permanece útil porque antecipa o que precisará ser verificado e, com isso, informa a construção: um critério de aprovação escrito antes do componente é uma especificação a mais para quem vai implementá-lo. Mas ele não pode ser lido como cobertura efetiva. Ao final da Sprint 4, a única cobertura demonstrável será a dos dezessete casos executáveis, todos concentrados em RF01 e RF02.
+
+**A ausência de verificação de ponta a ponta pela interface.** Dos quarenta e seis casos, quatro são de nível interface e três deles ficam para a Sprint 5, quando a automação de testes de interface estiver disponível conforme a Seção 3.8.7. Até lá, a verificação do RF01 permanece incompleta em sua condição central, a C1.2, porque a apresentação da transcrição ao usuário antes do processamento é, por definição, um comportamento de interface, e nenhum teste de API pode substituí-la.
+
+#### Concentração da verificação e efeito sobre a demonstração ao parceiro
+
+A distribuição dos casos executáveis é desigual por consequência do estado do repositório, e não por escolha de escopo: RF01 concentra treze dos dezessete casos executáveis, RF02 concentra quatro, e os RF03 a RF06 não têm nenhum. Na prática, a Sprint 4 conseguirá demonstrar ao parceiro que o **canal de entrada** funciona e é robusto a entradas inválidas, mas não conseguirá demonstrar que o agente **consulta o portfólio com fonte rastreável**, que é a proposta de valor registrada na Seção 1.4.
+
+A consequência para o planejamento é direta e vale registrar aqui, e não apenas nas issues: as entregas que destravam a maior parte do plano são a persistência do banco e a fundamentação das respostas em fontes, ambas da Sprint 4. Vinte e sete dos vinte e nove casos ainda não executáveis dependem delas; os dois restantes são de interface. Enquanto essas entregas não existirem, o percentual de cobertura funcional demonstrável não passa de pouco mais de um terço, por mais testes de unidade que a suíte acumule.
+
+#### Evolução do plano
+
+O plano é revisado ao final de cada sprint. A revisão atualiza a coluna **Estado** da Seção 6.2.2 conforme os componentes forem construídos, acrescenta casos quando a construção revelar comportamento não previsto na especificação e registra na Seção 7 toda remoção de caso, com a justificativa. Os identificadores `CT-RFxx-nn` não são renumerados entre revisões, de modo que a evidência anexada a uma issue da Sprint 4 continue localizável na Sprint 5.
+
+A consolidação da cobertura alcançada, confrontando o planejado nesta seção com o efetivamente executado, é objeto da Seção 6.6.
+
 ## 6.3 Planejamento dos Testes de Requisitos Não Funcionais
 
 ### 6.3.1 Propósito e Rastreabilidade com os RNFs
