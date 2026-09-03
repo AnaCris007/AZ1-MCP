@@ -2150,9 +2150,10 @@ Os testes não chamam o serviço externo nem consomem cota. Um modelo falso impl
 | Arquivo | Cobertura |
 |---|---|
 | `tests/test_speech_service.py` | Remoção de espaços, encaminhamento de texto e voz, conversão PCM–WAV, texto vazio, limite de 4.000 caracteres, resposta vazia e falha do provedor |
+| `tests/test_gemini_speech_service.py` | Montagem da chamada ao SDK com modelo, texto, modalidade de áudio e voz `Kore`, além da rejeição de resposta externa sem áudio |
 | `tests/test_speech_api.py` | Resposta `200` com `audio/wav`, voz e formato inválidos e mapeamento dos erros controlados para `422` e `502` |
 
-Na validação da implementação, os oito testes específicos de TTS passaram. O frontend também foi submetido ao `oxlint` e ao build de produção do Vite; o build foi concluído, e os avisos de lint encontrados pertencem a componentes preexistentes não alterados por esta implementação. A reprodução real foi exercitada manualmente pela equipe no frontend com uma resposta em português. Essa validação comprova o caminho funcional, mas ainda não registra métricas de latência, custo ou qualidade de pronúncia e não substitui o teste automatizado do adaptador contra um ambiente controlado do provedor.
+Na validação da implementação, os dez testes específicos de TTS passaram. O frontend também foi submetido ao `oxlint` e ao build de produção do Vite; o build foi concluído, e os avisos de lint encontrados pertencem a componentes preexistentes não alterados por esta implementação. A reprodução real foi exercitada manualmente pela equipe no frontend com uma resposta em português. Essa validação comprova o caminho funcional, mas ainda não registra métricas de latência, custo ou qualidade de pronúncia e não substitui um teste automatizado de integração contra um ambiente controlado do provedor.
 
 ### 3.2.7 Coerência com o restante da especificação
 
