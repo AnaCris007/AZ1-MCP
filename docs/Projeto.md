@@ -5213,6 +5213,23 @@ A coluna **Sprint** indica em que ciclo o caso se torna executável, conforme o 
 | CT-RF03-03 | RF03 | C3.2 | Positivo | Interface | 4 | Planejado |
 | CT-RF03-04 | RF03 | C3.5 | Negativo | Integração | 4 | Planejado |
 | CT-RF03-05 | RF03 | C3.3 | Negativo | Integração | 4 | Planejado |
+| CT-RF04-01 | RF04 | C4.1 | Positivo | Integração | 5 | Planejado |
+| CT-RF04-02 | RF04 | C4.2 | Positivo | Interface | 5 | Planejado |
+| CT-RF04-03 | RF04 | C4.3 | Positivo | Integração | 5 | Planejado |
+| CT-RF04-04 | RF04 | C4.4 | Positivo | Integração | 5 | Planejado |
+| CT-RF04-05 | RF04 | C4.1 | Negativo | Integração | 5 | Planejado |
+| CT-RF04-06 | RF04 | C4.5 | Negativo | Integração | 5 | Planejado |
+| CT-RF05-01 | RF05 | C5.1, C5.2 | Positivo | Integração | 4 | Planejado |
+| CT-RF05-02 | RF05 | C5.3 | Positivo | Integração | 4 | Planejado |
+| CT-RF05-03 | RF05 | C5.4 | Negativo | Integração | 4 | Planejado |
+| CT-RF05-04 | RF05 | C5.3 | Negativo | Integração | 4 | Planejado |
+| CT-RF05-05 | RF05 | C5.5 | Negativo | Integração | 5 | Planejado |
+| CT-RF06-01 | RF06 | C6.1, C6.2 | Positivo | Integração | 5 | Planejado |
+| CT-RF06-02 | RF06 | C6.3, C6.4 | Positivo | Integração | 5 | Planejado |
+| CT-RF06-03 | RF06 | C6.3 | Negativo | Integração | 5 | Planejado |
+| CT-RF06-04 | RF06 | C6.5 | Negativo | API | 5 | Planejado |
+| CT-RF06-05 | RF06 | C6.1 | Negativo | Integração | 5 | Planejado |
+
 #### Distribuição consolidada
 
 | RF | Positivos | Negativos | Total | Executáveis na Sprint 4 | Planejados para as próximas sprints |
@@ -5220,8 +5237,109 @@ A coluna **Sprint** indica em que ciclo o caso se torna executável, conforme o 
 | RF01 | 5 | 10 | 15 | 13 | 2 |
 | RF02 | 6 | 4 | 10 | 4 | 6 |
 | RF03 | 3 | 2 | 5 | 0 | 5 |
+| RF04 | 4 | 2 | 6 | 0 | 6 |
+| RF05 | 2 | 3 | 5 | 0 | 5 |
+| RF06 | 2 | 3 | 5 | 0 | 5 |
+| **Total** | **22** | **24** | **46** | **17** | **29** |
+
+Dezessete dos quarenta e seis casos, ou 37%, podem ser executados sobre o que existe hoje, contando os dois marcados como *Executável em parte*. Os vinte e nove restantes permanecem como compromisso de verificação das Sprints 4 e 5, vinculados às entregas correspondentes da Seção 3.8.4. Essa proporção é a medida mais direta da distância entre o especificado e o construído, e a Seção 6.2.5 discute o que ela implica.
+
 ### 6.2.3 Procedimentos de Teste
 
+Esta subseção reúne, para cada requisito, as pré-condições comuns, a massa de dados necessária e o roteiro de execução caso a caso. O agrupamento por requisito evita repetir em quarenta e seis fichas o mesmo ambiente e a mesma massa de dados, e mantém legível a parte que efetivamente varia: o propósito do caso, o passo executado e a observação a registrar. A coluna **Propósito do teste** responde à pergunta que justifica a existência de cada caso, e é o que distingue um caso de outro dentro do mesmo requisito.
+
+#### Ambiente e ferramental comuns a todos os casos
+
+As condições abaixo valem para o conjunto inteiro e não são repetidas nas fichas.
+
+| Item | Definição |
+|---|---|
+| Ambiente | Contêiner local padronizado na Sprint 3, conforme a Seção 3.8.5, ou a instância de nuvem da Seção 3.7 quando o caso for de interface |
+| Instalação | `pip install -e ".[dev]"`, seguido dos recursos de linguagem indicados no `README.md` |
+| Execução dos casos automatizados | `python -m unittest discover tests`, mesmo comando da suíte atual de 145 testes |
+| Ferramental | `unittest` como executor, `fastapi.testclient.TestClient` para os casos de API e `httpx` para os de integração, já declarados no `pyproject.toml`. A consolidação das ferramentas por categoria de teste é objeto da Seção 6.1 |
+| Serviços externos | Nos casos de integração, as respostas do Deepgram e do Gemini são obtidas do mecanismo de armazenamento temporário previsto na Seção 3.8.10 e detalhado na Seção 6.4.3, e não do serviço ao vivo |
+| Registro da evidência | Saída do executor, corpo das respostas HTTP e captura de tela nos casos de interface, anexados à issue correspondente no GitLab |
+| Isolamento | Nenhum caso depende do resultado de outro. Casos que exigem estado prévio o constroem em sua própria pré-condição |
+
+#### Massa de dados necessária
+
+A massa é construída pela equipe e versionada junto dos testes. Nenhum item utiliza dado real do parceiro, em conformidade com a decisão D01.
+
+| Conjunto | Conteúdo | Casos que o utilizam | Situação |
+|---|---|---|---|
+| **A. Áudios válidos** | Seis gravações de 5 a 30 segundos, uma por formato aceito, com vocabulário de gestão de portfólio: nomes de linha, siglas de artefato, datas faladas | CT-RF01-01, CT-RF01-02, CT-RF01-05 | A gravar na Sprint 4 |
+| **B. Áudios inválidos** | Um arquivo `.ogg`, um arquivo de 12 MB, uma gravação de 6 minutos, um arquivo de zero byte, um `.wav` com cabeçalho truncado | CT-RF01-06 a CT-RF01-09 | A gerar por script na Sprint 4 |
+| **C. Solicitações em texto rotuladas** | A partição de teste isolada prevista na task T14 do planejamento da Sprint 3, separada por semente fixa e sem participação na varredura nem no ajuste de hiperparâmetros | CT-RF02-01 a CT-RF02-03, CT-RF02-07 | Depende da conclusão da T14 |
+| **D. Solicitações fora do catálogo** | Vinte pedidos alheios ao portfólio, distintos dos 40 exemplos de `fora_do_catalogo` usados no treinamento | CT-RF02-07 | A escrever na Sprint 4 |
+| **E. Projetos sintéticos** | Ao menos oito projetos com status, avanço, prazos e responsáveis distintos, sendo pelo menos dois liderados por perfis diferentes | CT-RF02-04 a CT-RF02-10, CT-RF03-*, CT-RF05-*, CT-RF06-* | Depende da população do banco, task T25 da Sprint 4 |
+| **F. Artefatos com metadados** | Ao menos seis artefatos vinculados aos projetos do conjunto E, com `referencia` e `data` preenchidas; um artefato deliberadamente sem `data`; um dado de negócio sem artefato de origem | CT-RF03-* | A construir na Sprint 4 |
+| **G. Artefatos com campos pendentes** | Um TAP com três campos pendentes, um mapa de benefícios integralmente preenchido e um documento de tipo não previsto no catálogo | CT-RF04-* | A construir na Sprint 5 |
+| **H. Pendências** | Pendências com prazo futuro, prazo vencido, uma já notificada e uma sem prazo, distribuídas entre projetos acompanhados e não acompanhados | CT-RF05-* | Depende do modelo de `Pendência`, Sprint 4 |
+| **I. Perfis de usuário** | Um diretor, um analista de PMO e dois líderes responsáveis por projetos distintos, conforme as especializações da Seção 2.2.1 | CT-RF02-10, CT-RF06-04 | Depende da autenticação, hoje não implementada |
+
+O conjunto C merece registro à parte. A base atual foi gerada por gabarito e a Seção 3.3.7 já declara que a medição sobre ela está saturada; o risco AM6 acompanha exatamente essa fragilidade. Os casos CT-RF02-01 a CT-RF02-03 executados sobre a base atual produziriam aprovação sem significado. Por isso o plano condiciona esses três casos à partição reformulada da task T14, e não à base existente.
+
+#### RF01 — Receber solicitações por áudio e texto e responder em texto
+
+**Propósito.** Verificar que o canal de entrada aceita as duas modalidades previstas, que a conversão de áudio em texto ocorre e é apresentada ao usuário antes do processamento, que a resposta chega em texto e que toda entrada inválida é recusada com o erro exato definido no contrato da Seção 3.4.
+
+**Pré-condições comuns.** Aplicação em execução; bucket compatível com S3 acessível; credencial do provedor de Speech to Text configurada nos casos de integração; conjuntos A e B disponíveis.
+
+| Caso | Propósito do teste | Passos | Observação a registrar |
+|---|---|---|---|
+| CT-RF01-01 | Confirmar que os seis formatos aceitos entram no sistema e ficam armazenados | Enviar `POST /api/v1/audio` com `multipart/form-data`, campo `audio`, usando cada um dos seis arquivos do conjunto A | Código HTTP, corpo da resposta e presença do objeto sob `incoming/{audio_id}` no bucket |
+| CT-RF01-02 | Confirmar que o áudio armazenado é convertido em texto com os metadados do reconhecimento | A partir do `audio_id` do caso anterior, enviar `POST /api/v1/audio/{audio_id}/transcribe?language=pt-BR` | Código HTTP e os campos `text`, `language`, `confidence` e `duration_seconds` |
+| CT-RF01-03 | Confirmar que o usuário vê e pode conferir a transcrição antes de ela ser processada | Pela interface, gravar uma solicitação por voz e acompanhar a tela até a resposta | Se a transcrição aparece na tela **antes** de a resposta ser solicitada, e se o usuário pode conferi-la nesse intervalo |
+| CT-RF01-04 | Confirmar que a solicitação em texto é processada sem passar pelo canal de voz | Enviar `POST /api/v1/chat` com `{"message": "...", "conversation_id": "..."}` usando cinco solicitações do conjunto C | Código HTTP e o campo `reply`, verificando que é texto não vazio |
+| CT-RF01-05 | Confirmar que os dois canais de entrada levam ao mesmo entendimento da solicitação | Submeter a mesma solicitação pelos dois canais: gravada em áudio do conjunto A e digitada em texto; comparar a intenção classificada nos dois caminhos | Intenção e confiança de cada caminho, e se coincidem |
+| CT-RF01-06 | Confirmar que formato fora da lista é recusado como formato, e não como arquivo inválido | `POST /api/v1/audio` com o arquivo `.ogg` do conjunto B | Código HTTP e o campo `error` do corpo |
+| CT-RF01-07 | Confirmar que o limite de 10 MB é aplicado antes de qualquer processamento | `POST /api/v1/audio` com o arquivo de 12 MB | Código HTTP e o campo `error` |
+| CT-RF01-08 | Confirmar que o limite de 5 minutos é aplicado sobre a duração real, e não sobre o tamanho | `POST /api/v1/audio` com a gravação de 6 minutos | Código HTTP e o campo `error` |
+| CT-RF01-09 | Confirmar que arquivo vazio e arquivo corrompido são recusados pelo conteúdo binário | `POST /api/v1/audio` com o arquivo de zero byte e, em seguida, com o `.wav` truncado | Código HTTP e o campo `error` em cada envio |
+| CT-RF01-10 | Confirmar que requisição estruturalmente inválida é distinguida de arquivo inválido | `POST /api/v1/audio` com corpo `application/json`, e não `multipart/form-data` | Código HTTP e o campo `error` |
+| CT-RF01-11 | Confirmar que identificador inexistente não é tratado como falha do provedor externo | `POST /api/v1/audio/aud_inexistente/transcribe` | Código HTTP e o campo `error` |
+| CT-RF01-12 | Confirmar que a falha do serviço externo chega ao cliente como erro previsto, sem vazar exceção | Executar a transcrição com o provedor de Speech to Text configurado para falhar, usando a resposta de erro armazenada conforme a Seção 6.4.3 | Código HTTP, o campo `error` e a mensagem devolvida ao cliente |
+| CT-RF01-13 | Confirmar que mensagem vazia é recusada antes de consumir o modelo de linguagem | `POST /api/v1/chat` com `message` vazia e, em seguida, com apenas espaços | Código HTTP e o campo `error` em cada envio |
+| CT-RF01-14 | Confirmar que o limite de 4.000 caracteres da mensagem é aplicado | `POST /api/v1/chat` com `message` de 4.001 caracteres | Código HTTP e o campo `error` |
+| CT-RF01-15 | Confirmar que a indisponibilidade do backend é comunicada, e não substituída por conteúdo de exemplo | Pela interface, enviar uma mensagem com o backend interrompido | O que a tela apresenta ao usuário: mensagem de erro identificável ou resposta indistinguível de uma resposta real |
+
+O CT-RF01-15 tem motivação concreta. O tratamento atual em `src/frontend/src/pages/AgentPage.jsx` registra `backend indisponível, usando resposta de exemplo` no console e apresenta uma resposta de demonstração na tela. Para a prototipação isso foi útil; para o usuário final significa receber conteúdo fabricado sem saber. O caso existe para forçar a decisão sobre esse comportamento antes da entrega, e sua aprovação exige que a indisponibilidade seja visível na interface.
+
+#### RF02 — Consultar dados de projetos
+
+**Propósito.** Verificar que o agente reconhece a natureza da solicitação, localiza o projeto e o dado pedidos, consulta as fontes, pede o que falta quando a solicitação é incompleta e recusa, sem consultar as fontes, aquilo que está fora do catálogo da Seção 3.1.
+
+**Pré-condições comuns.** Modelo de classificação treinado e carregado; partição de teste da task T14 disponível; conjuntos C, D, E e I conforme o caso.
+
+| Caso | Propósito do teste | Passos | Observação a registrar |
+|---|---|---|---|
+| CT-RF02-01 | Confirmar que solicitação sobre projeto é reconhecida como consulta ao portfólio | Submeter dez solicitações do conjunto C rotuladas como `consultar_projeto_sintetico` a `POST /api/v1/audio/{audio_id}/analyze` ou diretamente ao classificador | Intenção prevista, confiança e rótulo esperado de cada solicitação |
+| CT-RF02-02 | Confirmar que solicitação sobre norma é distinguida de solicitação sobre projeto | Repetir com dez solicitações rotuladas como `consultar_documentos_normativos` | Os mesmos campos |
+| CT-RF02-03 | Medir se o classificador separa as dez classes do catálogo em condição não vista no treinamento | Executar o classificador sobre a partição de teste completa e apurar a acurácia e a matriz de confusão | Acurácia global, acurácia por classe e as confusões mais frequentes |
+| CT-RF02-04 | Confirmar que o projeto nomeado na solicitação é associado ao registro correto | Submeter cinco solicitações que nomeiem projetos do conjunto E e verificar a entidade extraída e o registro correspondente | Entidade extraída, registro associado e se corresponde ao projeto nomeado |
+| CT-RF02-05 | Confirmar que o dado devolvido vem da fonte, e não da geração livre do modelo | Consultar um dado específico de um projeto do conjunto E e comparar o valor devolvido com o registro na fonte | Valor devolvido, valor na fonte e se coincidem |
+| CT-RF02-06 | Confirmar que o esclarecimento pede apenas o que falta e preserva o que já foi informado | Enviar "qual é o status do projeto?", sem nomear o projeto; responder à pergunta de esclarecimento com o nome; verificar se o dado originalmente pedido foi preservado | Texto da pergunta de esclarecimento, resposta final e se o pedido original foi mantido |
+| CT-RF02-07 | Confirmar que pedido fora do escopo é recusado antes de qualquer consulta às fontes | Submeter as vinte solicitações do conjunto D e observar a classificação e a resposta | Intenção atribuída, teor da resposta e, nos registros de auditoria, se houve consulta às fontes |
+| CT-RF02-08 | Confirmar que o agente admite não ter o dado em vez de fabricá-lo | Consultar um projeto que não existe no conjunto E | Teor da resposta, verificando se declara não ter encontrado o projeto ou se apresenta conteúdo fabricado |
+| CT-RF02-09 | Confirmar que a resposta dentro de um fluxo guiado não reinicia a classificação de intenção | Iniciar um fluxo guiado, responder à pergunta do agente com um valor simples, como uma data, e observar se o sistema trata a resposta como preenchimento de entidade ou como nova intenção | Estado do fluxo após a resposta e intenção registrada, se houver |
+| CT-RF02-10 | Confirmar que o alcance do perfil limita o que é devolvido | Autenticado como líder do projeto P1, consultar um dado do projeto P2, liderado por outro perfil | Código HTTP, teor da resposta e registro de auditoria da tentativa |
+
+O CT-RF02-07 é o caso que o plano identifica como *executável em parte*. A classificação como `fora_do_catalogo` pode ser verificada hoje; a exigência de que a recusa ocorra **sem consultar as fontes** só se torna verificável quando existirem fontes a consultar e registro de auditoria que evidencie a ausência da consulta, ambos previstos para a Sprint 4.
+
+#### RF03 — Apresentar a fonte da informação
+
+**Propósito.** Verificar que todo dado de negócio devolvido pelo agente vem acompanhado do documento de origem, da referência que permite localizá-lo e da data da sua última atualização, e que respostas construídas sobre mais de um documento listam todos eles.
+
+**Pré-condições comuns.** Conjuntos E e F carregados; atributos `referencia` e `data` da classe `Artefato` implementados conforme a Seção 2.2.1; resposta do agente fundamentada em fonte, e não gerada livremente.
+
+| Caso | Propósito do teste | Passos | Observação a registrar |
+|---|---|---|---|
+| CT-RF03-01 | Confirmar que os três elementos de origem acompanham o dado de negócio | Consultar um dado de projeto cuja origem seja um único artefato do conjunto F | Os três elementos exigidos na resposta: documento, referência e data |
+| CT-RF03-02 | Confirmar que nenhuma fonte usada na composição da resposta é omitida | Formular uma consulta cuja resposta exija combinar dois artefatos distintos | Quantidade de fontes listadas e se corresponde às efetivamente utilizadas |
+| CT-RF03-03 | Confirmar que a referência é acionável, e não apenas presente na tela | Tomar a referência exibida em CT-RF03-01 e tentar localizar o documento no repositório a partir dela | Se a referência levou ao documento correto, sem informação adicional |
+| CT-RF03-04 | Confirmar que dado sem origem não é apresentado como fundamentado | Consultar o dado de negócio que, no conjunto F, não possui artefato de origem | Se a resposta declara a ausência de fonte ou apresenta o dado como fundamentado |
+| CT-RF03-05 | Confirmar que a lacuna de data é declarada em vez de preenchida | Consultar o dado cujo artefato de origem está sem `data` preenchida | Se a resposta indica a lacuna ou exibe data vazia, nula ou inventada |
 ### 6.2.4 Resultados Esperados
 
 ### 6.2.5 Abrangência Planejada
