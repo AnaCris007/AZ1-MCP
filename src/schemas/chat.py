@@ -6,6 +6,7 @@ ChatErrorCode = Literal[
     "bad_request",
     "empty_message",
     "message_too_long",
+    "service_unavailable",
     "internal_error",
 ]
 

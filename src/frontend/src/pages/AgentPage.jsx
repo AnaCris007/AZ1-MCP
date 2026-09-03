@@ -297,7 +297,7 @@ export default function AgentPage() {
                 className="mt-2 max-w-md text-center text-[14px] leading-relaxed text-text-secondary"
               >
                 Pergunte sobre documentos, status de projetos ou pendências em
-                aberto, ou peça ajuda para preencher um formulário — é só
+                aberto, ou peça ajuda para preencher um formulário. É só
                 escrever ou usar o microfone.
               </motion.p>
             </div>
