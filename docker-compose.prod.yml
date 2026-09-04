@@ -1,0 +1,111 @@
+# =============================================================================
+# AZ1 — sobreposição de PRODUÇÃO
+# =============================================================================
+# Não é carregado automaticamente. O uso é explícito, e sempre com a base junto:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f api
+#
+# Como a linha é longa e repetida, vale exportar de uma vez na máquina de deploy:
+#
+#   export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
+#
+# ...e voltar a usar "docker compose up -d" normalmente. Definir COMPOSE_FILE
+# também neutraliza o carregamento automático do override de desenvolvimento,
+# que é o erro mais fácil de cometer num servidor.
+#
+# O que este arquivo acrescenta: limites de recurso, política de reinício mais
+# agressiva, mais de um worker no uvicorn e a porta 80 no host. O que ele NÃO
+# faz: afrouxar nada. Todo endurecimento vive na base, justamente para não
+# depender de alguém lembrar de aplicá-lo aqui.
+# =============================================================================
+
+services:
+  api:
+    restart: always
+
+    # Liga a verificação do entrypoint que recusa a credencial de exemplo. A
+    # trava ${VAR:?...} do MinIO, abaixo, só pega variável AUSENTE — e um .env
+    # copiado do .env.example tem AUDIO_STORAGE_SECRET_KEY presente, valendo
+    # "minioadmin". Sem esta linha, seria exatamente assim que credencial padrão
+    # chegaria à produção: passando por todas as validações.
+    environment:
+      AZ1_REFUSE_DEFAULT_CREDENTIALS: "1"
+
+    # Múltiplos workers: cada requisição de análise carrega o pipeline do
+    # scikit-learn e trabalha em CPU, então um processo só serializa tudo atrás
+    # do GIL. Cada worker carrega a própria cópia do modelo (~100 KB aqui, mas
+    # é o que define o teto de memória em modelos maiores).
+    #
+    # --forwarded-allow-ips só é seguro porque a API não é publicada: o único
+    # caminho até ela é o nginx da rede interna. Numa API exposta diretamente,
+    # aceitar X-Forwarded-For de qualquer origem é deixar o cliente forjar o
+    # próprio IP no log e em qualquer regra que dependa dele.
+    command:
+      - uvicorn
+      - az1_api.main:app
+      - --host=0.0.0.0
+      - --port=8000
+      - --workers=${UVICORN_WORKERS:-2}
+      - --proxy-headers
+      - --forwarded-allow-ips=*
+      - --no-server-header
+
+    deploy:
+      resources:
+        limits:
+          # Sem teto, um pico de análise consome a instância inteira e derruba
+          # o MinIO junto — o modo de falha em que um incidente pequeno vira
+          # indisponibilidade geral.
+          cpus: "1.5"
+          memory: 1536M
+        reservations:
+          # Piso: garante que a API não seja espremida por um vizinho barulhento.
+          cpus: "0.25"
+          memory: 512M
+
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  frontend:
+    restart: always
+
+    ports: !override
+      # A porta 80 do host é publicada pelo daemon do Docker, que roda como
+      # root; o nginx dentro do contêiner continua como UID 101, sem privilégio.
+      # TLS termina no proxy de borda (ALB, Cloudflare, Caddy) à frente disto.
+      - "${AZ1_WEB_PORT:-80}:8080"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+        reservations:
+          memory: 32M
+
+  minio:
+    restart: always
+
+    # Credenciais padrão são aceitáveis em desenvolvimento e inaceitáveis aqui.
+    # Sem as chaves definidas no ambiente, a subida FALHA — em vez de subir
+    # silenciosamente com minioadmin/minioadmin exposto.
+    #
+    # São as MESMAS variáveis que a API usa como chave de acesso S3, conforme o
+    # docker-compose.yml. Um par único no .env, dois consumidores.
+    environment:
+      MINIO_ROOT_USER: ${AUDIO_STORAGE_ACCESS_KEY:?defina AUDIO_STORAGE_ACCESS_KEY no .env de produção}
+      MINIO_ROOT_PASSWORD: ${AUDIO_STORAGE_SECRET_KEY:?defina AUDIO_STORAGE_SECRET_KEY no .env de produção (mínimo 8 caracteres)}
+      # O console web não tem função em produção; a operação é por mc/SDK.
+      MINIO_BROWSER: "off"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+        reservations:
+          memory: 256M
