@@ -22,6 +22,19 @@ app.include_router(analysis_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")
 
 
+# Fora do prefixo /api/v1 de propósito: quem consome é a infraestrutura
+# (HEALTHCHECK do contêiner, balanceador, orquestrador), não o cliente da API, e
+# esse contrato não deve mudar quando a versão da API mudar.
+#
+# Deliberadamente raso: responde "o processo subiu e atende HTTP". Não toca no
+# MinIO, no Deepgram nem no Gemini — uma sonda que depende de terceiros faz o
+# orquestrador reiniciar esta aplicação por causa de uma instabilidade que não é
+# dela, trocando uma degradação parcial por uma indisponibilidade total.
+@app.get("/health", tags=["infra"])
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
 @app.exception_handler(TranscriptionAPIError)
 def transcription_api_error_handler(request: Request, exc: TranscriptionAPIError) -> JSONResponse:
     return JSONResponse(
