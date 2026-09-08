@@ -13,3 +13,6 @@ dist/
 # chaves privadas de acesso
 *.pem
 *.ppk
+
+# cache local das builds do buildx bake
+.docker-cache/

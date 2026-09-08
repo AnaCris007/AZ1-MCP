@@ -5097,15 +5097,248 @@ O próximo passo é implementar essa interface, seguindo os passos da seção 4.
 
 ## 6.4 Planejamento dos Testes de Integração
 
+Os testes de integração têm como objetivo validar a comunicação entre os componentes da arquitetura do AZ1 (as rotas do FastAPI, os serviços de domínio que elas invocam por injeção de dependência e o pipeline de PLN) e as dependências que cada um consome: o armazenamento de objetos MinIO/Amazon S3, os provedores externos Deepgram e Gemini, o PostgreSQL a ser provisionado na Sprint 4, e os dois webhooks e o barramento de mensagens previstos para as Sprints 4 e 5. Esta camada assegura que os contratos HTTP, S3 e SQL são respeitados de ponta a ponta, que a persistência ocorre em serviços reais e não em dublês de memória, e que os mecanismos de resiliência (tradução de falha externa em código HTTP, idempotência de eventos, cache determinístico do módulo VHS) atuam conforme especificado. O critério que distingue um caso desta seção de um teste de unidade é operacional: um caso de integração exercita ao menos uma fronteira de processo, de rede ou de biblioteca de terceiro, ao contrário dos testes atuais de `tests/test_audio_api.py`, `tests/test_chat_api.py`, `tests/test_transcription_api.py` e `tests/test_analysis_api.py`, que verificam a rota com a dependência substituída por `app.dependency_overrides`.
+
+Os casos referentes aos webhooks (seção 5.1) e ao sistema de troca de mensagens (seção 5.3) são especificados como suítes de contrato: uma classe que descreve o comportamento exigido de qualquer provedor ou barramento, com um único ponto de extensão (o método de fábrica que constrói o objeto sob teste). Nesta etapa, a suíte é exercitada contra um dublê determinístico em memória; quando a tecnologia for selecionada nas Sprints 4 e 5, uma nova subclasse injeta o adaptador real e herda os mesmos casos, sem reescrevê-los. O arranjo estende às duas dependências ainda não escolhidas o mesmo padrão de portas e adaptadores que `AudioStorage`, `AudioFetcher` e `ChatModel` já praticam como `Protocol` nos serviços existentes.
+
 ### 6.4.1 Integrações entre Componentes Internos
+
+Objetivo e escopo. Validar, em caixa-preta sobre o contrato observável de cada rota, a comunicação entre a camada HTTP e os serviços de domínio que ela invoca, cobrindo a ordem entre validação e efeito colateral, a tradução de erro de domínio em código HTTP e a passagem de estado por referência opaca (o identificador `aud_<uuid>`) entre recebimento, transcrição e análise.
+
+| Suíte | Componentes | Mecanismo | Requisito |
+|---|---|---|---|
+| Recebimento aciona o armazenamento | `ReceiveAudio`, `AudioStorage` | Chamada de biblioteca por `Protocol` | RF01 |
+| Transcrição lê o objeto gravado pelo recebimento | `TranscribeAudio`, `AudioFetcher` | `Protocol` sobre o adaptador de armazenamento | RF01 |
+| Análise encadeia transcrição e classificação | `AnalyzeAudio`, `TranscribeAudio`, `prever_intencao` | Corrotina interna e carga do artefato `.joblib` | RF01, RNF03 |
+| Resposta de chat delega ao modelo de linguagem | `AnswerChatMessage`, `ChatModel` | Chamada de biblioteca por `Protocol` | RF02 |
+| Interface consome as rotas do backend | Frontend, roteador FastAPI | HTTPS/REST pelo proxy do Vite | RF01, RF02, RNF05 |
+| Backend persiste e recupera interações | Serviços de domínio, PostgreSQL (schemas `portfolio` e `auditoria`) | SQL sobre TCP | RF02, RF03, RNF04, RNF09 |
+| Webhook aciona a regra de negócio correspondente | Endpoint de entrada, camada de domínio | Chamada em processo, após verificação de assinatura | RF05, RF06 |
+| Produtor publica evento consumido de forma assíncrona | Serviço produtor, barramento, consumidor | Protocolo do barramento selecionado | RF05 |
+| Síntese de fala delega ao provedor de voz | `GenerateSpeech`, `SpeechModel` | Chamada de biblioteca por `Protocol` | Não documentado (seção 6.4.4) |
+| Agendador aciona a regra de pendências | Agendador, PLN — Transações e Ações | Chamada em processo | RF05 |
+
+A validação de entrada precede sempre o efeito colateral: `ReceiveAudio` confere tamanho, assinatura binária e duração do áudio antes de acionar o armazenamento, `GenerateSpeech` confere o texto antes de acionar o provedor de síntese, e `AnswerChatMessage` confere o conteúdo da mensagem antes de acionar o provedor de linguagem. É essa ordem que os casos TI-05, TI-09, TI-12 a TI-14, TI-22 e TI-23 da seção 6.4.4 verificam. A tradução de erro segue o mesmo princípio de fronteira: `TranscribeAudio` converte a ausência do objeto de áudio em `TranscriptionError.AUDIO_NOT_FOUND`, que a rota converte em `404 audio_not_found`.
 
 ### 6.4.2 Integrações com Serviços Externos
 
+Quatro serviços externos sustentam o fluxo de voz e de conversação do agente, cada um com um perfil de falha próprio que os casos da seção 6.4.4 cobrem individualmente.
+
+| Suíte | Serviço | Adaptador | Mecanismo | Requisito |
+|---|---|---|---|---|
+| Armazenamento de áudio | MinIO em ambiente local, Amazon S3 em nuvem | `S3AudioStorage` | API S3 sobre HTTP, via `boto3` | RF01 |
+| Transcrição de fala | Deepgram, modelo Nova-3 | `TranscribeAudio` | HTTPS, `AsyncDeepgramClient` | RNF06, RF01 |
+| Síntese de fala | Google Gemini, modelo `gemini-2.5-flash-preview-tts` | `GeminiSpeechModel` | HTTPS, `google-genai` | Não documentado (seção 6.4.4) |
+| Geração de resposta | Google Gemini, modelo `gemini-3.5-flash-lite` | `GeminiChatModel` | HTTPS, `google-genai` | RF02, RNF11 |
+
+O adaptador de armazenamento traduz apenas o erro `NoSuchKey` do `botocore`, convertido em `KeyError` e em seguida em `404 audio_not_found` pela rota de transcrição; as demais falhas de infraestrutura (bucket inexistente, credencial inválida, serviço fora do ar) chegam ao cliente como `500 internal_error`. O caso TI-04 valida esse comportamento nas três causas e serve de base para a eventual diferenciação de código a decidir na Sprint 4.
+
+`TranscribeAudio.transcribe` captura qualquer exceção do SDK e a converte em `502 transcription_failed`, o que garante que nenhum detalhe do provedor vaza ao cliente ao custo de não distinguir indisponibilidade, tempo limite e credencial inválida. O caso TI-07 verifica essa conversão nas três causas, e registra que a chamada não define tempo limite explícito, ficando sujeita ao padrão do SDK conforme a seção 3.2.2.
+
+`GenerateSpeech.generate`, diferente do chat, já captura qualquer exceção do modelo de síntese e a converte em `502 speech_generation_failed`, inclusive quando o provedor devolve áudio vazio, tratado como falha. O caso TI-15 verifica as duas causas.
+
+O caminho do chat ainda não replica essa conversão: uma falha do Gemini sobe ao manipulador global e é respondida como `500 internal_error`, e uma resposta vazia do provedor reprova apenas na serialização de `ChatResponse`, também como `500`. O caso TI-21 fixa esse comportamento e serve de evidência para a decisão de alinhar o contrato de erro do chat ao da transcrição e ao da síntese de fala, que já tratam a falha do provedor de forma equivalente.
+
 ### 6.4.3 Uso Planejado do Módulo VHS
+
+O módulo VHS, especificado na seção 5.2 como mecanismo de cache das respostas dos provedores externos, cumpre dois papéis nos testes de integração: reduz o tempo de resposta ao evitar chamadas repetidas ao mesmo provedor com a mesma entrada, e torna determinística a execução da suíte, eliminando a dependência de crédito de API e de disponibilidade de rede durante a integração contínua. O módulo guarda dois tipos de registro pela mesma chave: um registro de sucesso, com o conteúdo da resposta do provedor (o DTO de transcrição, o texto da resposta de chat, os bytes do áudio sintetizado), e um registro de falha, com o código de erro a relançar quando o provedor está indisponível, excede o tempo esperado ou rejeita a credencial. O registro de falha não é uma invenção de teste: é a mesma técnica de cache negativo usada em produção para evitar bater outra vez num provedor que acabou de falhar, aplicada aqui também à suíte.
+
+Um registro de falha é criado de duas formas. Quando a causa é uma resposta de erro do próprio provedor, uma credencial deliberadamente inválida, por exemplo, o registro é gravado a partir de uma interação real, do mesmo jeito que um registro de sucesso. Quando a causa é a ausência de qualquer interação, indisponibilidade de rede ou tempo limite, não há resposta real para capturar, e o registro é composto diretamente pela equipe, descrevendo o erro que o teste precisa reproduzir. Nos dois casos, a leitura em modo `reproduzir` funciona da mesma forma: a chave é consultada, e o registro devolve um valor ou relança um erro, sem que o adaptador real seja acionado.
+
+Com essa extensão, todo caso de teste que envolve o provedor de fala em texto, o de síntese de fala ou o modelo de linguagem passa pelo VHS, tanto no caminho de sucesso quanto no de falha, o que cumpre o uso obrigatório do módulo exigido para os testes de integração. A única exceção é o caso que verifica quais parâmetros a aplicação envia ao provedor (TI-10, os termos do domínio enviados ao Deepgram): essa verificação depende de o cliente real ser efetivamente chamado, o que só acontece nas execuções de gravação, e por isso usa um dublê espião substituído diretamente na porta, sem passar pelo VHS. O armazenamento de objetos permanece fora do módulo por um motivo diferente: o MinIO é infraestrutura local e determinística, sob controle da própria equipe, e não uma API externa no sentido do enunciado, sem custo por requisição nem limite de taxa a evitar; cachear a leitura do bucket esconderia justamente os defeitos que os casos TI-01 a TI-05 procuram.
+
+| Serviço | Componentes da chave | Observação |
+|---|---|---|
+| Transcrição | Hash do conteúdo do áudio, idioma, modelo, hash da lista de termos do domínio | A chave deriva do conteúdo do áudio, não do identificador `aud_<uuid>`, gerado a cada envio |
+| Síntese de fala | Texto normalizado, voz, formato, modelo | A mesma resposta sintetizada duas vezes reaproveita o áudio já gerado; qualquer mudança de voz ou de modelo seleciona uma chave distinta |
+| Chat | Mensagem normalizada, modelo, hash da instrução de sistema | A instrução de sistema participa da chave, de modo que uma alteração de prompt invalide o cache |
+| Armazenamento de objetos | Não integra o módulo | Infraestrutura local, fora do sentido de API externa do enunciado; os casos TI-01 a TI-05 validam esse serviço diretamente |
+
+| Modo | Leitura | Gravação | Rede | Uso nos testes |
+|---|:-:|:-:|:-:|---|
+| `reproduzir` | Sim | Não | Nenhuma | Modo padrão da suíte e da integração contínua; devolve um valor ou relança um erro, conforme o tipo do registro |
+| `gravar` | Sim | Apenas quando ausente | Apenas quando ausente | Criação inicial dos registros de sucesso, e dos registros de falha capturáveis a partir de uma resposta real |
+| `atualizar` | Não | Sempre | Sempre | Regravação após mudança de modelo, de instrução ou de SDK |
+| `ignorar` | Não | Não | Sempre | Verificação contra o serviço real e medição de desempenho (seção 6.3) |
+
+A chave precisa cobrir tudo o que altera a resposta, a ausência de registro em modo `reproduzir` falha de forma explícita informando o comando de regravação, e nenhum segredo (chave de API, cabeçalho de autorização, token) é gravado nos arquivos versionados, nem nos de sucesso, nem nos de falha. Como o módulo atua sobre a porta de domínio e não sobre o transporte HTTP, o cabeçalho de autenticação nunca chega a ser observado por ele; o caso TI-50 confirma essa garantia por inspeção direta dos arquivos gravados. Os registros de transcrição e de síntese de fala seguem o mesmo prazo de retenção do áudio de origem no MinIO, sete dias conforme a seção 3.2.5; os registros de chat, por não terem origem física a expirar, seguem o prazo de 24 horas definido na seção 5.2.
 
 ### 6.4.4 Cenários Positivos e Negativos Planejados
 
+Casos de teste detalhados. Os identificadores seguem a numeração `TI-nn`, sequencial por suíte. O nome de cada caso corresponde à convenção de classe e método já adotada em `tests/` (`TestNomeDoCaso.test_descricao_do_cenario`). Quando duas ou mais causas produzem exatamente a mesma resposta do sistema, o catálogo reúne essas causas num único caso, com a entrada listando as variantes e o resultado esperado cobrindo todas elas; é o caso, por exemplo, de `test_falha_de_infraestrutura_retorna_500`, que cobre bucket inexistente, credencial inválida e serviço indisponível porque as três produzem hoje o mesmo `500 internal_error` sem distinção.
+
+A tabela relaciona cada suíte à dependência que ela isola e ao mecanismo usado para isolá-la. O módulo VHS cobre tanto o caminho de sucesso quanto o de falha de cada provedor, pelos dois tipos de registro descritos na seção 6.4.3; a única suíte de provedor externo que foge dessa regra é a de transcrição, no caso isolado que inspeciona os parâmetros de uma chamada em vez da resposta a ela.
+
+| Suíte | Dependência isolada nos testes | Mecanismo |
+|---|---|---|
+| Recebimento de áudio e armazenamento de objetos | MinIO | Contêiner real, provisionado por `docker compose` |
+| Transcrição e provedor de fala em texto | Deepgram | VHS, registro de sucesso (TI-06, TI-08) e registro de falha (TI-07); dublê espião para os parâmetros da chamada (TI-10) |
+| Síntese de fala e provedor de voz | Google Gemini (`gemini-2.5-flash-preview-tts`) | VHS, registro de sucesso (TI-11) e registro de falha (TI-15); TI-12 a TI-14 não acionam nenhuma dependência |
+| Análise e pipeline de PLN | Deepgram, por meio de `TranscribeAudio`; modelo classificador local | VHS no trecho de transcrição (TI-16 a TI-18); modelo carregado diretamente do disco, sem dublê; TI-19 não aciona nenhuma dependência externa |
+| Chat e provedor de modelo de linguagem | Google Gemini (`gemini-3.5-flash-lite`) | VHS, registro de sucesso (TI-20) e registro de falha (TI-21) |
+| Persistência em banco de dados | PostgreSQL | Contêiner real, provisionado por `docker compose` a partir da Sprint 4 |
+| Frontend e backend | Nenhuma; verificação de contrato entre interface e aplicação | `TestClient` sobre a aplicação FastAPI real, sem substituição de dependência |
+| Webhooks | Provedor a definir na Sprint 4 | Suíte de contrato `ContratoWebhookInbound` contra um receptor em memória |
+| Mensageria | Barramento a definir na Sprint 5 | Suíte de contrato `ContratoBarramentoMensagens` contra um intermediário em memória |
+| Módulo VHS | O adaptador real que o módulo decora | Dublê instrumentado que conta chamadas, decorado pelo módulo VHS sob teste |
+
+#### Recebimento de áudio e armazenamento de objetos
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-01 | Positivo | `TestRecebimentoAudioIntegracao.test_upload_valido_grava_objeto_no_bucket` | Áudio `.wav` válido em `multipart/form-data` | `201 Created`; objeto em `incoming/{id}` com `Content-Type` e metadata `audio-format` corretos | RF01 |
+| TI-02 | Positivo | `TestRecebimentoAudioIntegracao.test_leitura_devolve_bytes_identicos_ao_upload` | Áudio gravado por TI-01, lido em seguida por `TranscribeAudio` | Bytes lidos idênticos aos bytes enviados | RF01 |
+| TI-03 | Negativo | `TestRecebimentoAudioIntegracao.test_audio_id_inexistente_retorna_404` | Identificador inexistente em `POST /audio/{id}/transcribe` | `404 audio_not_found` | RF01 |
+| TI-04 | Negativo | `TestRecebimentoAudioIntegracao.test_falha_de_infraestrutura_retorna_500` | Bucket inexistente, credencial de armazenamento inválida, ou serviço inacessível (três causas distintas) | `500 internal_error` nas três causas, sem detalhe de infraestrutura no corpo | RNF07 |
+| TI-05 | Negativo | `TestRecebimentoAudioIntegracao.test_arquivo_rejeitado_nao_grava_objeto` | Arquivo de texto renomeado para `.wav` | `415 unsupported_format`; nenhum objeto novo no bucket | RF01 |
+
+#### Transcrição e provedor de fala em texto
+
+Os casos TI-06 e TI-08 leem um registro de sucesso do módulo VHS, com uma resposta genuína gravada do provedor. O caso TI-07 lê um registro de falha, que reproduz num único teste as três causas de indisponibilidade de infraestrutura (indisponibilidade, tempo limite e credencial inválida); a de credencial inválida foi gravada a partir de uma resposta real do provedor a uma chave deliberadamente errada, e as outras duas foram compostas diretamente, por não haver interação real a capturar quando a rede está fora do ar. O caso TI-10 é a exceção que não passa pelo VHS: substitui o cliente por um dublê espião que inspeciona os parâmetros da chamada, verificação que a reprodução de um registro não alcançaria, porque em modo `reproduzir` o cliente real nunca é acionado, e nada garantiria que o código de produção continuasse enviando `keyterm` ao SDK.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-06 | Positivo | `TestTranscricaoIntegracao.test_transcreve_audio_de_referencia` | Áudio de referência com fala em português | `200 OK`; texto não vazio; `language` igual a `pt-BR`; `confidence` entre 0 e 1; `duration_seconds` maior que zero | RNF06, RF01 |
+| TI-07 | Negativo | `TestTranscricaoIntegracao.test_falha_do_provedor_retorna_502` | Provedor inacessível, tempo limite excedido, ou credencial inválida (três causas distintas) | `502 transcription_failed` nas três causas, sem detalhe do SDK no corpo; o tempo limite não é configurado explicitamente e segue o padrão do SDK (seção 3.2.2) | RNF01, RNF07 |
+| TI-08 | Negativo | `TestTranscricaoIntegracao.test_audio_sem_fala_retorna_texto_vazio` | Áudio sem fala reconhecível | `200 OK` com `text` vazio | RNF06 |
+| TI-09 | Negativo | `TestTranscricaoIntegracao.test_idioma_nao_suportado_retorna_422_sem_chamar_provedor` | `language=en-US` | `422 Unprocessable Entity`; nenhuma chamada ao provedor | RF01 |
+| TI-10 | Positivo | `TestTranscricaoIntegracao.test_termos_do_dominio_sao_enviados_ao_provedor` | Transcrição de áudio de referência | Parâmetro `keyterm` contém os 12 termos do domínio, junto com `model=nova-3` | RNF03, RNF06 |
+
+#### Síntese de fala e provedor de voz
+
+A rota `POST /api/v1/text-to-speech` converte a resposta do agente em áudio sob demanda, acionada pelo botão "Ouvir resposta" da interface; não substitui a apresentação em texto exigida pelo RF01, é um canal complementar. A especificação de requisitos da seção 2.2 ainda não documenta essa capacidade: não há RF que cubra explicitamente a saída em áudio, e por isso as entradas da tabela abaixo marcadas como "não documentado" apontam uma atualização pendente a levar à revisão da seção 2.2, e não uma omissão deste plano. `GenerateSpeech.generate` já captura qualquer exceção do modelo de síntese, inclusive áudio vazio, e as converte em `502 speech_generation_failed`; por isso o caso TI-15 lê um registro de falha do VHS do mesmo jeito que o caso TI-07 lê o da transcrição.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-11 | Positivo | `TestSinteseDeFalaIntegracao.test_gera_audio_wav_a_partir_do_texto` | Texto de resposta típico | `200 OK`; `Content-Type` igual a `audio/wav`; corpo de bytes não vazio | Não documentado |
+| TI-12 | Negativo | `TestSinteseDeFalaIntegracao.test_texto_vazio_nao_aciona_o_provedor` | Texto vazio ou composto apenas de espaços | `422 empty_text`; nenhuma chamada ao provedor | RNF01 |
+| TI-13 | Negativo | `TestSinteseDeFalaIntegracao.test_texto_acima_do_limite_nao_aciona_o_provedor` | Texto com mais de 4000 caracteres | `422 text_too_long`; nenhuma chamada ao provedor | RNF01 |
+| TI-14 | Negativo | `TestSinteseDeFalaIntegracao.test_voz_ou_formato_nao_suportado_retorna_422` | `voice` diferente de `Kore`, ou `format` diferente de `wav` (duas causas) | `422 Unprocessable Entity` pela validação do schema nas duas, sem chamar o provedor | RNF01 |
+| TI-15 | Negativo | `TestSinteseDeFalaIntegracao.test_falha_ou_audio_vazio_do_provedor_retorna_502` | Provedor lança exceção, ou devolve conteúdo de áudio vazio (duas causas distintas) | `502 speech_generation_failed` nas duas causas | RNF07 |
+
+#### Análise e pipeline de PLN
+
+O acerto da classificação, medido pelo F1-macro, é avaliado como requisito não funcional na seção 6.3; os casos abaixo validam apenas a forma do contrato entre transcrição e classificação. As transcrições dos casos TI-16 a TI-18 vêm de um registro de sucesso do módulo VHS, pela mesma chave de registro que a suíte de transcrição usa; o caso TI-19 não aciona nenhum serviço externo, porque a falha ocorre na composição local do classificador.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-16 | Positivo | `TestAnaliseIntegracao.test_transcricao_recebe_intencao_do_catalogo` | Áudio com solicitação típica do domínio | `200 OK`; `intencao` pertence a INT-01 a INT-10; `confianca_pln` entre 0 e 1 | RF01, RNF03 |
+| TI-17 | Positivo | `TestAnaliseIntegracao.test_texto_digitado_e_transcrito_produzem_a_mesma_intencao` | Mesma frase via `/chat` e via `/audio/analyze` | Mesma intenção nas duas rotas | RF01 |
+| TI-18 | Negativo | `TestAnaliseIntegracao.test_solicitacao_fora_do_catalogo_retorna_intencao_valida` | Solicitação fora do escopo do agente | `200 OK`; `intencao` igual a `fora_do_catalogo` | RF02, RNF03 |
+| TI-19 | Negativo | `TestAnaliseIntegracao.test_modelo_ausente_falha_na_composicao` | Inicialização da aplicação sem `resultados/classificador.joblib` | Falha explícita na composição de `get_analyzer` | RNF03 |
+
+#### Chat e provedor de modelo de linguagem
+
+O caso TI-20 lê um registro de sucesso do módulo VHS. O caso TI-21 lê um registro de falha que reproduz, num único teste, a indisponibilidade do provedor e o retorno de um conteúdo nulo; a primeira causa foi composta diretamente, por não haver interação real a capturar, e a segunda pode ser gravada a partir de uma resposta real do provedor sem conteúdo de texto.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-20 | Positivo | `TestChatIntegracao.test_resposta_gerada_pelo_provedor` | Mensagem típica de consulta | `200 OK`; `reply` não vazio | RF02, RNF11 |
+| TI-21 | Negativo | `TestChatIntegracao.test_falha_ou_resposta_vazia_retorna_500` | Provedor inacessível, ou resposta com conteúdo nulo (duas causas distintas) | `500 internal_error` nas duas causas: a exceção do SDK sobe ao manipulador global, e o conteúdo nulo reprova apenas na serialização de `ChatResponse` | RF02, RNF07 |
+| TI-22 | Negativo | `TestChatIntegracao.test_mensagem_acima_do_limite_nao_aciona_o_provedor` | Mensagem com mais de 4000 caracteres | `422 message_too_long`; nenhuma chamada ao provedor | RF02, RNF01 |
+| TI-23 | Negativo | `TestChatIntegracao.test_mensagem_vazia_nao_aciona_o_provedor` | Mensagem vazia ou composta apenas de espaços | `422 empty_message`; nenhuma chamada externa | RF02 |
+
+#### Persistência em banco de dados
+
+Casos executados contra o PostgreSQL provisionado a partir do DDL da seção 3.6.6, aplicado a uma base de testes dedicada.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-24 | Positivo | `TestPersistenciaIntegracao.test_interacao_por_texto_e_gravada_com_atributos_minimos` | Interação processada pelo canal de texto | Registro em `auditoria.interacao` com os dez atributos exigidos pelo RNF09 | RNF04, RNF09 |
+| TI-25 | Positivo e negativo | `TestPersistenciaIntegracao.test_interacao_por_voz_vincula_o_audio_de_origem` | Interação processada pelo canal de voz | `audio_referencia` igual ao identificador do MinIO; preenchê-lo com `canal=texto` é rejeitado pela restrição | RNF04, RF01 |
+| TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.interacao_artefato` por artefato citado | RF02, RF03, RNF11 |
+| TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_a_interacao` | Interação processada com o banco inacessível | Código de indisponibilidade definido; a interação é reencaminhada, não descartada | RNF07, RNF04 |
+| TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.*` com as credenciais da aplicação | Operação rejeitada pelo banco | RNF04 |
+| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução do DDL da seção 3.6.6 em base vazia | Os dois schemas e as onze tabelas são criados; carga inicial populada | Seção 3.6 |
+
+#### Frontend e backend
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-30 | Positivo | `TestFrontendBackendIntegracao.test_contrato_da_rota_de_chat` | Envio de mensagem pela interface | Campos de `ChatRequest`/`ChatResponse` respeitados nos dois sentidos | RF02, RNF05 |
+| TI-31 | Positivo | `TestFrontendBackendIntegracao.test_contrato_do_envio_de_audio` | `Blob` de áudio sem nome de arquivo, anexado no campo `audio` | `201 Created` | RF01 |
+| TI-32 | Negativo | `TestFrontendBackendIntegracao.test_erro_4xx_5xx_e_tratado_pela_interface` | Resposta `4xx`/`5xx` do backend | Interface exibe estado de falha sem travar | RNF08 |
+| TI-33 | Negativo | `TestFrontendBackendIntegracao.test_rotas_nao_implementadas_retornam_404` | `GET /api/v1/tasks`, `PATCH /api/v1/tasks/{id}` e `GET /api/v1/calendar/events` (três rotas) | `404 Not Found` nas três | RF05, RF06 |
+| TI-34 | Negativo | `TestFrontendBackendIntegracao.test_porta_do_proxy_coincide_com_a_porta_do_servidor` | Leitura de `vite.config.js` e do procedimento de execução do backend | As portas declaradas coincidem | RNF05 |
+
+#### Webhooks
+
+Suíte de contrato `ContratoWebhookInbound`, exercitada nesta etapa contra um receptor em memória, conforme a estratégia da abertura desta seção.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-35 | Positivo | `ContratoWebhookInbound.test_entrega_com_assinatura_valida_e_processada` | Evento com assinatura válida | `2xx`; efeito aplicado exatamente uma vez | RF05 |
+| TI-36 | Negativo | `ContratoWebhookInbound.test_assinatura_invalida_e_rejeitada` | Evento sem assinatura, com assinatura incorreta, ou com assinatura válida porém antiga (três causas) | `401 Unauthorized` nas três; nenhum efeito; a rejeição por janela de tempo impede a reapresentação de uma entrega capturada anteriormente | RNF02 |
+| TI-37 | Negativo | `ContratoWebhookInbound.test_entrega_duplicada_produz_efeito_unico` | Mesmo evento entregue duas vezes, com o mesmo identificador | `2xx` nas duas entregas; efeito aplicado uma única vez | RF05, RNF04 |
+| TI-38 | Negativo | `ContratoWebhookInbound.test_confirmacao_so_ocorre_apos_persistencia` | Falha no processamento após a entrega | `5xx`, para provocar reentrega do provedor | RNF04, RNF07 |
+| TI-39 | Negativo | `ContratoWebhookInbound.test_conteudo_malformado_e_rejeitado` | JSON inválido ou campo obrigatório ausente | `400 Bad Request`; evento registrado sem efeito | RNF04 |
+| TI-40 | Positivo | `ContratoWebhookInbound.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado` | Evento de tipo não catalogado | `2xx`; registrado sem processamento | RNF07 |
+
+#### Mensageria
+
+Suíte de contrato `ContratoBarramentoMensagens`, exercitada nesta etapa contra um intermediário em memória. O contrato é o envelope da mensagem, com os campos identificador, tipo, versão, marca de tempo, correlação e conteúdo, além do ciclo de publicação e consumo.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-41 | Positivo | `ContratoBarramentoMensagens.test_publica_e_consome_o_envelope_integro` | Mensagem publicada | Consumidor recebe os seis campos do envelope preservados | RF05 |
+| TI-42 | Positivo e negativo | `ContratoBarramentoMensagens.test_confirmacao_remove_e_recusa_devolve_a_mensagem` | Mensagem confirmada pelo consumidor; mensagem que gera exceção no consumidor | Mensagem confirmada não é reentregue; mensagem recusada é devolvida à fila | RF05, RNF07 |
+| TI-43 | Negativo | `ContratoBarramentoMensagens.test_falha_persistente_vai_para_dead_letter` | Processamento sempre reprova, com reentregas sucessivas contadas, ou payload indesserializável | O contador de tentativas é incrementado a cada reentrega; após o limite, ou de imediato se indesserializável, a mensagem vai para a fila de mensagens mortas com a causa registrada; a fila principal segue processando | RNF04, RNF07 |
+| TI-44 | Negativo | `ContratoBarramentoMensagens.test_consumo_duplicado_produz_efeito_unico` | Mesma mensagem processada duas vezes | Efeito único | RF05, RNF04 |
+| TI-45 | Positivo | `ContratoBarramentoMensagens.test_consumidor_nao_depende_de_ordem_global` | Mensagens publicadas fora de ordem | Consumidor processa corretamente sem pressupor ordem de chegada | RF05 |
+| TI-46 | Negativo | `ContratoBarramentoMensagens.test_indisponibilidade_na_publicacao_e_reportada` | Barramento inacessível no momento da publicação | Erro explícito ao produtor; nenhuma perda silenciosa | RNF07 |
+
+#### Módulo VHS
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-47 | Positivo | `TestVhsIntegracao.test_ausencia_ou_expiracao_aciona_o_adaptador_real` | Primeira chamada com uma chave nova, ou chamada além do prazo de validade de um registro existente | Adaptador real acionado; resultado gravado ou regravado | RNF01 |
+| TI-48 | Positivo | `TestVhsIntegracao.test_registro_existente_nao_aciona_o_adaptador` | Segunda chamada com a mesma chave, para um registro de sucesso ou de falha | O valor ou o erro gravado é devolvido sem acionar o adaptador novamente | RNF01, RNF07 |
+| TI-49 | Negativo | `TestVhsIntegracao.test_modo_reproduzir_sem_registro_valido_falha_sem_acessar_a_rede` | Chave sem registro correspondente, ou com registro corrompido, em modo `reproduzir` | Falha explícita, distinguindo ausência de corrupção; nenhuma requisição de rede | RNF07 |
+| TI-50 | Negativo | `TestVhsIntegracao.test_nenhum_segredo_e_gravado_no_registro` | Varredura dos arquivos gravados, de sucesso e de falha | Nenhuma ocorrência de `Authorization`, chave de API ou token | RNF02 |
+| TI-51 | Positivo | `TestVhsIntegracao.test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado` | Execução nos modos `ignorar` e `atualizar` | `ignorar` não lê nem grava; `atualizar` sobrescreve o registro existente | RNF01 |
+| TI-52 | Positivo | `TestVhsIntegracao.test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao` | Alteração de idioma, modelo ou instrução de sistema | Nova chave gerada; registro anterior não é reaproveitado | RNF01, RNF11 |
+
 ### 6.4.5 Procedimentos, Ferramentas e Validação Esperada
+
+Ferramentas e bibliotecas, com justificativa.
+
+`unittest` — framework padrão da suíte, adotado desde a Sprint 2 conforme a seção 3.5.3; não acrescenta dependência e roda em qualquer ambiente Python.
+
+`unittest.IsolatedAsyncioTestCase` — executa os casos que exercitam `transcribe` e `analyze`, ambos corrotinas, sem depender do `TestClient` para alcançá-los.
+
+`fastapi.testclient.TestClient` — sobe a aplicação FastAPI em processo, exercitando roteamento, injeção de dependências, serialização Pydantic e os manipuladores de exceção de `main.py`.
+
+`app.dependency_overrides` — mecanismo de composição que substitui o adaptador real pelo dublê ou pelo módulo VHS nos casos que o exigem.
+
+`httpx` — dependência de transporte do `TestClient`, incluída no extra de desenvolvimento do `pyproject.toml`.
+
+`docker compose` — provisiona o MinIO e, a partir da Sprint 4, o PostgreSQL, com o bucket `az1-audio` e a regra de ciclo de vida já configurados pelo serviço `minio-init`.
+
+`boto3` — cliente independente do usado pela aplicação, para conferir de fora o estado do bucket após cada operação.
+
+`ContratoWebhookInbound` e `ContratoBarramentoMensagens` — classes que descrevem o comportamento exigido de webhooks e do barramento de mensagens independentemente do provedor selecionado, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste.
+
+Padrão de validação. Cada caso verifica o código de status HTTP ou o efeito observável da operação, a integridade do payload desserializado para o schema Pydantic correspondente e, quando aplicável, o estado persistido (releitura do objeto no bucket, ou da linha na tabela) e o comportamento do módulo VHS, comparando o número de chamadas ao adaptador real entre a primeira e a segunda execução com a mesma chave.
+
+Ambiente e pré-requisitos.
+
+Python 3.12 com o pacote instalado em modo editável incluindo o extra de desenvolvimento (`pip install -e ".[dev]"`), que traz o `httpx` consumido pelo `TestClient`. Docker em execução para as suítes que dependem de contêiner: o armazenamento de objetos (TI-01 a TI-05) exige o serviço `minio` do `docker-compose.yml`, e a persistência (TI-24 a TI-29) exige o serviço de PostgreSQL a ser acrescentado ao mesmo arquivo na Sprint 4, com o DDL da seção 3.6.6 aplicado à base de testes. As suítes de contrato de webhook e de mensageria (TI-35 a TI-46) não exigem contêiner nesta etapa, por rodarem contra dublês em memória. O modelo de classificação (`resultados/classificador.joblib`) precisa existir para os casos TI-16 a TI-19, gerado por `python -m pln.classificador`.
+
+```bash
+docker compose up -d
+python -m unittest discover tests -p "test_integracao_*.py"
+```
+
+A regravação dos registros do módulo VHS é a etapa que usa a rede e exige as chaves dos provedores, e a verificação em modo `ignorar` é a que mede o sistema sem cache:
+
+```bash
+VHS_MODO=atualizar python -m unittest tests.test_integracao_transcricao
+VHS_MODO=ignorar python -m unittest discover tests -p "test_integracao_*.py"
+```
+
+Ficam fora deste escopo os testes de desempenho e carga sob concorrência, que dependem do módulo VHS em modo `ignorar` e de instrumentação própria (seção 6.3), os testes de acerto da transcrição e da classificação de intenção, medidos como requisito não funcional (seção 6.3), e a verificação do ambiente de nuvem após a implantação, coberta pelo roteiro da seção 3.7.7.
+
+---
 
 ## 6.5 Planejamento dos Testes de Usabilidade
 
