@@ -1,0 +1,126 @@
+# =============================================================================
+# AZ1 — sobreposição de DESENVOLVIMENTO
+# =============================================================================
+# Carregado automaticamente pelo compose quando nenhum -f é informado. Ou seja:
+#
+#   docker compose up          → base + este arquivo
+#
+# O que muda em relação à base, e por quê:
+#
+#   • os alvos de build viram `dev`: recarga automática em vez de bundle
+#     estático, dependências de teste presentes;
+#   • o código do host entra por bind mount, para que editar um arquivo tenha
+#     efeito imediato, sem rebuild;
+#   • as portas de API e MinIO são publicadas, para depurar direto (Swagger em
+#     /docs, console do MinIO em 9001);
+#   • o endurecimento de produção (raiz somente-leitura) é afrouxado onde ele
+#     atrapalharia — e SÓ onde atrapalha.
+#
+# O ponto de manter isto separado da base é que ninguém precisa lembrar de
+# desligar o modo de desenvolvimento antes de subir em produção: a produção
+# simplesmente não carrega este arquivo.
+# =============================================================================
+
+services:
+  api:
+    build:
+      target: dev
+    image: az1/api-dev:${AZ1_VERSION:-dev}
+
+    # Instalação editável dentro da imagem + código do host montado por cima:
+    # o uvicorn --reload observa /app/src e reinicia a cada salvamento.
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      # O modelo treinado vem do host, e não da imagem: assim o retreino pelo
+      # serviço `trainer` reflete na API sem reconstruir nada. É o motivo de o
+      # entrypoint avisar quando o arquivo não existe — este mount pode chegar
+      # vazio numa cópia recém-clonada.
+      - ./resultados:/app/resultados
+
+    command:
+      - uvicorn
+      - az1_api.main:app
+      - --host=0.0.0.0
+      - --port=8000
+      - --reload
+      - --reload-dir=/app/src
+
+    # `!override` marca o CAMPO, e não um item: assim a lista da base é
+    # SUBSTITUÍDA. Marcando o item, o compose SOMA as duas listas e o serviço
+    # acaba publicando também a porta da base, apontando para nada.
+    ports: !override
+      # 8010 e não 8000 por compatibilidade com o proxy do Vite rodando no host
+      # (vite.config.js), que já apontava para 127.0.0.1:8010.
+      - "${AZ1_API_PORT:-8010}:8000"
+
+    # A recarga automática precisa gravar bytecode e arquivos temporários.
+    read_only: false
+
+    environment:
+      # Bind mount em Windows e macOS não propaga eventos de inotify: sem
+      # polling, o --reload simplesmente nunca dispara. Em Linux nativo dá para
+      # deixar vazio e economizar CPU.
+      WATCHFILES_FORCE_POLLING: ${WATCHFILES_FORCE_POLLING:-1}
+      PYTHONDONTWRITEBYTECODE: "1"
+
+    # O alvo `dev` não traz HEALTHCHECK (isso é coisa da imagem de produção),
+    # mas o frontend abaixo espera a API saudável. Definir a sonda aqui mantém a
+    # mesma dependência ordenada valendo em desenvolvimento.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys, urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).status == 200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      target: dev
+    image: az1/frontend-dev:${AZ1_VERSION:-dev}
+
+    volumes:
+      - ./src/frontend:/app
+      # Volume anônimo sobre node_modules: sem ele, o bind mount do host
+      # esconderia o node_modules instalado na imagem, e o Vite não acharia
+      # dependência nenhuma. Em Windows isso é ainda mais importante — o
+      # node_modules do host, se existir, foi instalado para outro sistema
+      # operacional e traria binários nativos incompatíveis.
+      - /app/node_modules
+
+    ports: !override
+      - "${AZ1_WEB_PORT:-5173}:5173"
+
+    environment:
+      # Lido pelo vite.config.js: dentro da rede do compose, a API atende em
+      # http://api:8000, e não em 127.0.0.1.
+      VITE_DEV_API_PROXY: http://api:8000
+      # Mesma história do WATCHFILES_FORCE_POLLING acima, do lado do Node.
+      VITE_USE_POLLING: ${VITE_USE_POLLING:-1}
+
+    read_only: false
+    tmpfs: !override []
+
+    # "docker compose watch" (opcional, alternativa ao bind mount): reconstrói a
+    # imagem quando o manifesto de dependências muda, em vez de deixar o
+    # contêiner rodando com um node_modules defasado até alguém perceber.
+    develop:
+      watch:
+        - path: ./src/frontend/package.json
+          action: rebuild
+        - path: ./src/frontend/package-lock.json
+          action: rebuild
+
+  minio:
+    ports:
+      # 9000 = API S3 (útil para apontar um cliente do host), 9001 = console web.
+      # Em produção nenhuma das duas é publicada.
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+
+  postgres:
+    ports:
+      # Útil para o webhook, que ainda roda fora do contêiner (uvicorn no
+      # host) e fala com "localhost:5432", conforme DATABASE_URL no
+      # .env.example. Em produção não é publicada.
+      - "${POSTGRES_PORT:-5432}:5432"
