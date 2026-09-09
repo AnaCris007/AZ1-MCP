@@ -27,6 +27,10 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | A pilha de tecnologias e as razões de cada escolha | [Projeto.md, Pilha de Tecnologias](./Projeto.md#35-pilha-de-tecnologias) |
 | Os modelos conceitual, lógico e físico dos dados | [Projeto.md, Modelagem Conceitual e Lógica dos Dados](./Projeto.md#36-modelagem-conceitual-e-lógica-dos-dados) |
 | Como implantar a solução em nuvem | [Projeto.md, Processo de Deploy em Nuvem](./Projeto.md#37-processo-de-deploy-em-nuvem) |
+| Os webhooks, sua escolha, contrato e tratamento de erros | [Projeto.md, Webhooks](./Projeto.md#51-webhooks) |
+| Como ligar o webhook ao Google Drive, passo a passo | [Projeto.md, Manual de operação — Google Drive](./Projeto.md#516-exemplos-e-testes) |
+| Como ligar o webhook ao SharePoint, passo a passo | [Projeto.md, Manual de operação — Microsoft Graph](./Projeto.md#516-exemplos-e-testes) |
+| Por que as assinaturas de webhook expiram, e como renovar | [Projeto.md, Expiração das Assinaturas](./Projeto.md#517-expiração-das-assinaturas) |
 | O que será entregue em cada uma das Sprints 3, 4 e 5 | [Projeto.md, Estratégia de Entrega](./Projeto.md#38-estratégia-de-entrega-para-as-sprints-3-4-e-5) |
 | Os diagramas de classes, de componentes e de sequência | [Projeto.md, Projeto Técnico e Arquitetural](./Projeto.md#39-projeto-técnico-e-arquitetural) |
 | O algoritmo de PLN, como ele foi escolhido e como rodá-lo | [Projeto.md, Algoritmo de NLP e Implementação](./Projeto.md#33-algoritmo-de-nlp-e-implementação) |
