@@ -71,8 +71,30 @@
 
 </details>
 
-- [5. Registro de Decisões](#5-registro-de-decisões)
-- [6. Fontes](#6-fontes)
+<details>
+<summary><strong>5. Desenvolvimento e Documentação Técnica do Projeto</strong></summary>
+
+- [5.1 Webhooks](#51-webhooks)
+- [5.2 Módulo VHS](#52-módulo-vhs)
+- [5.3 Sistema de Troca de Mensagens](#53-sistema-de-troca-de-mensagens)
+- [5.4 Integração entre Frontend e Backend](#54-integração-entre-frontend-e-backend)
+
+</details>
+
+<details>
+<summary><strong>6. Planejamento de Testes Sistêmicos</strong></summary>
+
+- [6.1 Estratégia, Ferramentas e Bibliotecas Planejadas](#61-estratégia-ferramentas-e-bibliotecas-planejadas)
+- [6.2 Planejamento dos Testes de Funcionalidade](#62-planejamento-dos-testes-de-funcionalidade)
+- [6.3 Planejamento dos Testes de Requisitos Não Funcionais](#63-planejamento-dos-testes-de-requisitos-não-funcionais)
+- [6.4 Planejamento dos Testes de Integração](#64-planejamento-dos-testes-de-integração)
+- [6.5 Planejamento dos Testes de Usabilidade](#65-planejamento-dos-testes-de-usabilidade)
+- [6.6 Matriz de Cobertura Planejada](#66-matriz-de-cobertura-planejada)
+
+</details>
+
+- [7. Registro de Decisões](#7-registro-de-decisões)
+- [8. Fontes](#8-fontes)
 
 ---
 
@@ -171,7 +193,7 @@ Nesse contexto, o projeto pode aproveitar as forças já existentes no Metrô pa
 | 9   | Respostas estruturadas com referências     | Apresenta respostas claras e estruturadas, indicando as fontes ou referências utilizadas quando disponíveis, e informa quando não existem dados suficientes para uma resposta confiável.        |
 | 10  | Alertas e apoio proativo                   | Alerta sobre prazos próximos ou vencidos, sinaliza documentos esperados ausentes, identifica campos incompletos e demais pendências, e oferece ajuda proativa conforme o contexto identificado. |
 | 11  | Sugestões de preenchimento                 | Identifica solicitações de transação e apresenta, no chat, sugestões estruturadas de preenchimento de campos e registros, permitindo que o profissional as avalie antes de qualquer registro.   |
-| 12  | Segurança e governança das interações      | Respeita as permissões de cada perfil, a confidencialidade das informações e a rastreabilidade das interações.                                                                                  |
+| 12  | Segurança e governança das interações      | Exige autenticação por SSO, preserva a confidencialidade das informações e mantém a rastreabilidade das interações.                                                                              |
 
 ### O que o produto NÃO FAZ (fora de escopo)
 
@@ -183,7 +205,7 @@ Nesse contexto, o projeto pode aproveitar as forças já existentes no Metrô pa
 | 4   | Executar automaticamente as sugestões apresentadas                                                                         | O profissional deve avaliar e decidir sobre cada sugestão, mantendo-se como responsável final pelas informações registradas.                                                   |
 | 5   | Tomar decisões técnicas, administrativas ou estratégicas, ou aprovar documentos, riscos, prazos e ações de governança      | O agente tem caráter de apoio: decisões e aprovações permanecem sob responsabilidade dos profissionais e dos processos de governança do Metrô.                                 |
 | 6   | Substituir os sistemas, processos ou profissionais do Metrô                                                                | O produto é uma camada adicional de interação sobre a estrutura existente, e não um substituto dela.                                                                           |
-| 7   | Permitir acesso a informações incompatíveis com as permissões do usuário                                                   | Exigência de confidencialidade e controle de acesso por perfil definida pelo parceiro.                                                                                         |
+| 7   | Permitir o uso das funcionalidades protegidas sem autenticação válida                                                       | Exigência de identificação do usuário e confidencialidade das interações.                                                                                                      |
 | 8   | Responder a solicitações fora do catálogo de intenções                                                                     | O TAPI determina que interações genéricas ou sem contexto sejam detectadas, orientadas e descartadas.                                                                          |
 | 9   | Garantir respostas conclusivas com dados ausentes, incompletos ou desatualizados, ou prever com certeza resultados futuros | Limitação inerente à natureza da solução: as respostas dependem da qualidade dos dados disponíveis, e o agente sinaliza incertezas em vez de ocultá-las.                       |
 | 10  | Contemplar todos os documentos, processos e possibilidades do ambiente corporativo                                         | Delimitação necessária de escopo para um MVP acadêmico com prazo definido; a cobertura completa é evolução futura.                                                             |
@@ -195,16 +217,16 @@ Nesse contexto, o projeto pode aproveitar as forças já existentes no Metrô pa
 
 ## 1.4 Objetivo do Produto
 
- O objetivo geral do produto é reduzir o esforço manual necessário para consultar, interpretar e registrar informações dos projetos administrados pelo PMO Corporativo do Metrô de São Paulo, por meio de um agente de Inteligência Artificial capaz de compreender solicitações em linguagem natural, escrita e por voz, e de responder com informações estruturadas, alertas e sugestões de preenchimento, preservando os processos, as permissões e a rastreabilidade já estabelecidos pela companhia.
+ O objetivo geral do produto é reduzir o esforço manual necessário para consultar, interpretar e registrar informações dos projetos administrados pelo PMO Corporativo do Metrô de São Paulo, por meio de um agente de Inteligência Artificial capaz de compreender solicitações em linguagem natural, escrita e por voz, e de responder com informações estruturadas, alertas e sugestões de preenchimento, preservando os processos, a autenticação e a rastreabilidade estabelecidos para a solução.
 
  Esse objetivo foi formulado a partir da conclusão central da análise do problema: o desafio do Metrô não está na ausência de uma estrutura de gestão, mas no custo operacional de interagir com ela. Por essa razão, o objetivo não propõe a substituição de sistemas, processos ou profissionais, e sim a redução do atrito entre o profissional e a informação, atuando exatamente sobre os pontos em que a análise identificou esforço manual: a localização de informações dispersas em diferentes arquivos, listas e sistemas, a consolidação de análises e o registro de novos dados. O objetivo geral desdobra-se nas seguintes metas específicas, alinhadas ao problema identificado e às necessidades do negócio:
 
-- **Agilizar o acesso à informação:** permitir que o profissional obtenha dados sobre documentos, prazos, marcos, riscos, pendências e avanço dos projetos por meio de uma única interface conversacional. O atendimento será verificado pelo RNF01: pelo menos 80% das consultas textuais deverão produzir resposta em até 15 segundos;
-- **Compreender corretamente as solicitações dos usuários:** desenvolver e avaliar um pipeline de Processamento de Linguagem Natural capaz de identificar as intenções dos usuários e classificá-las como consultas, transações sugestivas ou alertas. O atendimento será verificado pelo RNF03, que estabelece precisão mínima de 85% na classificação das intenções;
-- **Apoiar a análise dos projetos:** oferecer respostas estruturadas sobre os projetos do portfólio, com fonte e data da informação. O atendimento será verificado pelos critérios de aceitação dos RF02 e RF03 e pelo RNF08, segundo o qual pelo menos 80% dos participantes dos testes deverão compreender a resposta sem auxílio externo;
+- **Agilizar o acesso à informação:** permitir que o profissional obtenha dados sobre documentos, prazos, marcos, riscos, pendências e avanço dos projetos por meio de uma única interface conversacional. O atendimento será verificado pelo RNF01: pelo menos 80% das consultas textuais deverão produzir resposta em até 15 segundos e todas deverão receber um desfecho em até 60 segundos;
+- **Compreender corretamente as solicitações dos usuários:** desenvolver e avaliar um pipeline de Processamento de Linguagem Natural capaz de identificar as intenções dos usuários e classificá-las como consultas, transações sugestivas ou alertas. O atendimento será verificado pelo RNF03, que estabelece F1-macro mínimo de 0,85 e critérios próprios para cobertura e rejeição;
+- **Apoiar a análise dos projetos:** oferecer respostas estruturadas sobre os projetos do portfólio, com fonte e data da informação. O atendimento será verificado pelos RF02 e RF03, pelo RNF08, segundo o qual pelo menos 80% dos participantes deverão compreender a resposta sem auxílio, e pelo RNF12, que mede se as afirmações são sustentadas pelas fontes;
 - **Fortalecer o acompanhamento preventivo do portfólio:** identificar e comunicar proativamente prazos próximos ou vencidos, documentos ausentes, campos incompletos e demais pendências. O atendimento será verificado pelos critérios de aceitação do RF05 e pelo conjunto de casos de teste de alertas definido na seção 2.1;
 - **Apoiar a qualidade da entrada de dados:** apresentar sugestões estruturadas para campos pendentes, sem alterar a fonte original. O atendimento será verificado pelos critérios de aceitação do RF04 e pelo RNF11, que exige referências válidas e justificativa compreensível em pelo menos 85% das sugestões;
-- **Garantir conformidade com as restrições do parceiro:** validar a solução exclusivamente com dados sintéticos e simular permissões de acesso por perfil. O atendimento será verificado pelo RNF02 e pela presença de todos os elementos de auditoria definidos no RNF04;
+- **Garantir conformidade com as restrições do parceiro:** validar a solução exclusivamente com dados sintéticos, exigir autenticação por SSO e proteger os registros das interações. O atendimento será verificado pelo RNF02, pela correlação dos elementos definida no RNF04 e pelos controles definidos no RNF09;
 - **Assegurar aderência e sustentabilidade tecnológica:** manter o núcleo do agente desacoplado das aplicações clientes e exposto por interfaces padronizadas. O atendimento será verificado pelo RNF05, mediante o consumo das funcionalidades principais por pelo menos duas aplicações clientes sem duplicação das regras de negócio.
 
  Para evidenciar o alinhamento entre as metas, o problema identificado e as necessidades do negócio, a tabela a seguir apresenta a rastreabilidade de cada meta em relação ao aspecto do problema que a origina e ao benefício esperado pelo parceiro que ela atende, conforme registrado no TAPI:
@@ -220,14 +242,14 @@ Nesse contexto, o projeto pode aproveitar as forças já existentes no Metrô pa
 | Apoiar a análise dos projetos                      | Consolidação manual de documentos e análises                                   | Capacidade analítica e suporte à decisão; Relatórios automatizados         |
 | Fortalecer o acompanhamento preventivo             | Limitação da capacidade do PMO de identificar riscos e desvios preventivamente | Proatividade                                                               |
 | Apoiar a qualidade da entrada de dados             | Registro de informações trabalhoso e suscetível a erros e inconsistências      | Precisão                                                                   |
-| Garantir conformidade com as restrições            | Exigências de confidencialidade, permissões por perfil e rastreabilidade       | Confidencialidade; Rastreabilidade                                         |
+| Garantir conformidade com as restrições            | Exigências de confidencialidade, autenticação e rastreabilidade                | Confidencialidade; Rastreabilidade                                         |
 | Assegurar aderência e sustentabilidade tecnológica | Premissa de possível troca da plataforma de portfólio                          | Interoperabilidade e integração; Sustentação e autonomia da equipe interna |
 
 <div align="center">
 <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
- Em conjunto, essas metas respondem diretamente ao problema central identificado: tornar mais ágil, simples e intuitiva a interação com a estrutura de gestão de portfólio já existente. Ao permitir que a informação seja consultada, analisada e sugerida por meio de linguagem natural, o produto atua sobre o esforço manual que hoje consome o tempo das equipes, gerando eficiência, precisão e apoio à tomada de decisão, ao mesmo tempo em que preserva as permissões, a confidencialidade e a rastreabilidade exigidas pela companhia. Alcançar esse objetivo significa, portanto, entregar ao PMO Corporativo não um substituto de seus sistemas, processos ou profissionais, mas uma camada de interação que amplia a capacidade da estrutura já existente, liberando as equipes para as atividades analíticas e estratégicas que efetivamente dependem do julgamento humano.
+ Em conjunto, essas metas respondem diretamente ao problema central identificado: tornar mais ágil, simples e intuitiva a interação com a estrutura de gestão de portfólio já existente. Ao permitir que a informação seja consultada, analisada e sugerida por meio de linguagem natural, o produto atua sobre o esforço manual que hoje consome o tempo das equipes, gerando eficiência, precisão e apoio à tomada de decisão, ao mesmo tempo em que preserva a autenticação, a confidencialidade e a rastreabilidade exigidas para a solução. Alcançar esse objetivo significa, portanto, entregar ao PMO Corporativo não um substituto de seus sistemas, processos ou profissionais, mas uma camada de interação que amplia a capacidade da estrutura já existente, liberando as equipes para as atividades analíticas e estratégicas que efetivamente dependem do julgamento humano.
 
 ## 1.5 Personas e Jornada do Usuário
 
@@ -555,7 +577,7 @@ Cada feature foi avaliada em dois critérios. A importância expressa o valor pa
 | 13 | Sugestões proativas de consultas e perguntas sugeridas | Média | Média | 4,0 | MVP | Equipe (produto) |
 | 14 | Registro de feedback do usuário sobre as respostas | Média | Média | 4,0 | MVP | Equipe (técnica) |
 | 15 | Rastreabilidade das interações | Alta | Média | 5,0 | Simulação no MVP | TAPI |
-| 16 | Controle de acesso por perfil | Alta | Média/Baixa | 4,5 | Simulação no MVP | TAPI |
+| 16 | Autenticação por SSO | Alta | Média/Baixa | 4,5 | Simulação no MVP | TAPI |
 | 17 | Análises comparativas entre projetos | Alta | Média/Baixa | 4,5 | Evolução futura | TAPI |
 | 18 | Prévia de relatório de status | Média/Alta | Média | 4,5 | Evolução futura | TAPI |
 | 19 | Painel de alertas e pendências | Média | Média | 4,0 | Evolução futura | Equipe (produto) |
@@ -575,7 +597,7 @@ Cada feature foi avaliada em dois critérios. A importância expressa o valor pa
 
  O MVP reúne as funcionalidades que serão efetivamente desenvolvidas e validadas ao longo do módulo, sobre a base de dados sintéticos, e representa a resposta mínima e completa ao problema identificado. As primeiras posições da priorização foram ocupadas pelas capacidades de interpretação em linguagem natural, de classificação de intenções e de controle do catálogo de interações, porque nenhuma outra funcionalidade do agente existe sem elas: o pipeline de Processamento de Linguagem Natural é o fundamento técnico sobre o qual toda a solução se apoia. A entrada por voz foi incluída nesse mesmo núcleo por ser um requisito central do módulo e por reutilizar integralmente o processamento de texto, uma vez que o áudio é convertido em texto antes de seguir para o pipeline. Na sequência, foram priorizadas as consultas, as respostas estruturadas e o aviso de dados insuficientes, que juntas entregam o valor mais imediato ao usuário: obter informação confiável de forma rápida. Por fim, os alertas, o apoio ao preenchimento de campos, o esclarecimento de dúvidas e o registro de feedback completam o escopo, agregando a dimensão proativa da solução e gerando insumos para a melhoria contínua do próprio pipeline. Essa ordenação também funciona como instrumento de gestão do risco de prazo registrado na matriz de riscos: caso o cronograma exija replanejamento, o corte de escopo ocorre das últimas para as primeiras posições, preservando sempre as funcionalidades das quais as demais dependem.
 
- A categoria de simulação no MVP foi criada para as funcionalidades que o parceiro considera indispensáveis, mas que só podem ser implementadas de forma plena na infraestrutura corporativa real do Metrô, à qual o grupo não terá acesso nesta etapa. É o caso do controle de acesso por perfil e da rastreabilidade das interações, exigências diretas das restrições de confidencialidade do TAPI. Em vez de simplesmente adiá-las, o grupo optou por demonstrar seus mecanismos sobre a base sintética, com perfis de permissão fictícios e registro das interações realizadas. Essa escolha permite validar o comportamento da solução diante dessas exigências e facilita a futura implantação no ambiente da companhia, já que a lógica estará construída e documentada.
+ A categoria de simulação no MVP foi criada para as funcionalidades que dependem da infraestrutura corporativa real do Metrô, à qual o grupo não terá acesso nesta etapa. É o caso da autenticação por SSO e da rastreabilidade das interações. Em vez de adiar sua especificação, o grupo optou por planejar a validação com identidade e dados sintéticos, sem definir diferenças de acesso por cargo. Essa escolha permite validar o contrato de autenticação independentemente da futura seleção entre Microsoft e Google e facilita a implantação posterior no ambiente da companhia.
 
  A evolução futura reúne as funcionalidades que agregariam valor ao produto, mas que dependem da maturidade consolidada do núcleo para serem bem executadas, razão pela qual não integram o compromisso inicial do MVP. As análises comparativas entre projetos e a prévia de relatório de status, embora presentes no escopo macro do TAPI, exigem uma base sintética com múltiplos projetos suficientemente ricos e um mecanismo de consulta já estável, condições que só se confirmam ao longo das sprints. Por isso, essa faixa funciona como um backlog complementar, alinhado à estratégia de aproveitamento da oportunidade de expansão registrada na matriz de riscos: ao final de cada sprint, o grupo avalia se há capacidade de incorporar algum desses itens, priorizando os de maior importância. As funcionalidades que não forem desenvolvidas não se perdem, pois serão registradas nas orientações de evolução entregues ao parceiro.
 
@@ -895,7 +917,7 @@ As faixas de criticidade adotadas são apresentadas a seguir:
 - **Severidade:** 4,32 (Moderada)
 - **Responsável nominal:** Ana Cristina Jardim
 - **Status:** Aberto
-- **Descrição:** Este risco se refere à possibilidade de o modelo de linguagem utilizado no pipeline de PLN gerar respostas que não estejam fundamentadas nas fontes consultadas, produzindo informações plausíveis mas incorretas sobre os projetos do portfólio — fenômeno conhecido como alucinação. A probabilidade foi estimada em 50% porque a geração de texto por modelos de linguagem de grande porte é suscetível a esse problema em domínios especializados, especialmente quando as fontes disponíveis não cobrem todos os cenários de consulta ou quando a pergunta é ambígua. O risco é especialmente relevante no contexto do MVP, cujas fontes são dados sintéticos com cobertura limitada. O impacto foi classificado como Alto porque uma resposta incorreta apresentada como confiável pode induzir o profissional a tomar uma decisão baseada em informação falsa, comprometendo tanto a credibilidade do agente quanto a qualidade da gestão do portfólio. Esse risco está diretamente relacionado ao RF03, que exige a indicação de fonte, e ao RNF11, que exige explicabilidade das sugestões.
+- **Descrição:** Este risco se refere à possibilidade de o modelo de linguagem utilizado no pipeline de PLN gerar respostas que não estejam fundamentadas nas fontes consultadas, produzindo informações plausíveis mas incorretas sobre os projetos do portfólio — fenômeno conhecido como alucinação. A probabilidade foi estimada em 50% porque a geração de texto por modelos de linguagem de grande porte é suscetível a esse problema em domínios especializados, especialmente quando as fontes disponíveis não cobrem todos os cenários de consulta ou quando a pergunta é ambígua. O risco é especialmente relevante no contexto do MVP, cujas fontes são dados sintéticos com cobertura limitada. O impacto foi classificado como Alto porque uma resposta incorreta apresentada como confiável pode induzir o profissional a tomar uma decisão baseada em informação falsa, comprometendo tanto a credibilidade do agente quanto a qualidade da gestão do portfólio. Esse risco está diretamente relacionado ao RF03, que exige a indicação de fonte, ao RNF11, que exige explicabilidade das sugestões, e ao RNF12, que mede se as fontes sustentam as afirmações das respostas de consulta.
 - **Mitigação:** Adotar a abordagem de Retrieval-Augmented Generation (RAG), ancorando todas as respostas em trechos recuperados das fontes disponíveis antes da geração de texto. Exibir obrigatoriamente a fonte e o trecho de origem em cada resposta, de modo que o usuário possa verificar a informação. Construir casos de teste específicos para avaliar a taxa de respostas fundamentadas versus respostas sem suporte nas fontes.
 - **Contingência:** Caso respostas sem fundamentação sejam identificadas nos testes, adicionar um mecanismo de filtragem que bloqueie a exibição de respostas cuja confiança de recuperação esteja abaixo de um limiar definido. Nesses casos, o agente deve informar ao usuário que não há dados suficientes para uma resposta confiável, conforme previsto no critério de aceitação do RF02.
 
@@ -1012,8 +1034,8 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 - **Situação proposta (TO-BE):** o usuário formula sua solicitação diretamente em linguagem natural, como por exemplo: "qual o status do projeto X?" ou "compare os projetos X e Y em relação a prazo e riscos", e o sistema retorna os indicadores solicitados já filtrados conforme seu nível de permissão, acompanhados da fonte e da data de apuração de cada dado. Quando a solicitação for ambígua, o sistema solicita esclarecimento apenas sobre o dado faltante, preservando o que já foi informado.
 
 - **Indicadores computacionais:**
-  - **Precisão da classificação de intenção:** número de solicitações corretamente classificadas dividido pelo total de solicitações do conjunto de teste. O valor-alvo é de pelo menos 85%, conforme o RNF03.
-  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas dividido pelo total de entidades presentes no conjunto de teste, para a extração de nome do projeto, período de referência e indicador solicitado. O valor-alvo é de pelo menos 85%, na mesma linha da precisão mínima definida para a classificação de intenções no RNF03.
+  - **Qualidade da classificação de intenção:** F1-macro entre as dez classes, com valor-alvo mínimo de 0,85, acompanhado de cobertura mínima de 90% sobre as intenções conhecidas e aceitação indevida máxima de 15% para `fora_do_catalogo`, conforme o RNF03.
+  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas dividido pelo total de entidades presentes no conjunto de teste, para a extração de nome do projeto, período de referência e indicador solicitado. O valor-alvo é de pelo menos 85%; essa métrica pertence à extração e não substitui o F1-macro definido para a classificação no RNF03.
   - **Taxa de correspondência entre entidade e registro:** número de consultas em que a entidade extraída foi associada ao registro correto dividido pelo total de consultas do conjunto de teste. O valor-alvo é de pelo menos 90%, por se tratar de uma correspondência determinística executada após a extração.
 
 ### Fluxo de negócio 2: Apoio proativo ao preenchimento e acompanhamento de pendências
@@ -1023,9 +1045,9 @@ Essa transformação depende de duas capacidades transversais, exigidas por ambo
 - **Situação proposta (TO-BE):** o sistema sugere textos para os campos pendentes a partir da interação com o usuário, mantendo o controle humano sobre o que é efetivamente registrado, e notifica proativamente o PMO sobre marcos, riscos e pendências conforme filtros configurados, sem repetir alertas já enviados.
 
 - **Indicadores computacionais:**
-  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas da fala ou do texto dividido pelo total de entidades presentes nas interações do conjunto de teste, para a extração do campo e do conteúdo sugerido. O valor-alvo é de pelo menos 85%, na mesma linha do RNF03.
+  - **Taxa de acerto na extração de entidades:** número de entidades corretamente extraídas da fala ou do texto dividido pelo total de entidades presentes nas interações do conjunto de teste, para a extração do campo e do conteúdo sugerido. O valor-alvo é de pelo menos 85%; essa métrica é avaliada separadamente da classificação do RNF03.
   - **Precisão na detecção de alertas:** número de marcos, riscos e pendências corretamente identificados como elegíveis dividido pelo total de alertas gerados. O valor-alvo é de pelo menos 90%, por se tratar de uma verificação baseada em regras de prazo e status já estruturados; os filtros que comporão o conjunto de teste serão definidos na Sprint 3.
-  - **Taxa de erro de palavras (Word Error Rate — WER):** soma de substituições, inserções e exclusões dividida pelo total de palavras do áudio de referência. O valor-alvo é de no máximo 15%, equivalente à taxa mínima de 85% de palavras reconhecidas corretamente definida no RNF06.
+  - **Taxa de erro de palavras (Word Error Rate — WER):** soma de substituições, inserções e exclusões dividida pelo total de palavras do áudio de referência. A métrica adotada pelo RNF06 é WER de no máximo 15%; ela não é tratada como complemento exato de uma taxa de palavras corretas, pois inclui inserções e pode ultrapassar 100%.
 
 ---
 
@@ -1426,7 +1448,7 @@ A inclusão do terceiro ramo, com o fluxo bem-sucedido, é intencional, ainda qu
 | Caso crítico | Completa o cenário | RFs | RNFs | Riscos | Seções relacionadas |
 |---|---|---|---|---|---|
 | Caso crítico 1 | Cenário 2 (seção 2.2.2) | RF02 | RNF08, RNF09 | AM2 | 3.1 (catálogo de intenções e delimitação central) |
-| Caso crítico 2 | Cenário 1 (seção 2.2.2) | RF02, RF03 | RNF01, RNF02, RNF07, RNF08, RNF09, RNF11 | AM8 | 3.3 (algoritmo de NLP), 3.6 (modelagem dos dados) |
+| Caso crítico 2 | Cenário 1 (seção 2.2.2) | RF02, RF03 | RNF01, RNF02, RNF07, RNF08, RNF09, RNF11, RNF12 | AM8 | 3.3 (algoritmo de NLP), 3.6 (modelagem dos dados) |
 
 ### 2.2.4. Rastreabilidade entre requisitos, cenários e classes
 
@@ -1475,7 +1497,7 @@ O **RF06 não recebeu diagrama de sequência próprio** porque possui prioridade
 
  Os **cenários representam apenas o fluxo principal**. A cláusula do RF02 que determina informar a limitação ao usuário quando a solicitação não corresponder a nenhuma consulta prevista não está representada graficamente, assim como não estão os tratamentos de falha de transcrição ou de indisponibilidade das fontes. A opção por diagramas de caminho feliz privilegia a legibilidade nesta primeira especificação, e os desvios entram na sprint seguinte.
 
- Registra-se ainda que a automensagem `log()` do cenário 1 não decorre de nenhum requisito funcional. Ela sustenta a rastreabilidade das interpretações feitas pelo agente, que é atributo de qualidade e será formalizada como requisito não funcional de auditabilidade na seção 2.3.
+ Registra-se ainda que a automensagem `log()` do cenário 1 não decorre de nenhum requisito funcional. Ela sustenta a rastreabilidade das interpretações feitas pelo agente, formalizada no RNF04, e produz registros submetidos aos controles de auditabilidade do RNF09.
 
 
 ---
@@ -1488,41 +1510,43 @@ Os valores-alvo ainda não acordados estão identificados como **a validar com o
 
 | ID e título                                                | História de usuário                                                                                                                                               | Business Driver relacionado                               | Característica de qualidade        | Critério mensurável e verificável                                                                                                                                                                                                                                                           | Forma de validação ou teste                                                                                                                                     |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **RNF01 — Desempenho das consultas**                       | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações           | Desempenho                         | Pelo menos 80% das consultas textuais devem apresentar uma resposta em até 15 segundos, desconsiderando indisponibilidades dos serviços externos.                                                                                                                                           | Executar conjunto representativo de consultas e medir o tempo de resposta e taxa de sucesso.                                                                    |
-| **RNF02 — Controle de acesso às informações**              | Como diretor, quero que o acesso às informações seja limitado de acordo com o perfil de cada usuário para preservar a confidencialidade dos projetos.              | Confidencialidade e segurança da informação               | Segurança e controle de acesso     | O sistema deve autenticar o usuário e validar suas permissões antes de responder às consultas. Nos testes de autorização, pelo menos 80% das tentativas de acesso a informações não permitidas devem ser bloqueadas em até 15 segundos.                                                     | Executar testes de autorização com diferentes perfis e verificar bloqueio de acessos não autorizados dentro do tempo limite.                                    |
-| **RNF03 — Precisão na identificação de intenções**         | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas                   | Precisão e confiabilidade          | O componente de processamento de linguagem natural deve atingir precisão mínima de 85% na classificação das intenções em um conjunto de testes previamente validado pela equipe e pelo parceiro.                                                                                            | Avaliar o classificador em conjunto de teste rotulado, separado dos dados de treinamento.                                                                       |
-| **RNF04 — Rastreabilidade das consultas**                  | Como responsável pela gestão dos projetos, quero que as consultas e respostas sejam registradas para permitir a auditoria das informações fornecidas pelo agente. | Rastreabilidade e transparência                           | Auditabilidade e rastreabilidade   | O sistema deve registrar o identificador do usuário, a data e hora, o canal utilizado, a intenção identificada, as fontes consultadas e o resultado da solicitação. Os registros devem ser protegidos contra alterações por usuários comuns.                                                | Verificar se todos os elementos obrigatórios estão presentes nos logs de auditoria e se são imutáveis.                                                          |
-| **RNF05 — Interoperabilidade entre aplicações clientes**   | Como usuário, quero acessar o agente a partir de diferentes aplicações para consultar os projetos pelo ponto de acesso mais adequado à minha rotina.              | Interoperabilidade e acessibilidade                       | Flexibilidade e integração         | O núcleo do agente deve expor suas funcionalidades por meio de interfaces padronizadas, permitindo que pelo menos duas aplicações clientes distintas o consumam sem duplicação das regras de negócio.                                                                                       | Acionar as funcionalidades principais a partir de duas aplicações clientes distintas e verificar que o resultado é idêntico nas duas.                           |
-| **RNF06 — Qualidade da transcrição de áudio**              | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural     | Acurácia em reconhecimento de fala | O componente de conversão de áudio em texto deve alcançar uma taxa mínima de 85% de palavras reconhecidas corretamente em um conjunto de áudios representativo do contexto do projeto.                                                                                                     | Testar com áudios do vocabulário de projetos e medir a taxa de erro de palavras (WER) contra transcrições de referência.                                        |
-| **RNF07 — Disponibilidade da solução**                     | Como usuário, quero que o agente esteja disponível durante o período de trabalho para realizar consultas sempre que necessário.                                   | Continuidade operacional e eficiência                     | Confiabilidade e disponibilidade   | A solução deve apresentar disponibilidade mínima de 99% durante o horário de operação definido pelo parceiro, desconsiderando manutenções previamente comunicadas.                                                                                                                          | Monitorar uptime da aplicação e infraestrutura durante período de operação.                                                                                     |
+| **RNF01 — Desempenho das consultas**                       | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações           | Desempenho                         | Pelo menos 80% das consultas textuais elegíveis devem apresentar resposta completa em até 15 segundos, e 100% devem terminar com resposta ou erro controlado em até 60 segundos, desconsiderando somente indisponibilidades externas comprovadas.                                                                                                            | Executar conjunto representativo de consultas, medir taxa de sucesso e tempos de resposta e verificar simultaneamente o limite principal e o teto da cauda.      |
+| **RNF02 — Autenticação dos usuários**                      | Como usuário do agente, quero acessar a solução por uma identidade autenticada para impedir o uso das funcionalidades por pessoas não identificadas.               | Confidencialidade e segurança da informação               | Segurança e autenticidade          | Todas as funcionalidades protegidas devem exigir sessão ou token válido emitido por um provedor SSO. Nos testes, 100% das solicitações sem credencial, com credencial malformada, expirada, com assinatura inválida ou audiência incorreta devem ser rejeitadas com HTTP 401 antes da execução da regra de negócio. O provedor poderá ser Microsoft ou Google e sua escolha não altera o contrato do teste. | Executar cada endpoint protegido com credencial válida e com as cinco condições inválidas, verificando autenticação, resposta 401, interrupção antes da regra de negócio e ausência de credenciais nos registros. |
+| **RNF03 — Qualidade da classificação de intenções**        | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas                   | Correção e confiabilidade          | Em conjunto de teste cego e equilibrado, o classificador deve atingir F1-macro mínimo de 0,85 entre as dez intenções, cobertura mínima de 90% sobre as nove intenções conhecidas e taxa máxima de 15% de aceitação indevida dos exemplos `fora_do_catalogo`. A cobertura corresponde à proporção de exemplos conhecidos que não são encaminhados à rejeição pelo limiar de confiança. | Avaliar o modelo e o limiar congelados sobre conjunto rotulado que nunca participou de treinamento, seleção de pré-processamento, calibração ou ajuste.           |
+| **RNF04 — Rastreabilidade das consultas**                  | Como responsável pela gestão dos projetos, quero que cada solicitação possa ser relacionada às etapas e informações que produziram sua resposta.                  | Rastreabilidade e transparência                           | Rastreabilidade                    | Cada interação deve possuir identificador único e permitir relacionar o usuário autenticado, a data e hora, o canal, a solicitação, a intenção identificada, as fontes consultadas, a resposta ou resultado, o tempo de processamento, o feedback e eventual erro. No modelo planejado, `interacao.id` identifica a interação, `resultado` registra a resposta ou resultado e `interacao_artefato` relaciona as fontes. | Executar interações de texto e voz, consultar seus registros pelo identificador e verificar a presença e o relacionamento de todos os elementos aplicáveis.       |
+| **RNF05 — Interoperabilidade entre aplicações clientes**   | Como usuário, quero acessar o agente a partir de diferentes aplicações para consultar os projetos pelo ponto de acesso mais adequado à minha rotina.              | Interoperabilidade e acessibilidade                       | Flexibilidade e integração         | O núcleo do agente deve expor suas funcionalidades por meio de interfaces padronizadas, permitindo que pelo menos duas aplicações clientes distintas o consumam sem duplicação das regras de negócio e com equivalência de contrato e resultado de negócio.                                                                                              | Acionar as funcionalidades principais pela interface React e por um cliente Python independente e comparar status HTTP, esquema, intenção, fontes, dados estruturados e categorias de erro, sem exigir redação textual idêntica. |
+| **RNF06 — Qualidade da transcrição de áudio**              | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural     | Qualidade do reconhecimento de fala | O componente de conversão de áudio em texto deve apresentar WER geral de no máximo 15% em um conjunto de áudios representativo do contexto do projeto.                                                                                                                                      | Testar com áudios do vocabulário de projetos e calcular substituições, exclusões e inserções contra transcrições de referência.                                  |
+| **RNF07 — Disponibilidade da solução**                     | Como usuário, quero que o agente permaneça disponível durante uma sessão de trabalho para realizar consultas quando necessário.                                   | Continuidade operacional e eficiência                     | Confiabilidade e disponibilidade   | No ambiente acadêmico, a solução deve apresentar disponibilidade mínima de 99% durante uma janela contínua de quatro horas, desconsiderando manutenções previamente comunicadas. Uma verificação é bem-sucedida quando `GET /health` responde HTTP 200 em até dois segundos, indicando disponibilidade da aplicação e do banco de dados; provedores externos são monitorados separadamente. | Consultar o endpoint de saúde uma vez por minuto durante a sessão de quatro horas e calcular a proporção de verificações bem-sucedidas entre as verificações elegíveis. |
 | **RNF08 — Usabilidade das respostas**                      | Como usuário, quero receber respostas claras e organizadas para compreender rapidamente a situação dos projetos, independentemente do meu conhecimento técnico.   | Transparência e apoio à tomada de decisão                 | Usabilidade e compreensibilidade   | Em testes com representantes das personas, pelo menos 80% dos participantes devem compreender a resposta e identificar a informação solicitada sem auxílio externo.                                                                                                                         | Conduzir testes de usabilidade com representantes das personas e validar compreensão.                                                                           |
-| **RNF09 — Auditabilidade das interações**  | Como responsável pela gestão e governança da solução, quero consultar registros das interações realizadas pelo agente para acompanhar seu funcionamento, investigar falhas e verificar a origem das respostas apresentadas. | Rastreabilidade e transparência | Auditabilidade | O sistema deve registrar eventos relevantes das interações realizadas com o agente, permitindo rastrear consultas, respostas, fontes utilizadas, solicitações de esclarecimento, notificações e falhas ocorridas durante o processamento. Os registros mínimos são: identificador único do evento, data e horário, tipo de interação, canal utilizado, requisito ou operação executada, resultado da operação, fonte consultada (quando aplicável), código ou categoria do erro (quando aplicável), identificador técnico do usuário (respeitando as regras de privacidade e acesso) e tempo de processamento. **Validação necessária pela equipe:** definir o período de retenção dos registros de auditoria e os perfis autorizados a consultá-los. | (1) Dado que uma consulta seja processada, quando o processamento for finalizado, então o sistema deve registrar a data, o canal, a operação e as fontes utilizadas. (2) Dado que ocorra uma falha, quando o erro for tratado, então o sistema deve registrar a categoria do erro sem armazenar senhas, tokens ou dados sensíveis. (3) Dado que um usuário sem permissão tente acessar os registros, quando a solicitação for realizada, então o sistema deve negar o acesso. Forma de verificação: inspeção dos registros gerados, testes de acesso autorizado e não autorizado, verificação da ausência de dados sensíveis. |
-| **RNF10 — Escalabilidade do agente**                       | Como administrador da solução, quero que o agente seja capaz de processar aumentos de volume de consultas e dados sem degradação significativa de desempenho.     | Continuidade operacional e sustentabilidade técnica       | Escalabilidade e performance       | O agente deve suportar aumento de até 10x no volume de consultas simultâneas mantendo a latência em até 20 segundos para 95% das requisições; o pipeline deve processar datasets sinteticamente maiores sem aumento proporcional de memória.                                                | Realizar testes de carga progressivos, aumentando gradualmente o volume de consultas e medir latência, throughput e uso de recursos.                            |
-| **RNF11 — Explicabilidade das sugestões de preenchimento** | Como responsável por documentos, quero compreender as razões pelas quais o agente sugeriu determinados valores ou conteúdos.                                      | Transparência e confiabilidade dos dados sugeridos        | Explicabilidade e rastreabilidade  | Cada sugestão de preenchimento deve indicar explicitamente a fonte dos dados utilizados e o raciocínio por trás da sugestão; pelo menos 85% das sugestões devem ser acompanhadas de referências válidas e justificativa compreensível.                                                      | Verificar que todas as sugestões apresentadas incluem fontes identificáveis e justificativas claras; validar compreensão junto aos usuários.                    |
+| **RNF09 — Auditabilidade das interações**                  | Como responsável pela gestão e governança da solução, quero consultar registros das interações realizadas pelo agente para acompanhar seu funcionamento e investigar falhas. | Governança, segurança e transparência | Auditabilidade | Os registros de auditoria devem ser consultáveis no banco ou na camada de serviço apenas por acesso administrativo, permanecer protegidos contra alteração e exclusão e ser mantidos por no mínimo 90 dias, tornando-se elegíveis para expurgo após esse prazo. Somente o feedback pode receber atualização controlada. Senhas, tokens e outros segredos não podem ser armazenados. Se o mecanismo principal de auditoria falhar, a solução deve produzir registro técnico alternativo ou manter o evento em buffer, emitir alerta e tentar persistir novamente, sem necessariamente interromper a solicitação do usuário. | Inspecionar registros e prazo de retenção; testar acesso administrativo e comum, tentativas de alteração e exclusão, atualização de feedback, ausência de segredos e indisponibilidade controlada do mecanismo de auditoria. |
+| **RNF10 — Escalabilidade do agente**                       | Como administrador da solução, quero que o agente seja capaz de processar aumentos de volume de consultas e dados sem degradação significativa de desempenho.     | Continuidade operacional e sustentabilidade técnica       | Escalabilidade e performance       | Sob dependências externas controladas, o agente deve suportar aumento de `1x` para `10x` na concorrência, mantendo p95 em até 20 segundos e em no máximo duas vezes o p95 da linha de base. Com dataset `10x`, o pico de memória do treinamento deve ser no máximo `8x` o observado em `1x`, e tanto a memória estabilizada quanto o pico de inferência do processo servido devem ser no máximo `2x` as respectivas linhas de base. | Executar baseline e carga progressiva com as mesmas dependências controladas e medir latência, throughput, erros, memória de treinamento e memória estabilizada e de pico do processo servido. |
+| **RNF11 — Explicabilidade das sugestões de preenchimento** | Como responsável por documentos, quero compreender as razões pelas quais o agente sugeriu determinados valores ou conteúdos.                                      | Transparência e confiabilidade dos dados sugeridos        | Explicabilidade e rastreabilidade  | Cada sugestão de preenchimento deve indicar explicitamente uma fonte existente que sustente seu conteúdo e apresentar ao usuário uma justificativa curta e compreensível; pelo menos 85% das sugestões devem atender simultaneamente a essas condições.                                                                                                  | Avaliar sugestões contra fontes de referência conhecidas e verificar a validade da fonte, sua relação com o conteúdo sugerido e a clareza da justificativa.      |
+| **RNF12 — Fundamentação das respostas de consulta**        | Como usuário do agente, quero que as afirmações apresentadas nas respostas sejam sustentadas pelas fontes indicadas para não tomar decisões com base em conteúdo inventado ou incompatível com os documentos. | Confiabilidade e apoio à tomada de decisão | Correção factual e fundamentação | Em uma amostra de respostas do RF02, 100% das referências apresentadas devem existir e ser recuperáveis e pelo menos 90% das afirmações factuais atômicas devem ser diretamente sustentadas pelas fontes citadas. Quando não houver evidência suficiente, 100% das respostas devem informar a limitação sem produzir afirmação factual não sustentada. | Decompor as respostas em afirmações factuais, comparar cada uma com as fontes de referência por avaliação independente e testar também consultas sem evidência suficiente. |
 
 ### Tabela de rastreabilidade entre requisitos não funcionais e funcionais
 
 | RNF                                            | RF relacionado         | Relação de rastreabilidade                                                                                                |
 | ---------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | RNF01 — Desempenho das consultas               | RF02                               | Qualifica o tempo de resposta das consultas de dados de projetos, sem alterar o comportamento especificado no requisito.                                                                                       |
-| RNF02 — Controle de acesso às informações      | RF02, RF03, RF04, RF05, RF06       | Assegura que consultas, indicações de fonte, sugestões, notificações e alterações de cadastro respeitem o alcance de cada perfil, materializado nas associações `supervisiona`, `administra` e `lidera`.       |
-| RNF03 — Precisão na identificação de intenções | RF02, RF04, RF06                   | Mede a qualidade da classificação executada pelo `: Intencao` nos cenários 1 e 2, que é o passo comum aos requisitos iniciados por linguagem natural.                                                          |
-| RNF04 — Rastreabilidade das consultas          | RF01, RF02, RF03, RF04, RF05, RF06 | Mede o registro e a imutabilidade da auditoria de todas as interações, comportamento representado pela automensagem `log()` do cenário 1.                                                                      |
-| RNF05 — Interoperabilidade entre aplicações clientes | RF01, RF02, RF04, RF05       | Assegura que as funcionalidades operem de maneira idêntica em qualquer aplicação que consuma o agente. Trata do ponto de acesso, enquanto o RF01 define as modalidades de entrada e estabelece a resposta em formato textual.                 |
+| RNF02 — Autenticação dos usuários              | RF01, RF02, RF03, RF04, RF05, RF06 | Assegura que as funcionalidades protegidas somente sejam executadas após a validação da identidade por SSO, sem estabelecer autorização ou diferença de acesso por cargo. |
+| RNF03 — Qualidade da classificação de intenções | RF02, RF04, RF06                  | Mede pelo F1-macro, pela cobertura das intenções conhecidas e pela rejeição de `fora_do_catalogo` a classificação executada pelo `: Intencao` nos cenários 1 e 2.                                               |
+| RNF04 — Rastreabilidade das consultas          | RF01, RF02, RF03, RF04, RF05, RF06 | Permite correlacionar cada solicitação às etapas, fontes e ao resultado que produziram a resposta, comportamento representado pela automensagem `log()` do cenário 1.                                           |
+| RNF05 — Interoperabilidade entre aplicações clientes | RF01, RF02, RF04, RF05       | Assegura equivalência do contrato e do resultado de negócio em qualquer aplicação que consuma o agente. Trata do ponto de acesso, enquanto o RF01 define as modalidades de entrada e estabelece a resposta em formato textual. |
 | RNF06 — Qualidade da transcrição de áudio      | RF01                               | Qualifica a conversão de áudio em texto executada pelo `: ServicoDeVoz` no cenário 1, da qual dependem todas as solicitações formuladas por voz.                                                               |
 | RNF07 — Disponibilidade da solução             | RF01, RF02, RF03, RF04, RF05, RF06 | Assegura que o agente esteja disponível durante o horário de operação, condição para a execução de qualquer requisito funcional.                                                                               |
 | RNF08 — Usabilidade das respostas              | RF02, RF03                         | Mede a clareza e a compreensibilidade da resposta e da indicação de fonte devolvidas ao final do cenário 1.                                                                                                    |
-| RNF09 — Auditabilidade das interações          | RF01, RF02, RF03, RF04, RF05 | Registra eventos de todas as interações com o agente, cobrindo consultas (RF01, RF02, RF03), sugestões de preenchimento (RF04) e notificações proativas (RF05), permitindo rastreabilidade e investigação de falhas. Complementa o RNF04, detalhando os atributos mínimos de cada evento registrado.                                                                              |
+| RNF09 — Auditabilidade das interações          | RF01, RF02, RF03, RF04, RF05 | Protege, retém e restringe a consulta dos registros produzidos pelos fluxos funcionais, permitindo sua inspeção administrativa e a investigação de falhas. Complementa o RNF04 sem repetir a correlação automática das etapas da interação. |
 | RNF10 — Escalabilidade do agente               | RF02, RF04                         | Qualifica a capacidade de manter desempenho sob aumento de volume nos dois requisitos que percorrem o portfólio inteiro.                                                                                       |
 | RNF11 — Explicabilidade das sugestões          | RF03, RF04                         | Mede a clareza e a rastreabilidade das fontes e justificativas das sugestões de preenchimento, estendendo ao RF04 a exigência de indicação de origem que o RF03 estabelece para as respostas de consulta.      |
+| RNF12 — Fundamentação das respostas de consulta | RF02, RF03                        | Mede se as fontes apresentadas existem e sustentam as afirmações factuais da resposta, complementando a presença de referência exigida pelo RF03 e tratando diretamente o risco AM8.                            |
 
 ### Relação dos requisitos não funcionais com os Business Drivers
 
 Os requisitos não funcionais foram definidos a partir dos Business Drivers do projeto, considerando as características de qualidade necessárias para que o agente ofereça informações confiáveis, seguras e acessíveis aos usuários do Metrô de São Paulo.
 
-Os requisitos de desempenho (RNF01) e disponibilidade (RNF07) contribuem para a **eficiência e agilidade no acesso às informações**, permitindo que os profissionais obtenham respostas rapidamente sem comprometer a tomada de decisão. O controle de acesso (RNF02) e a proteção de dados preservam a **confidencialidade e segurança da informação**, respeitando o perfil de cada usuário e as exigências legais aplicáveis. A rastreabilidade (RNF04) permite **transparência e auditoria** das consultas e respostas.
+Os requisitos de desempenho (RNF01) e disponibilidade (RNF07) contribuem para a **eficiência e agilidade no acesso às informações**, permitindo que os profissionais obtenham respostas rapidamente sem comprometer a tomada de decisão. A autenticação por SSO (RNF02) e a proteção dos registros preservam a **confidencialidade e segurança da informação**, sem introduzir diferenças de acesso por cargo. A rastreabilidade (RNF04) permite correlacionar a solicitação, o processamento, as fontes e o resultado de cada interação.
 
-A precisão na identificação de intenções (RNF03) garante a **confiabilidade no acesso e tratamento das informações**, assegurando que solicitações em linguagem natural sejam interpretadas corretamente. A auditabilidade das interações (RNF09) complementa a rastreabilidade (RNF04), estabelecendo os atributos mínimos de cada evento registrado, de modo que seja possível investigar falhas, verificar a origem das respostas e controlar o acesso aos registros. A qualidade da transcrição de áudio (RNF06) e a interoperabilidade entre aplicações clientes (RNF05) oferecem **acessibilidade e flexibilidade**. A usabilidade (RNF08) e explicabilidade (RNF11) garantem que as respostas apoiem a **tomada de decisão** de forma clara. A escalabilidade (RNF10) contribui para a **continuidade operacional**, permitindo que o agente processe aumentos de volume sem degradação.
+A qualidade da classificação de intenções (RNF03) garante a **confiabilidade no acesso e tratamento das informações**, assegurando que solicitações em linguagem natural sejam interpretadas corretamente ou rejeitadas quando a confiança for insuficiente. A auditabilidade das interações (RNF09) complementa a rastreabilidade (RNF04) ao proteger, reter e restringir a consulta dos registros para que possam ser inspecionados administrativamente e usados na investigação de falhas. Essa separação segue a distinção entre trilhas de uma solicitação e controles sobre registros adotada nas referências de observabilidade e segurança (OPENTELEMETRY, 2026; OWASP, 2026; NIST, 2024). A qualidade da transcrição de áudio (RNF06) e a interoperabilidade entre aplicações clientes (RNF05) oferecem **acessibilidade e flexibilidade**. A usabilidade (RNF08), a explicabilidade das sugestões (RNF11) e a fundamentação das respostas de consulta (RNF12) garantem que a solução apoie a **tomada de decisão** de forma clara e baseada nas fontes. A escalabilidade (RNF10) contribui para a **continuidade operacional**, permitindo que o agente processe aumentos de volume sem degradação.
 
 ## 2.4 Visão Inicial da Solução Técnica
 
@@ -1552,10 +1576,10 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 | Armazenamento do áudio | Não representado — o áudio parecia trafegar direto entre componentes | Componente próprio na camada de dados, com chave `incoming/{audio_id}` e retenção de sete dias |
 | Acoplamento recebimento ↔ transcrição | Chamada direta entre os dois | Nenhuma chamada direta: o vínculo é o identificador e o armazenamento compartilhado |
 | Acesso ao armazenamento | Inexistente | Encapsulado pelo SDK boto3, isolando a aplicação da API do provedor |
-| Controle de Acesso | No caminho de todas as solicitações, como se estivesse implementado | Em traço interrompido e fora do caminho de execução, sinalizando decisão pendente |
+| Autenticação SSO, rotulada inicialmente como Controle de Acesso | No caminho de todas as solicitações, como se estivesse implementada | Em traço interrompido e fora do caminho de execução, sinalizando implementação pendente |
 | Modelo de linguagem | Ausente do diagrama | Agrupamento «Serviços de Terceiros», tornando visível a dependência externa e o risco AM8 |
 
- Os dois últimos ajustes seguem o mesmo princípio, aplicado em direções opostas: o diagrama deve mostrar aquilo de que a solução depende e não deve mostrar como pronto aquilo que ainda não existe. O Controle de Acesso saiu do caminho de execução porque não está implementado; o modelo de linguagem entrou porque, embora a equipe não o construa, o fluxo de geração de respostas depende dele.
+ Os dois últimos ajustes seguem o mesmo princípio, aplicado em direções opostas: o diagrama deve mostrar aquilo de que a solução depende e não deve mostrar como pronto aquilo que ainda não existe. A autenticação SSO saiu do caminho de execução porque não está implementada; o modelo de linguagem entrou porque, embora a equipe não o construa, o fluxo de geração de respostas depende dele.
 
 ### Versão atual do diagrama de componentes
 
@@ -1572,9 +1596,9 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 | Camada | Componentes | Responsabilidade |
 |---|---|---|
 | **Interface (IHC)** | Chat UI - Texto e Voz | Recebe a solicitação do usuário nos dois canais previstos pelo RF01 e exibe a resposta estruturada ao final do processamento. Nas entradas por voz, é ela quem envia o arquivo à API de Recebimento de Áudio e quem recebe de volta o identificador da gravação. |
-| **Lógica de negócio** | API de Recebimento de Áudio, SDK boto3, Conversão de Áudio em Texto, API Gateway, Controle de Acesso, PLN — Compreensão (Intenção e Parâmetros), PLN — Transações e Ações, Gerador de Respostas e Explicabilidade, Auditoria e Feedback | A API de Recebimento de Áudio é a porta de entrada do canal de voz: valida presença, tamanho, formato e duração do arquivo, delega a gravação ao SDK boto3 e devolve um `audio_id` (RF01 e RNF06). Ela não transcreve. O SDK boto3 encapsula o acesso ao armazenamento compatível com S3, isolando o restante da aplicação da API do provedor. A Conversão de Áudio em Texto recupera o áudio pelo identificador e devolve a transcrição. O API Gateway centraliza a entrada das solicitações em texto. O componente PLN — Compreensão identifica a intenção e extrai os parâmetros (RNF03), direcionando solicitações de preenchimento ao componente PLN — Transações e Ações (RF04 e RF06), alertas ao mesmo componente (RF05) e consultas ao Gerador de Respostas (RF02). O Gerador de Respostas monta a saída final e informa as fontes (RF03), além da justificativa quando aplicável (RNF11). Auditoria e Feedback registra os elementos definidos no RNF04 e captura a avaliação do usuário. O Controle de Acesso permanece no diagrama como decisão arquitetural registrada para o RNF02, mas aparece em traço interrompido porque não está implementado no MVP. |
-| **Dados e serviços** | Armazenamento de Áudios, Repositório de Dados e Conhecimento, Logs de Auditoria | O Armazenamento de Áudios guarda as gravações recebidas em um bucket compatível com S3 (MinIO no ambiente local), sob a chave `incoming/{audio_id}`, e é o ponto de contato entre o recebimento e a transcrição: um grava, o outro lê. Os objetos em `incoming/` expiram automaticamente após sete dias, de modo que o áudio bruto não se acumula além do necessário. O Repositório de Dados e Conhecimento reúne os dados sintéticos estruturados do portfólio, o catálogo de intenções e a base de normativos empregados nas consultas (RF02), na indicação de fontes (RF03), nas sugestões (RF04 e RF06) e nos alertas (RF05). Os Logs de Auditoria armazenam separadamente os registros de interação e feedback protegidos contra alteração por usuários comuns (RNF04), pois possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais. |
-| **Serviços de terceiros** | Serviços de LLMs | Modelo de linguagem consumido pelo Gerador de Respostas para compor respostas fundamentadas nas fontes recuperadas (RF03 e RNF11). A equipe não implementa nem hospeda esse componente: define apenas o contrato de consumo. Sua presença no diagrama registra a dependência externa e é onde se materializa o risco AM8. |
+| **Lógica de negócio** | API de Recebimento de Áudio, SDK boto3, Conversão de Áudio em Texto, API Gateway, Autenticação SSO, PLN — Compreensão (Intenção e Parâmetros), PLN — Transações e Ações, Gerador de Respostas e Explicabilidade, Auditoria e Feedback | A API de Recebimento de Áudio é a porta de entrada do canal de voz: valida presença, tamanho, formato e duração do arquivo, delega a gravação ao SDK boto3 e devolve um `audio_id` (RF01 e RNF06). Ela não transcreve. O SDK boto3 encapsula o acesso ao armazenamento compatível com S3, isolando o restante da aplicação da API do provedor. A Conversão de Áudio em Texto recupera o áudio pelo identificador e devolve a transcrição. O API Gateway centraliza a entrada das solicitações em texto. O componente PLN — Compreensão identifica a intenção e extrai os parâmetros (RNF03), direcionando solicitações de preenchimento ao componente PLN — Transações e Ações (RF04 e RF06), alertas ao mesmo componente (RF05) e consultas ao Gerador de Respostas (RF02). O Gerador de Respostas monta a saída final e informa as fontes (RF03), além da justificativa quando aplicável (RNF11). Auditoria e Feedback registra os elementos definidos no RNF04 e captura a avaliação do usuário. A Autenticação SSO valida a identidade conforme o RNF02, sem autorização por cargo, e aparece em traço interrompido porque ainda não está implementada. |
+| **Dados e serviços** | Armazenamento de Áudios, Repositório de Dados e Conhecimento, Logs de Auditoria | O Armazenamento de Áudios guarda as gravações recebidas em um bucket compatível com S3 (MinIO no ambiente local), sob a chave `incoming/{audio_id}`, e é o ponto de contato entre o recebimento e a transcrição: um grava, o outro lê. Os objetos em `incoming/` expiram automaticamente após sete dias, de modo que o áudio bruto não se acumula além do necessário. O Repositório de Dados e Conhecimento reúne os dados sintéticos estruturados do portfólio, o catálogo de intenções e a base de normativos empregados nas consultas (RF02), na indicação de fontes (RF03), nas sugestões (RF04 e RF06) e nos alertas (RF05). Os Logs de Auditoria armazenam separadamente os registros de interação e feedback correlacionados pelo RNF04 e protegidos conforme o RNF09, pois possuem padrão de escrita e controles distintos dos dados operacionais. |
+| **Serviços de terceiros** | Serviços de LLMs | Modelo de linguagem consumido pelo Gerador de Respostas para compor respostas fundamentadas nas fontes recuperadas (RF03, RNF11 e RNF12). A equipe não implementa nem hospeda esse componente: define apenas o contrato de consumo. Sua presença no diagrama registra a dependência externa e é onde se materializa o risco AM8. |
 
 ### Conexões entre componentes
 
@@ -1588,7 +1612,7 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 | Conversão de Áudio em Texto → Chat UI | Retorno da chamada | Devolve o texto transcrito para conferência do usuário antes do processamento, conforme o RF01. |
 | Conversão de Áudio em Texto → PLN — Compreensão | Chamada interna | Encaminha a transcrição para o mesmo tratamento aplicado às entradas digitadas. |
 | Chat UI → API Gateway | HTTPS/REST | Envia as solicitações digitadas, sem passar pelo canal de voz. |
-| API Gateway → Controle de Acesso | Chamada interna (previsto) | Autenticação e autorização das solicitações (RNF02). Conexão registrada como decisão arquitetural; não existe no MVP. |
+| API Gateway → Autenticação SSO | Chamada interna (previsto) | Validação da identidade antes do processamento das solicitações (RNF02), sem autorização por cargo. Conexão registrada como decisão arquitetural; não existe no MVP. |
 | API Gateway → PLN — Compreensão | Chamada interna | Encaminha a solicitação em texto para classificação de intenção e extração de parâmetros. |
 | PLN — Compreensão → PLN — Transações e Ações | Chamada interna | Direciona intenções de sugestão e alerta para suas regras de negócio. |
 | PLN — Compreensão → Gerador de Respostas | Chamada interna | Direciona consultas reconhecidas para composição da resposta. |
@@ -1608,7 +1632,7 @@ A precisão na identificação de intenções (RNF03) garante a **confiabilidade
 
  O diagrama passou por uma revisão relevante entre a primeira versão da arquitetura e a implementação da API de recebimento de áudio. As duas versões estão reproduzidas nesta seção — a Imagem 2.4.1, anterior à implementação, e a Imagem 2.4.2, em vigor — e os seis ajustes que as separam estão registrados na tabela da subseção *Ajustes feitos após a implementação da API de recebimento de áudio*. A versão anterior é mantida no documento deliberadamente, como referência para acompanhar o desenvolvimento do projeto.
 
- A comparação registra uma lição de projeto que vale além deste artefato: a primeira versão descrevia a arquitetura pretendida, e a segunda descreve a arquitetura construída. A diferença entre as duas apareceu durante a implementação, quando ficou claro que separar recebimento de transcrição simplificava as duas responsabilidades — e que o diagrama anterior sugeria como pronto um controle de acesso que ainda não existia.
+ A comparação registra uma lição de projeto que vale além deste artefato: a primeira versão descrevia a arquitetura pretendida, e a segunda descreve a arquitetura construída. A diferença entre as duas apareceu durante a implementação, quando ficou claro que separar recebimento de transcrição simplificava as duas responsabilidades — e que o diagrama anterior sugeria como pronta uma autenticação que ainda não existia.
 
  A consolidação desses componentes em uma visão de projeto arquitetural, acompanhada dos diagramas de classes e de sequência revisados na Sprint 2, está na Seção 3.9.
 
@@ -1648,7 +1672,7 @@ O pipeline de classificação de intenções utiliza **scikit-learn**, com o alg
 
 ### Dados, arquivos e recuperação de informação
 
-O **PostgreSQL** foi selecionado como banco de dados relacional do MVP. Sua modelagem conceitual, lógica e física foi concluída nesta sprint, incluindo o dicionário de dados e a definição em SQL apresentados na seção 3.6. O provisionamento e a integração do banco à aplicação ocorrerão em etapa posterior. O banco deverá armazenar dados sintéticos do portfólio, usuários e permissões, metadados de documentos, feedbacks, alertas e registros de auditoria.
+O **PostgreSQL** foi selecionado como banco de dados relacional do MVP. Sua modelagem conceitual, lógica e física foi concluída nesta sprint, incluindo o dicionário de dados e a definição em SQL apresentados na seção 3.6. O provisionamento e a integração do banco à aplicação ocorrerão em etapa posterior. O banco deverá armazenar dados sintéticos do portfólio, usuários e perfis profissionais, metadados de documentos, feedbacks, alertas e registros de auditoria.
 
 No ambiente local, os arquivos são armazenados no **MinIO**, serviço compatível com a API S3, acessado pelo backend por meio da biblioteca **Boto3**. O armazenamento de áudios já utiliza essa estrutura. Para a implantação na AWS, está prevista a substituição do MinIO pelo **Amazon S3**, mantendo o contrato S3 e o cliente Boto3; essa utilização depende da disponibilidade do serviço no laboratório da AWS Academy. Para o fluxo futuro de RAG, os documentos sintéticos também serão mantidos no armazenamento de objetos, enquanto seus metadados e vetores serão armazenados no PostgreSQL com a extensão **pgvector**. O modelo `gemini-embedding-001` produzirá os embeddings usados na busca semântica, e o `gemini-3.5-flash-lite` produzirá a resposta com base nos trechos recuperados.
 
@@ -1668,7 +1692,7 @@ O **Docker Compose** executa atualmente o MinIO e mantém seus objetos em um vol
 
 O deploy acadêmico será realizado na **Amazon Web Services**, por meio do ambiente fornecido pela **AWS Academy**. O Amazon EC2 foi confirmado como recurso de computação. Amazon ECR, Amazon S3 e Amazon CloudWatch permanecem planejados, condicionados à disponibilidade no catálogo do laboratório. A forma de hospedagem do PostgreSQL na AWS ainda será definida pelo responsável pelo deploy.
 
-Copilot Studio, Power Automate, Microsoft Teams, SharePoint e Microsoft Entra ID permanecem como possibilidades de integração futura com o ecossistema corporativo do Metrô. Eles não compõem a pilha executável atual do MVP. Durante o desenvolvimento serão utilizados apenas dados, documentos, usuários e permissões sintéticos, sem exposição de dados corporativos reais.
+Copilot Studio, Power Automate, Microsoft Teams, SharePoint e Microsoft Entra ID permanecem como possibilidades de integração futura com o ecossistema corporativo do Metrô. Eles não compõem a pilha executável atual do MVP. Durante o desenvolvimento serão utilizados apenas dados, documentos e identidades sintéticos, sem exposição de dados corporativos reais.
 
 ---
 
@@ -1679,8 +1703,8 @@ A tabela a seguir apresenta a rastreabilidade entre os principais elementos do a
 | Business Driver | Persona principal | Jornada relacionada | RF | RNF relacionado | Diagrama de classe (entidade central) | Diagrama de sequência | Componente arquitetural |
 | --------------- | ----------------- | ------------------- | -- | --------------- | ------------------------------------- | --------------------- | ----------------------- |
 | Eficiência e agilidade no acesso às informações | Robson (Diretor), Maria Eduarda (PMO), Rafael (Líder) | Jornadas 1.5.1, 1.5.2, 1.5.3 | RF01, RF02 | RNF01, RNF06, RNF07 | `Projeto`, `Portfólio`, `Usuário` | Cenário 1 | Chat UI, API Gateway, PLN — Compreensão, Gerador de Respostas |
-| Precisão e confiabilidade das consultas | Robson (Diretor), Maria Eduarda (PMO) | Jornadas 1.5.1, 1.5.2 | RF02, RF03 | RNF03, RNF08, RNF11 | `Projeto`, `Artefato`, `Diretor`, `PMO` | Cenário 1 | PLN — Compreensão, Gerador de Respostas, Repositório de Dados |
-| Confidencialidade e segurança da informação | Todos | Todas | RF02, RF03, RF04, RF05, RF06 | RNF02 | `Usuário`, `Diretor`, `PMO`, `LiderProjeto` | Cenários 1, 2, 3 | Controle de Acesso, API Gateway |
+| Precisão e confiabilidade das consultas | Robson (Diretor), Maria Eduarda (PMO) | Jornadas 1.5.1, 1.5.2 | RF02, RF03 | RNF03, RNF08, RNF12 | `Projeto`, `Artefato`, `Diretor`, `PMO` | Cenário 1 | PLN — Compreensão, Gerador de Respostas, Repositório de Dados |
+| Confidencialidade e segurança da informação | Todos | Todas | RF01, RF02, RF03, RF04, RF05, RF06 | RNF02 | `Usuário` | Cenários 1, 2, 3 | Autenticação por SSO, API Gateway |
 | Rastreabilidade e transparência | Todos | Todas | RF01, RF02, RF03, RF04, RF05 | RNF04, RNF09 | `Usuário` | Cenários 1, 2, 3 (automensagem `log()`) | Auditoria e Feedback, Logs de Auditoria |
 | Proatividade e acompanhamento preventivo | Maria Eduarda (PMO), Rafael (Líder) | Jornadas 1.5.2, 1.5.3 | RF05 | RNF07 | `Pendência`, `Projeto`, `Usuário` | Cenário 3 | PLN — Transações e Ações, Serviço de Notificações, Agendador |
 | Qualidade da entrada de dados | Rafael (Líder), Maria Eduarda (PMO) | Jornadas 1.5.2, 1.5.3 | RF04 | RNF11, RNF03 | `CampoArtefato`, `Artefato`, `LiderProjeto` | Cenário 2 | PLN — Transações e Ações, Gerador de Respostas, Repositório de Dados |
@@ -2048,8 +2072,8 @@ A tabela fecha o vínculo entre esta seção e os demais elementos do projeto, d
 |---|---|
 | RF01 — entrada por texto ou voz | A transcrição é o que permite que a solicitação falada percorra o mesmo pipeline da digitada, sem um segundo classificador |
 | RNF01 — desempenho | O tempo da chamada externa é a maior parcela do tempo de resposta do canal de voz; a política de tempo limite em aberto incide diretamente sobre este requisito |
-| RNF03 — precisão na identificação de intenções | Um erro de transcrição vira um erro de classificação; por isso o `keyterm` cobre o vocabulário que distingue as intenções |
-| RNF04 e RNF09 — auditoria | A coluna `auditoria.interacao.audio_referencia`, definida na Seção 3.6.5, guarda o `audio_id` e liga cada interação por voz ao arquivo original |
+| RNF03 — qualidade da classificação de intenções | Um erro de transcrição vira um erro de classificação; por isso o `keyterm` cobre o vocabulário que distingue as intenções |
+| RNF04 e RNF09 — rastreabilidade e auditoria | A coluna `auditoria.interacao.audio_referencia`, definida na Seção 3.6.5, guarda o `audio_id` e liga cada interação por voz ao arquivo original |
 | RNF06 — acessibilidade | O canal de voz é o mecanismo que atende a este requisito, e o WER medido é a métrica que comprova o atendimento |
 | AM9 — degradação da transcrição em ambiente ruidoso | O risco incide exatamente sobre esta seção e permanece **Aberto**, sem medição, conforme a Seção 4.3.2 do `GestaoProjeto.md` |
 | Seção 2.4 — diagrama de componentes | A Conversão de Áudio em Texto é o componente que encapsula este serviço |
@@ -2058,7 +2082,7 @@ A tabela fecha o vínculo entre esta seção e os demais elementos do projeto, d
 
 ## 3.3 Algoritmo de NLP e Implementação
 
-Esta seção documenta o pipeline de Processamento de Linguagem Natural que classifica a intenção de cada solicitação. Ele é o passo comum a todos os requisitos iniciados por linguagem natural, o `classificarIntencao` que aparece nos cenários 1 e 2 da Seção 3.9, e é sobre ele que incide o RNF03, que exige precisão mínima de 85% na identificação de intenções.
+Esta seção documenta o pipeline de Processamento de Linguagem Natural que classifica a intenção de cada solicitação. Ele é o passo comum a todos os requisitos iniciados por linguagem natural, o `classificarIntencao` que aparece nos cenários 1 e 2 da Seção 3.9, e é sobre ele que incide o RNF03, medido por F1-macro, cobertura das intenções conhecidas e aceitação indevida de exemplos fora do catálogo.
 
 O código está em `src/pln/`.
 
@@ -2091,7 +2115,7 @@ Os demais critérios acompanham a escolha:
 | Volume de dados disponível | Estima uma contagem por termo e classe, sem otimização iterativa que exija muitos exemplos para convergir |
 | Determinismo | Sem sorteio interno nem `random_state`. Duas execuções produzem exatamente o mesmo modelo, o que torna a avaliação reprodutível |
 | RNF11, explicabilidade das sugestões | Expõe peso por termo e por classe, permitindo listar as palavras que sustentaram cada decisão |
-| RNF04 e RNF09, auditabilidade | A intenção identificada e as palavras que a determinaram podem ser registradas no log de cada interação |
+| RNF04 e RNF09, rastreabilidade e auditabilidade | A intenção identificada e as palavras que a determinaram podem ser registradas no log de cada interação |
 | RNF01 e RNF10, desempenho e escalabilidade | Classificação em microssegundos, e a matriz esparsa não cresce em memória proporcionalmente ao corpus |
 
 **Decisão:** o classificador do produto é o mesmo que serve de instrumento de medida no experimento.
@@ -2296,7 +2320,7 @@ FIT_PRIOR_PADRAO  = True
 
 F1-macro de **0,6736** em validação cruzada de 5 dobras. Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
 
-**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que 0,6736 está **17,6 pontos percentuais abaixo dos 85% exigidos pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a Seção 3.8, e as duas frentes são ampliar o dataset e calibrar um limiar de confiança sobre as nove intenções conhecidas.
+**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que o F1-macro de 0,6736 está **17,6 pontos percentuais abaixo do 0,85 exigido pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a Seção 3.8, e as duas frentes são ampliar o dataset e calibrar, somente em dados de desenvolvimento, um limiar de confiança sobre as nove intenções conhecidas. A validação final também deverá atender à cobertura e à aceitação indevida definidas no RNF03.
 
 ### 3.3.7 Bibliotecas utilizadas
 
@@ -2687,7 +2711,6 @@ A tabela confronta cada situação de erro exigida pelo canal de voz com a respo
 | Arquivo corrompido, ou aceito porém ilegível | `422 invalid_audio` | `POST /api/v1/audio` | Implementada |
 | Áudio acima de 5 minutos | `422 audio_too_long` | `POST /api/v1/audio` | Implementada |
 | Usuário não autenticado | `401 unauthorized` | `POST /api/v1/audio` | **Planejada**, não implementada |
-| Usuário autenticado sem permissão sobre o recurso | `403`, código de erro a definir | Controle de Acesso, Seção 2.4 | **Planejada**, não implementada; depende do RNF02 |
 | Áudio inexistente na hora de transcrever | `404 audio_not_found` | `POST /api/v1/audio/{audio_id}/transcribe` | Implementada, Seção 3.2.2 |
 | Serviço de transcrição indisponível | `502 transcription_failed` | `POST /api/v1/audio/{audio_id}/transcribe` | Implementada, Seção 3.2.2 |
 | Tempo limite da transcrição excedido | `502 transcription_failed` | `POST /api/v1/audio/{audio_id}/transcribe` | Coberta pelo tratamento genérico de exceção; o tempo limite explícito é **DECISÃO TÉCNICA EM ABERTO**, Seção 3.2.2 |
@@ -2707,15 +2730,14 @@ A tabela separa os controles vigentes dos previstos. A separação importa porqu
 | Identificador opaco | **Implementado** | O `audio_id` é um UUID em hexadecimal prefixado por `aud_`, sem relação com o nome do arquivo original, que é descartado |
 | Descarte automático do áudio | **Implementado** | Expiração de sete dias no prefixo `incoming/`, conforme a Seção 3.2.5 |
 | Log sem conteúdo sensível | **Implementado** | Nenhuma rota registra o conteúdo do arquivo nem o texto transcrito |
-| Autenticação | **Planejado** | Bearer Token definido no contrato; emissor a definir na Sprint 3 |
-| Autorização por perfil | **Planejado** | Depende do Controle de Acesso e da coluna `usuario.perfil` da Seção 3.6.5 (RNF02) |
+| Autenticação por SSO | **Planejado** | Bearer Token definido no contrato; provedor Microsoft ou Google ainda a selecionar, sem alteração do contrato do RNF02 |
 | Criptografia em trânsito | **Planejado** | HTTPS exigido pelo contrato; o ambiente local ainda serve por HTTP |
 | Limitação de taxa de requisições | **DECISÃO TÉCNICA EM ABERTO** | Sem mecanismo no código. Sem autenticação e sem limite de taxa, o endpoint não deve ser exposto publicamente |
 | Inspeção antivírus do arquivo recebido | **DECISÃO TÉCNICA EM ABERTO** | Não previsto no MVP. A mitigação atual é indireta: o arquivo é validado como áudio íntegro, nunca é executado e nunca é servido de volta a outro usuário |
 | Registro de auditoria do envio | **Planejado** | Depende do schema `auditoria` da Seção 3.6.5, adiado para a Sprint 3 conforme a decisão registrada na Seção 2.4 |
 | Conformidade com a LGPD | **Restrição de escopo vigente** | Nenhum dado pessoal ou corporativo real trafega no MVP (Seção 1.3). Antes de qualquer uso real, é necessário definir base legal, prazo de retenção e direitos do titular sobre a gravação |
 
-> **Consequência prática desta tabela.** Enquanto autenticação, autorização e limitação de taxa não estiverem implementadas, a API deve ser executada apenas em ambiente local ou de laboratório com acesso restrito. A publicação em endereço público sem esses três controles é o principal risco de segurança aberto do MVP e está encaminhada na Seção 3.7.9, item 11, junto da regra de SSH aberta na instância.
+> **Consequência prática desta tabela.** Enquanto autenticação e limitação de taxa não estiverem implementadas, a API deve ser executada apenas em ambiente local ou de laboratório com acesso restrito. A publicação em endereço público sem esses controles é o principal risco de segurança aberto do MVP e está encaminhada na Seção 3.7.9, item 11, junto da regra de SSH aberta na instância.
 
 ### Requisitos adicionais
 
@@ -2833,11 +2855,11 @@ O quadro reúne, em uma única leitura, cada camada da solução com a tecnologi
 | Speech to Text | Deepgram SDK 5+, modelo Nova-3 | Converter o áudio em texto | Suporte a termos de domínio via `keyterm`, latência baixa e créditos gratuitos, conforme a comparação da Seção 3.2.1 | OpenAI Whisper API, Google Cloud STT, Azure AI Speech | Vocabulário do PMO reconhecido com mais precisão | Dependência de serviço externo pago, com custo por minuto de áudio | Implementado |
 | IA generativa | Google Gen AI SDK, `gemini-3.5-flash-lite` | Gerar a resposta em linguagem natural no endpoint de chat | Camada gratuita suficiente para o MVP e SDK Python oficial | Consumo de outro provedor de modelo de linguagem | Resposta fluente sem infraestrutura própria de inferência | Origem do risco AM8, de alucinação; ainda sem fundamentação em fonte recuperada | Implementado |
 | Infraestrutura local | Docker e Docker Compose | Executar o MinIO e preservar seus dados | Padroniza o ambiente entre as máquinas da equipe e antecipa o empacotamento do deploy | Instalação direta na máquina de cada integrante | Paridade entre desenvolvimento e implantação | Os Dockerfiles de frontend e backend ainda não existem no repositório | Implementado para o MinIO |
-| Persistência estruturada | PostgreSQL | Guardar portfólio, projetos, artefatos, pendências e a trilha de auditoria | Modelo relacional adequado às entidades da Seção 3.6, com recursos de integridade que sustentam RNF02, RNF04 e RNF09 | Banco não relacional para os dados do portfólio | Restrições declarativas, colunas geradas e separação por schema | Provisionamento e integração ainda não realizados | Decidido |
+| Persistência estruturada | PostgreSQL | Guardar portfólio, projetos, artefatos, pendências e a trilha de auditoria | Modelo relacional adequado às entidades da Seção 3.6, com recursos de integridade que sustentam RNF04 e RNF09 | Banco não relacional para os dados do portfólio | Restrições declarativas, colunas geradas e separação por schema | Provisionamento e integração ainda não realizados | Decidido |
 | Busca vetorial (RAG) | PostgreSQL com pgvector, `gemini-embedding-001` | Recuperar trechos de documentos para fundamentar a resposta | Evita introduzir um segundo banco só para busca semântica | Banco vetorial dedicado | Uma única base para dados e vetores, com uma só operação | Desempenho a verificar quando o volume de documentos crescer | Selecionado |
 | Agendamento | APScheduler | Executar as verificações periódicas de pendências do RF05 | Roda no mesmo processo Python do backend, o que atende ao porte do MVP | Agendador externo ou serviço gerenciado de nuvem | Nenhum componente novo de infraestrutura | Não sobrevive a múltiplas instâncias nem à interrupção da sessão do laboratório, conforme a Seção 3.7.9, item 4 | Selecionado |
 | Text to Speech | Provedor não definido | Converter a resposta em áudio | Critérios de avaliação registrados na Seção 3.2.6 | Deepgram, Google Cloud, Azure AI Speech e OpenAI | — | Sem decisão, o canal de voz permanece unidirecional | Em aberto |
-| Autenticação e autorização | Emissor não definido | Autenticar o usuário e aplicar o RNF02 | Contrato de Bearer Token já definido na Seção 3.4 | Autenticação própria ou integração com o Copilot Studio | — | Ausência do controle é a principal lacuna de segurança do MVP | Em aberto |
+| Autenticação por SSO | Microsoft ou Google, a definir | Autenticar o usuário e aplicar o RNF02 | Contrato de Bearer Token já definido na Seção 3.4 | Autenticação própria | Integração padronizada e independente das regras de negócio | Ausência do mecanismo é a principal lacuna de segurança do MVP | Em aberto |
 | Computação em nuvem | AWS Academy com Amazon EC2 | Hospedar frontend e backend | Ambiente concedido pela instituição, sem custo nem necessidade de orçamento | Outros provedores com camada gratuita | Disponibilidade imediata e verificada | Crédito de US$ 50 e sessão de 4 horas, conforme a Seção 3.7.3 | Selecionado, com EC2 confirmado |
 | Registro de imagens | Amazon ECR | Guardar as imagens de contêiner do pipeline | Integra-se ao EC2 sem credencial adicional, pelo papel de execução da instância | Construção local da imagem na própria instância | Rastreabilidade entre a imagem testada e a implantada | Disponibilidade no catálogo do laboratório ainda não confirmada | Selecionado |
 | Armazenamento em nuvem | Amazon S3 com Boto3 | Substituir o MinIO no ambiente de nuvem | Preserva o contrato S3 e o cliente já implementado | Manter o MinIO em contêiner na própria instância | Troca sem alteração de código | Disponibilidade no catálogo do laboratório ainda não confirmada | Selecionado |
@@ -2858,7 +2880,7 @@ As escolhas acima não foram feitas item a item de forma isolada. Sete critério
 | Compatibilidade e coesão | Backend e PLN compartilham a mesma linguagem e o mesmo processo, o que elimina serialização entre API e modelo. O contrato S3 é o mesmo no MinIO local e no Amazon S3, o que permite trocar o ambiente sem trocar o código |
 | Maturidade | Todas as bibliotecas do núcleo são estáveis e amplamente adotadas. A exceção declarada é o modelo generativo, cuja família evolui rapidamente e cujo identificador está fixado em variável de ambiente por esse motivo |
 | Escalabilidade | A representação esparsa não cresce em memória proporcionalmente ao corpus, e a classificação é da ordem de microssegundos. O ponto frágil declarado é o APScheduler, que não sobrevive a múltiplas instâncias |
-| Segurança | A validação do áudio ocorre pelo conteúdo real do arquivo, e as credenciais residem apenas em variáveis de ambiente. A lacuna reconhecida é a ausência de autenticação, autorização e limitação de taxa |
+| Segurança | A validação do áudio ocorre pelo conteúdo real do arquivo, e as credenciais residem apenas em variáveis de ambiente. As lacunas reconhecidas são a ausência de autenticação SSO e de limitação de taxa |
 | Curva de aprendizagem | A equipe partiu de Python e JavaScript, que já dominava. `unittest` foi mantido em lugar de uma dependência adicional de teste pela mesma razão |
 | Custo | Toda a pilha executável opera dentro de camadas gratuitas ou de créditos acadêmicos: Deepgram por crédito de conta nova, Gemini por camada gratuita, AWS pelo crédito de US$ 50 do laboratório |
 | Disponibilidade no ambiente do parceiro | O ecossistema Microsoft foi tratado como **critério de integração futura**, e não como imposição sobre a pilha atual. A conclusão registrada na Seção 3.7.1 é que a portabilidade da pilha aberta e conteinerizada preserva a possibilidade de promoção ao ambiente do parceiro, sem que o MVP fique bloqueado pelo acesso, que é justamente o risco AM3 |
@@ -2910,7 +2932,7 @@ Por se tratar de um modelo conceitual, o diagrama não representa componentes t�
 
 O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas. Os atributos de cada tabela vêm da modelagem estática da seção 2.2.1, e os atributos da tabela `interacao` vêm dos elementos de auditoria exigidos pelos RNF04 e RNF09.
 
-Além dos seis relacionamentos do diagrama conceitual, o modelo lógico incorpora três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no recorte conceitual, por serem indispensáveis aos requisitos: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção de perfis de usuário (Diretor, PMO e Líder de Projeto), que sustenta o controle de acesso do RNF02 e a relação de liderança (`lidera`) prevista no RF06. Dessa forma, o modelo lógico dá continuidade simultaneamente ao modelo conceitual desta seção e ao diagrama de classes da Sprint 1.
+Além dos seis relacionamentos do diagrama conceitual, o modelo lógico incorpora três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no recorte conceitual, por serem indispensáveis ao domínio: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção dos perfis profissionais Diretor, PMO e Líder de Projeto, que preserva as personas e a relação de liderança (`lidera`) prevista no RF06. Os perfis não determinam autorização no RNF02, que exige somente autenticação por SSO. Dessa forma, o modelo lógico dá continuidade simultaneamente ao modelo conceitual desta seção e ao diagrama de classes da Sprint 1 sem acrescentar campos para autenticação.
 
 <div align="center">
 <sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
@@ -2957,7 +2979,7 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `id` | `INTEGER` | `PK`, identity | Identificador único do usuário |
 | `nome` | `TEXT` | `NOT NULL` | Nome do profissional |
 | `email` | `TEXT` | `NOT NULL`, `UNIQUE` | Endereço corporativo de envio das notificações |
-| `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Papel do usuário, base do controle de acesso do RNF02 |
+| `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Perfil profissional usado nas personas e relações do domínio; não concede permissões distintas no RNF02 |
 
 **`projeto`** — empreendimento acompanhado pelo PMO:
 
@@ -3155,7 +3177,7 @@ CREATE TABLE auditoria.notificacao (
     UNIQUE (pendencia_id, usuario_id)
 );
 
--- Imutabilidade dos registros de auditoria (RNF04)
+-- Proteção dos registros de auditoria (RNF09)
 REVOKE UPDATE, DELETE ON auditoria.interacao, auditoria.interacao_artefato,
                         auditoria.notificacao FROM PUBLIC;
 
@@ -3174,7 +3196,7 @@ CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, dat
 
 As decisões estruturais do modelo, com as alternativas consideradas e as razões da escolha, são registradas a seguir.
 
-**Decisão 1 — Perfis de usuário por coluna de domínio, e não por tabelas de subtipo.** A generalização de Usuário da seção 2.2.1 poderia ser mapeada em tabelas de subtipo (`diretor`, `pmo`, `lider_projeto` com chave primária compartilhada). A opção pela coluna `perfil` com `CHECK` decorre da própria justificativa da modelagem estática: as três especializações não declaram atributos próprios, pois o que as distingue é o alcance de acesso, que é relacional. Esse alcance já está expresso no modelo lógico — o líder pela chave `projeto.lider_id` e pelo vínculo de `usuario_projeto`, e o diretor e o PMO pelo alcance consolidado sobre o portfólio, que é regra de autorização da aplicação (RNF02) e não dado armazenado. Tabelas de subtipo vazias adicionariam junções sem acrescentar informação.
+**Decisão 1 — Perfis de usuário por coluna de domínio, e não por tabelas de subtipo.** A generalização de Usuário da seção 2.2.1 poderia ser mapeada em tabelas de subtipo (`diretor`, `pmo`, `lider_projeto` com chave primária compartilhada). A opção pela coluna `perfil` com `CHECK` preserva a classificação profissional usada pelas personas e pelas relações do domínio sem criar tabelas de subtipo vazias. O líder continua relacionado aos projetos pela chave `projeto.lider_id` e pelo vínculo de `usuario_projeto`; diretor e PMO permanecem como perfis descritivos. Nenhum desses valores concede permissões diferentes: o RNF02 limita-se à autenticação por SSO, e a identificação administrativa prevista no RNF09 é fornecida pelo mecanismo de autenticação.
 
 **Decisão 2 — `preenchido` como coluna gerada.** Se `preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, preservando o atributo declarado na seção 2.2.1 como consultável e garantindo a confiabilidade da identificação de campos pendentes, que alimenta o RF04 e o RF05.
 
@@ -3184,7 +3206,7 @@ As decisões estruturais do modelo, com as alternativas consideradas e as razõe
 
 **Decisão 5 — Chaves substitutas com chave natural preservada.** Todas as tabelas usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
 
-**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.interacao_artefato` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: a rastreabilidade do RNF04 prevalece sobre a conveniência da exclusão, e o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a exigência de imutabilidade dos registros perante usuários comuns. A única flexibilização é a coluna `feedback_usuario`, atualizável pelo papel da aplicação por meio de permissão em nível de coluna, pois a avaliação do usuário só existe depois de a resposta ter sido registrada.
+**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.interacao_artefato` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: o relacionamento preserva a rastreabilidade do RNF04, enquanto o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a proteção exigida pelo RNF09. A única flexibilização é a coluna `feedback_usuario`, atualizável pelo papel da aplicação por meio de permissão em nível de coluna, pois a avaliação do usuário só existe depois de a resposta ter sido registrada.
 
 **Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de auditoria (`interacao`, `interacao_artefato` e `notificacao`) no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
 
@@ -3198,14 +3220,14 @@ Por fim, a tabela a seguir consolida a rastreabilidade entre as estruturas do mo
 
 | Estrutura do modelo | Requisitos sustentados | Papel |
 |---|---|---|
-| `usuario.perfil` | RNF02 | Base da validação de permissões por perfil |
-| `projeto.lider_id` | RF06, RNF02 | Delimita quem pode receber sugestões de alteração de cada projeto |
+| `usuario.perfil` | Personas e RF06 | Identifica o perfil profissional sem estabelecer autorização por cargo |
+| `projeto.lider_id` | RF06 | Identifica o responsável relacionado a cada projeto |
 | `usuario_projeto` | RF05 | Define os destinatários da notificação proativa |
 | `auditoria.notificacao` | RF05, RNF09 | Registra os envios e garante idempotência da verificação periódica |
 | `auditoria.interacao` | RNF01, RNF03, RNF04, RNF09 | Trilha de auditoria com canal, intenção, resultado e tempo de processamento |
 | `interacao.audio_referencia` | RF01, RNF06, RNF09 | Vincula a interação por voz ao arquivo de áudio original no armazenamento de objetos |
-| `interacao.feedback_usuario` | RNF04 | Registra a avaliação do usuário capturada pelo componente Auditoria e Feedback |
-| `auditoria.interacao_artefato` | RF03, RNF04, RNF11 | Registra as fontes que fundamentaram cada resposta |
+| `interacao.feedback_usuario` | RNF04, RNF09 | Registra a avaliação correlacionada à interação e admite somente a atualização controlada prevista para o feedback |
+| `auditoria.interacao_artefato` | RF03, RNF04, RNF11, RNF12 | Registra as fontes que fundamentaram cada resposta e permite confrontá-las com as afirmações produzidas |
 | `artefato.referencia`, `artefato.data` | RF03 | Origem e data exibidas junto a cada informação |
 | `campo_artefato.obrigatorio`, `campo_artefato.preenchido` | RF04, RF05 | Identificação dos campos pendentes de preenchimento |
 | `pendencia.prazo`, `pendencia.situacao` | RF05 | Critérios da verificação periódica do Agendador |
@@ -3272,12 +3294,12 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | **Internet - Browser** | Chat UI, Captura de áudio | Único nó fora da infraestrutura de nuvem: executa no navegador da máquina do profissional do PMO. A Chat UI é o código de interface baixado do Web App Frontend e executado localmente; é por ela que a solicitação é digitada e que a resposta é exibida junto da fonte consultada e da data de referência (RF02 e RF03). A Captura de áudio grava a mensagem falada e a encaminha como arquivo ao backend, atendendo ao canal de voz previsto no RF01 e à acessibilidade exigida pelo RNF06. Nenhum processamento de linguagem natural ocorre neste nó: ele apenas coleta a entrada e apresenta a saída. |
 | **Web App Frontend** (Amazon EC2) | JavaScript/JSX + React + Vite, Assets estáticos | Hospeda a aplicação cliente e a entrega ao navegador. Os Assets estáticos reúnem os arquivos de JavaScript, folhas de estilo e fontes que compõem a Chat UI; o bloco JavaScript/JSX + React + Vite responde pela construção e pela renderização das telas. A separação em relação ao Web App Backend mantém a aplicação cliente desacoplada do núcleo, condição do RNF05 para que outras aplicações possam futuramente consumir a mesma API. |
 | **Docker - Amazon ECR** | `<<Artifact>>` Imagens frontend + backend | Registro das imagens de contêiner produzidas pelo pipeline descrito na Seção 3.7.6. Não participa da execução: sua função é guardar a versão exata de frontend e backend que foi construída, testada e aprovada, para que as instâncias EC2 obtenham dela a imagem no momento da implantação. É esse nó que garante que a versão validada em homologação seja idêntica à promovida para produção. |
-| **Web App Backend** (Amazon EC2) | API Gateway, PLN - Compreensão, PLN - Transações e Ações, API de Recebimento de áudio, API de Transcrição, Gerador de Respostas, Auditoria e Feedback, Agendador, Lista de Tarefas | Concentra toda a camada de lógica de negócio definida na Seção 2.4. O API Gateway centraliza a entrada das solicitações e autentica o usuário antes de qualquer processamento (RNF02). A API de Recebimento de áudio aceita o arquivo enviado pelo navegador e a API de Transcrição atua como cliente do serviço de voz, de modo que áudio e texto convergem para o mesmo fluxo (RF01 e RNF06). O PLN - Compreensão classifica a intenção e extrai os parâmetros da solicitação (RNF03), encaminhando pedidos de preenchimento e alertas ao PLN - Transações e Ações (RF04, RF05 e RF06) e consultas ao Gerador de Respostas (RF02), que monta a saída e informa a fonte e a justificativa (RF03 e RNF11). O Agendador executa as verificações periódicas que não dependem de solicitação do usuário e alimenta a Lista de Tarefas com as pendências encontradas, sustentando o acompanhamento preventivo do RF05. O Auditoria e Feedback registra usuário, data, canal, intenção, fontes e resultado de cada interação (RNF04). |
+| **Web App Backend** (Amazon EC2) | API Gateway, PLN - Compreensão, PLN - Transações e Ações, API de Recebimento de áudio, API de Transcrição, Gerador de Respostas, Auditoria e Feedback, Agendador, Lista de Tarefas | Concentra toda a camada de lógica de negócio definida na Seção 2.4. O API Gateway centraliza a entrada das solicitações e autentica o usuário antes de qualquer processamento (RNF02). A API de Recebimento de áudio aceita o arquivo enviado pelo navegador e a API de Transcrição atua como cliente do serviço de voz, de modo que áudio e texto convergem para o mesmo fluxo (RF01 e RNF06). O PLN - Compreensão classifica a intenção e extrai os parâmetros da solicitação (RNF03), encaminhando pedidos de preenchimento e alertas ao PLN - Transações e Ações (RF04, RF05 e RF06) e consultas ao Gerador de Respostas (RF02), que monta a saída, informa a fonte e restringe afirmações ao que ela sustenta (RF03, RNF11 e RNF12). O Agendador executa as verificações periódicas que não dependem de solicitação do usuário e alimenta a Lista de Tarefas com as pendências encontradas, sustentando o acompanhamento preventivo do RF05. O Auditoria e Feedback registra usuário, data, canal, intenção, fontes e resultado de cada interação (RNF04). |
 | **API de Transcrição** (serviço externo de Speech to Text) | Speech to Text | Serviço de conversão de fala em texto consumido por API. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. **O provedor efetivamente implementado é o Deepgram Nova-3** (Seção 3.2.1), que é externo à conta da AWS; o rótulo Amazon Transcribe presente na figura corresponde ao desenho anterior à decisão de STT e será corrigido no diagrama junto da revisão prevista no item 12 da Seção 3.7.9. Com o Deepgram, este elemento deixa de ser um nó interno da conta acadêmica e passa a ser uma dependência externa, como o nó de modelo de linguagem. |
-| **Database - PostgreSQL** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback exigidos pelo RNF04. A separação em dois schemas, e não em dois bancos, atende à exigência da Seção 2.4 de proteger os logs contra alteração por usuário comum — o controle é feito por permissão — sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. A forma de hospedagem do PostgreSQL, em serviço gerenciado ou em contêiner na própria instância EC2, permanece em aberto na Seção 3.7.9. |
+| **Database - PostgreSQL** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback correlacionados pelo RNF04. A separação em dois schemas, e não em dois bancos, permite aplicar por permissão a proteção exigida pelo RNF09 sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. A forma de hospedagem do PostgreSQL, em serviço gerenciado ou em contêiner na própria instância EC2, permanece em aberto na Seção 3.7.9. |
 | **Amazon S3 - Bucket Storage** | Armazenamento de Prompts | Armazenamento de objetos para o conteúdo que não se representa bem em modelo relacional. Guarda os prompts utilizados pelo pipeline de PLN, versionados de forma independente do código, o que permite ajustá-los sem reconstruir a imagem do backend. |
-| **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a Rastreabilidade responde à pergunta técnica de saber se o sistema está funcionando, enquanto a auditoria responde à pergunta de negócio de saber quem pediu o quê e com qual resultado (RNF04). São dados com público, retenção e requisito de imutabilidade distintos, e por isso ficam em nós distintos. |
-| **LLM - Serviço externo** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API; o provedor implementado é o Google Gemini, modelo `gemini-3.5-flash-lite`, acionado pelo endpoint `POST /api/v1/chat`. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11). Por estar fora da fronteira da conta acadêmica, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
+| **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a telemetria mostra o funcionamento técnico, enquanto `auditoria.interacao` correlaciona quem pediu o quê, as fontes e o resultado conforme o RNF04; os controles de consulta, retenção e proteção desses registros pertencem ao RNF09. São dados com públicos e ciclos de vida distintos, e por isso ficam em nós distintos. |
+| **LLM - Serviço externo** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API; o provedor implementado é o Google Gemini, modelo `gemini-3.5-flash-lite`, acionado pelo endpoint `POST /api/v1/chat`. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11 e RNF12). Por estar fora da fronteira da conta acadêmica, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
 
 #### Caminhos de comunicação
 
@@ -3304,7 +3326,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 
  Os três percursos a seguir descrevem como os nós do diagrama cooperam nos cenários especificados na Seção 2.2.2, e cobrem todos os elementos implantados.
 
- **Consulta em texto.** O profissional abre o AZ1 no navegador; a Chat UI já foi baixada do Web App Frontend e executa localmente. Ao enviar a pergunta, a Chat UI faz uma requisição HTTPS ao API Gateway, no Web App Backend, que autentica o usuário e valida suas permissões antes de prosseguir (RNF02). O PLN - Compreensão classifica a solicitação como consulta e extrai os parâmetros mencionados, como o nome do projeto e o período (RNF03). O Gerador de Respostas consulta o schema `portfolio` no banco, recupera os prompts necessários no bucket S3 e aciona o LLM para redigir a resposta, que retorna à Chat UI acompanhada da fonte consultada e da data de referência (RF02 e RF03). Em paralelo, o Auditoria e Feedback grava a interação no schema `auditoria` e publica os eventos técnicos no CloudWatch (RNF04).
+ **Consulta em texto.** O profissional abre o AZ1 no navegador; a Chat UI já foi baixada do Web App Frontend e executa localmente. Ao enviar a pergunta, a Chat UI faz uma requisição HTTPS ao API Gateway, no Web App Backend, que valida a identidade por SSO antes de prosseguir (RNF02). O PLN - Compreensão classifica a solicitação como consulta e extrai os parâmetros mencionados, como o nome do projeto e o período (RNF03). O Gerador de Respostas consulta o schema `portfolio` no banco, recupera os prompts necessários no bucket S3 e aciona o LLM para redigir a resposta, que retorna à Chat UI acompanhada da fonte consultada e da data de referência (RF02 e RF03). Em paralelo, o Auditoria e Feedback grava a interação no schema `auditoria` e publica os eventos técnicos no CloudWatch (RNF04).
 
  **Solicitação por voz.** O percurso difere apenas na entrada. A Captura de áudio grava a mensagem falada e a envia à API de Recebimento de áudio, que valida o arquivo e o repassa à API de Transcrição; esta atua como cliente do Amazon Transcribe e devolve o texto correspondente. A partir desse ponto, a solicitação segue exatamente o mesmo caminho da consulta em texto, o que atende ao RF01 sem exigir um segundo pipeline de intenções e preserva a acessibilidade prevista no RNF06.
 
@@ -3319,15 +3341,15 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | Componente da Seção 2.4 | Nó de execução | Observação |
 |---|---|---|
 | Chat UI - Texto e Voz | Internet - Browser, servida pelo Web App Frontend | O componente executa no navegador; o Web App Frontend é o nó que o entrega. |
-| API Gateway | Web App Backend | Ponto único de entrada; concentra também a autenticação e a validação de permissões. |
+| API Gateway | Web App Backend | Ponto único de entrada; concentra também a autenticação SSO. |
 | Conversão de Áudio em Texto | Web App Backend e API de Transcrição (Amazon Transcribe) | Dividido em dois elementos: a API de Recebimento de áudio e a API de Transcrição no backend, e o Speech to Text no serviço gerenciado. |
-| Controle de Acesso | Web App Backend | Implantado junto ao API Gateway, aplicado antes de qualquer processamento de linguagem. |
+| Autenticação SSO | Web App Backend | Integrada ao API Gateway e aplicada antes de qualquer processamento de linguagem. |
 | PLN - Compreensão | Web App Backend | Classificação de intenção e extração de parâmetros. |
 | PLN - Transações e Ações | Web App Backend | Sugestões e alertas, apoiado pelo Agendador e pela Lista de Tarefas. |
 | Gerador de Respostas e Explicabilidade | Web App Backend, com apoio do LLM - Serviço externo | A composição da resposta e a indicação da fonte permanecem no backend; o LLM apoia a redação. |
 | Auditoria e Feedback | Web App Backend | Grava no schema `auditoria` e publica telemetria no nó Rastreabilidade. |
 | Repositório de Dados e Conhecimento | Database - PostgreSQL e Amazon S3 - Bucket Storage | Dados estruturados no banco; conteúdo não relacional no armazenamento de objetos. |
-| Logs de Auditoria | Database - PostgreSQL, schema `auditoria` | Separados dos dados operacionais por schema e por permissão (RNF04). |
+| Logs de Auditoria | Database - PostgreSQL, schema `auditoria` | Correlacionados pelo RNF04 e separados dos dados operacionais por schema e por permissão conforme o RNF09. |
 
 ### 3.7.3 Recursos do Ambiente Acadêmico e Limites
 
@@ -3632,12 +3654,12 @@ As quatro rotas compartilham as mesmas quatro primeiras etapas e divergem apenas
 | Consumo de crédito | Acompanhado a cada sessão do laboratório |
 | Vigência do acesso | Elegibilidade e validade do acesso ao AWS Academy confirmadas |
 
-**Verificação funcional da solução implantada.** O roteiro abaixo percorre as rotas efetivamente implementadas em `src/routes/`, na ordem em que uma falha isola melhor a causa: primeiro o processo, depois o armazenamento, depois cada serviço externo e, por fim, a interface.
+**Verificação funcional da solução implantada.** O roteiro abaixo percorre as rotas efetivamente implementadas em `src/routes/`, na ordem em que uma falha isola melhor a causa: primeiro o processo, depois o armazenamento, depois cada serviço externo e, por fim, a interface. O contrato planejado de `GET /health` responde `200 OK` em até dois segundos quando aplicação e banco estão disponíveis e `503 Service Unavailable` quando um deles não está pronto. Serviços externos são monitorados separadamente e não alteram esse estado. O endpoint ainda não está implementado.
 
 | # | Verificação | Rota ou recurso | Resultado esperado | Situação |
 |---:|---|---|---|---|
 | 1 | Contêineres de frontend e backend | `docker ps` na instância | Ambos em execução, com as portas publicadas | A verificar após o deploy |
-| 2 | Processo do backend no ar | `GET /health` | `200 OK` com `{"status": "healthy"}` | Depende da implementação do endpoint, item 13 da Seção 3.7.9 |
+| 2 | Saúde da aplicação e do banco | `GET /health` | `200 OK` em até dois segundos quando ambos estão disponíveis; `503 Service Unavailable` quando um deles não está pronto | Depende da implementação do endpoint, item 13 da Seção 3.7.9 |
 | 3 | Documentação da API gerada | `GET /docs` | Página do OpenAPI listando as quatro rotas de `/api/v1` | Disponível por padrão no FastAPI |
 | 4 | Recebimento e armazenamento do áudio | `POST /api/v1/audio` | `201 Created` com `id` no formato `aud_…`, e o objeto gravado sob `incoming/{audio_id}` | Implementada |
 | 5 | Rejeição de arquivo inválido | `POST /api/v1/audio` com um arquivo de texto renomeado para `.wav` | `415 unsupported_format` | Implementada |
@@ -3690,7 +3712,7 @@ Quando a solução for promovida para o ambiente real do Metrô:
 2. **Migrar o banco de dados:** transferir os schemas `portfolio` e `auditoria` para a instância PostgreSQL corporativa;
 3. **Substituir os serviços gerenciados:** trocar Amazon Transcribe, Amazon S3 e Amazon CloudWatch pelos equivalentes do ambiente de destino, o que afeta apenas as camadas de integração, e não a lógica de negócio;
 4. **Copilot Studio e Power Automate:** integrar o agente ao tenant corporativo e conectar os fluxos aos documentos e listas efetivamente utilizados pelo PMO;
-5. **Microsoft Entra ID:** integrar a autenticação corporativa do Metrô ao Controle de Acesso;
+5. **Provedor SSO:** selecionar Microsoft ou Google e integrar a autenticação ao API Gateway sem introduzir autorização por cargo;
 6. **Compliance e segurança:** implementar retenção de logs de auditoria, Data Loss Prevention (DLP) e conformidade com as políticas corporativas.
 
  A arquitetura em nós e os caminhos de comunicação permanecem os mesmos; o que muda são os serviços que ocupam cada nó.
@@ -4104,7 +4126,7 @@ A segunda é que **o classificador não sabe que existe uma API**. `Classificado
 
 A terceira é que **o pré-processamento é parte do modelo, e não um passo anterior a ele**. `PreprocessadorDeTexto` é a primeira etapa do `Pipeline` do scikit-learn, o que elimina por construção a possibilidade de treinar com uma configuração e prever com outra — erro que, como a Seção 3.3.5 observa, não levanta exceção nenhuma e apenas faz o modelo errar mais.
 
-**Classes ainda não implementadas.** Não aparecem no diagrama, por não existirem: o Controle de Acesso (RNF02), o extrator de entidades, o gerenciador de diálogo, o Agendador do RF05 e a camada de persistência das interações. Todas estão especificadas nas Seções 2.4, 3.3.11 e 3.6 e distribuídas entre as Sprints 3 e 4 conforme a Seção 3.8.
+**Classes ainda não implementadas.** Não aparecem no diagrama, por não existirem: o componente de Autenticação SSO (RNF02), o extrator de entidades, o gerenciador de diálogo, o Agendador do RF05 e a camada de persistência das interações. Todas estão especificadas nas Seções 2.4, 3.3.11 e 3.6 e distribuídas entre as Sprints 3 e 4 conforme a Seção 3.8.
 
 ### 3.9.3 Visão de componentes com estado de implementação
 
@@ -4123,7 +4145,7 @@ flowchart TB
         RX["API de Recebimento de Áudio<br/>POST /api/v1/audio<br/>IMPLEMENTADO"]
         TR["Conversão de Áudio em Texto<br/>POST .../transcribe e .../analyze<br/>IMPLEMENTADO"]
         GW["API Gateway<br/>POST /api/v1/chat<br/>PARCIAL"]
-        CA["Controle de Acesso<br/>NÃO IMPLEMENTADO"]
+        CA["Autenticação SSO<br/>NÃO IMPLEMENTADA"]
         PC["PLN — Compreensão<br/>intenção: IMPLEMENTADO<br/>entidades: NÃO IMPLEMENTADO"]
         PT["PLN — Transações e Ações<br/>NÃO IMPLEMENTADO"]
         GR["Gerador de Respostas<br/>e Explicabilidade<br/>PARCIAL"]
@@ -4165,7 +4187,7 @@ flowchart TB
 
 **Como ler o esquema.** As setas contínuas representam chamadas que existem no código; as tracejadas, chamadas especificadas e ainda não construídas. O rótulo de cada bloco declara o estado do componente em quatro valores: **implementado**, **parcial**, **não implementado** e, para os serviços externos, **integrado** ou **em aberto**.
 
-Dois blocos merecem explicação do rótulo *parcial*. O **API Gateway** existe como ponto de entrada HTTP — o FastAPI compõe as quatro rotas sob o prefixo `/api/v1` —, mas não cumpre ainda as duas funções que a Seção 2.4 lhe atribui além do roteamento: autenticar a solicitação e registrar a interação. O **Gerador de Respostas** produz texto em linguagem natural pelo endpoint de chat, porém sem a recuperação de fontes que o RF03 e o RNF11 exigem; hoje ele responde a partir do conhecimento do próprio modelo de linguagem, e não de conteúdo recuperado do repositório, e essa distinção é justamente onde o risco AM8 se materializa.
+Dois blocos merecem explicação do rótulo *parcial*. O **API Gateway** existe como ponto de entrada HTTP — o FastAPI compõe as quatro rotas sob o prefixo `/api/v1` —, mas não cumpre ainda as duas funções que a Seção 2.4 lhe atribui além do roteamento: autenticar a solicitação e registrar a interação. O **Gerador de Respostas** produz texto em linguagem natural pelo endpoint de chat, porém sem a recuperação de fontes que o RF03, o RNF11 e o RNF12 exigem; hoje ele responde a partir do conhecimento do próprio modelo de linguagem, e não de conteúdo recuperado do repositório, e essa distinção é justamente onde o risco AM8 se materializa.
 
 **O caminho fechado.** Lendo apenas as setas contínuas, existe um percurso completo: `Captura de áudio → API de Recebimento → Armazenamento → Conversão de Áudio em Texto → Deepgram → PLN — Compreensão`. Esse é o resultado técnico da Sprint 2, e é o que os diagramas de sequência a seguir detalham.
 
@@ -4211,7 +4233,7 @@ sequenceDiagram
 
 **Explicação.** O fluxo tem duas requisições, e não uma, pela decisão registrada na Seção 3.2.2: separar recebimento de transcrição permite retranscrever sem reenviar o arquivo. As mensagens 3 e 4 mostram por que a validação precede o armazenamento — arquivo inválido nunca chega a ocupar o bucket nem a consumir crédito do provedor. A mensagem 12 evidencia a diferença entre `confidence`, que é do reconhecedor de fala, e `confianca_pln`, que é do classificador: são grandezas distintas e não devem ser somadas nem comparadas.
 
-**O que este cenário ainda não contém.** A autenticação do usuário, a verificação de permissão, a recuperação da informação nas fontes e o registro de auditoria. Os quatro estão especificados e ausentes do código, conforme a Seção 3.3.11.
+**O que este cenário ainda não contém.** A autenticação do usuário, a recuperação da informação nas fontes e o registro de auditoria. Os três estão especificados e ausentes do código, conforme a Seção 3.3.11.
 
 **Ressalva sobre o rótulo devolvido.** A mensagem 12 devolve uma intenção do catálogo da Seção 3.1 porque é esse o contrato-alvo. O modelo versionado hoje reconhece três classes genéricas, e não o catálogo, conforme a Seção 3.3.2: o fluxo do diagrama está implementado, mas o vocabulário de saída ainda não corresponde ao especificado.
 
@@ -4326,43 +4348,39 @@ sequenceDiagram
 
 **Explicação.** O diagrama existe justamente porque a regra de negócio já está definida na Seção 3.1 e o mecanismo que a executa não. Ele torna explícito o que precisa ser construído: um limiar de confiança, uma margem mínima entre a primeira e a segunda intenção candidata, e um componente que formule a pergunta de desambiguação. Os dois primeiros são números a calibrar sobre a partição de teste isolada prevista na task T14 da Sprint 3, e não devem ser escolhidos por intuição, pela razão de calibração registrada na Seção 3.3.3. Note ainda que os três ramos registram desfechos distintos na auditoria — `sucesso`, `esclarecimento` e `recusada` —, valores que já existem no `CHECK` da coluna `auditoria.interacao.resultado` definida na Seção 3.6.5.
 
-#### Cenário E — Usuário sem permissão sobre a informação solicitada
+#### Cenário E — Solicitação sem autenticação válida
 
-**Objetivo.** Registrar o comportamento previsto quando o usuário autenticado pede informação fora do seu alcance de acesso.
-**Requisitos.** RNF02, RNF09.
-**Estado.** **Não implementado.** O Controle de Acesso aparece em traço interrompido na Seção 2.4 exatamente por isso.
+**Objetivo.** Registrar o comportamento previsto quando uma funcionalidade protegida é chamada sem identidade SSO válida.
+**Requisitos.** RNF02.
+**Estado.** **Não implementado.** O componente de autenticação aparece em traço interrompido na Seção 2.4 exatamente por isso.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor L as Líder de Projeto
+    actor U as Usuário
     participant UI as :ChatUI
     participant GW as :APIGateway
-    participant CA as :ControleDeAcesso
+    participant CA as :AutenticacaoSSO
     participant PLN as :PLNCompreensao
-    participant RD as :RepositorioDeDados
-    participant AUD as :AuditoriaEFeedback
 
-    L->>UI: "qual o avanço de todos os projetos do portfólio?"
+    U->>UI: envia uma solicitação
     UI->>GW: POST /api/v1/chat com cabeçalho Authorization Bearer
     GW->>CA: autenticar(token)
 
-    alt Token ausente ou inválido
+    alt Token ausente, malformado, expirado, com assinatura inválida ou audiência incorreta
         CA-->>GW: credencial inválida
         GW-->>UI: 401 {error: unauthorized}
+        UI-->>U: solicita nova autenticação
     else Token válido
-        CA-->>GW: usuário autenticado, perfil = lider_projeto
+        CA-->>GW: identidade autenticada
         GW->>PLN: classificar e extrair parâmetros
-        PLN-->>GW: intencao = consultar_projeto_sintetico, escopo = portfólio
-        GW->>CA: autorizar(usuario, escopo)
-        CA-->>GW: negado — o perfil alcança apenas os projetos que lidera
-        GW->>AUD: registrar(resultado = "recusada", categoria = "autorizacao")
-        GW-->>UI: 403, sem revelar dados do escopo negado
-        UI-->>L: informa a restrição e oferece o escopo permitido
+        PLN-->>GW: intenção e parâmetros
+        GW-->>UI: resposta da operação
+        UI-->>U: apresenta o resultado
     end
 ```
 
-**Explicação.** O diagrama separa duas verificações que costumam ser confundidas: **autenticação**, que responde quem é o usuário e ocorre antes de qualquer processamento, e **autorização**, que responde se ele alcança aquele dado e só pode ocorrer depois de a intenção e o escopo terem sido extraídos. Daí as duas chamadas distintas ao Controle de Acesso, nas mensagens 3 e 8. A resposta `403` é deliberadamente pobre em conteúdo: informar quantos projetos existem no portfólio, ainda que sem os dados, já seria vazamento de informação. O alcance de cada perfil não é um atributo, e sim uma relação — `lidera` para o líder, `supervisiona` e `administra` para diretor e PMO —, exatamente como a Seção 2.2.1 justifica, e é sobre essas associações que a autorização é calculada.
+**Explicação.** A autenticação responde quem é o usuário e ocorre antes de qualquer processamento de linguagem ou acesso aos dados. Por isso, todas as condições de credencial ausente ou inválida encerram o fluxo com `401`, enquanto uma credencial válida permite que a mesma regra de negócio seja executada para qualquer perfil profissional. O RNF02 não estabelece autorização por cargo. A única distinção de acesso planejada é a identificação administrativa usada pelo RNF09 para consulta dos registros de auditoria.
 
 #### Cobertura dos cenários
 
@@ -4376,7 +4394,7 @@ sequenceDiagram
 | **Consulta por voz bem-sucedida** | **Cenário A desta seção** | **Implementado** |
 | **Áudio recusado na validação** | **Cenário B desta seção** | **Implementado** |
 | **Falha do serviço de voz** | **Cenário C desta seção** | **Implementado quanto ao tratamento do erro** |
-| **Usuário sem permissão** | **Cenário E desta seção** | **Especificado; não implementado** |
+| **Usuário sem autenticação válida** | **Cenário E desta seção** | **Especificado; não implementado** |
 
 ### 3.9.5 Matriz de rastreabilidade técnica
 
@@ -4389,23 +4407,24 @@ A matriz fecha o artefato ligando cada requisito ao mecanismo que o realiza. Ela
 | RF03 — apresentar a fonte da informação | Campo de fontes na resposta, a definir | Seleção das fontes que fundamentam a resposta | `Artefato.referencia`, `Artefato.data`, associação `Interacao consulta Artefato` | Gerador de Respostas e Explicabilidade, Repositório de Dados | 2.2.2 cenário 1; 2.2.3 caso crítico 2 | Plano de testes funcionais, task T30 | 4 |
 | RF04 — sugerir preenchimento de documentos | Endpoint a definir | Classificação das intenções `orientar_*` e `analisar_completude_coerencia` | `CampoArtefato.obrigatorio`, `CampoArtefato.preenchido` | PLN — Transações e Ações | 2.2.2 cenário 2 | Plano de testes funcionais, task T30 | 4 |
 | RF05 — notificar pendências | Sem endpoint: fluxo iniciado pelo Agendador | Classificação de `gerar_alertas_pendencias` para a consulta correspondente | `Pendencia`, `Notificacao`, associação `acompanha` | Agendador, Lista de Tarefas, PLN — Transações e Ações | 2.2.2 cenário 3 | Plano de testes funcionais, task T30 | 4 e 5 |
-| RF06 — atualizar cadastro por instrução | Endpoint de escrita a definir | Extração de campos e valores da instrução | `Projeto`, `LiderProjeto`, `projeto.lider_id` | PLN — Transações e Ações, Controle de Acesso | 2.2.2 cenário 2 (variação) | Plano de testes funcionais, task T30 | 5 |
+| RF06 — atualizar cadastro por instrução | Endpoint de escrita a definir | Extração de campos e valores da instrução | `Projeto`, `LiderProjeto`, `projeto.lider_id` | PLN — Transações e Ações | 2.2.2 cenário 2 (variação) | Plano de testes funcionais, task T30 | 5 |
 | RNF01 — desempenho | Tempo de resposta de todas as rotas | Classificação em microssegundos; o custo dominante é a chamada externa | `Interacao.tempoProcessamentoMs` | API Gateway, Conversão de Áudio em Texto | 3.9.4 cenário A | Teste de desempenho, task T31 | 4 |
-| RNF02 — controle de acesso | Cabeçalho `Authorization`, respostas `401` e `403` | Não se aplica | `usuario.perfil`, `projeto.lider_id`, `usuario_projeto` | Controle de Acesso, API Gateway | 3.9.4 cenário E | Teste de autorização, task T31 | 3 e 4 |
-| RNF03 — precisão na identificação de intenções | Campo `confianca_pln` da resposta de análise | `MultinomialNB` sobre vetorização esparsa; medição saturada em 1,0000 sobre três classes genéricas, sem valor comprobatório | `Interacao.intencao` | PLN — Compreensão | 3.9.4 cenários A e D | `test_classificador`, `test_experimento`, `test_ajuste_fino` | Instrumento construído na 2; medição válida pendente para a 3 |
-| RNF04 — rastreabilidade | Registro de toda requisição | Intenção e termos de maior peso registráveis | `auditoria.interacao`, `auditoria.interacao_artefato` | Auditoria e Feedback, Logs de Auditoria | 2.2.2 cenário 1, automensagem `log()` | Inspeção dos registros gerados | 3 |
-| RNF05 — interoperabilidade | Contrato REST versionado em `/api/v1` | Núcleo de PLN sem dependência da camada de API | Não se aplica | API Gateway | 3.9.4 cenário A | Acionamento por dois clientes distintos | 4 e 5 |
+| RNF02 — autenticação | Cabeçalho `Authorization` e resposta `401` | Não se aplica | Identidade técnica associada ao usuário; sem autorização por cargo | Autenticação SSO, API Gateway | 3.9.4 cenário E | `CT-RNF02-P` e `CT-RNF02-N` | 3 e 4 |
+| RNF03 — qualidade da classificação de intenções | Campo `confianca_pln` da resposta de análise e decisão do limiar | `MultinomialNB` sobre vetorização esparsa; F1-macro atual de 0,6736, abaixo da meta | `Interacao.intencao` | PLN — Compreensão | 3.9.4 cenários A e D | `CT-RNF03-P` e `CT-RNF03-N`; testes automatizados existentes apoiam a regressão | Instrumento construído na 2; medição cega pendente para a 3 |
+| RNF04 — rastreabilidade | Identificador de cada interação e registro de toda requisição | Intenção e termos de maior peso registráveis | `auditoria.interacao`, `auditoria.interacao_artefato` | Auditoria e Feedback, Logs de Auditoria | 2.2.2 cenário 1, automensagem `log()` | `CT-RNF04-P` e `CT-RNF04-N` | 3 |
+| RNF05 — interoperabilidade | Contrato REST versionado em `/api/v1` | Núcleo de PLN sem dependência da camada de API | Não se aplica | API Gateway | 3.9.4 cenário A | `CT-RNF05-P` e `CT-RNF05-N` entre React e Python | 4 e 5 |
 | RNF06 — qualidade da transcrição | `POST .../transcribe`, campo `confidence` | Entrada do pipeline; `keyterm` cobre o vocabulário do domínio | `Interacao.audioReferencia` | Conversão de Áudio em Texto, Deepgram | 3.9.4 cenários A e C | Medição de WER, prevista para a 3 | 3 |
-| RNF07 — disponibilidade | `GET /health`, a implementar | Não se aplica | Não se aplica | Rastreabilidade (CloudWatch) | 3.9.4 cenário C | Monitoração de disponibilidade | 4 |
+| RNF07 — disponibilidade | `GET /health`, a implementar, com 200 ou 503 em até dois segundos | Não se aplica | Não se aplica | Rastreabilidade (CloudWatch) | 3.9.4 cenário C | `CT-RNF07-P` e `CT-RNF07-N` | 4 |
 | RNF08 — usabilidade das respostas | Formato da resposta devolvida | Não se aplica | Não se aplica | Chat UI, Gerador de Respostas | 2.2.2 cenário 1 | Teste de usabilidade com SUS, task T34 | 3 e 4 |
-| RNF09 — auditabilidade das interações | Todas as rotas | Intenção e desfecho registrados por interação | `auditoria.interacao`, `auditoria.notificacao` | Auditoria e Feedback | 3.9.4 cenários D e E | Inspeção dos registros e teste de acesso negado | 3 e 4 |
+| RNF09 — auditabilidade das interações | Consulta administrativa no banco ou serviço | Não se aplica | `auditoria.interacao`, `auditoria.notificacao` | Auditoria e Feedback | 3.9.4 cenários D e E | `CT-RNF09-P` e `CT-RNF09-N` | 3 e 4 |
 | RNF10 — escalabilidade | Todas as rotas sob carga | Matriz esparsa que não cresce proporcionalmente ao corpus | Não se aplica | Web App Backend | Não aplicável | Teste de carga progressiva, task T31 | 4 |
-| RNF11 — explicabilidade | Justificativa e fontes na resposta | `listar_palavras_de_maior_peso_por_intencao` expõe os termos que sustentaram a decisão | `auditoria.interacao_artefato` | Gerador de Respostas e Explicabilidade | 2.2.2 cenário 2 | `test_classificador`; validação junto aos usuários | 4 |
+| RNF11 — explicabilidade | Justificativa curta e fontes na resposta | Evidências recuperadas sustentam o conteúdo sugerido | `auditoria.interacao_artefato` | Gerador de Respostas e Explicabilidade | 2.2.2 cenário 2 | `CT-RNF11-P` e `CT-RNF11-N` | 4 |
+| RNF12 — fundamentação das respostas | Referências e data na resposta de consulta | Evidências recuperadas devem sustentar cada afirmação factual | `auditoria.interacao_artefato` | Gerador de Respostas, Repositório de Dados | 2.2.2 cenário 1; risco AM8 | `CT-RNF12-P` e `CT-RNF12-N` | 4 |
 
 **Ausências identificadas na verificação da matriz.** A leitura por coluna expõe cinco lacunas, todas já encaminhadas neste documento e no planejamento da Sprint 3:
 
 1. **RF03, RF04, RF05 e RF06 não têm endpoint definido.** São os quatro requisitos cuja construção começa na Sprint 4; o contrato precisa ser definido antes, e a definição está entre as tasks daquele ciclo.
-2. **RNF02 não tem mecanismo implementado.** É a lacuna de maior consequência: sem ela, os endpoints não podem ser expostos publicamente, conforme registrado na Seção 3.4.
+2. **RNF02 não tem mecanismo implementado.** A autenticação SSO é a lacuna de maior consequência: sem ela, os endpoints não podem ser expostos publicamente, conforme registrado na Seção 3.4.
 3. **RNF07 depende de um endpoint que não existe.** O `GET /health` é pressuposto pelo pipeline da Seção 3.7.6 e está no item 13 da Seção 3.7.9.
 4. **Nenhum endpoint está sem requisito de origem.** As quatro rotas implementadas rastreiam para RF01 e RF02.
 5. **Nenhuma entidade do modelo está sem uso.** Todas as onze tabelas da Seção 3.6.5 aparecem em pelo menos uma linha desta matriz, o que confirma que o modelo de dados não excede o necessário para sustentar os casos de uso.
@@ -4967,7 +4986,7 @@ A imagem representa a ideia dessa proposta, ainda não implementada.
 |---|---|---|
 | 1 | Priorizar e decidir os itens do inventário da seção 4.9 que bloqueiam a construção, a começar por P-A01, P-A02, P-B05 e P-B06 | Transforma decisões em aberto em requisitos de comportamento |
 | 2 | Substituir respostas simuladas por integração real com SharePoint, o banco de dados de projetos e o Microsoft Teams | Elimina a limitação apontada nas seções 4.8 e 4.13: nenhum protótipo utiliza dados reais |
-| 3 | Implementar controle de acesso ligado ao perfil autenticado da pessoa, em vez do bloqueio simulado da Imagem 4.5.4 | Resolve P-B06 e trata a exposição de dados sensíveis de projetos do Metrô |
+| 3 | Implementar autenticação por SSO para identificar a pessoa antes do uso, em vez do acesso simulado da Imagem 4.5.4 | Resolve P-B06 e trata o acesso não autenticado à solução |
 | 4 | Construir o canal de PLN e, quando necessário, o reconhecimento de voz, para tratar pedidos como os das situações S-B04 e S-B06 do [repertório da seção 4.10](#410-repertório-de-situações) | Substitui as respostas fixas por palavra-chave do mockup |
 | 5 | Definir e implementar a política de frequência e o gatilho da recomendação proativa como configuração real, não como roteiro encenado | Resolve P-A01 e P-A02 |
 | 6 | Rodar um piloto controlado com um pequeno grupo de profissionais do Metrô operando a interface embutida durante a rotina real de trabalho, com instrumentação de uso | Produz o teste com usuários reais apontado como pendente em toda a seção 4.8 |
@@ -4985,7 +5004,743 @@ O próximo passo é implementar essa interface, seguindo os passos da seção 4.
 
 ---
 
-# 5. Registro de Decisões
+# 5. Desenvolvimento e Documentação Técnica do Projeto
+
+## 5.1 Webhooks
+
+### 5.1.1 Definição dos Webhooks
+
+### 5.1.2 Rotas e Endpoints
+
+### 5.1.3 Estrutura dos Dados Recebidos
+
+### 5.1.4 Processamento e Armazenamento
+
+### 5.1.5 Respostas e Tratamento de Erros
+
+### 5.1.6 Exemplos e Testes
+
+## 5.2 Módulo VHS
+
+### 5.2.1 Objetivo e Tecnologia Utilizada
+
+### 5.2.2 Configuração do Cache
+
+### 5.2.3 Gravação e Reprodução das Respostas Externas
+
+### 5.2.4 Integração com os Serviços Externos
+
+### 5.2.5 Casos de Uso e Testes
+
+## 5.3 Sistema de Troca de Mensagens
+
+### 5.3.1 Tecnologia de Mensageria
+
+### 5.3.2 Configuração de Filas, Tópicos ou Canais
+
+### 5.3.3 Produtores
+
+### 5.3.4 Consumidores
+
+### 5.3.5 Integração com os Webhooks
+
+### 5.3.6 Tratamento de Falhas
+
+### 5.3.7 Casos de Uso e Testes
+
+## 5.4 Integração entre Frontend e Backend
+
+### 5.4.1 Arquitetura da Integração
+
+### 5.4.2 Configuração e Contratos das APIs
+
+### 5.4.3 Fluxos Integrados
+
+### 5.4.4 Tratamento de Erros e Falhas de Comunicação
+
+### 5.4.5 Testes de Integração
+
+---
+
+# 6. Planejamento de Testes Sistêmicos
+
+## 6.1 Estratégia, Ferramentas e Bibliotecas Planejadas
+
+## 6.2 Planejamento dos Testes de Funcionalidade
+
+### 6.2.1 Propósito e Rastreabilidade com os Requisitos Funcionais
+
+### 6.2.2 Cenários Positivos e Negativos Planejados
+
+### 6.2.3 Procedimentos de Teste
+
+### 6.2.4 Resultados Esperados
+
+### 6.2.5 Abrangência Planejada
+
+## 6.3 Planejamento dos Testes de Requisitos Não Funcionais
+
+### 6.3.1 Propósito e Rastreabilidade com os RNFs
+
+Os testes desta seção verificam os atributos de qualidade definidos nos requisitos não funcionais da Seção 2.3. Eles não substituem os testes de comportamento da Seção 6.2: partem dos mesmos fluxos funcionais, mas medem propriedades como tempo de resposta, precisão, qualidade da transcrição, compreensibilidade e capacidade de crescimento. Essa ligação evita testes isolados do uso real do produto e torna explícito qual comportamento funcional fornece o contexto para cada medição.
+
+Esta versão detalha os doze RNFs definidos na Seção 2.3. Nenhum resultado de execução é apresentado aqui; os casos descrevem o que deverá ser executado e quais evidências deverão ser preservadas. A cobertura integral do planejamento não significa que todos os mecanismos estejam implementados, distinção registrada na Seção 6.3.6.
+
+| Casos de teste | RNF de origem | RFs relacionados | Propósito |
+|---|---|---|---|
+| `CT-RNF01-P` e `CT-RNF01-N` | RNF01 — Desempenho das consultas | RF02 | Verificar o tempo de resposta das consultas textuais em condições normais e identificar respostas fora do limite |
+| `CT-RNF02-P` e `CT-RNF02-N` | RNF02 — Autenticação dos usuários | RF01, RF02, RF03, RF04, RF05 e RF06 | Verificar que credenciais SSO válidas permitem o acesso e que credenciais ausentes ou inválidas são rejeitadas antes da regra de negócio |
+| `CT-RNF03-P` e `CT-RNF03-N` | RNF03 — Qualidade da classificação de intenções | RF02, RF04 e RF06 | Verificar F1-macro, cobertura das intenções conhecidas e rejeição de solicitações fora do catálogo |
+| `CT-RNF04-P` e `CT-RNF04-N` | RNF04 — Rastreabilidade das consultas | RF01, RF02, RF03, RF04, RF05 e RF06 | Verificar se cada interação pode ser correlacionada à entrada, ao processamento, às fontes e ao resultado aplicável |
+| `CT-RNF05-P` e `CT-RNF05-N` | RNF05 — Interoperabilidade entre aplicações clientes | RF01, RF02, RF04 e RF05 | Verificar a equivalência de contrato e de resultado de negócio entre a interface React e um cliente Python independente |
+| `CT-RNF06-P` e `CT-RNF06-N` | RNF06 — Qualidade da transcrição de áudio | RF01 | Verificar a fidelidade da conversão de voz em texto em condições favoráveis e adversas |
+| `CT-RNF07-P` e `CT-RNF07-N` | RNF07 — Disponibilidade da solução | RF01, RF02, RF03, RF04, RF05 e RF06 | Verificar a disponibilidade na janela operacional e o comportamento do endpoint de saúde diante de falhas da aplicação e do banco |
+| `CT-RNF08-P` e `CT-RNF08-N` | RNF08 — Usabilidade das respostas | RF02 e RF03 | Verificar se o usuário compreende tanto respostas informativas quanto mensagens de limitação |
+| `CT-RNF09-P` e `CT-RNF09-N` | RNF09 — Auditabilidade das interações | RF01, RF02, RF03, RF04 e RF05 | Verificar acesso administrativo, proteção, retenção, privacidade e tratamento de falha dos registros de auditoria |
+| `CT-RNF10-C-P` e `CT-RNF10-C-N` | RNF10 — Escalabilidade do agente | RF02 e RF04 | Verificar a escalabilidade sob crescimento progressivo e pico repentino de solicitações concorrentes |
+| `CT-RNF10-M-P` e `CT-RNF10-M-N` | RNF10 — Escalabilidade do agente | RF02 e RF04 | Verificar o crescimento do consumo de memória com o aumento do volume e da diversidade dos dados |
+| `CT-RNF11-P` e `CT-RNF11-N` | RNF11 — Explicabilidade das sugestões | RF03 e RF04 | Verificar se as sugestões possuem fonte que as sustente e justificativa curta, e se o agente evita sugestões sem fundamento |
+| `CT-RNF12-P` e `CT-RNF12-N` | RNF12 — Fundamentação das respostas de consulta | RF02 e RF03 | Verificar se as fontes existem e sustentam as afirmações factuais e se o agente limita a resposta quando não há evidência suficiente |
+
+Nos identificadores, `P` representa o cenário positivo e `N` o cenário negativo. Nos casos do RNF10, `C` identifica o teste de concorrência e `M` o teste de crescimento de memória. Os mesmos identificadores são usados nas subseções seguintes para manter a rastreabilidade entre cenário, procedimento, resultado esperado e evidência.
+
+#### Operacionalização na Sprint 4
+
+A execução será coordenada pelo responsável da task T31, com revisão das evidências por um segundo integrante. Avaliações subjetivas seguem as regras específicas de independência e desempate dos RNF08, RNF11 e RNF12. As datas abaixo pertencem à janela da Sprint 4, de 14 a 25 de setembro de 2026, e definem uma ordem planejada; a designação nominal permanece registrada no quadro da equipe.
+
+| Ordem e data planejada | RNFs | Ambiente | Responsável operacional | Pré-requisitos |
+|---|---|---|---|---|
+| 1 — 14 e 15/09 | Preparação comum | Local controlado e repositório | Responsável da T31 | Massas versionadas, commit candidato, instrumentos da Seção 6.1 e respostas controladas da Seção 6.4 |
+| 2 — 16 e 17/09 | RNF03, RNF06 e RNF10-M | Local controlado, com processos reiniciados entre rodadas | Responsável da T31 e responsável pelo PLN | Modelo e limiar congelados, conjunto cego custodiado, áudios de referência e datasets escalonados |
+| 3 — 18/09 | RNF02, RNF04, RNF05 e RNF09 | Homologação | Responsável da T31 e responsável pelo backend | SSO, persistência de auditoria, identidade administrativa e cliente Python disponíveis |
+| 4 — 21 e 22/09 | RNF08, RNF11 e RNF12 | Homologação e sessões acompanhadas | Responsável da T31 e responsáveis pela avaliação | Roteiro da Seção 6.5, participantes recrutados, fontes e rubricas congeladas |
+| 5 — 23/09 | RNF01 e RNF10-C | Homologação, com recursos fixos | Responsável da T31 e responsável pela infraestrutura | Dependências reais verificadas para RNF01; mocks idênticos e linha de base disponíveis para RNF10 |
+| 6 — 24/09 | RNF07 | AWS Academy durante uma única sessão contínua | Responsável da T31 e responsável pela infraestrutura | `GET /health`, aplicação, banco e monitor disponíveis durante quatro horas |
+| 7 — 25/09 | Consolidação e retestes admissíveis | Conforme o caso original | Responsável da T31 e revisor | Evidências reunidas, defeitos classificados e critérios de reteste respeitados |
+
+**Política geral de resultado e reteste.** Um caso recebe `Aprovado` somente quando todos os seus critérios forem atendidos e as evidências mínimas estiverem disponíveis. `Reprovado` exige abertura de defeito com caso, ambiente, evidência, responsável e versão afetada; após a correção, executam-se novamente o caso afetado e os casos de regressão relacionados. `Bloqueado` somente pode ser usado quando um pré-requisito externo ou de implementação impedir a execução e deve registrar responsável e data esperada de desbloqueio. `Não executado` identifica apenas trabalho que não chegou a ser iniciado. A política específica do conjunto cego do RNF03 prevalece sobre a repetição geral quando houver ajuste do modelo ou do limiar.
+
+### 6.3.2 Planejamento dos Testes de Desempenho
+
+O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável para as consultas textuais, e as duas dimensões do RNF10: crescimento da concorrência e crescimento dos dados. Os ensaios devem ser executados em ambiente controlado, com versão do código, configuração, recursos computacionais, horário e estado dos serviços externos registrados antes de cada rodada.
+
+#### RNF01 — tempo de resposta das consultas textuais
+
+**Propósito.** Verificar se pelo menos 80% das consultas textuais previstas no RF02 apresentam resposta completa em até 15 segundos e se nenhuma consulta elegível permanece sem desfecho além do teto de 60 segundos.
+
+**Massa de teste.** Serão utilizadas 100 consultas sintéticas representativas dos tipos de consulta previstos no RF02. A massa deve variar a formulação das perguntas e os elementos consultados, sem utilizar dados corporativos reais.
+
+**Cenários.** O caso `CT-RNF01-P` executa consultas válidas sob condições normais. O caso `CT-RNF01-N` aplica lentidão controlada com duração configurada entre 15 e 60 segundos e acima de 60 segundos. Na condição mais lenta, a aplicação deve interromper a espera e devolver erro controlado dentro do teto, permitindo verificar tanto a meta principal quanto a proteção da cauda sem planejar uma reprovação obrigatória.
+
+**Instruções de execução:**
+
+1. Registrar o identificador do commit, o ambiente, a configuração da aplicação, os recursos computacionais, o horário e a disponibilidade dos serviços externos.
+2. Enviar uma requisição de aquecimento e descartá-la da medição, evitando que a inicialização do processo ou das conexões distorça a amostra.
+3. Executar as 100 consultas pelo endpoint textual, registrando o instante de envio e o instante de recebimento completo da resposta.
+4. Calcular a duração de cada requisição e classificá-la como: resposta completa em até 15 segundos; desfecho entre 15 e 60 segundos; ou ausência de desfecho em até 60 segundos.
+5. Separar da amostra elegível somente as falhas comprovadamente causadas por indisponibilidade de serviço externo, preservando o status HTTP e o log que sustentam cada exclusão.
+6. Calcular `consultas elegíveis com resposta completa em até 15 s / total de consultas elegíveis × 100` e `consultas elegíveis encerradas em até 60 s / total de consultas elegíveis × 100`.
+7. Registrar também p50, p80, p95, menor tempo, maior tempo e taxa de respostas HTTP bem-sucedidas.
+
+**Critério de aprovação.** Os dois limites devem ser atendidos: pelo menos 80% das consultas elegíveis com resposta completa em até 15 segundos e 100% encerradas com resposta ou erro controlado em até 60 segundos. Respostas acima de 15 segundos falham na meta principal; ausência de desfecho em 60 segundos também reprova o teto da cauda. Somente indisponibilidade externa comprovada permite exclusão.
+
+**Evidências planejadas.** Arquivo CSV com uma linha por consulta, logs HTTP, identificação da massa e do ambiente e relatório consolidado com percentuais e percentis.
+
+#### RNF10 — crescimento da concorrência
+
+**Propósito.** Verificar, sob dependências externas controladas, se o agente mantém o limite absoluto e a degradação relativa de latência quando submetido a uma carga dez vezes maior que a carga nominal adotada para o MVP.
+
+**Carga planejada.** A carga nominal, ou `1x`, será de cinco solicitações simultâneas e funcionará como linha de base controlada. O crescimento progressivo utilizará os estágios de 5, 10, 25 e 50 solicitações simultâneas, correspondentes a `1x`, `2x`, `5x` e `10x`. Todos os estágios usarão a mesma massa, versão e respostas simuladas das dependências externas; os resultados não serão comparados diretamente ao RNF01, que mede o fluxo com serviços reais.
+
+**Cenários.** O caso `CT-RNF10-C-P` aumenta a concorrência progressivamente até 50 solicitações. O caso `CT-RNF10-C-N` inicia diretamente com 50 solicitações simultâneas, representando um pico repentino e verificando se a mesma meta é preservada sem o período de crescimento gradual.
+
+**Instruções de execução:**
+
+1. Preparar respostas controladas para as dependências externas, conforme a estratégia da Seção 6.4, para que a medição represente a capacidade da aplicação e não o limite comercial de um provedor.
+2. Registrar o ambiente, o commit, a massa de solicitações, a configuração da ferramenta de carga e os recursos computacionais disponíveis.
+3. Executar um minuto de aquecimento antes de iniciar as rodadas contabilizadas.
+4. No caso progressivo, executar sucessivamente os estágios de 5, 10, 25 e 50 solicitações simultâneas durante cinco minutos cada.
+5. No caso de pico, iniciar diretamente uma rodada de cinco minutos com 50 solicitações simultâneas.
+6. Repetir cada estágio três vezes nas mesmas condições e usar a mediana das três rodadas na comparação.
+7. Registrar p50, p80 e p95 da latência, throughput, quantidade e categoria dos erros, CPU e pico de memória.
+8. Para cada rodada, calcular a razão `p95 do estágio / p95 da linha de base 1x` e comparar o estágio `10x` e o pico repentino com os limites do RNF10.
+
+**Critério de aprovação.** Tanto no crescimento progressivo quanto no pico de 50 solicitações, o p95 deve ser de no máximo 20 segundos e de no máximo duas vezes o p95 mediano da linha de base `1x`. Os dois limites são cumulativos.
+
+**Evidências planejadas.** Configuração da carga, arquivos brutos de cada rodada, relatório de percentis e throughput, gráficos de CPU e memória e registro das respostas controladas usadas nas dependências externas.
+
+#### RNF10 — crescimento do volume de dados
+
+**Propósito.** Verificar separadamente se a memória de treinamento cresce de forma sublinear e se o processo servido não carrega para cada requisição um custo proporcional ao volume usado para produzir o modelo.
+
+**Massa de teste.** Serão produzidas quatro versões sintéticas e versionadas do dataset, com tamanhos `1x`, `2x`, `5x` e `10x`. Cada versão preservará a distribuição das intenções. A versão adversa de `10x` acrescentará maior diversidade vocabular para aumentar deliberadamente o espaço de representação.
+
+**Cenários.** O caso `CT-RNF10-M-P` mede o crescimento sobre os quatro datasets com distribuição e vocabulário controlados. O caso `CT-RNF10-M-N` utiliza o dataset `10x` com alta diversidade vocabular, criando a condição mais desfavorável para a matriz esparsa.
+
+**Instruções de execução:**
+
+1. Versionar os quatro datasets e registrar quantidade de exemplos, classes, termos distintos e tamanho em disco.
+2. Reiniciar o processo antes de cada medição, evitando reaproveitamento de memória entre rodadas.
+3. Treinar cada tamanho três vezes com a mesma configuração e registrar o pico de RSS do processo, usando a mediana das três execuções.
+4. Reiniciar o serviço, carregar o modelo produzido por cada tamanho e registrar a memória RSS estabilizada antes de receber requisições.
+5. Executar a mesma massa fixa de 100 inferências em cada modelo e registrar memória estabilizada, pico durante o atendimento e variação por requisição.
+6. Repetir treinamento e serviço com o dataset adverso de alta diversidade vocabular.
+7. Calcular, para treinamento, `pico mediano 10x / pico mediano 1x` e, para serviço, as razões de RSS estabilizada e de pico de inferência entre os modelos `10x` e `1x`.
+
+**Critério de aprovação.** No dataset controlado e no adverso, a razão de pico de treinamento entre `10x` e `1x` deve ser no máximo 8, e as razões da memória estabilizada e do pico de inferência do processo servido devem ser no máximo 2. Os limites devem ser atendidos simultaneamente.
+
+**Evidências planejadas.** Datasets e modelos versionados, configuração do pipeline e do serviço, medições brutas de RSS, cálculo das medianas e gráficos separados de treinamento e serviço.
+
+### 6.3.3 Cenários Positivos e Negativos Planejados
+
+| Caso | Tipo | Condição exercitada | Comportamento ou medição esperada |
+|---|---|---|---|
+| `CT-RNF01-P` | Positivo | Consultas textuais válidas sob condições normais | Pelo menos 80% apresentam resposta completa em até 15 segundos e todas encerram em até 60 segundos |
+| `CT-RNF01-N` | Negativo | Dependência controlada com atrasos entre 15 e 60 segundos e acima de 60 segundos | A aplicação contabiliza a meta principal e encerra a espera mais longa com erro controlado antes do teto; exclusões exigem evidência |
+| `CT-RNF02-P` | Positivo | Requisição válida em cada endpoint protegido com token SSO válido | A identidade é aceita e a requisição alcança a regra de negócio sem resposta 401 |
+| `CT-RNF02-N` | Negativo | Token ausente, malformado, expirado, com assinatura inválida ou audiência incorreta | Todas as solicitações são interrompidas antes da regra de negócio e recebem HTTP 401 sem expor credenciais |
+| `CT-RNF03-P` | Positivo | Paráfrases inéditas e representativas das nove intenções conhecidas | O classificador preserva F1-macro mínimo de 0,85 e cobertura mínima de 90% sem rejeitar excessivamente entradas conhecidas |
+| `CT-RNF03-N` | Negativo | Solicitações inéditas, ambíguas, limítrofes e fora do catálogo | No máximo 15% dos exemplos `fora_do_catalogo` são aceitos indevidamente como intenção conhecida |
+| `CT-RNF04-P` | Positivo | Vinte interações de texto e voz, com sucesso, esclarecimento, fora do catálogo e respostas com ou sem fontes | Todos os elementos aplicáveis podem ser recuperados e relacionados pelo identificador da interação |
+| `CT-RNF04-N` | Negativo | Falha externa, erro de processamento e registro propositalmente incompleto | A falha é relacionada à interação e o checklist identifica qualquer ausência de elemento obrigatório |
+| `CT-RNF05-P` | Positivo | As mesmas vinte solicitações válidas executadas pela interface React e por cliente Python | Os pares apresentam o mesmo contrato e resultado de negócio, admitindo apenas variação de redação textual |
+| `CT-RNF05-N` | Negativo | Entrada inválida, erro de autenticação e falha controlada do serviço nos dois clientes | Os clientes recebem status, esquema e categoria de erro equivalentes |
+| `CT-RNF06-P` | Positivo | Fala clara em português brasileiro, com microfone adequado | A transcrição preserva o conteúdo e contribui para WER geral de até 15% |
+| `CT-RNF06-N` | Negativo | Ruído controlado, diferentes locutores e vocabulário técnico | A degradação é medida e discriminada por condição, sem ocultar os erros no resultado agregado |
+| `CT-RNF07-P` | Positivo | Verificação por minuto durante uma sessão contínua de quatro horas no AWS Academy | Pelo menos 99% das verificações elegíveis retornam HTTP 200 em até dois segundos |
+| `CT-RNF07-N` | Negativo | Condição não saudável controlada da aplicação, mantendo o servidor HTTP acessível, e interrupção separada do banco de dados | O endpoint retorna 503, a falha gera registro técnico e alerta e o serviço volta a 200 após a recuperação |
+| `CT-RNF08-P` | Positivo | Resposta contendo informação solicitada e fonte | O participante identifica a informação e sua origem sem auxílio |
+| `CT-RNF08-N` | Negativo | Resposta de limitação, ausência de fonte ou solicitação fora do catálogo | O participante identifica o motivo da limitação e o próximo passo sem auxílio |
+| `CT-RNF09-P` | Positivo | Consulta administrativa, registros dentro da retenção, tentativa de escrita comum e atualização controlada de feedback | O administrador consulta os registros, alterações e exclusões são bloqueadas e somente o feedback autorizado pode mudar |
+| `CT-RNF09-N` | Negativo | Consulta por usuário comum, adulteração, segredos simulados e indisponibilidade do mecanismo principal de auditoria | O acesso e a adulteração são negados, segredos não são persistidos e a falha aciona contingência, alerta e nova tentativa |
+| `CT-RNF10-C-P` | Positivo | Aumento progressivo de 5 para 50 solicitações simultâneas com linha de base e mocks constantes | No estágio de `10x`, o p95 fica em até 20 segundos e em no máximo duas vezes o p95 de `1x` |
+| `CT-RNF10-C-N` | Negativo | Pico direto de 50 solicitações simultâneas sob os mesmos mocks da linha de base | A aplicação preserva os limites absoluto e relativo sem depender do crescimento gradual |
+| `CT-RNF10-M-P` | Positivo | Treinamento e serviço com datasets de `1x`, `2x`, `5x` e `10x` | A razão fica em até 8 no treinamento e as razões de memória estabilizada e de pico ficam em até 2 no serviço |
+| `CT-RNF10-M-N` | Negativo | Treinamento e serviço com dataset `10x` de alta diversidade vocabular | Os dois limites de memória permanecem atendidos ou o caso é corretamente reprovado |
+| `CT-RNF11-P` | Positivo | Vinte solicitações com fontes de referência conhecidas e suficientes | Pelo menos 17 sugestões têm fonte existente que sustenta o conteúdo e justificativa curta e compreensível |
+| `CT-RNF11-N` | Negativo | Dez solicitações sem fonte suficiente, com fonte inexistente ou irrelevante | O agente se abstém ou informa a limitação, sem inventar fonte ou justificativa |
+| `CT-RNF12-P` | Positivo | Trinta consultas com respostas e fontes de referência conhecidas | Todas as referências existem e pelo menos 90% das afirmações factuais são sustentadas pelas fontes citadas |
+| `CT-RNF12-N` | Negativo | Dez consultas com evidência ausente, insuficiente, conflitante ou irrelevante | Todas as respostas informam a limitação e nenhuma apresenta afirmação factual sem sustentação |
+
+### 6.3.4 Procedimentos de Teste
+
+Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão detalhados na Seção 6.3.2. Esta subseção apresenta as instruções para os demais requisitos contemplados no planejamento.
+
+#### RNF02 — autenticação dos usuários
+
+**Propósito.** Verificar se todas as funcionalidades protegidas dos RF01 a RF06 somente são executadas após a validação de uma identidade por SSO e se as falhas de autenticação são tratadas de forma uniforme, independentemente da futura escolha entre Microsoft e Google.
+
+**Massa e ambiente.** Antes da execução, será extraída da especificação OpenAPI a lista de todos os endpoints protegidos. Para cada endpoint será preparada uma requisição válida com identidade sintética e token SSO válido para o `CT-RNF02-P`. O `CT-RNF02-N` repetirá cada requisição com cinco condições: credencial ausente, token malformado, token expirado, assinatura inválida e audiência incorreta. Tokens reais não serão usados nem preservados como evidência.
+
+**Instruções de execução:**
+
+1. Registrar commit, ambiente, lista de endpoints protegidos, configuração do adaptador SSO e metadados públicos do emissor, sem copiar segredo ou token para o relatório.
+2. Criar uma identidade sintética no provedor ou simulador homologado e obter uma credencial válida com emissor, assinatura, audiência e prazo compatíveis com a aplicação.
+3. Executar uma requisição funcionalmente válida em cada endpoint protegido com a credencial válida.
+4. Confirmar que a autenticação é aceita, que a identidade técnica é propagada à aplicação e que a resposta não é HTTP 401; erros funcionais posteriores não contam como falha de autenticação.
+5. Repetir a requisição de cada endpoint sem credencial e com cada uma das quatro credenciais inválidas preparadas.
+6. Confirmar que todas as variações negativas retornam HTTP 401 com mensagem genérica e são interrompidas antes do classificador, da consulta a dados, da geração de resposta ou de outra regra de negócio.
+7. Inspecionar os registros técnicos e de auditoria para confirmar que não contêm o token bruto, segredo, senha ou outro material de autenticação.
+8. Registrar cada tentativa como aceita ou bloqueada e calcular separadamente `credenciais válidas aceitas / total de credenciais válidas × 100` e `credenciais inválidas bloqueadas / total de credenciais inválidas × 100`.
+
+**Critério de aprovação.** 100% das credenciais válidas devem ser aceitas e 100% das condições ausentes ou inválidas devem ser rejeitadas com HTTP 401 antes da regra de negócio. Nenhuma credencial bruta ou segredo pode aparecer nas evidências ou nos registros inspecionados.
+
+**Evidências planejadas.** Inventário dos endpoints protegidos, configuração não secreta do emissor e da audiência, requisições com cabeçalhos ocultados, status e corpos das respostas, evidência da não execução das regras de negócio e inspeção anonimizada dos registros.
+
+#### RNF03 — qualidade da classificação de intenções
+
+**Propósito.** Verificar se o classificador interpreta corretamente solicitações relacionadas aos RF02, RF04 e RF06, mantendo equilíbrio entre qualidade por classe, atendimento das intenções conhecidas e rejeição de entradas fora do catálogo.
+
+**Massa de teste.** Será construído um conjunto cego novo com 200 exemplos, vinte para cada uma das dez intenções do catálogo. Os 180 exemplos das nove intenções conhecidas compõem o `CT-RNF03-P`; os vinte exemplos de `fora_do_catalogo`, incluindo formulações ambíguas e limítrofes, compõem o `CT-RNF03-N`. Um integrante que não participe do ajuste custodiará os textos e rótulos. Nenhum exemplo poderá integrar o corpus atual de 400 frases nem participar do treinamento, da comparação de pré-processamento, da ampliação do dataset, da calibração do limiar ou do ajuste de hiperparâmetros. Embora maior que a massa anterior, o conjunto sintético continua sendo evidência acadêmica controlada e não estima sozinho o desempenho sobre a linguagem real de toda a organização.
+
+**Instruções de execução:**
+
+1. Registrar a versão do modelo, o commit, a configuração do pipeline, a semente, o limiar de confiança e o hash do conjunto cego lacrado.
+2. Confirmar com o custodiante que nenhum dos 200 exemplos participou de treinamento, desenvolvimento, comparação ou calibração.
+3. Congelar modelo e limiar antes de receber os textos e rótulos do conjunto cego para execução.
+4. Classificar os 200 exemplos uma única vez para a versão candidata, sem alteração de modelo ou limiar durante a medição.
+5. Registrar, para cada exemplo, o identificador, o rótulo esperado, o rótulo previsto, a confiança e se houve rejeição pelo limiar.
+6. Calcular F1-macro entre as dez classes, métricas por classe e matriz de confusão.
+7. Calcular `exemplos conhecidos não rejeitados / 180 × 100` para obter a cobertura das intenções conhecidas.
+8. Calcular `exemplos fora do catálogo classificados como intenção conhecida / 20 × 100` para obter a aceitação indevida.
+9. Identificar as classes responsáveis pelos erros e distinguir classificação incorreta, rejeição de intenção conhecida e aceitação indevida.
+
+**Critério de aprovação.** Os três limites devem ser atendidos simultaneamente: F1-macro mínimo de 0,85, cobertura mínima de 90% sobre as intenções conhecidas e aceitação indevida máxima de 15% sobre `fora_do_catalogo`.
+
+**Evidências planejadas.** Hash e versão do conjunto cego, declaração de isolamento assinada pelo custodiante, arquivo de previsões, configuração do modelo e do limiar, matriz de confusão e relatório das três métricas.
+
+**Política específica de reteste.** Falhas causadas exclusivamente pelo instrumento ou ambiente permitem repetir o mesmo conjunto sem modificar o modelo. Se os resultados ou exemplos do conjunto cego forem usados para alterar corpus, pré-processamento, modelo, hiperparâmetros ou limiar, esse conjunto perde a condição de teste final: a nova versão deverá ser avaliada sobre outro conjunto cego, inédito e custodiado. O estado `Reprovado` deve gerar registro de defeito e nova versão candidata; o limiar é calibrado somente em dados de desenvolvimento.
+
+#### RNF04 — rastreabilidade das consultas
+
+**Propósito.** Verificar se as interações dos RF01 a RF06 podem ser rastreadas da solicitação ao resultado por meio de um identificador único, sem confundir essa correlação automática com os controles administrativos de auditoria do RNF09.
+
+**Massa de teste.** Serão produzidas 20 interações sintéticas de texto e voz, distribuídas entre consulta bem-sucedida, resposta com fonte, resposta sem fonte aplicável, solicitação de esclarecimento e rejeição fora do catálogo. O caso `CT-RNF04-P` utiliza registros completos desses fluxos. O caso `CT-RNF04-N` acrescenta falha de serviço externo, erro de processamento e uma cópia controlada de registro com elemento obrigatório ausente, destinada exclusivamente a validar o instrumento de inspeção.
+
+**Instruções de execução:**
+
+1. Versionar a massa e registrar, para cada interação, o usuário sintético, o canal, a entrada, a intenção, as fontes e o desfecho esperados.
+2. Executar as 20 interações e preservar o identificador devolvido ou associado a cada uma.
+3. Consultar `auditoria.interacao` por `interacao.id` e, quando houver fonte, relacionar os registros de `auditoria.interacao_artefato`.
+4. Verificar em cada registro os campos aplicáveis: usuário autenticado, data e hora, canal, solicitação ou referência do áudio, intenção, resultado, tempo de processamento, feedback e categoria de erro.
+5. Confirmar que as fontes recuperadas correspondem às fontes efetivamente utilizadas para produzir o resultado.
+6. Nas falhas, confirmar que o erro e o resultado controlado permanecem associados ao mesmo identificador.
+7. Executar o mesmo checklist sobre o registro incompleto preparado para o cenário negativo e confirmar que a ausência é apontada.
+8. Calcular `interações completas / interações executadas × 100` e listar separadamente as inconsistências encontradas.
+
+**Critério de aprovação.** As 20 interações executadas devem apresentar 100% dos elementos aplicáveis e relacionamentos corretos, e o registro incompleto controlado deve ser identificado como inválido pelo checklist.
+
+**Evidências planejadas.** Massa de entradas, identificadores das interações, consultas e registros recuperados, relacionamentos com artefatos e checklist de completude por caso.
+
+#### RNF05 — interoperabilidade entre aplicações clientes
+
+**Propósito.** Verificar se a interface React e um cliente Python independente consomem o mesmo núcleo por contratos REST padronizados e recebem resultados de negócio equivalentes, sem duplicar regras do agente nos clientes.
+
+**Massa e ambiente.** Serão usadas as mesmas 20 solicitações sintéticas válidas nos dois clientes, incluindo o fluxo textual por `POST /api/v1/chat` e o fluxo de voz iniciado por `POST /api/v1/audio` e continuado por `POST /api/v1/audio/{audio_id}/analyze`. As dependências externas usarão respostas controladas para que ambos os clientes recebam as mesmas condições. O caso `CT-RNF05-N` acrescenta entrada inválida, credencial inválida simulada e falha controlada do serviço.
+
+**Instruções de execução:**
+
+1. Registrar commit, versão da interface React, versão do cliente Python, contratos da API e configuração das respostas externas controladas.
+2. Confirmar que os dois clientes apontam para a mesma instância da API e não executam localmente classificação, recuperação de fontes ou regras de negócio.
+3. Executar em cada cliente as 20 solicitações válidas com os mesmos dados de entrada e preservar requisições e respostas completas.
+4. Para cada par, comparar método e rota, status HTTP, campos obrigatórios do esquema, intenção, fontes e dados estruturados de negócio.
+5. Comparar a resposta textual apenas quanto ao significado e aos dados apresentados; não reprovar diferenças de redação que preservem o mesmo resultado de negócio.
+6. Repetir nos dois clientes os cenários de entrada inválida, credencial inválida simulada e falha controlada do serviço.
+7. Comparar, nos cenários negativos, status HTTP, esquema e categoria de erro, sem exigir mensagens textuais literais idênticas.
+8. Registrar cada par como equivalente ou divergente e calcular `pares equivalentes / total de pares × 100`.
+
+**Critério de aprovação.** Todos os pares positivos e negativos devem apresentar contrato e resultado de negócio equivalentes. Qualquer divergência de status, esquema, intenção, fonte, dado estruturado ou categoria de erro reprova o caso correspondente.
+
+**Evidências planejadas.** Versões dos clientes, contratos utilizados, requisições e respostas completas, configuração das dependências controladas e tabela comparativa por par.
+
+#### RNF06 — qualidade da transcrição de áudio
+
+**Propósito.** Verificar se o canal de voz do RF01 apresenta WER geral de no máximo 15% em um conjunto representativo.
+
+**Massa de teste.** Serão utilizadas 30 gravações em português brasileiro, produzidas por pelo menos cinco locutores. Metade será gravada em condição limpa e metade com ruído controlado. O conjunto incluirá termos de gestão de projetos e do contexto metroferroviário. O caso `CT-RNF06-P` usa fala clara e microfone adequado; o caso `CT-RNF06-N` combina ruído, variação de locutor e vocabulário técnico.
+
+**Instruções de execução:**
+
+1. Produzir e versionar uma transcrição manual de referência para cada gravação.
+2. Registrar locutor anonimizado, condição de ruído, equipamento, duração e termos técnicos presentes em cada áudio.
+3. Enviar cada gravação pelo endpoint de transcrição configurado para `pt-BR` e preservar o texto devolvido.
+4. Aplicar a mesma regra de normalização à referência e ao resultado, sem corrigir manualmente o texto produzido pelo serviço.
+5. Contar substituições (`S`), exclusões (`D`) e inserções (`I`) em relação ao total de palavras da referência (`N`).
+6. Calcular `WER = (S + D + I) / N × 100` para cada gravação e para o corpus completo.
+7. Consolidar separadamente os resultados de fala limpa, ruído controlado e ocorrências de vocabulário técnico.
+
+**Critério de aprovação.** O WER geral deve ser igual ou inferior a 15%. Como a métrica inclui inserções, ela não é apresentada como complemento exato de uma porcentagem de palavras reconhecidas corretamente.
+
+**Evidências planejadas.** Arquivos de áudio, transcrições de referência, textos devolvidos pelo serviço, metadados anonimizados da massa e planilha com o cálculo do WER.
+
+#### RNF07 — disponibilidade da solução
+
+**Propósito.** Verificar se aplicação e banco permanecem disponíveis em pelo menos 99% da janela operacional definida e se o endpoint de saúde distingue corretamente condições saudáveis e indisponíveis.
+
+**Contrato e período.** O endpoint planejado `GET /health` deve responder HTTP 200 quando aplicação e banco estiverem disponíveis e HTTP 503 quando um deles não estiver pronto, sempre dentro do limite de dois segundos. A medição ocorrerá uma vez por minuto durante uma sessão contínua de quatro horas do AWS Academy, produzindo 240 verificações antes de exclusões. Provedores externos serão monitorados separadamente e não alteram o estado desse endpoint.
+
+**Instruções de execução:**
+
+1. Registrar commit, ambiente, fuso horário, recursos, configuração do monitor, horários de início e término da sessão e eventuais manutenções comunicadas antes da janela afetada.
+2. Configurar o monitor para chamar `GET /health` uma vez por minuto e registrar início, fim, duração, status HTTP e corpo da resposta.
+3. Executar a monitoração durante quatro horas contínuas da mesma sessão do AWS Academy, sem preencher artificialmente verificações ausentes.
+4. Classificar como bem-sucedida somente a verificação com HTTP 200 recebida em até dois segundos.
+5. Excluir do denominador apenas verificações pertencentes a manutenções previamente comunicadas, preservando a justificativa e os limites de cada intervalo excluído.
+6. Calcular `verificações bem-sucedidas / verificações elegíveis × 100` e relacionar cada falha a eventual incidente conhecido.
+7. Para `CT-RNF07-N`, provocar uma condição interna não saudável na aplicação sem interromper o servidor HTTP e verificar retorno 503, registro técnico e alerta; restaurar a condição saudável e confirmar retorno a 200.
+8. Repetir o passo anterior interrompendo apenas a conexão com o banco, sem tornar indisponível o próprio monitor.
+9. Preservar o instante de detecção e de recuperação de cada falha e confirmar que dependências externas não foram indevidamente usadas para mudar o estado do health check.
+
+**Critério de aprovação.** A disponibilidade deve ser igual ou superior a 99%. Se todas as 240 verificações forem elegíveis, no máximo duas podem falhar. Nos cenários controlados, aplicação ou banco indisponível devem produzir 503, registro técnico e alerta, seguidos de 200 após a recuperação.
+
+**Evidências planejadas.** Histórico das verificações, configuração do monitor, tempos e status, intervalos de manutenção excluídos, registros e alertas dos incidentes e cálculo consolidado.
+
+#### RNF08 — compreensão das respostas
+
+**Propósito.** Verificar se as respostas associadas aos RF02 e RF03 permitem que representantes das personas identifiquem, sem auxílio, a informação solicitada e sua fonte ou, nos casos de limitação, compreendam o motivo e o próximo passo.
+
+**Participantes e cenários.** Participarão pelo menos cinco pessoas externas à turma, contemplando os perfis das personas. O caso `CT-RNF08-P` apresenta uma resposta com informação e fonte. O caso `CT-RNF08-N` apresenta resposta de limitação por ausência de fonte ou solicitação fora do catálogo. O recrutamento, o roteiro completo e a aplicação do SUS permanecem detalhados na Seção 6.5. A amostra mínima é exploratória: cada participante representa vinte pontos percentuais, portanto o resultado descreve o grupo observado e não permite generalização estatística para todos os usuários do Metrô.
+
+**Instruções de execução:**
+
+1. Apresentar as tarefas sem explicar previamente o conteúdo ou a organização da resposta.
+2. No caso positivo, solicitar que o participante identifique a informação principal e a fonte apresentada.
+3. No caso negativo, solicitar que o participante explique o motivo da limitação e indique o próximo passo sugerido pelo agente.
+4. Não fornecer auxílio, reformular a resposta nem indicar visualmente onde a informação está.
+5. Registrar acerto, erro, pedido de ajuda, tempo e observações relevantes em ficha anonimizada e preservar a gravação autorizada ou as anotações necessárias à revisão.
+6. Dois avaliadores devem classificar independentemente cada tarefa como bem-sucedida ou não, usando a mesma rubrica; uma divergência será decidida por um terceiro integrante que não participou das duas classificações iniciais.
+7. Considerar bem-sucedido apenas o participante que concluir as verificações previstas sem ajuda externa segundo a classificação consolidada.
+8. Calcular `participantes bem-sucedidos / total de participantes × 100` e apresentar também as contagens absolutas.
+
+**Critério de aprovação.** Pelo menos 80% dos participantes devem ser bem-sucedidos. Com a amostra mínima de cinco pessoas, isso exige pelo menos quatro participantes bem-sucedidos.
+
+**Evidências planejadas.** Roteiro da Seção 6.5, respostas apresentadas, fichas anonimizadas, avaliações independentes, decisões de desempate e consolidação dos resultados por cenário.
+
+#### RNF09 — auditabilidade das interações
+
+**Propósito.** Verificar se os registros correlacionados pelo RNF04 podem ser inspecionados administrativamente, permanecem protegidos e disponíveis pelo prazo definido, não expõem segredos e possuem contingência diante de falha da auditoria. O teste cobre banco e camada de serviço; a futura tela administrativa e a exportação de registros ficam fora desta seção.
+
+**Massa e acessos.** Serão preparados registros sintéticos com 89, 90 e 91 dias, uma identidade autenticada marcada administrativamente pelo mecanismo de autenticação e uma identidade comum. A identificação administrativa é um atributo de autenticação e não cria hierarquia de cargos nem novo campo no modelo. Também serão usados valores simulados com formato de senha e token, nunca credenciais reais.
+
+**Instruções de execução:**
+
+1. Registrar commit, ambiente, instante de referência, configuração da retenção e identificadores anonimizados das duas identidades de teste.
+2. Autenticar-se com acesso administrativo e consultar, no banco ou na camada de serviço, os registros com 89 e 90 dias, confirmando sua disponibilidade e integridade.
+3. Verificar que o registro com 91 dias está elegível para expurgo; sua presença não reprova o teste, pois a remoção não é obrigada imediatamente após o prazo mínimo.
+4. Tentar consultar os mesmos registros com a identidade comum e confirmar a negação, sem depender de tela administrativa.
+5. Tentar alterar e excluir um registro com credenciais comuns da aplicação e confirmar que ambas as operações são bloqueadas.
+6. Executar o mecanismo autorizado de atualização de `feedback_usuario` e confirmar que apenas esse campo mudou; em seguida, tentar alterar outro campo e confirmar o bloqueio.
+7. Processar entradas contendo senhas e tokens fictícios marcados e inspecionar os registros para confirmar que esses valores não foram persistidos.
+8. Indisponibilizar controladamente o mecanismo principal de persistência de auditoria e executar uma interação.
+9. Confirmar que a falha produziu registro técnico alternativo ou armazenamento temporário em buffer, emitiu alerta e programou ou realizou nova tentativa de persistência, sem expor os valores protegidos.
+10. Registrar se a solicitação do usuário foi concluída ou recebeu erro controlado; ambos são admissíveis desde que a perda silenciosa do evento não ocorra.
+
+**Critério de aprovação.** Todos os controles devem ser respeitados: consulta administrativa permitida, consulta comum negada, registros de até 90 dias preservados, registro mais antigo elegível ao expurgo, alteração e exclusão bloqueadas, feedback atualizado somente pelo caminho autorizado, ausência de segredos e contingência observável na falha da auditoria.
+
+**Evidências planejadas.** Consultas e respostas de autorização, registros antes e depois das tentativas, configuração de retenção, inspeção de ausência dos segredos simulados, conteúdo do buffer ou registro alternativo, alertas e evidência da nova tentativa.
+
+#### RNF11 — explicabilidade das sugestões de preenchimento
+
+**Propósito.** Verificar se as sugestões relacionadas ao RF04 são sustentadas por fontes existentes e apresentam justificativa curta e compreensível, estendendo às sugestões a indicação de origem prevista no RF03 sem exigir a exposição do processamento interno do modelo.
+
+**Massa de teste.** O caso `CT-RNF11-P` utilizará 20 solicitações com fontes sintéticas de referência conhecidas e suficientes. O caso `CT-RNF11-N` terá dez solicitações divididas entre ausência de fonte suficiente, referência inexistente e referência cujo conteúdo não sustenta a sugestão. Por seu tamanho, a amostra produz evidência exploratória e não uma estimativa precisa do desempenho em produção; o relatório deve apresentar 17 de 20 juntamente com os 85%, sem ocultar a contagem absoluta.
+
+**Instruções de execução:**
+
+1. Versionar as 30 solicitações e as fontes de referência, registrando previamente quais evidências podem ou não sustentar cada sugestão.
+2. Executar as 20 solicitações positivas sem alterar prompts, modelo ou fontes durante a avaliação.
+3. Para cada sugestão produzida, confirmar que a referência existe e pode ser recuperada pelo identificador apresentado.
+4. Comparar o conteúdo da sugestão com a fonte e registrar se a evidência sustenta diretamente o valor ou texto sugerido.
+5. Dois avaliadores devem julgar independentemente se a fonte sustenta a sugestão e se a justificativa explica, em linguagem curta dirigida ao usuário, a relação entre ambas sem depender de explicação externa.
+6. Submeter divergências a um terceiro avaliador, que aplicará a mesma rubrica sem conhecer qual integrante produziu cada decisão inicial.
+7. Classificar como válida somente a sugestão que atender simultaneamente a existência da fonte, sustentação do conteúdo e compreensão da justificativa na decisão consolidada.
+8. Calcular `sugestões válidas / 20 × 100` e listar separadamente o motivo de cada reprovação.
+9. Executar as dez solicitações negativas e verificar se o agente se abstém de sugerir ou informa explicitamente que não há fundamento suficiente.
+10. Confirmar que nenhuma resposta negativa inventa referência, atribui à fonte conteúdo inexistente ou apresenta justificativa sem evidência.
+
+**Critério de aprovação.** Pelo menos 17 das 20 sugestões positivas devem ser válidas, correspondendo aos 85% do RNF11. Nas dez solicitações negativas, o agente deve se abster ou informar a limitação em 100% dos casos, sem fabricar fonte ou justificativa.
+
+**Evidências planejadas.** Solicitações, fontes versionadas, respostas completas, rubricas dos dois avaliadores, decisões de desempate, justificativa das reprovações e consolidação separada dos cenários positivo e negativo.
+
+#### RNF12 — fundamentação das respostas de consulta
+
+**Propósito.** Verificar se as respostas do RF02 são factualmente sustentadas pelas fontes exibidas conforme o RF03, cobrindo o risco AM8 sem confundir a mera presença da referência com a correção do conteúdo atribuído a ela.
+
+**Massa de teste.** O `CT-RNF12-P` utilizará 30 consultas sintéticas com respostas esperadas e fontes de referência conhecidas, distribuídas entre status, prazo, marco, risco, pendência, documento e avanço de projeto. O `CT-RNF12-N` utilizará dez consultas divididas entre fonte ausente, evidência insuficiente, fontes conflitantes e fonte irrelevante. A unidade de avaliação será a afirmação factual atômica: proposição verificável que relaciona uma entidade a um valor, estado, data ou evento e que pode ser julgada separadamente das demais frases da resposta. A amostra é exploratória e o relatório deverá apresentar contagens absolutas de consultas, referências e afirmações juntamente com os percentuais.
+
+**Instruções de execução:**
+
+1. Versionar as 40 consultas e fontes, registrando previamente os fatos sustentados, os conflitos conhecidos e os casos sem evidência suficiente.
+2. Congelar versão do sistema, prompt, modelo e repositório de fontes antes da execução.
+3. Executar as 30 consultas positivas e preservar resposta completa, referências apresentadas e conteúdo das fontes na versão consultada.
+4. Decompor cada resposta em afirmações factuais atômicas sem alterar seu sentido.
+5. Confirmar para cada referência se ela existe, é recuperável e corresponde ao documento e à data apresentados ao usuário.
+6. Dois avaliadores devem classificar independentemente cada afirmação como sustentada, contradita ou não sustentada pela fonte citada, usando rubrica única.
+7. Encaminhar divergências a um terceiro avaliador e registrar a decisão consolidada sem apagar as avaliações originais.
+8. Calcular `referências existentes e recuperáveis / referências apresentadas × 100` e `afirmações sustentadas / total de afirmações factuais × 100`.
+9. Executar as dez consultas negativas e verificar se a resposta declara ausência, insuficiência ou conflito da evidência sem acrescentar afirmação factual não sustentada.
+10. Registrar separadamente referência inexistente, atribuição incompatível, afirmação sem citação e resposta segura de limitação.
+
+**Critério de aprovação.** No cenário positivo, 100% das referências devem existir e ser recuperáveis e pelo menos 90% das afirmações factuais devem ser sustentadas. No cenário negativo, 100% das respostas devem informar a limitação e nenhuma pode apresentar afirmação factual não sustentada.
+
+**Evidências planejadas.** Massa e fontes versionadas, respostas completas, decomposição em afirmações, rubricas independentes, decisões de desempate, cálculos por afirmação e relatório de falhas ligado ao risco AM8.
+
+### 6.3.5 Resultados Esperados
+
+| Casos | Métrica principal | Resultado esperado para aprovação | Evidências mínimas |
+|---|---|---|---|
+| `CT-RNF01-P` e `CT-RNF01-N` | Percentual com resposta em até 15 segundos e percentual encerrado em até 60 segundos | Pelo menos 80% com resposta completa em 15 segundos e 100% com desfecho em 60 segundos | CSV por consulta, logs HTTP, ambiente e relatório de percentis e teto |
+| `CT-RNF02-P` e `CT-RNF02-N` | Credenciais válidas aceitas e condições inválidas bloqueadas antes da regra de negócio | 100% das válidas aceitas e 100% das ausentes ou inválidas rejeitadas com HTTP 401, sem credenciais nos registros | Inventário de rotas, requisições ocultadas, respostas, evidência de interrupção e inspeção dos registros |
+| `CT-RNF03-P` e `CT-RNF03-N` | F1-macro, cobertura das intenções conhecidas e aceitação indevida de fora do catálogo | F1-macro ≥ 0,85; cobertura ≥ 90%; aceitação indevida ≤ 15% | Conjunto cego, declaração de isolamento, previsões, limiar e matriz de confusão |
+| `CT-RNF04-P` e `CT-RNF04-N` | Interações com todos os elementos aplicáveis e relacionamentos corretos | 100% das 20 interações completas; registro incompleto controlado corretamente identificado | Entradas, identificadores, registros consultados, fontes relacionadas e checklist |
+| `CT-RNF05-P` e `CT-RNF05-N` | Pares com contrato e resultado de negócio equivalentes | 100% dos pares equivalentes; diferenças exclusivamente de redação são permitidas | Requisições, respostas, versões dos clientes e tabela comparativa |
+| `CT-RNF06-P` e `CT-RNF06-N` | WER geral do corpus | WER igual ou inferior a 15%, com resultados discriminados por condição | Áudios, referências, transcrições geradas e planilha de WER |
+| `CT-RNF07-P` e `CT-RNF07-N` | Verificações elegíveis com HTTP 200 em até dois segundos | Disponibilidade mínima de 99%; falhas controladas retornam 503, alertam e recuperam para 200 | Histórico do monitor, status e tempos, exclusões, incidentes e cálculo final |
+| `CT-RNF08-P` e `CT-RNF08-N` | Participantes bem-sucedidos sem auxílio | Resultado igual ou superior a 80%; na amostra mínima, pelo menos quatro de cinco | Roteiro, fichas anonimizadas, avaliações independentes, desempates e consolidação |
+| `CT-RNF09-P` e `CT-RNF09-N` | Controles de acesso, proteção, retenção, privacidade e contingência atendidos | Todos os controles respeitados, sem perda silenciosa de evento nem persistência de segredo | Consultas, registros, configuração de retenção, alertas e contingência |
+| `CT-RNF10-C-P` e `CT-RNF10-C-N` | p95 absoluto e razão entre p95 de `10x` e de `1x` | p95 de `10x` ≤ 20 segundos e ≤ 2 vezes a linha de base, no crescimento e no pico | Configuração de carga e mocks, dados brutos, percentis, razões e métricas de recursos |
+| `CT-RNF10-M-P` e `CT-RNF10-M-N` | Razões de memória de treinamento, RSS estabilizada e pico de inferência entre `10x` e `1x` | Treinamento ≤ 8 vezes; memória estabilizada e pico do serviço ≤ 2 vezes, inclusive no dataset adverso | Datasets, modelos, RSS bruto, medianas e gráficos separados |
+| `CT-RNF11-P` e `CT-RNF11-N` | Sugestões com fonte válida, sustentação e justificativa compreensível | Pelo menos 17 de 20 positivas válidas; 100% das negativas se abstêm ou informam limitação sem invenção | Solicitações, fontes, respostas, rubricas independentes, desempates e consolidação |
+| `CT-RNF12-P` e `CT-RNF12-N` | Referências existentes e afirmações factuais sustentadas | 100% das referências recuperáveis, pelo menos 90% das afirmações sustentadas e 100% das negativas com limitação segura | Consultas, fontes, respostas, afirmações atômicas, rubricas e desempates |
+
+Durante a execução futura, cada caso deverá receber um dos estados `Aprovado`, `Reprovado`, `Bloqueado` ou `Não executado`. Esta seção registra somente o resultado esperado e não antecipa conclusões sobre o atendimento dos RNFs.
+
+### 6.3.6 Abrangência Planejada
+
+A abrangência desta versão foi definida pelas dimensões expressamente presentes nos doze RNFs. O RNF01 cobre apenas o canal textual porque esse é o canal delimitado pelo próprio requisito; o desempenho do fluxo de áudio permanece representado pela qualidade da transcrição no RNF06 e não é incorporado artificialmente ao critério de 15 segundos. O RNF02 percorre todos os endpoints protegidos e cinco condições de ausência ou invalidade da credencial, mas não testa autorização por cargo nem escolhe entre Microsoft e Google, pois o contrato de autenticação é independente do provedor. O acesso administrativo aos registros é testado exclusivamente no RNF09. O RNF03 percorre as dez intenções em um conjunto novo e cego, medindo desempenho por classe, cobertura e rejeição, mas não mede extração de entidades, que não faz parte de seu critério.
+
+O RNF04 percorre texto, voz, resultados com e sem fontes e desfechos de sucesso e falha, verificando a correlação automática pelo identificador da interação; não testa consulta administrativa, que pertence ao RNF09. O RNF05 compara contratos e dados de negócio entre React e Python, sem confundir equivalência semântica com igualdade literal de texto. O RNF06 combina condições favoráveis e adversas de fala, sem abranger Text-to-Speech. O RNF07 cobre uma sessão contínua de quatro horas e falhas separadas de aplicação e banco; provedores externos são observados separadamente. Essa janela é compatível com o limite do AWS Academy, mas constitui evidência acadêmica de curta duração e não permite generalizar o resultado para disponibilidade operacional semanal, mensal ou de produção. O RNF08 cobre respostas bem-sucedidas e respostas de limitação, enquanto a avaliação geral de usabilidade e o SUS permanecem na Seção 6.5.
+
+O RNF09 reúne os controles administrativos sobre os registros — acesso, proteção, retenção, privacidade e contingência — no banco ou na camada de serviço. A futura tela administrativa e a exportação de registros não fazem parte deste planejamento. O RNF10 cobre separadamente concorrência, memória de treinamento e memória do processo servido, usando linhas de base comparáveis. O RNF11 avalia sugestões fundamentadas e também a resposta segura quando não existe fonte suficiente, sem solicitar ou expor o processamento interno do modelo. O RNF12 cobre a existência e a sustentação das fontes das respostas de consulta e inclui ausência, insuficiência, conflito e irrelevância de evidência; não substitui o teste funcional de apresentação da referência exigida pelo RF03.
+
+Com isso, esta versão cobre o planejamento de **12 dos 12 RNFs**, ou 100% do inventário da Seção 2.3. Cada requisito possui derivação e propósito, cenário positivo, cenário negativo, instruções, resultado esperado, evidências e justificativa de abrangência, atendendo estruturalmente ao escopo da task T31.
+
+A cobertura integral é documental e não afirma que todos os mecanismos já existem. Permanecem como limitações de implementação a integração SSO do RNF02, o cliente Python independente, o endpoint `GET /health`, as sugestões fundamentadas, a recuperação de fontes necessária ao RNF12 e parte da persistência, proteção e contingência da auditoria. Esses itens impedem a execução imediata de seus casos, mas não deixam lacunas no planejamento.
+
+A retenção de sete dias do áudio bruto permanece como controle técnico da Seção 3.2.5 e deverá receber teste de ciclo de vida na Seção 6.4 quando o planejamento de integração for preenchido. Text-to-Speech permanece fora da cobertura porque o provedor e o comportamento de saída ainda não foram definidos na Seção 3.2.6; caso entre no escopo do MVP, exigirá requisito e casos próprios. Essas duas fronteiras são declaradas para não apresentar a cobertura de 100% dos RNFs como cobertura de todo comportamento técnico futuro.
+
+## 6.4 Planejamento dos Testes de Integração
+
+Os testes de integração têm como objetivo validar a comunicação entre os componentes da arquitetura do AZ1 (as rotas do FastAPI, os serviços de domínio que elas invocam por injeção de dependência e o pipeline de PLN) e as dependências que cada um consome: o armazenamento de objetos MinIO/Amazon S3, os provedores externos Deepgram e Gemini, o PostgreSQL a ser provisionado na Sprint 4, e os dois webhooks e o barramento de mensagens previstos para as Sprints 4 e 5. Esta camada assegura que os contratos HTTP, S3 e SQL são respeitados de ponta a ponta, que a persistência ocorre em serviços reais e não em dublês de memória, e que os mecanismos de resiliência (tradução de falha externa em código HTTP, idempotência de eventos, cache determinístico do módulo VHS) atuam conforme especificado. O critério que distingue um caso desta seção de um teste de unidade é operacional: um caso de integração exercita ao menos uma fronteira de processo, de rede ou de biblioteca de terceiro, ao contrário dos testes atuais de `tests/test_audio_api.py`, `tests/test_chat_api.py`, `tests/test_transcription_api.py` e `tests/test_analysis_api.py`, que verificam a rota com a dependência substituída por `app.dependency_overrides`.
+
+Os casos referentes aos webhooks (seção 5.1) e ao sistema de troca de mensagens (seção 5.3) são especificados como suítes de contrato: uma classe que descreve o comportamento exigido de qualquer provedor ou barramento, com um único ponto de extensão (o método de fábrica que constrói o objeto sob teste). Nesta etapa, a suíte é exercitada contra um dublê determinístico em memória; quando a tecnologia for selecionada nas Sprints 4 e 5, uma nova subclasse injeta o adaptador real e herda os mesmos casos, sem reescrevê-los. O arranjo estende às duas dependências ainda não escolhidas o mesmo padrão de portas e adaptadores que `AudioStorage`, `AudioFetcher` e `ChatModel` já praticam como `Protocol` nos serviços existentes.
+
+### 6.4.1 Integrações entre Componentes Internos
+
+Objetivo e escopo. Validar, em caixa-preta sobre o contrato observável de cada rota, a comunicação entre a camada HTTP e os serviços de domínio que ela invoca, cobrindo a ordem entre validação e efeito colateral, a tradução de erro de domínio em código HTTP e a passagem de estado por referência opaca (o identificador `aud_<uuid>`) entre recebimento, transcrição e análise.
+
+| Suíte | Componentes | Mecanismo | Requisito |
+|---|---|---|---|
+| Recebimento aciona o armazenamento | `ReceiveAudio`, `AudioStorage` | Chamada de biblioteca por `Protocol` | RF01 |
+| Transcrição lê o objeto gravado pelo recebimento | `TranscribeAudio`, `AudioFetcher` | `Protocol` sobre o adaptador de armazenamento | RF01 |
+| Análise encadeia transcrição e classificação | `AnalyzeAudio`, `TranscribeAudio`, `prever_intencao` | Corrotina interna e carga do artefato `.joblib` | RF01, RNF03 |
+| Resposta de chat delega ao modelo de linguagem | `AnswerChatMessage`, `ChatModel` | Chamada de biblioteca por `Protocol` | RF02 |
+| Interface consome as rotas do backend | Frontend, roteador FastAPI | HTTPS/REST pelo proxy do Vite | RF01, RF02, RNF05 |
+| Backend persiste e recupera interações | Serviços de domínio, PostgreSQL (schemas `portfolio` e `auditoria`) | SQL sobre TCP | RF02, RF03, RNF04, RNF09 |
+| Webhook aciona a regra de negócio correspondente | Endpoint de entrada, camada de domínio | Chamada em processo, após verificação de assinatura | RF05, RF06 |
+| Produtor publica evento consumido de forma assíncrona | Serviço produtor, barramento, consumidor | Protocolo do barramento selecionado | RF05 |
+| Síntese de fala delega ao provedor de voz | `GenerateSpeech`, `SpeechModel` | Chamada de biblioteca por `Protocol` | Não documentado (seção 6.4.4) |
+| Agendador aciona a regra de pendências | Agendador, PLN — Transações e Ações | Chamada em processo | RF05 |
+
+A validação de entrada precede sempre o efeito colateral: `ReceiveAudio` confere tamanho, assinatura binária e duração do áudio antes de acionar o armazenamento, `GenerateSpeech` confere o texto antes de acionar o provedor de síntese, e `AnswerChatMessage` confere o conteúdo da mensagem antes de acionar o provedor de linguagem. É essa ordem que os casos TI-05, TI-09, TI-12 a TI-14, TI-22 e TI-23 da seção 6.4.4 verificam. A tradução de erro segue o mesmo princípio de fronteira: `TranscribeAudio` converte a ausência do objeto de áudio em `TranscriptionError.AUDIO_NOT_FOUND`, que a rota converte em `404 audio_not_found`.
+
+### 6.4.2 Integrações com Serviços Externos
+
+Quatro serviços externos sustentam o fluxo de voz e de conversação do agente, cada um com um perfil de falha próprio que os casos da seção 6.4.4 cobrem individualmente.
+
+| Suíte | Serviço | Adaptador | Mecanismo | Requisito |
+|---|---|---|---|---|
+| Armazenamento de áudio | MinIO em ambiente local, Amazon S3 em nuvem | `S3AudioStorage` | API S3 sobre HTTP, via `boto3` | RF01 |
+| Transcrição de fala | Deepgram, modelo Nova-3 | `TranscribeAudio` | HTTPS, `AsyncDeepgramClient` | RNF06, RF01 |
+| Síntese de fala | Google Gemini, modelo `gemini-2.5-flash-preview-tts` | `GeminiSpeechModel` | HTTPS, `google-genai` | Não documentado (seção 6.4.4) |
+| Geração de resposta | Google Gemini, modelo `gemini-3.5-flash-lite` | `GeminiChatModel` | HTTPS, `google-genai` | RF02, RNF11 |
+
+O adaptador de armazenamento traduz apenas o erro `NoSuchKey` do `botocore`, convertido em `KeyError` e em seguida em `404 audio_not_found` pela rota de transcrição; as demais falhas de infraestrutura (bucket inexistente, credencial inválida, serviço fora do ar) chegam ao cliente como `500 internal_error`. O caso TI-04 valida esse comportamento nas três causas e serve de base para a eventual diferenciação de código a decidir na Sprint 4.
+
+`TranscribeAudio.transcribe` captura qualquer exceção do SDK e a converte em `502 transcription_failed`, o que garante que nenhum detalhe do provedor vaza ao cliente ao custo de não distinguir indisponibilidade, tempo limite e credencial inválida. O caso TI-07 verifica essa conversão nas três causas, e registra que a chamada não define tempo limite explícito, ficando sujeita ao padrão do SDK conforme a seção 3.2.2.
+
+`GenerateSpeech.generate`, diferente do chat, já captura qualquer exceção do modelo de síntese e a converte em `502 speech_generation_failed`, inclusive quando o provedor devolve áudio vazio, tratado como falha. O caso TI-15 verifica as duas causas.
+
+O caminho do chat ainda não replica essa conversão: uma falha do Gemini sobe ao manipulador global e é respondida como `500 internal_error`, e uma resposta vazia do provedor reprova apenas na serialização de `ChatResponse`, também como `500`. O caso TI-21 fixa esse comportamento e serve de evidência para a decisão de alinhar o contrato de erro do chat ao da transcrição e ao da síntese de fala, que já tratam a falha do provedor de forma equivalente.
+
+### 6.4.3 Uso Planejado do Módulo VHS
+
+O módulo VHS, especificado na seção 5.2 como mecanismo de cache das respostas dos provedores externos, cumpre dois papéis nos testes de integração: reduz o tempo de resposta ao evitar chamadas repetidas ao mesmo provedor com a mesma entrada, e torna determinística a execução da suíte, eliminando a dependência de crédito de API e de disponibilidade de rede durante a integração contínua. O módulo guarda dois tipos de registro pela mesma chave: um registro de sucesso, com o conteúdo da resposta do provedor (o DTO de transcrição, o texto da resposta de chat, os bytes do áudio sintetizado), e um registro de falha, com o código de erro a relançar quando o provedor está indisponível, excede o tempo esperado ou rejeita a credencial. O registro de falha não é uma invenção de teste: é a mesma técnica de cache negativo usada em produção para evitar bater outra vez num provedor que acabou de falhar, aplicada aqui também à suíte.
+
+Um registro de falha é criado de duas formas. Quando a causa é uma resposta de erro do próprio provedor, uma credencial deliberadamente inválida, por exemplo, o registro é gravado a partir de uma interação real, do mesmo jeito que um registro de sucesso. Quando a causa é a ausência de qualquer interação, indisponibilidade de rede ou tempo limite, não há resposta real para capturar, e o registro é composto diretamente pela equipe, descrevendo o erro que o teste precisa reproduzir. Nos dois casos, a leitura em modo `reproduzir` funciona da mesma forma: a chave é consultada, e o registro devolve um valor ou relança um erro, sem que o adaptador real seja acionado.
+
+Com essa extensão, todo caso de teste que envolve o provedor de fala em texto, o de síntese de fala ou o modelo de linguagem passa pelo VHS, tanto no caminho de sucesso quanto no de falha, o que cumpre o uso obrigatório do módulo exigido para os testes de integração. A única exceção é o caso que verifica quais parâmetros a aplicação envia ao provedor (TI-10, os termos do domínio enviados ao Deepgram): essa verificação depende de o cliente real ser efetivamente chamado, o que só acontece nas execuções de gravação, e por isso usa um dublê espião substituído diretamente na porta, sem passar pelo VHS. O armazenamento de objetos permanece fora do módulo por um motivo diferente: o MinIO é infraestrutura local e determinística, sob controle da própria equipe, e não uma API externa no sentido do enunciado, sem custo por requisição nem limite de taxa a evitar; cachear a leitura do bucket esconderia justamente os defeitos que os casos TI-01 a TI-05 procuram.
+
+| Serviço | Componentes da chave | Observação |
+|---|---|---|
+| Transcrição | Hash do conteúdo do áudio, idioma, modelo, hash da lista de termos do domínio | A chave deriva do conteúdo do áudio, não do identificador `aud_<uuid>`, gerado a cada envio |
+| Síntese de fala | Texto normalizado, voz, formato, modelo | A mesma resposta sintetizada duas vezes reaproveita o áudio já gerado; qualquer mudança de voz ou de modelo seleciona uma chave distinta |
+| Chat | Mensagem normalizada, modelo, hash da instrução de sistema | A instrução de sistema participa da chave, de modo que uma alteração de prompt invalide o cache |
+| Armazenamento de objetos | Não integra o módulo | Infraestrutura local, fora do sentido de API externa do enunciado; os casos TI-01 a TI-05 validam esse serviço diretamente |
+
+| Modo | Leitura | Gravação | Rede | Uso nos testes |
+|---|:-:|:-:|:-:|---|
+| `reproduzir` | Sim | Não | Nenhuma | Modo padrão da suíte e da integração contínua; devolve um valor ou relança um erro, conforme o tipo do registro |
+| `gravar` | Sim | Apenas quando ausente | Apenas quando ausente | Criação inicial dos registros de sucesso, e dos registros de falha capturáveis a partir de uma resposta real |
+| `atualizar` | Não | Sempre | Sempre | Regravação após mudança de modelo, de instrução ou de SDK |
+| `ignorar` | Não | Não | Sempre | Verificação contra o serviço real e medição de desempenho (seção 6.3) |
+
+A chave precisa cobrir tudo o que altera a resposta, a ausência de registro em modo `reproduzir` falha de forma explícita informando o comando de regravação, e nenhum segredo (chave de API, cabeçalho de autorização, token) é gravado nos arquivos versionados, nem nos de sucesso, nem nos de falha. Como o módulo atua sobre a porta de domínio e não sobre o transporte HTTP, o cabeçalho de autenticação nunca chega a ser observado por ele; o caso TI-50 confirma essa garantia por inspeção direta dos arquivos gravados. Os registros de transcrição e de síntese de fala seguem o mesmo prazo de retenção do áudio de origem no MinIO, sete dias conforme a seção 3.2.5; os registros de chat, por não terem origem física a expirar, seguem o prazo de 24 horas definido na seção 5.2.
+
+### 6.4.4 Cenários Positivos e Negativos Planejados
+
+Casos de teste detalhados. Os identificadores seguem a numeração `TI-nn`, sequencial por suíte. O nome de cada caso corresponde à convenção de classe e método já adotada em `tests/` (`TestNomeDoCaso.test_descricao_do_cenario`). Quando duas ou mais causas produzem exatamente a mesma resposta do sistema, o catálogo reúne essas causas num único caso, com a entrada listando as variantes e o resultado esperado cobrindo todas elas; é o caso, por exemplo, de `test_falha_de_infraestrutura_retorna_500`, que cobre bucket inexistente, credencial inválida e serviço indisponível porque as três produzem hoje o mesmo `500 internal_error` sem distinção.
+
+A tabela relaciona cada suíte à dependência que ela isola e ao mecanismo usado para isolá-la. O módulo VHS cobre tanto o caminho de sucesso quanto o de falha de cada provedor, pelos dois tipos de registro descritos na seção 6.4.3; a única suíte de provedor externo que foge dessa regra é a de transcrição, no caso isolado que inspeciona os parâmetros de uma chamada em vez da resposta a ela.
+
+| Suíte | Dependência isolada nos testes | Mecanismo |
+|---|---|---|
+| Recebimento de áudio e armazenamento de objetos | MinIO | Contêiner real, provisionado por `docker compose` |
+| Transcrição e provedor de fala em texto | Deepgram | VHS, registro de sucesso (TI-06, TI-08) e registro de falha (TI-07); dublê espião para os parâmetros da chamada (TI-10) |
+| Síntese de fala e provedor de voz | Google Gemini (`gemini-2.5-flash-preview-tts`) | VHS, registro de sucesso (TI-11) e registro de falha (TI-15); TI-12 a TI-14 não acionam nenhuma dependência |
+| Análise e pipeline de PLN | Deepgram, por meio de `TranscribeAudio`; modelo classificador local | VHS no trecho de transcrição (TI-16 a TI-18); modelo carregado diretamente do disco, sem dublê; TI-19 não aciona nenhuma dependência externa |
+| Chat e provedor de modelo de linguagem | Google Gemini (`gemini-3.5-flash-lite`) | VHS, registro de sucesso (TI-20) e registro de falha (TI-21) |
+| Persistência em banco de dados | PostgreSQL | Contêiner real, provisionado por `docker compose` a partir da Sprint 4 |
+| Frontend e backend | Nenhuma; verificação de contrato entre interface e aplicação | `TestClient` sobre a aplicação FastAPI real, sem substituição de dependência |
+| Webhooks | Provedor a definir na Sprint 4 | Suíte de contrato `ContratoWebhookInbound` contra um receptor em memória |
+| Mensageria | Barramento a definir na Sprint 5 | Suíte de contrato `ContratoBarramentoMensagens` contra um intermediário em memória |
+| Módulo VHS | O adaptador real que o módulo decora | Dublê instrumentado que conta chamadas, decorado pelo módulo VHS sob teste |
+
+#### Recebimento de áudio e armazenamento de objetos
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-01 | Positivo | `TestRecebimentoAudioIntegracao.test_upload_valido_grava_objeto_no_bucket` | Áudio `.wav` válido em `multipart/form-data` | `201 Created`; objeto em `incoming/{id}` com `Content-Type` e metadata `audio-format` corretos | RF01 |
+| TI-02 | Positivo | `TestRecebimentoAudioIntegracao.test_leitura_devolve_bytes_identicos_ao_upload` | Áudio gravado por TI-01, lido em seguida por `TranscribeAudio` | Bytes lidos idênticos aos bytes enviados | RF01 |
+| TI-03 | Negativo | `TestRecebimentoAudioIntegracao.test_audio_id_inexistente_retorna_404` | Identificador inexistente em `POST /audio/{id}/transcribe` | `404 audio_not_found` | RF01 |
+| TI-04 | Negativo | `TestRecebimentoAudioIntegracao.test_falha_de_infraestrutura_retorna_500` | Bucket inexistente, credencial de armazenamento inválida, ou serviço inacessível (três causas distintas) | `500 internal_error` nas três causas, sem detalhe de infraestrutura no corpo | RNF07 |
+| TI-05 | Negativo | `TestRecebimentoAudioIntegracao.test_arquivo_rejeitado_nao_grava_objeto` | Arquivo de texto renomeado para `.wav` | `415 unsupported_format`; nenhum objeto novo no bucket | RF01 |
+
+#### Transcrição e provedor de fala em texto
+
+Os casos TI-06 e TI-08 leem um registro de sucesso do módulo VHS, com uma resposta genuína gravada do provedor. O caso TI-07 lê um registro de falha, que reproduz num único teste as três causas de indisponibilidade de infraestrutura (indisponibilidade, tempo limite e credencial inválida); a de credencial inválida foi gravada a partir de uma resposta real do provedor a uma chave deliberadamente errada, e as outras duas foram compostas diretamente, por não haver interação real a capturar quando a rede está fora do ar. O caso TI-10 é a exceção que não passa pelo VHS: substitui o cliente por um dublê espião que inspeciona os parâmetros da chamada, verificação que a reprodução de um registro não alcançaria, porque em modo `reproduzir` o cliente real nunca é acionado, e nada garantiria que o código de produção continuasse enviando `keyterm` ao SDK.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-06 | Positivo | `TestTranscricaoIntegracao.test_transcreve_audio_de_referencia` | Áudio de referência com fala em português | `200 OK`; texto não vazio; `language` igual a `pt-BR`; `confidence` entre 0 e 1; `duration_seconds` maior que zero | RNF06, RF01 |
+| TI-07 | Negativo | `TestTranscricaoIntegracao.test_falha_do_provedor_retorna_502` | Provedor inacessível, tempo limite excedido, ou credencial inválida (três causas distintas) | `502 transcription_failed` nas três causas, sem detalhe do SDK no corpo; o tempo limite não é configurado explicitamente e segue o padrão do SDK (seção 3.2.2) | RNF01, RNF07 |
+| TI-08 | Negativo | `TestTranscricaoIntegracao.test_audio_sem_fala_retorna_texto_vazio` | Áudio sem fala reconhecível | `200 OK` com `text` vazio | RNF06 |
+| TI-09 | Negativo | `TestTranscricaoIntegracao.test_idioma_nao_suportado_retorna_422_sem_chamar_provedor` | `language=en-US` | `422 Unprocessable Entity`; nenhuma chamada ao provedor | RF01 |
+| TI-10 | Positivo | `TestTranscricaoIntegracao.test_termos_do_dominio_sao_enviados_ao_provedor` | Transcrição de áudio de referência | Parâmetro `keyterm` contém os 12 termos do domínio, junto com `model=nova-3` | RNF03, RNF06 |
+
+#### Síntese de fala e provedor de voz
+
+A rota `POST /api/v1/text-to-speech` converte a resposta do agente em áudio sob demanda, acionada pelo botão "Ouvir resposta" da interface; não substitui a apresentação em texto exigida pelo RF01, é um canal complementar. A especificação de requisitos da seção 2.2 ainda não documenta essa capacidade: não há RF que cubra explicitamente a saída em áudio, e por isso as entradas da tabela abaixo marcadas como "não documentado" apontam uma atualização pendente a levar à revisão da seção 2.2, e não uma omissão deste plano. `GenerateSpeech.generate` já captura qualquer exceção do modelo de síntese, inclusive áudio vazio, e as converte em `502 speech_generation_failed`; por isso o caso TI-15 lê um registro de falha do VHS do mesmo jeito que o caso TI-07 lê o da transcrição.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-11 | Positivo | `TestSinteseDeFalaIntegracao.test_gera_audio_wav_a_partir_do_texto` | Texto de resposta típico | `200 OK`; `Content-Type` igual a `audio/wav`; corpo de bytes não vazio | Não documentado |
+| TI-12 | Negativo | `TestSinteseDeFalaIntegracao.test_texto_vazio_nao_aciona_o_provedor` | Texto vazio ou composto apenas de espaços | `422 empty_text`; nenhuma chamada ao provedor | RNF01 |
+| TI-13 | Negativo | `TestSinteseDeFalaIntegracao.test_texto_acima_do_limite_nao_aciona_o_provedor` | Texto com mais de 4000 caracteres | `422 text_too_long`; nenhuma chamada ao provedor | RNF01 |
+| TI-14 | Negativo | `TestSinteseDeFalaIntegracao.test_voz_ou_formato_nao_suportado_retorna_422` | `voice` diferente de `Kore`, ou `format` diferente de `wav` (duas causas) | `422 Unprocessable Entity` pela validação do schema nas duas, sem chamar o provedor | RNF01 |
+| TI-15 | Negativo | `TestSinteseDeFalaIntegracao.test_falha_ou_audio_vazio_do_provedor_retorna_502` | Provedor lança exceção, ou devolve conteúdo de áudio vazio (duas causas distintas) | `502 speech_generation_failed` nas duas causas | RNF07 |
+
+#### Análise e pipeline de PLN
+
+O acerto da classificação, medido pelo F1-macro, é avaliado como requisito não funcional na seção 6.3; os casos abaixo validam apenas a forma do contrato entre transcrição e classificação. As transcrições dos casos TI-16 a TI-18 vêm de um registro de sucesso do módulo VHS, pela mesma chave de registro que a suíte de transcrição usa; o caso TI-19 não aciona nenhum serviço externo, porque a falha ocorre na composição local do classificador.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-16 | Positivo | `TestAnaliseIntegracao.test_transcricao_recebe_intencao_do_catalogo` | Áudio com solicitação típica do domínio | `200 OK`; `intencao` pertence a INT-01 a INT-10; `confianca_pln` entre 0 e 1 | RF01, RNF03 |
+| TI-17 | Positivo | `TestAnaliseIntegracao.test_texto_digitado_e_transcrito_produzem_a_mesma_intencao` | Mesma frase via `/chat` e via `/audio/analyze` | Mesma intenção nas duas rotas | RF01 |
+| TI-18 | Negativo | `TestAnaliseIntegracao.test_solicitacao_fora_do_catalogo_retorna_intencao_valida` | Solicitação fora do escopo do agente | `200 OK`; `intencao` igual a `fora_do_catalogo` | RF02, RNF03 |
+| TI-19 | Negativo | `TestAnaliseIntegracao.test_modelo_ausente_falha_na_composicao` | Inicialização da aplicação sem `resultados/classificador.joblib` | Falha explícita na composição de `get_analyzer` | RNF03 |
+
+#### Chat e provedor de modelo de linguagem
+
+O caso TI-20 lê um registro de sucesso do módulo VHS. O caso TI-21 lê um registro de falha que reproduz, num único teste, a indisponibilidade do provedor e o retorno de um conteúdo nulo; a primeira causa foi composta diretamente, por não haver interação real a capturar, e a segunda pode ser gravada a partir de uma resposta real do provedor sem conteúdo de texto.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-20 | Positivo | `TestChatIntegracao.test_resposta_gerada_pelo_provedor` | Mensagem típica de consulta | `200 OK`; `reply` não vazio | RF02, RNF11 |
+| TI-21 | Negativo | `TestChatIntegracao.test_falha_ou_resposta_vazia_retorna_500` | Provedor inacessível, ou resposta com conteúdo nulo (duas causas distintas) | `500 internal_error` nas duas causas: a exceção do SDK sobe ao manipulador global, e o conteúdo nulo reprova apenas na serialização de `ChatResponse` | RF02, RNF07 |
+| TI-22 | Negativo | `TestChatIntegracao.test_mensagem_acima_do_limite_nao_aciona_o_provedor` | Mensagem com mais de 4000 caracteres | `422 message_too_long`; nenhuma chamada ao provedor | RF02, RNF01 |
+| TI-23 | Negativo | `TestChatIntegracao.test_mensagem_vazia_nao_aciona_o_provedor` | Mensagem vazia ou composta apenas de espaços | `422 empty_message`; nenhuma chamada externa | RF02 |
+
+#### Persistência em banco de dados
+
+Casos executados contra o PostgreSQL provisionado a partir do DDL da seção 3.6.6, aplicado a uma base de testes dedicada.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-24 | Positivo | `TestPersistenciaIntegracao.test_interacao_por_texto_e_gravada_com_atributos_minimos` | Interação processada pelo canal de texto | Registro em `auditoria.interacao` com os dez atributos exigidos pelo RNF09 | RNF04, RNF09 |
+| TI-25 | Positivo e negativo | `TestPersistenciaIntegracao.test_interacao_por_voz_vincula_o_audio_de_origem` | Interação processada pelo canal de voz | `audio_referencia` igual ao identificador do MinIO; preenchê-lo com `canal=texto` é rejeitado pela restrição | RNF04, RF01 |
+| TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.interacao_artefato` por artefato citado | RF02, RF03, RNF11 |
+| TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_a_interacao` | Interação processada com o banco inacessível | Código de indisponibilidade definido; a interação é reencaminhada, não descartada | RNF07, RNF04 |
+| TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.*` com as credenciais da aplicação | Operação rejeitada pelo banco | RNF04 |
+| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução do DDL da seção 3.6.6 em base vazia | Os dois schemas e as onze tabelas são criados; carga inicial populada | Seção 3.6 |
+
+#### Frontend e backend
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-30 | Positivo | `TestFrontendBackendIntegracao.test_contrato_da_rota_de_chat` | Envio de mensagem pela interface | Campos de `ChatRequest`/`ChatResponse` respeitados nos dois sentidos | RF02, RNF05 |
+| TI-31 | Positivo | `TestFrontendBackendIntegracao.test_contrato_do_envio_de_audio` | `Blob` de áudio sem nome de arquivo, anexado no campo `audio` | `201 Created` | RF01 |
+| TI-32 | Negativo | `TestFrontendBackendIntegracao.test_erro_4xx_5xx_e_tratado_pela_interface` | Resposta `4xx`/`5xx` do backend | Interface exibe estado de falha sem travar | RNF08 |
+| TI-33 | Negativo | `TestFrontendBackendIntegracao.test_rotas_nao_implementadas_retornam_404` | `GET /api/v1/tasks`, `PATCH /api/v1/tasks/{id}` e `GET /api/v1/calendar/events` (três rotas) | `404 Not Found` nas três | RF05, RF06 |
+| TI-34 | Negativo | `TestFrontendBackendIntegracao.test_porta_do_proxy_coincide_com_a_porta_do_servidor` | Leitura de `vite.config.js` e do procedimento de execução do backend | As portas declaradas coincidem | RNF05 |
+
+#### Webhooks
+
+Suíte de contrato `ContratoWebhookInbound`, exercitada nesta etapa contra um receptor em memória, conforme a estratégia da abertura desta seção.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-35 | Positivo | `ContratoWebhookInbound.test_entrega_com_assinatura_valida_e_processada` | Evento com assinatura válida | `2xx`; efeito aplicado exatamente uma vez | RF05 |
+| TI-36 | Negativo | `ContratoWebhookInbound.test_assinatura_invalida_e_rejeitada` | Evento sem assinatura, com assinatura incorreta, ou com assinatura válida porém antiga (três causas) | `401 Unauthorized` nas três; nenhum efeito; a rejeição por janela de tempo impede a reapresentação de uma entrega capturada anteriormente | RNF02 |
+| TI-37 | Negativo | `ContratoWebhookInbound.test_entrega_duplicada_produz_efeito_unico` | Mesmo evento entregue duas vezes, com o mesmo identificador | `2xx` nas duas entregas; efeito aplicado uma única vez | RF05, RNF04 |
+| TI-38 | Negativo | `ContratoWebhookInbound.test_confirmacao_so_ocorre_apos_persistencia` | Falha no processamento após a entrega | `5xx`, para provocar reentrega do provedor | RNF04, RNF07 |
+| TI-39 | Negativo | `ContratoWebhookInbound.test_conteudo_malformado_e_rejeitado` | JSON inválido ou campo obrigatório ausente | `400 Bad Request`; evento registrado sem efeito | RNF04 |
+| TI-40 | Positivo | `ContratoWebhookInbound.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado` | Evento de tipo não catalogado | `2xx`; registrado sem processamento | RNF07 |
+
+#### Mensageria
+
+Suíte de contrato `ContratoBarramentoMensagens`, exercitada nesta etapa contra um intermediário em memória. O contrato é o envelope da mensagem, com os campos identificador, tipo, versão, marca de tempo, correlação e conteúdo, além do ciclo de publicação e consumo.
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-41 | Positivo | `ContratoBarramentoMensagens.test_publica_e_consome_o_envelope_integro` | Mensagem publicada | Consumidor recebe os seis campos do envelope preservados | RF05 |
+| TI-42 | Positivo e negativo | `ContratoBarramentoMensagens.test_confirmacao_remove_e_recusa_devolve_a_mensagem` | Mensagem confirmada pelo consumidor; mensagem que gera exceção no consumidor | Mensagem confirmada não é reentregue; mensagem recusada é devolvida à fila | RF05, RNF07 |
+| TI-43 | Negativo | `ContratoBarramentoMensagens.test_falha_persistente_vai_para_dead_letter` | Processamento sempre reprova, com reentregas sucessivas contadas, ou payload indesserializável | O contador de tentativas é incrementado a cada reentrega; após o limite, ou de imediato se indesserializável, a mensagem vai para a fila de mensagens mortas com a causa registrada; a fila principal segue processando | RNF04, RNF07 |
+| TI-44 | Negativo | `ContratoBarramentoMensagens.test_consumo_duplicado_produz_efeito_unico` | Mesma mensagem processada duas vezes | Efeito único | RF05, RNF04 |
+| TI-45 | Positivo | `ContratoBarramentoMensagens.test_consumidor_nao_depende_de_ordem_global` | Mensagens publicadas fora de ordem | Consumidor processa corretamente sem pressupor ordem de chegada | RF05 |
+| TI-46 | Negativo | `ContratoBarramentoMensagens.test_indisponibilidade_na_publicacao_e_reportada` | Barramento inacessível no momento da publicação | Erro explícito ao produtor; nenhuma perda silenciosa | RNF07 |
+
+#### Módulo VHS
+
+| ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
+|---|---|---|---|---|---|
+| TI-47 | Positivo | `TestVhsIntegracao.test_ausencia_ou_expiracao_aciona_o_adaptador_real` | Primeira chamada com uma chave nova, ou chamada além do prazo de validade de um registro existente | Adaptador real acionado; resultado gravado ou regravado | RNF01 |
+| TI-48 | Positivo | `TestVhsIntegracao.test_registro_existente_nao_aciona_o_adaptador` | Segunda chamada com a mesma chave, para um registro de sucesso ou de falha | O valor ou o erro gravado é devolvido sem acionar o adaptador novamente | RNF01, RNF07 |
+| TI-49 | Negativo | `TestVhsIntegracao.test_modo_reproduzir_sem_registro_valido_falha_sem_acessar_a_rede` | Chave sem registro correspondente, ou com registro corrompido, em modo `reproduzir` | Falha explícita, distinguindo ausência de corrupção; nenhuma requisição de rede | RNF07 |
+| TI-50 | Negativo | `TestVhsIntegracao.test_nenhum_segredo_e_gravado_no_registro` | Varredura dos arquivos gravados, de sucesso e de falha | Nenhuma ocorrência de `Authorization`, chave de API ou token | RNF02 |
+| TI-51 | Positivo | `TestVhsIntegracao.test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado` | Execução nos modos `ignorar` e `atualizar` | `ignorar` não lê nem grava; `atualizar` sobrescreve o registro existente | RNF01 |
+| TI-52 | Positivo | `TestVhsIntegracao.test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao` | Alteração de idioma, modelo ou instrução de sistema | Nova chave gerada; registro anterior não é reaproveitado | RNF01, RNF11 |
+
+### 6.4.5 Procedimentos, Ferramentas e Validação Esperada
+
+Ferramentas e bibliotecas, com justificativa.
+
+`unittest` — framework padrão da suíte, adotado desde a Sprint 2 conforme a seção 3.5.3; não acrescenta dependência e roda em qualquer ambiente Python.
+
+`unittest.IsolatedAsyncioTestCase` — executa os casos que exercitam `transcribe` e `analyze`, ambos corrotinas, sem depender do `TestClient` para alcançá-los.
+
+`fastapi.testclient.TestClient` — sobe a aplicação FastAPI em processo, exercitando roteamento, injeção de dependências, serialização Pydantic e os manipuladores de exceção de `main.py`.
+
+`app.dependency_overrides` — mecanismo de composição que substitui o adaptador real pelo dublê ou pelo módulo VHS nos casos que o exigem.
+
+`httpx` — dependência de transporte do `TestClient`, incluída no extra de desenvolvimento do `pyproject.toml`.
+
+`docker compose` — provisiona o MinIO e, a partir da Sprint 4, o PostgreSQL, com o bucket `az1-audio` e a regra de ciclo de vida já configurados pelo serviço `minio-init`.
+
+`boto3` — cliente independente do usado pela aplicação, para conferir de fora o estado do bucket após cada operação.
+
+`ContratoWebhookInbound` e `ContratoBarramentoMensagens` — classes que descrevem o comportamento exigido de webhooks e do barramento de mensagens independentemente do provedor selecionado, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste.
+
+Padrão de validação. Cada caso verifica o código de status HTTP ou o efeito observável da operação, a integridade do payload desserializado para o schema Pydantic correspondente e, quando aplicável, o estado persistido (releitura do objeto no bucket, ou da linha na tabela) e o comportamento do módulo VHS, comparando o número de chamadas ao adaptador real entre a primeira e a segunda execução com a mesma chave.
+
+Ambiente e pré-requisitos.
+
+Python 3.12 com o pacote instalado em modo editável incluindo o extra de desenvolvimento (`pip install -e ".[dev]"`), que traz o `httpx` consumido pelo `TestClient`. Docker em execução para as suítes que dependem de contêiner: o armazenamento de objetos (TI-01 a TI-05) exige o serviço `minio` do `docker-compose.yml`, e a persistência (TI-24 a TI-29) exige o serviço de PostgreSQL a ser acrescentado ao mesmo arquivo na Sprint 4, com o DDL da seção 3.6.6 aplicado à base de testes. As suítes de contrato de webhook e de mensageria (TI-35 a TI-46) não exigem contêiner nesta etapa, por rodarem contra dublês em memória. O modelo de classificação (`resultados/classificador.joblib`) precisa existir para os casos TI-16 a TI-19, gerado por `python -m pln.classificador`.
+
+```bash
+docker compose up -d
+python -m unittest discover tests -p "test_integracao_*.py"
+```
+
+A regravação dos registros do módulo VHS é a etapa que usa a rede e exige as chaves dos provedores, e a verificação em modo `ignorar` é a que mede o sistema sem cache:
+
+```bash
+VHS_MODO=atualizar python -m unittest tests.test_integracao_transcricao
+VHS_MODO=ignorar python -m unittest discover tests -p "test_integracao_*.py"
+```
+
+Ficam fora deste escopo os testes de desempenho e carga sob concorrência, que dependem do módulo VHS em modo `ignorar` e de instrumentação própria (seção 6.3), os testes de acerto da transcrição e da classificação de intenção, medidos como requisito não funcional (seção 6.3), e a verificação do ambiente de nuvem após a implantação, coberta pelo roteiro da seção 3.7.7.
+
+---
+
+## 6.5 Planejamento dos Testes de Usabilidade
+
+### 6.5.1 Objetivo do Teste
+
+### 6.5.2 Perfis, Diversidade e Seleção dos Participantes
+
+### 6.5.3 Cenários e Roteiro Planejados
+
+### 6.5.4 Aplicação Planejada do SUS
+
+### 6.5.5 Critérios para Análise dos Resultados
+
+## 6.6 Matriz de Cobertura Planejada
+
+---
+
+# 7. Registro de Decisões
 
 Esta seção registra as principais decisões técnicas, de escopo e de processo tomadas durante a Sprint 1. O registro segue o formato: decisão, contexto, alternativas consideradas, justificativa, impacto, participantes, data e status.
 
@@ -4997,11 +5752,16 @@ Esta seção registra as principais decisões técnicas, de escopo e de processo
 | D04 | RF06 (Atualizar cadastro de projetos) não recebe diagrama de sequência na Sprint 1 | RF06 tem prioridade baixa e representa variação do cenário 2; no MVP, gera apenas sugestão copiável sem escrita nas fontes | Modelar RF06 com diagrama próprio; incluir fluxo de confirmação explícita | O comportamento sugestivo do RF06 é coberto pela modelagem do cenário 2; a escrita com confirmação pertence à evolução futura | A ausência de diagrama é declarada explicitamente no documento como limitação desta sprint e não como omissão | Equipe | **Data a confirmar pela equipe** | Aprovada |
 | D05 | Cenários de sequência representam apenas o fluxo principal nesta sprint | Os desvios (rejeição de intenção desconhecida, esclarecimento de parâmetros, falha de transcrição, indisponibilidade de fonte) aumentariam significativamente a complexidade dos diagramas | Incluir todos os fragmentos alternativos desde a Sprint 1; dividir cada cenário em diagrama principal e diagrama de exceção | Privilegiar legibilidade na primeira especificação; os desvios entram na Sprint 2 conforme registrado no documento | Os critérios de aceitação dos RFs descrevem os desvios, mas eles não aparecem graficamente nesta sprint | Equipe | **Data a confirmar pela equipe** | Aprovada |
 | D06 | RNF09 substituído de "Tratamento de ambiguidades" para "Auditabilidade das interações" | A equipe não possuía informações suficientes para sustentar metas mensuráveis para o RNF09 original; o componente de auditoria já estava presente na arquitetura (seção 2.4) sem requisito formal correspondente | Manter o RNF09 original com metas pendentes; remover o requisito sem substituição | Auditabilidade é exigência direta das restrições de rastreabilidade do parceiro e estava prevista na arquitetura sem cobertura por requisito não funcional | O RNF09 de auditabilidade passou a cobrir o componente "Auditoria e Feedback" da solução técnica; o tratamento de ambiguidades permanece como comportamento descrito nos critérios de aceitação do RF02 | Equipe | 2026-08-14 | Aprovada |
+| D07 | Reformular o RNF02 como autenticação por SSO sem autorização por cargo | A equipe decidiu que o MVP terá autenticação comum e não diferenciará o acesso às funcionalidades por perfil; a única distinção será o acesso administrativo aos registros, tratado pelo RNF09 | Manter autorização por perfil; escolher imediatamente Microsoft; escolher imediatamente Google | Um contrato baseado em Bearer Token permite planejar e testar a autenticação sem depender da escolha do provedor e evita atribuir aos perfis profissionais uma regra de autorização que não fará parte do MVP | O RNF02 passa a exigir 100% de rejeição das credenciais ausentes ou inválidas com HTTP 401; `usuario.perfil` permanece apenas como informação profissional e o RNF02 deixa de ser uma lacuna do planejamento | Equipe | 2026-09-03 | Aprovada |
+| D08 | Adicionar o RNF12 para fundamentação das respostas de consulta | O RF03 exige apresentar a referência, mas não mede se a fonte realmente sustenta as afirmações produzidas pelo modelo; o risco AM8 identifica alucinação como ameaça relevante | Tratar apenas como teste funcional do RF03; reutilizar o RNF11, restrito às sugestões | Separar existência da referência de sustentação factual permite medir diretamente o risco sem misturar respostas de consulta com sugestões de preenchimento | O inventário passa a ter doze RNFs e a Seção 6.3 inclui avaliação por afirmações atômicas, dois avaliadores e cenários sem evidência suficiente | Equipe | 2026-09-03 | Aprovada |
 
-# 6. Fontes
+# 8. Fontes
 
 - ANPTrilhos. [Balanço do Setor Metroferroviário 2024](https://anptrilhos.org.br/balanco-metroferroviario-2024-transporte-sobre-trilhos-cresce-e-transporta-257-bilhoes-de-passageiros/). Acesso em ago. 2026.
 - Microsoft. [Design effective language understanding — Microsoft Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/language-understanding). Acesso em ago. 2026.
 - Metrô/CPTM. [Guia do Metrô de São Paulo em 2026](https://www.metrocptm.com.br/guia-do-metro-de-sao-paulo-em-2026-linhas-operacao-e-como-usar-o-sistema/). Acesso em ago. 2026.
+- NIST. [Security Requirements for Controlled Unclassified Information — NIST SP 800-171 Rev. 3](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/800-171r3/NIST.SP.800-171r3.html). 2024. Acesso em set. 2026.
+- OpenTelemetry. [Observability primer](https://opentelemetry.io/docs/concepts/observability-primer/). Acesso em set. 2026.
+- OWASP Foundation. [Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html). Acesso em set. 2026.
 - Rasa. [Intents and Entities — Rasa Documentation](https://rasa.com/docs/reference/primitives/intents-and-entities/). Acesso em ago. 2026.
 - Wikipédia. [Metropolitano de São Paulo](https://pt.wikipedia.org/wiki/Metropolitano_de_S%C3%A3o_Paulo). Acesso em ago. 2026.
