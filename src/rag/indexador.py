@@ -103,7 +103,7 @@ def buscar(
 
 def contar() -> int:
     """Retorna o número total de chunks indexados."""
-    with _cliente().session as session:
+    with _cliente().Session() as session:
         n = session.execute(
             text(f'SELECT COUNT(*) FROM vecs."{NOME_COLECAO}"')
         ).scalar()

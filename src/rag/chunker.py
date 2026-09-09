@@ -18,11 +18,18 @@ class Chunk:
     chunk_index: int
 
 
-def _agrupar_por_arquivo(textos: list[TextoExtraido]) -> list[list[TextoExtraido]]:
+def _agrupar(textos: list[TextoExtraido]) -> list[list[TextoExtraido]]:
+    """Agrupa por (arquivo, seção).
+
+    A seção é parte da chave — e não só o arquivo — por dois motivos: um chunk
+    nunca mistura conteúdo de duas seções (ou de duas abas de planilha), e o
+    metadado `secao` do chunk passa a corresponder ao texto que ele carrega.
+    """
     grupos: list[list[TextoExtraido]] = []
     atual: list[TextoExtraido] = []
     for item in textos:
-        if atual and item.arquivo_origem != atual[0].arquivo_origem:
+        chave_atual = (atual[0].arquivo_origem, atual[0].secao) if atual else None
+        if atual and (item.arquivo_origem, item.secao) != chave_atual:
             grupos.append(atual)
             atual = []
         atual.append(item)
@@ -42,9 +49,11 @@ def _chunkar_grupo(
     buffer: list[str] = []
     buffer_len = 0
     ref = grupo[0]
+    pendente = False  # há texto novo no buffer além do overlap herdado?
 
     for item in grupo:
         buffer.append(item.texto)
+        pendente = True
         buffer_len += len(item.texto)
 
         if buffer_len >= tamanho:
@@ -62,8 +71,11 @@ def _chunkar_grupo(
             sobrep = texto_chunk[-sobreposicao:] if sobreposicao else ""
             buffer = [sobrep] if sobrep else []
             buffer_len = len(sobrep)
+            pendente = False
 
-    if buffer:
+    # Sem `pendente`, o resto do buffer seria só o overlap do chunk anterior —
+    # um chunk duplicado, custando uma chamada de embedding e poluindo a busca.
+    if buffer and pendente:
         chunks.append(Chunk(
             texto=" ".join(buffer),
             projeto_id=ref.projeto_id,
@@ -85,7 +97,7 @@ def chunkar(
         return []
 
     chunks: list[Chunk] = []
-    for grupo in _agrupar_por_arquivo(textos):
+    for grupo in _agrupar(textos):
         novos = _chunkar_grupo(grupo, tamanho, sobreposicao, len(chunks))
         chunks.extend(novos)
     return chunks

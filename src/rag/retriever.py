@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from rag.embedder import vetorizar_um
 from rag import indexador
+from rag.embedder import vetorizar_um
 
 
 @dataclass(frozen=True)
@@ -26,13 +26,18 @@ def buscar(
     """Vetoriza a query e busca os chunks mais relevantes no índice."""
     embedding = vetorizar_um(query)
 
+    # vecs aceita no máximo uma entrada por filtro: dois critérios exigem $and.
+    condicoes: list[dict] = []
+    if projeto_id:
+        condicoes.append({"projeto_id": {"$eq": projeto_id}})
+    if tipo_documento:
+        condicoes.append({"tipo_documento": {"$eq": tipo_documento}})
+
     filtro: dict | None = None
-    if projeto_id or tipo_documento:
-        filtro = {}
-        if projeto_id:
-            filtro["projeto_id"] = {"$eq": projeto_id}
-        if tipo_documento:
-            filtro["tipo_documento"] = {"$eq": tipo_documento}
+    if len(condicoes) == 1:
+        filtro = condicoes[0]
+    elif condicoes:
+        filtro = {"$and": condicoes}
 
     brutos = indexador.buscar(embedding, n_resultados=n_resultados, filtro=filtro)
 
