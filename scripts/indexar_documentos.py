@@ -29,14 +29,14 @@ _SRC = Path(__file__).parent.parent / "src"
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv()
 
-from rag.parsers import extrair
-from rag.chunker import chunkar
-from rag.embedder import vetorizar
-from rag import indexador
+from rag import indexador  # noqa: E402
+from rag.chunker import chunkar  # noqa: E402
+from rag.embedder import vetorizar  # noqa: E402
+from rag.parsers import extrair  # noqa: E402
 
 
 def indexar_pasta(pasta_base: Path) -> None:
@@ -69,7 +69,7 @@ def indexar_pasta(pasta_base: Path) -> None:
         total_chunks += n
         total_arquivos += 1
 
-    print(f"\nIndexação concluída.")
+    print("\nIndexação concluída.")
     print(f"  Arquivos processados : {total_arquivos}/{len(arquivos)}")
     print(f"  Chunks no índice     : {indexador.contar()}")
 
