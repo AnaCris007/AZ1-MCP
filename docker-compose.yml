@@ -30,5 +30,28 @@ services:
     volumes:
       - ./infra/minio/lifecycle.json:/config/lifecycle.json:ro
 
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: az1
+      POSTGRES_PASSWORD: az1
+      POSTGRES_DB: az1
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Monta só o DDL, e não a pasta src/database inteira: 02_initial_data.sql
+      # ainda é o molde genérico do template inicial do repositório (commit
+      # 805d797), nunca preenchido com dados de verdade, e o Postgres o
+      # executaria como SQL se a pasta inteira fosse montada aqui.
+      # Recriar o banco do zero é `docker compose down -v`.
+      - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create_database.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U az1 -d az1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   minio_data:
+  postgres_data:

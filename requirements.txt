@@ -19,3 +19,6 @@ deepgram-sdk>=5.0
 
 # Dependências da API de chat (Gemini)
 google-genai>=1.0
+
+# Dependências da integração por webhook e do banco (src/services/webhook_*)
+psycopg[binary,pool]>=3.2
