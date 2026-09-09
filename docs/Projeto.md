@@ -5124,6 +5124,30 @@ A execução será coordenada pelo responsável da task T31, com revisão das ev
 
 O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável para as consultas textuais, e as duas dimensões do RNF10: crescimento da concorrência e crescimento dos dados. Os ensaios devem ser executados em ambiente controlado, com versão do código, configuração, recursos computacionais, horário e estado dos serviços externos registrados antes de cada rodada.
 
+#### Escopo, metas e componentes disponíveis
+
+O planejamento parte das metas da Seção 2.3 e dos componentes presentes no repositório. A tabela abaixo fixa as referências para preparar os ensaios; seus valores são critérios de aceitação, não resultados já obtidos.
+
+| Dimensão | Casos relacionados | Meta do requisito | Condição de comparação |
+|---|---|---|---|
+| Tempo de resposta textual — RNF01 | `CT-RNF01-P`, `CT-RNF01-N` | Pelo menos 80% das consultas elegíveis com resposta completa em até 15 s; 100% com resposta ou erro controlado em até 60 s | Fluxo textual com serviços reais para a avaliação principal; lentidão injetada em rodada separada para avaliar degradação |
+| Concorrência — RNF10 | `CT-RNF10-C-P`, `CT-RNF10-C-N` | Em `10x`, p95 ≤ 20 s e ≤ 2 vezes o p95 da linha de base | Dependências externas controladas e idênticas; `1x` = 5 e `10x` = 50 solicitações simultâneas, conforme a carga adotada neste plano |
+| Memória de treinamento — RNF10 | `CT-RNF10-M-P`, `CT-RNF10-M-N` | Pico de memória com dataset `10x` ≤ 8 vezes o pico em `1x` | Mesma configuração de treinamento, processos reiniciados e datasets identificados |
+| Memória do processo servido — RNF10 | `CT-RNF10-M-P`, `CT-RNF10-M-N` | Memória estabilizada e pico de inferência com modelo treinado em `10x` ≤ 2 vezes suas respectivas linhas de base | Mesma massa de inferência e recursos fixos, medindo separadamente as duas razões |
+
+Os cinco acessos simultâneos da linha de base são uma hipótese de carga do MVP, não uma estimativa comprovada do uso pelo Metrô. O aumento de concorrência e o aumento do dataset serão avaliados separadamente, para permitir identificar a origem de uma eventual degradação.
+
+| Componente disponível | Entrada e interação atual | Aplicação no planejamento e limite da evidência |
+|---|---|---|
+| `POST /api/v1/chat` — `src/routes/chat.py` | JSON com `message` e `conversation_id`; chama `AnswerChatMessage`, que utiliza o adaptador Gemini, e retorna `reply` | Alvo HTTP inicial para RNF01 e RNF10-C. A mensagem deve ser não vazia e ter até 4000 caracteres após remoção de espaços nas extremidades. O fluxo atual gera resposta com Gemini; medir essa rota não comprova, sozinho, a consulta integrada às fontes de projetos exigida pelo RF02 |
+| `POST /api/v1/audio/{audio_id}/analyze` — `src/routes/analysis.py` | Recebe identificador de áudio armazenado, transcreve via Deepgram e executa o classificador carregado pelo serviço | Referência do processo que já utiliza o modelo de PLN. A duração total da rota inclui armazenamento e transcrição; não deve ser usada como tempo de consulta textual do RNF01 nem confundida com inferência isolada |
+| `src/pln/classificador.py` | CLI `python -m pln.classificador`, com opções `--dataset` e `--salvar`; oferece carregamento e predição do modelo | Base disponível para preparar RNF10-M. Separar a medição do treinamento da avaliação cruzada também executada pela CLI; usar um processo persistente com modelo carregado para medir a memória do serviço |
+| `GET /health` — `src/az1_api/main.py` | Retorna o estado básico do processo HTTP | Verificação inicial de acesso ao servidor; não comprova disponibilidade do Gemini, Deepgram, armazenamento ou fontes de projetos |
+
+**Pré-requisitos para a execução.** Identificar o commit candidato, congelar a massa sintética e registrar recursos, processos e configuração do servidor. Antes de declarar atendimento integral aos RF02 e RF04 associados a estes RNFs, confirmar que os fluxos de consulta às fontes e de sugestões estejam integrados. Enquanto isso, identificar as medições como parciais e informar o componente efetivamente exercitado.
+
+Para o RNF01, verificar as credenciais e a disponibilidade do provedor real e confirmar o mecanismo de interrupção da espera dentro de 60 segundos; o contrato atual de chat não demonstra por si só essa garantia. Para o RNF10-C, preparar a substituição controlada das dependências externas mantendo o processamento interno que se deseja medir. Quando utilizado, o VHS deverá ter seu modo e estado registrados: respostas reproduzidas servem ao ensaio controlado, mas não comprovam a latência do provedor real. Para o RNF10-M, disponibilizar datasets e modelos identificáveis em todos os tamanhos e a instrumentação de memória. A ausência desses pré-requisitos deve ser registrada como bloqueio do caso correspondente, conforme a Seção 6.3.1.
+
 #### RNF01 — tempo de resposta das consultas textuais
 
 **Propósito.** Verificar se pelo menos 80% das consultas textuais previstas no RF02 apresentam resposta completa em até 15 segundos e se nenhuma consulta elegível permanece sem desfecho além do teto de 60 segundos.
