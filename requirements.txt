@@ -19,3 +19,8 @@ deepgram-sdk>=5.0
 
 # Dependências da API de chat (Gemini)
 google-genai>=1.0
+
+# Dependências do pipeline RAG (src/rag)
+openpyxl>=3.1
+python-docx>=1.1
+vecs>=0.4
