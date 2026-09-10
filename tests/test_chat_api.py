@@ -49,6 +49,7 @@ class TestChatAPI(unittest.TestCase):
         cases = (
             (ChatReceptionErrorCode.EMPTY_MESSAGE, 422, "empty_message"),
             (ChatReceptionErrorCode.MESSAGE_TOO_LONG, 422, "message_too_long"),
+            (ChatReceptionErrorCode.SERVICE_UNAVAILABLE, 503, "service_unavailable"),
         )
         for code, status, error in cases:
             with self.subTest(code=code):
