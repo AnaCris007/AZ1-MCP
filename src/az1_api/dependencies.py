@@ -1,8 +1,11 @@
 import os
 from functools import lru_cache
 
+from database.conexao import obter_engine
+from services.alerta_service import ConfiguracaoAlertas, DesativarAssinante, DispatcherAlerta, ListarAssinantes, RegistrarAssinante
 from services.analysis_service import AnalyzeAudio
 from services.audio_service import ReceiveAudio
+from services.auditoria_service import GravarConsulta, ListarConsultas
 from services.chat_service import AnswerChatMessage
 from services.gemini_service import GeminiChatModel, GeminiSettings
 from services.gemini_speech_service import DEFAULT_TTS_MODEL, GeminiSpeechModel
@@ -67,3 +70,33 @@ def get_speech_generator() -> GenerateSpeech:
         raise RuntimeError("GEMINI_API_KEY não configurada para geração de áudio.")
     model = os.environ.get("GEMINI_TTS_MODEL", DEFAULT_TTS_MODEL)
     return GenerateSpeech(model=GeminiSpeechModel.from_api_key(api_key, model))
+
+
+@lru_cache
+def get_alerta_registrador() -> RegistrarAssinante:
+    return RegistrarAssinante(engine=obter_engine())
+
+
+@lru_cache
+def get_alerta_desativador() -> DesativarAssinante:
+    return DesativarAssinante(engine=obter_engine())
+
+
+@lru_cache
+def get_alerta_listador() -> ListarAssinantes:
+    return ListarAssinantes(engine=obter_engine())
+
+
+@lru_cache
+def get_alerta_dispatcher() -> DispatcherAlerta:
+    return DispatcherAlerta(engine=obter_engine(), configuracao=ConfiguracaoAlertas.carregar())
+
+
+@lru_cache
+def get_gravador_auditoria() -> GravarConsulta:
+    return GravarConsulta(engine=obter_engine())
+
+
+@lru_cache
+def get_listador_auditoria() -> ListarConsultas:
+    return ListarConsultas(engine=obter_engine())

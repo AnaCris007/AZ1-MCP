@@ -5,8 +5,10 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from routes import analysis_router, audio_router, chat_router, rag_router, speech_router, transcription_router
+from routes import alerta_router, analysis_router, audio_router, auditoria_router, chat_router, rag_router, speech_router, transcription_router
+from routes.alerta import AlertaAPIError
 from routes.audio import AudioAPIError
+from routes.auditoria import AuditoriaAPIError
 from routes.chat import ChatAPIError
 from routes.speech import SpeechAPIError
 from routes.transcription import TranscriptionAPIError
@@ -23,11 +25,29 @@ app.include_router(analysis_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")
 app.include_router(rag_router, prefix="/api/v1")
 app.include_router(speech_router, prefix="/api/v1")
+app.include_router(alerta_router, prefix="/api/v1")
+app.include_router(auditoria_router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["infra"])
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.exception_handler(AlertaAPIError)
+def alerta_api_error_handler(request: Request, exc: AlertaAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
+
+
+@app.exception_handler(AuditoriaAPIError)
+def auditoria_api_error_handler(request: Request, exc: AuditoriaAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
 
 
 @app.exception_handler(TranscriptionAPIError)

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 
-from az1_api.dependencies import get_analyzer
+from az1_api.dependencies import get_alerta_dispatcher, get_analyzer
 from routes.transcription import TranscriptionAPIError
 from schemas.analysis import AnalysisResponse
 from schemas.transcription import TranscriptionLanguage
+from services.alerta_service import DispatcherAlerta
 from services.analysis_service import AnalyzeAudio
 from services.transcription_service import TranscriptionError, TranscriptionErrorCode
 
@@ -20,17 +21,30 @@ _ERROR_MAP = {
 @router.post("/audio/{audio_id}/analyze", response_model=AnalysisResponse, status_code=200)
 async def analyze_audio(
     audio_id: str,
+    background_tasks: BackgroundTasks,
     language: TranscriptionLanguage = Query(
         default="pt-BR",
         description="Idioma do áudio. Nesta versão, apenas pt-BR é suportado.",
     ),
     analyzer: AnalyzeAudio = Depends(get_analyzer),
+    dispatcher: DispatcherAlerta = Depends(get_alerta_dispatcher),
 ) -> AnalysisResponse:
     try:
         result = await analyzer.analyze(audio_id=audio_id, language=language)
     except TranscriptionError as exc:
         status_code, error, message = _ERROR_MAP[exc.code]
         raise TranscriptionAPIError(status_code, error, message) from exc
+
+    # projeto_id=None envia para todos os assinantes ativos independente do projeto.
+    # Revisar quando o AZ1 suportar múltiplos projetos num mesmo tenant.
+    background_tasks.add_task(
+        dispatcher.despachar,
+        intencao=result.intencao,
+        confianca_pln=result.confianca_pln,
+        audio_id=audio_id,
+        transcricao=result.text,
+        projeto_id=None,
+    )
 
     return AnalysisResponse(
         audio_id=audio_id,
