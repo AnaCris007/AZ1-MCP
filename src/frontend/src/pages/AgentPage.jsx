@@ -13,10 +13,16 @@ import TopBar from '../components/TopBar/TopBar'
 import metroMapPattern from '../assets/metro-map-pattern.svg'
 import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
-import { sendAudio, sendMessage, transcribeAudio } from '../lib/api'
+import { ChatRequestError, sendAudio, sendMessage, transcribeAudio } from '../lib/api'
 
-const FALLBACK_REPLY =
-  'Estou aqui para ajudar. Em breve estarei conectado aos serviços de fala e processamento de linguagem natural para responder de forma completa.'
+const SERVICE_UNAVAILABLE_FALLBACK =
+  'O serviço de IA está sobrecarregado no momento. Tente novamente em instantes.'
+const NETWORK_ERROR_FALLBACK =
+  'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.'
+const GENERIC_ERROR_FALLBACK =
+  'Ocorreu um erro inesperado ao processar sua mensagem. Tente novamente.'
+const EMPTY_TRANSCRIPTION_MESSAGE =
+  'Não foi possível identificar nenhuma fala. Tente gravar novamente.'
 
 const TITLE_MAX_LENGTH = 42
 
@@ -42,6 +48,7 @@ export default function AgentPage() {
   const [inputValue, setInputValue] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [isTranscribing, setIsTranscribing] = useState(false)
+  const [hasPendingTranscription, setHasPendingTranscription] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [shareCopied, setShareCopied] = useState(false)
   const scrollRef = useRef(null)
@@ -75,15 +82,23 @@ export default function AgentPage() {
 
     setMessages((prev) => [...prev, { role: 'user', content: trimmed }])
     setInputValue('')
+    setHasPendingTranscription(false)
     setIsProcessing(true)
 
     sendMessage(trimmed, conversationId)
       .then((data) => {
         setMessages((prev) => [...prev, { role: 'agent', content: data.reply }])
       })
-      .catch(() => {
-        console.info('[chat] backend indisponível, usando resposta de exemplo')
-        setMessages((prev) => [...prev, { role: 'agent', content: FALLBACK_REPLY }])
+      .catch((err) => {
+        let content = GENERIC_ERROR_FALLBACK
+        if (err instanceof ChatRequestError) {
+          if (err.error === 'service_unavailable') {
+            content = err.message || SERVICE_UNAVAILABLE_FALLBACK
+          } else if (err.error === 'network_error') {
+            content = NETWORK_ERROR_FALLBACK
+          }
+        }
+        setMessages((prev) => [...prev, { role: 'agent', content }])
       })
       .finally(() => setIsProcessing(false))
   }
@@ -105,8 +120,15 @@ export default function AgentPage() {
     sendAudio(blob)
       .then((upload) => transcribeAudio(upload.id))
       .then((transcription) => {
-        if (transcription.text.trim()) {
-          submitMessage(transcription.text)
+        const text = transcription.text.trim()
+        if (text) {
+          setInputValue(text)
+          setHasPendingTranscription(true)
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            { role: 'agent', content: EMPTY_TRANSCRIPTION_MESSAGE },
+          ])
         }
       })
       .catch(() => {
@@ -116,6 +138,11 @@ export default function AgentPage() {
         ])
       })
       .finally(() => setIsTranscribing(false))
+  }
+
+  const handleDiscardTranscription = () => {
+    setInputValue('')
+    setHasPendingTranscription(false)
   }
 
   const handleNewConversation = () => {
@@ -338,6 +365,8 @@ export default function AgentPage() {
                 onToggleListening={handleToggleListening}
                 isTranscribing={isTranscribing}
                 onRecordingComplete={handleRecordingComplete}
+                hasPendingTranscription={hasPendingTranscription}
+                onDiscardTranscription={handleDiscardTranscription}
               />
             </div>
           )}
