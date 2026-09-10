@@ -1513,7 +1513,7 @@ Os valores-alvo ainda não acordados estão identificados como **a validar com o
 | **RNF01 — Desempenho das consultas**                       | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações           | Desempenho                         | Pelo menos 80% das consultas textuais elegíveis devem apresentar resposta completa em até 15 segundos, e 100% devem terminar com resposta ou erro controlado em até 60 segundos, desconsiderando somente indisponibilidades externas comprovadas.                                                                                                            | Executar conjunto representativo de consultas, medir taxa de sucesso e tempos de resposta e verificar simultaneamente o limite principal e o teto da cauda.      |
 | **RNF02 — Autenticação dos usuários**                      | Como usuário do agente, quero acessar a solução por uma identidade autenticada para impedir o uso das funcionalidades por pessoas não identificadas.               | Confidencialidade e segurança da informação               | Segurança e autenticidade          | Todas as funcionalidades protegidas devem exigir sessão ou token válido emitido por um provedor SSO. Nos testes, 100% das solicitações sem credencial, com credencial malformada, expirada, com assinatura inválida ou audiência incorreta devem ser rejeitadas com HTTP 401 antes da execução da regra de negócio. O provedor poderá ser Microsoft ou Google e sua escolha não altera o contrato do teste. | Executar cada endpoint protegido com credencial válida e com as cinco condições inválidas, verificando autenticação, resposta 401, interrupção antes da regra de negócio e ausência de credenciais nos registros. |
 | **RNF03 — Qualidade da classificação de intenções**        | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas                   | Correção e confiabilidade          | Em conjunto de teste cego e equilibrado, o classificador deve atingir F1-macro mínimo de 0,85 entre as dez intenções, cobertura mínima de 90% sobre as nove intenções conhecidas e taxa máxima de 15% de aceitação indevida dos exemplos `fora_do_catalogo`. A cobertura corresponde à proporção de exemplos conhecidos que não são encaminhados à rejeição pelo limiar de confiança. | Avaliar o modelo e o limiar congelados sobre conjunto rotulado que nunca participou de treinamento, seleção de pré-processamento, calibração ou ajuste.           |
-| **RNF04 — Rastreabilidade das consultas**                  | Como responsável pela gestão dos projetos, quero que cada solicitação possa ser relacionada às etapas e informações que produziram sua resposta.                  | Rastreabilidade e transparência                           | Rastreabilidade                    | Cada interação deve possuir identificador único e permitir relacionar o usuário autenticado, a data e hora, o canal, a solicitação, a intenção identificada, as fontes consultadas, a resposta ou resultado, o tempo de processamento, o feedback e eventual erro. No modelo planejado, `interacao.id` identifica a interação, `resultado` registra a resposta ou resultado e `interacao_artefato` relaciona as fontes. | Executar interações de texto e voz, consultar seus registros pelo identificador e verificar a presença e o relacionamento de todos os elementos aplicáveis.       |
+| **RNF04 — Rastreabilidade das consultas**                  | Como responsável pela gestão dos projetos, quero que cada solicitação possa ser relacionada às etapas e informações que produziram sua resposta.                  | Rastreabilidade e transparência                           | Rastreabilidade                    | Cada interação deve possuir identificador único e permitir relacionar o usuário autenticado, a data e hora, o canal, a solicitação, a intenção identificada, as fontes consultadas, a resposta ou resultado, o tempo de processamento, o feedback e eventual erro. No modelo implementado, `conversa.id` e `mensagem.id` identificam a conversa e cada turno, `mensagem.conteudo` registra o texto da solicitação e o da resposta, `mensagem.resultado` registra o desfecho e `mensagem_fonte` relaciona as fontes. | Executar interações de texto e voz, consultar seus registros pelo identificador e verificar a presença e o relacionamento de todos os elementos aplicáveis.       |
 | **RNF05 — Interoperabilidade entre aplicações clientes**   | Como usuário, quero acessar o agente a partir de diferentes aplicações para consultar os projetos pelo ponto de acesso mais adequado à minha rotina.              | Interoperabilidade e acessibilidade                       | Flexibilidade e integração         | O núcleo do agente deve expor suas funcionalidades por meio de interfaces padronizadas, permitindo que pelo menos duas aplicações clientes distintas o consumam sem duplicação das regras de negócio e com equivalência de contrato e resultado de negócio.                                                                                              | Acionar as funcionalidades principais pela interface React e por um cliente Python independente e comparar status HTTP, esquema, intenção, fontes, dados estruturados e categorias de erro, sem exigir redação textual idêntica. |
 | **RNF06 — Qualidade da transcrição de áudio**              | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural     | Qualidade do reconhecimento de fala | O componente de conversão de áudio em texto deve apresentar WER geral de no máximo 15% em um conjunto de áudios representativo do contexto do projeto.                                                                                                                                      | Testar com áudios do vocabulário de projetos e calcular substituições, exclusões e inserções contra transcrições de referência.                                  |
 | **RNF07 — Disponibilidade da solução**                     | Como usuário, quero que o agente permaneça disponível durante uma sessão de trabalho para realizar consultas quando necessário.                                   | Continuidade operacional e eficiência                     | Confiabilidade e disponibilidade   | No ambiente acadêmico, a solução deve apresentar disponibilidade mínima de 99% durante uma janela contínua de quatro horas, desconsiderando manutenções previamente comunicadas. Uma verificação é bem-sucedida quando `GET /health` responde HTTP 200 em até dois segundos, indicando disponibilidade da aplicação e do banco de dados; provedores externos são monitorados separadamente. | Consultar o endpoint de saúde uma vez por minuto durante a sessão de quatro horas e calcular a proporção de verificações bem-sucedidas entre as verificações elegíveis. |
@@ -2073,7 +2073,7 @@ A tabela fecha o vínculo entre esta seção e os demais elementos do projeto, d
 | RF01 — entrada por texto ou voz | A transcrição é o que permite que a solicitação falada percorra o mesmo pipeline da digitada, sem um segundo classificador |
 | RNF01 — desempenho | O tempo da chamada externa é a maior parcela do tempo de resposta do canal de voz; a política de tempo limite em aberto incide diretamente sobre este requisito |
 | RNF03 — qualidade da classificação de intenções | Um erro de transcrição vira um erro de classificação; por isso o `keyterm` cobre o vocabulário que distingue as intenções |
-| RNF04 e RNF09 — rastreabilidade e auditoria | A coluna `auditoria.interacao.audio_referencia`, definida na Seção 3.6.5, guarda o `audio_id` e liga cada interação por voz ao arquivo original |
+| RNF04 e RNF09 — rastreabilidade e auditoria | A coluna `auditoria.mensagem.audio_referencia`, definida na Seção 3.6.5, guarda o `audio_id` e liga cada turno por voz ao arquivo original |
 | RNF06 — acessibilidade | O canal de voz é o mecanismo que atende a este requisito, e o WER medido é a métrica que comprova o atendimento |
 | AM9 — degradação da transcrição em ambiente ruidoso | O risco incide exatamente sobre esta seção e permanece **Aberto**, sem medição, conforme a Seção 4.3.2 do `GestaoProjeto.md` |
 | Seção 2.4 — diagrama de componentes | A Conversão de Áudio em Texto é o componente que encapsula este serviço |
@@ -2928,26 +2928,40 @@ A entidade **Interação** estabelece a ligação entre o usuário e as fontes c
 
 Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico-relacional é apresentada nas subseções seguintes, que detalham os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
 
+Esse recorte permanece o do negócio, e não o da implementação: as subseções seguintes acrescentam estruturas que não são conceitos do domínio de portfólio — a avaliação da resposta, os eventos de uso da plataforma e o desdobramento de **Interação** em conversa e turno — sem que isso contradiga o diagrama acima. A relação entre cada entidade conceitual e as tabelas que a implementam está na tabela de correspondência da seção 3.6.4.
+
 ### 3.6.4 Modelo lógico-relacional
 
-O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas. Os atributos de cada tabela vêm da modelagem estática da seção 2.2.1, e os atributos da tabela `interacao` vêm dos elementos de auditoria exigidos pelos RNF04 e RNF09.
+O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas.
 
-Além dos seis relacionamentos do diagrama conceitual, o modelo lógico incorpora três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no recorte conceitual, por serem indispensáveis ao domínio: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção dos perfis profissionais Diretor, PMO e Líder de Projeto, que preserva as personas e a relação de liderança (`lidera`) prevista no RF06. Os perfis não determinam autorização no RNF02, que exige somente autenticação por SSO. Dessa forma, o modelo lógico dá continuidade simultaneamente ao modelo conceitual desta seção e ao diagrama de classes da Sprint 1 sem acrescentar campos para autenticação.
+O modelo lógico é mais amplo que o recorte conceitual da seção 3.6.1, e essa diferença é deliberada. Ele incorpora, primeiro, três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no diagrama conceitual por não serem conceitos de negócio: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção dos perfis profissionais Diretor, PMO e Líder de Projeto, que preserva as personas e a relação de liderança (`lidera`) prevista no RF06. Incorpora, em segundo lugar, as estruturas exigidas pelo fluxo conversacional e pelos controles de auditoria — conversa, mensagem, fonte da resposta, avaliação e evento de plataforma —, detalhadas mais adiante nesta subseção. Os perfis não determinam autorização no RNF02, que exige somente autenticação por SSO.
 
 <div align="center">
 <sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
-  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, artefato, campo_artefato, pendencia, interacao, interacao_artefato, usuario_projeto e notificacao"><br>
+  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, projeto_relacionado, artefato, campo_artefato, pendencia, usuario_projeto, conversa, mensagem, mensagem_fonte, avaliacao, evento_plataforma e notificacao"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
+
+#### Do conceito de Interação às tabelas `conversa` e `mensagem`
+
+A entidade conceitual **Interação** representa "uma solicitação realizada pelo usuário". No modelo lógico ela se desdobra em duas tabelas, por três razões que só aparecem quando se desce ao nível da implementação.
+
+A primeira é que o produto não trata solicitações isoladas, e sim **conversas**: a interface mantém uma barra lateral de conversas anteriores e envia um identificador de conversa a cada mensagem. Sem uma tabela que represente esse agrupamento, o histórico não teria onde existir.
+
+A segunda é que a solicitação e a resposta precisam ser **registros de mesma natureza**. Uma tabela com uma linha por solicitação obriga a tratar a resposta como atributo da pergunta, o que impede atribuir a ela fontes, tempo de processamento e avaliação próprios. Modelando cada turno como uma linha — distinguida pela coluna `papel`, com valores `usuario` e `agente`, e ordenada por `ordem` dentro da conversa — pergunta e resposta ganham identidade própria, e as fontes passam a pender da resposta que elas fundamentam, que é onde o RF03 e o RNF12 as exigem.
+
+A terceira é que o **texto da resposta precisa ser persistido**. O RNF12 estabelece que as afirmações factuais da resposta devem ser confrontadas com as fontes citadas, e o RNF04 exige que a interação permita relacionar "a resposta ou resultado". Um atributo categórico de desfecho — `sucesso`, `esclarecimento`, `recusada`, `falha` — informa como a solicitação terminou, mas não guarda o que foi afirmado ao usuário, e portanto não sustenta nenhuma das duas verificações. A coluna `mensagem.conteudo` guarda o texto de ambos os papéis: o prompt digitado, a transcrição do áudio enviado ou a resposta gerada.
+
+#### Correspondência entre as modelagens
 
 A tabela a seguir registra a correspondência entre cada elemento das modelagens anteriores e a estrutura relacional que o implementa, evidenciando que nenhuma regra de negócio foi perdida na tradução:
 
 | Elemento de origem | Estrutura relacional | Regra de derivação aplicada |
 |---|---|---|
 | Entidade **Usuário** e especializações (2.2.1) | Tabela `usuario` com coluna `perfil` | Especializações sem atributos próprios colapsadas em coluna de domínio restrito por `CHECK` (decisão 1 da seção 3.6.7) |
-| Entidade **Interação** | Tabela `interacao` | Entidade para tabela; atributos definidos pelos RNF04 e RNF09 |
-| **Usuário realiza Interação** `(0,n)`–`(1,1)` | `interacao.usuario_id NOT NULL` | Um-para-muitos vira chave estrangeira no lado "muitos"; mínimo 1 vira `NOT NULL` |
-| **Interação consulta Artefato** `(0,n)`–`(0,n)` | Tabela associativa `interacao_artefato` | Muitos-para-muitos vira tabela associativa com chave primária composta |
+| Entidade **Interação** | Tabelas `conversa` e `mensagem` | Entidade desdobrada em agrupamento e turno, conforme a justificativa acima (decisão 8 da seção 3.6.7) |
+| **Usuário realiza Interação** `(0,n)`–`(1,1)` | `conversa.usuario_id NOT NULL` | Um-para-muitos vira chave estrangeira no lado "muitos"; mínimo 1 vira `NOT NULL`. A autoria da mensagem é herdada da conversa, evitando repetir o usuário em cada turno |
+| **Interação consulta Artefato** `(0,n)`–`(0,n)` | Tabela `mensagem_fonte` | Muitos-para-muitos materializado com atributos próprios de posição, score e cópia dos metadados (decisão 9 da seção 3.6.7) |
 | **Artefato documenta/pertence a Projeto** `(1,1)`–`(0,n)` | `artefato.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
 | **Artefato possui Campo Artefato** `(1,n)`–`(1,1)` | `campo_artefato.artefato_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata e unicidade de `nome` por artefato |
 | **Projeto pertence a Portfólio** `(1,1)`–`(1,n)` | `projeto.portfolio_id NOT NULL` | Um-para-muitos vira chave estrangeira |
@@ -2955,16 +2969,19 @@ A tabela a seguir registra a correspondência entre cada elemento das modelagens
 | **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
 | **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
 | **Pendência notifica Usuário** (2.2.1) | Tabela `notificacao` | Muitos-para-muitos materializado como registro de envio, com atributo próprio `data_envio` (decisão 3 da seção 3.6.7) |
+| Atributo de avaliação da Interação | Tabela `avaliacao` | Atributo promovido a entidade por possuir autor, instante e alvo próprios (decisão 10 da seção 3.6.7) |
+| Uso da plataforma fora do agente | Tabela `evento_plataforma` | Estrutura nova, exigida pelo RNF09 e sem correspondência no recorte conceitual (decisão 11 da seção 3.6.7) |
+| Dependências entre projetos declaradas na base | Tabela `projeto_relacionado` | Auto-relacionamento muitos-para-muitos sobre `projeto` (decisão 12 da seção 3.6.7) |
 
 As cardinalidades mínimas do lado "muitos" — um portfólio reúne ao menos um projeto `(1,n)` e um artefato possui ao menos um campo `(1,n)` — não são expressáveis por restrições declarativas simples no modelo relacional, pois exigiriam verificação no momento da inserção da linha "pai". Essas duas regras permanecem documentadas como restrições de aplicação, a serem garantidas pela camada de serviços descrita na seção 2.4.
 
 ### 3.6.5 Dicionário de dados (modelo físico)
 
-O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. Todas as chaves primárias substitutas usam `INTEGER GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais.
+O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. As chaves primárias substitutas usam `INTEGER` ou `BIGINT GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais; a exceção é `conversa`, cuja chave é `UUID` pela razão registrada na decisão 8 da seção 3.6.7.
 
-As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente (portfólios, projetos, usuários, artefatos, campos e pendências), e o schema **`auditoria`** reúne os registros de interação, fontes consultadas e notificações, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
+As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente, e o schema **`auditoria`** reúne os registros de conversa, mensagem, fonte, avaliação, evento e notificação, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
 
-**`portfolio`** — agrupamento de projetos de um exercício:
+**`portfolio.portfolio`** — agrupamento de projetos de um exercício:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
@@ -2972,41 +2989,56 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
 | `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
 
-**`usuario`** — profissional autorizado a utilizar o agente:
+**`portfolio.usuario`** — profissional autorizado a utilizar o agente:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `id` | `INTEGER` | `PK`, identity | Identificador único do usuário |
+| `auth_user_id` | `UUID` | `UNIQUE` | Identidade no provedor de SSO. Nula até a implementação do RNF02 (decisão 13 da seção 3.6.7) |
 | `nome` | `TEXT` | `NOT NULL` | Nome do profissional |
 | `email` | `TEXT` | `NOT NULL`, `UNIQUE` | Endereço corporativo de envio das notificações |
 | `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Perfil profissional usado nas personas e relações do domínio; não concede permissões distintas no RNF02 |
+| `ativo` | `BOOLEAN` | `NOT NULL`, `DEFAULT TRUE` | Desligamento lógico, preservando as conversas e a trilha do usuário |
+| `criado_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do cadastro |
 
-**`projeto`** — empreendimento acompanhado pelo PMO:
+**`portfolio.projeto`** — empreendimento acompanhado pelo PMO:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `id` | `INTEGER` | `PK`, identity | Identificador único do projeto |
 | `codigo` | `TEXT` | `NOT NULL`, `UNIQUE` | Código institucional do empreendimento (chave natural) |
 | `nome` | `TEXT` | `NOT NULL` | Denominação do empreendimento |
-| `status` | `TEXT` | `NOT NULL` | Situação corrente do projeto |
+| `fase` | `TEXT` | `NOT NULL` | Fase do ciclo de vida: Iniciação, Execução, Encerramento |
+| `status` | `TEXT` | `NOT NULL` | Situação corrente apurada pelo PMO |
 | `data_inicio` | `DATE` | — | Data de início da execução |
 | `data_termino_prevista` | `DATE` | — | Data prevista de conclusão, base da apuração de prazos |
-| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física |
+| `percentual_previsto` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Avanço planejado para a data de referência |
+| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física realizado |
+| `desvio_pp` | `NUMERIC(6,2)` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Desvio em pontos percentuais entre realizado e previsto (decisão 2 da seção 3.6.7) |
 | `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
 | `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
 
-**`artefato`** — documento que integra a documentação do projeto:
+**`portfolio.projeto_relacionado`** — dependências declaradas entre projetos:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto de origem da relação |
+| `relacionado_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE`, `CHECK (<> projeto_id)` | Projeto relacionado |
+| `relacao` | `TEXT` | `NOT NULL` | Natureza da dependência, como fornecimento de dados ou compartilhamento de recurso |
+
+**`portfolio.artefato`** — documento que integra a documentação do projeto:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `id` | `INTEGER` | `PK`, identity | Identificador único do artefato |
 | `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto documentado (composição) |
-| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, como ata, relatório ou contrato |
-| `referencia` | `TEXT` | `NOT NULL` | Localizador do documento no repositório, exibido como fonte no RF03 |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, alinhada ao metadado `tipo_documento` do índice vetorial |
+| `referencia` | `TEXT` | `NOT NULL`, `UNIQUE (projeto_id, referencia)` | Caminho relativo do documento no repositório, exibido como fonte no RF03 |
+| `titulo` | `TEXT` | — | Denominação legível do documento |
 | `data` | `TIMESTAMPTZ` | `NOT NULL` | Data da última atualização, exibida junto à fonte no RF03 |
 | `versao` | `TEXT` | — | Versão vigente do documento |
 
-**`campo_artefato`** — campo individual de um artefato:
+**`portfolio.campo_artefato`** — campo individual de um artefato:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
@@ -3017,46 +3049,106 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `obrigatorio` | `BOOLEAN` | `NOT NULL`, `DEFAULT FALSE` | Indica se o preenchimento é exigido |
 | `preenchido` | `BOOLEAN` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Derivada de `valor`, elimina inconsistência entre valor e marcação (decisão 2 da seção 3.6.7) |
 
-**`pendencia`** — item em aberto originado por um projeto:
+**`portfolio.pendencia`** — item em aberto originado por um projeto:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `id` | `INTEGER` | `PK`, identity | Identificador único da pendência |
 | `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto de origem (composição) |
-| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência, como prazo, documento ou aprovação; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `codigo` | `TEXT` | `UNIQUE (projeto_id, codigo)` | Identificador do item na planilha de origem |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `titulo` | `TEXT` | `NOT NULL` | Enunciado curto do item |
 | `descricao` | `TEXT` | `NOT NULL` | Detalhamento do item em aberto |
+| `criticidade` | `TEXT` | — | Grau de criticidade apurado pelo PMO |
+| `responsavel` | `TEXT` | — | Área responsável pelo tratamento |
+| `acao_resposta` | `TEXT` | — | Ação de resposta planejada |
 | `prazo` | `DATE` | — | Data limite para tratamento, base da notificação do RF05 |
-| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'resolvida')` | Estado corrente da pendência |
+| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'materializada', 'resolvida')` | Estado corrente da pendência (decisão 14 da seção 3.6.7) |
 
-**`auditoria.interacao`** — registro de auditoria de cada solicitação (RNF04 e RNF09):
-
-| Coluna | Tipo | Restrições | Finalidade |
-|---|---|---|---|
-| `id` | `INTEGER` | `PK`, identity | Identificador único do evento |
-| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Usuário que realizou a interação |
-| `data_hora` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do evento |
-| `canal` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'voz')` | Canal utilizado, conforme o RF01 |
-| `texto_solicitacao` | `TEXT` | `NOT NULL` | Texto da solicitação (original ou transcrito do áudio) |
-| `audio_referencia` | `TEXT` | `CHECK` (preenchida apenas quando `canal = 'voz'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4), vinculando o registro ao arquivo original |
-| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1 | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
-| `resultado` | `TEXT` | `NOT NULL`, `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')` | Desfecho da solicitação |
-| `categoria_erro` | `TEXT` | — | Categoria do erro, quando aplicável (RNF09) |
-| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)` | Tempo de processamento, insumo da verificação do RNF01 |
-| `feedback_usuario` | `TEXT` | — | Avaliação da resposta fornecida pelo usuário, capturada pelo componente Auditoria e Feedback da seção 2.4 |
-
-**`auditoria.interacao_artefato`** — fontes consultadas em cada interação (associativa de `consulta`):
-
-| Coluna | Tipo | Restrições | Finalidade |
-|---|---|---|---|
-| `interacao_id` | `INTEGER` | `PK` composta, `FK → interacao` | Interação que consultou a fonte |
-| `artefato_id` | `INTEGER` | `PK` composta, `FK → artefato` | Artefato que fundamentou a resposta (RF03) |
-
-**`usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
+**`portfolio.usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
 | `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`auditoria.conversa`** — sequência de turnos entre um usuário e o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `UUID` | `PK`, `DEFAULT gen_random_uuid()` | Identificador da conversa, gerado pelo cliente (decisão 8 da seção 3.6.7) |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Autor da conversa; a autoria dos turnos é herdada daqui |
+| `titulo` | `TEXT` | — | Rótulo exibido na barra lateral, derivado da primeira mensagem |
+| `criada_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento de abertura |
+| `atualizada_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do último turno, mantido por gatilho |
+| `arquivada_em` | `TIMESTAMPTZ` | — | Exclusão lógica. A linha permanece para atender à retenção do RNF09 |
+
+**`auditoria.mensagem`** — turno da conversa, do usuário ou do agente (RNF04 e RNF09):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `BIGINT` | `PK`, identity | Identificador único do turno |
+| `conversa_id` | `UUID` | `FK → conversa`, `NOT NULL` | Conversa à qual o turno pertence |
+| `ordem` | `INTEGER` | `NOT NULL`, `CHECK (> 0)`, `UNIQUE (conversa_id, ordem)` | Posição do turno na conversa |
+| `papel` | `TEXT` | `NOT NULL`, `CHECK IN ('usuario', 'agente')` | Autor do turno |
+| `formato` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'audio')` | Modalidade de entrada ou de saída, conforme o RF01 |
+| `conteudo` | `TEXT` | `NOT NULL` | Texto do prompt, da transcrição ou da resposta |
+| `audio_referencia` | `TEXT` | `CHECK` (apenas quando `formato = 'audio'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4) |
+| `audio_duracao_s` | `NUMERIC(8,2)` | `CHECK (>= 0)` | Duração do áudio, insumo do RNF06 |
+| `transcricao_confianca` | `NUMERIC(5,4)` | `CHECK (BETWEEN 0 AND 1)` | Confiança devolvida pelo serviço de transcrição (RNF06) |
+| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1; apenas `papel = 'usuario'` | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
+| `confianca_intencao` | `NUMERIC(5,4)` | `CHECK (BETWEEN 0 AND 1)`; apenas `papel = 'usuario'` | Confiança da classificação, base do limiar do RNF03 |
+| `resultado` | `TEXT` | `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')`; obrigatório em `papel = 'agente'` | Desfecho da solicitação |
+| `categoria_erro` | `TEXT` | apenas `papel = 'agente'` | Categoria do erro, quando aplicável (RNF09) |
+| `modelo` | `TEXT` | apenas `papel = 'agente'` | Modelo de linguagem que gerou a resposta |
+| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)`; apenas `papel = 'agente'` | Tempo de processamento, insumo da verificação do RNF01 |
+| `criada_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do turno |
+
+Duas restrições de tabela garantem a coerência entre papel e colunas: `mensagem_audio_coerente` impede referenciar áudio em mensagem de texto, e `mensagem_papel_coerente` anula, em cada papel, as colunas que pertencem ao outro — de modo que o banco não admite uma resposta do agente com intenção classificada nem um prompt do usuário com tempo de processamento.
+
+**`auditoria.mensagem_fonte`** — fontes que fundamentaram uma resposta (associativa de `consulta`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `BIGINT` | `PK`, identity | Identificador único da citação |
+| `mensagem_id` | `BIGINT` | `FK → mensagem`, `NOT NULL`, `ON DELETE CASCADE` | Resposta que citou a fonte |
+| `posicao` | `INTEGER` | `NOT NULL`, `CHECK (> 0)`, `UNIQUE (mensagem_id, posicao)` | Ordem de relevância devolvida pelo recuperador |
+| `chunk_id` | `TEXT` | `NOT NULL`, `UNIQUE (mensagem_id, chunk_id)` | Identificador do trecho no índice vetorial, sem chave estrangeira (decisão 9 da seção 3.6.7) |
+| `score` | `NUMERIC(7,6)` | — | Similaridade apurada na recuperação |
+| `artefato_id` | `INTEGER` | `FK → artefato` | Artefato correspondente, quando existe (RF03) |
+| `projeto_codigo` | `TEXT` | — | Cópia do projeto de origem no momento da resposta |
+| `tipo_documento` | `TEXT` | — | Cópia do tipo do documento no momento da resposta |
+| `arquivo_origem` | `TEXT` | `NOT NULL` | Cópia do localizador do documento no momento da resposta |
+| `secao` | `TEXT` | — | Cópia da seção do documento no momento da resposta |
+| `trecho` | `TEXT` | — | Cópia do texto citado, base da verificação do RNF12 |
+
+**`auditoria.avaliacao`** — juízo do usuário sobre uma resposta ou sobre a conversa:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `BIGINT` | `PK`, identity | Identificador único da avaliação |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Autor da avaliação |
+| `conversa_id` | `UUID` | `FK → conversa` | Alvo, quando a avaliação recai sobre a conversa inteira |
+| `mensagem_id` | `BIGINT` | `FK → mensagem` | Alvo, quando a avaliação recai sobre uma resposta |
+| `polaridade` | `TEXT` | `CHECK IN ('positiva', 'negativa')` | Juízo binário, correspondente ao polegar da interface |
+| `nota` | `SMALLINT` | `CHECK (BETWEEN 1 AND 5)` | Juízo graduado |
+| `motivo` | `TEXT` | `CHECK` contra domínio fechado de sete valores | Categoria da avaliação, base da análise agregada |
+| `comentario` | `TEXT` | — | Justificativa livre |
+| `criada_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento da avaliação |
+
+Duas restrições delimitam o registro: `avaliacao_alvo_unico` exige que a avaliação recaia sobre exatamente um alvo, mensagem ou conversa; e `avaliacao_tem_juizo` exige polaridade ou nota, impedindo que um comentário isolado seja contabilizado como avaliação. Dois índices únicos parciais garantem uma avaliação por usuário por alvo, de modo que reavaliar seja atualização e não acúmulo de linhas.
+
+**`auditoria.evento_plataforma`** — uso da plataforma fora do diálogo com o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `BIGINT` | `PK`, identity | Identificador único do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario` | Usuário do evento; nulo quando a identidade não foi resolvida |
+| `tipo` | `TEXT` | `NOT NULL`, `CHECK` contra domínio fechado de dez valores | Natureza do evento, de `login` a `erro_aplicacao` |
+| `conversa_id` | `UUID` | `FK → conversa` | Conversa envolvida, quando aplicável |
+| `origem` | `TEXT` | `CHECK IN ('web', 'api', 'agendador')` | Canal que originou o evento |
+| `detalhe` | `JSONB` | `NOT NULL`, `DEFAULT '{}'` | Contexto livre. Proibido armazenar senhas, tokens ou segredos (RNF09) |
+| `ocorrido_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do evento |
 
 **`auditoria.notificacao`** — registro dos envios da notificação proativa (materialização de `notifica`):
 
@@ -3065,15 +3157,28 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `id` | `INTEGER` | `PK`, identity | Identificador único do envio |
 | `pendencia_id` | `INTEGER` | `FK → pendencia`, `NOT NULL`, `ON DELETE CASCADE` | Pendência comunicada |
 | `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `UNIQUE (pendencia_id, usuario_id)` | Destinatário; a unicidade composta impede notificar duas vezes a mesma pendência ao mesmo usuário |
+| `canal` | `TEXT` | `NOT NULL`, `DEFAULT 'email'`, `CHECK IN ('email', 'interface')` | Meio pelo qual o alerta foi entregue |
 | `data_envio` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do envio, exigido pelo RNF09 |
+
+#### Visões de leitura
+
+Duas visões evitam que cada consumidor reescreva as mesmas junções — e que cada um as escreva de forma diferente:
+
+| Visão | Conteúdo | Uso |
+|---|---|---|
+| `auditoria.vw_turno` | Um par prompt/resposta por linha, com intenção, desfecho, tempo, contagem de fontes e avaliação | Tela de histórico e inspeção do RNF04 |
+| `portfolio.vw_projeto_situacao` | Situação consolidada de cada projeto, com portfólio, líder, desvio, pendências abertas e artefatos | Consultas comparativas do RF02 |
 
 ### 3.6.6 Definição física em SQL
 
-A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5 — na nuvem, o serviço gerenciado correspondente do provedor escolhido na seção 3.7. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+
+O script executável, com os comentários de justificativa por coluna, é [`src/database/01_create_database.sql`](../src/database/01_create_database.sql), e **é ele que vale como fonte de verdade**. O bloco abaixo é a transcrição do mesmo modelo, sem os comentários longos. A coerência entre os dois e o banco em execução é verificável por `scripts/verificar_modelo_documentado.py`, descrito ao final desta subseção. A pasta [`src/database`](../src/database/README.md) reúne também a carga inicial, as políticas de acesso e o roteiro de verificação.
 
 ```sql
 CREATE SCHEMA portfolio;
 CREATE SCHEMA auditoria;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE portfolio.portfolio (
     id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -3083,23 +3188,40 @@ CREATE TABLE portfolio.portfolio (
 );
 
 CREATE TABLE portfolio.usuario (
-    id     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome   TEXT NOT NULL,
-    email  TEXT NOT NULL UNIQUE,
-    perfil TEXT NOT NULL CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto'))
+    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    auth_user_id UUID UNIQUE,
+    nome         TEXT NOT NULL,
+    email        TEXT NOT NULL UNIQUE,
+    perfil       TEXT NOT NULL
+                 CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto')),
+    ativo        BOOLEAN     NOT NULL DEFAULT TRUE,
+    criado_em    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE portfolio.projeto (
     id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     codigo                TEXT NOT NULL UNIQUE,
     nome                  TEXT NOT NULL,
+    fase                  TEXT NOT NULL,
     status                TEXT NOT NULL,
     data_inicio           DATE,
     data_termino_prevista DATE,
+    percentual_previsto   NUMERIC(5,2) NOT NULL DEFAULT 0
+                          CHECK (percentual_previsto BETWEEN 0 AND 100),
     percentual_avanco     NUMERIC(5,2) NOT NULL DEFAULT 0
                           CHECK (percentual_avanco BETWEEN 0 AND 100),
+    desvio_pp             NUMERIC(6,2) GENERATED ALWAYS AS
+                          (percentual_avanco - percentual_previsto) STORED,
     portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
     lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
+);
+
+CREATE TABLE portfolio.projeto_relacionado (
+    projeto_id     INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    relacionado_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    relacao        TEXT    NOT NULL,
+    PRIMARY KEY (projeto_id, relacionado_id),
+    CHECK (projeto_id <> relacionado_id)
 );
 
 CREATE TABLE portfolio.artefato (
@@ -3107,8 +3229,10 @@ CREATE TABLE portfolio.artefato (
     projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
     tipo       TEXT NOT NULL,
     referencia TEXT NOT NULL,
+    titulo     TEXT,
     data       TIMESTAMPTZ NOT NULL,
-    versao     TEXT
+    versao     TEXT,
+    UNIQUE (projeto_id, referencia)
 );
 
 CREATE TABLE portfolio.campo_artefato (
@@ -3123,13 +3247,20 @@ CREATE TABLE portfolio.campo_artefato (
 );
 
 CREATE TABLE portfolio.pendencia (
-    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
-    tipo       TEXT NOT NULL,
-    descricao  TEXT NOT NULL,
-    prazo      DATE,
-    situacao   TEXT NOT NULL DEFAULT 'aberta'
-               CHECK (situacao IN ('aberta', 'em_tratamento', 'resolvida'))
+    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id    INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    codigo        TEXT,
+    tipo          TEXT NOT NULL,
+    titulo        TEXT NOT NULL,
+    descricao     TEXT NOT NULL,
+    criticidade   TEXT,
+    responsavel   TEXT,
+    acao_resposta TEXT,
+    prazo         DATE,
+    situacao      TEXT NOT NULL DEFAULT 'aberta'
+                  CHECK (situacao IN ('aberta', 'em_tratamento',
+                                      'materializada', 'resolvida')),
+    UNIQUE (projeto_id, codigo)
 );
 
 CREATE TABLE portfolio.usuario_projeto (
@@ -3138,13 +3269,25 @@ CREATE TABLE portfolio.usuario_projeto (
     PRIMARY KEY (usuario_id, projeto_id)
 );
 
-CREATE TABLE auditoria.interacao (
-    id                     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    usuario_id             INTEGER NOT NULL REFERENCES portfolio.usuario (id),
-    data_hora              TIMESTAMPTZ NOT NULL DEFAULT now(),
-    canal                  TEXT NOT NULL CHECK (canal IN ('texto', 'voz')),
-    texto_solicitacao      TEXT NOT NULL,
-    audio_referencia       TEXT CHECK (audio_referencia IS NULL OR canal = 'voz'),
+CREATE TABLE auditoria.conversa (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    usuario_id    INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    titulo        TEXT,
+    criada_em     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizada_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+    arquivada_em  TIMESTAMPTZ
+);
+
+CREATE TABLE auditoria.mensagem (
+    id                     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    conversa_id            UUID    NOT NULL REFERENCES auditoria.conversa (id),
+    ordem                  INTEGER NOT NULL CHECK (ordem > 0),
+    papel                  TEXT    NOT NULL CHECK (papel IN ('usuario', 'agente')),
+    formato                TEXT    NOT NULL CHECK (formato IN ('texto', 'audio')),
+    conteudo               TEXT    NOT NULL,
+    audio_referencia       TEXT,
+    audio_duracao_s        NUMERIC(8,2) CHECK (audio_duracao_s >= 0),
+    transcricao_confianca  NUMERIC(5,4) CHECK (transcricao_confianca BETWEEN 0 AND 1),
     intencao               TEXT CHECK (intencao IN (
                                'consultar_documentos_normativos',
                                'consultar_projeto_sintetico',
@@ -3156,41 +3299,139 @@ CREATE TABLE auditoria.interacao (
                                'analisar_completude_coerencia',
                                'gerar_alertas_pendencias',
                                'fora_do_catalogo')),
-    resultado              TEXT NOT NULL CHECK (resultado IN
+    confianca_intencao     NUMERIC(5,4) CHECK (confianca_intencao BETWEEN 0 AND 1),
+    resultado              TEXT CHECK (resultado IN
                                ('sucesso', 'esclarecimento', 'recusada', 'falha')),
     categoria_erro         TEXT,
+    modelo                 TEXT,
     tempo_processamento_ms INTEGER CHECK (tempo_processamento_ms >= 0),
-    feedback_usuario       TEXT
+    criada_em              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (conversa_id, ordem),
+    CONSTRAINT mensagem_audio_coerente CHECK (
+        (formato = 'audio') OR
+        (audio_referencia IS NULL AND audio_duracao_s IS NULL
+         AND transcricao_confianca IS NULL)
+    ),
+    CONSTRAINT mensagem_papel_coerente CHECK (
+        CASE papel
+            WHEN 'usuario' THEN
+                resultado IS NULL AND categoria_erro IS NULL
+                AND modelo IS NULL AND tempo_processamento_ms IS NULL
+            WHEN 'agente' THEN
+                intencao IS NULL AND confianca_intencao IS NULL
+                AND resultado IS NOT NULL
+        END
+    )
 );
 
-CREATE TABLE auditoria.interacao_artefato (
-    interacao_id INTEGER NOT NULL REFERENCES auditoria.interacao (id),
-    artefato_id  INTEGER NOT NULL REFERENCES portfolio.artefato (id),
-    PRIMARY KEY (interacao_id, artefato_id)
+CREATE TABLE auditoria.mensagem_fonte (
+    id             BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    mensagem_id    BIGINT  NOT NULL REFERENCES auditoria.mensagem (id) ON DELETE CASCADE,
+    posicao        INTEGER NOT NULL CHECK (posicao > 0),
+    chunk_id       TEXT    NOT NULL,
+    score          NUMERIC(7,6),
+    artefato_id    INTEGER REFERENCES portfolio.artefato (id),
+    projeto_codigo TEXT,
+    tipo_documento TEXT,
+    arquivo_origem TEXT NOT NULL,
+    secao          TEXT,
+    trecho         TEXT,
+    UNIQUE (mensagem_id, chunk_id),
+    UNIQUE (mensagem_id, posicao)
+);
+
+CREATE TABLE auditoria.avaliacao (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id  INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    conversa_id UUID   REFERENCES auditoria.conversa (id),
+    mensagem_id BIGINT REFERENCES auditoria.mensagem (id),
+    polaridade  TEXT CHECK (polaridade IN ('positiva', 'negativa')),
+    nota        SMALLINT CHECK (nota BETWEEN 1 AND 5),
+    motivo      TEXT CHECK (motivo IN (
+                    'resposta_incorreta', 'fonte_irrelevante',
+                    'resposta_incompleta', 'nao_entendeu_pergunta',
+                    'demorou_demais', 'resposta_util', 'outro')),
+    comentario  TEXT,
+    criada_em   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT avaliacao_alvo_unico
+        CHECK (num_nonnulls(conversa_id, mensagem_id) = 1),
+    CONSTRAINT avaliacao_tem_juizo
+        CHECK (polaridade IS NOT NULL OR nota IS NOT NULL)
+);
+
+CREATE UNIQUE INDEX uq_avaliacao_mensagem
+    ON auditoria.avaliacao (usuario_id, mensagem_id) WHERE mensagem_id IS NOT NULL;
+CREATE UNIQUE INDEX uq_avaliacao_conversa
+    ON auditoria.avaliacao (usuario_id, conversa_id) WHERE conversa_id IS NOT NULL;
+
+CREATE TABLE auditoria.evento_plataforma (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id  INTEGER REFERENCES portfolio.usuario (id),
+    tipo        TEXT NOT NULL CHECK (tipo IN (
+                    'login', 'login_falho', 'logout',
+                    'conversa_criada', 'conversa_renomeada',
+                    'conversa_arquivada', 'conversa_exportada',
+                    'audio_enviado', 'audio_recusado', 'erro_aplicacao')),
+    conversa_id UUID REFERENCES auditoria.conversa (id),
+    origem      TEXT CHECK (origem IN ('web', 'api', 'agendador')),
+    detalhe     JSONB NOT NULL DEFAULT '{}'::jsonb,
+    ocorrido_em TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE auditoria.notificacao (
     id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     pendencia_id INTEGER NOT NULL REFERENCES portfolio.pendencia (id) ON DELETE CASCADE,
     usuario_id   INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    canal        TEXT NOT NULL DEFAULT 'email'
+                 CHECK (canal IN ('email', 'interface')),
     data_envio   TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (pendencia_id, usuario_id)
 );
 
 -- Proteção dos registros de auditoria (RNF09)
-REVOKE UPDATE, DELETE ON auditoria.interacao, auditoria.interacao_artefato,
-                        auditoria.notificacao FROM PUBLIC;
+REVOKE UPDATE, DELETE ON auditoria.mensagem, auditoria.mensagem_fonte,
+                         auditoria.evento_plataforma, auditoria.notificacao
+    FROM PUBLIC;
+REVOKE DELETE ON auditoria.conversa, auditoria.avaliacao FROM PUBLIC;
 
--- Exceção pontual: a avaliação do usuário chega depois da resposta, portanto
--- o papel da aplicação recebe permissão de atualização restrita a essa coluna:
--- GRANT UPDATE (feedback_usuario) ON auditoria.interacao TO <papel_da_aplicacao>;
+-- As duas atualizações permitidas, concedidas em nível de coluna ao papel da
+-- aplicação em 03_rls_policies.sql, não reescrevem nenhum registro:
+-- GRANT UPDATE (titulo, atualizada_em, arquivada_em)  ON auditoria.conversa  TO az1_app;
+-- GRANT UPDATE (polaridade, nota, motivo, comentario) ON auditoria.avaliacao TO az1_app;
 
 -- Índices dos acessos frequentes dos cenários da seção 2.2.2
+CREATE INDEX idx_projeto_portfolio       ON portfolio.projeto (portfolio_id);
+CREATE INDEX idx_projeto_lider           ON portfolio.projeto (lider_id);
 CREATE INDEX idx_artefato_projeto        ON portfolio.artefato (projeto_id);
 CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_id);
 CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo);
-CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, data_hora);
+CREATE INDEX idx_pendencia_projeto       ON portfolio.pendencia (projeto_id);
+CREATE INDEX idx_conversa_usuario_recente
+    ON auditoria.conversa (usuario_id, atualizada_em DESC)
+    WHERE arquivada_em IS NULL;
+CREATE INDEX idx_mensagem_conversa_ordem ON auditoria.mensagem (conversa_id, ordem);
+CREATE INDEX idx_mensagem_criada_em      ON auditoria.mensagem (criada_em);
+CREATE INDEX idx_mensagem_intencao       ON auditoria.mensagem (intencao)
+    WHERE intencao IS NOT NULL;
+CREATE INDEX idx_mensagem_fonte_mensagem ON auditoria.mensagem_fonte (mensagem_id);
+CREATE INDEX idx_mensagem_fonte_chunk    ON auditoria.mensagem_fonte (chunk_id);
+CREATE INDEX idx_mensagem_fonte_artefato ON auditoria.mensagem_fonte (artefato_id)
+    WHERE artefato_id IS NOT NULL;
+CREATE INDEX idx_evento_usuario_data     ON auditoria.evento_plataforma (usuario_id, ocorrido_em);
+CREATE INDEX idx_evento_tipo_data        ON auditoria.evento_plataforma (tipo, ocorrido_em);
 ```
+
+O gatilho `trg_mensagem_toca_conversa` mantém `conversa.atualizada_em` alinhada ao instante do último turno, de modo que a ordenação da barra lateral não dependa de a aplicação lembrar de atualizar a coluna. As visões `auditoria.vw_turno` e `portfolio.vw_projeto_situacao`, descritas na seção 3.6.5, são criadas na sequência.
+
+#### Verificação da coerência entre documento, script e banco
+
+O risco desta subseção é conhecido: uma definição transcrita em documento envelhece em silêncio quando o banco muda. Para que a divergência apareça como falha, e não como surpresa em uma sprint futura, o script `scripts/verificar_modelo_documentado.py` extrai o bloco SQL acima, extrai o de `src/database/01_create_database.sql` e compara ambos com o `information_schema` do banco em execução, apontando tabelas e colunas presentes em um lado e ausentes no outro:
+
+```bash
+python scripts/verificar_modelo_documentado.py
+```
+
+A verificação faz parte do procedimento de teste do RNF04 e integra o caso `TI-29` da seção 6.4.4.
 
 ### 3.6.7 Decisões de modelagem e restrições de integridade
 
@@ -3198,41 +3439,59 @@ As decisões estruturais do modelo, com as alternativas consideradas e as razõe
 
 **Decisão 1 — Perfis de usuário por coluna de domínio, e não por tabelas de subtipo.** A generalização de Usuário da seção 2.2.1 poderia ser mapeada em tabelas de subtipo (`diretor`, `pmo`, `lider_projeto` com chave primária compartilhada). A opção pela coluna `perfil` com `CHECK` preserva a classificação profissional usada pelas personas e pelas relações do domínio sem criar tabelas de subtipo vazias. O líder continua relacionado aos projetos pela chave `projeto.lider_id` e pelo vínculo de `usuario_projeto`; diretor e PMO permanecem como perfis descritivos. Nenhum desses valores concede permissões diferentes: o RNF02 limita-se à autenticação por SSO, e a identificação administrativa prevista no RNF09 é fornecida pelo mecanismo de autenticação.
 
-**Decisão 2 — `preenchido` como coluna gerada.** Se `preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, preservando o atributo declarado na seção 2.2.1 como consultável e garantindo a confiabilidade da identificação de campos pendentes, que alimenta o RF04 e o RF05.
+**Decisão 2 — Colunas derivadas geradas pelo banco.** Se `campo_artefato.preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, o que garante a confiabilidade da identificação de campos pendentes que alimenta o RF04 e o RF05. O mesmo raciocínio se aplica a `projeto.desvio_pp`, derivada de `percentual_avanco` e `percentual_previsto`: é o número que a persona do Diretor pede diretamente na jornada 1.5.1, e mantê-lo como coluna comum permitiria que divergisse das duas colunas que o produzem.
 
 **Decisão 3 — `notificacao` como registro de envio.** A relação `notifica` poderia ser apenas derivada: os destinatários de uma pendência são os usuários que acompanham o projeto de origem. A materialização em tabela foi escolhida porque o RNF09 exige o registro dos eventos de notificação, e porque a unicidade composta `(pendencia_id, usuario_id)` dá ao Agendador do cenário 3 um critério idempotente, impedindo que a mesma pendência seja comunicada repetidamente ao mesmo usuário a cada verificação periódica.
 
-**Decisão 4 — Intenção como domínio de coluna, e não como tabela.** O catálogo de intenções da seção 3.1 poderia ser normalizado em uma tabela própria. A opção pelo `CHECK` na coluna `interacao.intencao` mantém a coerência com a delimitação do modelo conceitual, que tratou intenção como conceito da camada técnica de PLN, e não como entidade do domínio de portfólio. O custo da escolha é que a evolução do catálogo exige alteração da restrição; o benefício é não introduzir no banco uma entidade sem respaldo nas modelagens anteriores. A restrição deve ser mantida sincronizada com o catálogo da seção 3.1.
+**Decisão 4 — Intenção como domínio de coluna, e não como tabela.** O catálogo de intenções da seção 3.1 poderia ser normalizado em uma tabela própria. A opção pelo `CHECK` na coluna `mensagem.intencao` mantém a coerência com a delimitação do modelo conceitual, que tratou intenção como conceito da camada técnica de PLN, e não como entidade do domínio de portfólio. O custo da escolha é que a evolução do catálogo exige alteração da restrição; o benefício é não introduzir no banco uma entidade sem respaldo nas modelagens anteriores. A restrição deve ser mantida sincronizada com o catálogo da seção 3.1 e com `pln/classificador.py`.
 
-**Decisão 5 — Chaves substitutas com chave natural preservada.** Todas as tabelas usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
+**Decisão 5 — Chaves substitutas com chave natural preservada.** As tabelas do domínio usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
 
-**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.interacao_artefato` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: o relacionamento preserva a rastreabilidade do RNF04, enquanto o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a proteção exigida pelo RNF09. A única flexibilização é a coluna `feedback_usuario`, atualizável pelo papel da aplicação por meio de permissão em nível de coluna, pois a avaliação do usuário só existe depois de a resposta ter sido registrada.
+**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.mensagem_fonte` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: o relacionamento preserva a rastreabilidade do RNF04, enquanto o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a proteção exigida pelo RNF09.
 
-**Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de auditoria (`interacao`, `interacao_artefato` e `notificacao`) no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
+**Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de trilha no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
 
-**Alinhamento com o estado da implementação.** Duas colunas de `auditoria.interacao` fecham lacunas registradas em outras frentes da equipe. A coluna `audio_referencia` guarda o identificador do áudio no armazenamento de objetos (o `audio_id` devolvido pela API da seção 3.4): a decisão registrada na seção 2.4 adiou a persistência do pipeline de voz exatamente porque "o PostgreSQL será provisionado e o schema de auditoria definido" em etapa posterior — este modelo define esse schema, e a coluna completa a rastreabilidade que hoje é parcial, ligando cada interação por voz ao arquivo original. A coluna `feedback_usuario` materializa a captura da avaliação do usuário atribuída ao componente Auditoria e Feedback na seção 2.4 e listada entre os registros previstos na seção 2.5.
+**Decisão 8 — Interação desdobrada em `conversa` e `mensagem`, com um turno por linha.** A alternativa era manter uma tabela única de interação, com uma linha por solicitação e a resposta como atributo dela. Foi descartada por três motivos, desenvolvidos na seção 3.6.4: o produto trabalha com conversas e não com solicitações isoladas; a resposta precisa de identidade própria para receber fontes, tempo e avaliação; e o texto da resposta precisa ser persistido, sem o que o RNF12 não é verificável. A chave de `conversa` é `UUID` porque o identificador nasce no cliente — a interface o gera antes de a primeira mensagem existir e o envia em cada requisição de chat —, de modo que uma chave sequencial gerada pelo banco exigiria uma ida e volta adicional apenas para descobrir o valor que o cliente já escolheu. A coerência entre papel e colunas é imposta pelo banco, e não pela aplicação: `mensagem_papel_coerente` recusa uma resposta do agente com intenção classificada e um prompt do usuário com tempo de processamento.
 
-**Limitação registrada — documentos normativos.** A intenção INT-01 do catálogo da seção 3.1 consulta conceitos e normativos de gestão de portfólio, documentos que não pertencem a nenhum projeto específico. Pelo modelo conceitual e pela seção 2.2.1, todo artefato compõe exatamente um projeto, portanto a base de normativos permanece fora do modelo relacional, no repositório de arquivos independente descrito na seção 2.5. Consequência assumida: a associação `interacao_artefato` registra as fontes de respostas sobre projetos, e a fonte de uma resposta normativa é registrada de forma textual no próprio registro da interação. Se a base de normativos evoluir para dado estruturado, a modelagem de uma entidade própria — ou de um artefato sem vínculo com projeto — deverá ser reavaliada junto com o modelo conceitual, para que as duas representações não divirjam.
+**Decisão 9 — Fonte registrada por cópia, e sem chave estrangeira para o índice vetorial.** O conteúdo dos documentos é recuperado do índice vetorial descrito na seção 2.5, no qual cada trecho é identificado por uma soma de verificação do próprio conteúdo. Declarar `mensagem_fonte.chunk_id` como chave estrangeira para esse índice foi considerado e descartado: reindexar um documento produz identificadores novos, e a restrição obrigaria a escolher entre impedir a reindexação e apagar registros de auditoria, ambas incompatíveis com a imutabilidade do RNF09. Pela mesma razão, os metadados da fonte — arquivo de origem, seção, projeto e o próprio trecho citado — são copiados no instante da resposta, e não lidos por junção: a fonte apresentada ao usuário precisa continuar legível na auditoria mesmo depois de o documento ser reindexado, movido ou retirado do índice. A coluna `artefato_id` permanece opcional, o que resolve a limitação registrada adiante nesta seção: uma resposta fundamentada em documento normativo, que não pertence a projeto algum, tem fonte registrada com vínculo relacional nulo e metadados preenchidos.
 
-**Normalização.** O modelo está na terceira forma normal: todas as tabelas têm chave primária definida, os atributos são atômicos e nenhum atributo não chave depende de outro atributo não chave. A única redundância existente é a coluna `preenchido`, que é derivada — e, por ser gerada pelo próprio banco, não constitui anomalia de atualização.
+**Decisão 10 — Avaliação como entidade, e não como atributo da interação.** A avaliação poderia ser uma coluna de texto na própria mensagem. A promoção a tabela decorre de a avaliação ter autor, instante e alvo próprios: ela é produzida depois da resposta, possivelmente por caminho distinto, e pode recair sobre uma resposta específica ou sobre a conversa inteira. Como coluna, não haveria onde registrar quem avaliou nem quando, e não seria possível correlacionar avaliação negativa com intenção classificada, fontes citadas ou tempo de processamento — correlação que é o insumo da melhoria do agente e da leitura do RNF08. A tabela admite juízo binário e graduado simultaneamente porque a interface oferece o polegar e a rubrica de usabilidade pede escala; `avaliacao_tem_juizo` garante que ao menos um dos dois exista, e `avaliacao_alvo_unico` impede o registro ambíguo que aponta para conversa e mensagem ao mesmo tempo.
+
+**Decisão 11 — Eventos de plataforma separados dos turnos da conversa.** Login, abertura, renomeação e arquivamento de conversa poderiam ser registrados como linhas de `mensagem` com um papel adicional. Foram separados porque respondem a outra pergunta: `mensagem` responde "o que o agente respondeu e com base em quê", enquanto `evento_plataforma` responde "quem esteve na plataforma e o que fez". Misturá-los contaminaria as métricas do RNF01 e do RNF03, que contam turnos, e obrigaria toda consulta de conversa a filtrar registros que não são conversa. A coluna `detalhe`, do tipo `JSONB`, admite contexto livre por evento e é, por isso, o ponto de maior risco de violação da proibição de armazenar segredos do RNF09 — restrição que o procedimento de teste da seção 6.3.4 verifica explicitamente.
+
+**Decisão 12 — Dependências entre projetos como auto-relacionamento.** A planilha de portfólio declara relações entre projetos, como fornecimento de dados de monitoramento e compartilhamento de recurso técnico. Sem a tabela `projeto_relacionado`, essa informação existiria apenas no texto vetorizado e o banco não conseguiria responder a consultas de impacto cruzado, do tipo "o que depende deste projeto?", que são justamente as que a jornada do Diretor exercita. A relação é direcionada e a restrição `CHECK (projeto_id <> relacionado_id)` impede o auto-vínculo.
+
+**Decisão 13 — Identidade de autenticação como coluna preparada, sem chave estrangeira imediata.** O RNF02 exige autenticação por SSO, cuja implementação pertence a outra frente. Para que o modelo não precise ser alterado quando ela chegar, `usuario.auth_user_id` já existe e é o ponto único de ligação com o provedor; a função `portfolio.usuario_atual()`, definida em `src/database/03_rls_policies.sql`, traduz a identidade autenticada para a chave do usuário e é atravessada por todas as políticas de acesso, de modo que nenhuma delas precisará ser reescrita. A coluna não foi declarada como chave estrangeira desde já porque isso impediria cadastrar usuários antes de existirem contas no provedor, o que é justamente a situação da base sintética; a promoção a chave estrangeira é um comando único, registrado no `README.md` da pasta `src/database`. Nenhuma senha, token ou segredo é armazenado, conforme o RNF09: o provedor detém a credencial e o banco guarda apenas a correspondência.
+
+**Decisão 14 — Estado `materializada` acrescentado ao domínio de `pendencia.situacao`.** O domínio inicialmente previsto continha três estados: aberta, em tratamento e resolvida. As planilhas de riscos e problemas da base sintética usam um quarto estado para o risco que se concretizou, e mapeá-lo para um dos três existentes faria a resposta produzida a partir do banco divergir da resposta produzida a partir do mesmo documento no índice vetorial — precisamente a incoerência que o RNF12 mede. O domínio foi ampliado em vez de a informação ser colapsada. Pela mesma razão foram preservadas as colunas `codigo`, `titulo`, `criticidade`, `responsavel` e `acao_resposta`, presentes na origem e sem as quais a resposta do agente seria mais pobre que o documento que a fundamenta.
+
+**Limitação registrada — documentos normativos.** A intenção INT-01 do catálogo da seção 3.1 consulta conceitos e normativos de gestão de portfólio, documentos que não pertencem a nenhum projeto específico. Pelo modelo conceitual e pela seção 2.2.1, todo artefato compõe exatamente um projeto, portanto a base de normativos permanece fora da tabela `artefato`, no repositório de arquivos independente descrito na seção 2.5. A consequência, que na modelagem anterior era assumida como perda, é resolvida pela decisão 9: a coluna `mensagem_fonte.artefato_id` é opcional e as demais colunas guardam a cópia dos metadados, de modo que a fonte de uma resposta normativa é registrada com a mesma estrutura das demais, apenas sem vínculo relacional. Se a base de normativos evoluir para dado estruturado, a modelagem de uma entidade própria deverá ser reavaliada junto com o modelo conceitual.
+
+**Normalização.** O modelo está na terceira forma normal: todas as tabelas têm chave primária definida, os atributos são atômicos e nenhum atributo não chave depende de outro atributo não chave. Há duas redundâncias deliberadas, ambas justificadas acima e nenhuma delas configurando anomalia de atualização: as colunas geradas `preenchido` e `desvio_pp`, mantidas pelo próprio banco a partir de colunas da mesma linha (decisão 2); e a cópia dos metadados da fonte em `mensagem_fonte`, que não é redundância de estado e sim registro histórico — o valor copiado descreve o que era verdade no instante da resposta, e deve permanecer imune a mudanças posteriores na origem (decisão 9).
 
 Por fim, a tabela a seguir consolida a rastreabilidade entre as estruturas do modelo e os requisitos que elas sustentam, no mesmo formato adotado nas seções anteriores:
 
 | Estrutura do modelo | Requisitos sustentados | Papel |
 |---|---|---|
 | `usuario.perfil` | Personas e RF06 | Identifica o perfil profissional sem estabelecer autorização por cargo |
+| `usuario.auth_user_id` | RNF02 | Ponto único de ligação com o provedor de SSO, sem armazenar credencial |
 | `projeto.lider_id` | RF06 | Identifica o responsável relacionado a cada projeto |
+| `projeto.desvio_pp` | RF02 | Desvio entre previsto e realizado, base da consulta comparativa |
+| `projeto_relacionado` | RF02 | Permite responder a consultas de impacto entre projetos |
 | `usuario_projeto` | RF05 | Define os destinatários da notificação proativa |
 | `auditoria.notificacao` | RF05, RNF09 | Registra os envios e garante idempotência da verificação periódica |
-| `auditoria.interacao` | RNF01, RNF03, RNF04, RNF09 | Trilha de auditoria com canal, intenção, resultado e tempo de processamento |
-| `interacao.audio_referencia` | RF01, RNF06, RNF09 | Vincula a interação por voz ao arquivo de áudio original no armazenamento de objetos |
-| `interacao.feedback_usuario` | RNF04, RNF09 | Registra a avaliação correlacionada à interação e admite somente a atualização controlada prevista para o feedback |
-| `auditoria.interacao_artefato` | RF03, RNF04, RNF11, RNF12 | Registra as fontes que fundamentaram cada resposta e permite confrontá-las com as afirmações produzidas |
+| `auditoria.conversa` | RF01, RNF04 | Agrupa os turnos e sustenta o histórico apresentado ao usuário |
+| `auditoria.mensagem` | RNF01, RNF03, RNF04, RNF09 | Trilha com formato, intenção, desfecho, tempo e o texto de cada turno |
+| `mensagem.conteudo` | RNF04, RNF12 | Guarda o texto da resposta, sem o qual a fundamentação não é verificável |
+| `mensagem.audio_referencia` | RF01, RNF06, RNF09 | Vincula o turno por voz ao arquivo de áudio original no armazenamento de objetos |
+| `auditoria.mensagem_fonte` | RF03, RNF04, RNF11, RNF12 | Registra as fontes que fundamentaram cada resposta e permite confrontá-las com as afirmações produzidas |
+| `auditoria.avaliacao` | RNF04, RNF08, RNF09 | Registra a avaliação com autor, instante e alvo, permitindo correlacioná-la à intenção e às fontes |
+| `auditoria.evento_plataforma` | RNF09 | Registra o uso da plataforma fora do diálogo, para inspeção administrativa |
 | `artefato.referencia`, `artefato.data` | RF03 | Origem e data exibidas junto a cada informação |
 | `campo_artefato.obrigatorio`, `campo_artefato.preenchido` | RF04, RF05 | Identificação dos campos pendentes de preenchimento |
 | `pendencia.prazo`, `pendencia.situacao` | RF05 | Critérios da verificação periódica do Agendador |
 
-O modelo físico definido nesta seção será populado exclusivamente com os dados sintéticos previstos na seção 1.3 e serve de base tanto para a implementação da camada de acesso a dados quanto para o processo de deploy descrito na seção 3.7.
+O modelo físico definido nesta seção foi implementado e está populado exclusivamente com os dados sintéticos previstos na seção 1.3, carregados a partir dos mesmos documentos que alimentam o índice vetorial. Os scripts de criação, carga, políticas de acesso e verificação estão em [`src/database`](../src/database/README.md), cujo `README.md` descreve a ordem de execução, o controle de acesso e as pendências conhecidas.
 
 ## 3.7 Processo de Deploy em Nuvem
 
@@ -3298,7 +3557,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | **API de Transcrição** (serviço externo de Speech to Text) | Speech to Text | Serviço de conversão de fala em texto consumido por API. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. **O provedor efetivamente implementado é o Deepgram Nova-3** (Seção 3.2.1), que é externo à conta da AWS; o rótulo Amazon Transcribe presente na figura corresponde ao desenho anterior à decisão de STT e será corrigido no diagrama junto da revisão prevista no item 12 da Seção 3.7.9. Com o Deepgram, este elemento deixa de ser um nó interno da conta acadêmica e passa a ser uma dependência externa, como o nó de modelo de linguagem. |
 | **Database - PostgreSQL** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback correlacionados pelo RNF04. A separação em dois schemas, e não em dois bancos, permite aplicar por permissão a proteção exigida pelo RNF09 sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. A forma de hospedagem do PostgreSQL, em serviço gerenciado ou em contêiner na própria instância EC2, permanece em aberto na Seção 3.7.9. |
 | **Amazon S3 - Bucket Storage** | Armazenamento de Prompts | Armazenamento de objetos para o conteúdo que não se representa bem em modelo relacional. Guarda os prompts utilizados pelo pipeline de PLN, versionados de forma independente do código, o que permite ajustá-los sem reconstruir a imagem do backend. |
-| **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a telemetria mostra o funcionamento técnico, enquanto `auditoria.interacao` correlaciona quem pediu o quê, as fontes e o resultado conforme o RNF04; os controles de consulta, retenção e proteção desses registros pertencem ao RNF09. São dados com públicos e ciclos de vida distintos, e por isso ficam em nós distintos. |
+| **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a telemetria mostra o funcionamento técnico, enquanto `auditoria.mensagem` e `auditoria.mensagem_fonte` correlacionam quem pediu o quê, as fontes e o resultado conforme o RNF04; os controles de consulta, retenção e proteção desses registros pertencem ao RNF09. São dados com públicos e ciclos de vida distintos, e por isso ficam em nós distintos. |
 | **LLM - Serviço externo** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API; o provedor implementado é o Google Gemini, modelo `gemini-3.5-flash-lite`, acionado pelo endpoint `POST /api/v1/chat`. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11 e RNF12). Por estar fora da fronteira da conta acadêmica, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
 
 #### Caminhos de comunicação
@@ -4015,7 +4274,7 @@ classDiagram
 
 | Classe acrescentada | Origem | O que passa a ser representável |
 |---|---|---|
-| `Interacao` | Tabela `auditoria.interacao` da Seção 3.6.5 | O registro de cada solicitação: quem pediu, por qual canal, qual intenção foi identificada, quanto tempo levou e qual foi o desfecho. É o que torna o RNF04 e o RNF09 verificáveis no modelo, e não apenas no texto |
+| `Interacao` | Tabelas `auditoria.conversa` e `auditoria.mensagem` da Seção 3.6.5 | O registro de cada turno: quem pediu, por qual formato, qual intenção foi identificada, o que foi respondido, quanto tempo levou e qual foi o desfecho. A classe corresponde a duas tabelas porque a solicitação e a resposta são turnos irmãos de uma mesma conversa, conforme a decisão 8 da Seção 3.6.7. É o que torna o RNF04 e o RNF09 verificáveis no modelo, e não apenas no texto |
 | `Notificacao` | Tabela `auditoria.notificacao` da Seção 3.6.5 | O envio efetivo de um aviso de pendência a um usuário. A associação `notifica`, que na Sprint 1 era muitos-para-muitos entre `Pendencia` e `Usuario`, ganha atributo próprio (`dataEnvio`) e por isso vira classe |
 
 A associação `Interacao consulta Artefato`, de muitos para muitos, é o que sustenta o RF03: ela registra quais fontes fundamentaram cada resposta e permite reconstruir a origem de uma informação depois de exibida.
@@ -4346,7 +4605,7 @@ sequenceDiagram
     end
 ```
 
-**Explicação.** O diagrama existe justamente porque a regra de negócio já está definida na Seção 3.1 e o mecanismo que a executa não. Ele torna explícito o que precisa ser construído: um limiar de confiança, uma margem mínima entre a primeira e a segunda intenção candidata, e um componente que formule a pergunta de desambiguação. Os dois primeiros são números a calibrar sobre a partição de teste isolada prevista na task T14 da Sprint 3, e não devem ser escolhidos por intuição, pela razão de calibração registrada na Seção 3.3.3. Note ainda que os três ramos registram desfechos distintos na auditoria — `sucesso`, `esclarecimento` e `recusada` —, valores que já existem no `CHECK` da coluna `auditoria.interacao.resultado` definida na Seção 3.6.5.
+**Explicação.** O diagrama existe justamente porque a regra de negócio já está definida na Seção 3.1 e o mecanismo que a executa não. Ele torna explícito o que precisa ser construído: um limiar de confiança, uma margem mínima entre a primeira e a segunda intenção candidata, e um componente que formule a pergunta de desambiguação. Os dois primeiros são números a calibrar sobre a partição de teste isolada prevista na task T14 da Sprint 3, e não devem ser escolhidos por intuição, pela razão de calibração registrada na Seção 3.3.3. Note ainda que os três ramos registram desfechos distintos na auditoria — `sucesso`, `esclarecimento` e `recusada` —, valores que já existem no `CHECK` da coluna `auditoria.mensagem.resultado` definida na Seção 3.6.5.
 
 #### Cenário E — Solicitação sem autenticação válida
 
@@ -4411,15 +4670,15 @@ A matriz fecha o artefato ligando cada requisito ao mecanismo que o realiza. Ela
 | RNF01 — desempenho | Tempo de resposta de todas as rotas | Classificação em microssegundos; o custo dominante é a chamada externa | `Interacao.tempoProcessamentoMs` | API Gateway, Conversão de Áudio em Texto | 3.9.4 cenário A | Teste de desempenho, task T31 | 4 |
 | RNF02 — autenticação | Cabeçalho `Authorization` e resposta `401` | Não se aplica | Identidade técnica associada ao usuário; sem autorização por cargo | Autenticação SSO, API Gateway | 3.9.4 cenário E | `CT-RNF02-P` e `CT-RNF02-N` | 3 e 4 |
 | RNF03 — qualidade da classificação de intenções | Campo `confianca_pln` da resposta de análise e decisão do limiar | `MultinomialNB` sobre vetorização esparsa; F1-macro atual de 0,6736, abaixo da meta | `Interacao.intencao` | PLN — Compreensão | 3.9.4 cenários A e D | `CT-RNF03-P` e `CT-RNF03-N`; testes automatizados existentes apoiam a regressão | Instrumento construído na 2; medição cega pendente para a 3 |
-| RNF04 — rastreabilidade | Identificador de cada interação e registro de toda requisição | Intenção e termos de maior peso registráveis | `auditoria.interacao`, `auditoria.interacao_artefato` | Auditoria e Feedback, Logs de Auditoria | 2.2.2 cenário 1, automensagem `log()` | `CT-RNF04-P` e `CT-RNF04-N` | 3 |
+| RNF04 — rastreabilidade | Identificador de cada interação e registro de toda requisição | Intenção e termos de maior peso registráveis | `auditoria.mensagem`, `auditoria.mensagem_fonte` | Auditoria e Feedback, Logs de Auditoria | 2.2.2 cenário 1, automensagem `log()` | `CT-RNF04-P` e `CT-RNF04-N` | 3 |
 | RNF05 — interoperabilidade | Contrato REST versionado em `/api/v1` | Núcleo de PLN sem dependência da camada de API | Não se aplica | API Gateway | 3.9.4 cenário A | `CT-RNF05-P` e `CT-RNF05-N` entre React e Python | 4 e 5 |
 | RNF06 — qualidade da transcrição | `POST .../transcribe`, campo `confidence` | Entrada do pipeline; `keyterm` cobre o vocabulário do domínio | `Interacao.audioReferencia` | Conversão de Áudio em Texto, Deepgram | 3.9.4 cenários A e C | Medição de WER, prevista para a 3 | 3 |
 | RNF07 — disponibilidade | `GET /health`, a implementar, com 200 ou 503 em até dois segundos | Não se aplica | Não se aplica | Rastreabilidade (CloudWatch) | 3.9.4 cenário C | `CT-RNF07-P` e `CT-RNF07-N` | 4 |
 | RNF08 — usabilidade das respostas | Formato da resposta devolvida | Não se aplica | Não se aplica | Chat UI, Gerador de Respostas | 2.2.2 cenário 1 | Teste de usabilidade com SUS, task T34 | 3 e 4 |
-| RNF09 — auditabilidade das interações | Consulta administrativa no banco ou serviço | Não se aplica | `auditoria.interacao`, `auditoria.notificacao` | Auditoria e Feedback | 3.9.4 cenários D e E | `CT-RNF09-P` e `CT-RNF09-N` | 3 e 4 |
+| RNF09 — auditabilidade das interações | Consulta administrativa no banco ou serviço | Não se aplica | `auditoria.mensagem`, `auditoria.evento_plataforma`, `auditoria.notificacao` | Auditoria e Feedback | 3.9.4 cenários D e E | `CT-RNF09-P` e `CT-RNF09-N` | 3 e 4 |
 | RNF10 — escalabilidade | Todas as rotas sob carga | Matriz esparsa que não cresce proporcionalmente ao corpus | Não se aplica | Web App Backend | Não aplicável | Teste de carga progressiva, task T31 | 4 |
-| RNF11 — explicabilidade | Justificativa curta e fontes na resposta | Evidências recuperadas sustentam o conteúdo sugerido | `auditoria.interacao_artefato` | Gerador de Respostas e Explicabilidade | 2.2.2 cenário 2 | `CT-RNF11-P` e `CT-RNF11-N` | 4 |
-| RNF12 — fundamentação das respostas | Referências e data na resposta de consulta | Evidências recuperadas devem sustentar cada afirmação factual | `auditoria.interacao_artefato` | Gerador de Respostas, Repositório de Dados | 2.2.2 cenário 1; risco AM8 | `CT-RNF12-P` e `CT-RNF12-N` | 4 |
+| RNF11 — explicabilidade | Justificativa curta e fontes na resposta | Evidências recuperadas sustentam o conteúdo sugerido | `auditoria.mensagem_fonte` | Gerador de Respostas e Explicabilidade | 2.2.2 cenário 2 | `CT-RNF11-P` e `CT-RNF11-N` | 4 |
+| RNF12 — fundamentação das respostas | Referências e data na resposta de consulta | Evidências recuperadas devem sustentar cada afirmação factual | `auditoria.mensagem_fonte`, `mensagem.conteudo` | Gerador de Respostas, Repositório de Dados | 2.2.2 cenário 1; risco AM8 | `CT-RNF12-P` e `CT-RNF12-N` | 4 |
 
 **Ausências identificadas na verificação da matriz.** A leitura por coluna expõe cinco lacunas, todas já encaminhadas neste documento e no planejamento da Sprint 3:
 
@@ -5281,8 +5540,8 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 
 1. Versionar a massa e registrar, para cada interação, o usuário sintético, o canal, a entrada, a intenção, as fontes e o desfecho esperados.
 2. Executar as 20 interações e preservar o identificador devolvido ou associado a cada uma.
-3. Consultar `auditoria.interacao` por `interacao.id` e, quando houver fonte, relacionar os registros de `auditoria.interacao_artefato`.
-4. Verificar em cada registro os campos aplicáveis: usuário autenticado, data e hora, canal, solicitação ou referência do áudio, intenção, resultado, tempo de processamento, feedback e categoria de erro.
+3. Consultar `auditoria.mensagem` pelo identificador do turno e, quando houver fonte, relacionar os registros de `auditoria.mensagem_fonte`; a visão `auditoria.vw_turno` devolve o par solicitação/resposta já reunido.
+4. Verificar em cada registro os campos aplicáveis: usuário autenticado, data e hora, formato, texto da solicitação ou referência do áudio, intenção, texto da resposta, resultado, tempo de processamento, avaliação e categoria de erro.
 5. Confirmar que as fontes recuperadas correspondem às fontes efetivamente utilizadas para produzir o resultado.
 6. Nas falhas, confirmar que o erro e o resultado controlado permanecem associados ao mesmo identificador.
 7. Executar o mesmo checklist sobre o registro incompleto preparado para o cenário negativo e confirmar que a ausência é apontada.
@@ -5389,8 +5648,8 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 3. Verificar que o registro com 91 dias está elegível para expurgo; sua presença não reprova o teste, pois a remoção não é obrigada imediatamente após o prazo mínimo.
 4. Tentar consultar os mesmos registros com a identidade comum e confirmar a negação, sem depender de tela administrativa.
 5. Tentar alterar e excluir um registro com credenciais comuns da aplicação e confirmar que ambas as operações são bloqueadas.
-6. Executar o mecanismo autorizado de atualização de `feedback_usuario` e confirmar que apenas esse campo mudou; em seguida, tentar alterar outro campo e confirmar o bloqueio.
-7. Processar entradas contendo senhas e tokens fictícios marcados e inspecionar os registros para confirmar que esses valores não foram persistidos.
+6. Executar os dois mecanismos autorizados de atualização — renomear ou arquivar uma conversa e reavaliar uma resposta em `auditoria.avaliacao` — e confirmar que apenas as colunas concedidas mudaram; em seguida, tentar alterar `auditoria.mensagem` e confirmar o bloqueio.
+7. Processar entradas contendo senhas e tokens fictícios marcados e inspecionar os registros para confirmar que esses valores não foram persistidos, incluindo a coluna `auditoria.evento_plataforma.detalhe`, que admite conteúdo livre e é o ponto de maior risco.
 8. Indisponibilizar controladamente o mecanismo principal de persistência de auditoria e executar uma interação.
 9. Confirmar que a falha produziu registro técnico alternativo ou armazenamento temporário em buffer, emitiu alerta e programou ou realizou nova tentativa de persistência, sem expor os valores protegidos.
 10. Registrar se a solicitação do usuário foi concluída ou recebeu erro controlado; ambos são admissíveis desde que a perda silenciosa do evento não ocorra.
@@ -5624,16 +5883,18 @@ O caso TI-20 lê um registro de sucesso do módulo VHS. O caso TI-21 lê um regi
 
 #### Persistência em banco de dados
 
-Casos executados contra o PostgreSQL provisionado a partir do DDL da seção 3.6.6, aplicado a uma base de testes dedicada.
+Casos executados contra o PostgreSQL provisionado pelos scripts de `src/database`, cuja definição está transcrita na seção 3.6.6, aplicados a uma base de testes dedicada. O roteiro manual equivalente é `src/database/04_verificacao.sql`, que exercita o caminho de escrita e as restrições dentro de uma transação revertida ao final.
 
 | ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
 |---|---|---|---|---|---|
-| TI-24 | Positivo | `TestPersistenciaIntegracao.test_interacao_por_texto_e_gravada_com_atributos_minimos` | Interação processada pelo canal de texto | Registro em `auditoria.interacao` com os dez atributos exigidos pelo RNF09 | RNF04, RNF09 |
-| TI-25 | Positivo e negativo | `TestPersistenciaIntegracao.test_interacao_por_voz_vincula_o_audio_de_origem` | Interação processada pelo canal de voz | `audio_referencia` igual ao identificador do MinIO; preenchê-lo com `canal=texto` é rejeitado pela restrição | RNF04, RF01 |
-| TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.interacao_artefato` por artefato citado | RF02, RF03, RNF11 |
-| TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_a_interacao` | Interação processada com o banco inacessível | Código de indisponibilidade definido; a interação é reencaminhada, não descartada | RNF07, RNF04 |
-| TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.*` com as credenciais da aplicação | Operação rejeitada pelo banco | RNF04 |
-| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução do DDL da seção 3.6.6 em base vazia | Os dois schemas e as onze tabelas são criados; carga inicial populada | Seção 3.6 |
+| TI-24 | Positivo | `TestPersistenciaIntegracao.test_turno_por_texto_e_gravado_com_atributos_minimos` | Solicitação e resposta processadas pelo formato de texto | Duas linhas em `auditoria.mensagem`, com papéis `usuario` e `agente`, ordens consecutivas e o texto de ambas preservado | RNF04, RNF09 |
+| TI-25 | Positivo e negativo | `TestPersistenciaIntegracao.test_turno_por_voz_vincula_o_audio_de_origem` | Solicitação processada pelo formato de áudio | `audio_referencia` igual ao identificador do MinIO; preenchê-lo com `formato='texto'` é rejeitado por `mensagem_audio_coerente` | RNF04, RF01 |
+| TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.mensagem_fonte` por trecho citado, com `chunk_id`, posição e cópia dos metadados | RF02, RF03, RNF11, RNF12 |
+| TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_o_turno` | Turno processado com o banco inacessível | Código de indisponibilidade definido; o turno é reencaminhado, não descartado | RNF07, RNF04 |
+| TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.mensagem` com as credenciais da aplicação | Operação rejeitada pelo banco; renomear conversa e reavaliar resposta continuam permitidos | RNF04, RNF09 |
+| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução de `src/database/01_create_database.sql` em base vazia, seguida de `02_initial_data.sql` e `03_rls_policies.sql` | Os dois schemas e as catorze tabelas são criados; carga inicial populada; `scripts/verificar_modelo_documentado.py` não aponta divergência com a seção 3.6.6 | Seção 3.6 |
+| TI-30 | Positivo e negativo | `TestPersistenciaIntegracao.test_papel_da_mensagem_delimita_as_colunas` | Resposta do agente com intenção classificada e solicitação do usuário com tempo de processamento | Ambas rejeitadas por `mensagem_papel_coerente` | RNF04 |
+| TI-31 | Positivo e negativo | `TestPersistenciaIntegracao.test_avaliacao_exige_alvo_e_juizo_unicos` | Avaliação apontando para conversa e mensagem ao mesmo tempo; avaliação apenas com comentário | Ambas rejeitadas por `avaliacao_alvo_unico` e `avaliacao_tem_juizo`; reavaliar o mesmo alvo atualiza a linha existente | RNF08, RNF09 |
 
 #### Frontend e backend
 
