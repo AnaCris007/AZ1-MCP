@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from routes import analysis_router, audio_router, chat_router, transcription_router, webhooks_router
+from routes import analysis_router, audio_router, chat_router, rag_router, transcription_router, webhooks_router
 from routes.audio import AudioAPIError
 from routes.chat import ChatAPIError
 from routes.transcription import TranscriptionAPIError
@@ -21,6 +21,7 @@ app.include_router(audio_router, prefix="/api/v1")
 app.include_router(transcription_router, prefix="/api/v1")
 app.include_router(analysis_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")
+app.include_router(rag_router, prefix="/api/v1")
 app.include_router(webhooks_router, prefix="/api/v1")
 
 
