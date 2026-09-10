@@ -73,7 +73,7 @@ class TradutorGraph:
             raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO) from exc
 
         dados = notificacao.get("resourceData") or {}
-        identificador = notificacao.get("id") or dados.get("id")
+        identificador = notificacao.get("id") or self._identificador_de_fallback(dados)
         if not identificador:
             # Sem identificador não há como garantir efeito único (TI-37), e
             # processar mesmo assim arriscaria aplicar o efeito duas vezes.
@@ -94,6 +94,25 @@ class TradutorGraph:
                 "tenant_id": notificacao.get("tenantId"),
             },
         )
+
+    def _identificador_de_fallback(self, dados: Mapping[str, Any]) -> str | None:
+        """Usado quando a notificação não traz `id` — campo documentado como
+        opcional pelo Graph (`changeNotification.id`).
+
+        `resourceData.id` sozinho identifica o *item*, não a *entrega*: duas
+        edições sucessivas do mesmo arquivo compartilham o mesmo `resourceData.id`,
+        e usá-lo isolado como chave de idempotência faria a segunda edição parecer
+        reentrega da primeira e ser descartada sem processar — perda silenciosa,
+        não falha visível. O `@odata.etag` muda a cada edição do item, então
+        compô-lo à chave distingue as duas. Se também faltar, ainda não há como
+        diferenciar — limitação do que o provedor envia, não deste código.
+        """
+        item_id = dados.get("id")
+        if not item_id:
+            return None
+
+        etag = dados.get("@odata.etag")
+        return f"{item_id}:{etag}" if etag else item_id
 
 
 @dataclass(frozen=True)
