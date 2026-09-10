@@ -27,6 +27,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | O contrato da API de recebimento de áudios | [Projeto.md, API para Recebimento de Áudios](./Projeto.md#34-api-para-recebimento-de-áudios) |
 | A pilha de tecnologias e as razões de cada escolha | [Projeto.md, Pilha de Tecnologias](./Projeto.md#35-pilha-de-tecnologias) |
 | Os modelos conceitual, lógico e físico dos dados | [Projeto.md, Modelagem Conceitual e Lógica dos Dados](./Projeto.md#36-modelagem-conceitual-e-lógica-dos-dados) |
+| Como criar, popular e verificar o banco de dados | [src/database/README.md](../src/database/README.md) |
 | Como implantar a solução em nuvem | [Projeto.md, Processo de Deploy em Nuvem](./Projeto.md#37-processo-de-deploy-em-nuvem) |
 | Os webhooks, sua escolha, contrato e tratamento de erros | [Projeto.md, Webhooks](./Projeto.md#51-webhooks) |
 | Como ligar o webhook ao Google Drive, passo a passo | [Projeto.md, Manual de operação — Google Drive](./Projeto.md#516-exemplos-e-testes) |
@@ -57,7 +58,8 @@ Os diagramas e as imagens utilizados pelos documentos estão armazenados na past
 - registros visuais dos protótipos A e B;
 - diagrama do fluxo Gitflow;
 - diagrama de implantação em nuvem e as capturas dos cinco passos de provisionamento da instância;
-- modelos conceitual e lógico-relacional dos dados;
+- modelos conceitual e lógico-relacional dos dados — o lógico foi regerado na
+  Sprint 3 com as tabelas de conversa, trilha, avaliação e eventos;
 - linha do tempo de entrega das Sprints 3, 4 e 5.
 
 Os diagramas de classes, de componentes e de sequência criados na Seção 3.9 do `Projeto.md` estão escritos em Mermaid, dentro do próprio documento, e não como arquivos em `assets`. A conversão para SVG, caso a equipe a considere necessária, corresponde às tasks T05 a T07 do planejamento da Sprint 3.

@@ -15,6 +15,7 @@ from services.drive_push_service import (
     VerificadorChannelToken,
 )
 from services.gemini_service import GeminiChatModel, GeminiSettings
+from services.gemini_speech_service import DEFAULT_TTS_MODEL, GeminiSpeechModel
 from services.graph_push_service import PROVEDOR as PROVEDOR_GRAPH
 from services.graph_push_service import TIPOS_PROCESSAVEIS as TIPOS_GRAPH
 from services.graph_push_service import (
@@ -23,6 +24,7 @@ from services.graph_push_service import (
     VerificadorClientState,
     VerificadorEmCadeia,
 )
+from services.speech_service import GenerateSpeech
 from services.storage_service import S3AudioStorage, S3StorageSettings
 from services.transcription_service import TranscribeAudio
 from services.webhook_registry_service import (
@@ -81,6 +83,15 @@ def get_analyzer() -> AnalyzeAudio:
 def get_chat_answerer() -> AnswerChatMessage:
     settings = GeminiSettings.from_environment()
     return AnswerChatMessage(model=GeminiChatModel.from_settings(settings))
+
+
+@lru_cache
+def get_speech_generator() -> GenerateSpeech:
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY não configurada para geração de áudio.")
+    model = os.environ.get("GEMINI_TTS_MODEL", DEFAULT_TTS_MODEL)
+    return GenerateSpeech(model=GeminiSpeechModel.from_api_key(api_key, model))
 
 
 @lru_cache

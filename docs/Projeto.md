@@ -1513,7 +1513,7 @@ Os valores-alvo ainda não acordados estão identificados como **a validar com o
 | **RNF01 — Desempenho das consultas**                       | Como usuário do agente, quero receber rapidamente as respostas das minhas consultas para obter informações dos projetos sem comprometer minha tomada de decisão.  | Eficiência e agilidade no acesso às informações           | Desempenho                         | Pelo menos 80% das consultas textuais elegíveis devem apresentar resposta completa em até 15 segundos, e 100% devem terminar com resposta ou erro controlado em até 60 segundos, desconsiderando somente indisponibilidades externas comprovadas.                                                                                                            | Executar conjunto representativo de consultas, medir taxa de sucesso e tempos de resposta e verificar simultaneamente o limite principal e o teto da cauda.      |
 | **RNF02 — Autenticação dos usuários**                      | Como usuário do agente, quero acessar a solução por uma identidade autenticada para impedir o uso das funcionalidades por pessoas não identificadas.               | Confidencialidade e segurança da informação               | Segurança e autenticidade          | Todas as funcionalidades protegidas devem exigir sessão ou token válido emitido por um provedor SSO. Nos testes, 100% das solicitações sem credencial, com credencial malformada, expirada, com assinatura inválida ou audiência incorreta devem ser rejeitadas com HTTP 401 antes da execução da regra de negócio. O provedor poderá ser Microsoft ou Google e sua escolha não altera o contrato do teste. | Executar cada endpoint protegido com credencial válida e com as cinco condições inválidas, verificando autenticação, resposta 401, interrupção antes da regra de negócio e ausência de credenciais nos registros. |
 | **RNF03 — Qualidade da classificação de intenções**        | Como usuário do agente, quero que minhas perguntas sejam interpretadas corretamente para receber respostas coerentes com as informações solicitadas.              | Precisão e confiabilidade das consultas                   | Correção e confiabilidade          | Em conjunto de teste cego e equilibrado, o classificador deve atingir F1-macro mínimo de 0,85 entre as dez intenções, cobertura mínima de 90% sobre as nove intenções conhecidas e taxa máxima de 15% de aceitação indevida dos exemplos `fora_do_catalogo`. A cobertura corresponde à proporção de exemplos conhecidos que não são encaminhados à rejeição pelo limiar de confiança. | Avaliar o modelo e o limiar congelados sobre conjunto rotulado que nunca participou de treinamento, seleção de pré-processamento, calibração ou ajuste.           |
-| **RNF04 — Rastreabilidade das consultas**                  | Como responsável pela gestão dos projetos, quero que cada solicitação possa ser relacionada às etapas e informações que produziram sua resposta.                  | Rastreabilidade e transparência                           | Rastreabilidade                    | Cada interação deve possuir identificador único e permitir relacionar o usuário autenticado, a data e hora, o canal, a solicitação, a intenção identificada, as fontes consultadas, a resposta ou resultado, o tempo de processamento, o feedback e eventual erro. No modelo planejado, `interacao.id` identifica a interação, `resultado` registra a resposta ou resultado e `interacao_artefato` relaciona as fontes. | Executar interações de texto e voz, consultar seus registros pelo identificador e verificar a presença e o relacionamento de todos os elementos aplicáveis.       |
+| **RNF04 — Rastreabilidade das consultas**                  | Como responsável pela gestão dos projetos, quero que cada solicitação possa ser relacionada às etapas e informações que produziram sua resposta.                  | Rastreabilidade e transparência                           | Rastreabilidade                    | Cada interação deve possuir identificador único e permitir relacionar o usuário autenticado, a data e hora, o canal, a solicitação, a intenção identificada, as fontes consultadas, a resposta ou resultado, o tempo de processamento, o feedback e eventual erro. No modelo implementado, `conversa.id` e `mensagem.id` identificam a conversa e cada turno, `mensagem.conteudo` registra o texto da solicitação e o da resposta, `mensagem.resultado` registra o desfecho e `mensagem_fonte` relaciona as fontes. | Executar interações de texto e voz, consultar seus registros pelo identificador e verificar a presença e o relacionamento de todos os elementos aplicáveis.       |
 | **RNF05 — Interoperabilidade entre aplicações clientes**   | Como usuário, quero acessar o agente a partir de diferentes aplicações para consultar os projetos pelo ponto de acesso mais adequado à minha rotina.              | Interoperabilidade e acessibilidade                       | Flexibilidade e integração         | O núcleo do agente deve expor suas funcionalidades por meio de interfaces padronizadas, permitindo que pelo menos duas aplicações clientes distintas o consumam sem duplicação das regras de negócio e com equivalência de contrato e resultado de negócio.                                                                                              | Acionar as funcionalidades principais pela interface React e por um cliente Python independente e comparar status HTTP, esquema, intenção, fontes, dados estruturados e categorias de erro, sem exigir redação textual idêntica. |
 | **RNF06 — Qualidade da transcrição de áudio**              | Como usuário, quero realizar consultas por voz e ter minha fala convertida corretamente em texto para interagir com o agente de maneira natural.                  | Acessibilidade, eficiência e uso de linguagem natural     | Qualidade do reconhecimento de fala | O componente de conversão de áudio em texto deve apresentar WER geral de no máximo 15% em um conjunto de áudios representativo do contexto do projeto.                                                                                                                                      | Testar com áudios do vocabulário de projetos e calcular substituições, exclusões e inserções contra transcrições de referência.                                  |
 | **RNF07 — Disponibilidade da solução**                     | Como usuário, quero que o agente permaneça disponível durante uma sessão de trabalho para realizar consultas quando necessário.                                   | Continuidade operacional e eficiência                     | Confiabilidade e disponibilidade   | No ambiente acadêmico, a solução deve apresentar disponibilidade mínima de 99% durante uma janela contínua de quatro horas, desconsiderando manutenções previamente comunicadas. Uma verificação é bem-sucedida quando `GET /health` responde HTTP 200 em até dois segundos, indicando disponibilidade da aplicação e do banco de dados; provedores externos são monitorados separadamente. | Consultar o endpoint de saúde uma vez por minuto durante a sessão de quatro horas e calcular a proporção de verificações bem-sucedidas entre as verificações elegíveis. |
@@ -1652,7 +1652,7 @@ Esta seção registra as tecnologias selecionadas para o MVP e distingue o que j
 | PLN e classificação de intenções | scikit-learn, `MultinomialNB`, NLTK, spaCy, NumPy e Joblib | Implementados | Sustentam o pré-processamento linguístico, a vetorização, o treinamento, a classificação e a persistência do modelo. |
 | Persistência estruturada | PostgreSQL e SQL | Modelagem concluída; integração futura | O modelo relacional atende aos dados estruturados do portfólio, metadados, alertas, feedbacks e registros de auditoria. |
 | Speech-to-Text | Deepgram SDK 5+ e modelo Nova-3 | Implementado | Converte os áudios recebidos em texto antes do encaminhamento ao mesmo pipeline de intenção usado pelas mensagens digitadas. |
-| Text-to-Speech | Provedor a definir | Previsto para a próxima sprint | Permitirá gerar respostas em áudio; a escolha do serviço será registrada após a avaliação das alternativas. |
+| Text-to-Speech | Google Gen AI SDK, Gemini TTS e voz `Kore` | Implementado | Converte sob demanda as respostas textuais em áudio WAV, mantendo o texto como fallback em caso de falha. |
 | IA generativa | Google Gen AI SDK e modelo `gemini-3.5-flash-lite` | Implementada | Gera respostas em linguagem natural, preservando no backend as regras de negócio e a orquestração da solução. |
 | RAG e documentos | MinIO, PostgreSQL com pgvector, Gemini Embedding (`gemini-embedding-001`) e Gemini 3.5 Flash-Lite | Selecionados para implementação futura | Separam o armazenamento dos arquivos, os metadados e vetores, a recuperação semântica e a geração da resposta fundamentada. |
 | Agendamento e alertas | APScheduler, PostgreSQL e interface React | Selecionados para implementação futura | Permitem executar verificações periódicas, persistir os alertas identificados e apresentá-los na própria aplicação. |
@@ -1680,7 +1680,7 @@ No ambiente local, os arquivos são armazenados no **MinIO**, serviço compatív
 
 A geração de respostas utiliza o **Google Gen AI SDK** com o modelo `gemini-3.5-flash-lite`. A aplicação mantém sua própria camada de orquestração e regras de negócio, utilizando o modelo generativo como um serviço especializado do fluxo.
 
-A conversão de áudio em texto utiliza o **Deepgram SDK 5+** com o modelo **Nova-3**, configurado para português brasileiro. Após a transcrição, o texto segue o mesmo pipeline de classificação usado nas entradas digitadas. A conversão de texto em áudio também faz parte do produto, mas será desenvolvida na próxima sprint e seu provedor ainda será definido.
+A conversão de áudio em texto utiliza o **Deepgram SDK 5+** com o modelo **Nova-3**, configurado para português brasileiro. Após a transcrição, o texto segue o mesmo pipeline de classificação usado nas entradas digitadas. Para a saída por voz, o backend utiliza o **Gemini Text-to-Speech** com a voz `Kore`: a resposta é sintetizada sob demanda, encapsulada como WAV e reproduzida pelo frontend sem substituir o conteúdo textual.
 
 ### Agendamento e notificações
 
@@ -1757,7 +1757,7 @@ Uma nova classificação de intenção só deve ser executada quando o sistema d
 
 ## 3.2 API de Speech to Text e Text to Speech
 
-Esta seção documenta as duas pontas do canal de voz: a conversão de fala em texto (Speech to Text, STT), que já está implementada e integrada ao pipeline de PLN, e a conversão de texto em fala (Text to Speech, TTS), cuja escolha de provedor permanece em aberto. Ela é a contraparte externa da API interna de recebimento de áudio descrita na Seção 3.4: aquela recebe e guarda o arquivo, esta o converte em texto por meio de um serviço de terceiros.
+Esta seção documenta as duas pontas do canal de voz: a conversão de fala em texto (Speech to Text, STT), implementada com Deepgram e integrada ao pipeline de PLN, e a conversão de texto em fala (Text to Speech, TTS), implementada com Gemini e integrada ao frontend básico. A API interna de recebimento descrita na Seção 3.4 recebe e guarda o áudio enviado pelo usuário; o STT o converte em texto; após o processamento, o TTS permite que a resposta textual do agente seja ouvida sob demanda. O texto permanece como resposta principal e como fallback quando a síntese de voz falha.
 
 **Estado de implementação desta seção.** A tabela abaixo separa o que está em execução do que é proposta, para que nenhuma parte da especificação seja lida como pronta sem estar.
 
@@ -1769,7 +1769,7 @@ Esta seção documenta as duas pontas do canal de voz: a conversão de fala em t
 | Autenticação do usuário nos endpoints de voz | Planejado, não implementado | Nenhum verificador de credencial nas rotas; ver Seção 3.4 |
 | Política de tempo limite e de repetição | **DECISÃO TÉCNICA EM ABERTO** | Nenhum tempo limite explícito é configurado no cliente |
 | Medição de Word Error Rate (WER) | Planejada para a Sprint 3 | Não há execução registrada em `resultados/` |
-| Escolha do serviço de TTS | **DECISÃO TÉCNICA EM ABERTO** | Sem dependência de TTS declarada no `pyproject.toml` |
+| Escolha e implementação do serviço de TTS | Implementado e coberto por testes | `src/services/gemini_speech_service.py`, `src/services/speech_service.py`, `src/routes/speech.py`, `tests/test_speech_service.py` e `tests/test_speech_api.py` |
 
 ### 3.2.1 Serviço de Speech to Text
 
@@ -2002,6 +2002,51 @@ Esta é a única resposta de erro dos endpoints de voz que mantém o corpo nativ
 }
 ```
 
+**Exemplo 5 — Text to Speech bem-sucedido.**
+
+```bash
+curl -X POST \
+  "http://localhost:8010/api/v1/text-to-speech" \
+  -H "Content-Type: application/json" \
+  --output resposta.wav \
+  -d '{"text":"O empreendimento está dentro do prazo.","voice":"Kore","format":"wav"}'
+```
+
+**Código HTTP:** `200 OK`
+
+```http
+Content-Type: audio/wav
+Content-Disposition: inline; filename="speech.wav"
+```
+
+O corpo é binário e começa com a assinatura `RIFF` de um arquivo WAV; por isso não há corpo JSON no caminho de sucesso. No exemplo, `--output resposta.wav` grava o conteúdo para reprodução local. A porta `8010` corresponde à configuração de desenvolvimento consumida pelo proxy do Vite em `src/frontend/vite.config.js`.
+
+**Exemplo 6 — Text to Speech com formato inválido.**
+
+```bash
+curl -X POST \
+  "http://localhost:8010/api/v1/text-to-speech" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Teste de formato.","voice":"Kore","format":"mp3"}'
+```
+
+**Código HTTP:** `422 Unprocessable Entity`
+
+```json
+{
+  "detail": [
+    {
+      "type": "literal_error",
+      "loc": ["body", "format"],
+      "msg": "Input should be 'wav'",
+      "input": "mp3"
+    }
+  ]
+}
+```
+
+O framework rejeita o formato antes de chamar o Gemini, porque `SpeechAudioFormat` admite somente o literal `wav`. O mesmo mecanismo recusa vozes diferentes de `Kore` nesta versão.
+
 **Pseudocódigo da integração.** O trecho abaixo resume, em forma reduzida, o que `TranscribeAudio.transcribe` faz. É **exemplo conceitual** destinado a explicar o mecanismo, e não o código executável do repositório, que está em `src/services/transcription_service.py`:
 
 ```python
@@ -2047,22 +2092,70 @@ A retenção de sete dias é curta de propósito e responde a duas exigências q
 
 ### 3.2.6 Serviço de Text to Speech
 
-> **DECISÃO TÉCNICA EM ABERTO.** A implementação do TTS não está no escopo desta sprint. O cliente de TTS exige que o serviço esteja escolhido e com credenciais de teste disponíveis antes de qualquer desenvolvimento, e essa avaliação ainda não foi concluída pelo grupo. Além disso, a integração ponta a ponta entre STT, PLN e TTS depende tanto do cliente de STT, já implementado, quanto do cliente de TTS, ainda pendente; iniciar a integração sem os dois clientes prontos resultaria em trabalho parcial que não pode ser validado.
+**Decisão:** utilizar a **API Gemini Text-to-Speech**, por meio do SDK oficial `google-genai`, para sintetizar em áudio as respostas textuais do agente. O projeto já utilizava o Gemini no serviço de chat e já declarava o SDK e a variável `GEMINI_API_KEY`; a escolha evita introduzir uma segunda credencial para geração de conteúdo e mantém o cliente externo na mesma família tecnológica. O Gemini TTS também aceita português e oferece vozes predefinidas. Como o recurso e o modelo utilizados estão em *preview*, a decisão deve ser reavaliada antes de uma implantação de produção.
 
-A ausência da decisão não impede fixar desde já os critérios sobre os quais ela será tomada, e é isso que a tabela abaixo faz. Os candidatos foram levantados pela equipe; nenhuma coluna de resultado é preenchida aqui, justamente porque ainda não houve medição.
+O TTS é complementar ao Speech to Text exigido para a entrada por voz. Sua inclusão fecha o ciclo de interação: o usuário pode falar para o agente por meio do STT e, após o processamento, ouvir a resposta por meio do TTS. A síntese não ocorre automaticamente; o frontend só solicita o áudio quando o usuário aciona **Ouvir resposta**, o que evita consumo de cota sem intenção explícita e respeita as restrições de reprodução automática dos navegadores.
 
-| Critério de avaliação | Por que importa neste projeto | Como será verificado na Sprint 3 |
+#### Identificação do serviço e decisões adotadas
+
+| Item | Valor adotado | Evidência no repositório |
 |---|---|---|
-| Qualidade da voz em português brasileiro | O usuário é um profissional do PMO ouvindo a resposta enquanto se desloca; entonação artificial compromete a compreensão de números e datas | Escuta comparativa de um mesmo texto de referência com vocabulário de portfólio |
-| Pronúncia de siglas e termos do domínio | Termos como TAP, PMO, Linha 6 e marco aparecem em quase toda resposta | Texto de teste contendo as siglas do catálogo da Seção 3.1 |
-| Latência até o primeiro áudio | Soma-se ao tempo já consumido por transcrição e classificação, e incide sobre o RNF01 | Medição do tempo até o primeiro byte de áudio devolvido |
-| Custo por caractere ou por minuto sintetizado | Determina a viabilidade do canal de voz dentro do orçamento acadêmico | Consulta à página de preço vigente do provedor no momento da decisão |
-| Existência de SDK Python oficial | A pilha do backend é Python, e um SDK oficial reduz o custo de manutenção | Verificação no índice de pacotes e na documentação oficial |
-| Possibilidade de troca de provedor | A mesma exigência de desacoplamento aplicada ao STT vale aqui | Confirmação de que o cliente cabe atrás de uma interface própria, como ocorre com o `AudioFetcher` |
+| Serviço externo | Gemini Text-to-Speech | `src/services/gemini_speech_service.py` |
+| SDK | `google-genai>=1.0` | `pyproject.toml` e `requirements.txt` |
+| Modelo padrão | `gemini-2.5-flash-preview-tts` | `DEFAULT_TTS_MODEL` e variável opcional `GEMINI_TTS_MODEL` |
+| Autenticação externa | Chave lida de `GEMINI_API_KEY` | `get_speech_generator` em `src/az1_api/dependencies.py` |
+| Voz | `Kore`, única voz exposta pelo contrato atual | `SpeechVoice` em `src/schemas/speech.py` |
+| Idioma | Inferido pelo modelo a partir do texto; o fluxo do AZ1 utiliza português | Conteúdo textual enviado ao provedor |
+| Saída do provedor | PCM mono, 24 kHz, amostras de 16 bits | Constantes de conversão em `src/services/speech_service.py` |
+| Saída da API interna | WAV (`audio/wav`) | `GeneratedSpeech` e `pcm_to_wav` |
+| Armazenamento | Nenhum; o áudio é mantido temporariamente em memória | Serviço e componente `ChatMessage` |
 
-**Candidatos considerados:** os mesmos provedores comparados para o STT oferecem síntese de fala — Deepgram, Google Cloud, Azure AI Speech e OpenAI —, o que torna a reutilização de credencial e de SDK um critério adicional de desempate. A equipe não fechou a escolha, e nenhum deles é apresentado aqui como selecionado.
+A aplicação não expõe a chave ao navegador. `GeminiSpeechModel` recebe o texto e a voz, chama o provedor e devolve os bytes PCM. A classe `GenerateSpeech` depende do protocolo interno `SpeechModel`, valida a entrada e encapsula o PCM em um contêiner WAV. Essa separação impede que a rota e o frontend dependam diretamente do SDK e permite substituir o fornecedor com a implementação de outro adaptador.
 
-> **PENDENTE DE VALIDAÇÃO DA EQUIPE.** Escolher o provedor de TTS e registrar nesta seção, na Sprint 3, os mesmos itens já documentados para o STT: nome oficial, versão da API, URL-base, autenticação, voz utilizada, formato e taxa de amostragem do áudio devolvido, respostas de sucesso e de erro com seus códigos HTTP, tempo limite e política de repetição. Os dois exemplos que faltam nesta seção — **TTS bem-sucedido** e **TTS com parâmetro inválido** — devem ser acrescentados à Seção 3.2.4, no mesmo formato dos Exemplos 1 a 4 e extraídos de execução real do cliente. Enquanto esses dois exemplos não existirem, o critério de exemplos completos de API de voz não pode ser considerado plenamente atendido.
+#### Endpoint interno de síntese
+
+```http
+POST /api/v1/text-to-speech
+Content-Type: application/json
+```
+
+| Campo | Tipo | Obrigatório | Padrão | Regra |
+|---|---|---:|---|---|
+| `text` | string | Sim | — | Após a remoção de espaços nas extremidades, deve possuir de 1 a 4.000 caracteres |
+| `voice` | string | Não | `Kore` | Nesta versão, somente `Kore` é aceita |
+| `format` | string | Não | `wav` | Nesta versão, somente `wav` é aceito |
+
+Em caso de sucesso, o endpoint devolve `200 OK`, o corpo binário do áudio, `Content-Type: audio/wav` e `Content-Disposition: inline; filename="speech.wav"`. O áudio não é codificado em Base64 nem armazenado no S3: o frontend o recebe como `Blob`, cria uma URL temporária com `URL.createObjectURL`, reproduz e revoga a URL quando o componente é removido.
+
+#### Respostas de erro e fallback
+
+| Código HTTP | `error` | Condição | Comportamento no frontend |
+|---|---|---|---|
+| `422 Unprocessable Entity` | `empty_text` | Texto vazio ou composto apenas por espaços | Mantém a resposta textual e informa que o áudio não pôde ser gerado |
+| `422 Unprocessable Entity` | `text_too_long` | Texto com mais de 4.000 caracteres | Mantém a resposta textual e informa a falha |
+| `422 Unprocessable Entity` | corpo de validação do FastAPI | Voz ou formato fora dos literais permitidos, ou campo obrigatório ausente | Mantém a resposta textual e informa a falha |
+| `502 Bad Gateway` | `speech_generation_failed` | Erro do Gemini, credencial inválida, resposta vazia ou conteúdo inesperado | Mantém a resposta textual e permite nova tentativa |
+| `500 Internal Server Error` | `internal_error` | Falha interna não prevista | Mantém a resposta textual e não expõe detalhes internos |
+
+O tratamento de `502` diferencia a indisponibilidade do fornecedor de um defeito interno do AZ1. A interface bloqueia o botão enquanto a geração está em andamento, evitando solicitações concorrentes para a mesma mensagem. Se a síntese falhar, a resposta textual não é removida, pois ela é o resultado principal do agente e o áudio é um recurso complementar.
+
+> **Limitação vigente.** O cliente ainda não define tempo limite nem repetição automática próprios; exceções do SDK são convertidas em `502 speech_generation_failed`. A política deve ser estabelecida antes de produção, considerando latência, custo de uma segunda geração e o RNF01. A autenticação do usuário no endpoint interno também permanece pendente, assim como nos demais endpoints de voz; por isso a execução atual deve permanecer em ambiente local ou controlado.
+
+#### Integração com o frontend
+
+A função `generateSpeech`, em `src/frontend/src/lib/api.js`, envia o conteúdo de uma resposta do agente ao endpoint e lê o retorno como `Blob`. O componente `ChatMessage` apresenta o botão apenas para mensagens do agente e controla os estados `idle`, `loading`, `playing` e `paused`. Durante a geração, o botão exibe **Gerando áudio...**; durante a reprodução, passa a **Pausar**. A geração acontece uma vez por instância da mensagem e o áudio já carregado pode ser retomado sem nova chamada ao provedor.
+
+#### Testes implementados
+
+Os testes não chamam o serviço externo nem consomem cota. Um modelo falso implementa o mesmo protocolo usado pelo adaptador real, permitindo verificar o comportamento da aplicação de forma determinística.
+
+| Arquivo | Cobertura |
+|---|---|
+| `tests/test_speech_service.py` | Remoção de espaços, encaminhamento de texto e voz, conversão PCM–WAV, texto vazio, limite de 4.000 caracteres, resposta vazia e falha do provedor |
+| `tests/test_gemini_speech_service.py` | Montagem da chamada ao SDK com modelo, texto, modalidade de áudio e voz `Kore`, além da rejeição de resposta externa sem áudio |
+| `tests/test_speech_api.py` | Resposta `200` com `audio/wav`, voz e formato inválidos e mapeamento dos erros controlados para `422` e `502` |
+
+Na validação da implementação, os dez testes específicos de TTS passaram. O frontend também foi submetido ao `oxlint` e ao build de produção do Vite; o build foi concluído, e os avisos de lint encontrados pertencem a componentes preexistentes não alterados por esta implementação. A reprodução real foi exercitada manualmente pela equipe no frontend com uma resposta em português. Essa validação comprova o caminho funcional, mas ainda não registra métricas de latência, custo ou qualidade de pronúncia e não substitui um teste automatizado de integração contra um ambiente controlado do provedor.
 
 ### 3.2.7 Coerência com o restante da especificação
 
@@ -2070,13 +2163,13 @@ A tabela fecha o vínculo entre esta seção e os demais elementos do projeto, d
 
 | Elemento relacionado | Vínculo com a API de voz |
 |---|---|
-| RF01 — entrada por texto ou voz | A transcrição é o que permite que a solicitação falada percorra o mesmo pipeline da digitada, sem um segundo classificador |
+| RF01 — entrada por texto ou voz | A transcrição permite que a solicitação falada percorra o mesmo pipeline da digitada; o TTS complementa o fluxo ao oferecer a reprodução da resposta, sem substituir o texto |
 | RNF01 — desempenho | O tempo da chamada externa é a maior parcela do tempo de resposta do canal de voz; a política de tempo limite em aberto incide diretamente sobre este requisito |
 | RNF03 — qualidade da classificação de intenções | Um erro de transcrição vira um erro de classificação; por isso o `keyterm` cobre o vocabulário que distingue as intenções |
-| RNF04 e RNF09 — rastreabilidade e auditoria | A coluna `auditoria.interacao.audio_referencia`, definida na Seção 3.6.5, guarda o `audio_id` e liga cada interação por voz ao arquivo original |
-| RNF06 — acessibilidade | O canal de voz é o mecanismo que atende a este requisito, e o WER medido é a métrica que comprova o atendimento |
+| RNF04 e RNF09 — rastreabilidade e auditoria | A coluna `auditoria.mensagem.audio_referencia`, definida na Seção 3.6.5, guarda o `audio_id` e liga cada turno por voz ao arquivo original |
+| RNF06 — acessibilidade | O STT oferece entrada por voz e o TTS oferece saída auditiva sob demanda; o texto permanece disponível e o controle possui rótulo acessível. WER, latência e avaliação de pronúncia ainda precisam ser medidos |
 | AM9 — degradação da transcrição em ambiente ruidoso | O risco incide exatamente sobre esta seção e permanece **Aberto**, sem medição, conforme a Seção 4.3.2 do `GestaoProjeto.md` |
-| Seção 2.4 — diagrama de componentes | A Conversão de Áudio em Texto é o componente que encapsula este serviço |
+| Seção 2.4 — diagrama de componentes | A Conversão de Áudio em Texto encapsula o STT; a rota e o serviço de síntese encapsulam o TTS e devolvem WAV ao frontend |
 | Seção 3.4 — API de recebimento | Fornece o `audio_id` e impõe os limites de formato, tamanho e duração que este serviço pressupõe |
 | Seção 3.9 — projeto técnico e arquitetural | Os diagramas de sequência da consulta por voz e da falha do serviço de voz representam graficamente os fluxos desta seção |
 
@@ -2824,7 +2917,6 @@ A geração de respostas textuais já está integrada separadamente pelo endpoin
 | Persistência estruturada | PostgreSQL e SQL | Modelagem conceitual, lógica e física concluída; provisionamento e integração posteriores. |
 | RAG | MinIO, PostgreSQL com pgvector, `gemini-embedding-001` e `gemini-3.5-flash-lite` | Armazenamento de documentos sintéticos, recuperação semântica e geração de respostas fundamentadas. |
 | Agendamento e alertas | APScheduler, PostgreSQL e interface React | Execução de verificações periódicas, persistência e apresentação de alertas na aplicação. |
-| Text-to-Speech | Provedor ainda não definido | Avaliação e escolha na próxima sprint. |
 | Computação em nuvem | AWS Academy e Amazon EC2 | Ambiente acadêmico selecionado e serviço de computação confirmado para o deploy do MVP. |
 | Registro de imagens | Amazon ECR | Uso planejado, condicionado à disponibilidade no catálogo do laboratório. |
 | Armazenamento de objetos em nuvem | Amazon S3 e Boto3 | Substituição planejada do MinIO no ambiente AWS, condicionada à disponibilidade do serviço. |
@@ -2837,7 +2929,7 @@ A escolha do PostgreSQL evita introduzir um segundo banco apenas para a busca ve
 
 No desenvolvimento local, o MinIO permanece como armazenamento compatível com S3. No ambiente AWS, a substituição planejada pelo Amazon S3 preserva o uso do Boto3 e o contrato de acesso a objetos. O Amazon EC2 hospedará os elementos executáveis do MVP; ECR, S3 e CloudWatch somente serão incorporados ao deploy após a confirmação de que estão liberados no laboratório da AWS Academy. A hospedagem do PostgreSQL nesse ambiente permanece em aberto.
 
-O serviço de Text-to-Speech integra a arquitetura prevista do produto, mas não é apresentado como tecnologia fechada porque seu provedor ainda será avaliado na próxima sprint. Da mesma forma, as integrações com o ecossistema Microsoft são tratadas como evolução futura e não como parte da pilha executável atual.
+O serviço de Text-to-Speech já integra a pilha executável com Gemini TTS, conforme o contrato e as limitações registrados na Seção 3.2.6. As integrações com o ecossistema Microsoft, por sua vez, continuam tratadas como evolução futura e não fazem parte da pilha executável atual.
 
 ### 3.5.3 Quadro consolidado da pilha
 
@@ -2858,7 +2950,7 @@ O quadro reúne, em uma única leitura, cada camada da solução com a tecnologi
 | Persistência estruturada | PostgreSQL | Guardar portfólio, projetos, artefatos, pendências e a trilha de auditoria | Modelo relacional adequado às entidades da Seção 3.6, com recursos de integridade que sustentam RNF04 e RNF09 | Banco não relacional para os dados do portfólio | Restrições declarativas, colunas geradas e separação por schema | Provisionamento e integração ainda não realizados | Decidido |
 | Busca vetorial (RAG) | PostgreSQL com pgvector, `gemini-embedding-001` | Recuperar trechos de documentos para fundamentar a resposta | Evita introduzir um segundo banco só para busca semântica | Banco vetorial dedicado | Uma única base para dados e vetores, com uma só operação | Desempenho a verificar quando o volume de documentos crescer | Selecionado |
 | Agendamento | APScheduler | Executar as verificações periódicas de pendências do RF05 | Roda no mesmo processo Python do backend, o que atende ao porte do MVP | Agendador externo ou serviço gerenciado de nuvem | Nenhum componente novo de infraestrutura | Não sobrevive a múltiplas instâncias nem à interrupção da sessão do laboratório, conforme a Seção 3.7.9, item 4 | Selecionado |
-| Text to Speech | Provedor não definido | Converter a resposta em áudio | Critérios de avaliação registrados na Seção 3.2.6 | Deepgram, Google Cloud, Azure AI Speech e OpenAI | — | Sem decisão, o canal de voz permanece unidirecional | Em aberto |
+| Text to Speech | Google Gen AI SDK, `gemini-2.5-flash-preview-tts`, voz `Kore` | Converter sob demanda a resposta em áudio WAV | Reutiliza o SDK e a credencial já empregados pelo chat, oferece suporte a português e permanece isolado por um protocolo interno | Deepgram, Google Cloud, Azure AI Speech e OpenAI | Fecha o ciclo de voz sem expor a credencial ao frontend | Modelo em *preview*; timeout, repetição e autenticação do usuário ainda pendentes | Implementado |
 | Autenticação por SSO | Microsoft ou Google, a definir | Autenticar o usuário e aplicar o RNF02 | Contrato de Bearer Token já definido na Seção 3.4 | Autenticação própria | Integração padronizada e independente das regras de negócio | Ausência do mecanismo é a principal lacuna de segurança do MVP | Em aberto |
 | Computação em nuvem | AWS Academy com Amazon EC2 | Hospedar frontend e backend | Ambiente concedido pela instituição, sem custo nem necessidade de orçamento | Outros provedores com camada gratuita | Disponibilidade imediata e verificada | Crédito de US$ 50 e sessão de 4 horas, conforme a Seção 3.7.3 | Selecionado, com EC2 confirmado |
 | Registro de imagens | Amazon ECR | Guardar as imagens de contêiner do pipeline | Integra-se ao EC2 sem credencial adicional, pelo papel de execução da instância | Construção local da imagem na própria instância | Rastreabilidade entre a imagem testada e a implantada | Disponibilidade no catálogo do laboratório ainda não confirmada | Selecionado |
@@ -2928,26 +3020,40 @@ A entidade **Interação** estabelece a ligação entre o usuário e as fontes c
 
 Por se tratar de um modelo conceitual, o diagrama não representa componentes técnicos, como API, pipeline de PLN, serviço de voz ou armazenamento de arquivos. Esses elementos pertencem à arquitetura da solução, descrita nas seções 2.4 e 3.8. A transformação deste modelo em um modelo lógico-relacional é apresentada nas subseções seguintes, que detalham os atributos das entidades, suas chaves primárias e estrangeiras, as tabelas associativas necessárias e as restrições de integridade correspondentes às cardinalidades apresentadas.
 
+Esse recorte permanece o do negócio, e não o da implementação: as subseções seguintes acrescentam estruturas que não são conceitos do domínio de portfólio — a avaliação da resposta, os eventos de uso da plataforma e o desdobramento de **Interação** em conversa e turno — sem que isso contradiga o diagrama acima. A relação entre cada entidade conceitual e as tabelas que a implementam está na tabela de correspondência da seção 3.6.4.
+
 ### 3.6.4 Modelo lógico-relacional
 
-O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas. Os atributos de cada tabela vêm da modelagem estática da seção 2.2.1, e os atributos da tabela `interacao` vêm dos elementos de auditoria exigidos pelos RNF04 e RNF09.
+O modelo lógico-relacional traduz o modelo conceitual para o paradigma relacional, tendo como alvo o PostgreSQL, sistema gerenciador de banco de dados definido na seção 2.5. A derivação seguiu as regras clássicas de mapeamento: cada entidade tornou-se uma tabela; cada relacionamento um-para-muitos tornou-se uma chave estrangeira no lado "muitos", com `NOT NULL` quando a cardinalidade mínima é 1; e cada relacionamento muitos-para-muitos tornou-se uma tabela associativa com chave primária composta pelas chaves estrangeiras das duas tabelas relacionadas.
 
-Além dos seis relacionamentos do diagrama conceitual, o modelo lógico incorpora três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no recorte conceitual, por serem indispensáveis ao domínio: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção dos perfis profissionais Diretor, PMO e Líder de Projeto, que preserva as personas e a relação de liderança (`lidera`) prevista no RF06. Os perfis não determinam autorização no RNF02, que exige somente autenticação por SSO. Dessa forma, o modelo lógico dá continuidade simultaneamente ao modelo conceitual desta seção e ao diagrama de classes da Sprint 1 sem acrescentar campos para autenticação.
+O modelo lógico é mais amplo que o recorte conceitual da seção 3.6.1, e essa diferença é deliberada. Ele incorpora, primeiro, três estruturas declaradas na modelagem estática da seção 2.2.1 que não aparecem no diagrama conceitual por não serem conceitos de negócio: a associação `acompanha` entre Usuário e Projeto, que define os destinatários da notificação proativa do RF05; a relação `notifica` entre Pendência e Usuário, materializada como registro dos envios realizados; e a distinção dos perfis profissionais Diretor, PMO e Líder de Projeto, que preserva as personas e a relação de liderança (`lidera`) prevista no RF06. Incorpora, em segundo lugar, as estruturas exigidas pelo fluxo conversacional e pelos controles de auditoria — conversa, mensagem, fonte da resposta, avaliação e evento de plataforma —, detalhadas mais adiante nesta subseção. Os perfis não determinam autorização no RNF02, que exige somente autenticação por SSO.
 
 <div align="center">
 <sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
-  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, artefato, campo_artefato, pendencia, interacao, interacao_artefato, usuario_projeto e notificacao"><br>
+  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, projeto_relacionado, artefato, campo_artefato, pendencia, usuario_projeto, conversa, mensagem, mensagem_fonte, avaliacao, evento_plataforma e notificacao"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
+
+#### Do conceito de Interação às tabelas `conversa` e `mensagem`
+
+A entidade conceitual **Interação** representa "uma solicitação realizada pelo usuário". No modelo lógico ela se desdobra em duas tabelas, por três razões que só aparecem quando se desce ao nível da implementação.
+
+A primeira é que o produto não trata solicitações isoladas, e sim **conversas**: a interface mantém uma barra lateral de conversas anteriores e envia um identificador de conversa a cada mensagem. Sem uma tabela que represente esse agrupamento, o histórico não teria onde existir.
+
+A segunda é que a solicitação e a resposta precisam ser **registros de mesma natureza**. Uma tabela com uma linha por solicitação obriga a tratar a resposta como atributo da pergunta, o que impede atribuir a ela fontes, tempo de processamento e avaliação próprios. Modelando cada turno como uma linha — distinguida pela coluna `papel`, com valores `usuario` e `agente`, e ordenada por `ordem` dentro da conversa — pergunta e resposta ganham identidade própria, e as fontes passam a pender da resposta que elas fundamentam, que é onde o RF03 e o RNF12 as exigem.
+
+A terceira é que o **texto da resposta precisa ser persistido**. O RNF12 estabelece que as afirmações factuais da resposta devem ser confrontadas com as fontes citadas, e o RNF04 exige que a interação permita relacionar "a resposta ou resultado". Um atributo categórico de desfecho — `sucesso`, `esclarecimento`, `recusada`, `falha` — informa como a solicitação terminou, mas não guarda o que foi afirmado ao usuário, e portanto não sustenta nenhuma das duas verificações. A coluna `mensagem.conteudo` guarda o texto de ambos os papéis: o prompt digitado, a transcrição do áudio enviado ou a resposta gerada.
+
+#### Correspondência entre as modelagens
 
 A tabela a seguir registra a correspondência entre cada elemento das modelagens anteriores e a estrutura relacional que o implementa, evidenciando que nenhuma regra de negócio foi perdida na tradução:
 
 | Elemento de origem | Estrutura relacional | Regra de derivação aplicada |
 |---|---|---|
 | Entidade **Usuário** e especializações (2.2.1) | Tabela `usuario` com coluna `perfil` | Especializações sem atributos próprios colapsadas em coluna de domínio restrito por `CHECK` (decisão 1 da seção 3.6.7) |
-| Entidade **Interação** | Tabela `interacao` | Entidade para tabela; atributos definidos pelos RNF04 e RNF09 |
-| **Usuário realiza Interação** `(0,n)`–`(1,1)` | `interacao.usuario_id NOT NULL` | Um-para-muitos vira chave estrangeira no lado "muitos"; mínimo 1 vira `NOT NULL` |
-| **Interação consulta Artefato** `(0,n)`–`(0,n)` | Tabela associativa `interacao_artefato` | Muitos-para-muitos vira tabela associativa com chave primária composta |
+| Entidade **Interação** | Tabelas `conversa` e `mensagem` | Entidade desdobrada em agrupamento e turno, conforme a justificativa acima (decisão 8 da seção 3.6.7) |
+| **Usuário realiza Interação** `(0,n)`–`(1,1)` | `conversa.usuario_id NOT NULL` | Um-para-muitos vira chave estrangeira no lado "muitos"; mínimo 1 vira `NOT NULL`. A autoria da mensagem é herdada da conversa, evitando repetir o usuário em cada turno |
+| **Interação consulta Artefato** `(0,n)`–`(0,n)` | Tabela `mensagem_fonte` | Muitos-para-muitos materializado com atributos próprios de posição, score e cópia dos metadados (decisão 9 da seção 3.6.7) |
 | **Artefato documenta/pertence a Projeto** `(1,1)`–`(0,n)` | `artefato.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
 | **Artefato possui Campo Artefato** `(1,n)`–`(1,1)` | `campo_artefato.artefato_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata e unicidade de `nome` por artefato |
 | **Projeto pertence a Portfólio** `(1,1)`–`(1,n)` | `projeto.portfolio_id NOT NULL` | Um-para-muitos vira chave estrangeira |
@@ -2955,16 +3061,19 @@ A tabela a seguir registra a correspondência entre cada elemento das modelagens
 | **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
 | **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
 | **Pendência notifica Usuário** (2.2.1) | Tabela `notificacao` | Muitos-para-muitos materializado como registro de envio, com atributo próprio `data_envio` (decisão 3 da seção 3.6.7) |
+| Atributo de avaliação da Interação | Tabela `avaliacao` | Atributo promovido a entidade por possuir autor, instante e alvo próprios (decisão 10 da seção 3.6.7) |
+| Uso da plataforma fora do agente | Tabela `evento_plataforma` | Estrutura nova, exigida pelo RNF09 e sem correspondência no recorte conceitual (decisão 11 da seção 3.6.7) |
+| Dependências entre projetos declaradas na base | Tabela `projeto_relacionado` | Auto-relacionamento muitos-para-muitos sobre `projeto` (decisão 12 da seção 3.6.7) |
 
 As cardinalidades mínimas do lado "muitos" — um portfólio reúne ao menos um projeto `(1,n)` e um artefato possui ao menos um campo `(1,n)` — não são expressáveis por restrições declarativas simples no modelo relacional, pois exigiriam verificação no momento da inserção da linha "pai". Essas duas regras permanecem documentadas como restrições de aplicação, a serem garantidas pela camada de serviços descrita na seção 2.4.
 
 ### 3.6.5 Dicionário de dados (modelo físico)
 
-O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. Todas as chaves primárias substitutas usam `INTEGER GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais.
+O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. As chaves primárias substitutas usam `INTEGER` ou `BIGINT GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais; a exceção é `conversa`, cuja chave é `UUID` pela razão registrada na decisão 8 da seção 3.6.7.
 
-As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente (portfólios, projetos, usuários, artefatos, campos e pendências), e o schema **`auditoria`** reúne os registros de interação, fontes consultadas e notificações, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
+As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente, e o schema **`auditoria`** reúne os registros de conversa, mensagem, fonte, avaliação, evento e notificação, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
 
-**`portfolio`** — agrupamento de projetos de um exercício:
+**`portfolio.portfolio`** — agrupamento de projetos de um exercício:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
@@ -2972,41 +3081,56 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
 | `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
 
-**`usuario`** — profissional autorizado a utilizar o agente:
+**`portfolio.usuario`** — profissional autorizado a utilizar o agente:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `id` | `INTEGER` | `PK`, identity | Identificador único do usuário |
+| `auth_user_id` | `UUID` | `UNIQUE` | Identidade no provedor de SSO. Nula até a implementação do RNF02 (decisão 13 da seção 3.6.7) |
 | `nome` | `TEXT` | `NOT NULL` | Nome do profissional |
 | `email` | `TEXT` | `NOT NULL`, `UNIQUE` | Endereço corporativo de envio das notificações |
 | `perfil` | `TEXT` | `NOT NULL`, `CHECK IN ('diretor', 'pmo', 'lider_projeto')` | Perfil profissional usado nas personas e relações do domínio; não concede permissões distintas no RNF02 |
+| `ativo` | `BOOLEAN` | `NOT NULL`, `DEFAULT TRUE` | Desligamento lógico, preservando as conversas e a trilha do usuário |
+| `criado_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do cadastro |
 
-**`projeto`** — empreendimento acompanhado pelo PMO:
+**`portfolio.projeto`** — empreendimento acompanhado pelo PMO:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `id` | `INTEGER` | `PK`, identity | Identificador único do projeto |
 | `codigo` | `TEXT` | `NOT NULL`, `UNIQUE` | Código institucional do empreendimento (chave natural) |
 | `nome` | `TEXT` | `NOT NULL` | Denominação do empreendimento |
-| `status` | `TEXT` | `NOT NULL` | Situação corrente do projeto |
+| `fase` | `TEXT` | `NOT NULL` | Fase do ciclo de vida: Iniciação, Execução, Encerramento |
+| `status` | `TEXT` | `NOT NULL` | Situação corrente apurada pelo PMO |
 | `data_inicio` | `DATE` | — | Data de início da execução |
 | `data_termino_prevista` | `DATE` | — | Data prevista de conclusão, base da apuração de prazos |
-| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física |
+| `percentual_previsto` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Avanço planejado para a data de referência |
+| `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física realizado |
+| `desvio_pp` | `NUMERIC(6,2)` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Desvio em pontos percentuais entre realizado e previsto (decisão 2 da seção 3.6.7) |
 | `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
 | `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
 
-**`artefato`** — documento que integra a documentação do projeto:
+**`portfolio.projeto_relacionado`** — dependências declaradas entre projetos:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto de origem da relação |
+| `relacionado_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE`, `CHECK (<> projeto_id)` | Projeto relacionado |
+| `relacao` | `TEXT` | `NOT NULL` | Natureza da dependência, como fornecimento de dados ou compartilhamento de recurso |
+
+**`portfolio.artefato`** — documento que integra a documentação do projeto:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `id` | `INTEGER` | `PK`, identity | Identificador único do artefato |
 | `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto documentado (composição) |
-| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, como ata, relatório ou contrato |
-| `referencia` | `TEXT` | `NOT NULL` | Localizador do documento no repositório, exibido como fonte no RF03 |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza do documento, alinhada ao metadado `tipo_documento` do índice vetorial |
+| `referencia` | `TEXT` | `NOT NULL`, `UNIQUE (projeto_id, referencia)` | Caminho relativo do documento no repositório, exibido como fonte no RF03 |
+| `titulo` | `TEXT` | — | Denominação legível do documento |
 | `data` | `TIMESTAMPTZ` | `NOT NULL` | Data da última atualização, exibida junto à fonte no RF03 |
 | `versao` | `TEXT` | — | Versão vigente do documento |
 
-**`campo_artefato`** — campo individual de um artefato:
+**`portfolio.campo_artefato`** — campo individual de um artefato:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
@@ -3017,46 +3141,106 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `obrigatorio` | `BOOLEAN` | `NOT NULL`, `DEFAULT FALSE` | Indica se o preenchimento é exigido |
 | `preenchido` | `BOOLEAN` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Derivada de `valor`, elimina inconsistência entre valor e marcação (decisão 2 da seção 3.6.7) |
 
-**`pendencia`** — item em aberto originado por um projeto:
+**`portfolio.pendencia`** — item em aberto originado por um projeto:
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `id` | `INTEGER` | `PK`, identity | Identificador único da pendência |
 | `projeto_id` | `INTEGER` | `FK → projeto`, `NOT NULL`, `ON DELETE CASCADE` | Projeto de origem (composição) |
-| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência, como prazo, documento ou aprovação; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `codigo` | `TEXT` | `UNIQUE (projeto_id, codigo)` | Identificador do item na planilha de origem |
+| `tipo` | `TEXT` | `NOT NULL` | Natureza da pendência; domínio exemplificativo mantido aberto, conforme a seção 2.2.1 |
+| `titulo` | `TEXT` | `NOT NULL` | Enunciado curto do item |
 | `descricao` | `TEXT` | `NOT NULL` | Detalhamento do item em aberto |
+| `criticidade` | `TEXT` | — | Grau de criticidade apurado pelo PMO |
+| `responsavel` | `TEXT` | — | Área responsável pelo tratamento |
+| `acao_resposta` | `TEXT` | — | Ação de resposta planejada |
 | `prazo` | `DATE` | — | Data limite para tratamento, base da notificação do RF05 |
-| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'resolvida')` | Estado corrente da pendência |
+| `situacao` | `TEXT` | `NOT NULL`, `DEFAULT 'aberta'`, `CHECK IN ('aberta', 'em_tratamento', 'materializada', 'resolvida')` | Estado corrente da pendência (decisão 14 da seção 3.6.7) |
 
-**`auditoria.interacao`** — registro de auditoria de cada solicitação (RNF04 e RNF09):
-
-| Coluna | Tipo | Restrições | Finalidade |
-|---|---|---|---|
-| `id` | `INTEGER` | `PK`, identity | Identificador único do evento |
-| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Usuário que realizou a interação |
-| `data_hora` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do evento |
-| `canal` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'voz')` | Canal utilizado, conforme o RF01 |
-| `texto_solicitacao` | `TEXT` | `NOT NULL` | Texto da solicitação (original ou transcrito do áudio) |
-| `audio_referencia` | `TEXT` | `CHECK` (preenchida apenas quando `canal = 'voz'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4), vinculando o registro ao arquivo original |
-| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1 | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
-| `resultado` | `TEXT` | `NOT NULL`, `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')` | Desfecho da solicitação |
-| `categoria_erro` | `TEXT` | — | Categoria do erro, quando aplicável (RNF09) |
-| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)` | Tempo de processamento, insumo da verificação do RNF01 |
-| `feedback_usuario` | `TEXT` | — | Avaliação da resposta fornecida pelo usuário, capturada pelo componente Auditoria e Feedback da seção 2.4 |
-
-**`auditoria.interacao_artefato`** — fontes consultadas em cada interação (associativa de `consulta`):
-
-| Coluna | Tipo | Restrições | Finalidade |
-|---|---|---|---|
-| `interacao_id` | `INTEGER` | `PK` composta, `FK → interacao` | Interação que consultou a fonte |
-| `artefato_id` | `INTEGER` | `PK` composta, `FK → artefato` | Artefato que fundamentou a resposta (RF03) |
-
-**`usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
+**`portfolio.usuario_projeto`** — projetos acompanhados por cada usuário (associativa de `acompanha`):
 
 | Coluna | Tipo | Restrições | Finalidade |
 |---|---|---|---|
 | `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
 | `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`auditoria.conversa`** — sequência de turnos entre um usuário e o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `UUID` | `PK`, `DEFAULT gen_random_uuid()` | Identificador da conversa, gerado pelo cliente (decisão 8 da seção 3.6.7) |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Autor da conversa; a autoria dos turnos é herdada daqui |
+| `titulo` | `TEXT` | — | Rótulo exibido na barra lateral, derivado da primeira mensagem |
+| `criada_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento de abertura |
+| `atualizada_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do último turno, mantido por gatilho |
+| `arquivada_em` | `TIMESTAMPTZ` | — | Exclusão lógica. A linha permanece para atender à retenção do RNF09 |
+
+**`auditoria.mensagem`** — turno da conversa, do usuário ou do agente (RNF04 e RNF09):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `BIGINT` | `PK`, identity | Identificador único do turno |
+| `conversa_id` | `UUID` | `FK → conversa`, `NOT NULL` | Conversa à qual o turno pertence |
+| `ordem` | `INTEGER` | `NOT NULL`, `CHECK (> 0)`, `UNIQUE (conversa_id, ordem)` | Posição do turno na conversa |
+| `papel` | `TEXT` | `NOT NULL`, `CHECK IN ('usuario', 'agente')` | Autor do turno |
+| `formato` | `TEXT` | `NOT NULL`, `CHECK IN ('texto', 'audio')` | Modalidade de entrada ou de saída, conforme o RF01 |
+| `conteudo` | `TEXT` | `NOT NULL` | Texto do prompt, da transcrição ou da resposta |
+| `audio_referencia` | `TEXT` | `CHECK` (apenas quando `formato = 'audio'`) | Identificador do áudio no armazenamento de objetos (`audio_id` da API da seção 3.4) |
+| `audio_duracao_s` | `NUMERIC(8,2)` | `CHECK (>= 0)` | Duração do áudio, insumo do RNF06 |
+| `transcricao_confianca` | `NUMERIC(5,4)` | `CHECK (BETWEEN 0 AND 1)` | Confiança devolvida pelo serviço de transcrição (RNF06) |
+| `intencao` | `TEXT` | `CHECK` contra o catálogo da seção 3.1; apenas `papel = 'usuario'` | Intenção identificada pelo pipeline de PLN; nula quando a classificação falha |
+| `confianca_intencao` | `NUMERIC(5,4)` | `CHECK (BETWEEN 0 AND 1)`; apenas `papel = 'usuario'` | Confiança da classificação, base do limiar do RNF03 |
+| `resultado` | `TEXT` | `CHECK IN ('sucesso', 'esclarecimento', 'recusada', 'falha')`; obrigatório em `papel = 'agente'` | Desfecho da solicitação |
+| `categoria_erro` | `TEXT` | apenas `papel = 'agente'` | Categoria do erro, quando aplicável (RNF09) |
+| `modelo` | `TEXT` | apenas `papel = 'agente'` | Modelo de linguagem que gerou a resposta |
+| `tempo_processamento_ms` | `INTEGER` | `CHECK (>= 0)`; apenas `papel = 'agente'` | Tempo de processamento, insumo da verificação do RNF01 |
+| `criada_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Data e hora do turno |
+
+Duas restrições de tabela garantem a coerência entre papel e colunas: `mensagem_audio_coerente` impede referenciar áudio em mensagem de texto, e `mensagem_papel_coerente` anula, em cada papel, as colunas que pertencem ao outro — de modo que o banco não admite uma resposta do agente com intenção classificada nem um prompt do usuário com tempo de processamento.
+
+**`auditoria.mensagem_fonte`** — fontes que fundamentaram uma resposta (associativa de `consulta`):
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `BIGINT` | `PK`, identity | Identificador único da citação |
+| `mensagem_id` | `BIGINT` | `FK → mensagem`, `NOT NULL`, `ON DELETE CASCADE` | Resposta que citou a fonte |
+| `posicao` | `INTEGER` | `NOT NULL`, `CHECK (> 0)`, `UNIQUE (mensagem_id, posicao)` | Ordem de relevância devolvida pelo recuperador |
+| `chunk_id` | `TEXT` | `NOT NULL`, `UNIQUE (mensagem_id, chunk_id)` | Identificador do trecho no índice vetorial, sem chave estrangeira (decisão 9 da seção 3.6.7) |
+| `score` | `NUMERIC(7,6)` | — | Similaridade apurada na recuperação |
+| `artefato_id` | `INTEGER` | `FK → artefato` | Artefato correspondente, quando existe (RF03) |
+| `projeto_codigo` | `TEXT` | — | Cópia do projeto de origem no momento da resposta |
+| `tipo_documento` | `TEXT` | — | Cópia do tipo do documento no momento da resposta |
+| `arquivo_origem` | `TEXT` | `NOT NULL` | Cópia do localizador do documento no momento da resposta |
+| `secao` | `TEXT` | — | Cópia da seção do documento no momento da resposta |
+| `trecho` | `TEXT` | — | Cópia do texto citado, base da verificação do RNF12 |
+
+**`auditoria.avaliacao`** — juízo do usuário sobre uma resposta ou sobre a conversa:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `BIGINT` | `PK`, identity | Identificador único da avaliação |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Autor da avaliação |
+| `conversa_id` | `UUID` | `FK → conversa` | Alvo, quando a avaliação recai sobre a conversa inteira |
+| `mensagem_id` | `BIGINT` | `FK → mensagem` | Alvo, quando a avaliação recai sobre uma resposta |
+| `polaridade` | `TEXT` | `CHECK IN ('positiva', 'negativa')` | Juízo binário, correspondente ao polegar da interface |
+| `nota` | `SMALLINT` | `CHECK (BETWEEN 1 AND 5)` | Juízo graduado |
+| `motivo` | `TEXT` | `CHECK` contra domínio fechado de sete valores | Categoria da avaliação, base da análise agregada |
+| `comentario` | `TEXT` | — | Justificativa livre |
+| `criada_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento da avaliação |
+
+Duas restrições delimitam o registro: `avaliacao_alvo_unico` exige que a avaliação recaia sobre exatamente um alvo, mensagem ou conversa; e `avaliacao_tem_juizo` exige polaridade ou nota, impedindo que um comentário isolado seja contabilizado como avaliação. Dois índices únicos parciais garantem uma avaliação por usuário por alvo, de modo que reavaliar seja atualização e não acúmulo de linhas.
+
+**`auditoria.evento_plataforma`** — uso da plataforma fora do diálogo com o agente:
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `BIGINT` | `PK`, identity | Identificador único do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario` | Usuário do evento; nulo quando a identidade não foi resolvida |
+| `tipo` | `TEXT` | `NOT NULL`, `CHECK` contra domínio fechado de dez valores | Natureza do evento, de `login` a `erro_aplicacao` |
+| `conversa_id` | `UUID` | `FK → conversa` | Conversa envolvida, quando aplicável |
+| `origem` | `TEXT` | `CHECK IN ('web', 'api', 'agendador')` | Canal que originou o evento |
+| `detalhe` | `JSONB` | `NOT NULL`, `DEFAULT '{}'` | Contexto livre. Proibido armazenar senhas, tokens ou segredos (RNF09) |
+| `ocorrido_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do evento |
 
 **`auditoria.notificacao`** — registro dos envios da notificação proativa (materialização de `notifica`):
 
@@ -3065,15 +3249,28 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `id` | `INTEGER` | `PK`, identity | Identificador único do envio |
 | `pendencia_id` | `INTEGER` | `FK → pendencia`, `NOT NULL`, `ON DELETE CASCADE` | Pendência comunicada |
 | `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `UNIQUE (pendencia_id, usuario_id)` | Destinatário; a unicidade composta impede notificar duas vezes a mesma pendência ao mesmo usuário |
+| `canal` | `TEXT` | `NOT NULL`, `DEFAULT 'email'`, `CHECK IN ('email', 'interface')` | Meio pelo qual o alerta foi entregue |
 | `data_envio` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento do envio, exigido pelo RNF09 |
+
+#### Visões de leitura
+
+Duas visões evitam que cada consumidor reescreva as mesmas junções — e que cada um as escreva de forma diferente:
+
+| Visão | Conteúdo | Uso |
+|---|---|---|
+| `auditoria.vw_turno` | Um par prompt/resposta por linha, com intenção, desfecho, tempo, contagem de fontes e avaliação | Tela de histórico e inspeção do RNF04 |
+| `portfolio.vw_projeto_situacao` | Situação consolidada de cada projeto, com portfólio, líder, desvio, pendências abertas e artefatos | Consultas comparativas do RF02 |
 
 ### 3.6.6 Definição física em SQL
 
-A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5 — na nuvem, o serviço gerenciado correspondente do provedor escolhido na seção 3.7. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+A definição a seguir implementa o modelo no PostgreSQL, banco definido na seção 2.5. A ordem de criação respeita as dependências entre as tabelas, e os índices finais cobrem os acessos mais frequentes identificados nos cenários da seção 2.2.2.
+
+O script executável, com os comentários de justificativa por coluna, é [`src/database/01_create_database.sql`](../src/database/01_create_database.sql), e **é ele que vale como fonte de verdade**. O bloco abaixo é a transcrição do mesmo modelo, sem os comentários longos. A coerência entre os dois e o banco em execução é verificável por `scripts/verificar_modelo_documentado.py`, descrito ao final desta subseção. A pasta [`src/database`](../src/database/README.md) reúne também a carga inicial, as políticas de acesso e o roteiro de verificação.
 
 ```sql
 CREATE SCHEMA portfolio;
 CREATE SCHEMA auditoria;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE portfolio.portfolio (
     id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -3083,23 +3280,40 @@ CREATE TABLE portfolio.portfolio (
 );
 
 CREATE TABLE portfolio.usuario (
-    id     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome   TEXT NOT NULL,
-    email  TEXT NOT NULL UNIQUE,
-    perfil TEXT NOT NULL CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto'))
+    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    auth_user_id UUID UNIQUE,
+    nome         TEXT NOT NULL,
+    email        TEXT NOT NULL UNIQUE,
+    perfil       TEXT NOT NULL
+                 CHECK (perfil IN ('diretor', 'pmo', 'lider_projeto')),
+    ativo        BOOLEAN     NOT NULL DEFAULT TRUE,
+    criado_em    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE portfolio.projeto (
     id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     codigo                TEXT NOT NULL UNIQUE,
     nome                  TEXT NOT NULL,
+    fase                  TEXT NOT NULL,
     status                TEXT NOT NULL,
     data_inicio           DATE,
     data_termino_prevista DATE,
+    percentual_previsto   NUMERIC(5,2) NOT NULL DEFAULT 0
+                          CHECK (percentual_previsto BETWEEN 0 AND 100),
     percentual_avanco     NUMERIC(5,2) NOT NULL DEFAULT 0
                           CHECK (percentual_avanco BETWEEN 0 AND 100),
+    desvio_pp             NUMERIC(6,2) GENERATED ALWAYS AS
+                          (percentual_avanco - percentual_previsto) STORED,
     portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
     lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
+);
+
+CREATE TABLE portfolio.projeto_relacionado (
+    projeto_id     INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    relacionado_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    relacao        TEXT    NOT NULL,
+    PRIMARY KEY (projeto_id, relacionado_id),
+    CHECK (projeto_id <> relacionado_id)
 );
 
 CREATE TABLE portfolio.artefato (
@@ -3107,8 +3321,10 @@ CREATE TABLE portfolio.artefato (
     projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
     tipo       TEXT NOT NULL,
     referencia TEXT NOT NULL,
+    titulo     TEXT,
     data       TIMESTAMPTZ NOT NULL,
-    versao     TEXT
+    versao     TEXT,
+    UNIQUE (projeto_id, referencia)
 );
 
 CREATE TABLE portfolio.campo_artefato (
@@ -3123,13 +3339,20 @@ CREATE TABLE portfolio.campo_artefato (
 );
 
 CREATE TABLE portfolio.pendencia (
-    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
-    tipo       TEXT NOT NULL,
-    descricao  TEXT NOT NULL,
-    prazo      DATE,
-    situacao   TEXT NOT NULL DEFAULT 'aberta'
-               CHECK (situacao IN ('aberta', 'em_tratamento', 'resolvida'))
+    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    projeto_id    INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
+    codigo        TEXT,
+    tipo          TEXT NOT NULL,
+    titulo        TEXT NOT NULL,
+    descricao     TEXT NOT NULL,
+    criticidade   TEXT,
+    responsavel   TEXT,
+    acao_resposta TEXT,
+    prazo         DATE,
+    situacao      TEXT NOT NULL DEFAULT 'aberta'
+                  CHECK (situacao IN ('aberta', 'em_tratamento',
+                                      'materializada', 'resolvida')),
+    UNIQUE (projeto_id, codigo)
 );
 
 CREATE TABLE portfolio.usuario_projeto (
@@ -3138,13 +3361,25 @@ CREATE TABLE portfolio.usuario_projeto (
     PRIMARY KEY (usuario_id, projeto_id)
 );
 
-CREATE TABLE auditoria.interacao (
-    id                     INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    usuario_id             INTEGER NOT NULL REFERENCES portfolio.usuario (id),
-    data_hora              TIMESTAMPTZ NOT NULL DEFAULT now(),
-    canal                  TEXT NOT NULL CHECK (canal IN ('texto', 'voz')),
-    texto_solicitacao      TEXT NOT NULL,
-    audio_referencia       TEXT CHECK (audio_referencia IS NULL OR canal = 'voz'),
+CREATE TABLE auditoria.conversa (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    usuario_id    INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    titulo        TEXT,
+    criada_em     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizada_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+    arquivada_em  TIMESTAMPTZ
+);
+
+CREATE TABLE auditoria.mensagem (
+    id                     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    conversa_id            UUID    NOT NULL REFERENCES auditoria.conversa (id),
+    ordem                  INTEGER NOT NULL CHECK (ordem > 0),
+    papel                  TEXT    NOT NULL CHECK (papel IN ('usuario', 'agente')),
+    formato                TEXT    NOT NULL CHECK (formato IN ('texto', 'audio')),
+    conteudo               TEXT    NOT NULL,
+    audio_referencia       TEXT,
+    audio_duracao_s        NUMERIC(8,2) CHECK (audio_duracao_s >= 0),
+    transcricao_confianca  NUMERIC(5,4) CHECK (transcricao_confianca BETWEEN 0 AND 1),
     intencao               TEXT CHECK (intencao IN (
                                'consultar_documentos_normativos',
                                'consultar_projeto_sintetico',
@@ -3156,41 +3391,139 @@ CREATE TABLE auditoria.interacao (
                                'analisar_completude_coerencia',
                                'gerar_alertas_pendencias',
                                'fora_do_catalogo')),
-    resultado              TEXT NOT NULL CHECK (resultado IN
+    confianca_intencao     NUMERIC(5,4) CHECK (confianca_intencao BETWEEN 0 AND 1),
+    resultado              TEXT CHECK (resultado IN
                                ('sucesso', 'esclarecimento', 'recusada', 'falha')),
     categoria_erro         TEXT,
+    modelo                 TEXT,
     tempo_processamento_ms INTEGER CHECK (tempo_processamento_ms >= 0),
-    feedback_usuario       TEXT
+    criada_em              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (conversa_id, ordem),
+    CONSTRAINT mensagem_audio_coerente CHECK (
+        (formato = 'audio') OR
+        (audio_referencia IS NULL AND audio_duracao_s IS NULL
+         AND transcricao_confianca IS NULL)
+    ),
+    CONSTRAINT mensagem_papel_coerente CHECK (
+        CASE papel
+            WHEN 'usuario' THEN
+                resultado IS NULL AND categoria_erro IS NULL
+                AND modelo IS NULL AND tempo_processamento_ms IS NULL
+            WHEN 'agente' THEN
+                intencao IS NULL AND confianca_intencao IS NULL
+                AND resultado IS NOT NULL
+        END
+    )
 );
 
-CREATE TABLE auditoria.interacao_artefato (
-    interacao_id INTEGER NOT NULL REFERENCES auditoria.interacao (id),
-    artefato_id  INTEGER NOT NULL REFERENCES portfolio.artefato (id),
-    PRIMARY KEY (interacao_id, artefato_id)
+CREATE TABLE auditoria.mensagem_fonte (
+    id             BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    mensagem_id    BIGINT  NOT NULL REFERENCES auditoria.mensagem (id) ON DELETE CASCADE,
+    posicao        INTEGER NOT NULL CHECK (posicao > 0),
+    chunk_id       TEXT    NOT NULL,
+    score          NUMERIC(7,6),
+    artefato_id    INTEGER REFERENCES portfolio.artefato (id),
+    projeto_codigo TEXT,
+    tipo_documento TEXT,
+    arquivo_origem TEXT NOT NULL,
+    secao          TEXT,
+    trecho         TEXT,
+    UNIQUE (mensagem_id, chunk_id),
+    UNIQUE (mensagem_id, posicao)
+);
+
+CREATE TABLE auditoria.avaliacao (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id  INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    conversa_id UUID   REFERENCES auditoria.conversa (id),
+    mensagem_id BIGINT REFERENCES auditoria.mensagem (id),
+    polaridade  TEXT CHECK (polaridade IN ('positiva', 'negativa')),
+    nota        SMALLINT CHECK (nota BETWEEN 1 AND 5),
+    motivo      TEXT CHECK (motivo IN (
+                    'resposta_incorreta', 'fonte_irrelevante',
+                    'resposta_incompleta', 'nao_entendeu_pergunta',
+                    'demorou_demais', 'resposta_util', 'outro')),
+    comentario  TEXT,
+    criada_em   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT avaliacao_alvo_unico
+        CHECK (num_nonnulls(conversa_id, mensagem_id) = 1),
+    CONSTRAINT avaliacao_tem_juizo
+        CHECK (polaridade IS NOT NULL OR nota IS NOT NULL)
+);
+
+CREATE UNIQUE INDEX uq_avaliacao_mensagem
+    ON auditoria.avaliacao (usuario_id, mensagem_id) WHERE mensagem_id IS NOT NULL;
+CREATE UNIQUE INDEX uq_avaliacao_conversa
+    ON auditoria.avaliacao (usuario_id, conversa_id) WHERE conversa_id IS NOT NULL;
+
+CREATE TABLE auditoria.evento_plataforma (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id  INTEGER REFERENCES portfolio.usuario (id),
+    tipo        TEXT NOT NULL CHECK (tipo IN (
+                    'login', 'login_falho', 'logout',
+                    'conversa_criada', 'conversa_renomeada',
+                    'conversa_arquivada', 'conversa_exportada',
+                    'audio_enviado', 'audio_recusado', 'erro_aplicacao')),
+    conversa_id UUID REFERENCES auditoria.conversa (id),
+    origem      TEXT CHECK (origem IN ('web', 'api', 'agendador')),
+    detalhe     JSONB NOT NULL DEFAULT '{}'::jsonb,
+    ocorrido_em TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE auditoria.notificacao (
     id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     pendencia_id INTEGER NOT NULL REFERENCES portfolio.pendencia (id) ON DELETE CASCADE,
     usuario_id   INTEGER NOT NULL REFERENCES portfolio.usuario (id),
+    canal        TEXT NOT NULL DEFAULT 'email'
+                 CHECK (canal IN ('email', 'interface')),
     data_envio   TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (pendencia_id, usuario_id)
 );
 
 -- Proteção dos registros de auditoria (RNF09)
-REVOKE UPDATE, DELETE ON auditoria.interacao, auditoria.interacao_artefato,
-                        auditoria.notificacao FROM PUBLIC;
+REVOKE UPDATE, DELETE ON auditoria.mensagem, auditoria.mensagem_fonte,
+                         auditoria.evento_plataforma, auditoria.notificacao
+    FROM PUBLIC;
+REVOKE DELETE ON auditoria.conversa, auditoria.avaliacao FROM PUBLIC;
 
--- Exceção pontual: a avaliação do usuário chega depois da resposta, portanto
--- o papel da aplicação recebe permissão de atualização restrita a essa coluna:
--- GRANT UPDATE (feedback_usuario) ON auditoria.interacao TO <papel_da_aplicacao>;
+-- As duas atualizações permitidas, concedidas em nível de coluna ao papel da
+-- aplicação em 03_rls_policies.sql, não reescrevem nenhum registro:
+-- GRANT UPDATE (titulo, atualizada_em, arquivada_em)  ON auditoria.conversa  TO az1_app;
+-- GRANT UPDATE (polaridade, nota, motivo, comentario) ON auditoria.avaliacao TO az1_app;
 
 -- Índices dos acessos frequentes dos cenários da seção 2.2.2
+CREATE INDEX idx_projeto_portfolio       ON portfolio.projeto (portfolio_id);
+CREATE INDEX idx_projeto_lider           ON portfolio.projeto (lider_id);
 CREATE INDEX idx_artefato_projeto        ON portfolio.artefato (projeto_id);
 CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_id);
 CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo);
-CREATE INDEX idx_interacao_usuario_data  ON auditoria.interacao (usuario_id, data_hora);
+CREATE INDEX idx_pendencia_projeto       ON portfolio.pendencia (projeto_id);
+CREATE INDEX idx_conversa_usuario_recente
+    ON auditoria.conversa (usuario_id, atualizada_em DESC)
+    WHERE arquivada_em IS NULL;
+CREATE INDEX idx_mensagem_conversa_ordem ON auditoria.mensagem (conversa_id, ordem);
+CREATE INDEX idx_mensagem_criada_em      ON auditoria.mensagem (criada_em);
+CREATE INDEX idx_mensagem_intencao       ON auditoria.mensagem (intencao)
+    WHERE intencao IS NOT NULL;
+CREATE INDEX idx_mensagem_fonte_mensagem ON auditoria.mensagem_fonte (mensagem_id);
+CREATE INDEX idx_mensagem_fonte_chunk    ON auditoria.mensagem_fonte (chunk_id);
+CREATE INDEX idx_mensagem_fonte_artefato ON auditoria.mensagem_fonte (artefato_id)
+    WHERE artefato_id IS NOT NULL;
+CREATE INDEX idx_evento_usuario_data     ON auditoria.evento_plataforma (usuario_id, ocorrido_em);
+CREATE INDEX idx_evento_tipo_data        ON auditoria.evento_plataforma (tipo, ocorrido_em);
 ```
+
+O gatilho `trg_mensagem_toca_conversa` mantém `conversa.atualizada_em` alinhada ao instante do último turno, de modo que a ordenação da barra lateral não dependa de a aplicação lembrar de atualizar a coluna. As visões `auditoria.vw_turno` e `portfolio.vw_projeto_situacao`, descritas na seção 3.6.5, são criadas na sequência.
+
+#### Verificação da coerência entre documento, script e banco
+
+O risco desta subseção é conhecido: uma definição transcrita em documento envelhece em silêncio quando o banco muda. Para que a divergência apareça como falha, e não como surpresa em uma sprint futura, o script `scripts/verificar_modelo_documentado.py` extrai o bloco SQL acima, extrai o de `src/database/01_create_database.sql` e compara ambos com o `information_schema` do banco em execução, apontando tabelas e colunas presentes em um lado e ausentes no outro:
+
+```bash
+python scripts/verificar_modelo_documentado.py
+```
+
+A verificação faz parte do procedimento de teste do RNF04 e integra o caso `TI-29` da seção 6.4.4.
 
 ### 3.6.7 Decisões de modelagem e restrições de integridade
 
@@ -3198,41 +3531,59 @@ As decisões estruturais do modelo, com as alternativas consideradas e as razõe
 
 **Decisão 1 — Perfis de usuário por coluna de domínio, e não por tabelas de subtipo.** A generalização de Usuário da seção 2.2.1 poderia ser mapeada em tabelas de subtipo (`diretor`, `pmo`, `lider_projeto` com chave primária compartilhada). A opção pela coluna `perfil` com `CHECK` preserva a classificação profissional usada pelas personas e pelas relações do domínio sem criar tabelas de subtipo vazias. O líder continua relacionado aos projetos pela chave `projeto.lider_id` e pelo vínculo de `usuario_projeto`; diretor e PMO permanecem como perfis descritivos. Nenhum desses valores concede permissões diferentes: o RNF02 limita-se à autenticação por SSO, e a identificação administrativa prevista no RNF09 é fornecida pelo mecanismo de autenticação.
 
-**Decisão 2 — `preenchido` como coluna gerada.** Se `preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, preservando o atributo declarado na seção 2.2.1 como consultável e garantindo a confiabilidade da identificação de campos pendentes, que alimenta o RF04 e o RF05.
+**Decisão 2 — Colunas derivadas geradas pelo banco.** Se `campo_artefato.preenchido` fosse um booleano comum, o banco admitiria estados inconsistentes, como um campo com valor registrado e marcado como não preenchido. Como coluna gerada a partir de `valor`, a marcação é sempre verdadeira por construção, o que garante a confiabilidade da identificação de campos pendentes que alimenta o RF04 e o RF05. O mesmo raciocínio se aplica a `projeto.desvio_pp`, derivada de `percentual_avanco` e `percentual_previsto`: é o número que a persona do Diretor pede diretamente na jornada 1.5.1, e mantê-lo como coluna comum permitiria que divergisse das duas colunas que o produzem.
 
 **Decisão 3 — `notificacao` como registro de envio.** A relação `notifica` poderia ser apenas derivada: os destinatários de uma pendência são os usuários que acompanham o projeto de origem. A materialização em tabela foi escolhida porque o RNF09 exige o registro dos eventos de notificação, e porque a unicidade composta `(pendencia_id, usuario_id)` dá ao Agendador do cenário 3 um critério idempotente, impedindo que a mesma pendência seja comunicada repetidamente ao mesmo usuário a cada verificação periódica.
 
-**Decisão 4 — Intenção como domínio de coluna, e não como tabela.** O catálogo de intenções da seção 3.1 poderia ser normalizado em uma tabela própria. A opção pelo `CHECK` na coluna `interacao.intencao` mantém a coerência com a delimitação do modelo conceitual, que tratou intenção como conceito da camada técnica de PLN, e não como entidade do domínio de portfólio. O custo da escolha é que a evolução do catálogo exige alteração da restrição; o benefício é não introduzir no banco uma entidade sem respaldo nas modelagens anteriores. A restrição deve ser mantida sincronizada com o catálogo da seção 3.1.
+**Decisão 4 — Intenção como domínio de coluna, e não como tabela.** O catálogo de intenções da seção 3.1 poderia ser normalizado em uma tabela própria. A opção pelo `CHECK` na coluna `mensagem.intencao` mantém a coerência com a delimitação do modelo conceitual, que tratou intenção como conceito da camada técnica de PLN, e não como entidade do domínio de portfólio. O custo da escolha é que a evolução do catálogo exige alteração da restrição; o benefício é não introduzir no banco uma entidade sem respaldo nas modelagens anteriores. A restrição deve ser mantida sincronizada com o catálogo da seção 3.1 e com `pln/classificador.py`.
 
-**Decisão 5 — Chaves substitutas com chave natural preservada.** Todas as tabelas usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
+**Decisão 5 — Chaves substitutas com chave natural preservada.** As tabelas do domínio usam identificadores substitutos gerados pelo banco, o que mantém as chaves estrangeiras compactas e estáveis. O código institucional do projeto, único identificador declarado na seção 2.2.1, é preservado como restrição `UNIQUE`, permanecendo utilizável nas consultas por linguagem natural sem servir de chave de referência.
 
-**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.interacao_artefato` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: o relacionamento preserva a rastreabilidade do RNF04, enquanto o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a proteção exigida pelo RNF09. A única flexibilização é a coluna `feedback_usuario`, atualizável pelo papel da aplicação por meio de permissão em nível de coluna, pois a avaliação do usuário só existe depois de a resposta ter sido registrada.
+**Decisão 6 — Cascatas apenas nas composições, com exceção deliberada na auditoria.** As exclusões em cascata seguem exatamente a distinção entre agregação e composição da seção 2.2.1: excluir um projeto remove seus artefatos, campos e pendências, que não fazem sentido isoladamente; excluir um portfólio, por sua vez, é bloqueado enquanto houver projetos, pois o projeto mantém identidade própria. A exceção é a trilha de auditoria: `auditoria.mensagem_fonte` referencia `portfolio.artefato` sem cascata, de modo que um artefato citado como fonte de uma resposta registrada não pode ser excluído sem tratamento explícito. O comportamento é intencional: o relacionamento preserva a rastreabilidade do RNF04, enquanto o comando `REVOKE UPDATE, DELETE` sobre as tabelas de auditoria implementa a proteção exigida pelo RNF09.
 
-**Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de auditoria (`interacao`, `interacao_artefato` e `notificacao`) no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
+**Decisão 7 — Separação em schemas `portfolio` e `auditoria`.** O diagrama de componentes da seção 2.4 determina que os logs de auditoria sejam mantidos "separados dos dados operacionais para facilitar controle de acesso e auditoria", e o processo de deploy da seção 3.7 concentra a persistência em um banco relacional único. A separação por schema concilia as duas exigências: um único banco, com as tabelas operacionais no schema `portfolio` e as de trilha no schema `auditoria`, onde o controle de permissões pode ser aplicado ao schema inteiro sem afetar os dados de negócio. A tabela `notificacao` integra o schema de auditoria por ser um registro de envio: a seção 2.5 lista os alertas gerados entre as informações a auditar, e o Agendador do cenário 3 precisa apenas de inserção e leitura, operações compatíveis com a imutabilidade do schema.
 
-**Alinhamento com o estado da implementação.** Duas colunas de `auditoria.interacao` fecham lacunas registradas em outras frentes da equipe. A coluna `audio_referencia` guarda o identificador do áudio no armazenamento de objetos (o `audio_id` devolvido pela API da seção 3.4): a decisão registrada na seção 2.4 adiou a persistência do pipeline de voz exatamente porque "o PostgreSQL será provisionado e o schema de auditoria definido" em etapa posterior — este modelo define esse schema, e a coluna completa a rastreabilidade que hoje é parcial, ligando cada interação por voz ao arquivo original. A coluna `feedback_usuario` materializa a captura da avaliação do usuário atribuída ao componente Auditoria e Feedback na seção 2.4 e listada entre os registros previstos na seção 2.5.
+**Decisão 8 — Interação desdobrada em `conversa` e `mensagem`, com um turno por linha.** A alternativa era manter uma tabela única de interação, com uma linha por solicitação e a resposta como atributo dela. Foi descartada por três motivos, desenvolvidos na seção 3.6.4: o produto trabalha com conversas e não com solicitações isoladas; a resposta precisa de identidade própria para receber fontes, tempo e avaliação; e o texto da resposta precisa ser persistido, sem o que o RNF12 não é verificável. A chave de `conversa` é `UUID` porque o identificador nasce no cliente — a interface o gera antes de a primeira mensagem existir e o envia em cada requisição de chat —, de modo que uma chave sequencial gerada pelo banco exigiria uma ida e volta adicional apenas para descobrir o valor que o cliente já escolheu. A coerência entre papel e colunas é imposta pelo banco, e não pela aplicação: `mensagem_papel_coerente` recusa uma resposta do agente com intenção classificada e um prompt do usuário com tempo de processamento.
 
-**Limitação registrada — documentos normativos.** A intenção INT-01 do catálogo da seção 3.1 consulta conceitos e normativos de gestão de portfólio, documentos que não pertencem a nenhum projeto específico. Pelo modelo conceitual e pela seção 2.2.1, todo artefato compõe exatamente um projeto, portanto a base de normativos permanece fora do modelo relacional, no repositório de arquivos independente descrito na seção 2.5. Consequência assumida: a associação `interacao_artefato` registra as fontes de respostas sobre projetos, e a fonte de uma resposta normativa é registrada de forma textual no próprio registro da interação. Se a base de normativos evoluir para dado estruturado, a modelagem de uma entidade própria — ou de um artefato sem vínculo com projeto — deverá ser reavaliada junto com o modelo conceitual, para que as duas representações não divirjam.
+**Decisão 9 — Fonte registrada por cópia, e sem chave estrangeira para o índice vetorial.** O conteúdo dos documentos é recuperado do índice vetorial descrito na seção 2.5, no qual cada trecho é identificado por uma soma de verificação do próprio conteúdo. Declarar `mensagem_fonte.chunk_id` como chave estrangeira para esse índice foi considerado e descartado: reindexar um documento produz identificadores novos, e a restrição obrigaria a escolher entre impedir a reindexação e apagar registros de auditoria, ambas incompatíveis com a imutabilidade do RNF09. Pela mesma razão, os metadados da fonte — arquivo de origem, seção, projeto e o próprio trecho citado — são copiados no instante da resposta, e não lidos por junção: a fonte apresentada ao usuário precisa continuar legível na auditoria mesmo depois de o documento ser reindexado, movido ou retirado do índice. A coluna `artefato_id` permanece opcional, o que resolve a limitação registrada adiante nesta seção: uma resposta fundamentada em documento normativo, que não pertence a projeto algum, tem fonte registrada com vínculo relacional nulo e metadados preenchidos.
 
-**Normalização.** O modelo está na terceira forma normal: todas as tabelas têm chave primária definida, os atributos são atômicos e nenhum atributo não chave depende de outro atributo não chave. A única redundância existente é a coluna `preenchido`, que é derivada — e, por ser gerada pelo próprio banco, não constitui anomalia de atualização.
+**Decisão 10 — Avaliação como entidade, e não como atributo da interação.** A avaliação poderia ser uma coluna de texto na própria mensagem. A promoção a tabela decorre de a avaliação ter autor, instante e alvo próprios: ela é produzida depois da resposta, possivelmente por caminho distinto, e pode recair sobre uma resposta específica ou sobre a conversa inteira. Como coluna, não haveria onde registrar quem avaliou nem quando, e não seria possível correlacionar avaliação negativa com intenção classificada, fontes citadas ou tempo de processamento — correlação que é o insumo da melhoria do agente e da leitura do RNF08. A tabela admite juízo binário e graduado simultaneamente porque a interface oferece o polegar e a rubrica de usabilidade pede escala; `avaliacao_tem_juizo` garante que ao menos um dos dois exista, e `avaliacao_alvo_unico` impede o registro ambíguo que aponta para conversa e mensagem ao mesmo tempo.
+
+**Decisão 11 — Eventos de plataforma separados dos turnos da conversa.** Login, abertura, renomeação e arquivamento de conversa poderiam ser registrados como linhas de `mensagem` com um papel adicional. Foram separados porque respondem a outra pergunta: `mensagem` responde "o que o agente respondeu e com base em quê", enquanto `evento_plataforma` responde "quem esteve na plataforma e o que fez". Misturá-los contaminaria as métricas do RNF01 e do RNF03, que contam turnos, e obrigaria toda consulta de conversa a filtrar registros que não são conversa. A coluna `detalhe`, do tipo `JSONB`, admite contexto livre por evento e é, por isso, o ponto de maior risco de violação da proibição de armazenar segredos do RNF09 — restrição que o procedimento de teste da seção 6.3.4 verifica explicitamente.
+
+**Decisão 12 — Dependências entre projetos como auto-relacionamento.** A planilha de portfólio declara relações entre projetos, como fornecimento de dados de monitoramento e compartilhamento de recurso técnico. Sem a tabela `projeto_relacionado`, essa informação existiria apenas no texto vetorizado e o banco não conseguiria responder a consultas de impacto cruzado, do tipo "o que depende deste projeto?", que são justamente as que a jornada do Diretor exercita. A relação é direcionada e a restrição `CHECK (projeto_id <> relacionado_id)` impede o auto-vínculo.
+
+**Decisão 13 — Identidade de autenticação como coluna preparada, sem chave estrangeira imediata.** O RNF02 exige autenticação por SSO, cuja implementação pertence a outra frente. Para que o modelo não precise ser alterado quando ela chegar, `usuario.auth_user_id` já existe e é o ponto único de ligação com o provedor; a função `portfolio.usuario_atual()`, definida em `src/database/03_rls_policies.sql`, traduz a identidade autenticada para a chave do usuário e é atravessada por todas as políticas de acesso, de modo que nenhuma delas precisará ser reescrita. A coluna não foi declarada como chave estrangeira desde já porque isso impediria cadastrar usuários antes de existirem contas no provedor, o que é justamente a situação da base sintética; a promoção a chave estrangeira é um comando único, registrado no `README.md` da pasta `src/database`. Nenhuma senha, token ou segredo é armazenado, conforme o RNF09: o provedor detém a credencial e o banco guarda apenas a correspondência.
+
+**Decisão 14 — Estado `materializada` acrescentado ao domínio de `pendencia.situacao`.** O domínio inicialmente previsto continha três estados: aberta, em tratamento e resolvida. As planilhas de riscos e problemas da base sintética usam um quarto estado para o risco que se concretizou, e mapeá-lo para um dos três existentes faria a resposta produzida a partir do banco divergir da resposta produzida a partir do mesmo documento no índice vetorial — precisamente a incoerência que o RNF12 mede. O domínio foi ampliado em vez de a informação ser colapsada. Pela mesma razão foram preservadas as colunas `codigo`, `titulo`, `criticidade`, `responsavel` e `acao_resposta`, presentes na origem e sem as quais a resposta do agente seria mais pobre que o documento que a fundamenta.
+
+**Limitação registrada — documentos normativos.** A intenção INT-01 do catálogo da seção 3.1 consulta conceitos e normativos de gestão de portfólio, documentos que não pertencem a nenhum projeto específico. Pelo modelo conceitual e pela seção 2.2.1, todo artefato compõe exatamente um projeto, portanto a base de normativos permanece fora da tabela `artefato`, no repositório de arquivos independente descrito na seção 2.5. A consequência, que na modelagem anterior era assumida como perda, é resolvida pela decisão 9: a coluna `mensagem_fonte.artefato_id` é opcional e as demais colunas guardam a cópia dos metadados, de modo que a fonte de uma resposta normativa é registrada com a mesma estrutura das demais, apenas sem vínculo relacional. Se a base de normativos evoluir para dado estruturado, a modelagem de uma entidade própria deverá ser reavaliada junto com o modelo conceitual.
+
+**Normalização.** O modelo está na terceira forma normal: todas as tabelas têm chave primária definida, os atributos são atômicos e nenhum atributo não chave depende de outro atributo não chave. Há duas redundâncias deliberadas, ambas justificadas acima e nenhuma delas configurando anomalia de atualização: as colunas geradas `preenchido` e `desvio_pp`, mantidas pelo próprio banco a partir de colunas da mesma linha (decisão 2); e a cópia dos metadados da fonte em `mensagem_fonte`, que não é redundância de estado e sim registro histórico — o valor copiado descreve o que era verdade no instante da resposta, e deve permanecer imune a mudanças posteriores na origem (decisão 9).
 
 Por fim, a tabela a seguir consolida a rastreabilidade entre as estruturas do modelo e os requisitos que elas sustentam, no mesmo formato adotado nas seções anteriores:
 
 | Estrutura do modelo | Requisitos sustentados | Papel |
 |---|---|---|
 | `usuario.perfil` | Personas e RF06 | Identifica o perfil profissional sem estabelecer autorização por cargo |
+| `usuario.auth_user_id` | RNF02 | Ponto único de ligação com o provedor de SSO, sem armazenar credencial |
 | `projeto.lider_id` | RF06 | Identifica o responsável relacionado a cada projeto |
+| `projeto.desvio_pp` | RF02 | Desvio entre previsto e realizado, base da consulta comparativa |
+| `projeto_relacionado` | RF02 | Permite responder a consultas de impacto entre projetos |
 | `usuario_projeto` | RF05 | Define os destinatários da notificação proativa |
 | `auditoria.notificacao` | RF05, RNF09 | Registra os envios e garante idempotência da verificação periódica |
-| `auditoria.interacao` | RNF01, RNF03, RNF04, RNF09 | Trilha de auditoria com canal, intenção, resultado e tempo de processamento |
-| `interacao.audio_referencia` | RF01, RNF06, RNF09 | Vincula a interação por voz ao arquivo de áudio original no armazenamento de objetos |
-| `interacao.feedback_usuario` | RNF04, RNF09 | Registra a avaliação correlacionada à interação e admite somente a atualização controlada prevista para o feedback |
-| `auditoria.interacao_artefato` | RF03, RNF04, RNF11, RNF12 | Registra as fontes que fundamentaram cada resposta e permite confrontá-las com as afirmações produzidas |
+| `auditoria.conversa` | RF01, RNF04 | Agrupa os turnos e sustenta o histórico apresentado ao usuário |
+| `auditoria.mensagem` | RNF01, RNF03, RNF04, RNF09 | Trilha com formato, intenção, desfecho, tempo e o texto de cada turno |
+| `mensagem.conteudo` | RNF04, RNF12 | Guarda o texto da resposta, sem o qual a fundamentação não é verificável |
+| `mensagem.audio_referencia` | RF01, RNF06, RNF09 | Vincula o turno por voz ao arquivo de áudio original no armazenamento de objetos |
+| `auditoria.mensagem_fonte` | RF03, RNF04, RNF11, RNF12 | Registra as fontes que fundamentaram cada resposta e permite confrontá-las com as afirmações produzidas |
+| `auditoria.avaliacao` | RNF04, RNF08, RNF09 | Registra a avaliação com autor, instante e alvo, permitindo correlacioná-la à intenção e às fontes |
+| `auditoria.evento_plataforma` | RNF09 | Registra o uso da plataforma fora do diálogo, para inspeção administrativa |
 | `artefato.referencia`, `artefato.data` | RF03 | Origem e data exibidas junto a cada informação |
 | `campo_artefato.obrigatorio`, `campo_artefato.preenchido` | RF04, RF05 | Identificação dos campos pendentes de preenchimento |
 | `pendencia.prazo`, `pendencia.situacao` | RF05 | Critérios da verificação periódica do Agendador |
 
-O modelo físico definido nesta seção será populado exclusivamente com os dados sintéticos previstos na seção 1.3 e serve de base tanto para a implementação da camada de acesso a dados quanto para o processo de deploy descrito na seção 3.7.
+O modelo físico definido nesta seção foi implementado e está populado exclusivamente com os dados sintéticos previstos na seção 1.3, carregados a partir dos mesmos documentos que alimentam o índice vetorial. Os scripts de criação, carga, políticas de acesso e verificação estão em [`src/database`](../src/database/README.md), cujo `README.md` descreve a ordem de execução, o controle de acesso e as pendências conhecidas.
 
 ## 3.7 Processo de Deploy em Nuvem
 
@@ -3298,7 +3649,7 @@ Esta seção descreve como a solução sai do ambiente de desenvolvimento e pass
 | **API de Transcrição** (serviço externo de Speech to Text) | Speech to Text | Serviço de conversão de fala em texto consumido por API. Recebe o áudio encaminhado pelo backend e devolve a transcrição, que segue daí em diante pelo mesmo pipeline das mensagens digitadas. O fato de ser chamado pelo backend, e não diretamente pelo navegador, mantém a autenticação e o registro de auditoria concentrados em um único ponto de entrada. **O provedor efetivamente implementado é o Deepgram Nova-3** (Seção 3.2.1), que é externo à conta da AWS; o rótulo Amazon Transcribe presente na figura corresponde ao desenho anterior à decisão de STT e será corrigido no diagrama junto da revisão prevista no item 12 da Seção 3.7.9. Com o Deepgram, este elemento deixa de ser um nó interno da conta acadêmica e passa a ser uma dependência externa, como o nó de modelo de linguagem. |
 | **Database - PostgreSQL** | Schemas portfolio + auditoria | Banco de dados relacional único da solução. O schema `portfolio` guarda os dados sintéticos de projetos, prazos, marcos, riscos, usuários e permissões consultados pelo agente (RF02, RF04 e RF05). O schema `auditoria` guarda os registros de interação e feedback correlacionados pelo RNF04. A separação em dois schemas, e não em dois bancos, permite aplicar por permissão a proteção exigida pelo RNF09 sem introduzir uma segunda base de dados, conforme decidido na Seção 2.5. A forma de hospedagem do PostgreSQL, em serviço gerenciado ou em contêiner na própria instância EC2, permanece em aberto na Seção 3.7.9. |
 | **Amazon S3 - Bucket Storage** | Armazenamento de Prompts | Armazenamento de objetos para o conteúdo que não se representa bem em modelo relacional. Guarda os prompts utilizados pelo pipeline de PLN, versionados de forma independente do código, o que permite ajustá-los sem reconstruir a imagem do backend. |
-| **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a telemetria mostra o funcionamento técnico, enquanto `auditoria.interacao` correlaciona quem pediu o quê, as fontes e o resultado conforme o RNF04; os controles de consulta, retenção e proteção desses registros pertencem ao RNF09. São dados com públicos e ciclos de vida distintos, e por isso ficam em nós distintos. |
+| **Rastreabilidade** (Amazon CloudWatch) | Telemetria e logs técnicos | Observabilidade da aplicação: tempos de resposta, taxas de erro e disponibilidade dos dois contêineres. Não se confunde com o schema `auditoria`: a telemetria mostra o funcionamento técnico, enquanto `auditoria.mensagem` e `auditoria.mensagem_fonte` correlacionam quem pediu o quê, as fontes e o resultado conforme o RNF04; os controles de consulta, retenção e proteção desses registros pertencem ao RNF09. São dados com públicos e ciclos de vida distintos, e por isso ficam em nós distintos. |
 | **LLM - Serviço externo** | Modelo de Linguagem | Serviço externo de modelo de linguagem, consumido por API; o provedor implementado é o Google Gemini, modelo `gemini-3.5-flash-lite`, acionado pelo endpoint `POST /api/v1/chat`. Apoia a geração das respostas em linguagem natural e a interpretação de documentos e normativos, sempre sob a orquestração do backend: o modelo é um componente do processamento, e não o responsável pela decisão (RNF11 e RNF12). Por estar fora da fronteira da conta acadêmica, é o único ponto do diagrama em que dados deixam a infraestrutura controlada pela equipe — razão pela qual o MVP trafega exclusivamente dados sintéticos, conforme a restrição registrada na Seção 1.3. |
 
 #### Caminhos de comunicação
@@ -4015,7 +4366,7 @@ classDiagram
 
 | Classe acrescentada | Origem | O que passa a ser representável |
 |---|---|---|
-| `Interacao` | Tabela `auditoria.interacao` da Seção 3.6.5 | O registro de cada solicitação: quem pediu, por qual canal, qual intenção foi identificada, quanto tempo levou e qual foi o desfecho. É o que torna o RNF04 e o RNF09 verificáveis no modelo, e não apenas no texto |
+| `Interacao` | Tabelas `auditoria.conversa` e `auditoria.mensagem` da Seção 3.6.5 | O registro de cada turno: quem pediu, por qual formato, qual intenção foi identificada, o que foi respondido, quanto tempo levou e qual foi o desfecho. A classe corresponde a duas tabelas porque a solicitação e a resposta são turnos irmãos de uma mesma conversa, conforme a decisão 8 da Seção 3.6.7. É o que torna o RNF04 e o RNF09 verificáveis no modelo, e não apenas no texto |
 | `Notificacao` | Tabela `auditoria.notificacao` da Seção 3.6.5 | O envio efetivo de um aviso de pendência a um usuário. A associação `notifica`, que na Sprint 1 era muitos-para-muitos entre `Pendencia` e `Usuario`, ganha atributo próprio (`dataEnvio`) e por isso vira classe |
 
 A associação `Interacao consulta Artefato`, de muitos para muitos, é o que sustenta o RF03: ela registra quais fontes fundamentaram cada resposta e permite reconstruir a origem de uma informação depois de exibida.
@@ -4162,7 +4513,7 @@ flowchart TB
     subgraph EXT["Serviços de terceiros"]
         STT["Deepgram Nova-3<br/>Speech to Text<br/>INTEGRADO"]
         LLM["Google Gemini<br/>geração de texto<br/>INTEGRADO"]
-        TTS["Text to Speech<br/>PROVEDOR EM ABERTO"]
+        TTS["Gemini TTS<br/>Text to Speech<br/>INTEGRADO"]
     end
 
     CAP -->|"multipart/form-data"| RX
@@ -4179,7 +4530,8 @@ flowchart TB
     GR -->|"HTTPS"| LLM
     GR -.->|"previsto"| RD
     GR --> UI
-    GR -.->|"previsto"| TTS
+    GW -->|"HTTPS, sob demanda"| TTS
+    TTS -->|"WAV"| UI
     AG -.->|"previsto"| PT
     AF -.->|"previsto"| LG
     GW -.->|"previsto"| AF
@@ -4346,7 +4698,7 @@ sequenceDiagram
     end
 ```
 
-**Explicação.** O diagrama existe justamente porque a regra de negócio já está definida na Seção 3.1 e o mecanismo que a executa não. Ele torna explícito o que precisa ser construído: um limiar de confiança, uma margem mínima entre a primeira e a segunda intenção candidata, e um componente que formule a pergunta de desambiguação. Os dois primeiros são números a calibrar sobre a partição de teste isolada prevista na task T14 da Sprint 3, e não devem ser escolhidos por intuição, pela razão de calibração registrada na Seção 3.3.3. Note ainda que os três ramos registram desfechos distintos na auditoria — `sucesso`, `esclarecimento` e `recusada` —, valores que já existem no `CHECK` da coluna `auditoria.interacao.resultado` definida na Seção 3.6.5.
+**Explicação.** O diagrama existe justamente porque a regra de negócio já está definida na Seção 3.1 e o mecanismo que a executa não. Ele torna explícito o que precisa ser construído: um limiar de confiança, uma margem mínima entre a primeira e a segunda intenção candidata, e um componente que formule a pergunta de desambiguação. Os dois primeiros são números a calibrar sobre a partição de teste isolada prevista na task T14 da Sprint 3, e não devem ser escolhidos por intuição, pela razão de calibração registrada na Seção 3.3.3. Note ainda que os três ramos registram desfechos distintos na auditoria — `sucesso`, `esclarecimento` e `recusada` —, valores que já existem no `CHECK` da coluna `auditoria.mensagem.resultado` definida na Seção 3.6.5.
 
 #### Cenário E — Solicitação sem autenticação válida
 
@@ -4411,15 +4763,15 @@ A matriz fecha o artefato ligando cada requisito ao mecanismo que o realiza. Ela
 | RNF01 — desempenho | Tempo de resposta de todas as rotas | Classificação em microssegundos; o custo dominante é a chamada externa | `Interacao.tempoProcessamentoMs` | API Gateway, Conversão de Áudio em Texto | 3.9.4 cenário A | Teste de desempenho, task T31 | 4 |
 | RNF02 — autenticação | Cabeçalho `Authorization` e resposta `401` | Não se aplica | Identidade técnica associada ao usuário; sem autorização por cargo | Autenticação SSO, API Gateway | 3.9.4 cenário E | `CT-RNF02-P` e `CT-RNF02-N` | 3 e 4 |
 | RNF03 — qualidade da classificação de intenções | Campo `confianca_pln` da resposta de análise e decisão do limiar | `MultinomialNB` sobre vetorização esparsa; F1-macro atual de 0,6736, abaixo da meta | `Interacao.intencao` | PLN — Compreensão | 3.9.4 cenários A e D | `CT-RNF03-P` e `CT-RNF03-N`; testes automatizados existentes apoiam a regressão | Instrumento construído na 2; medição cega pendente para a 3 |
-| RNF04 — rastreabilidade | Identificador de cada interação e registro de toda requisição | Intenção e termos de maior peso registráveis | `auditoria.interacao`, `auditoria.interacao_artefato` | Auditoria e Feedback, Logs de Auditoria | 2.2.2 cenário 1, automensagem `log()` | `CT-RNF04-P` e `CT-RNF04-N` | 3 |
+| RNF04 — rastreabilidade | Identificador de cada interação e registro de toda requisição | Intenção e termos de maior peso registráveis | `auditoria.mensagem`, `auditoria.mensagem_fonte` | Auditoria e Feedback, Logs de Auditoria | 2.2.2 cenário 1, automensagem `log()` | `CT-RNF04-P` e `CT-RNF04-N` | 3 |
 | RNF05 — interoperabilidade | Contrato REST versionado em `/api/v1` | Núcleo de PLN sem dependência da camada de API | Não se aplica | API Gateway | 3.9.4 cenário A | `CT-RNF05-P` e `CT-RNF05-N` entre React e Python | 4 e 5 |
 | RNF06 — qualidade da transcrição | `POST .../transcribe`, campo `confidence` | Entrada do pipeline; `keyterm` cobre o vocabulário do domínio | `Interacao.audioReferencia` | Conversão de Áudio em Texto, Deepgram | 3.9.4 cenários A e C | Medição de WER, prevista para a 3 | 3 |
 | RNF07 — disponibilidade | `GET /health`, a implementar, com 200 ou 503 em até dois segundos | Não se aplica | Não se aplica | Rastreabilidade (CloudWatch) | 3.9.4 cenário C | `CT-RNF07-P` e `CT-RNF07-N` | 4 |
 | RNF08 — usabilidade das respostas | Formato da resposta devolvida | Não se aplica | Não se aplica | Chat UI, Gerador de Respostas | 2.2.2 cenário 1 | Teste de usabilidade com SUS, task T34 | 3 e 4 |
-| RNF09 — auditabilidade das interações | Consulta administrativa no banco ou serviço | Não se aplica | `auditoria.interacao`, `auditoria.notificacao` | Auditoria e Feedback | 3.9.4 cenários D e E | `CT-RNF09-P` e `CT-RNF09-N` | 3 e 4 |
+| RNF09 — auditabilidade das interações | Consulta administrativa no banco ou serviço | Não se aplica | `auditoria.mensagem`, `auditoria.evento_plataforma`, `auditoria.notificacao` | Auditoria e Feedback | 3.9.4 cenários D e E | `CT-RNF09-P` e `CT-RNF09-N` | 3 e 4 |
 | RNF10 — escalabilidade | Todas as rotas sob carga | Matriz esparsa que não cresce proporcionalmente ao corpus | Não se aplica | Web App Backend | Não aplicável | Teste de carga progressiva, task T31 | 4 |
-| RNF11 — explicabilidade | Justificativa curta e fontes na resposta | Evidências recuperadas sustentam o conteúdo sugerido | `auditoria.interacao_artefato` | Gerador de Respostas e Explicabilidade | 2.2.2 cenário 2 | `CT-RNF11-P` e `CT-RNF11-N` | 4 |
-| RNF12 — fundamentação das respostas | Referências e data na resposta de consulta | Evidências recuperadas devem sustentar cada afirmação factual | `auditoria.interacao_artefato` | Gerador de Respostas, Repositório de Dados | 2.2.2 cenário 1; risco AM8 | `CT-RNF12-P` e `CT-RNF12-N` | 4 |
+| RNF11 — explicabilidade | Justificativa curta e fontes na resposta | Evidências recuperadas sustentam o conteúdo sugerido | `auditoria.mensagem_fonte` | Gerador de Respostas e Explicabilidade | 2.2.2 cenário 2 | `CT-RNF11-P` e `CT-RNF11-N` | 4 |
+| RNF12 — fundamentação das respostas | Referências e data na resposta de consulta | Evidências recuperadas devem sustentar cada afirmação factual | `auditoria.mensagem_fonte`, `mensagem.conteudo` | Gerador de Respostas, Repositório de Dados | 2.2.2 cenário 1; risco AM8 | `CT-RNF12-P` e `CT-RNF12-N` | 4 |
 
 **Ausências identificadas na verificação da matriz.** A leitura por coluna expõe cinco lacunas, todas já encaminhadas neste documento e no planejamento da Sprint 3:
 
@@ -4579,7 +4931,7 @@ As capturas a seguir registram a evolução em três momentos: a interface conve
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
-Diferentemente do protótipo, em que gravação, transcrição e resposta eram simuladas, a interface funcional captura o áudio do microfone de verdade para animar a onda sonora — o hook `useMicVolume` usa a Web Audio API para medir o volume da fala. Permanecem como limites do estado atual, a serem conectados nas próximas sprints junto à integração de STT/TTS: o áudio ainda não é enviado ao endpoint `/api/v1/audio` e o chat ainda não possui processamento de linguagem natural real. Essa distinção é mantida explícita porque a semelhança da interface com produtos reais gera expectativa de funcionamento real — e a documentação não deve sugerir comportamentos ainda não implementados.
+Diferentemente do protótipo, em que gravação, transcrição e resposta eram simuladas, a interface funcional captura o áudio do microfone de verdade para animar a onda sonora — o hook `useMicVolume` usa a Web Audio API para medir o volume da fala. O Text-to-Speech já está conectado às respostas do agente por meio do botão **Ouvir resposta**. Permanecem como limites do estado atual a entrada por voz ponta a ponta — o áudio capturado ainda não é enviado ao endpoint `/api/v1/audio` — e a integração completa dessa entrada ao processamento do chat. Essa distinção é mantida explícita porque a semelhança da interface com produtos reais gera expectativa de funcionamento real, e a documentação não deve sugerir comportamentos ainda não implementados.
 
 
 ## 4.5 Diário de Construção dos Dois Protótipos
@@ -6358,13 +6710,74 @@ A execução será coordenada pelo responsável da task T31, com revisão das ev
 
 O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável para as consultas textuais, e as duas dimensões do RNF10: crescimento da concorrência e crescimento dos dados. Os ensaios devem ser executados em ambiente controlado, com versão do código, configuração, recursos computacionais, horário e estado dos serviços externos registrados antes de cada rodada.
 
+#### Escopo, metas e componentes disponíveis
+
+O planejamento parte das metas da Seção 2.3 e dos componentes presentes no repositório. A tabela abaixo fixa as referências para preparar os ensaios; seus valores são critérios de aceitação, não resultados já obtidos.
+
+| Dimensão | Casos relacionados | Meta do requisito | Condição de comparação |
+|---|---|---|---|
+| Tempo de resposta textual — RNF01 | `CT-RNF01-P`, `CT-RNF01-N` | Pelo menos 80% das consultas elegíveis com resposta completa em até 15 s; 100% com resposta ou erro controlado em até 60 s | Fluxo textual com serviços reais para a avaliação principal; lentidão injetada em rodada separada para avaliar degradação |
+| Concorrência — RNF10 | `CT-RNF10-C-P`, `CT-RNF10-C-N` | Em `10x`, p95 ≤ 20 s e ≤ 2 vezes o p95 da linha de base | Dependências externas controladas e idênticas; `1x` = 5 e `10x` = 50 solicitações simultâneas, conforme a carga adotada neste plano |
+| Memória de treinamento — RNF10 | `CT-RNF10-M-P`, `CT-RNF10-M-N` | Pico de memória com dataset `10x` ≤ 8 vezes o pico em `1x` | Mesma configuração de treinamento, processos reiniciados e datasets identificados |
+| Memória do processo servido — RNF10 | `CT-RNF10-M-P`, `CT-RNF10-M-N` | Memória estabilizada e pico de inferência com modelo treinado em `10x` ≤ 2 vezes suas respectivas linhas de base | Mesma massa de inferência e recursos fixos, medindo separadamente as duas razões |
+
+Os cinco acessos simultâneos da linha de base são uma hipótese de carga do MVP, não uma estimativa comprovada do uso pelo Metrô. O aumento de concorrência e o aumento do dataset serão avaliados separadamente, para permitir identificar a origem de uma eventual degradação.
+
+| Componente disponível | Entrada e interação atual | Aplicação no planejamento e limite da evidência |
+|---|---|---|
+| `POST /api/v1/chat` — `src/routes/chat.py` | JSON com `message` e `conversation_id`; chama `AnswerChatMessage`, que utiliza o adaptador Gemini, e retorna `reply` | Alvo HTTP inicial para RNF01 e RNF10-C. A mensagem deve ser não vazia e ter até 4000 caracteres após remoção de espaços nas extremidades. O fluxo atual gera resposta com Gemini; medir essa rota não comprova, sozinho, a consulta integrada às fontes de projetos exigida pelo RF02 |
+| `POST /api/v1/audio/{audio_id}/analyze` — `src/routes/analysis.py` | Recebe identificador de áudio armazenado, transcreve via Deepgram e executa o classificador carregado pelo serviço | Referência do processo que já utiliza o modelo de PLN. A duração total da rota inclui armazenamento e transcrição; não deve ser usada como tempo de consulta textual do RNF01 nem confundida com inferência isolada |
+| `src/pln/classificador.py` | CLI `python -m pln.classificador`, com opções `--dataset` e `--salvar`; oferece carregamento e predição do modelo | Base disponível para preparar RNF10-M. Separar a medição do treinamento da avaliação cruzada também executada pela CLI; usar um processo persistente com modelo carregado para medir a memória do serviço |
+| `GET /health` — `src/az1_api/main.py` | Retorna o estado básico do processo HTTP | Verificação inicial de acesso ao servidor; não comprova disponibilidade do Gemini, Deepgram, armazenamento ou fontes de projetos |
+
+**Pré-requisitos para a execução.** Identificar o commit candidato, congelar a massa sintética e registrar recursos, processos e configuração do servidor. Antes de declarar atendimento integral aos RF02 e RF04 associados a estes RNFs, confirmar que os fluxos de consulta às fontes e de sugestões estejam integrados. Enquanto isso, identificar as medições como parciais e informar o componente efetivamente exercitado.
+
+Para o RNF01, verificar as credenciais e a disponibilidade do provedor real e confirmar o mecanismo de interrupção da espera dentro de 60 segundos; o contrato atual de chat não demonstra por si só essa garantia. Para o RNF10-C, preparar a substituição controlada das dependências externas mantendo o processamento interno que se deseja medir. Quando utilizado, o VHS deverá ter seu modo e estado registrados: respostas reproduzidas servem ao ensaio controlado, mas não comprovam a latência do provedor real. Para o RNF10-M, disponibilizar datasets e modelos identificáveis em todos os tamanhos e a instrumentação de memória. A ausência desses pré-requisitos deve ser registrada como bloqueio do caso correspondente, conforme a Seção 6.3.1.
+
+#### Ferramentas e preparação do ambiente
+
+Os ensaios utilizarão Python, acompanhando a tecnologia do backend e do pipeline de PLN. Os instrumentos descritos abaixo deverão ser preparados antes da execução; esta seção registra o planejamento, sem afirmar que os scripts de carga e coleta já existem.
+
+| Ferramenta ou biblioteca | Uso planejado | Situação no projeto |
+|---|---|---|
+| HTTPX e `asyncio` | Enviar consultas HTTP e controlar a quantidade de requisições simultâneas nos ensaios RNF01 e RNF10-C | HTTPX já consta no extra `dev`; `asyncio` integra a biblioteca padrão do Python. O gerador de carga deverá ser implementado |
+| `time.perf_counter` e `csv` | Medir a duração completa de cada requisição com relógio monotônico e preservar os registros individuais | Biblioteca padrão do Python; instrumentação a preparar |
+| `psutil` | Coletar CPU e memória RSS dos processos de treinamento e atendimento em RNF10 | Dependência adicional planejada, ainda não declarada no `pyproject.toml` |
+| NumPy | Consolidar percentis e medianas a partir dos registros brutos | Já declarado nas dependências do projeto |
+| Uvicorn | Servir a aplicação por HTTP durante os ensaios, com quantidade fixa de workers | Já declarado nas dependências do projeto |
+
+O cliente assíncrono permite reutilizar conexões durante as rodadas, conforme a [documentação do HTTPX](https://www.python-httpx.org/async/). A coleta de memória usará RSS, exposto por `memory_info`, conforme a [documentação do psutil](https://psutil.readthedocs.io/stable/index.html). As versões efetivamente utilizadas deverão acompanhar as evidências para permitir reprodução.
+
+**Configuração de referência.** Usar Python 3.12 em ambiente virtual, com a aplicação instalada por `python -m pip install -e ".[dev]"`. Instalar `psutil` no ambiente de medição e registrar sua versão. Iniciar o servidor com `python -m uvicorn az1_api.main:app --host 0.0.0.0 --port 8000 --workers 1`, sem recarga automática. Manter o mesmo número de workers, CPU e memória em todas as comparações de `1x` a `10x`; esses ensaios medem crescimento da carga e dos dados sob recursos fixos.
+
+O gerador de carga deverá rodar preferencialmente em outra máquina da mesma rede. Se compartilhar a máquina do servidor, registrar essa limitação e monitorar ambos os processos para identificar competição por recursos. Antes de cada rodada, preencher a ficha abaixo e verificar `GET /health`, seguido de uma consulta válida ao fluxo em teste.
+
+| Registro obrigatório | Informação a preencher na execução |
+|---|---|
+| Identificação | Caso, número da rodada, data, horário, responsável e commit avaliado |
+| Servidor e gerador | Sistema operacional, CPU, RAM, localização de cada processo e endereço base da API |
+| Configuração | Versões das bibliotecas, workers, limites de conexão e tempos limite do cliente e da aplicação |
+| Dados e modelo | Identificadores da massa de consultas, dataset e modelo, com tamanho e versão |
+| Dependências | Provedor real ou dublê, atraso configurado, modo do VHS e estado inicial do cache |
+| Evidências | Local dos CSVs de requisições, medições de recursos e logs correlacionados |
+
+#### Protocolo comum de execução e coleta
+
+1. **Preparar a entrada.** Usar a mesma massa de 100 consultas válidas em todas as comparações HTTP, com `message` e `conversation_id` preenchidos. Atribuir um identificador a cada consulta e manter sua ordem reproduzível. No RNF01 positivo, enviar uma consulta por vez; no RNF10-C, percorrer ciclicamente a massa durante cada estágio.
+2. **Controlar a carga.** No RNF10-C, manter 5, 10, 25 ou 50 tarefas concorrentes, cada uma enviando a próxima requisição após concluir a anterior, sem pausa deliberada. Configurar o pool de conexões para comportar pelo menos 50 requisições e registrar a concorrência efetivamente observada. Trata-se de carga fechada: a taxa de chegada depende do tempo de resposta, por isso o throughput deve acompanhar os percentis.
+3. **Medir a resposta completa.** Iniciar o cronômetro imediatamente antes do envio e encerrá-lo após receber todo o corpo ou identificar falha. Configurar um limite total de observação de 65 segundos no gerador; esse limite permite observar a violação do teto de 60 segundos e não amplia o prazo do RNF01. Cancelamento pelo cliente não equivale a erro controlado pela aplicação. Não repetir automaticamente requisições com falha.
+4. **Separar as condições externas.** Executar RNF01 positivo com o provedor real e VHS em modo `ignorar`, quando disponível. Preparar a rodada negativa com atrasos controlados de 20 e 65 segundos no adaptador externo, registrando cada condição separadamente. Para RNF10-C, usar respostas e atrasos determinísticos idênticos em todos os estágios, sem substituir a rota ou o serviço interno inteiro. Não agregar medições reais e simuladas em um único resultado.
+5. **Delimitar as rodadas.** Descartar o aquecimento previsto em cada caso. Ao terminar os cinco minutos de um estágio de concorrência, interromper novos envios e aguardar as requisições pendentes até seu limite de observação. Atribuir cada requisição ao estágio em que foi iniciada e registrar o tempo de drenagem. Reiniciar o servidor e restaurar o mesmo estado de cache antes de cada repetição completa; no ensaio de pico, aquecer apenas com a carga de base antes de saltar para 50 tarefas.
+6. **Coletar recursos.** Amostrar RSS a cada 100 ms e CPU a cada segundo em processo monitor separado, registrando PID e instante da coleta. Medir o treinamento em processo dedicado, sem incluir a validação cruzada. Para o serviço, carregar o modelo, realizar uma inferência de aquecimento e observar 30 segundos sem carga; usar a mediana da RSS dos últimos dez segundos como memória estabilizada. Em seguida, medir o pico durante as 100 inferências previstas. Repetir três vezes para cada tamanho, incluindo o dataset adverso. O maior RSS amostrado é uma estimativa do pico e pode perder variações menores que o intervalo de coleta.
+7. **Preservar os dados.** Salvar uma linha por requisição com caso, rodada, estágio, identificador da consulta, início, duração, status HTTP, categoria de erro e indicação de resposta completa. Salvar recursos em CSV separado. Calcular percentis pelo mesmo método em todas as rodadas, documentando-o, e apresentar latências de sucesso e de erro separadamente. Informar requisições concluídas por segundo na janela de carga, requisições pendentes ao final e total de falhas; um erro rápido não deve ser interpretado como resposta funcional rápida.
+
 #### RNF01 — tempo de resposta das consultas textuais
 
 **Propósito.** Verificar se pelo menos 80% das consultas textuais previstas no RF02 apresentam resposta completa em até 15 segundos e se nenhuma consulta elegível permanece sem desfecho além do teto de 60 segundos.
 
 **Massa de teste.** Serão utilizadas 100 consultas sintéticas representativas dos tipos de consulta previstos no RF02. A massa deve variar a formulação das perguntas e os elementos consultados, sem utilizar dados corporativos reais.
 
-**Cenários.** O caso `CT-RNF01-P` executa consultas válidas sob condições normais. O caso `CT-RNF01-N` aplica lentidão controlada com duração configurada entre 15 e 60 segundos e acima de 60 segundos. Na condição mais lenta, a aplicação deve interromper a espera e devolver erro controlado dentro do teto, permitindo verificar tanto a meta principal quanto a proteção da cauda sem planejar uma reprovação obrigatória.
+**Cenários.** O caso `CT-RNF01-P` executa as 100 consultas válidas sob condições normais, com serviços reais. Em outra rodada de 100 consultas, o caso `CT-RNF01-N` utiliza dependências controladas: 90 respostas sem atraso adicional, cinco com atraso de 20 segundos e cinco com atraso de 65 segundos, distribuídas em posições previamente registradas na massa. Na condição mais lenta, a aplicação deve interromper a espera e devolver erro controlado dentro do teto. Essa distribuição permite avaliar simultaneamente a meta de 80% e a proteção de 60 segundos; as dez falhas injetadas não podem ser excluídas como indisponibilidade externa comprovada.
 
 **Instruções de execução:**
 
@@ -6376,7 +6789,7 @@ O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável pa
 6. Calcular `consultas elegíveis com resposta completa em até 15 s / total de consultas elegíveis × 100` e `consultas elegíveis encerradas em até 60 s / total de consultas elegíveis × 100`.
 7. Registrar também p50, p80, p95, menor tempo, maior tempo e taxa de respostas HTTP bem-sucedidas.
 
-**Critério de aprovação.** Os dois limites devem ser atendidos: pelo menos 80% das consultas elegíveis com resposta completa em até 15 segundos e 100% encerradas com resposta ou erro controlado em até 60 segundos. Respostas acima de 15 segundos falham na meta principal; ausência de desfecho em 60 segundos também reprova o teto da cauda. Somente indisponibilidade externa comprovada permite exclusão.
+**Critério de aprovação.** Em cada caso, separadamente, pelo menos 80% das consultas elegíveis devem apresentar resposta completa em até 15 segundos e 100% devem encerrar com resposta ou erro controlado em até 60 segundos. Uma resposta acima de 15 segundos não conta para a meta principal, mas só reprova esse critério quando o percentual agregado fica abaixo de 80%; qualquer ausência de desfecho em até 60 segundos reprova o teto. Erro controlado conta apenas como desfecho, nunca como resposta completa. Somente indisponibilidade externa comprovada permite exclusão na rodada com serviços reais. Se não restarem consultas elegíveis, o resultado será inconclusivo e o caso ficará bloqueado para nova execução, sem aprovação por amostra vazia.
 
 **Evidências planejadas.** Arquivo CSV com uma linha por consulta, logs HTTP, identificação da massa e do ambiente e relatório consolidado com percentuais e percentis.
 
@@ -6395,11 +6808,11 @@ O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável pa
 3. Executar um minuto de aquecimento antes de iniciar as rodadas contabilizadas.
 4. No caso progressivo, executar sucessivamente os estágios de 5, 10, 25 e 50 solicitações simultâneas durante cinco minutos cada.
 5. No caso de pico, iniciar diretamente uma rodada de cinco minutos com 50 solicitações simultâneas.
-6. Repetir cada estágio três vezes nas mesmas condições e usar a mediana das três rodadas na comparação.
+6. Repetir três vezes a sequência progressiva completa e, separadamente, três vezes o ensaio de pico, restaurando as condições iniciais conforme o protocolo comum. Cada estágio terá, assim, três medições; usar a mediana dos três p95 na comparação.
 7. Registrar p50, p80 e p95 da latência, throughput, quantidade e categoria dos erros, CPU e pico de memória.
-8. Para cada rodada, calcular a razão `p95 do estágio / p95 da linha de base 1x` e comparar o estágio `10x` e o pico repentino com os limites do RNF10.
+8. Calcular `B = mediana dos três p95 de 1x`, `C = mediana dos três p95 de 10x progressivo` e `P = mediana dos três p95 do pico`. Comparar `C / B` e `P / B` com o limite relativo, e `C` e `P` com o limite absoluto. Preservar os p95 individuais para expor variações entre rodadas.
 
-**Critério de aprovação.** Tanto no crescimento progressivo quanto no pico de 50 solicitações, o p95 deve ser de no máximo 20 segundos e de no máximo duas vezes o p95 mediano da linha de base `1x`. Os dois limites são cumulativos.
+**Critério de aprovação.** Tanto no crescimento progressivo quanto no pico de 50 solicitações, a mediana dos três p95 deve ser de no máximo 20 segundos e de no máximo duas vezes o p95 mediano da linha de base `1x`. Os dois limites são cumulativos. Calcular o p95 sobre as durações de todas as tentativas do estágio, incluindo falhas, e apresentar também o p95 das respostas completas. Como controle de validade do ensaio com entradas válidas e dependências determinísticas de sucesso, exigir resposta completa em todas as tentativas; erros ou cancelamentos impedem aprovação baseada apenas em baixa latência. Esse controle complementa o plano e não altera as metas numéricas do RNF10. Linha de base ausente, nula ou carga não atingida invalida a comparação e exige nova rodada.
 
 **Evidências planejadas.** Configuração da carga, arquivos brutos de cada rodada, relatório de percentis e throughput, gráficos de CPU e memória e registro das respostas controladas usadas nas dependências externas.
 
@@ -6419,18 +6832,43 @@ O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável pa
 4. Reiniciar o serviço, carregar o modelo produzido por cada tamanho e registrar a memória RSS estabilizada antes de receber requisições.
 5. Executar a mesma massa fixa de 100 inferências em cada modelo e registrar memória estabilizada, pico durante o atendimento e variação por requisição.
 6. Repetir treinamento e serviço com o dataset adverso de alta diversidade vocabular.
-7. Calcular, para treinamento, `pico mediano 10x / pico mediano 1x` e, para serviço, as razões de RSS estabilizada e de pico de inferência entre os modelos `10x` e `1x`.
+7. Calcular, para treinamento, `pico mediano 10x / pico mediano 1x` e, para serviço, `mediana da RSS estabilizada em 10x / mediana da RSS estabilizada em 1x` e `mediana dos picos de inferência em 10x / mediana dos picos de inferência em 1x`. Usar as três repetições de cada condição e comparar o dataset adverso separadamente com a mesma linha de base `1x`.
 
 **Critério de aprovação.** No dataset controlado e no adverso, a razão de pico de treinamento entre `10x` e `1x` deve ser no máximo 8, e as razões da memória estabilizada e do pico de inferência do processo servido devem ser no máximo 2. Os limites devem ser atendidos simultaneamente.
 
 **Evidências planejadas.** Datasets e modelos versionados, configuração do pipeline e do serviço, medições brutas de RSS, cálculo das medianas e gráficos separados de treinamento e serviço.
+
+#### Consolidação dos resultados e critérios de falha
+
+Os percentuais serão calculados a partir das contagens brutas, sem arredondamento antes da comparação com os limites. Para os percentis, ordenar as durações e usar o posto mais próximo superior: p95 corresponde ao elemento de posição `ceil(0,95 × N)`, contando a primeira posição como 1. Aplicar a mesma regra a p50 e p80. O tempo de uma tentativa cancelada representa somente o tempo observado até o cancelamento, que deve permanecer identificado como falha.
+
+| Caso | Condição que reprova o ensaio | Evidência necessária para decidir |
+|---|---|---|
+| `CT-RNF01-P` | Menos de 80% de respostas completas em até 15 s ou qualquer consulta elegível sem desfecho em até 60 s | CSV das 100 tentativas, contagem elegível, tempos, respostas e justificativa individual das exclusões |
+| `CT-RNF01-N` | Mesmos limites violados na rodada de 90 consultas sem atraso adicional e dez com atraso; espera de 65 s sem interrupção controlada em até 60 s | Mapa das injeções de atraso, logs da aplicação e CSV completo, sem excluir as falhas injetadas |
+| `CT-RNF10-C-P` e `CT-RNF10-C-N` | Mediana dos p95 acima de 20 s ou razão acima de 2; falhas de atendimento no cenário determinístico de sucesso | Três rodadas por condição, valores de `B`, `C` e `P`, razões, erros, concorrência observada e throughput |
+| `CT-RNF10-M-P` e `CT-RNF10-M-N` | Razão de treinamento acima de 8, razão de memória estabilizada ou de pico de inferência acima de 2; término por falta de memória | Três medições de cada tamanho e condição, RSS bruto, medianas, modelos e logs de encerramento |
+
+Ausência de instrumento, dataset, fluxo integrado ou dependência necessária será registrada como `Bloqueado`, com motivo e responsável pelo desbloqueio. Uma falha observada no sistema durante um ensaio válido será `Reprovado`, não bloqueio. Problemas do gerador ou perda de amostras invalidam a rodada, que deverá ser preservada com a justificativa e repetida após correção. Não selecionar apenas a melhor execução nem remover uma rodada válida por resultado desfavorável.
+
+Para cada caso, o relatório de execução deverá conter: estado final, versão avaliada, configuração, resultados brutos, cálculo dos indicadores, comparação com cada limite, limitações e referência às evidências. Uma resposta HTTP 200 só será classificada como completa se respeitar o contrato e contiver o resultado esperado para a consulta; respostas vazias ou falhas de negócio deverão ser identificadas. Após correções, repetir o caso afetado; mudanças em código, modelo, recursos ou dependências dos ensaios comparativos exigem também nova linha de base.
+
+#### Justificativa de abrangência e revisão
+
+A massa de consultas deverá distribuir os 100 exemplos entre os tipos de informação do RF02, como documentos, prazos, marcos, riscos, pendências e avanço dos projetos, registrando a quantidade por tipo. Essa variedade cobre diferentes caminhos de consulta, mas constitui amostra sintética de engenharia e não demonstra representatividade estatística do uso real. Os ensaios isolam três causas de degradação: espera por dependência externa, concorrência no atendimento e crescimento do modelo e dos dados.
+
+Os estágios intermediários de `2x` e `5x` ajudam a localizar onde a degradação começa; o estágio `10x` e o pico verificam o limite previsto no RNF10. As três repetições reduzem a influência de variações ocasionais sem provar estabilidade de longo prazo. O dataset adverso amplia a cobertura além da simples repetição de frases, exercitando crescimento do vocabulário. Os ensaios de memória avaliam o pipeline de PLN e o processo servido, não o crescimento de armazenamento do banco ou de documentos.
+
+Ficam fora desta evidência testes de longa duração, descoberta do ponto de ruptura acima de `10x`, escalabilidade por adição de máquinas ou workers e latência do canal de voz. A configuração fixa permite comparar os limites definidos no RNF10, mas não comprova escalabilidade horizontal. A concorrência com dependências simuladas não estima a capacidade ou os limites comerciais dos provedores reais. O uso de VHS em integração permanece detalhado na Seção 6.4; seu cache não deverá mascarar as chamadas reais do RNF01.
+
+Antes de encerrar o card #186, um segundo integrante deverá revisar as metas contra a Seção 2.3, conferir se os scripts futuros reproduzem a carga descrita, verificar os cálculos com os dados brutos e registrar os comentários e ajustes no card ou no pull request. Nesta entrega de planejamento, a revisão de scripts e resultados fica condicionada à execução futura; a revisão documental deve registrar revisor, data e feedback aplicado, sem declarar testes executados ou aprovação do sistema.
 
 ### 6.3.3 Cenários Positivos e Negativos Planejados
 
 | Caso | Tipo | Condição exercitada | Comportamento ou medição esperada |
 |---|---|---|---|
 | `CT-RNF01-P` | Positivo | Consultas textuais válidas sob condições normais | Pelo menos 80% apresentam resposta completa em até 15 segundos e todas encerram em até 60 segundos |
-| `CT-RNF01-N` | Negativo | Dependência controlada com atrasos entre 15 e 60 segundos e acima de 60 segundos | A aplicação contabiliza a meta principal e encerra a espera mais longa com erro controlado antes do teto; exclusões exigem evidência |
+| `CT-RNF01-N` | Negativo | 100 consultas com dependência controlada: 90 sem atraso adicional, cinco com 20 s e cinco com 65 s | Pelo menos 80% de respostas completas em até 15 s e 100% de desfechos em até 60 s, interrompendo a espera excessiva; falhas injetadas não são excluídas |
 | `CT-RNF02-P` | Positivo | Requisição válida em cada endpoint protegido com token SSO válido | A identidade é aceita e a requisição alcança a regra de negócio sem resposta 401 |
 | `CT-RNF02-N` | Negativo | Token ausente, malformado, expirado, com assinatura inválida ou audiência incorreta | Todas as solicitações são interrompidas antes da regra de negócio e recebem HTTP 401 sem expor credenciais |
 | `CT-RNF03-P` | Positivo | Paráfrases inéditas e representativas das nove intenções conhecidas | O classificador preserva F1-macro mínimo de 0,85 e cobertura mínima de 90% sem rejeitar excessivamente entradas conhecidas |
@@ -6450,7 +6888,7 @@ O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável pa
 | `CT-RNF10-C-P` | Positivo | Aumento progressivo de 5 para 50 solicitações simultâneas com linha de base e mocks constantes | No estágio de `10x`, o p95 fica em até 20 segundos e em no máximo duas vezes o p95 de `1x` |
 | `CT-RNF10-C-N` | Negativo | Pico direto de 50 solicitações simultâneas sob os mesmos mocks da linha de base | A aplicação preserva os limites absoluto e relativo sem depender do crescimento gradual |
 | `CT-RNF10-M-P` | Positivo | Treinamento e serviço com datasets de `1x`, `2x`, `5x` e `10x` | A razão fica em até 8 no treinamento e as razões de memória estabilizada e de pico ficam em até 2 no serviço |
-| `CT-RNF10-M-N` | Negativo | Treinamento e serviço com dataset `10x` de alta diversidade vocabular | Os dois limites de memória permanecem atendidos ou o caso é corretamente reprovado |
+| `CT-RNF10-M-N` | Negativo | Treinamento e serviço com dataset `10x` de alta diversidade vocabular | Razão de pico de treinamento ≤ 8 e razões de memória estabilizada e pico de inferência ≤ 2; qualquer violação reprova o caso |
 | `CT-RNF11-P` | Positivo | Vinte solicitações com fontes de referência conhecidas e suficientes | Pelo menos 17 sugestões têm fonte existente que sustenta o conteúdo e justificativa curta e compreensível |
 | `CT-RNF11-N` | Negativo | Dez solicitações sem fonte suficiente, com fonte inexistente ou irrelevante | O agente se abstém ou informa a limitação, sem inventar fonte ou justificativa |
 | `CT-RNF12-P` | Positivo | Trinta consultas com respostas e fontes de referência conhecidas | Todas as referências existem e pelo menos 90% das afirmações factuais são sustentadas pelas fontes citadas |
@@ -6515,8 +6953,8 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 
 1. Versionar a massa e registrar, para cada interação, o usuário sintético, o canal, a entrada, a intenção, as fontes e o desfecho esperados.
 2. Executar as 20 interações e preservar o identificador devolvido ou associado a cada uma.
-3. Consultar `auditoria.interacao` por `interacao.id` e, quando houver fonte, relacionar os registros de `auditoria.interacao_artefato`.
-4. Verificar em cada registro os campos aplicáveis: usuário autenticado, data e hora, canal, solicitação ou referência do áudio, intenção, resultado, tempo de processamento, feedback e categoria de erro.
+3. Consultar `auditoria.mensagem` pelo identificador do turno e, quando houver fonte, relacionar os registros de `auditoria.mensagem_fonte`; a visão `auditoria.vw_turno` devolve o par solicitação/resposta já reunido.
+4. Verificar em cada registro os campos aplicáveis: usuário autenticado, data e hora, formato, texto da solicitação ou referência do áudio, intenção, texto da resposta, resultado, tempo de processamento, avaliação e categoria de erro.
 5. Confirmar que as fontes recuperadas correspondem às fontes efetivamente utilizadas para produzir o resultado.
 6. Nas falhas, confirmar que o erro e o resultado controlado permanecem associados ao mesmo identificador.
 7. Executar o mesmo checklist sobre o registro incompleto preparado para o cenário negativo e confirmar que a ausência é apontada.
@@ -6623,8 +7061,8 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 3. Verificar que o registro com 91 dias está elegível para expurgo; sua presença não reprova o teste, pois a remoção não é obrigada imediatamente após o prazo mínimo.
 4. Tentar consultar os mesmos registros com a identidade comum e confirmar a negação, sem depender de tela administrativa.
 5. Tentar alterar e excluir um registro com credenciais comuns da aplicação e confirmar que ambas as operações são bloqueadas.
-6. Executar o mecanismo autorizado de atualização de `feedback_usuario` e confirmar que apenas esse campo mudou; em seguida, tentar alterar outro campo e confirmar o bloqueio.
-7. Processar entradas contendo senhas e tokens fictícios marcados e inspecionar os registros para confirmar que esses valores não foram persistidos.
+6. Executar os dois mecanismos autorizados de atualização — renomear ou arquivar uma conversa e reavaliar uma resposta em `auditoria.avaliacao` — e confirmar que apenas as colunas concedidas mudaram; em seguida, tentar alterar `auditoria.mensagem` e confirmar o bloqueio.
+7. Processar entradas contendo senhas e tokens fictícios marcados e inspecionar os registros para confirmar que esses valores não foram persistidos, incluindo a coluna `auditoria.evento_plataforma.detalhe`, que admite conteúdo livre e é o ponto de maior risco.
 8. Indisponibilizar controladamente o mecanismo principal de persistência de auditoria e executar uma interação.
 9. Confirmar que a falha produziu registro técnico alternativo ou armazenamento temporário em buffer, emitiu alerta e programou ou realizou nova tentativa de persistência, sem expor os valores protegidos.
 10. Registrar se a solicitação do usuário foi concluída ou recebeu erro controlado; ambos são admissíveis desde que a perda silenciosa do evento não ocorra.
@@ -6683,7 +7121,7 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 
 | Casos | Métrica principal | Resultado esperado para aprovação | Evidências mínimas |
 |---|---|---|---|
-| `CT-RNF01-P` e `CT-RNF01-N` | Percentual com resposta em até 15 segundos e percentual encerrado em até 60 segundos | Pelo menos 80% com resposta completa em 15 segundos e 100% com desfecho em 60 segundos | CSV por consulta, logs HTTP, ambiente e relatório de percentis e teto |
+| `CT-RNF01-P` e `CT-RNF01-N` | Percentual com resposta completa em até 15 segundos e percentual encerrado em até 60 segundos, calculados separadamente por caso | Pelo menos 80% com resposta completa em até 15 segundos e 100% com desfecho em até 60 segundos; falhas injetadas permanecem na amostra negativa | CSV por consulta, mapa de atrasos, logs HTTP, ambiente, exclusões justificadas da rodada real e relatório de percentis e teto |
 | `CT-RNF02-P` e `CT-RNF02-N` | Credenciais válidas aceitas e condições inválidas bloqueadas antes da regra de negócio | 100% das válidas aceitas e 100% das ausentes ou inválidas rejeitadas com HTTP 401, sem credenciais nos registros | Inventário de rotas, requisições ocultadas, respostas, evidência de interrupção e inspeção dos registros |
 | `CT-RNF03-P` e `CT-RNF03-N` | F1-macro, cobertura das intenções conhecidas e aceitação indevida de fora do catálogo | F1-macro ≥ 0,85; cobertura ≥ 90%; aceitação indevida ≤ 15% | Conjunto cego, declaração de isolamento, previsões, limiar e matriz de confusão |
 | `CT-RNF04-P` e `CT-RNF04-N` | Interações com todos os elementos aplicáveis e relacionamentos corretos | 100% das 20 interações completas; registro incompleto controlado corretamente identificado | Entradas, identificadores, registros consultados, fontes relacionadas e checklist |
@@ -6692,7 +7130,7 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 | `CT-RNF07-P` e `CT-RNF07-N` | Verificações elegíveis com HTTP 200 em até dois segundos | Disponibilidade mínima de 99%; falhas controladas retornam 503, alertam e recuperam para 200 | Histórico do monitor, status e tempos, exclusões, incidentes e cálculo final |
 | `CT-RNF08-P` e `CT-RNF08-N` | Participantes bem-sucedidos sem auxílio | Resultado igual ou superior a 80%; na amostra mínima, pelo menos quatro de cinco | Roteiro, fichas anonimizadas, avaliações independentes, desempates e consolidação |
 | `CT-RNF09-P` e `CT-RNF09-N` | Controles de acesso, proteção, retenção, privacidade e contingência atendidos | Todos os controles respeitados, sem perda silenciosa de evento nem persistência de segredo | Consultas, registros, configuração de retenção, alertas e contingência |
-| `CT-RNF10-C-P` e `CT-RNF10-C-N` | p95 absoluto e razão entre p95 de `10x` e de `1x` | p95 de `10x` ≤ 20 segundos e ≤ 2 vezes a linha de base, no crescimento e no pico | Configuração de carga e mocks, dados brutos, percentis, razões e métricas de recursos |
+| `CT-RNF10-C-P` e `CT-RNF10-C-N` | Mediana dos três p95 de cada condição e razões `C / B` e `P / B` | `C` e `P` ≤ 20 segundos e ≤ 2 vezes `B`, com atendimento completo das entradas válidas sob dependências determinísticas de sucesso | Configuração de carga e mocks, dados brutos, percentis individuais, medianas, razões, erros e métricas de recursos |
 | `CT-RNF10-M-P` e `CT-RNF10-M-N` | Razões de memória de treinamento, RSS estabilizada e pico de inferência entre `10x` e `1x` | Treinamento ≤ 8 vezes; memória estabilizada e pico do serviço ≤ 2 vezes, inclusive no dataset adverso | Datasets, modelos, RSS bruto, medianas e gráficos separados |
 | `CT-RNF11-P` e `CT-RNF11-N` | Sugestões com fonte válida, sustentação e justificativa compreensível | Pelo menos 17 de 20 positivas válidas; 100% das negativas se abstêm ou informam limitação sem invenção | Solicitações, fontes, respostas, rubricas independentes, desempates e consolidação |
 | `CT-RNF12-P` e `CT-RNF12-N` | Referências existentes e afirmações factuais sustentadas | 100% das referências recuperáveis, pelo menos 90% das afirmações sustentadas e 100% das negativas com limitação segura | Consultas, fontes, respostas, afirmações atômicas, rubricas e desempates |
@@ -6858,16 +7296,18 @@ O caso TI-20 lê um registro de sucesso do módulo VHS. O caso TI-21 lê um regi
 
 #### Persistência em banco de dados
 
-Casos executados contra o PostgreSQL provisionado a partir do DDL da seção 3.6.6, aplicado a uma base de testes dedicada.
+Casos executados contra o PostgreSQL provisionado pelos scripts de `src/database`, cuja definição está transcrita na seção 3.6.6, aplicados a uma base de testes dedicada. O roteiro manual equivalente é `src/database/04_verificacao.sql`, que exercita o caminho de escrita e as restrições dentro de uma transação revertida ao final.
 
 | ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
 |---|---|---|---|---|---|
-| TI-24 | Positivo | `TestPersistenciaIntegracao.test_interacao_por_texto_e_gravada_com_atributos_minimos` | Interação processada pelo canal de texto | Registro em `auditoria.interacao` com os dez atributos exigidos pelo RNF09 | RNF04, RNF09 |
-| TI-25 | Positivo e negativo | `TestPersistenciaIntegracao.test_interacao_por_voz_vincula_o_audio_de_origem` | Interação processada pelo canal de voz | `audio_referencia` igual ao identificador do MinIO; preenchê-lo com `canal=texto` é rejeitado pela restrição | RNF04, RF01 |
-| TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.interacao_artefato` por artefato citado | RF02, RF03, RNF11 |
-| TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_a_interacao` | Interação processada com o banco inacessível | Código de indisponibilidade definido; a interação é reencaminhada, não descartada | RNF07, RNF04 |
-| TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.*` com as credenciais da aplicação | Operação rejeitada pelo banco | RNF04 |
-| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução do DDL da seção 3.6.6 em base vazia | Os dois schemas e as onze tabelas são criados; carga inicial populada | Seção 3.6 |
+| TI-24 | Positivo | `TestPersistenciaIntegracao.test_turno_por_texto_e_gravado_com_atributos_minimos` | Solicitação e resposta processadas pelo formato de texto | Duas linhas em `auditoria.mensagem`, com papéis `usuario` e `agente`, ordens consecutivas e o texto de ambas preservado | RNF04, RNF09 |
+| TI-25 | Positivo e negativo | `TestPersistenciaIntegracao.test_turno_por_voz_vincula_o_audio_de_origem` | Solicitação processada pelo formato de áudio | `audio_referencia` igual ao identificador do MinIO; preenchê-lo com `formato='texto'` é rejeitado por `mensagem_audio_coerente` | RNF04, RF01 |
+| TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.mensagem_fonte` por trecho citado, com `chunk_id`, posição e cópia dos metadados | RF02, RF03, RNF11, RNF12 |
+| TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_o_turno` | Turno processado com o banco inacessível | Código de indisponibilidade definido; o turno é reencaminhado, não descartado | RNF07, RNF04 |
+| TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.mensagem` com as credenciais da aplicação | Operação rejeitada pelo banco; renomear conversa e reavaliar resposta continuam permitidos | RNF04, RNF09 |
+| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução de `src/database/01_create_database.sql` em base vazia, seguida de `02_initial_data.sql` e `03_rls_policies.sql` | Os dois schemas e as catorze tabelas são criados; carga inicial populada; `scripts/verificar_modelo_documentado.py` não aponta divergência com a seção 3.6.6 | Seção 3.6 |
+| TI-30 | Positivo e negativo | `TestPersistenciaIntegracao.test_papel_da_mensagem_delimita_as_colunas` | Resposta do agente com intenção classificada e solicitação do usuário com tempo de processamento | Ambas rejeitadas por `mensagem_papel_coerente` | RNF04 |
+| TI-31 | Positivo e negativo | `TestPersistenciaIntegracao.test_avaliacao_exige_alvo_e_juizo_unicos` | Avaliação apontando para conversa e mensagem ao mesmo tempo; avaliação apenas com comentário | Ambas rejeitadas por `avaliacao_alvo_unico` e `avaliacao_tem_juizo`; reavaliar o mesmo alvo atualiza a linha existente | RNF08, RNF09 |
 
 #### Frontend e backend
 
@@ -6960,15 +7400,183 @@ Ficam fora deste escopo os testes de desempenho e carga sob concorrência, que d
 
 ## 6.5 Planejamento dos Testes de Usabilidade
 
+Os testes das seções 6.2 a 6.4 verificam se o sistema faz o que foi especificado. Esta seção planeja um tipo diferente de verificação: se uma pessoa que nunca viu o agente consegue usá-lo sem instrução prévia. Nenhuma das evidências desta seção existe ainda: o que segue é o instrumento e o roteiro a serem aplicados, não os resultados da aplicação.
+
 ### 6.5.1 Objetivo do Teste
+
+O teste de usabilidade avalia se usuários externos ao projeto conseguem operar o agente de forma clara e intuitiva, sem receber explicações sobre a interface antes ou durante a tarefa. Especificamente, o teste verifica se o participante consegue:
+
+- enviar uma pergunta por texto;
+- enviar uma pergunta por áudio;
+- compreender a resposta apresentada pelo agente;
+- identificar a fonte da informação retornada;
+- entender alertas, limitações de escopo e mensagens de erro apresentados pelo sistema.
+
+Este teste é o instrumento de coleta que sustenta o RNF08 (usabilidade das respostas, meta de 80% de compreensão sem auxílio externo) e complementa o RNF06 (qualidade da transcrição de áudio), na medida em que uma transcrição tecnicamente correta ainda pode falhar em produzir uma interação compreensível se o fluxo de gravação confundir o usuário. O teste não mede desempenho, precisão de classificação de intenção ou corretude de dados: essas dimensões já são cobertas pelas seções 6.2 e 6.3. Aqui, o foco é exclusivamente a experiência de uso.
 
 ### 6.5.2 Perfis, Diversidade e Seleção dos Participantes
 
-### 6.5.3 Cenários e Roteiro Planejados
+O teste será aplicado a, no mínimo, 5 participantes externos à equipe e à turma, para que nenhum resultado seja explicado por familiaridade prévia com as decisões de design do grupo. A seleção busca variar o perfil profissional e o nível de familiaridade com IA e com gestão de projetos, para que o instrumento não meça apenas a facilidade de uso para um único tipo de usuário.
 
-### 6.5.4 Aplicação Planejada do SUS
+| Participante | Perfil | Familiaridade com IA | Familiaridade com gestão de projetos | Papel do agente aproximado |
+|---|---|---|---|---|
+| P1 | Estudante | A registrar na aplicação | A registrar na aplicação | Usuário do portfólio (consulta geral) |
+| P2 | Profissional de tecnologia | A registrar na aplicação | A registrar na aplicação | Usuário do portfólio / Líder de projeto |
+| P3 | Profissional administrativo | A registrar na aplicação | A registrar na aplicação | PMO |
+| P4 | Pessoa com experiência em projetos | A registrar na aplicação | A registrar na aplicação | Líder de projeto / Diretor |
+| P5 | Pessoa com pouca familiaridade com IA | A registrar na aplicação | A registrar na aplicação | Usuário do portfólio (consulta geral) |
 
-### 6.5.5 Critérios para Análise dos Resultados
+A coluna "Papel do agente aproximado" não atribui uma persona fictícia da seção 1.5 ao participante; ela apenas indica qual perfil de uso (consulta, liderança de projeto, PMO ou diretoria) o participante mais se aproxima ao interpretar as tarefas, para que a diversidade de perfis cubra os mesmos papéis já mapeados nas jornadas do usuário. As colunas de familiaridade serão preenchidas por uma pergunta de triagem de escala 1 a 5 (nenhuma a muita familiaridade), aplicada antes do início do teste e não durante ele, para não induzir o participante a se autoavaliar em função das tarefas que ainda vai executar.
+
+Critérios de seleção: o participante não pode ter contato prévio com o agente nem com as decisões de arquitetura descritas neste documento; o convite é feito sem revelar o que o sistema faz além de "um agente conversacional para acompanhamento de portfólio de projetos"; e o consentimento para observação e registro das respostas é obtido antes da sessão.
+
+### 6.5.3 Cenários de Teste
+
+| ID | Cenário | O que o usuário faz | Requisito relacionado |
+|---|---|---|---|
+| TU-01 | Consulta por texto | Envia uma pergunta digitada ao agente | RF01, RF02 |
+| TU-02 | Consulta por áudio | Grava e envia uma pergunta por voz | RF01, RNF06 |
+| TU-03 | Consulta com fontes | Faz uma pergunta e identifica a fonte da resposta | RF03, RNF11 |
+| TU-04 | Solicitação fora do catálogo | Tenta pedir algo que o agente não executa diretamente | RF06, RNF08, RNF09 |
+| TU-05 | Dados insuficientes | Faz uma pergunta sem informação suficiente disponível | RF03, RNF08, RNF09 |
+| TU-06 | Alertas e pendências | Consulta uma situação em que o agente apresenta alerta | RF05, RNF08 |
+
+O TU-04 explora deliberadamente um limite conhecido do sistema: o RF06 não executa escrita direta nas fontes, apenas gera uma sugestão copiável, conforme a decisão D04 (seção 7). Pedir ao agente para "atualizar o prazo de entrega de um projeto" não deve resultar em uma alteração de fato: a resposta esperada é uma sugestão de texto para o participante copiar e aplicar manualmente na ferramenta oficial. O critério de sucesso da tarefa não é o prazo ter sido alterado, e sim se o participante entende, a partir da resposta do agente, que recebeu uma sugestão (e não uma confirmação de alteração), por que a mudança não foi feita diretamente e qual é o próximo passo para efetivá-la.
+
+### 6.5.4 Cenário Detalhado de Uso por Áudio (TU-02)
+
+Este é o cenário com maior número de pontos de possível confusão, porque depende de o participante perceber corretamente três estados sucessivos da interface (gravando, enviando, processando) sem qualquer explicação prévia sobre onde procurar essas indicações. O roteiro observa cada etapa do fluxo descrito na seção 3 (Chat UI → API de Recebimento de Áudio → transcrição exibida para conferência → processamento pelo pipeline de PLN):
+
+| Etapa | O que será observado | Indício de dificuldade |
+|---|---|---|
+| 1. Localizar o controle de áudio | Tempo até o participante identificar o botão/ícone de gravação sem apoio | Participante navega pela tela procurando, ou pergunta onde gravar |
+| 2. Perceber o início da gravação | Se o participante reconhece, sem perguntar, que a gravação começou | Participante fala antes de confirmar visualmente o início, ou pergunta "já está gravando?" |
+| 3. Perceber o fim da gravação | Se o participante sabe como e quando a gravação é encerrada | Participante continua falando após pretender parar, ou não sabe como parar |
+| 4. Enviar o áudio gravado | Se o envio é uma ação distinta e reconhecível após a gravação | Participante acredita que gravar já enviou, ou não encontra o botão de envio |
+| 5. Perceber o processamento | Se existe alguma indicação de que o sistema está processando, e se o participante a percebe | Participante pergunta se o sistema travou, ou envia o áudio novamente |
+| 6. Entender a transcrição e eventuais erros | Se o participante relaciona a transcrição exibida ao que falou, e entende mensagens de erro quando ocorrem | Participante não nota que a transcrição está errada, ou não sabe o que fazer diante de uma mensagem de erro |
+| 7. Relacionar a resposta final ao áudio enviado | Se o participante confirma que a resposta corresponde à pergunta que fez por voz | Participante hesita ou pergunta se a resposta é sobre o que ele perguntou |
+
+Além do fluxo correto, cada sessão induz pelo menos uma condição de erro no canal de áudio. A condição prioritária é o áudio muito longo, por ser o único limite já definido no documento: a seção 3 estabelece um teto de 5 minutos por gravação. As demais condições (áudio inválido, formato não suportado e falha no envio) são aplicadas como complemento quando o tempo de sessão permitir, já que seus limites técnicos ainda dependem de definição de implementação e não fazem parte do escopo desta seção.
+
+O critério de avaliação do erro não é se o backend retornou o código HTTP correto: isso já é coberto pelos testes de requisitos não funcionais da seção 6.3. Aqui, o que importa é se o participante entende, a partir da mensagem exibida, o que aconteceu e o que pode fazer em seguida (regravar, encurtar o áudio, tentar novamente), sem precisar perguntar ao facilitador.
+
+### 6.5.5 Tarefas Aplicadas aos Participantes
+
+Cada participante recebe as seis tarefas abaixo, uma por cenário, em texto escrito e sem indicação de como executá-las na interface.
+
+| ID | Tarefa entregue ao participante | Cenário |
+|---|---|---|
+| T1 | "Pergunte por texto quais são os principais riscos do projeto." | TU-01 |
+| T2 | "Faça a mesma consulta utilizando áudio." | TU-02 |
+| T3 | "Descubra qual fonte foi utilizada na resposta." | TU-03 |
+| T4 | "Peça ao agente para atualizar o prazo de entrega de um projeto." | TU-04 |
+| T5 | "Faça uma pergunta para a qual não há dados suficientes." | TU-05 |
+| T6 | "Identifique uma pendência ou alerta apresentado pelo sistema." | TU-06 |
+
+As tarefas são apresentadas nessa ordem para todos os participantes, de modo que T2 (áudio) já ocorra com o participante familiarizado com a resposta do agente em texto (T1), isolando a dificuldade específica do canal de voz das dificuldades gerais de uma primeira interação com o sistema.
+
+### 6.5.6 Métricas Observadas
+
+Para cada tarefa, o facilitador registra:
+
+| Métrica | Definição |
+|---|---|
+| Resultado | Concluída sem ajuda / concluída com ajuda / não concluída |
+| Tempo para concluir | Do início da leitura da tarefa até a ação que a encerra, em mm:ss |
+| Quantidade de erros | Número de ações que não levam ao objetivo da tarefa (cliques, tentativas, reformulações) |
+| Necessidade de ajuda | Se o facilitador precisou intervir, e em que ponto |
+| Dúvidas verbalizadas | Perguntas feitas em voz alta durante a tarefa (protocolo think-aloud) |
+| Comentários do participante | Observações espontâneas registradas literalmente |
+
+O instrumento de campo é uma ficha por participante, com uma linha por tarefa:
+
+| Participante | Tarefa | Resultado | Tempo | Nº de erros | Ajuda necessária | Dúvidas verbalizadas | Comentários |
+|---|---|---|---|---|---|---|---|
+
+### 6.5.7 Procedimento de Execução
+
+1. **Apresentar rapidamente o contexto.** O facilitador explica em poucas frases o que é o agente ("um assistente conversacional para consultar informações de projetos"), sem descrever a interface ou como realizar qualquer ação nela.
+2. **Entregar as tarefas.** As seis tarefas da seção 6.5.5 são entregues por escrito, uma de cada vez, na ordem T1 a T6.
+3. **Não ensinar onde clicar.** O facilitador não indica botões, menus ou fluxos. Se o participante travar completamente, o facilitador registra o bloqueio como parte do resultado antes de decidir se intervém.
+4. **Observar a interação.** O facilitador acompanha em silêncio, sem validar ou corrigir escolhas do participante durante a tarefa.
+5. **Registrar dificuldades.** Cada hesitação, tentativa fracassada, pergunta ou comentário é anotado na ficha da seção 6.5.6 no momento em que ocorre.
+6. **Aplicar todas as tarefas.** As seis tarefas são aplicadas na mesma sessão, sem pular etapas, mesmo quando uma tarefa anterior não é concluída.
+7. **Aplicar o SUS ao final.** Após a última tarefa, o participante responde ao questionário da seção 6.5.8 sem a presença de comentários do facilitador sobre o desempenho observado.
+8. **Fazer perguntas abertas.** O facilitador conduz as perguntas qualitativas da seção 6.5.9 como conversa, não como formulário lido em voz alta.
+9. **Consolidar os resultados.** Ao final de cada sessão, a ficha de observação e as respostas do SUS são digitalizadas e associadas ao identificador do participante (P1 a P5), preservando o anonimato do nome real no restante do documento.
+
+### 6.5.8 Questionário SUS e Cálculo do Escore
+
+Ao final da sessão, todos os participantes respondem às dez perguntas padrão do System Usability Scale (Brooke, 1996), em escala de 1 (discordo totalmente) a 5 (concordo totalmente):
+
+1. Eu acho que gostaria de usar este sistema com frequência.
+2. Eu achei o sistema desnecessariamente complexo.
+3. Eu achei o sistema fácil de usar.
+4. Eu acho que precisaria do apoio de uma pessoa com conhecimento técnico para conseguir usar este sistema.
+5. Eu achei que as várias funções deste sistema estavam bem integradas.
+6. Eu achei que havia muita inconsistência neste sistema.
+7. Eu imagino que a maioria das pessoas aprenderia a usar este sistema rapidamente.
+8. Eu achei o sistema muito difícil de usar.
+9. Eu me senti muito confiante usando o sistema.
+10. Eu precisei aprender uma quantidade grande de coisas antes de conseguir usar este sistema.
+
+O escore de cada participante é calculado assim:
+
+- para as questões ímpares (1, 3, 5, 7, 9): resposta − 1;
+- para as questões pares (2, 4, 6, 8, 10): 5 − resposta;
+- soma-se o resultado das dez questões;
+- multiplica-se a soma por 2,5, produzindo um escore de 0 a 100.
+
+O escore final reportado é a média dos escores individuais dos 5 participantes (ou mais, se o recrutamento da seção 6.5.2 exceder o mínimo).
+
+### 6.5.9 Perguntas Qualitativas Finais
+
+Aplicadas em conversa aberta após o SUS, sem opções de resposta pré-definidas:
+
+- O que foi mais fácil de usar?
+- O que foi mais difícil?
+- Você preferiu usar texto ou áudio? Por quê?
+- Em algum momento você ficou em dúvida se o sistema estava gravando, enviando ou processando?
+- O que você mudaria na interface?
+
+### 6.5.10 Critérios de Avaliação dos Resultados
+
+Com 5 participantes executando as 6 tarefas da seção 6.5.5, o instrumento produz 30 execuções de tarefa. A taxa de conclusão sem ajuda é calculada como:
+
+Taxa de conclusão sem ajuda = (execuções concluídas sem ajuda / total de execuções) × 100
+
+Essa taxa será reportada como indicador complementar de execução das tarefas. A verificação do RNF08 será feita por participante, pois o requisito estabelece que pelo menos 80% dos participantes compreendam a resposta e identifiquem a informação solicitada sem auxílio externo.
+
+Para observar essa compreensão, após T1 e T3 o facilitador solicitará, sem dar pistas: "Explique com suas palavras o que a resposta informa e mostre onde encontrou a informação solicitada e sua fonte". Após T5, solicitará: "Explique o que a resposta permite concluir sobre a informação solicitada". As respostas serão comparadas com um gabarito preparado previamente a partir da massa de teste, registrando compreensão correta e necessidade de ajuda. No cenário de dados insuficientes, compreender corretamente significa reconhecer que a informação não está disponível, sem interpretar a limitação como uma resposta factual.
+
+Cada participante será contado uma única vez como bem-sucedido no RNF08 se compreender tanto a resposta informativa e sua fonte quanto a resposta de limitação, sem explicação adicional do facilitador. Os registros por cenário serão preservados para identificar dificuldades específicas.
+
+Taxa de compreensão sem ajuda = (participantes que atendem aos critérios de compreensão / total de participantes avaliados) × 100
+
+Com cinco participantes, pelo menos quatro deverão atender aos critérios. Com mais participantes, será exigida a menor quantidade inteira que alcance 80% da amostra, sem arredondar o percentual para cima. Esses cálculos serão realizados após a aplicação; não representam resultados já obtidos.
+
+O teste é considerado bem-sucedido quando:
+
+- a taxa de compreensão sem ajuda é igual ou superior a 80% dos participantes, conforme o RNF08, independentemente da taxa complementar de conclusão das tarefas;
+- os erros de interação registrados na seção 6.5.6 são pontuais, sem um mesmo ponto de confusão se repetir de forma consistente entre participantes diferentes;
+- os participantes descrevem, nas perguntas qualitativas, ter entendido as respostas do agente, a indicação de fonte (TU-03) e as mensagens de alerta, limitação e erro (TU-04, TU-05, TU-06) sem precisar de explicação adicional;
+- os participantes completam o fluxo de áudio (TU-02), ou seja, localizar o botão, gravar, enviar e reconhecer o processamento, sem orientação do facilitador, conforme os sete pontos de verificação da seção 6.5.4;
+- o escore médio do SUS calculado na seção 6.5.8 fica em nível aceitável, tomando como referência usual da literatura de usabilidade um escore igual ou superior a 68 (Bangor, Kortum e Miller, 2008), que corresponde à média histórica de sistemas avaliados pelo instrumento.
+
+Qualquer um desses critérios não atendido é registrado como achado do teste, não como falha do plano: o objetivo desta seção é gerar evidência para decidir onde a interface precisa de ajuste, não aprovar o sistema.
+
+### 6.5.11 Orientações para a Elaboração da Conclusão
+
+Esta seção planeja o instrumento; a conclusão só pode ser escrita depois da aplicação com os 5 participantes. Quando os dados existirem, a conclusão deve:
+
+- reportar o resultado agregado por cenário (TU-01 a TU-06), não apenas por participante, para identificar se a dificuldade está concentrada em um cenário específico: é possível que o TU-02 apresente maior concentração de dificuldades, considerando a quantidade de estados e ações envolvidos no fluxo de áudio; essa hipótese deverá ser confirmada ou rejeitada pelos resultados;
+- comparar a taxa de compreensão sem ajuda por participante com a meta de 80% do RNF08, apresentar a contagem absoluta (por exemplo, quatro de cinco) e declarar se a meta foi atingida ou não; reportar separadamente a taxa de conclusão das tarefas como indicador complementar;
+- reportar o escore médio do SUS e sua faixa de interpretação (abaixo, próximo ou acima da referência de 68), junto com o desvio entre participantes: um SUS médio aceitável com alta variância indica um sistema que funciona bem para alguns perfis e mal para outros, o que é uma conclusão diferente de um SUS uniformemente mediano;
+- descrever os dois ou três pontos de confusão que mais se repetiram nas fichas de observação e nas respostas às perguntas qualitativas, citando a etapa exata da seção 6.5.4 ou 6.5.6 em que ocorreram, para que a recomendação de ajuste seja acionável e não genérica;
+- indicar, para cada ponto de confusão relevante, se a causa é de interface (o controle certo existe mas não foi encontrado) ou de conteúdo (a mensagem existe mas não foi compreendida), porque as duas causas pedem correções diferentes;
+- registrar as limitações da coleta, em particular o tamanho da amostra (mínimo de 5 participantes) e qualquer desvio do roteiro planejado nesta seção, para que os resultados não sejam lidos como estatisticamente conclusivos;
+- encerrar com recomendações concretas de ajuste de interface ou de texto, priorizadas pelos achados mais recorrentes, e indicar quais delas justificam nova rodada de teste após implementadas. As recomendações que não forem endereçadas nesta sprint devem ser registradas na seção 7 (Registro de Decisões) ou na seção 1.7 (evolução futura), para não se perderem entre sprints.
 
 ## 6.6 Matriz de Cobertura Planejada
 
