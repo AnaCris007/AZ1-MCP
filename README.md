@@ -98,7 +98,8 @@ python -m spacy download pt_core_news_md
 python -m pln.experimento          # varre pré-processamento e vetorização
 python -m pln.ajuste_fino          # varre os hiperparâmetros do modelo
 python -m pln.classificador        # treina, avalia e salva o modelo
-python -m unittest discover tests  # 106 testes
+python -m pln.bancada              # mede latência, tempo de treino e memória
+python -m unittest discover tests  # 169 testes
 ```
 
 - `assets/`: imagens e diagramas utilizados na documentação.
@@ -111,8 +112,8 @@ python -m unittest discover tests  # 106 testes
 - `src/services/`: casos de uso e integração com armazenamento S3-compatível.
 - `src/az1_api/main.py`: ponto de entrada da aplicação FastAPI.
 - `resultados/`: saída gerada. Nada ali é editado à mão. Os comparativos vêm de
-  `python -m pln.experimento` e `python -m pln.ajuste_fino`, e o modelo treinado de
-  `python -m pln.classificador`.
+  `python -m pln.experimento` e `python -m pln.ajuste_fino`, o modelo treinado de
+  `python -m pln.classificador`, e as medições de desempenho de `python -m pln.bancada`.
 
 ##  Rodando com Docker
 
@@ -132,7 +133,7 @@ docker compose up -d --build
 O código do repositório é montado dentro dos contêineres: editar um arquivo recarrega a API ou a interface, sem reconstruir imagem.
 
 ```bash
-docker compose --profile ci run --rm tests      # os 145 testes, dentro da imagem
+docker compose --profile ci run --rm tests      # os 169 testes, dentro da imagem
 docker compose --profile ml run --rm trainer    # retreina o classificador
 docker compose logs -f api                      # acompanha os logs
 docker compose down                             # derruba, preservando os áudios

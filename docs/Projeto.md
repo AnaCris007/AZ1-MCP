@@ -2328,9 +2328,11 @@ F1-macro de **0,6736** em validação cruzada de 5 dobras. Esses valores estão 
 | --- | --- | --- |
 | `scikit-learn` | 1.9.0 | Vetorizadores, `MultinomialNB`, `Pipeline`, validação cruzada e métricas |
 | `nltk` | 3.10.3 | Lista de stopwords do português, stemmer RSLP e tokenizador por expressão regular |
-| `spacy` | 3.8.15 | Tokenizador linguístico e lematizador de português (`pt_core_news_sm`) |
+| `spacy` | 3.8.16 | Tokenizador linguístico e lematizador de português (`pt_core_news_sm`) |
 | `numpy` | 2.5.2 | Operações sobre a matriz de pesos na explicação por classe |
-| `joblib` | 1.5.3 | Serialização do modelo treinado e paralelização da varredura |
+| `joblib` | 1.6.0 | Serialização do modelo treinado e paralelização da varredura |
+
+As cinco versões acima estão fixadas com `==` em `requirements.txt` e em `pyproject.toml`, e não com piso `>=`. A tabela e os dois arquivos precisam concordar: são essas versões que produzem o F1-macro publicado em `resultados/`, e com piso um rebuild puxaria versões novas, mudando o número medido sem que nenhum teste acusasse. O teste `TesteVersoesFixadas`, em `tests/test_reprodutibilidade.py`, falha se a tabela divergir dos arquivos de dependência. Atualizar qualquer versão exige regerar os relatórios com `python -m pln.experimento` e `python -m pln.ajuste_fino` antes de editar a tabela.
 
 O tokenizador linguístico usa `spacy.blank("pt")`, que carrega apenas as regras do idioma e não exige o download de modelo. O `pt_core_news_sm` é necessário somente para a lematização.
 
@@ -2391,7 +2393,7 @@ listar_palavras_de_maior_peso_por_intencao(modelo, quantas=4)
 
 ### 3.3.9 Testes
 
-O pipeline tem **100 testes automatizados**, organizados por módulo. Eles são a evidência de que o
+O pipeline tem **124 testes automatizados**, organizados por módulo. Eles são a evidência de que o
 comportamento descrito nesta seção é o que o código faz, e não apenas o que se pretendia.
 
 ```bash
