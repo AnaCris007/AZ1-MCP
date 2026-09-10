@@ -10,6 +10,7 @@ export function useMicVolume({ onRecordingComplete } = {}) {
   const mediaRecorderRef = useRef(null)
   const chunksRef = useRef([])
   const onRecordingCompleteRef = useRef(onRecordingComplete)
+  const activeRequestRef = useRef(false)
 
   useEffect(() => {
     onRecordingCompleteRef.current = onRecordingComplete
@@ -60,8 +61,15 @@ export function useMicVolume({ onRecordingComplete } = {}) {
   }, [])
 
   const start = useCallback(async () => {
+    activeRequestRef.current = true
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+
+      if (!activeRequestRef.current) {
+        stream.getTracks().forEach((track) => track.stop())
+        return
+      }
+
       streamRef.current = stream
 
       const AudioContextClass = window.AudioContext || window.webkitAudioContext
@@ -90,12 +98,14 @@ export function useMicVolume({ onRecordingComplete } = {}) {
       setPermissionDenied(false)
       tick()
     } catch {
+      if (!activeRequestRef.current) return
       setPermissionDenied(true)
       rafRef.current = requestAnimationFrame(simulateTick)
     }
   }, [tick, simulateTick, cleanupStream])
 
   const stop = useCallback(() => {
+    activeRequestRef.current = false
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.stop()
       return
