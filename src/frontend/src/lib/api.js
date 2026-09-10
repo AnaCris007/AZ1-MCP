@@ -30,6 +30,20 @@ export async function sendMessage(text, conversationId) {
   return response.json()
 }
 
+export async function generateSpeech(text) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/text-to-speech`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, voice: 'Kore', format: 'wav' }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Falha ao gerar áudio: ${response.status}`)
+  }
+
+  return response.blob()
+}
+
 export async function fetchTasks() {
   const response = await fetch(`${API_BASE_URL}/api/v1/tasks`)
 
