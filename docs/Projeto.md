@@ -5125,8 +5125,9 @@ Cada critério de aceitação da Seção 2.2 é uma frase que reúne mais de uma
 | | C1.2 — A transcrição é apresentada ao usuário **antes** do processamento | CT-RF01-03 |
 | | C1.3 — Solicitação em texto é processada diretamente | CT-RF01-04 |
 | | C1.4 — A resposta é apresentada em texto, qualquer que seja o formato de entrada | CT-RF01-05 |
-| | C1.5 — Entradas inválidas são recusadas com o erro previsto no contrato da Seção 3.4 | CT-RF01-06 a CT-RF01-14 |
+| | C1.5 — Entradas inválidas no recebimento de áudio são recusadas com o erro previsto no contrato da Seção 3.4 | CT-RF01-06 a CT-RF01-10 |
 | | C1.6 — A falha do canal é comunicada ao usuário, e não mascarada | CT-RF01-15 |
+| | C1.7 — Falha da transcrição e mensagem de texto inválida são recusadas com o erro correspondente, definido no código das rotas de transcrição e de chat | CT-RF01-11 a CT-RF01-14 |
 | **RF02** | C2.1 — O sistema identifica a que tipo de solicitação a mensagem se refere | CT-RF02-01, CT-RF02-02, CT-RF02-03 |
 | | C2.2 — O sistema identifica a que projeto e a que dado a solicitação se refere | CT-RF02-04 |
 | | C2.3 — O sistema consulta as fontes e retorna os dados solicitados | CT-RF02-05 |
@@ -5173,7 +5174,7 @@ Alguns casos funcionais tocam requisitos não funcionais sem, no entanto, medi-l
 
 #### Critério de composição
 
-O plano não distribui casos positivos e negativos em proporção fixa. A distribuição acompanha a superfície de erro efetivamente especificada de cada requisito: o RF01 concentra nove casos negativos porque o contrato da Seção 3.4 define, um a um, sete códigos de erro com código HTTP e mensagem próprios, e cada um deles é uma promessa verificável; o RF03, ao contrário, tem dois negativos porque seu critério descreve principalmente uma obrigação de presença, e não um conjunto de recusas.
+O plano não distribui casos positivos e negativos em proporção fixa. A distribuição acompanha a superfície de erro efetivamente especificada de cada requisito: o RF01 concentra nove casos negativos porque três fontes de erro sobre o mesmo canal de entrada definem, um a um, códigos com HTTP e mensagem próprios — cinco dos sete códigos padronizados pelo contrato da Seção 3.4, mais dois da API de transcrição e dois da validação de mensagem do chat, definidos no código das rotas — e cada um deles é uma promessa verificável; o RF03, ao contrário, tem dois negativos porque seu critério descreve principalmente uma obrigação de presença, e não um conjunto de recusas.
 
 Um caso negativo só é aprovado quando o sistema apresenta o **comportamento previsto** para a condição adversa. Ausência de exceção não é aprovação: um endpoint que aceita um arquivo corrompido e devolve `201` falha o caso negativo correspondente, ainda que não tenha quebrado.
 
@@ -5193,10 +5194,10 @@ A coluna **Sprint** indica em que ciclo o caso se torna executável, conforme o 
 | CT-RF01-08 | RF01 | C1.5 | Negativo | API | 4 | Executável |
 | CT-RF01-09 | RF01 | C1.5 | Negativo | API | 4 | Executável |
 | CT-RF01-10 | RF01 | C1.5 | Negativo | API | 4 | Executável |
-| CT-RF01-11 | RF01 | C1.5 | Negativo | API | 4 | Executável |
-| CT-RF01-12 | RF01 | C1.5 | Negativo | Integração | 4 | Executável |
-| CT-RF01-13 | RF01 | C1.5 | Negativo | API | 4 | Executável |
-| CT-RF01-14 | RF01 | C1.5 | Negativo | API | 4 | Executável |
+| CT-RF01-11 | RF01 | C1.7 | Negativo | API | 4 | Executável |
+| CT-RF01-12 | RF01 | C1.7 | Negativo | Integração | 4 | Executável |
+| CT-RF01-13 | RF01 | C1.7 | Negativo | API | 4 | Executável |
+| CT-RF01-14 | RF01 | C1.7 | Negativo | API | 4 | Executável |
 | CT-RF01-15 | RF01 | C1.6 | Negativo | Interface | 5 | Planejado |
 | CT-RF02-01 | RF02 | C2.1 | Positivo | API | 4 | Executável |
 | CT-RF02-02 | RF02 | C2.1 | Positivo | API | 4 | Executável |
@@ -5282,7 +5283,7 @@ O conjunto C merece registro à parte. A base atual foi gerada por gabarito e a 
 
 #### RF01 — Receber solicitações por áudio e texto e responder em texto
 
-**Propósito.** Verificar que o canal de entrada aceita as duas modalidades previstas, que a conversão de áudio em texto ocorre e é apresentada ao usuário antes do processamento, que a resposta chega em texto e que toda entrada inválida é recusada com o erro exato definido no contrato da Seção 3.4.
+**Propósito.** Verificar que o canal de entrada aceita as duas modalidades previstas, que a conversão de áudio em texto ocorre e é apresentada ao usuário antes do processamento, que a resposta chega em texto e que toda entrada inválida é recusada com o erro exato definido no contrato de cada rota envolvida: a Seção 3.4 para o recebimento de áudio; o código das rotas de transcrição e de chat para os demais.
 
 **Pré-condições comuns.** Aplicação em execução; bucket compatível com S3 acessível; credencial do provedor de Speech to Text configurada nos casos de integração; conjuntos A e B disponíveis.
 
@@ -5482,7 +5483,7 @@ Nenhum caso é considerado aprovado por inspeção de código. A aprovação exi
 
 #### O que o plano cobre
 
-O plano cobre os seis requisitos funcionais da Seção 2.2 e as trinta e duas condições verificáveis extraídas de seus critérios de aceitação, sem deixar condição sem caso nem caso sem condição de origem. Cobre também a parte provocável do contrato de erro da Seção 3.4: cinco dos sete códigos padronizados possuem caso próprio, aos quais se somam os dois códigos da transcrição e os dois do chat, totalizando nove casos negativos sobre o canal de entrada. Ficam de fora `unauthorized`, que depende da autenticação ainda não construída, e `internal_error`, que por definição não é provocável por entrada do cliente. É essa densidade que faz do RF01 o requisito de verificação mais forte do conjunto.
+O plano cobre os seis requisitos funcionais da Seção 2.2 e as trinta e três condições verificáveis extraídas de seus critérios de aceitação, sem deixar condição sem caso nem caso sem condição de origem. Cobre também a parte provocável do contrato de erro da Seção 3.4: cinco dos sete códigos padronizados possuem caso próprio, aos quais se somam os dois códigos da transcrição e os dois do chat, totalizando nove casos negativos sobre o canal de entrada. Ficam de fora `unauthorized`, que depende da autenticação ainda não construída, e `internal_error`, que por definição não é provocável por entrada do cliente. É essa densidade que faz do RF01 o requisito de verificação mais forte do conjunto.
 
 A cobertura é maior onde a especificação é mais precisa. Isso não é acidental: um critério que enumera códigos de erro, limites numéricos e formatos aceitos permite escrever um resultado esperado inequívoco, ao passo que um critério redigido em termos de comportamento desejado, como "apresentar sugestões para os campos pendentes", só se converte em caso verificável depois que a equipe fixa o que conta como sugestão adequada. O plano registra essa assimetria em vez de disfarçá-la distribuindo casos uniformemente entre os requisitos.
 
