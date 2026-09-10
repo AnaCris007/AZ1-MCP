@@ -26,6 +26,8 @@ Sem ele, a suíte inteira é pulada em vez de falhar.
 from __future__ import annotations
 
 import os
+import threading
+import time
 import unittest
 
 import psycopg
@@ -188,25 +190,110 @@ class TestPersistenciaDoEvento(unittest.TestCase):
             conteudo={"provedor": PROVEDOR_DRIVE, "channel_id": CANAL, "message_number": "7"},
         )
 
-    def test_entrega_inedita_e_reentrega_nao_concluida(self) -> None:
+    def test_reivindicacao_e_duplicata_apos_concluida(self) -> None:
+        """TI-37, sem concorrência: uma vez concluída, mais ninguém reivindica."""
         evento = self._evento()
 
-        # Primeira vez: inédita.
-        self.assertTrue(self.registro.registrar(evento))
-        # Registrada mas não concluída: a reentrega precisa poder retomar (TI-38).
-        self.assertTrue(self.registro.registrar(evento))
+        reivindicacao = self.registro.reivindicar(evento)
+        self.assertIsNotNone(reivindicacao)
+        reivindicacao.concluir(SituacaoEvento.PROCESSADO)
 
-        self.registro.marcar_processado(evento, SituacaoEvento.PROCESSADO)
-
-        # Depois de concluída, vira duplicata (TI-37).
-        self.assertFalse(self.registro.registrar(evento))
+        self.assertIsNone(self.registro.reivindicar(evento))
 
         with self.pool.connection() as conexao:
             linha = conexao.execute(
                 "SELECT count(*), min(situacao) FROM auditoria.evento_webhook WHERE notificacao_id = '7'"
             ).fetchone()
 
-        # Uma linha só, apesar das três chamadas: a unicidade é do esquema.
+        # Uma linha só: a segunda chamada não inseriu nem reivindicou de novo.
+        self.assertEqual(linha, (1, "processado"))
+
+    def test_reivindicacao_concorrente_espera_e_ve_a_conclusao(self) -> None:
+        """Prova com duas threads de verdade que a segunda espera a primeira —
+        e não decide por uma leitura tirada antes de a primeira terminar.
+
+        É o cenário observado na demonstração ao vivo: o Google reentregou a
+        mesma mudança por dois caminhos quase ao mesmo tempo. A ordem registrada
+        abaixo só pode sair como está se `reivindicar` da thread B tiver
+        bloqueado dentro do Postgres até a thread A concluir — não é apenas o
+        valor final que está sob teste, é o bloqueio em si.
+        """
+        evento = self._evento()
+        a_reivindicou = threading.Event()
+        ordem: list[str] = []
+
+        def tentativa_a() -> None:
+            reivindicacao = self.registro.reivindicar(evento)
+            assert reivindicacao is not None
+            a_reivindicou.set()
+            time.sleep(0.3)  # segura o lock por tempo perceptível
+            ordem.append("a_concluiu")
+            reivindicacao.concluir(SituacaoEvento.PROCESSADO)
+
+        resultado_b: list[object] = []
+
+        def tentativa_b() -> None:
+            a_reivindicou.wait(timeout=5)
+            resultado_b.append(self.registro.reivindicar(evento))
+            ordem.append("b_desbloqueou")
+
+        thread_a = threading.Thread(target=tentativa_a)
+        thread_b = threading.Thread(target=tentativa_b)
+        thread_a.start()
+        thread_b.start()
+        thread_a.join(timeout=5)
+        thread_b.join(timeout=5)
+
+        # B só desbloqueou depois que A concluiu, nunca antes.
+        self.assertEqual(ordem, ["a_concluiu", "b_desbloqueou"])
+        # E viu o estado definitivo: já concluído, portanto duplicata.
+        self.assertIsNone(resultado_b[0])
+
+    def test_reivindicacao_concorrente_retoma_apos_a_primeira_liberar(self) -> None:
+        """A reentrega de verdade do TI-38 — a primeira tentativa falhou.
+
+        Distinto do teste acima só no desfecho da thread A: aqui ela libera
+        (simulando falha de processamento) em vez de concluir. A thread B,
+        destravada em seguida, precisa conseguir reivindicar de verdade — é
+        essa retomada que TI-38 exige, e ela precisa sobreviver ao mesmo lock
+        que agora serializa o caso concorrente.
+        """
+        evento = self._evento()
+        a_reivindicou = threading.Event()
+        ordem: list[str] = []
+
+        def tentativa_a() -> None:
+            reivindicacao = self.registro.reivindicar(evento)
+            assert reivindicacao is not None
+            a_reivindicou.set()
+            time.sleep(0.3)
+            ordem.append("a_liberou")
+            reivindicacao.liberar()
+
+        resultado_b: list[object] = []
+
+        def tentativa_b() -> None:
+            a_reivindicou.wait(timeout=5)
+            resultado_b.append(self.registro.reivindicar(evento))
+            ordem.append("b_desbloqueou")
+
+        thread_a = threading.Thread(target=tentativa_a)
+        thread_b = threading.Thread(target=tentativa_b)
+        thread_a.start()
+        thread_b.start()
+        thread_a.join(timeout=5)
+        thread_b.join(timeout=5)
+
+        self.assertEqual(ordem, ["a_liberou", "b_desbloqueou"])
+        self.assertIsNotNone(resultado_b[0])
+        resultado_b[0].concluir(SituacaoEvento.PROCESSADO)
+
+        with self.pool.connection() as conexao:
+            linha = conexao.execute(
+                "SELECT count(*), min(situacao) FROM auditoria.evento_webhook WHERE notificacao_id = '7'"
+            ).fetchone()
+
+        # Uma linha só, apesar das duas reivindicações: a unicidade é do esquema.
         self.assertEqual(linha, (1, "processado"))
 
     def test_recusa_grava_o_corpo_bruto_sem_envelope(self) -> None:

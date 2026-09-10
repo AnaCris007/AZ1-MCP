@@ -41,74 +41,120 @@ def _partes(evento: EventoWebhook) -> tuple[str, str]:
     return origem, item
 
 
+class _ReivindicacaoPostgres:
+    """Uma conexão retirada do pool sem devolução automática, segurada aberta
+    entre `reivindicar` e `concluir`/`liberar`.
+
+    É essa conexão — mais precisamente, o lock de linha que ela detém desde o
+    INSERT ou o `SELECT ... FOR UPDATE` que a criou — que serializa duas
+    reivindicações concorrentes do mesmo evento. Nenhum dos dois métodos abaixo
+    pode deixar de devolvê-la ao pool, daí o `finally` nos dois.
+    """
+
+    def __init__(self, pool: Any, conexao: Any, provedor: str, origem: str, item: str) -> None:
+        self._pool = pool
+        self._conexao = conexao
+        self._provedor = provedor
+        self._origem = origem
+        self._item = item
+
+    def concluir(self, situacao: SituacaoEvento) -> None:
+        try:
+            self._conexao.execute(
+                """
+                UPDATE auditoria.evento_webhook
+                   SET concluido_em = now(), situacao = %s
+                 WHERE provedor = %s AND subscription_id = %s AND notificacao_id = %s
+                """,
+                (_SITUACAO_NO_BANCO[situacao], self._provedor, self._origem, self._item),
+            )
+            self._conexao.commit()
+        finally:
+            self._pool.putconn(self._conexao)
+
+    def liberar(self) -> None:
+        # Sem tocar em concluido_em, e com commit — não rollback: um rollback
+        # desfaria o INSERT desta tentativa (se foi ela quem inseriu a linha),
+        # fazendo o evento desaparecer da auditoria sem deixar rastro de que
+        # chegou. O commit preserva a linha, ainda pendente, e libera o lock
+        # para a próxima tentativa — reentrega do provedor (TI-38) ou uma
+        # segunda entrega concorrente que estava esperando nesta mesma chamada.
+        try:
+            self._conexao.commit()
+        finally:
+            self._pool.putconn(self._conexao)
+
+
 class RegistroEventosPostgres:
     """Grava a trilha de entregas em `auditoria.evento_webhook`.
 
-    A idempotência do caso TI-37 não é implementada aqui: ela é uma propriedade
-    do esquema, a restrição `UNIQUE (provedor, subscription_id, notificacao_id)`.
-    Este adaptador apenas consulta o resultado do `ON CONFLICT` para saber se a
-    entrega era inédita. Deixar a garantia no banco é o que a torna válida também
-    quando duas réplicas da API recebem a mesma reentrega ao mesmo tempo — uma
-    verificação em Python, feita antes do INSERT, perderia essa corrida.
+    A idempotência do caso TI-37 e a retomada após falha do caso TI-38 são a
+    mesma exclusividade, vista em dois desfechos — não dois mecanismos
+    separados. `reivindicar` tenta o INSERT; se a linha já existe, trava-a com
+    `SELECT ... FOR UPDATE` e esse `SELECT` *bloqueia* caso outra transação já
+    esteja segurando essa mesma linha, em vez de decidir com base numa leitura
+    que pode estar desatualizada. Só depois de destravar — quando a outra
+    transação já concluiu ou liberou — é que este método decide se ainda há o
+    que fazer. Uma versão anterior deste método usava uma janela de tempo para
+    essa decisão em vez de um lock; falhava exatamente no caso TI-38, porque
+    não existe prazo que distinga de forma confiável "outra entrega deste
+    mesmo evento está processando agora" de "a tentativa anterior falhou e o
+    provedor está reentregando rápido" — as duas acontecem na mesma escala de
+    tempo. Um lock de banco resolve os dois casos com a mesma regra, sem
+    precisar adivinhar quanto tempo é "rápido demais".
     """
 
     def __init__(self, pool: Any, provedor: str) -> None:
         self._pool = pool
         self._provedor = provedor
 
-    def registrar(self, evento: EventoWebhook) -> bool:
+    def reivindicar(self, evento: EventoWebhook) -> _ReivindicacaoPostgres | None:
         origem, item = _partes(evento)
+        conexao = self._pool.getconn()
 
-        with self._pool.connection() as conexao:
-            inserida = conexao.execute(
-                """
-                INSERT INTO auditoria.evento_webhook
-                    (provedor, subscription_id, notificacao_id, tipo, versao_envelope,
-                     correlacao, conteudo, recebido_em)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (provedor, subscription_id, notificacao_id) DO NOTHING
-                RETURNING id
-                """,
-                (
-                    self._provedor,
-                    origem,
-                    item,
-                    evento.tipo,
-                    evento.versao,
-                    evento.correlacao,
-                    Jsonb(dict(evento.conteudo)),
-                    evento.marca_de_tempo,
-                ),
-            ).fetchone()
+        inserida = conexao.execute(
+            """
+            INSERT INTO auditoria.evento_webhook
+                (provedor, subscription_id, notificacao_id, tipo, versao_envelope,
+                 correlacao, conteudo, recebido_em)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (provedor, subscription_id, notificacao_id) DO NOTHING
+            RETURNING id
+            """,
+            (
+                self._provedor,
+                origem,
+                item,
+                evento.tipo,
+                evento.versao,
+                evento.correlacao,
+                Jsonb(dict(evento.conteudo)),
+                evento.marca_de_tempo,
+            ),
+        ).fetchone()
 
-            if inserida is not None:
-                return True
+        if inserida is not None:
+            return _ReivindicacaoPostgres(self._pool, conexao, self._provedor, origem, item)
 
-            # A linha já existia. Ela só é duplicata de fato se tiver concluído:
-            # uma entrega registrada mas interrompida por falha (caso TI-38) tem
-            # `concluido_em` nulo, e a reentrega precisa poder retomá-la.
-            linha = conexao.execute(
-                """
-                SELECT concluido_em FROM auditoria.evento_webhook
-                 WHERE provedor = %s AND subscription_id = %s AND notificacao_id = %s
-                """,
-                (self._provedor, origem, item),
-            ).fetchone()
+        # A linha já existia: FOR UPDATE trava-a, bloqueando aqui mesmo se
+        # outra transação a estiver segurando neste instante. Ao desbloquear —
+        # depois que a outra concluir ou liberar —, o estado já é definitivo.
+        linha = conexao.execute(
+            """
+            SELECT concluido_em FROM auditoria.evento_webhook
+             WHERE provedor = %s AND subscription_id = %s AND notificacao_id = %s
+             FOR UPDATE
+            """,
+            (self._provedor, origem, item),
+        ).fetchone()
 
-        return linha is not None and linha[0] is None
+        if linha is not None and linha[0] is None:
+            return _ReivindicacaoPostgres(self._pool, conexao, self._provedor, origem, item)
 
-    def marcar_processado(self, evento: EventoWebhook, situacao: SituacaoEvento) -> None:
-        origem, item = _partes(evento)
-
-        with self._pool.connection() as conexao:
-            conexao.execute(
-                """
-                UPDATE auditoria.evento_webhook
-                   SET concluido_em = now(), situacao = %s
-                 WHERE provedor = %s AND subscription_id = %s AND notificacao_id = %s
-                """,
-                (_SITUACAO_NO_BANCO[situacao], self._provedor, origem, item),
-            )
+        # Concluída por outra tentativa: duplicata de verdade (TI-37).
+        conexao.commit()
+        self._pool.putconn(conexao)
+        return None
 
     def registrar_recusa(self, *, motivo: str, corpo: bytes) -> None:
         # A entrega provou vir do provedor mas não pôde ser interpretada (TI-39).

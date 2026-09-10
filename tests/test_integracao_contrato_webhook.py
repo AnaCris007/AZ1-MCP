@@ -282,6 +282,26 @@ class TradutorEmMemoria:
             raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO) from exc
 
 
+class _ReivindicacaoEmMemoria:
+    """Contraparte em memória de `_ReivindicacaoPostgres`.
+
+    Sem lock de verdade — os testes que exercitam este dublê rodam num só
+    processo, síncrono, então não há concorrência real para serializar. O que
+    importa preservar é a mesma máquina de estados observável: registrado e
+    não concluído (`None`) até `concluir`; `liberar` deixa exatamente assim.
+    """
+
+    def __init__(self, registro: RegistroEmMemoria, identificador: str) -> None:
+        self._registro = registro
+        self._identificador = identificador
+
+    def concluir(self, situacao: SituacaoEvento) -> None:
+        self._registro.eventos[self._identificador] = situacao
+
+    def liberar(self) -> None:
+        pass  # já está None — registrado, não concluído; nada a desfazer.
+
+
 class RegistroEmMemoria:
     def __init__(self) -> None:
         self.eventos: dict[str, SituacaoEvento | None] = {}
@@ -290,14 +310,11 @@ class RegistroEmMemoria:
     def registrar_recusa(self, *, motivo: str, corpo: bytes) -> None:
         self.recusas.append((motivo, corpo))
 
-    def registrar(self, evento: EventoWebhook) -> bool:
+    def reivindicar(self, evento: EventoWebhook) -> _ReivindicacaoEmMemoria | None:
         if self.eventos.get(evento.identificador) is not None:
-            return False
+            return None
         self.eventos[evento.identificador] = None
-        return True
-
-    def marcar_processado(self, evento: EventoWebhook, situacao: SituacaoEvento) -> None:
-        self.eventos[evento.identificador] = situacao
+        return _ReivindicacaoEmMemoria(self, evento.identificador)
 
 
 class ProcessadorEmMemoria:

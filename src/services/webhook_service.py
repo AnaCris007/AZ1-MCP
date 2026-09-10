@@ -98,20 +98,55 @@ class TradutorDeEvento(Protocol):
     def traduzir(self, *, cabecalhos: Mapping[str, str], corpo: bytes) -> Sequence[EventoWebhook]: ...
 
 
-class RegistroEventos(Protocol):
-    """Porta de persistência e idempotência."""
+class ReivindicacaoDeEvento(Protocol):
+    """Exclusividade de processamento sobre um evento, devolvida por `reivindicar`.
 
-    def registrar(self, evento: EventoWebhook) -> bool:
-        """Grava o evento como recebido.
+    Viva entre a chamada a `reivindicar` e a chamada a `concluir` ou `liberar` —
+    o adaptador Postgres mantém uma transação aberta por esse intervalo inteiro,
+    e é essa transação, não um prazo arbitrário, que serializa duas tentativas
+    concorrentes sobre o mesmo evento (ver `RegistroEventos.reivindicar`).
+    """
 
-        Devolve False quando o mesmo identificador já foi processado antes, o
-        que sustenta o efeito único do caso TI-37. Uma entrega registrada mas
-        ainda não concluída devolve True, para que a reentrega provocada por um
-        5xx (caso TI-38) consiga retomar o processamento.
+    def concluir(self, situacao: SituacaoEvento) -> None:
+        """Marca o evento como concluído e libera a exclusividade."""
+        ...
+
+    def liberar(self) -> None:
+        """Libera a exclusividade sem concluir.
+
+        Usada quando o processamento falha (caso TI-38): o evento permanece
+        visível na auditoria como pendente, e a próxima tentativa — seja a
+        reentrega do provedor, seja uma segunda entrega concorrente que estava
+        esperando — consegue reivindicá-lo de novo.
         """
         ...
 
-    def marcar_processado(self, evento: EventoWebhook, situacao: SituacaoEvento) -> None: ...
+
+class RegistroEventos(Protocol):
+    """Porta de persistência e idempotência.
+
+    A garantia de efeito único (TI-37) e a retomada após falha (TI-38) não são
+    dois mecanismos: são a mesma reivindicação, vista em dois desfechos. Duas
+    chamadas concorrentes de `reivindicar` para o mesmo evento não podem ambas
+    devolver uma reivindicação viva — a segunda bloqueia até a primeira liberar
+    ou concluir, e só então decide, com o estado já definitivo, se ainda há o
+    que fazer. Um par de portas "registrar" + "marcar_processado" que não
+    compartilhasse essa exclusividade pareceria correto e não seria: a janela
+    entre as duas chamadas é exatamente onde uma segunda entrega do mesmo
+    evento processaria em paralelo.
+    """
+
+    def reivindicar(self, evento: EventoWebhook) -> ReivindicacaoDeEvento | None:
+        """Registra o evento, se ainda não existir, e reivindica exclusividade.
+
+        Devolve None quando o evento já foi concluído antes (TI-37): nesse caso
+        nada é escrito, e a chamada não bloqueia. Caso contrário, devolve uma
+        reivindicação — mesmo que o evento já tivesse sido registrado por uma
+        tentativa anterior que não concluiu, o que sustenta o TI-38. Entre duas
+        chamadas concorrentes para o mesmo evento, uma delas espera a outra
+        `concluir` ou `liberar` antes de saber qual dos dois desfechos aplica.
+        """
+        ...
 
     def registrar_recusa(self, *, motivo: str, corpo: bytes) -> None:
         """Grava uma entrega autêntica que não pôde ser interpretada.
@@ -196,30 +231,32 @@ class ReceberEventoWebhook:
 
     def _receber_um(self, evento: EventoWebhook) -> ResultadoEvento:
         try:
-            inedito = self._registro.registrar(evento)
+            reivindicacao = self._registro.reivindicar(evento)
         except WebhookError:
             raise
         except Exception as exc:
             raise WebhookError(WebhookErrorCode.FALHA_DE_PERSISTENCIA) from exc
 
-        if not inedito:
+        if reivindicacao is None:
             return ResultadoEvento(situacao=SituacaoEvento.DUPLICADO, evento=evento)
 
-        # Evento fora do catálogo é registrado e encerrado sem efeito (TI-40). Ele
-        # é marcado como concluído de propósito: reentregá-lo não produziria nada
-        # de diferente, e deixá-lo pendente faria o provedor insistir à toa.
+        # Evento fora do catálogo é concluído sem efeito (TI-40), e não liberado:
+        # reentregá-lo não produziria nada de diferente, e deixá-lo pendente
+        # faria o provedor insistir à toa.
         if not self._processador.suporta(evento.tipo):
-            self._registro.marcar_processado(evento, SituacaoEvento.IGNORADO)
+            reivindicacao.concluir(SituacaoEvento.IGNORADO)
             return ResultadoEvento(situacao=SituacaoEvento.IGNORADO, evento=evento)
 
         try:
             self._processador.processar(evento)
         except WebhookError:
+            reivindicacao.liberar()
             raise
         except Exception as exc:
+            reivindicacao.liberar()
             raise WebhookError(WebhookErrorCode.FALHA_DE_PROCESSAMENTO) from exc
 
-        self._registro.marcar_processado(evento, SituacaoEvento.PROCESSADO)
+        reivindicacao.concluir(SituacaoEvento.PROCESSADO)
         return ResultadoEvento(situacao=SituacaoEvento.PROCESSADO, evento=evento)
 
 
