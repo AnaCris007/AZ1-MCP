@@ -5450,6 +5450,28 @@ O instrumento de campo é uma ficha por participante, com uma linha por tarefa:
 
 ### 6.5.8 Questionário SUS e Cálculo do Escore
 
+Ao final da sessão, todos os participantes respondem às dez perguntas padrão do System Usability Scale (Brooke, 1996), em escala de 1 (discordo totalmente) a 5 (concordo totalmente):
+
+1. Eu acho que gostaria de usar este sistema com frequência.
+2. Eu achei o sistema desnecessariamente complexo.
+3. Eu achei o sistema fácil de usar.
+4. Eu acho que precisaria do apoio de uma pessoa com conhecimento técnico para conseguir usar este sistema.
+5. Eu achei que as várias funções deste sistema estavam bem integradas.
+6. Eu achei que havia muita inconsistência neste sistema.
+7. Eu imagino que a maioria das pessoas aprenderia a usar este sistema rapidamente.
+8. Eu achei o sistema muito difícil de usar.
+9. Eu me senti muito confiante usando o sistema.
+10. Eu precisei aprender uma quantidade grande de coisas antes de conseguir usar este sistema.
+
+O escore de cada participante é calculado assim:
+
+- para as questões ímpares (1, 3, 5, 7, 9): resposta − 1;
+- para as questões pares (2, 4, 6, 8, 10): 5 − resposta;
+- soma-se o resultado das dez questões;
+- multiplica-se a soma por 2,5, produzindo um escore de 0 a 100.
+
+O escore final reportado é a média dos escores individuais dos 5 participantes (ou mais, se o recrutamento da seção 6.5.2 exceder o mínimo).
+
 ### 6.5.9 Perguntas Qualitativas Finais
 
 Aplicadas em conversa aberta após o SUS, sem opções de resposta pré-definidas:
