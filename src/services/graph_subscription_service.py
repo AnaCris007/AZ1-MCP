@@ -30,7 +30,6 @@ import json
 import os
 import sys
 import time
-import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -230,9 +229,6 @@ def abrir(config: Config) -> None:
             "resource": config.recurso,
             "expirationDateTime": expira_em.isoformat().replace("+00:00", "Z"),
             "clientState": config.client_state,
-            # Identificador nosso, devolvido em cada notificação. Útil para
-            # correlacionar log da aplicação com log do provedor.
-            "clientId": str(uuid.uuid4()),
         },
     )
 
@@ -290,18 +286,27 @@ def fechar(config: Config) -> None:
         for (assinatura_id,) in linhas:
             # A desativação local vem primeiro e é a que importa para a segurança:
             # a partir dela o verificador já recusa qualquer entrega com 401,
-            # mesmo que a remoção do lado do provedor falhe.
+            # mesmo que a remoção do lado do provedor falhe. O commit() logo
+            # abaixo é o que torna essa garantia real: sem ele, a UPDATE e a
+            # chamada externa ficam na mesma transação, e uma falha de rede na
+            # chamada (não só um erro HTTP do provedor) propagaria para fora do
+            # try/except e desfaria a desativação por rollback — exatamente o
+            # oposto do que o comentário acima promete.
             conexao.execute(
                 "UPDATE integracao.conexao SET ativa = FALSE WHERE provedor = %s AND subscription_id = %s",
                 (PROVEDOR, assinatura_id),
             )
+            conexao.commit()
             try:
                 _pedir(f"{GRAPH}/subscriptions/{assinatura_id}", metodo="DELETE", token=token)
                 print(f"Assinatura {assinatura_id} removida no Graph e desativada localmente.")
-            except ErroHTTP as exc:
-                # Assinatura já expirada devolve erro, e isso não é problema: o
-                # efeito pretendido — parar de receber — já aconteceu.
-                print(f"Assinatura {assinatura_id} desativada localmente. O Graph recusou a remoção: {exc.status}")
+            except ErroDeOperacao as exc:
+                # Cobre tanto um erro HTTP do provedor (assinatura já expirada,
+                # por exemplo, o que não é problema: o efeito pretendido — parar
+                # de receber — já aconteceu) quanto uma falha pura de rede
+                # (DNS, timeout, conexão recusada), que ErroHTTP sozinho não
+                # cobriria.
+                print(f"Assinatura {assinatura_id} desativada localmente. O Graph recusou a remoção: {exc}")
 
 
 def listar(config: Config) -> None:
