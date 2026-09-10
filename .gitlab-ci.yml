@@ -1,0 +1,89 @@
+# =============================================================================
+# Pipeline CI do repositório — build → test → quality
+# =============================================================================
+# Este arquivo existe porque a suíte da aplicação não rodava em pipeline
+# nenhum. O único CI do projeto era `gitlab-issue-kit/.gitlab-ci.yml`, que
+# cobre apenas os scripts de automação de issues — e que o GitLab só lê da
+# raiz do repositório. Os testes do pipeline de PLN, da API e dos serviços
+# passavam ou quebravam sem que nada avisasse.
+#
+# Os jobs do issue-kit continuam valendo: são trazidos pelo `include` no fim
+# do arquivo, em vez de copiados, para não existirem em duas versões.
+# =============================================================================
+
+stages:
+  - build
+  - test
+  - quality
+
+default:
+  image: python:3.12-slim
+  interruptible: true
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  # O pipeline de PLN precisa das stopwords e do stemmer RSLP do NLTK. O
+  # caminho é explícito para que o cache do job encontre o que o passo de
+  # download gravou.
+  NLTK_DATA: "$CI_PROJECT_DIR/.cache/nltk_data"
+
+cache:
+  key:
+    files:
+      - requirements.txt
+  paths:
+    - .cache/pip
+    - .cache/nltk_data
+
+# Passos comuns aos jobs que importam o pacote. `pip install -e .` é
+# obrigatório e não opcional: o projeto usa src layout, então `from pln import
+# ...` só resolve com o pacote instalado. Sem isso os testes rodariam contra
+# arquivos soltos, que é exatamente o que o layout existe para impedir.
+.python_app: &python_app
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install -e ".[dev]"
+    - python -m nltk.downloader -d "$NLTK_DATA" stopwords rslp
+
+# ----------------------------------------------------------------- build
+# Prova que as dependências resolvem e que todo o Python compila.
+build:app:
+  stage: build
+  <<: *python_app
+  script:
+    - python -m compileall -q src tests
+
+# ------------------------------------------------------------------ test
+# A suíte inteira: pipeline de PLN, API e serviços.
+#
+# O modelo do spaCy é baixado aqui e não no `before_script` comum porque só
+# os testes de lematização precisam dele — são 13 MB que os outros jobs não
+# têm por que pagar.
+test:app:
+  stage: test
+  <<: *python_app
+  script:
+    - python -m spacy download pt_core_news_sm
+    - python -m unittest discover -v tests
+
+# --------------------------------------------------------------- quality
+# A versão do ruff é fixada de propósito: sem pin, uma versão nova muda o
+# resultado do lint sem ninguém ter alterado o código. As regras aplicadas
+# estão declaradas em ruff.toml, na raiz do repositório.
+#
+# Diferente do lint do issue-kit, este NÃO usa allow_failure. O código da
+# aplicação já está limpo sob essas regras, e um lint que pode falhar sem
+# barrar nada informa menos do que aparenta.
+lint:app:
+  stage: quality
+  script:
+    - pip install ruff==0.16.2
+    - ruff check src tests
+
+# Traz os jobs do gitlab-issue-kit e a varredura de segredos que ele já
+# configurava. O arquivo incluído define os mesmos três stages declarados
+# acima, então os jobs de ambos convivem sem conflito.
+include:
+  - local: gitlab-issue-kit/.gitlab-ci.yml
