@@ -11,6 +11,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | [Projeto](./Projeto.md) | Documento central do projeto. Reúne o entendimento de negócio (Seção 1), a especificação de requisitos (Seção 2), a definição técnica e arquitetural — APIs de voz, algoritmo de PLN, API de áudio, pilha, modelagem de dados, deploy, estratégia das Sprints 3 a 5 e projeto técnico e arquitetural (Seção 3) — e a prototipação exploratória de design e UX (Seção 4). | Consulta principal para compreensão técnica e de negócio da solução. |
 | [Gestão do Projeto](./GestaoProjeto.md) | Consolida os acordos permanentes da equipe, o processo de desenvolvimento, o acompanhamento de riscos, as retrospectivas, as ações de melhoria e o planejamento das sprints. | Referência para acompanhamento da organização da equipe e da evolução do projeto. |
 | [Gestão de Configuração](./GestaoConfiguracao.md) | Define o Gitflow adotado, o papel das branches, as convenções de nomenclatura, as políticas de commits e Merge Requests, os procedimentos de integração e os exemplos de aplicação. | Referência para versionamento, rastreabilidade e colaboração no GitLab. |
+| [Docker](./Docker.md) | Descreve a conteinerização da solução: as imagens de frontend e de API, a topologia dos serviços, os perfis de treino e de teste, as variáveis de ambiente, o uso de segredos, a build multiarquitetura e o processo de deploy. | Referência de operação para subir, testar e implantar a pilha. |
 | [Roteiro do Protótipo A](./RoteiroPrototipoA.md) | Roteiro do vídeo encenado do Protótipo A, com as onze cenas que exercitam a interação proativa e contextual do agente, incluindo os casos de erro e de interação por áudio. | Evidência bruta da prototipação exploratória, complementar à Seção 4 do Projeto.md. |
 
 ## Guia rápido por tema
@@ -34,6 +35,8 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
 | Os papéis de cada integrante e a evidência da rotação | [GestaoProjeto.md, Matriz de Papéis da Sprint 2](./GestaoProjeto.md#44-matriz-de-papéis-e-responsabilidades-da-sprint-2) |
 | O planejamento da Sprint 3, com estimativas, DoR e DoD | [GestaoProjeto.md, Planejamento da Sprint 3](./GestaoProjeto.md#47-planejamento-da-sprint-3) |
+| Como subir a pilha inteira em contêineres | [Docker.md](./Docker.md) |
+| Por que cada decisão de imagem e de compose foi tomada | [Docker.md, Técnicas aplicadas](./Docker.md#12-técnicas-aplicadas) |
 | O Gitflow, as branches, os commits e os MRs | [GestaoConfiguracao.md](./GestaoConfiguracao.md) |
 | Se a política de versionamento é seguida na prática | [GestaoConfiguracao.md, Coerência entre Política e Prática](./GestaoConfiguracao.md#7-coerência-entre-política-e-prática) |
 
@@ -63,5 +66,6 @@ docs/
 ├── Projeto.md
 ├── GestaoProjeto.md
 ├── GestaoConfiguracao.md
+├── Docker.md
 └── RoteiroPrototipoA.md
 ```
