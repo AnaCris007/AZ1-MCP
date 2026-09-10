@@ -5657,13 +5657,74 @@ A execução será coordenada pelo responsável da task T31, com revisão das ev
 
 O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável para as consultas textuais, e as duas dimensões do RNF10: crescimento da concorrência e crescimento dos dados. Os ensaios devem ser executados em ambiente controlado, com versão do código, configuração, recursos computacionais, horário e estado dos serviços externos registrados antes de cada rodada.
 
+#### Escopo, metas e componentes disponíveis
+
+O planejamento parte das metas da Seção 2.3 e dos componentes presentes no repositório. A tabela abaixo fixa as referências para preparar os ensaios; seus valores são critérios de aceitação, não resultados já obtidos.
+
+| Dimensão | Casos relacionados | Meta do requisito | Condição de comparação |
+|---|---|---|---|
+| Tempo de resposta textual — RNF01 | `CT-RNF01-P`, `CT-RNF01-N` | Pelo menos 80% das consultas elegíveis com resposta completa em até 15 s; 100% com resposta ou erro controlado em até 60 s | Fluxo textual com serviços reais para a avaliação principal; lentidão injetada em rodada separada para avaliar degradação |
+| Concorrência — RNF10 | `CT-RNF10-C-P`, `CT-RNF10-C-N` | Em `10x`, p95 ≤ 20 s e ≤ 2 vezes o p95 da linha de base | Dependências externas controladas e idênticas; `1x` = 5 e `10x` = 50 solicitações simultâneas, conforme a carga adotada neste plano |
+| Memória de treinamento — RNF10 | `CT-RNF10-M-P`, `CT-RNF10-M-N` | Pico de memória com dataset `10x` ≤ 8 vezes o pico em `1x` | Mesma configuração de treinamento, processos reiniciados e datasets identificados |
+| Memória do processo servido — RNF10 | `CT-RNF10-M-P`, `CT-RNF10-M-N` | Memória estabilizada e pico de inferência com modelo treinado em `10x` ≤ 2 vezes suas respectivas linhas de base | Mesma massa de inferência e recursos fixos, medindo separadamente as duas razões |
+
+Os cinco acessos simultâneos da linha de base são uma hipótese de carga do MVP, não uma estimativa comprovada do uso pelo Metrô. O aumento de concorrência e o aumento do dataset serão avaliados separadamente, para permitir identificar a origem de uma eventual degradação.
+
+| Componente disponível | Entrada e interação atual | Aplicação no planejamento e limite da evidência |
+|---|---|---|
+| `POST /api/v1/chat` — `src/routes/chat.py` | JSON com `message` e `conversation_id`; chama `AnswerChatMessage`, que utiliza o adaptador Gemini, e retorna `reply` | Alvo HTTP inicial para RNF01 e RNF10-C. A mensagem deve ser não vazia e ter até 4000 caracteres após remoção de espaços nas extremidades. O fluxo atual gera resposta com Gemini; medir essa rota não comprova, sozinho, a consulta integrada às fontes de projetos exigida pelo RF02 |
+| `POST /api/v1/audio/{audio_id}/analyze` — `src/routes/analysis.py` | Recebe identificador de áudio armazenado, transcreve via Deepgram e executa o classificador carregado pelo serviço | Referência do processo que já utiliza o modelo de PLN. A duração total da rota inclui armazenamento e transcrição; não deve ser usada como tempo de consulta textual do RNF01 nem confundida com inferência isolada |
+| `src/pln/classificador.py` | CLI `python -m pln.classificador`, com opções `--dataset` e `--salvar`; oferece carregamento e predição do modelo | Base disponível para preparar RNF10-M. Separar a medição do treinamento da avaliação cruzada também executada pela CLI; usar um processo persistente com modelo carregado para medir a memória do serviço |
+| `GET /health` — `src/az1_api/main.py` | Retorna o estado básico do processo HTTP | Verificação inicial de acesso ao servidor; não comprova disponibilidade do Gemini, Deepgram, armazenamento ou fontes de projetos |
+
+**Pré-requisitos para a execução.** Identificar o commit candidato, congelar a massa sintética e registrar recursos, processos e configuração do servidor. Antes de declarar atendimento integral aos RF02 e RF04 associados a estes RNFs, confirmar que os fluxos de consulta às fontes e de sugestões estejam integrados. Enquanto isso, identificar as medições como parciais e informar o componente efetivamente exercitado.
+
+Para o RNF01, verificar as credenciais e a disponibilidade do provedor real e confirmar o mecanismo de interrupção da espera dentro de 60 segundos; o contrato atual de chat não demonstra por si só essa garantia. Para o RNF10-C, preparar a substituição controlada das dependências externas mantendo o processamento interno que se deseja medir. Quando utilizado, o VHS deverá ter seu modo e estado registrados: respostas reproduzidas servem ao ensaio controlado, mas não comprovam a latência do provedor real. Para o RNF10-M, disponibilizar datasets e modelos identificáveis em todos os tamanhos e a instrumentação de memória. A ausência desses pré-requisitos deve ser registrada como bloqueio do caso correspondente, conforme a Seção 6.3.1.
+
+#### Ferramentas e preparação do ambiente
+
+Os ensaios utilizarão Python, acompanhando a tecnologia do backend e do pipeline de PLN. Os instrumentos descritos abaixo deverão ser preparados antes da execução; esta seção registra o planejamento, sem afirmar que os scripts de carga e coleta já existem.
+
+| Ferramenta ou biblioteca | Uso planejado | Situação no projeto |
+|---|---|---|
+| HTTPX e `asyncio` | Enviar consultas HTTP e controlar a quantidade de requisições simultâneas nos ensaios RNF01 e RNF10-C | HTTPX já consta no extra `dev`; `asyncio` integra a biblioteca padrão do Python. O gerador de carga deverá ser implementado |
+| `time.perf_counter` e `csv` | Medir a duração completa de cada requisição com relógio monotônico e preservar os registros individuais | Biblioteca padrão do Python; instrumentação a preparar |
+| `psutil` | Coletar CPU e memória RSS dos processos de treinamento e atendimento em RNF10 | Dependência adicional planejada, ainda não declarada no `pyproject.toml` |
+| NumPy | Consolidar percentis e medianas a partir dos registros brutos | Já declarado nas dependências do projeto |
+| Uvicorn | Servir a aplicação por HTTP durante os ensaios, com quantidade fixa de workers | Já declarado nas dependências do projeto |
+
+O cliente assíncrono permite reutilizar conexões durante as rodadas, conforme a [documentação do HTTPX](https://www.python-httpx.org/async/). A coleta de memória usará RSS, exposto por `memory_info`, conforme a [documentação do psutil](https://psutil.readthedocs.io/stable/index.html). As versões efetivamente utilizadas deverão acompanhar as evidências para permitir reprodução.
+
+**Configuração de referência.** Usar Python 3.12 em ambiente virtual, com a aplicação instalada por `python -m pip install -e ".[dev]"`. Instalar `psutil` no ambiente de medição e registrar sua versão. Iniciar o servidor com `python -m uvicorn az1_api.main:app --host 0.0.0.0 --port 8000 --workers 1`, sem recarga automática. Manter o mesmo número de workers, CPU e memória em todas as comparações de `1x` a `10x`; esses ensaios medem crescimento da carga e dos dados sob recursos fixos.
+
+O gerador de carga deverá rodar preferencialmente em outra máquina da mesma rede. Se compartilhar a máquina do servidor, registrar essa limitação e monitorar ambos os processos para identificar competição por recursos. Antes de cada rodada, preencher a ficha abaixo e verificar `GET /health`, seguido de uma consulta válida ao fluxo em teste.
+
+| Registro obrigatório | Informação a preencher na execução |
+|---|---|
+| Identificação | Caso, número da rodada, data, horário, responsável e commit avaliado |
+| Servidor e gerador | Sistema operacional, CPU, RAM, localização de cada processo e endereço base da API |
+| Configuração | Versões das bibliotecas, workers, limites de conexão e tempos limite do cliente e da aplicação |
+| Dados e modelo | Identificadores da massa de consultas, dataset e modelo, com tamanho e versão |
+| Dependências | Provedor real ou dublê, atraso configurado, modo do VHS e estado inicial do cache |
+| Evidências | Local dos CSVs de requisições, medições de recursos e logs correlacionados |
+
+#### Protocolo comum de execução e coleta
+
+1. **Preparar a entrada.** Usar a mesma massa de 100 consultas válidas em todas as comparações HTTP, com `message` e `conversation_id` preenchidos. Atribuir um identificador a cada consulta e manter sua ordem reproduzível. No RNF01 positivo, enviar uma consulta por vez; no RNF10-C, percorrer ciclicamente a massa durante cada estágio.
+2. **Controlar a carga.** No RNF10-C, manter 5, 10, 25 ou 50 tarefas concorrentes, cada uma enviando a próxima requisição após concluir a anterior, sem pausa deliberada. Configurar o pool de conexões para comportar pelo menos 50 requisições e registrar a concorrência efetivamente observada. Trata-se de carga fechada: a taxa de chegada depende do tempo de resposta, por isso o throughput deve acompanhar os percentis.
+3. **Medir a resposta completa.** Iniciar o cronômetro imediatamente antes do envio e encerrá-lo após receber todo o corpo ou identificar falha. Configurar um limite total de observação de 65 segundos no gerador; esse limite permite observar a violação do teto de 60 segundos e não amplia o prazo do RNF01. Cancelamento pelo cliente não equivale a erro controlado pela aplicação. Não repetir automaticamente requisições com falha.
+4. **Separar as condições externas.** Executar RNF01 positivo com o provedor real e VHS em modo `ignorar`, quando disponível. Preparar a rodada negativa com atrasos controlados de 20 e 65 segundos no adaptador externo, registrando cada condição separadamente. Para RNF10-C, usar respostas e atrasos determinísticos idênticos em todos os estágios, sem substituir a rota ou o serviço interno inteiro. Não agregar medições reais e simuladas em um único resultado.
+5. **Delimitar as rodadas.** Descartar o aquecimento previsto em cada caso. Ao terminar os cinco minutos de um estágio de concorrência, interromper novos envios e aguardar as requisições pendentes até seu limite de observação. Atribuir cada requisição ao estágio em que foi iniciada e registrar o tempo de drenagem. Reiniciar o servidor e restaurar o mesmo estado de cache antes de cada repetição completa; no ensaio de pico, aquecer apenas com a carga de base antes de saltar para 50 tarefas.
+6. **Coletar recursos.** Amostrar RSS a cada 100 ms e CPU a cada segundo em processo monitor separado, registrando PID e instante da coleta. Medir o treinamento em processo dedicado, sem incluir a validação cruzada. Para o serviço, carregar o modelo, realizar uma inferência de aquecimento e observar 30 segundos sem carga; usar a mediana da RSS dos últimos dez segundos como memória estabilizada. Em seguida, medir o pico durante as 100 inferências previstas. Repetir três vezes para cada tamanho, incluindo o dataset adverso. O maior RSS amostrado é uma estimativa do pico e pode perder variações menores que o intervalo de coleta.
+7. **Preservar os dados.** Salvar uma linha por requisição com caso, rodada, estágio, identificador da consulta, início, duração, status HTTP, categoria de erro e indicação de resposta completa. Salvar recursos em CSV separado. Calcular percentis pelo mesmo método em todas as rodadas, documentando-o, e apresentar latências de sucesso e de erro separadamente. Informar requisições concluídas por segundo na janela de carga, requisições pendentes ao final e total de falhas; um erro rápido não deve ser interpretado como resposta funcional rápida.
+
 #### RNF01 — tempo de resposta das consultas textuais
 
 **Propósito.** Verificar se pelo menos 80% das consultas textuais previstas no RF02 apresentam resposta completa em até 15 segundos e se nenhuma consulta elegível permanece sem desfecho além do teto de 60 segundos.
 
 **Massa de teste.** Serão utilizadas 100 consultas sintéticas representativas dos tipos de consulta previstos no RF02. A massa deve variar a formulação das perguntas e os elementos consultados, sem utilizar dados corporativos reais.
 
-**Cenários.** O caso `CT-RNF01-P` executa consultas válidas sob condições normais. O caso `CT-RNF01-N` aplica lentidão controlada com duração configurada entre 15 e 60 segundos e acima de 60 segundos. Na condição mais lenta, a aplicação deve interromper a espera e devolver erro controlado dentro do teto, permitindo verificar tanto a meta principal quanto a proteção da cauda sem planejar uma reprovação obrigatória.
+**Cenários.** O caso `CT-RNF01-P` executa as 100 consultas válidas sob condições normais, com serviços reais. Em outra rodada de 100 consultas, o caso `CT-RNF01-N` utiliza dependências controladas: 90 respostas sem atraso adicional, cinco com atraso de 20 segundos e cinco com atraso de 65 segundos, distribuídas em posições previamente registradas na massa. Na condição mais lenta, a aplicação deve interromper a espera e devolver erro controlado dentro do teto. Essa distribuição permite avaliar simultaneamente a meta de 80% e a proteção de 60 segundos; as dez falhas injetadas não podem ser excluídas como indisponibilidade externa comprovada.
 
 **Instruções de execução:**
 
@@ -5675,7 +5736,7 @@ O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável pa
 6. Calcular `consultas elegíveis com resposta completa em até 15 s / total de consultas elegíveis × 100` e `consultas elegíveis encerradas em até 60 s / total de consultas elegíveis × 100`.
 7. Registrar também p50, p80, p95, menor tempo, maior tempo e taxa de respostas HTTP bem-sucedidas.
 
-**Critério de aprovação.** Os dois limites devem ser atendidos: pelo menos 80% das consultas elegíveis com resposta completa em até 15 segundos e 100% encerradas com resposta ou erro controlado em até 60 segundos. Respostas acima de 15 segundos falham na meta principal; ausência de desfecho em 60 segundos também reprova o teto da cauda. Somente indisponibilidade externa comprovada permite exclusão.
+**Critério de aprovação.** Em cada caso, separadamente, pelo menos 80% das consultas elegíveis devem apresentar resposta completa em até 15 segundos e 100% devem encerrar com resposta ou erro controlado em até 60 segundos. Uma resposta acima de 15 segundos não conta para a meta principal, mas só reprova esse critério quando o percentual agregado fica abaixo de 80%; qualquer ausência de desfecho em até 60 segundos reprova o teto. Erro controlado conta apenas como desfecho, nunca como resposta completa. Somente indisponibilidade externa comprovada permite exclusão na rodada com serviços reais. Se não restarem consultas elegíveis, o resultado será inconclusivo e o caso ficará bloqueado para nova execução, sem aprovação por amostra vazia.
 
 **Evidências planejadas.** Arquivo CSV com uma linha por consulta, logs HTTP, identificação da massa e do ambiente e relatório consolidado com percentuais e percentis.
 
@@ -5694,11 +5755,11 @@ O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável pa
 3. Executar um minuto de aquecimento antes de iniciar as rodadas contabilizadas.
 4. No caso progressivo, executar sucessivamente os estágios de 5, 10, 25 e 50 solicitações simultâneas durante cinco minutos cada.
 5. No caso de pico, iniciar diretamente uma rodada de cinco minutos com 50 solicitações simultâneas.
-6. Repetir cada estágio três vezes nas mesmas condições e usar a mediana das três rodadas na comparação.
+6. Repetir três vezes a sequência progressiva completa e, separadamente, três vezes o ensaio de pico, restaurando as condições iniciais conforme o protocolo comum. Cada estágio terá, assim, três medições; usar a mediana dos três p95 na comparação.
 7. Registrar p50, p80 e p95 da latência, throughput, quantidade e categoria dos erros, CPU e pico de memória.
-8. Para cada rodada, calcular a razão `p95 do estágio / p95 da linha de base 1x` e comparar o estágio `10x` e o pico repentino com os limites do RNF10.
+8. Calcular `B = mediana dos três p95 de 1x`, `C = mediana dos três p95 de 10x progressivo` e `P = mediana dos três p95 do pico`. Comparar `C / B` e `P / B` com o limite relativo, e `C` e `P` com o limite absoluto. Preservar os p95 individuais para expor variações entre rodadas.
 
-**Critério de aprovação.** Tanto no crescimento progressivo quanto no pico de 50 solicitações, o p95 deve ser de no máximo 20 segundos e de no máximo duas vezes o p95 mediano da linha de base `1x`. Os dois limites são cumulativos.
+**Critério de aprovação.** Tanto no crescimento progressivo quanto no pico de 50 solicitações, a mediana dos três p95 deve ser de no máximo 20 segundos e de no máximo duas vezes o p95 mediano da linha de base `1x`. Os dois limites são cumulativos. Calcular o p95 sobre as durações de todas as tentativas do estágio, incluindo falhas, e apresentar também o p95 das respostas completas. Como controle de validade do ensaio com entradas válidas e dependências determinísticas de sucesso, exigir resposta completa em todas as tentativas; erros ou cancelamentos impedem aprovação baseada apenas em baixa latência. Esse controle complementa o plano e não altera as metas numéricas do RNF10. Linha de base ausente, nula ou carga não atingida invalida a comparação e exige nova rodada.
 
 **Evidências planejadas.** Configuração da carga, arquivos brutos de cada rodada, relatório de percentis e throughput, gráficos de CPU e memória e registro das respostas controladas usadas nas dependências externas.
 
@@ -5718,18 +5779,43 @@ O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável pa
 4. Reiniciar o serviço, carregar o modelo produzido por cada tamanho e registrar a memória RSS estabilizada antes de receber requisições.
 5. Executar a mesma massa fixa de 100 inferências em cada modelo e registrar memória estabilizada, pico durante o atendimento e variação por requisição.
 6. Repetir treinamento e serviço com o dataset adverso de alta diversidade vocabular.
-7. Calcular, para treinamento, `pico mediano 10x / pico mediano 1x` e, para serviço, as razões de RSS estabilizada e de pico de inferência entre os modelos `10x` e `1x`.
+7. Calcular, para treinamento, `pico mediano 10x / pico mediano 1x` e, para serviço, `mediana da RSS estabilizada em 10x / mediana da RSS estabilizada em 1x` e `mediana dos picos de inferência em 10x / mediana dos picos de inferência em 1x`. Usar as três repetições de cada condição e comparar o dataset adverso separadamente com a mesma linha de base `1x`.
 
 **Critério de aprovação.** No dataset controlado e no adverso, a razão de pico de treinamento entre `10x` e `1x` deve ser no máximo 8, e as razões da memória estabilizada e do pico de inferência do processo servido devem ser no máximo 2. Os limites devem ser atendidos simultaneamente.
 
 **Evidências planejadas.** Datasets e modelos versionados, configuração do pipeline e do serviço, medições brutas de RSS, cálculo das medianas e gráficos separados de treinamento e serviço.
+
+#### Consolidação dos resultados e critérios de falha
+
+Os percentuais serão calculados a partir das contagens brutas, sem arredondamento antes da comparação com os limites. Para os percentis, ordenar as durações e usar o posto mais próximo superior: p95 corresponde ao elemento de posição `ceil(0,95 × N)`, contando a primeira posição como 1. Aplicar a mesma regra a p50 e p80. O tempo de uma tentativa cancelada representa somente o tempo observado até o cancelamento, que deve permanecer identificado como falha.
+
+| Caso | Condição que reprova o ensaio | Evidência necessária para decidir |
+|---|---|---|
+| `CT-RNF01-P` | Menos de 80% de respostas completas em até 15 s ou qualquer consulta elegível sem desfecho em até 60 s | CSV das 100 tentativas, contagem elegível, tempos, respostas e justificativa individual das exclusões |
+| `CT-RNF01-N` | Mesmos limites violados na rodada de 90 consultas sem atraso adicional e dez com atraso; espera de 65 s sem interrupção controlada em até 60 s | Mapa das injeções de atraso, logs da aplicação e CSV completo, sem excluir as falhas injetadas |
+| `CT-RNF10-C-P` e `CT-RNF10-C-N` | Mediana dos p95 acima de 20 s ou razão acima de 2; falhas de atendimento no cenário determinístico de sucesso | Três rodadas por condição, valores de `B`, `C` e `P`, razões, erros, concorrência observada e throughput |
+| `CT-RNF10-M-P` e `CT-RNF10-M-N` | Razão de treinamento acima de 8, razão de memória estabilizada ou de pico de inferência acima de 2; término por falta de memória | Três medições de cada tamanho e condição, RSS bruto, medianas, modelos e logs de encerramento |
+
+Ausência de instrumento, dataset, fluxo integrado ou dependência necessária será registrada como `Bloqueado`, com motivo e responsável pelo desbloqueio. Uma falha observada no sistema durante um ensaio válido será `Reprovado`, não bloqueio. Problemas do gerador ou perda de amostras invalidam a rodada, que deverá ser preservada com a justificativa e repetida após correção. Não selecionar apenas a melhor execução nem remover uma rodada válida por resultado desfavorável.
+
+Para cada caso, o relatório de execução deverá conter: estado final, versão avaliada, configuração, resultados brutos, cálculo dos indicadores, comparação com cada limite, limitações e referência às evidências. Uma resposta HTTP 200 só será classificada como completa se respeitar o contrato e contiver o resultado esperado para a consulta; respostas vazias ou falhas de negócio deverão ser identificadas. Após correções, repetir o caso afetado; mudanças em código, modelo, recursos ou dependências dos ensaios comparativos exigem também nova linha de base.
+
+#### Justificativa de abrangência e revisão
+
+A massa de consultas deverá distribuir os 100 exemplos entre os tipos de informação do RF02, como documentos, prazos, marcos, riscos, pendências e avanço dos projetos, registrando a quantidade por tipo. Essa variedade cobre diferentes caminhos de consulta, mas constitui amostra sintética de engenharia e não demonstra representatividade estatística do uso real. Os ensaios isolam três causas de degradação: espera por dependência externa, concorrência no atendimento e crescimento do modelo e dos dados.
+
+Os estágios intermediários de `2x` e `5x` ajudam a localizar onde a degradação começa; o estágio `10x` e o pico verificam o limite previsto no RNF10. As três repetições reduzem a influência de variações ocasionais sem provar estabilidade de longo prazo. O dataset adverso amplia a cobertura além da simples repetição de frases, exercitando crescimento do vocabulário. Os ensaios de memória avaliam o pipeline de PLN e o processo servido, não o crescimento de armazenamento do banco ou de documentos.
+
+Ficam fora desta evidência testes de longa duração, descoberta do ponto de ruptura acima de `10x`, escalabilidade por adição de máquinas ou workers e latência do canal de voz. A configuração fixa permite comparar os limites definidos no RNF10, mas não comprova escalabilidade horizontal. A concorrência com dependências simuladas não estima a capacidade ou os limites comerciais dos provedores reais. O uso de VHS em integração permanece detalhado na Seção 6.4; seu cache não deverá mascarar as chamadas reais do RNF01.
+
+Antes de encerrar o card #186, um segundo integrante deverá revisar as metas contra a Seção 2.3, conferir se os scripts futuros reproduzem a carga descrita, verificar os cálculos com os dados brutos e registrar os comentários e ajustes no card ou no pull request. Nesta entrega de planejamento, a revisão de scripts e resultados fica condicionada à execução futura; a revisão documental deve registrar revisor, data e feedback aplicado, sem declarar testes executados ou aprovação do sistema.
 
 ### 6.3.3 Cenários Positivos e Negativos Planejados
 
 | Caso | Tipo | Condição exercitada | Comportamento ou medição esperada |
 |---|---|---|---|
 | `CT-RNF01-P` | Positivo | Consultas textuais válidas sob condições normais | Pelo menos 80% apresentam resposta completa em até 15 segundos e todas encerram em até 60 segundos |
-| `CT-RNF01-N` | Negativo | Dependência controlada com atrasos entre 15 e 60 segundos e acima de 60 segundos | A aplicação contabiliza a meta principal e encerra a espera mais longa com erro controlado antes do teto; exclusões exigem evidência |
+| `CT-RNF01-N` | Negativo | 100 consultas com dependência controlada: 90 sem atraso adicional, cinco com 20 s e cinco com 65 s | Pelo menos 80% de respostas completas em até 15 s e 100% de desfechos em até 60 s, interrompendo a espera excessiva; falhas injetadas não são excluídas |
 | `CT-RNF02-P` | Positivo | Requisição válida em cada endpoint protegido com token SSO válido | A identidade é aceita e a requisição alcança a regra de negócio sem resposta 401 |
 | `CT-RNF02-N` | Negativo | Token ausente, malformado, expirado, com assinatura inválida ou audiência incorreta | Todas as solicitações são interrompidas antes da regra de negócio e recebem HTTP 401 sem expor credenciais |
 | `CT-RNF03-P` | Positivo | Paráfrases inéditas e representativas das nove intenções conhecidas | O classificador preserva F1-macro mínimo de 0,85 e cobertura mínima de 90% sem rejeitar excessivamente entradas conhecidas |
@@ -5749,7 +5835,7 @@ O planejamento de desempenho cobre o RNF01, que estabelece o tempo aceitável pa
 | `CT-RNF10-C-P` | Positivo | Aumento progressivo de 5 para 50 solicitações simultâneas com linha de base e mocks constantes | No estágio de `10x`, o p95 fica em até 20 segundos e em no máximo duas vezes o p95 de `1x` |
 | `CT-RNF10-C-N` | Negativo | Pico direto de 50 solicitações simultâneas sob os mesmos mocks da linha de base | A aplicação preserva os limites absoluto e relativo sem depender do crescimento gradual |
 | `CT-RNF10-M-P` | Positivo | Treinamento e serviço com datasets de `1x`, `2x`, `5x` e `10x` | A razão fica em até 8 no treinamento e as razões de memória estabilizada e de pico ficam em até 2 no serviço |
-| `CT-RNF10-M-N` | Negativo | Treinamento e serviço com dataset `10x` de alta diversidade vocabular | Os dois limites de memória permanecem atendidos ou o caso é corretamente reprovado |
+| `CT-RNF10-M-N` | Negativo | Treinamento e serviço com dataset `10x` de alta diversidade vocabular | Razão de pico de treinamento ≤ 8 e razões de memória estabilizada e pico de inferência ≤ 2; qualquer violação reprova o caso |
 | `CT-RNF11-P` | Positivo | Vinte solicitações com fontes de referência conhecidas e suficientes | Pelo menos 17 sugestões têm fonte existente que sustenta o conteúdo e justificativa curta e compreensível |
 | `CT-RNF11-N` | Negativo | Dez solicitações sem fonte suficiente, com fonte inexistente ou irrelevante | O agente se abstém ou informa a limitação, sem inventar fonte ou justificativa |
 | `CT-RNF12-P` | Positivo | Trinta consultas com respostas e fontes de referência conhecidas | Todas as referências existem e pelo menos 90% das afirmações factuais são sustentadas pelas fontes citadas |
@@ -5982,7 +6068,7 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 
 | Casos | Métrica principal | Resultado esperado para aprovação | Evidências mínimas |
 |---|---|---|---|
-| `CT-RNF01-P` e `CT-RNF01-N` | Percentual com resposta em até 15 segundos e percentual encerrado em até 60 segundos | Pelo menos 80% com resposta completa em 15 segundos e 100% com desfecho em 60 segundos | CSV por consulta, logs HTTP, ambiente e relatório de percentis e teto |
+| `CT-RNF01-P` e `CT-RNF01-N` | Percentual com resposta completa em até 15 segundos e percentual encerrado em até 60 segundos, calculados separadamente por caso | Pelo menos 80% com resposta completa em até 15 segundos e 100% com desfecho em até 60 segundos; falhas injetadas permanecem na amostra negativa | CSV por consulta, mapa de atrasos, logs HTTP, ambiente, exclusões justificadas da rodada real e relatório de percentis e teto |
 | `CT-RNF02-P` e `CT-RNF02-N` | Credenciais válidas aceitas e condições inválidas bloqueadas antes da regra de negócio | 100% das válidas aceitas e 100% das ausentes ou inválidas rejeitadas com HTTP 401, sem credenciais nos registros | Inventário de rotas, requisições ocultadas, respostas, evidência de interrupção e inspeção dos registros |
 | `CT-RNF03-P` e `CT-RNF03-N` | F1-macro, cobertura das intenções conhecidas e aceitação indevida de fora do catálogo | F1-macro ≥ 0,85; cobertura ≥ 90%; aceitação indevida ≤ 15% | Conjunto cego, declaração de isolamento, previsões, limiar e matriz de confusão |
 | `CT-RNF04-P` e `CT-RNF04-N` | Interações com todos os elementos aplicáveis e relacionamentos corretos | 100% das 20 interações completas; registro incompleto controlado corretamente identificado | Entradas, identificadores, registros consultados, fontes relacionadas e checklist |
@@ -5991,7 +6077,7 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 | `CT-RNF07-P` e `CT-RNF07-N` | Verificações elegíveis com HTTP 200 em até dois segundos | Disponibilidade mínima de 99%; falhas controladas retornam 503, alertam e recuperam para 200 | Histórico do monitor, status e tempos, exclusões, incidentes e cálculo final |
 | `CT-RNF08-P` e `CT-RNF08-N` | Participantes bem-sucedidos sem auxílio | Resultado igual ou superior a 80%; na amostra mínima, pelo menos quatro de cinco | Roteiro, fichas anonimizadas, avaliações independentes, desempates e consolidação |
 | `CT-RNF09-P` e `CT-RNF09-N` | Controles de acesso, proteção, retenção, privacidade e contingência atendidos | Todos os controles respeitados, sem perda silenciosa de evento nem persistência de segredo | Consultas, registros, configuração de retenção, alertas e contingência |
-| `CT-RNF10-C-P` e `CT-RNF10-C-N` | p95 absoluto e razão entre p95 de `10x` e de `1x` | p95 de `10x` ≤ 20 segundos e ≤ 2 vezes a linha de base, no crescimento e no pico | Configuração de carga e mocks, dados brutos, percentis, razões e métricas de recursos |
+| `CT-RNF10-C-P` e `CT-RNF10-C-N` | Mediana dos três p95 de cada condição e razões `C / B` e `P / B` | `C` e `P` ≤ 20 segundos e ≤ 2 vezes `B`, com atendimento completo das entradas válidas sob dependências determinísticas de sucesso | Configuração de carga e mocks, dados brutos, percentis individuais, medianas, razões, erros e métricas de recursos |
 | `CT-RNF10-M-P` e `CT-RNF10-M-N` | Razões de memória de treinamento, RSS estabilizada e pico de inferência entre `10x` e `1x` | Treinamento ≤ 8 vezes; memória estabilizada e pico do serviço ≤ 2 vezes, inclusive no dataset adverso | Datasets, modelos, RSS bruto, medianas e gráficos separados |
 | `CT-RNF11-P` e `CT-RNF11-N` | Sugestões com fonte válida, sustentação e justificativa compreensível | Pelo menos 17 de 20 positivas válidas; 100% das negativas se abstêm ou informam limitação sem invenção | Solicitações, fontes, respostas, rubricas independentes, desempates e consolidação |
 | `CT-RNF12-P` e `CT-RNF12-N` | Referências existentes e afirmações factuais sustentadas | 100% das referências recuperáveis, pelo menos 90% das afirmações sustentadas e 100% das negativas com limitação segura | Consultas, fontes, respostas, afirmações atômicas, rubricas e desempates |
