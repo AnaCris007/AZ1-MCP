@@ -5342,15 +5342,151 @@ Ficam fora deste escopo os testes de desempenho e carga sob concorrência, que d
 
 ## 6.5 Planejamento dos Testes de Usabilidade
 
+Os testes das seções 6.2 a 6.4 verificam se o sistema faz o que foi especificado. Esta seção planeja um tipo diferente de verificação: se uma pessoa que nunca viu o agente consegue usá-lo sem instrução prévia. Nenhuma das evidências desta seção existe ainda: o que segue é o instrumento e o roteiro a serem aplicados, não os resultados da aplicação.
+
 ### 6.5.1 Objetivo do Teste
+
+O teste de usabilidade avalia se usuários externos ao projeto conseguem operar o agente de forma clara e intuitiva, sem receber explicações sobre a interface antes ou durante a tarefa. Especificamente, o teste verifica se o participante consegue:
+
+- enviar uma pergunta por texto;
+- enviar uma pergunta por áudio;
+- compreender a resposta apresentada pelo agente;
+- identificar a fonte da informação retornada;
+- entender alertas, limitações de escopo e mensagens de erro apresentados pelo sistema.
+
+Este teste é o instrumento de coleta que sustenta o RNF08 (usabilidade das respostas, meta de 80% de compreensão sem auxílio externo) e complementa o RNF06 (qualidade da transcrição de áudio), na medida em que uma transcrição tecnicamente correta ainda pode falhar em produzir uma interação compreensível se o fluxo de gravação confundir o usuário. O teste não mede desempenho, precisão de classificação de intenção ou corretude de dados: essas dimensões já são cobertas pelas seções 6.2 e 6.3. Aqui, o foco é exclusivamente a experiência de uso.
 
 ### 6.5.2 Perfis, Diversidade e Seleção dos Participantes
 
-### 6.5.3 Cenários e Roteiro Planejados
+O teste será aplicado a, no mínimo, 5 participantes externos à equipe e à turma, para que nenhum resultado seja explicado por familiaridade prévia com as decisões de design do grupo. A seleção busca variar o perfil profissional e o nível de familiaridade com IA e com gestão de projetos, para que o instrumento não meça apenas a facilidade de uso para um único tipo de usuário.
 
-### 6.5.4 Aplicação Planejada do SUS
+| Participante | Perfil | Familiaridade com IA | Familiaridade com gestão de projetos | Papel do agente aproximado |
+|---|---|---|---|---|
+| P1 | Estudante | A registrar na aplicação | A registrar na aplicação | Usuário do portfólio (consulta geral) |
+| P2 | Profissional de tecnologia | A registrar na aplicação | A registrar na aplicação | Usuário do portfólio / Líder de projeto |
+| P3 | Profissional administrativo | A registrar na aplicação | A registrar na aplicação | PMO |
+| P4 | Pessoa com experiência em projetos | A registrar na aplicação | A registrar na aplicação | Líder de projeto / Diretor |
+| P5 | Pessoa com pouca familiaridade com IA | A registrar na aplicação | A registrar na aplicação | Usuário do portfólio (consulta geral) |
 
-### 6.5.5 Critérios para Análise dos Resultados
+A coluna "Papel do agente aproximado" não atribui uma persona fictícia da seção 1.5 ao participante; ela apenas indica qual perfil de uso (consulta, liderança de projeto, PMO ou diretoria) o participante mais se aproxima ao interpretar as tarefas, para que a diversidade de perfis cubra os mesmos papéis já mapeados nas jornadas do usuário. As colunas de familiaridade serão preenchidas por uma pergunta de triagem de escala 1 a 5 (nenhuma a muita familiaridade), aplicada antes do início do teste e não durante ele, para não induzir o participante a se autoavaliar em função das tarefas que ainda vai executar.
+
+Critérios de seleção: o participante não pode ter contato prévio com o agente nem com as decisões de arquitetura descritas neste documento; o convite é feito sem revelar o que o sistema faz além de "um agente conversacional para acompanhamento de portfólio de projetos"; e o consentimento para observação e registro das respostas é obtido antes da sessão.
+
+### 6.5.3 Cenários de Teste
+
+| ID | Cenário | O que o usuário faz | Requisito relacionado |
+|---|---|---|---|
+| TU-01 | Consulta por texto | Envia uma pergunta digitada ao agente | RF01, RF02 |
+| TU-02 | Consulta por áudio | Grava e envia uma pergunta por voz | RF01, RNF06 |
+| TU-03 | Consulta com fontes | Faz uma pergunta e identifica a fonte da resposta | RF03, RNF11 |
+| TU-04 | Solicitação fora do catálogo | Tenta pedir algo que o agente não executa diretamente | RF06, RNF08, RNF09 |
+| TU-05 | Dados insuficientes | Faz uma pergunta sem informação suficiente disponível | RF03, RNF08, RNF09 |
+| TU-06 | Alertas e pendências | Consulta uma situação em que o agente apresenta alerta | RF05, RNF08 |
+
+O TU-04 explora deliberadamente um limite conhecido do sistema: o RF06 não executa escrita direta nas fontes, apenas gera uma sugestão copiável, conforme a decisão D04 (seção 7). Pedir ao agente para "atualizar o prazo de entrega de um projeto" não deve resultar em uma alteração de fato: a resposta esperada é uma sugestão de texto para o participante copiar e aplicar manualmente na ferramenta oficial. O critério de sucesso da tarefa não é o prazo ter sido alterado, e sim se o participante entende, a partir da resposta do agente, que recebeu uma sugestão (e não uma confirmação de alteração), por que a mudança não foi feita diretamente e qual é o próximo passo para efetivá-la.
+
+### 6.5.4 Cenário Detalhado de Uso por Áudio (TU-02)
+
+Este é o cenário com maior número de pontos de possível confusão, porque depende de o participante perceber corretamente três estados sucessivos da interface (gravando, enviando, processando) sem qualquer explicação prévia sobre onde procurar essas indicações. O roteiro observa cada etapa do fluxo descrito na seção 3 (Chat UI → API de Recebimento de Áudio → transcrição exibida para conferência → processamento pelo pipeline de PLN):
+
+| Etapa | O que será observado | Indício de dificuldade |
+|---|---|---|
+| 1. Localizar o controle de áudio | Tempo até o participante identificar o botão/ícone de gravação sem apoio | Participante navega pela tela procurando, ou pergunta onde gravar |
+| 2. Perceber o início da gravação | Se o participante reconhece, sem perguntar, que a gravação começou | Participante fala antes de confirmar visualmente o início, ou pergunta "já está gravando?" |
+| 3. Perceber o fim da gravação | Se o participante sabe como e quando a gravação é encerrada | Participante continua falando após pretender parar, ou não sabe como parar |
+| 4. Enviar o áudio gravado | Se o envio é uma ação distinta e reconhecível após a gravação | Participante acredita que gravar já enviou, ou não encontra o botão de envio |
+| 5. Perceber o processamento | Se existe alguma indicação de que o sistema está processando, e se o participante a percebe | Participante pergunta se o sistema travou, ou envia o áudio novamente |
+| 6. Entender a transcrição e eventuais erros | Se o participante relaciona a transcrição exibida ao que falou, e entende mensagens de erro quando ocorrem | Participante não nota que a transcrição está errada, ou não sabe o que fazer diante de uma mensagem de erro |
+| 7. Relacionar a resposta final ao áudio enviado | Se o participante confirma que a resposta corresponde à pergunta que fez por voz | Participante hesita ou pergunta se a resposta é sobre o que ele perguntou |
+
+Além do fluxo correto, cada sessão induz pelo menos uma condição de erro no canal de áudio. A condição prioritária é o áudio muito longo, por ser o único limite já definido no documento: a seção 3 estabelece um teto de 5 minutos por gravação. As demais condições (áudio inválido, formato não suportado e falha no envio) são aplicadas como complemento quando o tempo de sessão permitir, já que seus limites técnicos ainda dependem de definição de implementação e não fazem parte do escopo desta seção.
+
+O critério de avaliação do erro não é se o backend retornou o código HTTP correto: isso já é coberto pelos testes de requisitos não funcionais da seção 6.3. Aqui, o que importa é se o participante entende, a partir da mensagem exibida, o que aconteceu e o que pode fazer em seguida (regravar, encurtar o áudio, tentar novamente), sem precisar perguntar ao facilitador.
+
+### 6.5.5 Tarefas Aplicadas aos Participantes
+
+Cada participante recebe as seis tarefas abaixo, uma por cenário, em texto escrito e sem indicação de como executá-las na interface.
+
+| ID | Tarefa entregue ao participante | Cenário |
+|---|---|---|
+| T1 | "Pergunte por texto quais são os principais riscos do projeto." | TU-01 |
+| T2 | "Faça a mesma consulta utilizando áudio." | TU-02 |
+| T3 | "Descubra qual fonte foi utilizada na resposta." | TU-03 |
+| T4 | "Peça ao agente para atualizar o prazo de entrega de um projeto." | TU-04 |
+| T5 | "Faça uma pergunta para a qual não há dados suficientes." | TU-05 |
+| T6 | "Identifique uma pendência ou alerta apresentado pelo sistema." | TU-06 |
+
+As tarefas são apresentadas nessa ordem para todos os participantes, de modo que T2 (áudio) já ocorra com o participante familiarizado com a resposta do agente em texto (T1), isolando a dificuldade específica do canal de voz das dificuldades gerais de uma primeira interação com o sistema.
+
+### 6.5.6 Métricas Observadas
+
+Para cada tarefa, o facilitador registra:
+
+| Métrica | Definição |
+|---|---|
+| Resultado | Concluída sem ajuda / concluída com ajuda / não concluída |
+| Tempo para concluir | Do início da leitura da tarefa até a ação que a encerra, em mm:ss |
+| Quantidade de erros | Número de ações que não levam ao objetivo da tarefa (cliques, tentativas, reformulações) |
+| Necessidade de ajuda | Se o facilitador precisou intervir, e em que ponto |
+| Dúvidas verbalizadas | Perguntas feitas em voz alta durante a tarefa (protocolo think-aloud) |
+| Comentários do participante | Observações espontâneas registradas literalmente |
+
+O instrumento de campo é uma ficha por participante, com uma linha por tarefa:
+
+| Participante | Tarefa | Resultado | Tempo | Nº de erros | Ajuda necessária | Dúvidas verbalizadas | Comentários |
+|---|---|---|---|---|---|---|---|
+
+### 6.5.7 Procedimento de Execução
+
+1. **Apresentar rapidamente o contexto.** O facilitador explica em poucas frases o que é o agente ("um assistente conversacional para consultar informações de projetos"), sem descrever a interface ou como realizar qualquer ação nela.
+2. **Entregar as tarefas.** As seis tarefas da seção 6.5.5 são entregues por escrito, uma de cada vez, na ordem T1 a T6.
+3. **Não ensinar onde clicar.** O facilitador não indica botões, menus ou fluxos. Se o participante travar completamente, o facilitador registra o bloqueio como parte do resultado antes de decidir se intervém.
+4. **Observar a interação.** O facilitador acompanha em silêncio, sem validar ou corrigir escolhas do participante durante a tarefa.
+5. **Registrar dificuldades.** Cada hesitação, tentativa fracassada, pergunta ou comentário é anotado na ficha da seção 6.5.6 no momento em que ocorre.
+6. **Aplicar todas as tarefas.** As seis tarefas são aplicadas na mesma sessão, sem pular etapas, mesmo quando uma tarefa anterior não é concluída.
+7. **Aplicar o SUS ao final.** Após a última tarefa, o participante responde ao questionário da seção 6.5.8 sem a presença de comentários do facilitador sobre o desempenho observado.
+8. **Fazer perguntas abertas.** O facilitador conduz as perguntas qualitativas da seção 6.5.9 como conversa, não como formulário lido em voz alta.
+9. **Consolidar os resultados.** Ao final de cada sessão, a ficha de observação e as respostas do SUS são digitalizadas e associadas ao identificador do participante (P1 a P5), preservando o anonimato do nome real no restante do documento.
+
+### 6.5.8 Questionário SUS e Cálculo do Escore
+
+### 6.5.9 Perguntas Qualitativas Finais
+
+Aplicadas em conversa aberta após o SUS, sem opções de resposta pré-definidas:
+
+- O que foi mais fácil de usar?
+- O que foi mais difícil?
+- Você preferiu usar texto ou áudio? Por quê?
+- Em algum momento você ficou em dúvida se o sistema estava gravando, enviando ou processando?
+- O que você mudaria na interface?
+
+### 6.5.10 Critérios de Avaliação dos Resultados
+
+Com 5 participantes executando as 6 tarefas da seção 6.5.5, o instrumento produz 30 execuções de tarefa. A taxa de conclusão sem ajuda é calculada como:
+
+Taxa de conclusão sem ajuda = (execuções concluídas sem ajuda / total de execuções) × 100
+
+O teste é considerado bem-sucedido quando:
+
+- a taxa de conclusão sem ajuda é igual ou superior a 80%, operacionalizando de forma verificável a meta de compreensão sem auxílio externo definida no RNF08;
+- os erros de interação registrados na seção 6.5.6 são pontuais, sem um mesmo ponto de confusão se repetir de forma consistente entre participantes diferentes;
+- os participantes descrevem, nas perguntas qualitativas, ter entendido as respostas do agente, a indicação de fonte (TU-03) e as mensagens de alerta, limitação e erro (TU-04, TU-05, TU-06) sem precisar de explicação adicional;
+- os participantes completam o fluxo de áudio (TU-02), ou seja, localizar o botão, gravar, enviar e reconhecer o processamento, sem orientação do facilitador, conforme os sete pontos de verificação da seção 6.5.4;
+- o escore médio do SUS calculado na seção 6.5.8 fica em nível aceitável, tomando como referência usual da literatura de usabilidade um escore igual ou superior a 68 (Bangor, Kortum e Miller, 2008), que corresponde à média histórica de sistemas avaliados pelo instrumento.
+
+Qualquer um desses critérios não atendido é registrado como achado do teste, não como falha do plano: o objetivo desta seção é gerar evidência para decidir onde a interface precisa de ajuste, não aprovar o sistema.
+
+### 6.5.11 Orientações para a Elaboração da Conclusão
+
+Esta seção planeja o instrumento; a conclusão só pode ser escrita depois da aplicação com os 5 participantes. Quando os dados existirem, a conclusão deve:
+
+- reportar o resultado agregado por cenário (TU-01 a TU-06), não apenas por participante, para identificar se a dificuldade está concentrada em um cenário específico: é possível que o TU-02 apresente maior concentração de dificuldades, considerando a quantidade de estados e ações envolvidos no fluxo de áudio; essa hipótese deverá ser confirmada ou rejeitada pelos resultados;
+- comparar a taxa de conclusão sem ajuda apurada com a meta de 80% do RNF08 e declarar explicitamente se a meta foi atingida, quase atingida ou não atingida;
+- reportar o escore médio do SUS e sua faixa de interpretação (abaixo, próximo ou acima da referência de 68), junto com o desvio entre participantes: um SUS médio aceitável com alta variância indica um sistema que funciona bem para alguns perfis e mal para outros, o que é uma conclusão diferente de um SUS uniformemente mediano;
+- descrever os dois ou três pontos de confusão que mais se repetiram nas fichas de observação e nas respostas às perguntas qualitativas, citando a etapa exata da seção 6.5.4 ou 6.5.6 em que ocorreram, para que a recomendação de ajuste seja acionável e não genérica;
+- indicar, para cada ponto de confusão relevante, se a causa é de interface (o controle certo existe mas não foi encontrado) ou de conteúdo (a mensagem existe mas não foi compreendida), porque as duas causas pedem correções diferentes;
+- registrar as limitações da coleta, em particular o tamanho da amostra (mínimo de 5 participantes) e qualquer desvio do roteiro planejado nesta seção, para que os resultados não sejam lidos como estatisticamente conclusivos;
+- encerrar com recomendações concretas de ajuste de interface ou de texto, priorizadas pelos achados mais recorrentes, e indicar quais delas justificam nova rodada de teste após implementadas. As recomendações que não forem endereçadas nesta sprint devem ser registradas na seção 7 (Registro de Decisões) ou na seção 1.7 (evolução futura), para não se perderem entre sprints.
 
 ## 6.6 Matriz de Cobertura Planejada
 
