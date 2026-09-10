@@ -30,7 +30,7 @@ export AZ1_VCS_REF    := $(VCS_REF)
 export AZ1_BUILD_DATE := $(BUILD_DATE)
 
 .DEFAULT_GOAL := help
-.PHONY: help build up down restart logs ps sh test lint train experiment \
+.PHONY: help build up down restart logs ps sh test lint train experiment bancada \
 	    prod-build prod-up prod-down prod-logs bake release clean nuke scan size
 
 help:  ## Lista os alvos disponíveis
@@ -78,6 +78,9 @@ train:  ## Retreina o classificador e grava em ./resultados
 
 experiment:  ## Roda a varredura de pré-processamento e vetorização
 	$(COMPOSE) --profile ml run --rm trainer python -m pln.experimento
+
+bancada:  ## Mede latência, tempo de treino e pico de memória (RNF01 e RNF10)
+	$(COMPOSE) --profile ml run --rm trainer python -m pln.bancada
 
 # --- Produção ----------------------------------------------------------------
 
