@@ -217,45 +217,61 @@ def abrir(config: Config, *, retomar_de: str | None = None) -> None:
     canal_id = str(uuid.uuid4())
     expira_em = datetime.now(UTC) + VALIDADE
 
-    resposta = _pedir(
-        f"{DRIVE}/changes/watch?pageToken={inicio}",
-        metodo="POST",
-        token=token,
-        dados={
-            "id": canal_id,
-            "type": "web_hook",
-            "address": f"{config.url_publica}/api/v1/webhooks/google",
-            "token": config.channel_token,
-            # O Google espera milissegundos desde a época, como texto.
-            "expiration": str(int(expira_em.timestamp() * 1000)),
-        },
-    )
-
+    # Grava a origem ANTES de pedir o canal ao Google, e não depois. A
+    # documentação do Drive registra que o `sync` de abertura pode chegar antes
+    # mesmo de a resposta deste POST voltar para nós; se a linha só existisse
+    # depois da resposta, essa entrega encontraria `VerificadorCanalAtivo` sem
+    # nada para confrontar e seria recusada com 401 — um canal genuinamente
+    # recém-criado sendo rejeitado pelo próprio receptor que o criou. `canal_id`
+    # já é conhecido neste ponto porque o UUID é gerado por nós, não pelo Google;
+    # só `recurso_id` (que o Google atribui) fica pendente até a resposta.
     with psycopg.connect(config.dsn) as conexao:
         conexao.execute(
             """
             INSERT INTO integracao.conexao
                 (provedor, conta, recurso, client_state, subscription_id, recurso_id,
                  expira_em, delta_token, ativa)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, TRUE)
+            VALUES (%s, %s, %s, %s, %s, NULL, %s, %s, TRUE)
             ON CONFLICT (provedor, conta, recurso) DO UPDATE
                SET client_state = EXCLUDED.client_state,
                    subscription_id = EXCLUDED.subscription_id,
-                   recurso_id = EXCLUDED.recurso_id,
+                   recurso_id = NULL,
                    expira_em = EXCLUDED.expira_em,
                    delta_token = EXCLUDED.delta_token,
                    ativa = TRUE
             """,
-            (
-                PROVEDOR,
-                "padrao",
-                "changes",
-                config.channel_token,
-                canal_id,
-                resposta.get("resourceId"),
-                expira_em,
-                inicio,
-            ),
+            (PROVEDOR, "padrao", "changes", config.channel_token, canal_id, expira_em, inicio),
+        )
+
+    try:
+        resposta = _pedir(
+            f"{DRIVE}/changes/watch?pageToken={inicio}",
+            metodo="POST",
+            token=token,
+            dados={
+                "id": canal_id,
+                "type": "web_hook",
+                "address": f"{config.url_publica}/api/v1/webhooks/google",
+                "token": config.channel_token,
+                # O Google espera milissegundos desde a época, como texto.
+                "expiration": str(int(expira_em.timestamp() * 1000)),
+            },
+        )
+    except ErroDeOperacao:
+        # O canal nunca chegou a existir do lado do Google: desfaz a linha
+        # especulativa, em vez de deixar uma origem "ativa" fantasma que nunca
+        # vai receber nada e nunca vai ser corretamente encerrada por `fechar`.
+        with psycopg.connect(config.dsn) as conexao:
+            conexao.execute(
+                "UPDATE integracao.conexao SET ativa = FALSE WHERE provedor = %s AND subscription_id = %s",
+                (PROVEDOR, canal_id),
+            )
+        raise
+
+    with psycopg.connect(config.dsn) as conexao:
+        conexao.execute(
+            "UPDATE integracao.conexao SET recurso_id = %s WHERE provedor = %s AND subscription_id = %s",
+            (resposta.get("resourceId"), PROVEDOR, canal_id),
         )
 
     print(f"Canal aberto.\n  id:        {canal_id}")
