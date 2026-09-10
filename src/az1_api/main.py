@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from routes import analysis_router, audio_router, chat_router, speech_router, transcription_router
+from routes import analysis_router, audio_router, chat_router, rag_router, speech_router, transcription_router
 from routes.audio import AudioAPIError
 from routes.chat import ChatAPIError
 from routes.speech import SpeechAPIError
@@ -21,7 +21,13 @@ app.include_router(audio_router, prefix="/api/v1")
 app.include_router(transcription_router, prefix="/api/v1")
 app.include_router(analysis_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")
+app.include_router(rag_router, prefix="/api/v1")
 app.include_router(speech_router, prefix="/api/v1")
+
+
+@app.get("/health", tags=["infra"])
+def health() -> dict[str, str]:
+    return {"status": "ok"}
 
 
 @app.exception_handler(TranscriptionAPIError)

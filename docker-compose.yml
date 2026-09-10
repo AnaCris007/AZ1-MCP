@@ -1,34 +1,335 @@
+# =============================================================================
+# AZ1 — composição base
+# =============================================================================
+# Este arquivo descreve a topologia REAL do sistema: quem fala com quem, quem
+# precisa estar saudável antes de quem, e sob que restrições cada contêiner
+# roda. Ele sozinho sobe uma pilha equivalente à de produção.
+#
+# Ele quase nunca é usado sozinho, porém:
+#
+#   docker compose up                                  → base + override (dev)
+#   docker compose -f docker-compose.yml \
+#                  -f docker-compose.prod.yml up -d    → base + produção
+#
+# O docker-compose.override.yml é carregado AUTOMATICAMENTE pelo compose quando
+# nenhum -f é passado. É por isso que o dia a dia é "docker compose up" e a
+# produção é o comando explícito: o caminho curto é o seguro de errar.
+#
+# Perfis (profiles) mantêm trainer e tests fora do up normal. Eles existem no
+# arquivo, participam do build e da rede, e só sobem quando chamados.
+# =============================================================================
+
+# Prefixo de contêineres, redes e volumes. Fixar evita que o nome da pasta
+# (que muda de máquina para máquina) decida o nome do volume de dados.
+name: az1
+
+# --- Blocos reaproveitados ---------------------------------------------------
+# Campos de extensão (x-*) são ignorados pelo compose e servem de âncora YAML.
+# Sem eles, cada bloco abaixo seria repetido em cada serviço — e a repetição é o
+# que faz um endurecimento valer para três serviços e ser esquecido no quarto.
+
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      # Sem limite, o log de um contêiner esquecido cresce até encher o disco da
+      # instância. Já derrubou mais deploy do que bug de aplicação.
+      max-size: "10m"
+      max-file: "3"
+
+x-hardening: &hardening
+  security_opt:
+    # Impede que um binário setuid dentro do contêiner escale privilégio: um
+    # processo comprometido não consegue ganhar mais poder do que já tinha.
+    - "no-new-privileges:true"
+  cap_drop:
+    # Nenhum destes serviços precisa de capacidade de kernel alguma. Derrubar
+    # todas é mais defensável do que confiar no conjunto padrão do Docker, que
+    # inclui CHOWN, SETUID, NET_RAW e outras que ninguém aqui usa.
+    - ALL
+  # PID 1 real, que colhe processos zumbis e repassa sinais. Sem isso, um
+  # "docker stop" pode virar SIGKILL depois do timeout, cortando requisições.
+  init: true
+
+x-restart: &restart
+  # "unless-stopped" e não "always": se alguém parou o contêiner de propósito
+  # para investigar, ele não deve voltar sozinho no próximo boot da máquina.
+  restart: unless-stopped
+
 services:
-  minio:
-    image: minio/minio:latest
-    ports:
-      - "9000:9000"
-      - "9001:9001"
+  # ---------------------------------------------------------------------------
+  # api — FastAPI + pipeline de PLN
+  # ---------------------------------------------------------------------------
+  api:
+    <<: [*logging, *hardening, *restart]
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+      target: runtime
+      args:
+        PYTHON_VERSION: "3.12"
+        VERSION: ${AZ1_VERSION:-0.1.0}
+        VCS_REF: ${AZ1_VCS_REF:-unknown}
+        BUILD_DATE: ${AZ1_BUILD_DATE:-unknown}
+    image: az1/api:${AZ1_VERSION:-dev}
+
+    # "required: false" para que a pilha suba numa máquina recém-clonada, sem
+    # .env. Sem a chave do Gemini o endpoint de chat falha — mas falha ele, e
+    # não o "docker compose up" inteiro, com um erro de arquivo ausente.
+    env_file:
+      - path: .env
+        required: false
+
+    # Vem DEPOIS do env_file e vence: o .env é escrito para rodar a API no host
+    # (localhost:9000), e dentro da rede do compose o MinIO atende por "minio".
+    # Sem esta sobreposição, a API tentaria falar consigo mesma na 9000.
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    volumes:
-      - minio_data:/data
+      AUDIO_STORAGE_ENDPOINT_URL: http://minio:9000
+      AUDIO_STORAGE_BUCKET: ${AUDIO_STORAGE_BUCKET:-az1-audio}
+      AUDIO_STORAGE_REGION: ${AUDIO_STORAGE_REGION:-us-east-1}
+      # As mesmas duas variáveis com que o serviço `minio` sobe, logo abaixo.
+      # Cliente e servidor lendo a MESMA entrada do .env é o que garante que
+      # eles não possam divergir: com nomes separados, mudar um e esquecer o
+      # outro produz 403 SignatureDoesNotMatch — erro que aparece só na primeira
+      # gravação de áudio e não diz qual dos dois lados está errado.
+      AUDIO_STORAGE_ACCESS_KEY: ${AUDIO_STORAGE_ACCESS_KEY:-minioadmin}
+      AUDIO_STORAGE_SECRET_KEY: ${AUDIO_STORAGE_SECRET_KEY:-minioadmin}
+      TZ: ${TZ:-America/Sao_Paulo}
+
+    depends_on:
+      minio:
+        # Espera o MinIO responder ao healthcheck, não apenas o processo existir.
+        condition: service_healthy
+      minio-init:
+        # E espera o bucket existir. "service_started" deixaria a API subir antes
+        # da criação do bucket — a primeira gravação de áudio daria NoSuchBucket.
+        condition: service_completed_successfully
+
+    # Sem "ports": a API não é publicada no host. Quem atende na porta é o
+    # frontend, que encaminha /api pela rede interna. Uma porta a menos exposta
+    # é uma porta a menos para proteger.
+    expose:
+      - "8000"
+
+    # Sistema de arquivos imutável. A aplicação não escreve em disco: os áudios
+    # vão para o S3/MinIO e o modelo é apenas lido. Se algum dia um processo
+    # tentar gravar na raiz, a falha é imediata e visível, em vez de silenciosa.
+    read_only: true
+    tmpfs:
+      # O UploadFile do Starlette usa SpooledTemporaryFile: acima de ~1 MB o
+      # upload transborda para /tmp. Com raiz somente-leitura e sem este tmpfs,
+      # todo áudio grande falharia. 128 MB cobrem o limite de 10 MB por arquivo
+      # com folga para requisições concorrentes.
+      - /tmp:size=128m,mode=1777
+
+    networks:
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # frontend — bundle React servido por nginx, e porta de entrada da pilha
+  # ---------------------------------------------------------------------------
+  frontend:
+    <<: [*logging, *hardening, *restart]
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+      target: runtime
+      args:
+        NODE_VERSION: "22"
+        # Vazio de propósito: o cliente chama /api na própria origem e o nginx
+        # deste contêiner encaminha. Ver o comentário no Dockerfile do frontend.
+        VITE_API_BASE_URL: ""
+        VERSION: ${AZ1_VERSION:-0.1.0}
+        VCS_REF: ${AZ1_VCS_REF:-unknown}
+        BUILD_DATE: ${AZ1_BUILD_DATE:-unknown}
+    image: az1/frontend:${AZ1_VERSION:-dev}
+
+    environment:
+      NGINX_PORT: "8080"
+      API_UPSTREAM: http://api:8000
+
+    ports:
+      # 8080 e não 80 no host: 80 exige privilégio em Linux e costuma estar
+      # ocupada. Quem termina TLS e atende na 443 em produção é o proxy de
+      # borda, à frente desta porta.
+      - "${AZ1_WEB_PORT:-8080}:8080"
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+    read_only: true
+    tmpfs:
+      # O entrypoint da imagem nginx roda envsubst sobre o template e grava a
+      # conf aqui na subida — é escrita legítima, e o único motivo de conf.d
+      # precisar ser gravável.
+      #
+      # uid/gid 101 são obrigatórios, não decoração: um tmpfs nasce pertencendo
+      # ao root, e o nginx desta imagem roda como 101. Sem isso o envsubst falha
+      # com "conf.d is not writable", o nginx sobe assim mesmo — sem nenhum
+      # server block — e a porta publicada recusa conexão sem uma linha de erro
+      # que explique por quê.
+      - /etc/nginx/conf.d:size=1m,uid=101,gid=101,mode=0755
+      - /var/cache/nginx:size=32m,uid=101,gid=101,mode=0755
+      - /tmp:size=16m,uid=101,gid=101,mode=1777
+
+    # Nas duas redes por necessidade: "frontend" recebe do host, "backend" fala
+    # com a API. É a peça que atravessa a fronteira, e a única.
+    networks:
+      - frontend
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # minio — armazenamento de áudio compatível com S3
+  # ---------------------------------------------------------------------------
+  minio:
+    <<: [*logging, *restart]
+    # Tag de release fixa, não "latest". Com "latest", a mesma composição sobe
+    # versões diferentes em máquinas diferentes conforme a data do pull — o tipo
+    # de divergência que só aparece em produção.
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
     command: server /data --console-address ":9001"
+
+    # O usuário root do MinIO É a chave de acesso S3 que a API usa: nesta pilha
+    # existe uma credencial só, com dois nomes apenas porque cada software
+    # chama a sua variável de um jeito. A tradução acontece aqui, e o .env
+    # guarda um par único.
+    #
+    # Atenção ao tamanho: o MinIO se recusa a INICIAR com senha de menos de 8
+    # caracteres (e usuário de menos de 3). O contêiner fica reiniciando e a API
+    # nunca sobe, porque espera o healthcheck dele.
+    environment:
+      MINIO_ROOT_USER: ${AUDIO_STORAGE_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${AUDIO_STORAGE_SECRET_KEY:-minioadmin}
+
+    volumes:
+      # Volume nomeado, não bind mount: o Docker gerencia, sobrevive ao
+      # "docker compose down" (só "down -v" apaga) e não depende do sistema de
+      # arquivos do host — bind mount de dados em Windows/macOS paga uma
+      # tradução de I/O que derruba a performance de escrita.
+      - minio_data:/data
+
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+      # Sem start_period, as falhas durante a inicialização contam para o limite
+      # de retries e podem marcar o serviço como unhealthy antes de ele ter tido
+      # chance de subir.
+      start_period: 15s
 
+    # Sem "ports" aqui: o MinIO só é alcançável de dentro da rede. O override de
+    # desenvolvimento publica 9000/9001 para o console; produção não publica.
+    networks:
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # minio-init — cria o bucket e aplica o ciclo de vida, depois sai
+  # ---------------------------------------------------------------------------
+  # Contêiner de tarefa, não de serviço: roda uma vez, termina com 0 e acabou.
+  # Deixar essa preparação a cargo de um passo manual no README é o que produz o
+  # clássico "na minha máquina funciona" — aqui ela é parte da composição,
+  # versionada e idempotente (--ignore-existing), então rodar de novo não quebra.
   minio-init:
-    image: minio/mc:latest
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
     depends_on:
       minio:
         condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      mc alias set local http://minio:9000 minioadmin minioadmin &&
-      mc mb --ignore-existing local/az1-audio &&
-      mc ilm rule import local/az1-audio < /config/lifecycle.json
-      "
+    environment:
+      AUDIO_STORAGE_ACCESS_KEY: ${AUDIO_STORAGE_ACCESS_KEY:-minioadmin}
+      AUDIO_STORAGE_SECRET_KEY: ${AUDIO_STORAGE_SECRET_KEY:-minioadmin}
+      AUDIO_STORAGE_BUCKET: ${AUDIO_STORAGE_BUCKET:-az1-audio}
+    # $$ escapa a interpolação do compose: a variável precisa chegar ao shell do
+    # contêiner e ser expandida lá, com os valores do bloco environment acima.
+    # Com um cifrão só, o compose substituiria pelo valor do host — vazio.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        mc alias set local http://minio:9000 "$$AUDIO_STORAGE_ACCESS_KEY" "$$AUDIO_STORAGE_SECRET_KEY"
+        mc mb --ignore-existing "local/$$AUDIO_STORAGE_BUCKET"
+        mc ilm rule import "local/$$AUDIO_STORAGE_BUCKET" < /config/lifecycle.json
+        echo "bucket $$AUDIO_STORAGE_BUCKET pronto"
     volumes:
       - ./infra/minio/lifecycle.json:/config/lifecycle.json:ro
+    networks:
+      - backend
+    restart: "no"
 
+  # ---------------------------------------------------------------------------
+  # trainer — retreina o classificador (perfil "ml")
+  # ---------------------------------------------------------------------------
+  #   docker compose --profile ml run --rm trainer
+  #   docker compose --profile ml run --rm trainer python -m pln.experimento
+  #
+  # Roda o mesmo código, com as mesmas versões de biblioteca da API, e escreve
+  # em ./resultados no host. É o que garante que o modelo servido em produção e
+  # o modelo medido no experimento saíram do mesmo ambiente — resultado de PLN
+  # muda com versão de scikit-learn, e essa é uma diferença cara de descobrir.
+  trainer:
+    profiles: ["ml"]
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+      target: trainer
+      args:
+        PYTHON_VERSION: "3.12"
+    image: az1/trainer:${AZ1_VERSION:-dev}
+    volumes:
+      # Bind mount: o artefato precisa aterrissar no repositório do host, para
+      # ser inspecionado e versionado. É o oposto do caso do MinIO.
+      - ./resultados:/app/resultados
+      - ./src/pln/dados:/app/src/pln/dados:ro
+    # Em Linux, exporte DOCKER_UID=$(id -u) e DOCKER_GID=$(id -g) antes de rodar,
+    # senão os arquivos gerados saem pertencendo ao root do host. Em Windows e
+    # macOS o padrão 0:0 é o correto, porque a tradução de permissão é do Docker
+    # Desktop e não há mapeamento de UID a acertar.
+    user: "${DOCKER_UID:-0}:${DOCKER_GID:-0}"
+    networks:
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # tests — suíte completa dentro da imagem (perfil "ci")
+  # ---------------------------------------------------------------------------
+  #   docker compose --profile ci run --rm tests
+  #
+  # Executa contra o pacote INSTALADO, com as dependências resolvidas na build.
+  # É o mesmo que o pipeline de CI vai rodar, o que elimina a classe de falha
+  # "passou na minha máquina e quebrou no CI por diferença de ambiente".
+  tests:
+    profiles: ["ci"]
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+      target: dev
+      args:
+        PYTHON_VERSION: "3.12"
+    image: az1/api-dev:${AZ1_VERSION:-dev}
+    environment:
+      # Os testes de API sobem o app com dependências substituídas por dublês,
+      # mas a construção das dependências reais lê estas variáveis. Valores
+      # fictícios bastam: nenhuma chamada de rede é feita.
+      DEEPGRAM_API_KEY: "test-key"
+      GEMINI_API_KEY: "test-key"
+    command: ["python", "-m", "unittest", "discover", "-v", "tests"]
+    networks:
+      - backend
+
+# --- Redes -------------------------------------------------------------------
+# Duas redes em vez de uma, para que a segmentação seja estrutural e não uma
+# regra que alguém precise lembrar de aplicar. Um contêiner novo colocado em
+# "frontend" simplesmente não enxerga o MinIO; não há como esquecer de bloquear.
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    # "internal: true" cortaria o acesso da rede à internet — e a API precisa
+    # dele, para Deepgram e Gemini. Fica registrado por que NÃO está ligado.
+
+# --- Volumes -----------------------------------------------------------------
 volumes:
   minio_data:
+    name: az1_minio_data
