@@ -5488,9 +5488,19 @@ Com 5 participantes executando as 6 tarefas da seção 6.5.5, o instrumento prod
 
 Taxa de conclusão sem ajuda = (execuções concluídas sem ajuda / total de execuções) × 100
 
+Essa taxa será reportada como indicador complementar de execução das tarefas. A verificação do RNF08 será feita por participante, pois o requisito estabelece que pelo menos 80% dos participantes compreendam a resposta e identifiquem a informação solicitada sem auxílio externo.
+
+Para observar essa compreensão, após T1 e T3 o facilitador solicitará, sem dar pistas: "Explique com suas palavras o que a resposta informa e mostre onde encontrou a informação solicitada e sua fonte". Após T5, solicitará: "Explique o que a resposta permite concluir sobre a informação solicitada". As respostas serão comparadas com um gabarito preparado previamente a partir da massa de teste, registrando compreensão correta e necessidade de ajuda. No cenário de dados insuficientes, compreender corretamente significa reconhecer que a informação não está disponível, sem interpretar a limitação como uma resposta factual.
+
+Cada participante será contado uma única vez como bem-sucedido no RNF08 se compreender tanto a resposta informativa e sua fonte quanto a resposta de limitação, sem explicação adicional do facilitador. Os registros por cenário serão preservados para identificar dificuldades específicas.
+
+Taxa de compreensão sem ajuda = (participantes que atendem aos critérios de compreensão / total de participantes avaliados) × 100
+
+Com cinco participantes, pelo menos quatro deverão atender aos critérios. Com mais participantes, será exigida a menor quantidade inteira que alcance 80% da amostra, sem arredondar o percentual para cima. Esses cálculos serão realizados após a aplicação; não representam resultados já obtidos.
+
 O teste é considerado bem-sucedido quando:
 
-- a taxa de conclusão sem ajuda é igual ou superior a 80%, operacionalizando de forma verificável a meta de compreensão sem auxílio externo definida no RNF08;
+- a taxa de compreensão sem ajuda é igual ou superior a 80% dos participantes, conforme o RNF08, independentemente da taxa complementar de conclusão das tarefas;
 - os erros de interação registrados na seção 6.5.6 são pontuais, sem um mesmo ponto de confusão se repetir de forma consistente entre participantes diferentes;
 - os participantes descrevem, nas perguntas qualitativas, ter entendido as respostas do agente, a indicação de fonte (TU-03) e as mensagens de alerta, limitação e erro (TU-04, TU-05, TU-06) sem precisar de explicação adicional;
 - os participantes completam o fluxo de áudio (TU-02), ou seja, localizar o botão, gravar, enviar e reconhecer o processamento, sem orientação do facilitador, conforme os sete pontos de verificação da seção 6.5.4;
@@ -5503,7 +5513,7 @@ Qualquer um desses critérios não atendido é registrado como achado do teste, 
 Esta seção planeja o instrumento; a conclusão só pode ser escrita depois da aplicação com os 5 participantes. Quando os dados existirem, a conclusão deve:
 
 - reportar o resultado agregado por cenário (TU-01 a TU-06), não apenas por participante, para identificar se a dificuldade está concentrada em um cenário específico: é possível que o TU-02 apresente maior concentração de dificuldades, considerando a quantidade de estados e ações envolvidos no fluxo de áudio; essa hipótese deverá ser confirmada ou rejeitada pelos resultados;
-- comparar a taxa de conclusão sem ajuda apurada com a meta de 80% do RNF08 e declarar explicitamente se a meta foi atingida, quase atingida ou não atingida;
+- comparar a taxa de compreensão sem ajuda por participante com a meta de 80% do RNF08, apresentar a contagem absoluta (por exemplo, quatro de cinco) e declarar se a meta foi atingida ou não; reportar separadamente a taxa de conclusão das tarefas como indicador complementar;
 - reportar o escore médio do SUS e sua faixa de interpretação (abaixo, próximo ou acima da referência de 68), junto com o desvio entre participantes: um SUS médio aceitável com alta variância indica um sistema que funciona bem para alguns perfis e mal para outros, o que é uma conclusão diferente de um SUS uniformemente mediano;
 - descrever os dois ou três pontos de confusão que mais se repetiram nas fichas de observação e nas respostas às perguntas qualitativas, citando a etapa exata da seção 6.5.4 ou 6.5.6 em que ocorreram, para que a recomendação de ajuste seja acionável e não genérica;
 - indicar, para cada ponto de confusão relevante, se a causa é de interface (o controle certo existe mas não foi encontrado) ou de conteúdo (a mensagem existe mas não foi compreendida), porque as duas causas pedem correções diferentes;
