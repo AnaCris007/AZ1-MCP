@@ -4,8 +4,9 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_chat_answerer
+from az1_api.dependencies import get_chat_answerer, require_authenticated_user
 from az1_api.main import app
+from services.auth_service import AuthenticatedUser
 from services.chat_service import ChatReceptionError, ChatReceptionErrorCode, ChatReply
 
 
@@ -19,12 +20,16 @@ class FakeAnswerer:
         return self.result
 
 
+_TEST_USER = AuthenticatedUser(subject="test-user", email="teste@example.com", name="Usuário de Teste", provider="azure")
+
+
 class TestChatAPI(unittest.TestCase):
     def tearDown(self) -> None:
         app.dependency_overrides.clear()
 
     def _client_with(self, result: ChatReply | Exception) -> TestClient:
         app.dependency_overrides[get_chat_answerer] = lambda: FakeAnswerer(result)
+        app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
         return TestClient(app, raise_server_exceptions=False)
 
     def test_responde_mensagem_com_sucesso(self) -> None:
@@ -49,6 +54,7 @@ class TestChatAPI(unittest.TestCase):
         cases = (
             (ChatReceptionErrorCode.EMPTY_MESSAGE, 422, "empty_message"),
             (ChatReceptionErrorCode.MESSAGE_TOO_LONG, 422, "message_too_long"),
+            (ChatReceptionErrorCode.SERVICE_UNAVAILABLE, 503, "service_unavailable"),
         )
         for code, status, error in cases:
             with self.subTest(code=code):

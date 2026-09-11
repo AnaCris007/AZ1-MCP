@@ -4,8 +4,9 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_transcriber
+from az1_api.dependencies import get_transcriber, require_authenticated_user
 from az1_api.main import app
+from services.auth_service import AuthenticatedUser
 from services.transcription_service import (
     TranscriptionError,
     TranscriptionErrorCode,
@@ -23,12 +24,16 @@ class FakeTranscriber:
         return self.result
 
 
+_TEST_USER = AuthenticatedUser(subject="test-user", email="teste@example.com", name="Usuário de Teste", provider="azure")
+
+
 class TestTranscriptionAPI(unittest.TestCase):
     def tearDown(self) -> None:
         app.dependency_overrides.clear()
 
     def _client_with(self, result: TranscriptionResult | Exception) -> TestClient:
         app.dependency_overrides[get_transcriber] = lambda: FakeTranscriber(result)
+        app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
         return TestClient(app, raise_server_exceptions=False)
 
     def test_retorna_transcricao_com_sucesso(self) -> None:

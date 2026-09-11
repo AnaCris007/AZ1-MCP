@@ -43,6 +43,11 @@ _ERROR_DETAILS = {
         "message_too_long",
         f"A mensagem excede o limite de {MAX_MESSAGE_LENGTH} caracteres.",
     ),
+    ChatReceptionErrorCode.SERVICE_UNAVAILABLE: _HTTPErrorDetails(
+        503,
+        "service_unavailable",
+        "O serviço de IA está sobrecarregado no momento. Tente novamente em instantes.",
+    ),
 }
 
 

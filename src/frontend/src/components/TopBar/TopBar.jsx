@@ -1,4 +1,5 @@
-import { Check, Moon, Settings, Share, SquarePen, Sun } from 'lucide-react'
+import { Check, LogOut, Moon, Settings, Share, SquarePen, Sun } from 'lucide-react'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function TopBar({
   title,
@@ -10,6 +11,8 @@ export default function TopBar({
   theme,
   onToggleTheme,
 }) {
+  const { user, signOut } = useAuth()
+
   return (
     <div className="flex h-16 shrink-0 items-center justify-between border-b border-border-soft px-4 md:px-6">
       <div className="flex items-center gap-2">
@@ -58,6 +61,24 @@ export default function TopBar({
           Novo chat
           <SquarePen size={14} strokeWidth={1.75} />
         </button>
+        {user && (
+          <>
+            <span
+              className="hidden max-w-[160px] truncate text-[13px] text-text-secondary sm:inline"
+              title={user.email}
+            >
+              {user.email}
+            </span>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              aria-label="Sair da conta"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-text-primary transition-colors hover:bg-surface-hover"
+            >
+              <LogOut size={15} strokeWidth={1.75} />
+            </button>
+          </>
+        )}
       </div>
     </div>
   )

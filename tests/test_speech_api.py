@@ -4,8 +4,9 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_speech_generator
+from az1_api.dependencies import get_speech_generator, require_authenticated_user
 from az1_api.main import app
+from services.auth_service import AuthenticatedUser
 from services.speech_service import GeneratedSpeech, SpeechGenerationError, SpeechGenerationErrorCode
 
 
@@ -21,6 +22,9 @@ class FakeSpeechGenerator:
         return self.result
 
 
+_TEST_USER = AuthenticatedUser(subject="test-user", email="teste@example.com", name="Usuário de Teste", provider="azure")
+
+
 class TestSpeechAPI(unittest.TestCase):
     def tearDown(self) -> None:
         app.dependency_overrides.clear()
@@ -28,6 +32,7 @@ class TestSpeechAPI(unittest.TestCase):
     def _client_with(self, result: GeneratedSpeech | Exception) -> tuple[TestClient, FakeSpeechGenerator]:
         generator = FakeSpeechGenerator(result)
         app.dependency_overrides[get_speech_generator] = lambda: generator
+        app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
         return TestClient(app, raise_server_exceptions=False), generator
 
     def test_retorna_audio_wav_com_sucesso(self) -> None:

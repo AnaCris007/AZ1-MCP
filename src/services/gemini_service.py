@@ -4,7 +4,9 @@ import os
 from dataclasses import dataclass
 
 from google import genai
-from google.genai import types
+from google.genai import errors, types
+
+from services.chat_service import ChatModelUnavailableError
 
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
 MAX_OUTPUT_TOKENS = 1024
@@ -48,15 +50,23 @@ class GeminiChatModel:
         historico = self._historico.get(conversation_id, []) if conversation_id else []
         contents = historico + [{"role": "user", "parts": [{"text": message}]}]
 
-        response = self._client.models.generate_content(
-            model=self._model,
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_INSTRUCTION,
-                max_output_tokens=MAX_OUTPUT_TOKENS,
-                thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
-            ),
-        )
+        try:
+            response = self._client.models.generate_content(
+                model=self._model,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_INSTRUCTION,
+                    max_output_tokens=MAX_OUTPUT_TOKENS,
+                    thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
+                ),
+            )
+        except errors.ServerError as exc:
+            raise ChatModelUnavailableError from exc
+        except errors.ClientError as exc:
+            if exc.code == 429:
+                raise ChatModelUnavailableError from exc
+            raise
+
         reply_text = response.text
 
         if conversation_id:

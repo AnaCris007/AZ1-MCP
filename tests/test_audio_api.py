@@ -4,13 +4,14 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_audio_receiver
+from az1_api.dependencies import get_audio_receiver, require_authenticated_user
 from az1_api.main import app
 from services.audio_service import (
     AudioReceipt,
     AudioReceptionError,
     AudioReceptionErrorCode,
 )
+from services.auth_service import AuthenticatedUser
 
 
 class FakeReceiver:
@@ -23,15 +24,19 @@ class FakeReceiver:
         return self.result
 
 
+_TEST_USER = AuthenticatedUser(subject="test-user", email="teste@example.com", name="Usuário de Teste", provider="azure")
+
+
 class TestAudioAPI(unittest.TestCase):
     def tearDown(self) -> None:
         app.dependency_overrides.clear()
 
     def _client_with(self, result: AudioReceipt | Exception) -> TestClient:
         app.dependency_overrides[get_audio_receiver] = lambda: FakeReceiver(result)
+        app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
         return TestClient(app, raise_server_exceptions=False)
 
-    def test_recebe_audio_sem_header_de_autorizacao(self) -> None:
+    def test_recebe_audio_com_usuario_autenticado(self) -> None:
         client = self._client_with(AudioReceipt(audio_id="aud_123"))
 
         response = client.post(

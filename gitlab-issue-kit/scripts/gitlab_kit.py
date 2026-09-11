@@ -9,6 +9,7 @@ Não é executável — importe a partir dos scripts de CLI.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import sys
@@ -38,10 +39,8 @@ DEFAULT_CONFIG_PATH = KIT_DIR / "config.yml"
 # progresso e derruba o script com UnicodeEncodeError. Forçar UTF-8 na saída
 # resolve; onde não der (stream redirecionado sem reconfigure), seguimos.
 for _stream in (sys.stdout, sys.stderr):
-    try:
+    with contextlib.suppress(AttributeError, OSError, ValueError):
         _stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
-    except (AttributeError, OSError, ValueError):
-        pass
 
 
 # ---------------------------------------------------------------------------
