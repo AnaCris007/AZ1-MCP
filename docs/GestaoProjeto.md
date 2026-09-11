@@ -131,7 +131,11 @@
 - [5.5 Revisão do Contrato de Convivência, SLA e Rituais](#55-revisão-do-contrato-de-convivência-sla-e-rituais)
 - [5.6 Revisão da Gestão do Processo de Desenvolvimento](#56-revisão-da-gestão-do-processo-de-desenvolvimento)
   - [5.6.1 Aderência das políticas na Sprint 3](#561-aderência-das-políticas-na-sprint-3)
-  - [5.6.2 Ferramenta pessoal de apoio ao backlog](#562-ferramenta-pessoal-de-apoio-ao-backlog)
+  - [5.6.2 Automação do processo com o gitlab-issue-kit](#562-automação-do-processo-com-o-gitlab-issue-kit)
+
+- [5.7 Estratégia de planejamento da Sprint 4](#57-estratégia-de-planejamento-da-sprint-4)
+  - [5.7.1 Objetivo e sequência das frentes](#571-objetivo-e-sequência-das-frentes)
+  - [5.7.2 Planejamento e acompanhamento no Kanban](#572-planejamento-e-acompanhamento-no-kanban)
 
 </details>
 
@@ -145,7 +149,7 @@ Este documento reúne as práticas permanentes de gestão adotadas pela equipe a
 
 ## 1.2 Organização evolutiva do documento
 
-O documento está dividido em duas grandes partes. A primeira, composta pela Seção 2, reúne os acordos e práticas permanentes que se aplicam a todo o módulo: o Contrato de Convivência, a Gestão do Processo de Desenvolvimento e o mecanismo de Acompanhamento Contínuo dos Riscos. Essas diretrizes não são reescritas a cada sprint, e eventuais ajustes são incorporados sem apagar o histórico dos acordos anteriores, de modo que a evolução dos combinados fique registrada. A segunda parte, composta pelas Seções 3 a 7, reúne os registros específicos de cada sprint: a síntese e a retrospectiva, a revisão dos riscos, a matriz de papéis e responsabilidades e o planejamento da sprint seguinte. Cada sprint preserva seus próprios registros, sem sobrescrever os das sprints anteriores, o que permite acompanhar a evolução da equipe ao longo do módulo. A gestão de configuração, por sua vez, está documentada em arquivo separado, o GestaoConfiguracao.md, que define o fluxo gitflow, as políticas de branches e os procedimentos de criação, mesclagem e exclusão.
+O documento está dividido em duas grandes partes. A primeira, composta pela Seção 2, reúne os acordos e práticas permanentes que se aplicam a todo o módulo: o Contrato de Convivência, a Gestão do Processo de Desenvolvimento e o mecanismo de Acompanhamento Contínuo dos Riscos. Essas diretrizes não são reescritas a cada sprint, e eventuais ajustes são incorporados sem apagar o histórico dos acordos anteriores, de modo que a evolução dos combinados fique registrada. A segunda parte, composta pelas Seções 3 a 5, reúne os registros específicos de cada sprint: a síntese e a retrospectiva, a revisão dos riscos, a matriz de papéis e responsabilidades e o planejamento da sprint seguinte. Cada sprint preserva seus próprios registros, sem sobrescrever os das sprints anteriores, o que permite acompanhar a evolução da equipe ao longo do módulo. A gestão de configuração, por sua vez, está documentada em arquivo separado, o GestaoConfiguracao.md, que define o fluxo gitflow, as políticas de branches e os procedimentos de criação, mesclagem e exclusão.
 
 ---
 
@@ -1004,9 +1008,9 @@ A coluna de designação está deliberadamente em branco. A distribuição de re
 
 ### 4.7.7 Registro das tasks no Kanban
 
- As tabelas das Seções 4.7.4, 4.7.5 e 4.7.6 constituem o planejamento aprovado na Sprint Planning. Cada task é registrada como uma issue no GitLab, com o mesmo identificador no título, e recebe descrição, tipo, prioridade, estimativa t-shirt, responsável, revisor, dependências, DoR e DoD conforme registrado acima. A designação de responsável e revisor observa o critério de cobertura registrado na Seção 4.2.4, segundo o qual nenhuma entrega é revisada por seu próprio autor, todos os integrantes revisam ao menos uma entrega e toda frente com mais de três entregas conta com ao menos dois revisores distintos. A designação contempla também as quatro entregas que ficaram sem responsável na Sprint 2, conforme a Seção 4.4.1.
+ As tabelas das Seções 4.7.4, 4.7.5 e 4.7.6 preservam a decomposição documental inicialmente proposta. O backlog executado foi refinado no GitLab e não possui correspondência individual com T01 a T40: as issues não utilizam esses identificadores. O quadro contém itens adicionais, como a validação da baseline, e não reproduz todas as tasks documentais ou de qualificação da base. Por isso, as tabelas são um registro histórico da proposta, não um espelho dos cards executados. A designação de responsável e revisor observa o critério de cobertura registrado na Seção 4.2.4, segundo o qual nenhuma entrega é revisada por seu próprio autor, todos os integrantes revisam ao menos uma entrega e toda frente com mais de três entregas conta com ao menos dois revisores distintos. A designação contempla também as quatro entregas que ficaram sem responsável na Sprint 2, conforme a Seção 4.4.1.
 
- O quadro Kanban do GitLab permanece a fonte oficial para o acompanhamento da execução, nos termos da Seção 2.2.2, e este documento registra o planejamento tal como aprovado, permitindo comparar o previsto com o realizado na retrospectiva da Sprint 3.
+ O quadro Kanban do GitLab permanece a fonte oficial para o acompanhamento da execução, nos termos da Seção 2.2.2, e este documento preserva a estratégia e as diferenças entre a proposta inicial e a execução, analisadas na retrospectiva da Sprint 3.
 
 ---
 
@@ -1014,9 +1018,9 @@ A coluna de designação está deliberadamente em branco. A distribuição de re
 
 ## 5.1 Visão geral da entrega
 
-Esta seção reúne os componentes concluídos neste estágio da documentação: a análise retrospectiva do ciclo, a matriz de risco do projeto, a matriz de papéis e responsabilidades, a revisão do contrato de convivência e a revisão das políticas de processo. O planejamento da Sprint 4 será incorporado em subseção posterior, sem alterar o histórico das Sprints 1 e 2.
+Esta seção consolida a análise da Sprint 3, a evolução dos riscos, os papéis e as colaborações da equipe, a revisão dos acordos e processos de trabalho e a estratégia de planejamento da Sprint 4.
 
-Os dados quantitativos desta versão correspondem a uma fotografia do repositório e do GitLab realizada em **09/09/2026, às 23h05 (BRT)**. Como a Sprint 3 termina em 11/09/2026, eles não constituem a aferição final da entrega. A equipe deve repetir a consulta no encerramento e atualizar os números que tiverem mudado, cumprindo a ação de conferência final definida na Seção 4.2.4.
+Os indicadores das Seções 5.2 e 5.4.2 preservam o retrato de **09/09/2026, às 23h05 (BRT)**, com registros de revisão de 10/09 onde indicado. A matriz principal de papéis e as respostas aos riscos incorporam também entregas versionadas verificadas em **11/09/2026, às 15h20 (BRT)**. Os números permanecem parciais até o encerramento das integrações da Sprint 3; as datas distinguem a evolução do trabalho de seu estado final.
 
 ## 5.2 Análise e retrospectiva da Sprint 3
 
@@ -1092,8 +1096,8 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 | AM1 | Comunicação interna do grupo | Não materializado. Os canais e SLAs da Seção 2.1.5 permaneceram em uso, e a revisão do contrato na Seção 5.5 não registrou descumprimento de SLA nem necessidade de escalonamento | 30% → 30% | Alto → Alto | 2,50 → 2,50 | Baixa | Tobias Viana | Em Monitoramento |
 | AM2 | Baixa acurácia na identificação de intenções | Sem alteração observável. Nenhum commit atingiu `src/pln` desde 29/08, início da Sprint 3; o catálogo de intenções e o classificador permanecem no estado homologado na Sprint 2, e a medição de acurácia sobre linguagem espontânea continua sem ocorrer | 30% → 30% | Muito Alto → Muito Alto | 3,18 → 3,18 | Baixa | Ana Cristina Jardim | Em Monitoramento |
 | AM3 | Atraso na liberação de acesso ao ambiente Microsoft | Mitigação sustentada, com o bloqueio original ainda presente em escopo reduzido. O adaptador do Microsoft Graph foi implementado (`src/services/graph_push_service.py`, `graph_subscription_service.py`), mas a demonstração ao vivo permanece inviável por indisponibilidade do tenant do Entra ID, conforme registrado na Seção 5.1.1 do `Projeto.md`. O caminho crítico não está bloqueado porque a validação ao vivo foi feita pelo adaptador do Google Drive | 70% → 70% | Baixo → Baixo | 2,95 → 2,95 | Baixa | Rui Facó | Mitigado |
-| AM4 | Atraso no fornecimento de informações pelo Metrô | Sem novo registro de troca de arquivos com o parceiro no período coberto pelo repositório. Como essa interação ocorre fora do Git, a manutenção do valor depende de confirmação direta da equipe | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Karol Barbosa Rocha | Em Monitoramento (**PENDENTE DE VALIDAÇÃO DA EQUIPE**) |
-| AM5 | Não conclusão do projeto dentro do prazo | Probabilidade elevada em relação à Sprint 2. Na fotografia de 09/09, dois dias antes do encerramento, 5 dos 11 MRs da sprint e 14 das 50 issues da milestone permaneciam abertos (Seção 5.2.1), e a segunda ação herdada da Sprint 2 seguia em andamento (Seção 5.2.2). O prazo não foi descumprido, mas a margem restante é menor do que nas sprints anteriores | 10% → 30% | Muito Alto → Muito Alto | 0,91 → 3,18 | Muito Baixa → Baixa | Felipe Simão | Em Monitoramento |
+| AM4 | Atraso no fornecimento de informações pelo Metrô | Sem novo registro de troca de arquivos com o parceiro no período coberto pelo repositório. Como essa interação ocorre fora do Git, a manutenção do valor depende de confirmação direta da equipe | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Karol Barbosa Rocha | Em Monitoramento |
+| AM5 | Não conclusão do projeto dentro do prazo | Probabilidade elevada em relação à Sprint 2. Na fotografia de 09/09, dois dias antes do encerramento, 5 dos 11 MRs da sprint e 38 das 50 issues da milestone permaneciam abertos, sendo 14 issues em revisão (Seção 5.2.1), e a segunda ação herdada da Sprint 2 seguia em andamento (Seção 5.2.2). O prazo não foi descumprido, mas a margem restante é menor do que nas sprints anteriores | 10% → 30% | Muito Alto → Muito Alto | 0,91 → 3,18 | Muito Baixa → Baixa | Felipe Simão | Em Monitoramento |
 | AM6 | Dados insuficientes ou inadequados para validação do agente | Resposta pendente não executada. A reformulação da base prevista para esta sprint (Seção 4.3.2) não ocorreu: não há commit em `src/pln/dados` nem em `resultados/` desde 29/08, e `intencoes_exemplos.csv` permanece com o mesmo conteúdo. É a segunda sprint consecutiva em que a reavaliação fica suspensa | 70% → 70% | Alto → Alto | 6,14 → 6,14 | Alta | Matheus Ferreira | Em Monitoramento |
 | AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | Não materializado como ausência, mas com redistribuição relevante: a matriz de papéis da Seção 5.4.1 mostra ao menos três integrantes assumindo frentes fora da responsabilidade planejada na Planning, o que indica pressão sobre a distribuição original sem chegar a configurar indisponibilidade | 50% → 50% | Moderado → Moderado | 3,18 → 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
 | AM8 | Alucinação do modelo de linguagem | **Risco reaberto, com exposição confirmada em código.** `src/services/gemini_service.py` gera resposta livre via Gemini a partir da mensagem do usuário, e `src/services/chat_service.py` junto com `src/routes/chat.py` repassam essa resposta ao usuário sem qualquer verificação factual ou injeção de contexto do RAG, que existe no repositório mas não está ligado ao chat. Os testes em `tests/test_gemini_service.py` cobrem disponibilidade e formato da chamada, não a correção do conteúdo gerado | 50% → 70% | Alto → Alto | 4,32 → 6,14 | Moderada → Alta | Paulo Henrique | Aberto |
@@ -1105,7 +1109,7 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 
 | ID | Oportunidade | Situação apurada na Sprint 3 | Probabilidade S2 → S3 | Impacto S2 → S3 | Sev. S2 → S3 | Criticidade | Responsável | Status |
 |---|---|---|:--:|:--:|:--:|---|---|---|
-| OP1 | Reutilização e evolução da solução | Padrão reforçado. O pipeline RAG foi implementado como módulo isolado em `src/rag`, com endpoint próprio (`POST /api/v1/rag/search`) e sem acoplamento ao serviço de chat, replicando a separação já demonstrada por `src/pln`. A resposta prevista na Seção 4.3.5 (registrar as decisões de arquitetura na Seção 3.8/3.9 do `Projeto.md`) segue sem evidência de execução nesta sprint | 90% → 90% | Alto → Alto | 7,95 → 7,95 | Alta | Felipe Simão | Materializado |
+| OP1 | Reutilização e evolução da solução | Padrão reforçado. O pipeline RAG foi implementado como módulo isolado em `src/rag`, com endpoint próprio (`POST /api/v1/rag/search`) e sem acoplamento ao serviço de chat, replicando a separação já demonstrada por `src/pln`. As decisões arquiteturais constam das Seções 3.8/3.9 do `Projeto.md`; o acompanhamento verifica sua coerência com as novas integrações | 90% → 90% | Alto → Alto | 7,95 → 7,95 | Alta | Felipe Simão | Materializado |
 | OP2 | Expansão do agente para novas funcionalidades de gestão de portfólio | Em aproveitamento acelerado. A sprint entregou RAG, síntese de voz, recepção de webhooks e estrutura Docker, quatro funcionalidades novas dentro do backlog complementar estimado na Sprint 2, o que eleva a probabilidade de a expansão planejada se concretizar dentro do cronograma | 50% → 70% | Moderado → Moderado | 3,18 → 4,55 | Baixa → Moderada | Paulo Henrique | Em Monitoramento |
 | OP3 | Validação com dados e cenários mais próximos da realidade | Resposta pendente não executada, pela segunda sprint consecutiva. Não há commit relacionado à calibração da base sintética com os anexos recebidos do Metrô, e a base permanece integralmente sintética | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Matheus Ferreira | Em Monitoramento |
 | OP4 | Antecipação da frente de implementação | Reforçada nesta sprint. Além do que já havia sido antecipado na Sprint 2, a equipe entregou RAG, TTS, webhooks e infraestrutura Docker antes do previsto pelo roteiro da Seção 4.2.4, que alocava essas frentes entre as Sprints 3 e 5, e o total de métodos de teste subiu de 160 para 190 no mesmo período | 70% → 90% | Alto → Alto | 6,14 → 7,95 | Alta | Ana Cristina Jardim | Materializado |
@@ -1119,7 +1123,7 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 | AM12 | Backlog superdimensionado e desalinhado da capacidade real da equipe | Das 50 issues da milestone, 38 permaneciam abertas em 09/09, 21 delas em `Backlog` e 13 sem assignee; as issues `#166`, `#206` e `#211` duplicam o objetivo de realizar a Planning, e `#199`, `#200` e `#202` a `#205` fragmentam uma gestão consolidada na `#207` (Seção 5.2.4) | 70% | Moderado | 4,55 | Moderada | Scrum Master da Sprint 3 | Materializado |
 | AM13 | Cadência irregular com acúmulo de revisão no encerramento do ciclo | Os commits autorais concentraram-se em seis datas, com interrupção entre 05 e 07/09; em 09/09, 14 issues estavam em `Waiting Review` e 5 dos 11 MRs da sprint continuavam abertos, dois dias antes do encerramento (Seções 5.2.1 e 5.2.4) | 70% | Moderado | 4,55 | Moderada | Scrum Master da Sprint 3 | Aberto |
 | AM14 | Regras de forma dos commits ainda não incorporadas ao hábito da equipe | Apenas 17 das 31 mensagens (54,8%) iniciam no infinitivo e 5 ultrapassam 72 caracteres; não há hook `commit-msg` instalado nesta cópia do repositório, segunda sprint seguida com o mesmo padrão de não conformidade (Seção 5.2.1) | 70% | Baixo | 2,95 | Baixa | Scrum Master da Sprint 3 | Aberto |
-| OP5 | Ferramenta pessoal de apoio ao backlog | Uma ferramenta desenvolvida pelo próprio Scrum Master apoiou a criação das issues no GitLab nesta sprint (Seção 5.6.2), reduzindo o trabalho manual de cadastro. O mesmo ciclo mostrou que a automação da criação não substitui o refinamento coletivo, condição registrada como pré-requisito para que a ferramenta produza ganho líquido na Sprint 4 | 50% | Moderado | 3,18 | Baixa | Scrum Master da Sprint 3 | Em Monitoramento |
+| OP5 | Automação do backlog com o gitlab-issue-kit | O gitlab-issue-kit, entregável de automação do processo de desenvolvimento versionado no repositório (Seção 5.6.2), apoiou a criação das issues no GitLab nesta sprint, reduzindo o trabalho manual de cadastro. O mesmo ciclo mostrou que a automação da criação não substitui o refinamento coletivo, condição registrada como pré-requisito para que a ferramenta produza ganho líquido na Sprint 4 | 50% | Moderado | 3,18 | Baixa | Scrum Master da Sprint 3 | Em Monitoramento |
 
 ### 5.3.5 Efetividade das respostas aplicadas
 
@@ -1127,15 +1131,26 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 
 | ID | Resposta definida no texto da Sprint 2 | Executada? | Produziu o efeito pretendido? | Evidência |
 |---|---|---|---|---|
-| AM6 | Definir critérios de composição da base sintética e reformulá-la na Sprint 3 | Não | Não | Nenhum commit em `src/pln/dados` ou `resultados/` desde 29/08; `intencoes_exemplos.csv` inalterado |
-| OP1 | Registrar as decisões de arquitetura que sustentam o desacoplamento na Seção 3.8 do `Projeto.md` | Não | Não se aplica | Nenhum commit relacionado a essa seção localizado no histórico de `docs/Projeto.md` desde 29/08 |
+| AM6 | Definir critérios de composição da base sintética e reformulá-la na Sprint 3 | Não | Não | No retrato de 09/09, a reformulação não estava registrada; em 11/09, a base de intenções integrada continuava inalterada, embora houvesse novas medições em `resultados/` |
+| OP1 | Registrar as decisões de arquitetura que sustentam o desacoplamento na Seção 3.8 do `Projeto.md` | Documentação arquitetural existente | Desacoplamento presente; reutilização externa não demonstrada | Seções 3.8 e 3.9 de `Projeto.md` e módulos `src/pln` e `src/rag`; ausência de novo commit não significa ausência de documentação |
 | OP3 | Utilizar os materiais recebidos do Metrô para calibrar a base sintética | Não | Não | Mesma evidência de AM6: nenhuma alteração em `src/pln/dados` |
 
- As três respostas pendentes desde a Sprint 2 compartilham a mesma causa raiz: nenhuma delas foi executada, e as três dependem da mesma frente, a base de dados do pipeline de PLN. É a segunda sprint em que essa frente fica sem execução, o que a torna prioridade explícita para a Sprint 4, ao lado da resposta ainda inexistente para o AM8, recém-reaberto.
+ O retrato anterior não apresentava evidência de conclusão dessas respostas. AM6 e OP3 dependem da qualificação dos dados; OP1 depende do registro arquitetural, uma frente distinta. Ausência de commit em uma janela não comprova ausência de trabalho. A evolução até 11/09 está registrada a seguir nesta seção.
+
+**Evolução das respostas até 11/09, às 15h20.** Os commits `307bf260` e `337ff08d`, de Tobias, acrescentaram medições ao PLN; portanto, o retrato de 09/09 não deve ser interpretado como ausência de trabalho nessa frente durante toda a sprint. A base `src/pln/dados/intencoes_exemplos.csv` permaneceu sem alteração no conteúdo integrado, mantendo a distinção entre medir o modelo e qualificar os dados. A documentação arquitetural já existe em `Projeto.md`; sua existência não depende de um commit novo em cada sprint.
+
+Para AM8, o commit `7bf71922`, na branch `feat/integrar-rag-ao-chat`, introduziu busca de contexto antes da geração, com testes em `5a6a6547`. No corte, essa alteração ainda não estava em `develop`; o fallback continua permitindo resposta sem contexto quando a busca falha ou não encontra resultados. A implementação é uma resposta em andamento, sem comprovar redução de alucinações ou apresentação de fonte ao usuário. Os valores e o status Aberto foram mantidos.
+
+| Item materializado | Resposta e efeito observado | Efetividade |
+|---|---|---|
+| AM10 | As seções documentais pendentes foram preenchidas na homologação anterior, conforme 4.2.5 | A ocorrência documental foi remediada; o padrão de concentração continua acompanhado em AM13 |
+| AM11 | Registro explícito de corte e reconciliação dos fatos com o conteúdo versionado | Melhora a rastreabilidade da informação; exige nova conferência no fechamento, pois a data sozinha não elimina divergências |
+| AM12 | Refinamento do backlog e eliminação de duplicidades foram definidos como ações para S4 em 5.2.5 | O efeito depende da execução dessas ações no Kanban; não se considera o problema resolvido apenas pela proposta |
+| OP1 e OP4 | Módulos e integrações de RAG, voz, banco e infraestrutura foram versionados | A construção está evidenciada; reutilização externa e ganho de capacidade não são medidos apenas pelo número de entregas |
 
 ### 5.3.6 Quadro consolidado e representação visual
 
- O quadro reúne os dezenove itens em acompanhamento ao final da Sprint 3, sendo quatorze ameaças e cinco oportunidades, ordenados por severidade decrescente:
+ O quadro reúne os dezenove itens em acompanhamento no retrato parcial da Sprint 3, sendo quatorze ameaças e cinco oportunidades, ordenados por severidade decrescente:
 
 | ID | Item | Categoria | Probabilidade | Impacto | Severidade | Criticidade | Responsável | Status |
 |---|---|---|---:|---|---:|---|---|---|
@@ -1153,7 +1168,7 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 | AM5 | Não conclusão do projeto dentro do prazo | Cronograma | 30% | Muito Alto | 3,18 | Baixa | Felipe Simão | Em Monitoramento |
 | AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | Equipe | 50% | Moderado | 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
 | AM9 | Degradação da qualidade da transcrição em ambiente ruidoso | Técnico | 50% | Moderado | 3,18 | Baixa | Matheus Ferreira | Em Monitoramento |
-| OP5 | Ferramenta pessoal de apoio ao backlog | Processo | 50% | Moderado | 3,18 | Baixa | Scrum Master da Sprint 3 | Em Monitoramento |
+| OP5 | Automação do backlog com o gitlab-issue-kit | Processo | 50% | Moderado | 3,18 | Baixa | Scrum Master da Sprint 3 | Em Monitoramento |
 | AM3 | Atraso na liberação de acesso ao ambiente Microsoft | Stakeholders | 70% | Baixo | 2,95 | Baixa | Rui Facó | Mitigado |
 | AM11 | Divergência entre a documentação e o estado real do repositório | Processo | 70% | Baixo | 2,95 | Baixa | Tobias Viana | Mitigado |
 | AM14 | Regras de forma dos commits ainda não incorporadas ao hábito | Processo | 70% | Baixo | 2,95 | Baixa | Scrum Master da Sprint 3 | Aberto |
@@ -1169,7 +1184,7 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 
 ### 5.3.7 Análise dos três itens mais críticos
 
- O critério de seleção permanece o da Seção 4.3.7: a ordenação por severidade. Sob esse critério, os itens de maior severidade ao final da Sprint 3 apresentam um empate na segunda posição da lista, que a análise resolve de forma explícita:
+ O critério de seleção permanece o da Seção 4.3.7: a ordenação por severidade. Sob esse critério, os itens de maior severidade no retrato parcial da Sprint 3 apresentam um empate na segunda posição da lista, que a análise resolve de forma explícita:
 
 | Item | Descrição resumida | Severidade | Criticidade | Variação desde a Sprint 2 |
 |---|---|---:|---|---|
@@ -1177,11 +1192,19 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 | OP4 | Antecipação da frente de implementação | 7,95 | Alta | 6,14 → 7,95 (+1,81) |
 | AM8 | Alucinação do modelo de linguagem | 6,14 | Alta | 4,32 → 6,14 (+1,82) |
 
- **OP1 e OP4** empatam no topo, e ambas continuam a ser oportunidades: a arquitetura desacoplada resistiu a mais uma sprint de crescimento: RAG, TTS e webhooks entraram como módulos e adaptadores adicionais, sem forçar a API a conhecer detalhes de cada provedor, e a equipe seguiu entregando escopo à frente do roteiro original. A ressalva de ambas é a mesma: a resposta prometida para OP1, registrar as decisões de arquitetura na Seção 3.8/3.9 do `Projeto.md`, ainda não foi executada, e sustentar OP4 sem documentar o porquê da antecipação tende a dificultar a leitura do artefato por quem não acompanhou a sprint.
+ **OP1 e OP4** empatam no topo, e ambas continuam a ser oportunidades: a arquitetura desacoplada resistiu a mais uma sprint de crescimento: RAG, TTS e webhooks entraram como módulos e adaptadores adicionais, sem forçar a API a conhecer detalhes de cada provedor, e a equipe seguiu entregando escopo à frente do roteiro original. O aproveitamento depende de manter as decisões arquiteturais das Seções 3.8/3.9 do `Projeto.md` coerentes com as integrações e de usar a capacidade antecipada para validação, sem confundir construção com homologação.
 
  A terceira posição tem um empate entre **AM6** (6,14, estável desde a Sprint 1) e **AM8** (6,14, mais que triplicado desde que voltou ao acompanhamento). A equipe escolhe **AM8** como o terceiro item mais crítico porque ele representa uma exposição nova e ativa: o AM6 descreve uma limitação conhecida e sem mudança de estado há duas sprints, enquanto o AM8 passou, nesta mesma sprint, de um risco condicional (que dependia de um modelo generativo entrar no caminho de execução) para um fato verificável no código de produção, sem nenhuma barreira de verificação de conteúdo entre a geração e a resposta ao usuário do PMO. Um assistente que responde com texto plausível, mas sem lastro em dado real, é um risco de confiança direta na ferramenta, e a ausência de resposta definida o torna mais urgente do que o AM6, cuja resposta já está planejada para a Sprint 4.
 
  Vale registrar o deslocamento em relação à Sprint 2. Naquela análise, os três itens mais críticos eram OP1, AM6 e OP4, e a leitura apontava que a exposição do projeto havia migrado de fatores externos para a capacidade da equipe de aproveitar o que já havia construído. Nesta sprint, a leitura se mantém quanto à origem interna dos riscos, mas ganha uma camada nova: o item que entra no topo não é mais só sobre aproveitar arquitetura, é sobre a confiabilidade do que o agente efetivamente diz ao usuário.
+
+| Item prioritário | Responsável registrado | Acompanhamento e resposta para a Sprint 4 | Gatilho de contingência proposto |
+|---|---|---|---|
+| OP1 | Felipe Simão | Conferir contratos e decisões arquiteturais a cada integração, preservando a separação entre módulos | Integração exige acoplamento ao fornecedor: revisar o adaptador antes de ampliar a funcionalidade |
+| OP4 | Ana Cristina Jardim | Confrontar antecipação de escopo com capacidade e resultados dos testes | Incremento sem validação suficiente: priorizar estabilização e testes antes de expandir o escopo |
+| AM8 | Paulo Henrique Bueno Fernandes | Validar resposta com fonte, ausência de fonte e falha do RAG antes da homologação | Resposta factual sem sustentação no teste: registrar correção e impedir o aceite desse comportamento |
+
+Esses gatilhos orientam o planejamento das respostas; não representam contingências já executadas.
 
 ### 5.3.8 Histórico de acompanhamento
 
@@ -1211,23 +1234,25 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 
 #### Registro das alterações de valor
 
+As alterações abaixo foram versionadas em **11/09/2026**, no commit [`7720fff`](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/commit/7720fff446c9b3cbf60123347048b04c447c1d45), com evidências observadas em 09/09 ou na data indicada em cada linha. A data de registro não substitui a data de ocorrência do evento; sua distinção permite acompanhar a atualização da matriz sem atribuir datas retroativas às decisões.
+
  Assim como na Seção 4.3.8, só constam aqui os itens cujos valores ou status efetivamente se alteraram nesta transição, ou que entraram no acompanhamento nesta sprint. Os demais permanecem com os valores da Sprint 2.
 
-| ID | Sprint | P anterior | I anterior | Severidade anterior | Novo valor | Status | Motivo da alteração | Evidência |
-|---|---|---:|---|---:|---:|---|---|---|
-| AM5 | 3 | 10% | Muito Alto | 0,91 | **3,18** (30%, Muito Alto) | Em Monitoramento | Dois dias antes do encerramento, quase metade dos MRs e mais de um quarto das issues da milestone ainda estavam abertos, o que reduz a margem restante sem indicar descumprimento do prazo | Seções 5.2.1 e 5.2.2 deste documento, fotografia de 09/09/2026 |
-| AM8 | 3 | 50% | Alto | 4,32 | **6,14** (70%, Alto) | Aberto | O modelo generativo deixou de ser condicional e passou a responder mensagens reais do chat sem verificação factual nem contexto de RAG, condição que a própria Sprint 2 havia apontado como gatilho para reabrir o risco | `src/services/gemini_service.py`, `src/services/chat_service.py`, `src/routes/chat.py`, verificados em 09/09/2026 |
-| AM9 | 3 | 50% | Moderado | 3,18 | 3,18, sem alteração numérica | Em Monitoramento | A transcrição foi integrada com Deepgram e ganhou mitigação parcial (termos de domínio e confirmação do usuário antes do envio ao chat), o que justifica sair de Aberto sem ainda justificar reduzir a severidade, já que o `confidence` retornado não é usado para alertar sobre baixa qualidade | `src/services/transcription_service.py`, `src/routes/transcription.py`, issue `#170`, verificados em 09/09/2026 |
-| AM10 | 3 | 70% | Moderado | 4,55 | 4,55, sem alteração numérica | Encerrado | A materialização registrada na Sprint 2 foi remediada: as quatro seções do `Projeto.md` foram preenchidas na homologação de 28/08, conforme a Seção 4.2.5 | Seção 4.2.5 deste documento |
-| AM11 | 3 | 70% | Moderado | 4,55 | **2,95** (70%, Baixo) | Mitigado | O documento passou a registrar data e hora da fotografia consultada e a declarar como parcial todo número sujeito a mudança até o encerramento, prática que reduz o impacto de uma eventual defasagem entre documentação e repositório | Seção 5.1 deste documento |
-| OP2 | 3 | 50% | Moderado | 3,18 | **4,55** (70%, Moderado) | Em Monitoramento | Quatro funcionalidades novas do backlog complementar foram entregues nesta sprint (RAG, TTS, webhooks e Docker), o que eleva a probabilidade de a expansão planejada se concretizar no cronograma | `src/rag`, `src/services/webhook_service.py`, `src/services/gemini_speech_service.py`, `docker-compose.yml` |
-| OP4 | 3 | 70% | Alto | 6,14 | **7,95** (90%, Alto) | Materializado | A antecipação de escopo se repetiu e se ampliou: RAG, TTS, webhooks e Docker foram entregues antes do previsto pelo roteiro da Seção 4.2.4, e o total de métodos de teste subiu de 160 para 190 | Seções 5.2.1 e 4.2.4 deste documento |
-| AM12 | 3 | Não aplicável | Não aplicável | Não aplicável | 4,55 (70%, Moderado) | Materializado | Item novo, decorrente do backlog superdimensionado e das issues duplicadas ou sem responsável identificadas na retrospectiva | Seção 5.2.4 deste documento, fotografia de 09/09/2026 |
-| AM13 | 3 | Não aplicável | Não aplicável | Não aplicável | 4,55 (70%, Moderado) | Aberto | Item novo, decorrente da concentração de revisão no encerramento do ciclo | Seções 5.2.1 e 5.2.4 deste documento |
-| AM14 | 3 | Não aplicável | Não aplicável | Não aplicável | 2,95 (70%, Baixo) | Aberto | Item novo, decorrente da persistência das mensagens de commit fora do padrão por duas sprints seguidas | Seção 5.2.1 deste documento |
-| OP5 | 3 | Não aplicável | Não aplicável | Não aplicável | 3,18 (50%, Moderado) | Em Monitoramento | Item novo, decorrente da ferramenta pessoal de apoio ao backlog usada nesta sprint | Seção 5.6.2 deste documento |
+| ID | Sprint | Data do registro | P anterior | I anterior | Severidade anterior | Novo valor | Status | Motivo da alteração | Evidência |
+|---|---|---|---:|---|---:|---:|---|---|---|
+| AM5 | 3 | 11/09/2026 | 10% | Muito Alto | 0,91 | **3,18** (30%, Muito Alto) | Em Monitoramento | Dois dias antes do encerramento, 5 dos 11 MRs e 38 das 50 issues da milestone ainda estavam abertos, sendo 14 issues em revisão, o que reduz a margem restante sem indicar descumprimento do prazo | Seções 5.2.1 e 5.2.2 deste documento, fotografia de 09/09/2026 |
+| AM8 | 3 | 11/09/2026 | 50% | Alto | 4,32 | **6,14** (70%, Alto) | Aberto | O modelo generativo deixou de ser condicional e passou a responder mensagens reais do chat sem verificação factual nem contexto de RAG, condição que a própria Sprint 2 havia apontado como gatilho para reabrir o risco | `src/services/gemini_service.py`, `src/services/chat_service.py`, `src/routes/chat.py`, verificados em 09/09/2026 |
+| AM9 | 3 | 11/09/2026 | 50% | Moderado | 3,18 | 3,18, sem alteração numérica | Em Monitoramento | A transcrição foi integrada com Deepgram e ganhou mitigação parcial (termos de domínio e confirmação do usuário antes do envio ao chat), o que justifica sair de Aberto sem ainda justificar reduzir a severidade, já que o `confidence` retornado não é usado para alertar sobre baixa qualidade | `src/services/transcription_service.py`, `src/routes/transcription.py`, issue `#170`, verificados em 09/09/2026 |
+| AM10 | 3 | 11/09/2026 | 70% | Moderado | 4,55 | 4,55, sem alteração numérica | Encerrado | A materialização registrada na Sprint 2 foi remediada: as quatro seções do `Projeto.md` foram preenchidas na homologação de 28/08, conforme a Seção 4.2.5 | Seção 4.2.5 deste documento |
+| AM11 | 3 | 11/09/2026 | 70% | Moderado | 4,55 | **2,95** (70%, Baixo) | Mitigado | O documento passou a registrar data e hora da fotografia consultada e a declarar como parcial todo número sujeito a mudança até o encerramento, prática que reduz o impacto de uma eventual defasagem entre documentação e repositório | Seção 5.1 deste documento |
+| OP2 | 3 | 11/09/2026 | 50% | Moderado | 3,18 | **4,55** (70%, Moderado) | Em Monitoramento | Quatro funcionalidades novas do backlog complementar foram entregues nesta sprint (RAG, TTS, webhooks e Docker), o que eleva a probabilidade de a expansão planejada se concretizar no cronograma | `src/rag`, `src/services/webhook_service.py`, `src/services/gemini_speech_service.py`, `docker-compose.yml` |
+| OP4 | 3 | 11/09/2026 | 70% | Alto | 6,14 | **7,95** (90%, Alto) | Materializado | A antecipação de escopo se repetiu e se ampliou: RAG, TTS, webhooks e Docker foram entregues antes do previsto pelo roteiro da Seção 4.2.4, e o total de métodos de teste subiu de 160 para 190 | Seções 5.2.1 e 4.2.4 deste documento |
+| AM12 | 3 | 11/09/2026 | Não aplicável | Não aplicável | Não aplicável | 4,55 (70%, Moderado) | Materializado | Item novo, decorrente do backlog superdimensionado e das issues duplicadas ou sem responsável identificadas na retrospectiva | Seção 5.2.4 deste documento, fotografia de 09/09/2026 |
+| AM13 | 3 | 11/09/2026 | Não aplicável | Não aplicável | Não aplicável | 4,55 (70%, Moderado) | Aberto | Item novo, decorrente da concentração de revisão no encerramento do ciclo | Seções 5.2.1 e 5.2.4 deste documento |
+| AM14 | 3 | 11/09/2026 | Não aplicável | Não aplicável | Não aplicável | 2,95 (70%, Baixo) | Aberto | Item novo, decorrente da persistência das mensagens de commit fora do padrão por duas sprints seguidas | Seção 5.2.1 deste documento |
+| OP5 | 3 | 11/09/2026 | Não aplicável | Não aplicável | Não aplicável | 3,18 (50%, Moderado) | Em Monitoramento | Item novo, decorrente do gitlab-issue-kit usado nesta sprint | Seção 5.6.2 deste documento |
 
- Três leituras se destacam neste registro. A primeira é que **a exposição técnica cresceu mais do que a exposição de processo**: AM8 e OP4 têm as maiores variações absolutas de severidade da sprint, e ambas vêm de código de produção, não de decisão de gestão. A segunda é que **duas correções vieram de mudança de prática, e não de sorte**: AM11 caiu por causa da própria convenção de datar a fotografia que esta seção usa, e AM10 fechou porque a dívida documental identificada na Sprint 2 foi paga antes do início desta sprint. A terceira é que **as três respostas pendentes desde a Sprint 2 seguem todas paradas na mesma frente**, a base de dados do pipeline de PLN, o que torna essa frente a prioridade mais concreta e mais adiada do planejamento da Sprint 4.
+ Três leituras se destacam neste registro. A primeira é que **a exposição técnica cresceu mais do que a exposição de processo**: AM8 e OP4 têm as maiores variações absolutas de severidade da sprint, e ambas vêm de código de produção, não de decisão de gestão. A segunda é que **duas correções vieram de mudança de prática, e não de sorte**: AM11 caiu por causa da própria convenção de datar a fotografia que esta seção usa, e AM10 fechou porque a dívida documental identificada na Sprint 2 foi paga antes do início desta sprint. A terceira é que **AM6 e OP3 compartilham a qualificação da base**, enquanto OP1 exige documentação arquitetural, o que torna essa frente a prioridade mais concreta e mais adiada do planejamento da Sprint 4.
 
 ---
 
@@ -1237,17 +1262,18 @@ O problema de definição das tasks não deve ser interpretado como falha da fer
 
 A matriz separa dois planos de análise, seguindo o padrão elogiado na avaliação da Sprint 2. O primeiro é a **atribuição aprovada na Planning**, recuperada do registro produzido pela equipe no início da Sprint 3. O segundo é a **execução efetivamente observada**, apurada por meio das issues, dos commits e dos MRs. A comparação permite identificar continuidade, colaboração e redistribuição sem transformar uma mudança ocorrida durante a sprint em algo que teria sido planejado desde o início.
 
-O registro original possuía campos de responsável e revisor ainda vazios. Esses campos são preservados como “não definido na Planning”; o nome de quem posteriormente assumiu ou revisou aparece somente nas colunas de execução. Essa distinção evita criar retrospectivamente um acordo que não foi registrado. A coluna de execução e colaborações também atende ao feedback da Sprint 2, que pediu que o trabalho realizado fora da frente principal aparecesse na matriz principal.
+O registro original possuía campos de responsável e revisor ainda vazios. Esses campos são preservados como “não definido na Planning”; o nome de quem posteriormente assumiu ou revisou aparece somente nas colunas de execução. Essa distinção evita criar retrospectivamente um acordo que não foi registrado. A coluna de execução e colaborações também atende ao feedback da Sprint 2, que pediu que o trabalho realizado fora da frente principal aparecesse na matriz principal. A execução incorpora evidências até 11/09 às 15h20; a coluna de revisões conserva o registro de 10/09.
 
-| Integrante | Papel principal na Sprint 2 | Responsabilidades planejadas na Sprint 3 | Revisões planejadas | Execução e colaborações observadas | Revisões registradas nos MRs até 10/09 | Comparação e natureza da rotação |
-|---|---|---|---|---|---|---|
-| Ana Cristina Jardim | Algoritmo de PLN e artefatos de gestão | Planejamento dos testes de integração | Implementação e integração do algoritmo de NLP | Produziu o plano de integração e assumiu também a implementação, os testes e a documentação dos webhooks, originalmente atribuídos a Matheus; issues `#181`, `#182`, `#183` e `#189` | MR `!62`, de testes funcionais | Rotação de PLN e gestão para validação sistêmica; execução ampliada por redistribuição da frente de webhooks |
-| Felipe Simão | Prototipação exploratória e modelagem de dados | Início da integração com o banco de dados, em conjunto com Matheus | Não definida na Planning | Assumiu os testes funcionais e colaborou no RAG, corrigindo lint, dependências, chunking, indexação e recuperação; issues `#184`, `#185` e `#201` | MRs `!58`, de reorganização do frontend, e `!66`, de RAG | Rotação de design e modelagem para qualidade funcional e validação técnica; a execução não permaneceu concentrada no recorte de banco originalmente previsto |
-| Karol Barbosa Rocha | Prototipação exploratória e organização documental | API de Text-to-Speech, validação técnica da solução e piloto de desempenho | Não definida na Planning | Implementou, testou e documentou o TTS e participou do planejamento de desempenho; issues `#186`, `#190`, `#196` e `#198` | MRs `!59` e `!63`, de documentação; `!65`, de Docker; e `!68`, de usabilidade | Rotação de design para implementação de voz, desempenho e revisão técnica, com aderência à responsabilidade principal planejada |
-| Matheus Ferreira da Silva | APIs de Speech to Text e Text-to-Speech | Webhooks e integração com banco, esta última em conjunto com Felipe | API de Text-to-Speech | Conduziu principalmente o pipeline RAG, com parsers, chunking, embeddings, indexação, recuperação e endpoint de busca; manteve atribuições de contrato e persistência relacionadas a webhooks e banco | MR `!60`, de Text-to-Speech | A revisão planejada foi cumprida; a execução migrou parcialmente de webhooks e banco para RAG |
-| Paulo Henrique Bueno Fernandes | API de recebimento de áudios | Frontend básico integrado, organização e documentação do frontend e testes de usabilidade | Não definida na Planning | Reorganizou o frontend em `src`, integrou upload e análise de áudio, tratou falhas do chat e produziu o plano de usabilidade; issues `#167`, `#170`, `#171`, `#192` e `#197` | MR `!61`, de testes de integração | Rotação de backend para frontend e avaliação com usuários, com aderência às responsabilidades planejadas |
-| Rui Facó | Pilha de tecnologias e contratos de entrada | Testes de requisitos não funcionais e Gestão de Projetos Evolutiva | Frontend básico integrado | Estruturou a documentação da Sprint 3, produziu o plano de RNFs e a gestão evolutiva; issues `#194`, `#207` e `#209` | MR `!64`, de integração de áudio; MR `!67`, de webhooks, ainda aberto | Rotação de definição técnica para gestão e qualidade; revisão planejada do frontend cumprida e colaboração adicional em webhooks |
-| Tobias Viana | Processo de deploy em nuvem | Implementação e integração do algoritmo de NLP | Webhooks | Conduziu a simplificação e integração da estrutura Docker e iniciou a melhoria do PLN; issues `#165`, `#169` e `#216` | Nenhuma revisão registrada até a consulta | A rotação planejada para NLP ainda não possui conclusão versionada; a execução permaneceu majoritariamente em infraestrutura e a revisão planejada de webhooks foi assumida por Rui |
+| Integrante | Papel na Sprint 1 | Papel principal na Sprint 2 | Responsabilidades planejadas na Sprint 3 | Revisões planejadas | Execução e colaborações observadas | Revisões registradas nos MRs até 10/09 | Comparação e natureza da rotação |
+|---|---|---|---|---|---|---|---|
+| Ana Cristina Jardim | Gestão de riscos e requisitos funcionais | Algoritmo de PLN e artefatos de gestão | Planejamento dos testes de integração | Implementação e integração do algoritmo de NLP | Produziu o plano de integração e assumiu também a implementação, os testes e a documentação dos webhooks, originalmente atribuídos a Matheus; issues `#181`, `#182`, `#183` e `#189`; colaborou também em SSO (`a8ed93d3`) | MR `!62`, de testes funcionais | Rotação de PLN e gestão para validação sistêmica; execução ampliada por redistribuição da frente de webhooks |
+| Felipe Simão | Contexto da indústria e perfil do líder | Prototipação exploratória e modelagem de dados | Início da integração com o banco de dados, em conjunto com Matheus | Não definida na Planning | Produziu testes funcionais, colaborou no RAG e implementou os schemas, carga e verificação do banco; issues `#184`, `#185`, `#201` e `#175`; commit `6afd4209` | MRs `!58`, de reorganização do frontend, e `!66`, de RAG | Rotação de design e modelagem para qualidade funcional e validação técnica; a execução abrangeu banco, testes funcionais e colaboração no RAG |
+| Karol Barbosa Rocha | Perfil do diretor e requisitos não funcionais | Prototipação exploratória e organização documental | API de Text-to-Speech, validação técnica da solução e piloto de desempenho | Não definida na Planning | Implementou, testou e documentou o TTS e participou do planejamento de desempenho; issues `#186`, `#190`, `#196` e `#198` | MRs `!59` e `!63`, de documentação; `!65`, de Docker; e `!68`, de usabilidade | Rotação de design para implementação de voz, desempenho e revisão técnica, com aderência à responsabilidade principal planejada |
+| Matheus Ferreira da Silva | Perfil do PMO e estratégia técnica inicial | APIs de Speech to Text e Text-to-Speech | Webhooks e integração com banco, esta última em conjunto com Felipe | API de Text-to-Speech | Conduziu RAG, contratos de webhooks, endpoints de alertas e auditoria e histórico de chat; commits `ae036f89` e `c5602de3`; issues `#191`, `#193`, `#212` e `#179` | MR `!60`, de Text-to-Speech | A revisão planejada foi cumprida; a execução migrou parcialmente de webhooks e banco para RAG |
+| Paulo Henrique Bueno Fernandes | Entendimento do problema e visão do produto | API de recebimento de áudios | Frontend básico integrado, organização e documentação do frontend e testes de usabilidade | Não definida na Planning | Reorganizou o frontend em `src`, integrou upload e análise de áudio, tratou falhas do chat e produziu o plano de usabilidade e colaborou na matriz de riscos (`7720fff4`); issues `#167`, `#170`, `#171`, `#192` e `#197` | MR `!61`, de testes de integração | Rotação de backend para frontend e avaliação com usuários, com aderência às responsabilidades planejadas |
+| Rui Facó | Definição do MVP e tecnologias | Pilha de tecnologias e contratos de entrada | Testes de requisitos não funcionais e Gestão de Projetos Evolutiva | Frontend básico integrado | Estruturou a documentação da Sprint 3, produziu o plano de RNFs e a gestão evolutiva; issues `#194`, `#207` e `#209` | MR `!64`, de integração de áudio; MR `!67`, de webhooks, integrado em 11/09 | Rotação de definição técnica para gestão e qualidade; revisão planejada do frontend cumprida e colaboração adicional em webhooks |
+| Tobias Viana | Modelagem do fluxo de negócio | Processo de deploy em nuvem | Implementação e integração do algoritmo de NLP | Webhooks | Conduziu Docker, CI e medições de latência, memória e treino do PLN; issues `#165`, `#169` e `#216`; commits `307bf260` e `337ff08d` | Nenhuma revisão registrada até a consulta | Rotação de processos (S1) e deploy (S2) para medição de PLN (S3), com continuidade em infraestrutura; a revisão de webhooks foi atribuída a Rui no registro histórico |
+
 
 ### 5.4.2 Evidência versionada e colaborações efetivas
 
@@ -1263,9 +1289,9 @@ O registro original possuía campos de responsável e revisor ainda vazios. Esse
 
 **Método da apuração.** Foram considerados os 31 commits autorais únicos, identificados por SHA e alcançáveis a partir das referências atualizadas do repositório, com data entre 29/08 e 09/09/2026. Commits de merge foram excluídos e os nomes de autoria equivalentes foram consolidados por integrante. Os dados de issues e MRs foram consultados no GitLab às 23h05 de 09/09. A aferição deve ser repetida após os últimos merges, pois esta tabela registra o trabalho observado, e não uma previsão de encerramento.
 
-**Correspondência entre atribuição e execução.** Paulo, Rui e Karol mantiveram correspondência direta entre as responsabilidades planejadas e as entregas versionadas. Ana manteve os testes de integração e absorveu a frente de webhooks que estava com Matheus. Felipe migrou do recorte de banco para testes funcionais e colaboração no RAG. Matheus concentrou sua autoria em RAG, embora o planejamento o apontasse para webhooks e banco. Tobias entregou a estrutura Docker, mas a melhoria do PLN que demonstraria sua rotação principal ainda não estava concluída. Essas mudanças não são tratadas como erro por si mesmas: tornam-se problema apenas quando não são registradas e deixam tasks sem responsável claro.
+**Correspondência entre atribuição e execução.** Paulo, Rui e Karol mantiveram correspondência direta entre as responsabilidades planejadas e as entregas versionadas. Ana manteve os testes de integração e absorveu a frente de webhooks que estava com Matheus. No retrato de 09/09, Felipe havia ampliado sua atuação para testes funcionais e RAG; em 11/09, o banco também estava integrado (!70). Matheus concentrou sua autoria em RAG, embora o planejamento o apontasse para webhooks e banco. No retrato de 09/09, Tobias havia entregue Docker; os commits de medições do PLN de 09–10/09, incorporados à matriz principal, acrescentam a evidência da rotação técnica. Essas mudanças não são tratadas como erro por si mesmas: tornam-se problema apenas quando não são registradas e deixam tasks sem responsável claro.
 
-A colaboração mais clara fora da responsabilidade principal ocorre no RAG: Matheus conduziu a entrega no MR `!66`, enquanto Felipe registrou duas correções na mesma branch por meio da issue `#201` e também realizou a revisão final registrada no GitLab. Para fins desta matriz, Felipe é contabilizado como o revisor efetivo da entrega.
+A colaboração mais clara fora da responsabilidade principal ocorre no RAG: Matheus conduziu a entrega no MR `!66`, enquanto Felipe registrou duas correções na mesma branch por meio da issue `#201` e também realizou a revisão final registrada no GitLab. Sua contribuição em código e sua participação na revisão são papéis distintos. Conforme 2.2.4, a revisão independente da entrega deve ser realizada por quem não participou de sua implementação.
 
 ### 5.4.3 Avaliação da distribuição
 
@@ -1275,13 +1301,13 @@ A distribuição do backlog, por outro lado, apresenta uma fragilidade objetiva:
 
 Não há evidência de centralização absoluta, pois os sete integrantes possuem autoria e as revisões registradas se distribuem entre seis pessoas. Das quatro revisões nominalmente planejadas, duas são verificáveis como cumpridas: Matheus revisou o TTS e Rui revisou o frontend. A revisão de webhooks, planejada para Tobias, foi assumida por Rui, e a revisão do NLP, planejada para Ana, depende da conclusão da entrega correspondente. Nos demais casos, a Planning não definiu revisor; os nomes registrados na matriz decorrem da prática observada nos MRs.
 
-Na consulta de 10/09, Tobias ainda não possuía revisão registrada e o MR `!72`, referente a este artefato de gestão, continuava aberto sem reviewer designado. Como as revisões finais estão previstas para 11/09, a matriz preserva esse estado parcial e deve ser atualizada após a conclusão dos MRs, sem antecipar os nomes ainda não registrados.
+Na consulta de 10/09, Tobias ainda não possuía revisão registrada e o MR `!72` estava aberto. Em 11/09, a integração do !72 foi registrada no commit `df2655e4`. O merge comprova integração, mas não substitui a evidência de revisão; as participações nas revisões preservam a data de seu registro.
 
 ---
 
 ## 5.5 Revisão do Contrato de Convivência, SLA e Rituais
 
-O contrato vigente na Seção 2.1 foi revisado a partir da experiência da Sprint 3. **A decisão da equipe foi mantê-lo integralmente, sem alteração de regras.** As fragilidades observadas — especialmente a cadência irregular, alguns atrasos na atualização do Kanban e a concentração de revisões no encerramento — já são cobertas pelo contrato e pelas políticas permanentes. Por isso, exigem melhoria na execução, e não a criação de novas regras.
+Conforme o registro da equipe, o contrato foi revisado na Sprint 3 e mantido integralmente, sem alteração de regras. As fragilidades observadas — especialmente a cadência irregular, alguns atrasos na atualização do Kanban e a concentração de revisões no encerramento — já são cobertas pelo contrato e pelas políticas permanentes. Por isso, exigem melhoria na execução, e não a criação de novas regras.
 
 | Item do contrato | Aderência observada na Sprint 3 | Evidência e avaliação | Decisão |
 |---|---|---|---|
@@ -1293,7 +1319,7 @@ O contrato vigente na Seção 2.1 foi revisado a partir da experiência da Sprin
 | 2.1.6 Dailies e demais rituais | Atendida | Conforme registro da equipe, as dailies ocorreram normalmente; os atrasos pontuais do Kanban não impediram a sincronização cotidiana | Mantida sem alteração |
 | 2.1.7 Acordos adicionais | Parcial, sujeita à conferência final | Os MRs integrados possuíam revisão, mas parte das revisões finais ainda estava prevista para 11/09 e alguns revisores não haviam sido definidos na Planning | Mantida sem alteração; atualizar a matriz de papéis após as revisões finais |
 
-O resultado não indica que todos os acordos foram executados sem desvio. Ele indica que as regras continuam adequadas para tratar os problemas encontrados. A Sprint 4 deve verificar a efetividade das ações da Seção 5.2.5 antes de considerar qualquer alteração normativa. O histórico desta decisão foi acrescentado à Seção 2.1.8; como não houve mudança de texto no contrato, não existe nova versão de regra nem evidência de aceite de alteração a anexar.
+O resultado não indica que todos os acordos foram executados sem desvio. Ele indica que as regras continuam adequadas para tratar os problemas encontrados. A Sprint 4 deve verificar a efetividade das ações da Seção 5.2.5 antes de considerar qualquer alteração normativa. O histórico desta decisão foi acrescentado à Seção 2.1.8; como não houve mudança de texto no contrato, não houve nova versão contratual nesta sprint.
 
 ---
 
@@ -1314,10 +1340,49 @@ As políticas da Seção 2.2 também foram revisadas e permanecem vigentes. A Sp
 
 As ações correspondentes já estão registradas na Seção 5.2.5 com responsáveis, prazos, evidências e critérios verificáveis. Assim, a revisão não cria regras paralelas: ela liga cada desvio observado ao mecanismo de correção que será acompanhado na Sprint 4.
 
-### 5.6.2 Ferramenta pessoal de apoio ao backlog
+### 5.6.2 Automação do processo com o gitlab-issue-kit
 
-Na Sprint 3, a criação das tasks no GitLab foi apoiada por uma ferramenta pessoal desenvolvida pelo próprio Scrum Master. Esse recurso foi utilizado para reduzir o trabalho manual de cadastro dos cards e apoiar a preparação do quadro.
+O **gitlab-issue-kit** é um entregável de automação do processo de desenvolvimento, versionado no repositório. Ele transforma um backlog em CSV em issues com descrição, tamanho, prioridade, DoR, DoD e milestone; também provisiona labels e gera o modelo de Merge Request. O registro da Sprint 3 relata seu uso como apoio ao cadastro das tasks.
 
-A automação da criação não substitui o refinamento coletivo. As duplicidades e os itens sem responsável observados na Sprint 3 mostram que uma issue pode ser criada corretamente pela ferramenta e ainda assim não representar um compromisso útil ou coerente com a entrega. Por isso, o fluxo da Sprint 4 deve ser: refinar e aprovar o backlog em equipe e somente então utilizar a ferramenta para cadastrar as issues. O quadro do GitLab continua sendo a fonte oficial do planejamento e do acompanhamento.
+| Componente | Papel no processo | Evidência versionada |
+|---|---|---|
+| `create_issues.py` | Valida o CSV e cria issues em lote | [Script](../gitlab-issue-kit/scripts/create_issues.py) |
+| `setup_labels.py` e `relabel.py` | Provisionam o catálogo e ajustam labels | [Provisionamento](../gitlab-issue-kit/scripts/setup_labels.py), [ajustes](../gitlab-issue-kit/scripts/relabel.py) |
+| `setup_mr_template.py` | Gera o modelo de MR na raiz do projeto; pode aplicá-lo à configuração remota | [Script](../gitlab-issue-kit/scripts/setup_mr_template.py) |
+| `config.yml` e `gitlab_kit.py` | Separam convenções do grupo da lógica compartilhada | [Configuração](../gitlab-issue-kit/scripts/config.yml), [núcleo](../gitlab-issue-kit/scripts/gitlab_kit.py) |
 
----
+O modo `--dry-run` permite verificar as operações antes de aplicá-las. A automação reduz cadastro repetitivo, mas não decide prioridade, capacidade ou responsabilidade: essas decisões pertencem à Planning. O fluxo de S4 é refinar coletivamente, validar o cadastro e só então publicar as issues. As orientações de uso estão no [guia do kit](../gitlab-issue-kit/docs/README.md).
+
+## 5.7 Estratégia de planejamento da Sprint 4
+
+### 5.7.1 Objetivo e sequência das frentes
+
+A Sprint 4, prevista na estratégia de entrega para **14 a 25/09/2026**, concentra a consolidação da persistência e das integrações, a implantação em nuvem e a execução dos testes planejados. O refinamento considera banco, webhooks, autenticação e CI já integrados em S3, evitando cadastrá-los novamente como construção do zero.
+
+| Ordem | Frente | Prioridade | Dependência e resultado esperado |
+|---|---|---|---|
+| 1 | Refinamento do backlog e capacidade | Alta | Retrospectiva de S3; eliminar duplicidades, distinguir incremento restante e confrontar estimativas com disponibilidade |
+| 2 | Qualificação de dados e preparação dos testes | Alta | Critérios de AM6 e OP3; preparar dados e cenários representativos e separar os casos de avaliação |
+| 3 | Consolidação da persistência e das respostas com fonte | Alta | Contratos e dados disponíveis; validar o incremento de banco e RAG, inclusive ausência de fonte e falhas de recuperação |
+| 4 | Integração e implantação em nuvem | Alta | Incremento funcional; verificar frontend, backend, webhooks, banco e ambiente de implantação em conjunto |
+| 5 | Execução dos testes funcionais, não funcionais e de usabilidade | Alta | Ambiente e casos aplicáveis preparados; registrar resultados, defeitos e limites por cenário |
+| 6 | Documentação, revisão e homologação | Alta | Evidências do incremento; atualizar os artefatos junto das entregas, revisar por pares e homologar antes da promoção |
+
+As frentes indicam precedência, não execução estritamente serial: a preparação dos testes começa cedo e a documentação acompanha a implementação. A prioridade de aproveitamento de OP1/OP4 não deve retirar capacidade da validação dos riscos AM6/AM8.
+
+### 5.7.2 Planejamento e acompanhamento no Kanban
+
+O planejamento detalhado da Sprint 4 está completo no [Kanban do GitLab](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/boards), conforme confirmação da equipe: as tasks possuem estimativas, prioridades, descrição, tipo, DoR e DoD. Este documento registra somente a estratégia, evitando uma segunda lista de T01–T40 que possa divergir das issues, conforme o aprendizado da Sprint 2.
+
+Cada card deve apresentar título, descrição, tipo, prioridade, responsável, revisor, dependências, estimativa, DoR e DoD. A Planning compara a carga estimada com a disponibilidade de cada integrante e preserva a rotação, sem usar apenas quantidade de cards ou commits como medida de contribuição.
+
+| Tamanho | Esforço estimado |
+|---|---|
+| PP | Até 15 minutos, para microtarefas |
+| P | Até 30 minutos |
+| M | De 30 a 60 minutos |
+| G | De 60 a 120 minutos |
+
+Itens maiores que 120 minutos são decompostos antes da execução. O **DoR** exige objetivo compreensível, insumos disponíveis, dependências identificadas, estimativa e responsáveis definidos. O **DoD** específico de cada task descreve um resultado observável, com evidência de teste ou revisão, ajustes resolvidos e integração concluída quando aplicável. A issue não é encerrada apenas pela existência de um commit.
+
+O quadro deve refletir cada mudança de estado e ser atualizado antes da Daily. A revisão do backlog verifica duplicidades, bloqueios, carga de revisão e aderência ao entregável; as ações da Seção 5.2.5 orientam esse acompanhamento.
