@@ -56,7 +56,7 @@ def send_chat_message(
     inicio = time.monotonic()
     resposta_texto: str | None = None
     try:
-        reply = answerer.answer(payload.message)
+        reply = answerer.answer(payload.message, payload.conversation_id)
         resposta_texto = reply.text
     except ChatReceptionError as exc:
         details = _ERROR_DETAILS[exc.code]
