@@ -64,6 +64,15 @@ COPY src/frontend/ ./
 ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
+# Login com Microsoft via Supabase Auth (RNF02). As duas são públicas por
+# natureza — o projeto Supabase e a anon key ficam visíveis no bundle de
+# qualquer jeito — mas, ao contrário de VITE_API_BASE_URL acima, não têm um
+# valor fixo: cada deploy aponta para o seu próprio projeto Supabase.
+ARG VITE_SUPABASE_URL=""
+ENV VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+ARG VITE_SUPABASE_ANON_KEY=""
+ENV VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+
 RUN npm run build && test -f dist/index.html
 
 # -----------------------------------------------------------------------------

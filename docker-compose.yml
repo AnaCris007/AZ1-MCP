@@ -139,6 +139,11 @@ services:
         # Vazio de propósito: o cliente chama /api na própria origem e o nginx
         # deste contêiner encaminha. Ver o comentário no Dockerfile do frontend.
         VITE_API_BASE_URL: ""
+        # Mesmas duas variáveis que a API lê como SUPABASE_URL, abaixo — um
+        # projeto Supabase, dois consumidores. Nome VITE_ diferente porque o
+        # valor vai para dentro do bundle, não do processo do contêiner.
+        VITE_SUPABASE_URL: ${SUPABASE_URL:-}
+        VITE_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-}
         VERSION: ${AZ1_VERSION:-0.1.0}
         VCS_REF: ${AZ1_VCS_REF:-unknown}
         BUILD_DATE: ${AZ1_BUILD_DATE:-unknown}

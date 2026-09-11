@@ -1,11 +1,12 @@
 import logging
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from az1_api.dependencies import AuthAPIError, require_authenticated_user
 from routes import (
     analysis_router,
     audio_router,
@@ -33,12 +34,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(audio_router, prefix="/api/v1")
-app.include_router(transcription_router, prefix="/api/v1")
-app.include_router(analysis_router, prefix="/api/v1")
-app.include_router(chat_router, prefix="/api/v1")
-app.include_router(rag_router, prefix="/api/v1")
-app.include_router(speech_router, prefix="/api/v1")
+
+# RNF02: toda funcionalidade protegida exige sessão/token válido de um
+# provedor SSO, rejeitado com 401 antes de qualquer regra de negócio. /health
+# fica de fora de propósito — o RNF07 depende de sondá-lo sem credencial.
+_auth_dependency = [Depends(require_authenticated_user)]
+app.include_router(audio_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(transcription_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(analysis_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(chat_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(rag_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(speech_router, prefix="/api/v1", dependencies=_auth_dependency)
+
+# Webhooks ficam fora do RNF02: quem chama é o provedor (Google Drive /
+# Microsoft Graph), que não tem token do SSO. A autenticidade dessas entregas
+# vem do segredo compartilhado verificado em src/services/webhook_*.
 app.include_router(webhooks_router, prefix="/api/v1")
 
 
@@ -76,6 +86,15 @@ def speech_api_error_handler(request: Request, exc: SpeechAPIError) -> JSONRespo
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
+
+
+@app.exception_handler(AuthAPIError)
+def auth_api_error_handler(request: Request, exc: AuthAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
 

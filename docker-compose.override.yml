@@ -97,6 +97,13 @@ services:
       VITE_DEV_API_PROXY: http://api:8000
       # Mesma história do WATCHFILES_FORCE_POLLING acima, do lado do Node.
       VITE_USE_POLLING: ${VITE_USE_POLLING:-1}
+      # No alvo `dev` o Vite não passa por build args — ele lê processo de
+      # ambiente diretamente. O envDir do vite.config.js (que aponta para a
+      # raiz do repo) não alcança aqui dentro: o bind mount só traz
+      # src/frontend, não o .env da raiz. Por isso precisam vir como variável
+      # de contêiner, e não do arquivo.
+      VITE_SUPABASE_URL: ${SUPABASE_URL:-}
+      VITE_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-}
 
     read_only: false
     tmpfs: !override []
