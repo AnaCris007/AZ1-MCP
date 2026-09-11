@@ -48,6 +48,17 @@ variable "BUILD_DATE" {
   default = "unknown"
 }
 
+// Login com Microsoft via Supabase Auth (RNF02). Públicas por natureza — vão
+// para dentro do bundle do frontend de qualquer jeito — mas sem valor fixo
+// como VITE_API_BASE_URL: cada deploy aponta para o seu próprio projeto.
+variable "SUPABASE_URL" {
+  default = ""
+}
+
+variable "SUPABASE_ANON_KEY" {
+  default = ""
+}
+
 // --- Grupos ------------------------------------------------------------------
 
 group "default" {
@@ -114,6 +125,8 @@ target "frontend" {
   args = {
     // Vazio: o bundle chama /api na própria origem e o nginx encaminha.
     VITE_API_BASE_URL = ""
+    VITE_SUPABASE_URL       = SUPABASE_URL
+    VITE_SUPABASE_ANON_KEY  = SUPABASE_ANON_KEY
   }
   tags = [
     "${REGISTRY}az1/frontend:${TAG}",

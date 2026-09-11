@@ -47,14 +47,14 @@ for nome in DEEPGRAM_API_KEY GEMINI_API_KEY AUDIO_STORAGE_ACCESS_KEY AUDIO_STORA
 done
 unset nome arquivo valor 2>/dev/null || true
 
-# --- 2. Credencial de exemplo em produção ------------------------------------
+# --- 2. Atalhos de desenvolvimento proibidos em produção ---------------------
 # A trava do docker-compose.prod.yml (${VAR:?...}) só dispara com a variável
 # AUSENTE. Como AUDIO_STORAGE_SECRET_KEY vem preenchida no .env.example, um
 # .env copiado do exemplo passa por ela levando "minioadmin" para o servidor —
 # a falha exata que a trava existia para impedir.
 #
-# Esta verificação fecha esse caminho. Fica atrás de uma variável porque em
-# desenvolvimento a credencial de exemplo é justamente o que se quer: só o
+# As verificações abaixo fecham esse caminho. Ficam atrás de uma variável
+# porque em desenvolvimento o atalho é justamente o que se quer: só o
 # docker-compose.prod.yml liga o modo estrito.
 if [ "${AZ1_REFUSE_DEFAULT_CREDENTIALS:-0}" = "1" ]; then
     case "${AUDIO_STORAGE_SECRET_KEY:-}" in
@@ -67,6 +67,19 @@ if [ "${AZ1_REFUSE_DEFAULT_CREDENTIALS:-0}" = "1" ]; then
             ;;
     esac
     log "credenciais de armazenamento: verificadas (não são as de exemplo)"
+
+    # AZ1_AUTH_MODE=disabled existe para rodar a API localmente sem depender do
+    # Supabase Auth (ver src/services/auth_service.py). Não é um bug corrigível
+    # com valor default: com ela ligada, TODAS as rotas do RNF02 ficam abertas
+    # sem credencial, então a verificação recusa a subida em vez de logar um
+    # aviso que ninguém vai ler antes do primeiro incidente.
+    if [ "${AZ1_AUTH_MODE:-enabled}" = "disabled" ]; then
+        log "ERRO: AZ1_AUTH_MODE=disabled em produção deixaria todas as rotas"
+        log "      protegidas (RNF02) abertas sem autenticação."
+        log "      Remova AZ1_AUTH_MODE do .env de produção ou defina =enabled."
+        exit 1
+    fi
+    log "autenticação: verificada (RNF02 não está desligado)"
 fi
 
 # --- 3. Artefato do modelo ---------------------------------------------------

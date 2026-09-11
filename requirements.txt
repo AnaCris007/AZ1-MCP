@@ -20,6 +20,10 @@ deepgram-sdk>=5.0
 # Dependências da API de chat (Gemini)
 google-genai>=1.0
 
+# Dependências de autenticação (RNF02 — Supabase Auth / Microsoft Entra ID)
+PyJWT[crypto]>=2.10
+psycopg[binary,pool]>=3.2
+
 # Dependências do pipeline RAG (src/rag)
 openpyxl>=3.1
 python-docx>=1.1
