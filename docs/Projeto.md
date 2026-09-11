@@ -6534,7 +6534,7 @@ O conjunto C merece registro à parte. A base atual foi gerada por gabarito e a 
 | Campo | Planejamento |
 |---|---|
 | Propósito | Confirmar que os quatro formatos aceitos entram no sistema e ficam armazenados |
-| Procedimento | Enviar `POST /api/v1/audio` com `multipart/form-data`, campo `audio`, usando cada um dos seis arquivos do conjunto A |
+| Procedimento | Enviar `POST /api/v1/audio` com `multipart/form-data`, campo `audio`, usando cada um dos quatro arquivos do conjunto A |
 | Resultado esperado | `201` com corpo `{"id": "...", "status": "received", "message": "Áudio recebido com sucesso."}` e objeto gravado sob `incoming/{audio_id}` |
 | Critério de aprovação | Os quatro formatos do conjunto A aprovados, sem exceção |
 | Evidência a registrar | Código HTTP, corpo da resposta e presença do objeto sob `incoming/{audio_id}` no bucket |
@@ -8154,7 +8154,7 @@ A matriz abaixo complementa a decomposição C1.1–C6.5 e as fichas de cada cat
 
 | Requisito | Critério de aceitação | Caso de teste | Tipo | Componente | Ferramenta | Evidência esperada | Status |
 |---|---|---|---|---|---|---|---|
-| RF01 | Texto/áudio, transcrição antes do processamento, resposta textual | CT-RF01-01–19; TI-01–19, TI-31; TU-01/02/10 | Funcional, integração, usabilidade | React, upload, STT, chat | Navegador, unittest/HTTPX, SDK | Rede ordenada, transcrição, resposta, bucket | Planejado |
+| RF01 | Texto/áudio, transcrição antes do processamento, resposta textual | CT-RF01-01–19; TI-01–10, TI-16–19, TI-31; TU-01/02/10 | Funcional, integração, usabilidade | React, upload, STT, chat | Navegador, unittest/HTTPX, SDK | Rede ordenada, transcrição, resposta, bucket | Planejado |
 | RF02 | Identificação, consulta, esclarecimento e recusa fora do domínio | CT-RF02-01–14; TI-20–23, TI-55–58; TU-01/05/07/08 | Funcional, integração, usabilidade | PLN, RAG, diálogo, chat | unittest, HTTPX, rubrica | Previsões, entidades, dados/fonte, ausência de consulta na recusa | Planejado; ID 10 suspenso |
 | RF03 | Documento, referência, data e múltiplas fontes | CT-RF03-01–06; TI-26/55; TU-03 | Funcional, integração, usabilidade | RAG, resposta, interface | HTTPX, SQL, navegador | Citações acionáveis e metadados corretos | Planejado |
 | RF04 | Sugestão por campo, cópia individual, sem escrita | CT-RF04-01–08; TU-09 | Funcional, usabilidade | Serviço de sugestões, React | Navegador, hash, rubrica | Campos/sugestões e documento antes/depois | Planejado |
