@@ -8,7 +8,10 @@
 --   - o conteúdo dos documentos é vetorizado e vive em vecs.documentos_metro,
 --     no MESMO banco (extensão pgvector), gravado pelo pipeline de src/rag;
 --   - este script cria a parte relacional: identidade, domínio do portfólio,
---     conversas, trilha de auditoria, avaliações e eventos de plataforma.
+--     conversas, trilha de auditoria, avaliações e eventos de plataforma;
+--   - a integração por webhook (Microsoft Graph e Google Drive, Seção 5.1) tem
+--     schema e tabela de auditoria próprios, acrescentados ao final deste
+--     arquivo (Seção 7).
 --
 -- Manter os dois no mesmo banco é o que permite ligar uma resposta do agente
 -- ao chunk que a fundamentou (auditoria.mensagem_fonte) sem consulta cruzada
@@ -560,6 +563,108 @@ REVOKE DELETE ON auditoria.conversa, auditoria.avaliacao FROM PUBLIC;
 -- uma resposta — são concedidas em nível de coluna a um papel nomeado, não a
 -- PUBLIC. O papel e os GRANTs ficam em 03_rls_policies.sql, junto das demais
 -- decisões de acesso.
+
+
+-- =============================================================================
+-- 7. INTEGRAÇÃO POR WEBHOOK (Seção 5.1)
+-- =============================================================================
+
+-- Assinaturas e canais de notificação externos que alimentam o receptor de
+-- webhook, e a trilha imutável das entregas recebidas por eles.
+CREATE SCHEMA IF NOT EXISTS integracao;
+
+COMMENT ON SCHEMA integracao IS
+    'Origens externas observadas por webhook (Microsoft Graph, Google Drive). Somente a aplicação lê e escreve.';
+
+-- Uma linha por origem observada. É o que permite trocar a conta, o site ou a
+-- biblioteca sem tocar no código: `recurso` guarda o caminho assinado no
+-- provedor, e é a única diferença entre observar o OneDrive de desenvolvimento
+-- ('/me/drive/root') e a biblioteca de documentos do SharePoint do parceiro
+-- ('/drives/{drive-id}/root') — os dois são `driveItem`, então o mesmo tradutor
+-- serve aos dois.
+--
+-- `subscription_id` guarda o identificador que o provedor devolve ao criar a
+-- origem: a assinatura, no Microsoft Graph, e o canal, no Google Drive. É contra
+-- esta coluna que o verificador de autenticidade confronta cada entrega, e é por
+-- isso que desativar a linha invalida na hora tudo que tenha sido capturado antes.
+CREATE TABLE integracao.conexao (
+    id              INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    provedor        TEXT NOT NULL CHECK (provedor IN ('microsoft_graph', 'google_drive', 'power_automate')),
+    conta           TEXT NOT NULL,
+    recurso         TEXT NOT NULL,
+    client_state    TEXT NOT NULL,
+    subscription_id TEXT UNIQUE,
+    -- Exigido pelo `channels.stop` do Google, que encerra o canal pelo par
+    -- (id, resourceId). Nulo no Microsoft Graph, que apaga a assinatura só
+    -- pelo identificador dela.
+    recurso_id      TEXT,
+    expira_em       TIMESTAMPTZ,
+    delta_token     TEXT,
+    refresh_token   TEXT,
+    ativa           BOOLEAN     NOT NULL DEFAULT TRUE,
+    -- Marcado pelo processador quando chega uma notificação que exige varredura.
+    -- A notificação diz que algo mudou, não o que mudou: descobrir exige uma
+    -- chamada `delta` (Graph) ou `changes.list` (Drive), que não cabe na janela
+    -- de resposta ao provedor. Esta coluna é o ponto de encaixe do consumidor da
+    -- Sprint 5, que varre e limpa a marca.
+    delta_pendente  BOOLEAN     NOT NULL DEFAULT FALSE,
+    criada_em       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (provedor, conta, recurso)
+);
+
+-- Registro imutável de cada entrega recebida. A unicidade composta é o critério
+-- de idempotência exigido pelo caso TI-37: a mesma notificação reentregue pelo
+-- provedor encontra a linha já gravada e não repete o efeito.
+--
+-- `concluido_em` nulo significa entrega registrada mas ainda não processada —
+-- o estado em que fica um evento que devolveu 5xx. É por isso que a reentrega
+-- consegue retomá-lo em vez de ser descartada como duplicata.
+-- As colunas do envelope são anuláveis porque a tabela também guarda a entrega
+-- que chegou autenticada mas não pôde ser interpretada (situacao 'recusado',
+-- caso TI-39): ela não tem envelope, só o corpo bruto e o motivo. Manter tudo
+-- numa tabela só preserva uma ordem única do que o provedor enviou, que é o que
+-- a auditoria precisa responder. O UNIQUE convive com isso porque o PostgreSQL
+-- não considera dois NULL como iguais.
+CREATE TABLE auditoria.evento_webhook (
+    id              INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    conexao_id      INTEGER REFERENCES integracao.conexao (id),
+    provedor        TEXT        NOT NULL,
+    subscription_id TEXT,
+    notificacao_id  TEXT,
+    tipo            TEXT,
+    versao_envelope TEXT,
+    correlacao      TEXT,
+    conteudo        JSONB,
+    corpo_bruto     TEXT,
+    motivo          TEXT,
+    recebido_em     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    concluido_em    TIMESTAMPTZ,
+    situacao        TEXT CHECK (situacao IN ('processado', 'ignorado', 'recusado')),
+    UNIQUE (provedor, subscription_id, notificacao_id),
+    -- Ou é um evento com envelope, ou é uma recusa com motivo. Nunca os dois,
+    -- nunca nenhum dos dois.
+    CONSTRAINT ck_evento_ou_recusa CHECK (
+        (situacao = 'recusado' AND motivo IS NOT NULL AND notificacao_id IS NULL)
+        OR (situacao <> 'recusado' AND notificacao_id IS NOT NULL)
+        OR (situacao IS NULL AND notificacao_id IS NOT NULL)
+    )
+);
+
+COMMENT ON TABLE auditoria.evento_webhook IS
+    'Trilha de entregas de webhook (Microsoft Graph, Google Drive). Idempotência do TI-37 via UNIQUE composto.';
+
+-- Imutabilidade da trilha de webhook (RNF09), no mesmo regime da Seção 6.
+REVOKE UPDATE, DELETE ON auditoria.evento_webhook FROM PUBLIC;
+
+-- Exceção pontual, análoga às da Seção 6: a conclusão do processamento só é
+-- conhecida depois da gravação, portanto o papel da aplicação recebe permissão
+-- de atualização restrita a estas duas colunas:
+-- GRANT UPDATE (concluido_em, situacao) ON auditoria.evento_webhook TO <papel_da_aplicacao>;
+
+-- Índice parcial para a varredura de pendentes: só as entregas não concluídas
+-- interessam, e elas são a minoria.
+CREATE INDEX idx_evento_webhook_pendente ON auditoria.evento_webhook (recebido_em)
+    WHERE concluido_em IS NULL;
 
 COMMIT;
 
