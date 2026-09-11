@@ -48,6 +48,7 @@
 - [3.7 Processo de Deploy em Nuvem](#37-processo-de-deploy-em-nuvem)
 - [3.8 Estratégia de Entrega para as Sprints 3, 4 e 5](#38-estratégia-de-entrega-para-as-sprints-3-4-e-5)
 - [3.9 Projeto Técnico e Arquitetural](#39-projeto-técnico-e-arquitetural)
+- [3.10 Implementação da Autenticação (RNF02)](#310-implementação-da-autenticação-rnf02)
 
 </details>
 
@@ -1851,9 +1852,9 @@ POST /api/v1/audio/{audio_id}/transcribe
 
 #### Autenticação
 
-Nenhum cabeçalho de autenticação é exigido pela implementação atual. A autenticação com o Deepgram é feita internamente pela API, a partir da variável de ambiente `DEEPGRAM_API_KEY`.
+O Bearer Token definido na Seção 3.4 é exigido por esta rota, pelos demais endpoints do canal de voz (recebimento e análise) e por todos os demais endpoints protegidos de `/api/v1` — a validação é aplicada de uma só vez, no registro dos roteadores em `src/az1_api/main.py`, e não em cada rota individualmente. A autenticação com o Deepgram continua interna à API, a partir da variável de ambiente `DEEPGRAM_API_KEY`, e não depende da identidade de quem chamou a rota.
 
-> **Divergência declarada entre contrato e implementação.** A Seção 3.4 define Bearer Token obrigatório para o canal de voz, e essa regra vale igualmente para os endpoints de transcrição e de análise. Ela ainda **não está implementada** em nenhuma das três rotas. Enquanto isso não mudar, o serviço só deve ser executado em ambiente local ou de laboratório, sem exposição pública. A implementação está prevista para a Sprint 3, junto da definição do emissor do token.
+> **Divergência fechada.** Esta seção registrava, até a implementação do RNF02, que o Bearer Token ainda não era exigido em nenhuma das três rotas de voz e que o serviço deveria rodar apenas em ambiente local. Isso deixou de valer: a autenticação está implementada (Supabase Auth com Microsoft Entra ID como provedor de identidade — detalhe do mecanismo na Seção 3.4) e coberta por teste automatizado em `tests/test_auth_api.py`.
 
 #### Resposta de sucesso
 
@@ -2605,7 +2606,7 @@ O vínculo entre as duas é o `audio_id` e o objeto gravado no armazenamento: o 
 | Corpo de erro padronizado com `error` e `message` | **Implementada** | `ErrorResponse` e os manipuladores de exceção em `src/az1_api/main.py` |
 | Armazenamento em bucket compatível com S3 sob `incoming/{audio_id}` | **Implementada** | `S3AudioStorage.store` em `src/services/storage_service.py` |
 | Cobertura por testes automatizados | **Implementada** | 4 testes de rota e 13 de serviço, em `tests/test_audio_api.py` e `tests/test_audio_service.py` |
-| **Autenticação por Bearer Token e resposta `401`** | **Planejada, não implementada** | A rota não declara nenhuma dependência de autenticação |
+| **Autenticação por Bearer Token e resposta `401`** | **Implementada** | Dependência `require_authenticated_user` aplicada a todas as rotas de `/api/v1` em `src/az1_api/main.py`; ver a subseção Autenticação, abaixo |
 | **HTTPS obrigatório** | **Planejada, não implementada** | O ambiente local serve por HTTP; ver Seção 3.7.4 |
 | **Limitação de taxa de requisições** | **DECISÃO TÉCNICA EM ABERTO** | Nenhum mecanismo de *rate limit* no código |
 | **Inspeção antivírus do arquivo** | **DECISÃO TÉCNICA EM ABERTO** | Não previsto no MVP; ver a subseção de segurança |
@@ -2628,7 +2629,11 @@ O método `POST` é adequado para o envio de um novo recurso ao sistema. O prefi
 Authorization: Bearer <token>
 ```
 
-Esse mecanismo restringe o acesso à API a usuários ou serviços autenticados e segue um padrão amplamente utilizado em APIs HTTP. O token será emitido pelo mecanismo de autenticação da solução. A definição do serviço emissor, entre autenticação própria ou integração com o Copilot Studio, será consolidada na Sprint 3, quando a camada de orquestração estiver especificada.
+Esse mecanismo restringe o acesso à API a usuários ou serviços autenticados e segue um padrão amplamente utilizado em APIs HTTP.
+
+**Decisão consolidada:** o token é emitido pelo **Supabase Auth**, atuando como intermediário (*broker*) do **Microsoft Entra ID**. A distinção entre os dois papéis importa: quem autentica a pessoa é a Microsoft — o login acontece inteiramente no domínio `login.microsoftonline.com`, e a solução nunca vê a senha da conta — enquanto quem emite o JWT que a API valida é o Supabase, depois de receber a confirmação da Microsoft. Esse desenho evita reimplementar OAuth2/OIDC contra o Entra ID diretamente no frontend e reaproveita a base de usuários (`auth.users`) que o Supabase já mantém para o RNF04.
+
+A validação, em `src/services/auth_service.py`, confere assinatura (JWKS do projeto Supabase), emissor, audiência e — como camada adicional específica desta solução — que o campo `app_metadata.provider` do token seja `azure`, rejeitando um cadastro que porventura reative outro provedor de login no mesmo projeto. As cinco condições inválidas do RNF02 (ausente, malformada, expirada, assinatura inválida, audiência incorreta) são cobertas por teste automatizado em `tests/test_auth_api.py`, contra uma rota real, verificando que a rejeição ocorre com HTTP 401 antes de qualquer execução da regra de negócio.
 
 ### Formato da requisição
 
@@ -4706,7 +4711,7 @@ sequenceDiagram
 
 **Objetivo.** Registrar o comportamento previsto quando uma funcionalidade protegida é chamada sem identidade SSO válida.
 **Requisitos.** RNF02.
-**Estado.** **Não implementado.** O componente de autenticação aparece em traço interrompido na Seção 2.4 exatamente por isso.
+**Estado.** **Implementado.** O diagrama de componentes da Seção 2.4 ainda representa a Autenticação SSO em traço interrompido; essa figura está desatualizada e a atualização fica registrada como pendência, fora do escopo desta implementação.
 
 ```mermaid
 sequenceDiagram
@@ -4748,7 +4753,7 @@ sequenceDiagram
 | **Consulta por voz bem-sucedida** | **Cenário A desta seção** | **Implementado** |
 | **Áudio recusado na validação** | **Cenário B desta seção** | **Implementado** |
 | **Falha do serviço de voz** | **Cenário C desta seção** | **Implementado quanto ao tratamento do erro** |
-| **Usuário sem autenticação válida** | **Cenário E desta seção** | **Especificado; não implementado** |
+| **Usuário sem autenticação válida** | **Cenário E desta seção** | **Implementado** |
 
 ### 3.9.5 Matriz de rastreabilidade técnica
 
@@ -4778,10 +4783,109 @@ A matriz fecha o artefato ligando cada requisito ao mecanismo que o realiza. Ela
 **Ausências identificadas na verificação da matriz.** A leitura por coluna expõe cinco lacunas, todas já encaminhadas neste documento e no planejamento da Sprint 3:
 
 1. **RF03, RF04, RF05 e RF06 não têm endpoint definido.** São os quatro requisitos cuja construção começa na Sprint 4; o contrato precisa ser definido antes, e a definição está entre as tasks daquele ciclo.
-2. **RNF02 não tem mecanismo implementado.** A autenticação SSO é a lacuna de maior consequência: sem ela, os endpoints não podem ser expostos publicamente, conforme registrado na Seção 3.4.
+2. ~~**RNF02 não tem mecanismo implementado.** A autenticação SSO é a lacuna de maior consequência: sem ela, os endpoints não podem ser expostos publicamente, conforme registrado na Seção 3.4.~~ **Implementado** — ver Seção 3.10.
 3. **RNF07 depende de um endpoint que não existe.** O `GET /health` é pressuposto pelo pipeline da Seção 3.7.6 e está no item 13 da Seção 3.7.9.
 4. **Nenhum endpoint está sem requisito de origem.** As quatro rotas implementadas rastreiam para RF01 e RF02.
 5. **Nenhuma entidade do modelo está sem uso.** Todas as onze tabelas da Seção 3.6.5 aparecem em pelo menos uma linha desta matriz, o que confirma que o modelo de dados não excede o necessário para sustentar os casos de uso.
+
+## 3.10 Implementação da Autenticação (RNF02)
+
+As Seções 2.3 e 3.4 definem o requisito e o contrato: Bearer Token, corpo de erro, cinco condições inválidas. Esta seção documenta *como* isso foi construído: a decisão de arquitetura, a configuração do provedor, a validação do token no backend, a integração no frontend, o modo de desenvolvimento e a cobertura de testes. O código correspondente vive em `src/services/auth_service.py`, `src/az1_api/dependencies.py`, `src/az1_api/main.py` e, no frontend, em `src/frontend/src/contexts/AuthContext.jsx`, `src/frontend/src/lib/supabase.js` e `src/frontend/src/lib/api.js`.
+
+### 3.10.1 Decisão de arquitetura: Supabase Auth como *broker* do Microsoft Entra ID
+
+O provedor de identidade é a Microsoft, mas quem emite o token que a API valida é o **Supabase Auth**, atuando como intermediário entre o frontend e o Entra ID. A distinção entre os dois papéis é o que costuma gerar confusão e por isso fica explícita aqui: a Microsoft autentica a pessoa (o login acontece inteiramente em `login.microsoftonline.com`, e a solução nunca vê a senha da conta), enquanto o Supabase, depois de receber a confirmação da Microsoft, emite um JWT próprio, assinado pelas chaves do projeto Supabase, não pelas da Microsoft.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant UI as :ChatUI (React)
+    participant SB as :SupabaseAuth
+    participant MS as :EntraID (Microsoft)
+    participant API as :AZ1API
+
+    U->>UI: clica em "Entrar com Microsoft"
+    UI->>SB: signInWithOAuth(provider="azure")
+    SB-->>UI: redireciona para o Entra ID
+    UI->>MS: navegação de topo (fora do CSP)
+    U->>MS: autentica com a conta Microsoft
+    MS-->>SB: código de autorização (redirect_uri do Supabase)
+    SB->>MS: troca o código pelo token (PKCE)
+    SB-->>UI: redireciona de volta com sessão + JWT do Supabase
+    UI->>API: Authorization: Bearer <JWT do Supabase>
+    API->>API: valida assinatura (JWKS), issuer, audiência, provider
+    API-->>UI: 200 com o resultado, ou 401 se a validação falhar
+```
+
+Essa escolha evita reimplementar o fluxo OAuth2/OIDC contra o Entra ID diretamente no frontend (Authorization Code + PKCE, renovação de token, cache de sessão) e reaproveita a base de usuários que o Supabase já mantém em `auth.users`, a mesma que `portfolio.usuario.auth_user_id` foi desenhado para referenciar (Seção 3.6.7, Decisão 13). O custo aceito é um serviço a mais no caminho do login e a necessidade de um Client Secret no App Registration do Entra, gerido fora do repositório.
+
+**Explicação.** O ponto que define a arquitetura como um *broker*, e não como um login direto, é o destino do código de autorização no passo 6: a Microsoft o devolve para o Supabase, não para o frontend. É o Supabase quem troca esse código pelo token junto à Microsoft, no passo 7, usando o Client Secret, que por isso fica só no painel do Supabase e nunca chega ao navegador. O frontend recebe, no passo 8, uma sessão já pronta, com um JWT assinado pelo Supabase. Por consequência direta disso, o backend, no passo 10, valida o token contra as chaves do **Supabase** (JWKS), e não contra as da Microsoft: ele nunca precisa falar com `login.microsoftonline.com`, nem em tempo de configuração nem a cada requisição. Essa indireção é o que evita expor o Client Secret no bundle do frontend e o que torna a validação de cada requisição uma operação local, sem chamada de rede à Microsoft.
+
+### 3.10.2 Configuração do provedor
+
+A configuração começa no Entra ID (`portal.azure.com`), onde o app é registrado como plataforma **Web**. A Redirect URI cadastrada ali não aponta para o AZ1, e sim para o callback do Supabase (`https://<project-ref>.supabase.co/auth/v1/callback`): é essa URL que a Microsoft precisa reconhecer, exatamente porque é o Supabase, e não o frontend, quem recebe o código de autorização (Seção 3.10.1). Nenhum tenant precisou ser criado só para isso: o Default Directory de uma conta Microsoft pessoal já serve, dentro do tier Free do Entra ID. O registro gera um Client Secret, colado em seguida no painel do Supabase (`Authentication → Providers → Azure`), junto do Client ID e da Tenant URL. Essa Tenant URL é sempre `https://login.microsoftonline.com/<tenant-id>`, nunca `common`, que aceitaria qualquer conta Microsoft do mundo, e não só as do tenant deste projeto.
+
+O passo que realmente decide se a autenticação protege alguma coisa é outro: desabilitar o provider **Email**, no mesmo painel de *Providers*, porque ele vem ligado por padrão em todo projeto novo do Supabase. A chave pública do projeto (`anon`/`publishable key`) é embutida no bundle do frontend por design, e é assim que o Supabase espera que ela seja usada. É justamente por isso que um provider Email ligado vira uma porta aberta: qualquer pessoa que leia o JavaScript da aplicação consegue se cadastrar direto contra a API do Supabase, sem nunca passar pela Microsoft. Esquecer esse passo não deixa a autenticação mais fraca: deixa-a decorativa.
+
+Por fim, o projeto está configurado para assinar os tokens por JWKS, com chave assimétrica ES256, confirmável a qualquer momento consultando `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`, que devolve a chave pública em uso. O verificador do backend (Seção 3.10.3) aceita também RS256 e, para um projeto configurado no modo legado de segredo compartilhado, HS256. Nunca mais de um desses modos ao mesmo tempo, porque aceitar dois algoritmos incompatíveis simultaneamente é a brecha clássica de implementações de JWT malfeitas.
+
+### 3.10.3 Validação do token no backend
+
+`src/services/auth_service.py` concentra a lógica. `SupabaseAuthSettings.from_environment()` lê `SUPABASE_URL` e monta o `issuer` (`{SUPABASE_URL}/auth/v1`) e o `jwks_url` a partir dele. `SupabaseTokenVerifier.verify(token)` decodifica o JWT com `PyJWT`, exigindo:
+
+- **assinatura válida**, resolvida via `PyJWKClient` contra o JWKS do projeto;
+- **`iss` igual ao do projeto**. O `aud` de todo JWT emitido pelo Supabase é a string literal `"authenticated"`, idêntica em qualquer projeto do mundo: validar só o `aud` não isolaria este projeto de nenhum outro. Quem isola é o `iss`, por isso os dois são conferidos separadamente;
+- **`app_metadata.provider == "azure"`**, uma camada de defesa própria desta solução, sem equivalente automático no Supabase: garante, no código, que um token só é aceito se a conta de origem realmente veio do fluxo Microsoft, mesmo que outro provedor seja reaberto no painel por engano.
+
+O `key_resolver` de `SupabaseTokenVerifier` é injetável, o que permite testar cada uma das cinco condições do RNF02 com um par de chaves gerado localmente, sem depender do JWKS real do Supabase (ver 3.10.7).
+
+A dependência `require_authenticated_user` (`src/az1_api/dependencies.py`) é aplicada de uma vez só, no registro dos roteadores em `src/az1_api/main.py` (`dependencies=[Depends(require_authenticated_user)]`), e não em cada rota individualmente: as seis rotas de `/api/v1` ficam protegidas sem que nenhum arquivo de rota precise ser tocado. `GET /health` fica fora de propósito, porque o RNF07 depende de sondá-lo sem credencial.
+
+A resposta de erro é sempre a mesma, independentemente da causa:
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Token de autenticação ausente ou inválido."
+}
+```
+
+Variar a mensagem por causa (token ausente, expirado, assinatura inválida...) transformaria a API num oráculo para quem está testando credenciais roubadas ou forjadas. A causa real é registrada em log de nível `WARNING`, **sem o token**, para permitir diagnóstico operacional sem violar a proibição do RNF09 de armazenar credenciais nos registros.
+
+### 3.10.4 Integração no frontend
+
+`AuthContext.jsx` expõe `user`, `loading`, `signInWithMicrosoft` e `signOut` via `supabase.auth.onAuthStateChange`. `App.jsx` usa esse estado como portão: enquanto `loading`, mostra um indicador; sem `user`, renderiza `LoginScreen`; com `user`, renderiza `AgentPage` normalmente. `lib/api.js` busca a sessão atual (`supabase.auth.getSession()`) antes de cada requisição e injeta `Authorization: Bearer <token>`. Buscar a sessão a cada chamada, em vez de guardar o token numa variável, é o que garante que o token renovado pelo Supabase seja sempre o usado. `TopBar` exibe o e-mail da conta autenticada e o botão de sair.
+
+O cliente Supabase (`lib/supabase.js`) é configurado com `storage: window.sessionStorage` em vez do padrão (`localStorage`): a sessão morre ao fechar a aba, reduzindo a janela de exposição caso um script malicioso consiga executar na página (XSS) e tente ler o token. O custo aceito é pedir login de novo ao abrir uma nova aba.
+
+### 3.10.5 Modo de desenvolvimento e trava de produção
+
+`AZ1_AUTH_MODE=disabled` faz `require_authenticated_user` devolver um usuário fixo sem consultar o Supabase, liberando as rotas protegidas para desenvolvimento local sem depender da configuração do provedor. `docker/api/entrypoint.sh` recusa a subida com esse valor quando `AZ1_REFUSE_DEFAULT_CREDENTIALS=1`, a mesma variável que já impedia credenciais de exemplo do MinIO em produção (Seção 3.7), e `docker-compose.prod.yml` liga essa verificação. Não há como a válvula de desenvolvimento chegar a produção por esquecimento.
+
+### 3.10.6 Mitigação de XSS: Content-Security-Policy
+
+Como o token de sessão vive no navegador (Seção 3.10.4), um `Content-Security-Policy` foi adicionado a `docker/frontend/security-headers.conf`, inexistente até então. As diretivas relevantes: `connect-src` restrito a `'self'` e ao domínio do Supabase (necessário para login e renovação de sessão); `media-src blob:` (reprodução do áudio gerado pelo TTS); `style-src 'unsafe-inline'` (o framer-motion aplica estilo via atributo `style=""`); e `script-src 'self'`, sem `'unsafe-inline'`, porque o build do Vite não gera nenhum `<script>` embutido. Mesmo com um XSS bem-sucedido, o risco residual aceito é limitado: o token roubado abre apenas a API do AZ1 com dados sintéticos, porque nenhum escopo do Microsoft Graph é solicitado (`scopes: 'email'`), e o Microsoft 365 de quem logou permanece fora de alcance.
+
+### 3.10.7 Cobertura de testes
+
+`tests/test_auth_service.py` cobre `SupabaseTokenVerifier` isoladamente, com um par de chaves ES256 gerado em teste: token válido, ausente, malformado, expirado, assinado com outra chave, com audiência incorreta, com issuer de outro projeto Supabase e com `app_metadata.provider` diferente de `azure`. `tests/test_auth_api.py` exercita as cinco condições do RNF02 contra uma rota real (`app.dependency_overrides`, no mesmo padrão dos demais testes de API), verificando três coisas por condição inválida: status `401`, corpo de erro fixo e que a regra de negócio **não foi executada**, a evidência de que a interrupção ocorre antes de qualquer processamento, como o RNF02 exige. Um teste adicional confirma que corpo de requisição inválido mais token ausente ainda resulta em `401`, não `422`: a dependência de rota é resolvida antes da validação do corpo, e é essa ordem que torna a autenticação um portão de fato, não apenas mais uma validação de entrada. As cinco suítes de API pré-existentes (`test_audio_api.py`, `test_transcription_api.py`, `test_analysis_api.py`, `test_chat_api.py`, `test_speech_api.py`) foram ajustadas para sobrepor `require_authenticated_user` em seu `setUp`, isolando os testes de negócio da autenticação.
+
+### 3.10.8 Ligação com `portfolio.usuario`
+
+A coluna `portfolio.usuario.auth_user_id` existe desde a modelagem de dados (Seção 3.6.7, Decisão 13), preparada exatamente para este momento, mas ficava nula até aqui: nada na aplicação escrevia nela. `src/services/usuario_service.py` fecha essa lacuna. A cada requisição autenticada, depois que o token é validado, `ResolveOrCreateUsuario.resolve()` procura um registro em `portfolio.usuario` primeiro pelo `auth_user_id`, o caso comum de quem já logou antes, e, se não encontrar, pelo e-mail, para o caso de o registro já existir sem ligação (é assim que os 10 perfis sintéticos de `02_initial_data.sql` seriam adotados, se algum dia tivessem um e-mail real). Quando nenhuma das duas buscas encontra nada, o que acontece com qualquer login real, já que os 10 registros seedados usam e-mails fictícios `@metro.example`, um novo `portfolio.usuario` é criado na hora, com `perfil` padrão `lider_projeto`. Esse padrão é uma escolha segura porque o RNF02 não estabelece autorização por cargo (Seção 2.3): nenhuma funcionalidade se comporta diferente em função de qual dos três perfis a pessoa recebe.
+
+Essa ligação é deliberadamente **best-effort**: se `SUPABASE_DB_URL` não estiver configurada ou o banco estiver fora do ar, a requisição autentica normalmente, só sem preencher `auth_user_id` daquela vez. A autenticação (RNF02) não pode depender da disponibilidade do banco relacional para funcionar, porque nenhuma outra parte da API depende dele hoje. Essa dependência só é introduzida aqui, e de forma que uma falha nela não se propaga para o resto da requisição.
+
+A lógica de busca e criação é coberta por `tests/test_usuario_service.py`, com um banco falso que verifica os três caminhos (encontrado, ligado e criado) sem tocar em infraestrutura real. Adicionalmente, as mesmas instruções SQL foram executadas uma vez contra o banco Supabase do projeto dentro de uma transação finalizada em `ROLLBACK`, no mesmo espírito de `04_verificacao.sql` (Seção 3.6.6), para confirmar a compatibilidade com o esquema em produção sem persistir nenhum dado de teste.
+
+O que continua fora do escopo desta implementação é a promoção de `auth_user_id` a chave estrangeira de `auth.users`, descrita como o passo seguinte em `src/database/README.md`. Ela é segura de aplicar agora, já que os registros sintéticos remanescentes continuam com `auth_user_id` nulo e uma FK não rejeita nulo, mas é uma migração de esquema, categoria de mudança distinta de código de aplicação escrevendo dados, e por isso fica como decisão separada da equipe.
+
+### 3.10.9 Limitações conhecidas
+
+- **O diagrama de componentes da Seção 2.4 e os diagramas de classes da Seção 3.9.2 ainda representam a Autenticação SSO em traço interrompido**, convenção usada para marcar componentes não implementados. A atualização desses artefatos visuais é manual e não foi feita junto com o código.
+- A escolha entre Microsoft e Google, deixada em aberto pelo RNF02 desde a Seção 2.3, está resolvida nesta implementação a favor da Microsoft; o contrato de teste (`CT-RNF02-P`/`CT-RNF02-N`, Seção 6) permanece válido para qualquer provedor.
+- A promoção de `portfolio.usuario.auth_user_id` a chave estrangeira de `auth.users`, descrita na Seção 3.10.8, permanece pendente.
 
 # 4. Prototipação Exploratória — Design e UX
 
