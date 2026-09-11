@@ -76,9 +76,7 @@
 <summary><strong>5. Desenvolvimento e Documentação Técnica do Projeto</strong></summary>
 
 - [5.1 Webhooks](#51-webhooks)
-- [5.2 Módulo VHS](#52-módulo-vhs)
-- [5.3 Sistema de Troca de Mensagens](#53-sistema-de-troca-de-mensagens)
-- [5.4 Integração entre Frontend e Backend](#54-integração-entre-frontend-e-backend)
+- [5.2 Integração entre Frontend e Backend](#52-integração-entre-frontend-e-backend)
 
 </details>
 
@@ -5714,7 +5712,7 @@ Uma sutileza necessária: a linha gravada mas **não concluída** (`concluido_em
 
 Nem o Graph nem o Drive dizem **o que** mudou: os dois dizem apenas que algo mudou na origem observada. Descobrir o quê exige uma chamada posterior — `delta` num, `changes.list` no outro — seguida de download, extração de texto e vetorização. Nada disso cabe na janela de poucos segundos que os provedores concedem antes de considerar a entrega falha.
 
-Por isso o receptor confirma com `202` e para em `delta_pendente = TRUE`. A varredura é trabalho do consumidor do barramento da Sprint 5, e essa coluna é a marca que ele vai ler. **O receptor de webhook é, portanto, o produtor do barramento da Sprint 5** — é esse o ponto que amarra a Seção 5.1 à Seção 5.3. Trocar `ProcessadorVarreduraPendente` por uma implementação que publique numa fila é trocar uma classe, sem tocar em rota, serviço ou banco.
+Por isso o receptor confirma com `202` e para em `delta_pendente = TRUE`. A varredura é trabalho do consumidor do barramento da Sprint 5, e essa coluna é a marca que ele vai ler. **O receptor de webhook é, portanto, o produtor do barramento da Sprint 5** (é esse o ponto que amarra o webhook, na Seção 5.1, ao futuro sistema de troca de mensagens). Trocar `ProcessadorVarreduraPendente` por uma implementação que publique numa fila é trocar uma classe, sem tocar em rota, serviço ou banco.
 
 ---
 
@@ -6272,39 +6270,11 @@ O receptor (a rota, a verificação de autenticidade, a tradução, a idempotên
 
 Nenhuma das duas assinaturas é permanente: o Microsoft Graph aceita validade de até 30 dias para o recurso observado, renovável por `PATCH` sem recriar; o Google Drive limita o canal a 7 dias, sem possibilidade de extensão. Ao expirar, a origem para de gerar notificações sem aviso do provedor. A renovação é feita pelos comandos `renovar` (Graph) e `renovar`/`abrir` (Drive), descritos nos manuais de operação da Seção 5.1.6.
 
-## 5.2 Módulo VHS
+## 5.2 Integração entre Frontend e Backend
 
-### 5.2.1 Objetivo e Tecnologia Utilizada
+Esta seção descreve as integrações implementadas até a Sprint 3 entre a interface e os serviços do AZ1: comunicação HTTP, execução em contêineres, entrada de áudio com confirmação, síntese de fala, autenticação SSO, histórico de conversa, recuperação zde contexto por RAG e auditoria. São apresentados a arquitetura, os contratos das APIs, os fluxos disponíveis e os limites atuais da integração.
 
-### 5.2.2 Configuração do Cache
-
-### 5.2.3 Gravação e Reprodução das Respostas Externas
-
-### 5.2.4 Integração com os Serviços Externos
-
-### 5.2.5 Casos de Uso e Testes
-
-## 5.3 Sistema de Troca de Mensagens
-
-### 5.3.1 Tecnologia de Mensageria
-
-### 5.3.2 Configuração de Filas, Tópicos ou Canais
-
-### 5.3.3 Produtores
-
-### 5.3.4 Consumidores
-
-### 5.3.5 Integração com os Webhooks
-
-### 5.3.6 Tratamento de Falhas
-
-### 5.3.7 Casos de Uso e Testes
-
-## 5.4 Integração entre Frontend e Backend
-
-Esta seção descreve as integrações implementadas até a Sprint 3 entre a interface e os serviços do AZ1: comunicação HTTP, execução em contêineres, entrada de áudio com confirmação, síntese de fala, autenticação SSO, histórico de conversa, recuperação de contexto por RAG e auditoria. São apresentados a arquitetura, os contratos das APIs, os fluxos disponíveis e os limites atuais da integração.
-
-### 5.4.1 Arquitetura da Integração
+### 5.2.1 Arquitetura da Integração
 
 A interface em React utiliza o cliente HTTP centralizado em [api.js](../src/frontend/src/lib/api.js), que chama a API FastAPI com `fetch`. O ponto de entrada [main.py](../src/az1_api/main.py) registra as rotas sob `/api/v1`; os schemas Pydantic definem as entradas e saídas, enquanto os serviços executam as operações e acessam os provedores externos. A comunicação do chat usa requisição e resposta HTTP, sem streaming, WebSocket ou fila de mensagens entre navegador e API.
 
@@ -6325,7 +6295,7 @@ O navegador acessa Supabase Auth para autenticação; as chamadas a Deepgram, Ge
 
 A [AgentPage](../src/frontend/src/pages/AgentPage.jsx) coordena as mensagens e a seleção de conversas. [PromptBar](../src/frontend/src/components/PromptBar/PromptBar.jsx) e [useMicVolume](../src/frontend/src/hooks/useMicVolume.js) implementam a captura do microfone; [ChatMessage](../src/frontend/src/components/ChatMessage/ChatMessage.jsx) permite ouvir a resposta. O backend monta as dependências em [dependencies.py](../src/az1_api/dependencies.py).
 
-### 5.4.2 Configuração e Contratos das APIs
+### 5.2.2 Configuração e Contratos das APIs
 
 #### Endereçamento e execução
 
@@ -6365,7 +6335,7 @@ A resposta contém apenas `reply`: o contrato atual não inclui fontes documenta
 
 Os contratos estão definidos em [schemas/chat.py](../src/schemas/chat.py), [schemas/audio.py](../src/schemas/audio.py), [schemas/transcription.py](../src/schemas/transcription.py) e [schemas/speech.py](../src/schemas/speech.py).
 
-### 5.4.3 Fluxos Integrados
+### 5.2.3 Fluxos Integrados
 
 #### Autenticação e acesso
 
@@ -6416,7 +6386,7 @@ O botão “Ouvir resposta” envia o conteúdo textual da mensagem ao endpoint 
 
 Esses limites são verificáveis comparando [api.js](../src/frontend/src/lib/api.js), [TasksView](../src/frontend/src/components/TasksView/TasksView.jsx), [CalendarView](../src/frontend/src/components/CalendarView/CalendarView.jsx), [routes/analysis.py](../src/routes/analysis.py), [routes/rag.py](../src/routes/rag.py) e [services/gemini_service.py](../src/services/gemini_service.py). A interface ainda não comprova consulta ao portfólio real, apresentação de fontes ou persistência de edições de tarefas.
 
-### 5.4.4 Tratamento de Erros e Falhas de Comunicação
+### 5.2.4 Tratamento de Erros e Falhas de Comunicação
 
 | Situação | Comportamento implementado |
 |---|---|
@@ -6434,7 +6404,7 @@ Os erros controlados de domínio usam `error` e `message`; erros de validação 
 
 O cliente não define timeout, cancelamento ou repetição automática das chamadas. O [nginx](../docker/frontend/default.conf.template) configura 10 segundos para conexão e 120 segundos para envio e leitura do proxy, além de limite de corpo de 12 MB para acomodar o envelope multipart. O indicador de processamento do chat não bloqueia novos envios enquanto uma resposta está pendente; serialização de envios não deve ser considerada uma garantia desta versão.
 
-### 5.4.5 Testes de Integração
+### 5.2.5 Testes de Integração
 
 Os testes automatizados verificam os contratos HTTP e o comportamento dos componentes com dependências substituídas. Ela deve ser distinguida dos testes sistêmicos planejados na Seção 6, que envolvem o fluxo completo e os serviços reais.
 
@@ -7411,7 +7381,7 @@ A retenção de sete dias do áudio bruto permanece como controle técnico da Se
 
 Os testes de integração têm como objetivo validar a comunicação entre os componentes da arquitetura do AZ1 (as rotas do FastAPI, os serviços de domínio que elas invocam por injeção de dependência e o pipeline de PLN) e as dependências que cada um consome: o armazenamento de objetos MinIO/Amazon S3, os provedores externos Deepgram e Gemini, o PostgreSQL a ser provisionado na Sprint 4, e os dois webhooks e o barramento de mensagens previstos para as Sprints 4 e 5. Esta camada assegura que os contratos HTTP, S3 e SQL são respeitados de ponta a ponta, que a persistência ocorre em serviços reais e não em dublês de memória, e que os mecanismos de resiliência (tradução de falha externa em código HTTP, idempotência de eventos, cache determinístico do módulo VHS) atuam conforme especificado. O critério que distingue um caso desta seção de um teste de unidade é operacional: um caso de integração exercita ao menos uma fronteira de processo, de rede ou de biblioteca de terceiro, ao contrário dos testes atuais de `tests/test_audio_api.py`, `tests/test_chat_api.py`, `tests/test_transcription_api.py` e `tests/test_analysis_api.py`, que verificam a rota com a dependência substituída por `app.dependency_overrides`.
 
-Os casos referentes aos webhooks (seção 5.1) e ao sistema de troca de mensagens (seção 5.3) são especificados como suítes de contrato: uma classe que descreve o comportamento exigido de qualquer provedor ou barramento, com um único ponto de extensão (o método de fábrica que constrói o objeto sob teste). Nesta etapa, a suíte é exercitada contra um dublê determinístico em memória; quando a tecnologia for selecionada nas Sprints 4 e 5, uma nova subclasse injeta o adaptador real e herda os mesmos casos, sem reescrevê-los. O arranjo estende às duas dependências ainda não escolhidas o mesmo padrão de portas e adaptadores que `AudioStorage`, `AudioFetcher` e `ChatModel` já praticam como `Protocol` nos serviços existentes.
+Os casos referentes aos webhooks (Seção 5.1) e ao sistema de troca de mensagens, cuja arquitetura ainda não foi detalhada em seção própria, são especificados como suítes de contrato: uma classe que descreve o comportamento exigido de qualquer provedor ou barramento, com um único ponto de extensão (o método de fábrica que constrói o objeto sob teste). Nesta etapa, a suíte é exercitada contra um dublê determinístico em memória; quando a tecnologia for selecionada nas Sprints 4 e 5, uma nova subclasse injeta o adaptador real e herda os mesmos casos, sem reescrevê-los. O arranjo estende às duas dependências ainda não escolhidas o mesmo padrão de portas e adaptadores que `AudioStorage`, `AudioFetcher` e `ChatModel` já praticam como `Protocol` nos serviços existentes.
 
 ### 6.4.1 Integrações entre Componentes Internos
 
@@ -7453,7 +7423,7 @@ O caminho do chat ainda não replica essa conversão: uma falha do Gemini sobe a
 
 ### 6.4.3 Uso Planejado do Módulo VHS
 
-O módulo VHS, especificado na seção 5.2 como mecanismo de cache das respostas dos provedores externos, cumpre dois papéis nos testes de integração: reduz o tempo de resposta ao evitar chamadas repetidas ao mesmo provedor com a mesma entrada, e torna determinística a execução da suíte, eliminando a dependência de crédito de API e de disponibilidade de rede durante a integração contínua. O módulo guarda dois tipos de registro pela mesma chave: um registro de sucesso, com o conteúdo da resposta do provedor (o DTO de transcrição, o texto da resposta de chat, os bytes do áudio sintetizado), e um registro de falha, com o código de erro a relançar quando o provedor está indisponível, excede o tempo esperado ou rejeita a credencial. O registro de falha não é uma invenção de teste: é a mesma técnica de cache negativo usada em produção para evitar bater outra vez num provedor que acabou de falhar, aplicada aqui também à suíte.
+O módulo VHS, mecanismo de cache das respostas dos provedores externos ainda não especificado em seção própria, cumpre dois papéis nos testes de integração: reduz o tempo de resposta ao evitar chamadas repetidas ao mesmo provedor com a mesma entrada, e torna determinística a execução da suíte, eliminando a dependência de crédito de API e de disponibilidade de rede durante a integração contínua. O módulo guarda dois tipos de registro pela mesma chave: um registro de sucesso, com o conteúdo da resposta do provedor (o DTO de transcrição, o texto da resposta de chat, os bytes do áudio sintetizado), e um registro de falha, com o código de erro a relançar quando o provedor está indisponível, excede o tempo esperado ou rejeita a credencial. O registro de falha não é uma invenção de teste: é a mesma técnica de cache negativo usada em produção para evitar bater outra vez num provedor que acabou de falhar, aplicada aqui também à suíte.
 
 Um registro de falha é criado de duas formas. Quando a causa é uma resposta de erro do próprio provedor, uma credencial deliberadamente inválida, por exemplo, o registro é gravado a partir de uma interação real, do mesmo jeito que um registro de sucesso. Quando a causa é a ausência de qualquer interação, indisponibilidade de rede ou tempo limite, não há resposta real para capturar, e o registro é composto diretamente pela equipe, descrevendo o erro que o teste precisa reproduzir. Nos dois casos, a leitura em modo `reproduzir` funciona da mesma forma: a chave é consultada, e o registro devolve um valor ou relança um erro, sem que o adaptador real seja acionado.
 
@@ -7473,7 +7443,7 @@ Com essa extensão, todo caso de teste que envolve o provedor de fala em texto, 
 | `atualizar` | Não | Sempre | Sempre | Regravação após mudança de modelo, de instrução ou de SDK |
 | `ignorar` | Não | Não | Sempre | Verificação contra o serviço real e medição de desempenho (seção 6.3) |
 
-A chave precisa cobrir tudo o que altera a resposta, a ausência de registro em modo `reproduzir` falha de forma explícita informando o comando de regravação, e nenhum segredo (chave de API, cabeçalho de autorização, token) é gravado nos arquivos versionados, nem nos de sucesso, nem nos de falha. Como o módulo atua sobre a porta de domínio e não sobre o transporte HTTP, o cabeçalho de autenticação nunca chega a ser observado por ele; o caso TI-50 confirma essa garantia por inspeção direta dos arquivos gravados. Os registros de transcrição e de síntese de fala seguem o mesmo prazo de retenção do áudio de origem no MinIO, sete dias conforme a seção 3.2.5; os registros de chat, por não terem origem física a expirar, seguem o prazo de 24 horas definido na seção 5.2.
+A chave precisa cobrir tudo o que altera a resposta, a ausência de registro em modo `reproduzir` falha de forma explícita informando o comando de regravação, e nenhum segredo (chave de API, cabeçalho de autorização, token) é gravado nos arquivos versionados, nem nos de sucesso, nem nos de falha. Como o módulo atua sobre a porta de domínio e não sobre o transporte HTTP, o cabeçalho de autenticação nunca chega a ser observado por ele; o caso TI-50 confirma essa garantia por inspeção direta dos arquivos gravados. Os registros de transcrição e de síntese de fala seguem o mesmo prazo de retenção do áudio de origem no MinIO, sete dias conforme a seção 3.2.5; os registros de chat, por não terem origem física a expirar, seguem o prazo de 24 horas adotado para esse tipo de registro.
 
 ### 6.4.4 Cenários Positivos e Negativos Planejados
 
