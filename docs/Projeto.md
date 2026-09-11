@@ -76,9 +76,7 @@
 <summary><strong>5. Desenvolvimento e Documentação Técnica do Projeto</strong></summary>
 
 - [5.1 Webhooks](#51-webhooks)
-- [5.2 Módulo VHS](#52-módulo-vhs)
-- [5.3 Sistema de Troca de Mensagens](#53-sistema-de-troca-de-mensagens)
-- [5.4 Integração entre Frontend e Backend](#54-integração-entre-frontend-e-backend)
+- [5.2 Integração entre Frontend e Backend](#52-integração-entre-frontend-e-backend)
 
 </details>
 
@@ -5714,7 +5712,7 @@ Uma sutileza necessária: a linha gravada mas **não concluída** (`concluido_em
 
 Nem o Graph nem o Drive dizem **o que** mudou: os dois dizem apenas que algo mudou na origem observada. Descobrir o quê exige uma chamada posterior — `delta` num, `changes.list` no outro — seguida de download, extração de texto e vetorização. Nada disso cabe na janela de poucos segundos que os provedores concedem antes de considerar a entrega falha.
 
-Por isso o receptor confirma com `202` e para em `delta_pendente = TRUE`. A varredura é trabalho do consumidor do barramento da Sprint 5, e essa coluna é a marca que ele vai ler. **O receptor de webhook é, portanto, o produtor do barramento da Sprint 5** — é esse o ponto que amarra a Seção 5.1 à Seção 5.3. Trocar `ProcessadorVarreduraPendente` por uma implementação que publique numa fila é trocar uma classe, sem tocar em rota, serviço ou banco.
+Por isso o receptor confirma com `202` e para em `delta_pendente = TRUE`. A varredura é trabalho do consumidor do barramento da Sprint 5, e essa coluna é a marca que ele vai ler. **O receptor de webhook é, portanto, o produtor do barramento da Sprint 5** (é esse o ponto que amarra o webhook, na Seção 5.1, ao futuro sistema de troca de mensagens). Trocar `ProcessadorVarreduraPendente` por uma implementação que publique numa fila é trocar uma classe, sem tocar em rota, serviço ou banco.
 
 ---
 
@@ -6272,45 +6270,167 @@ O receptor (a rota, a verificação de autenticidade, a tradução, a idempotên
 
 Nenhuma das duas assinaturas é permanente: o Microsoft Graph aceita validade de até 30 dias para o recurso observado, renovável por `PATCH` sem recriar; o Google Drive limita o canal a 7 dias, sem possibilidade de extensão. Ao expirar, a origem para de gerar notificações sem aviso do provedor. A renovação é feita pelos comandos `renovar` (Graph) e `renovar`/`abrir` (Drive), descritos nos manuais de operação da Seção 5.1.6.
 
-## 5.2 Módulo VHS
+## 5.2 Integração entre Frontend e Backend
 
-### 5.2.1 Objetivo e Tecnologia Utilizada
+Esta seção descreve as integrações implementadas até a Sprint 3 entre a interface e os serviços do AZ1: comunicação HTTP, execução em contêineres, entrada de áudio com confirmação, síntese de fala, autenticação SSO, histórico de conversa, recuperação zde contexto por RAG e auditoria. São apresentados a arquitetura, os contratos das APIs, os fluxos disponíveis e os limites atuais da integração.
 
-### 5.2.2 Configuração do Cache
+### 5.2.1 Arquitetura da Integração
 
-### 5.2.3 Gravação e Reprodução das Respostas Externas
+A interface em React utiliza o cliente HTTP centralizado em [api.js](../src/frontend/src/lib/api.js), que chama a API FastAPI com `fetch`. O ponto de entrada [main.py](../src/az1_api/main.py) registra as rotas sob `/api/v1`; os schemas Pydantic definem as entradas e saídas, enquanto os serviços executam as operações e acessam os provedores externos. A comunicação do chat usa requisição e resposta HTTP, sem streaming, WebSocket ou fila de mensagens entre navegador e API.
 
-### 5.2.4 Integração com os Serviços Externos
+```mermaid
+flowchart LR
+    U["Usuário"] --> F["React: login e chat"]
+    F <-->|"SSO Microsoft via Supabase Auth"| S["Supabase Auth"]
+    F -->|"HTTP /api/v1 + Bearer token"| P["Proxy Vite ou nginx"]
+    P --> A["FastAPI"]
+    A -->|"Upload e leitura de áudio"| M["S3 / MinIO"]
+    A -->|"Transcrição"| D["Deepgram"]
+    A -->|"Busca de contexto"| R["RAG: src/rag, pgvector"]
+    A -->|"Resposta textual e síntese de fala"| G["Gemini"]
+    A -.->|"Auditoria do chat, quando configurada"| B["PostgreSQL"]
+```
 
-### 5.2.5 Casos de Uso e Testes
+O navegador acessa Supabase Auth para autenticação; as chamadas a Deepgram, Gemini e armazenamento de áudio partem do backend. O frontend recebe o texto transcrito, a resposta textual e, quando solicitado, o arquivo de voz.
 
-## 5.3 Sistema de Troca de Mensagens
+A [AgentPage](../src/frontend/src/pages/AgentPage.jsx) coordena as mensagens e a seleção de conversas. [PromptBar](../src/frontend/src/components/PromptBar/PromptBar.jsx) e [useMicVolume](../src/frontend/src/hooks/useMicVolume.js) implementam a captura do microfone; [ChatMessage](../src/frontend/src/components/ChatMessage/ChatMessage.jsx) permite ouvir a resposta. O backend monta as dependências em [dependencies.py](../src/az1_api/dependencies.py).
 
-### 5.3.1 Tecnologia de Mensageria
+### 5.2.2 Configuração e Contratos das APIs
 
-### 5.3.2 Configuração de Filas, Tópicos ou Canais
+#### Endereçamento e execução
 
-### 5.3.3 Produtores
+| Ambiente | Configuração integrada |
+|---|---|
+| Frontend executado no host | O Vite encaminha `/api` para `http://127.0.0.1:8010` por padrão. `VITE_DEV_API_PROXY` permite alterar esse destino. |
+| Docker em desenvolvimento | O override publica o frontend em `5173` e a API em `8010`, por padrão. O proxy do Vite usa `http://api:8000` na rede do Compose. |
+| Docker com frontend de produção | O nginx serve o bundle e encaminha `/api/` para `API_UPSTREAM=http://api:8000`, preservando o caminho. A composição base publica `8080`; a sobreposição de produção usa `80`, salvo alteração por `AZ1_WEB_PORT`. |
+| URL explícita no cliente | `VITE_API_BASE_URL` é concatenada aos caminhos em `api.js`. O padrão vazio mantém as chamadas na origem do frontend. |
+| Acesso direto à API por outra origem | O CORS atual permite `http://localhost:5173` e `http://127.0.0.1:5173`. Outras origens não estão incluídas nessa configuração. |
 
-### 5.3.4 Consumidores
+O [vite.config.js](../src/frontend/vite.config.js) lê o `.env` da raiz e mapeia `SUPABASE_URL` e `SUPABASE_ANON_KEY` para o cliente. O Compose fornece os equivalentes `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` como variáveis no desenvolvimento e argumentos de build na imagem de produção. Alterar esses valores no bundle exige nova compilação.
 
-### 5.3.5 Integração com os Webhooks
+No backend, o fluxo depende de `SUPABASE_URL` para validar o token, `GEMINI_API_KEY` para chat e síntese de fala, `DEEPGRAM_API_KEY` para transcrição e das variáveis `AUDIO_STORAGE_*` para S3/MinIO. `SUPABASE_DB_URL` habilita a ligação com o usuário de domínio e a persistência utilizada pela auditoria. As referências de preparação são [.env.example](../.env.example) e [Docker.md](Docker.md); credenciais privadas permanecem no servidor.
 
-### 5.3.6 Tratamento de Falhas
+#### Contratos consumidos pela interface
 
-### 5.3.7 Casos de Uso e Testes
+Todas as chamadas abaixo recebem `Authorization: Bearer <access_token>` quando há sessão ativa. O cliente consulta `supabase.auth.getSession()` a cada requisição, usando o token disponível naquele momento.
 
-## 5.4 Integração entre Frontend e Backend
+| Operação | Requisição enviada pelo frontend | Resposta de sucesso |
+|---|---|---|
+| Enviar mensagem | `POST /api/v1/chat`, JSON com `message` e `conversation_id`, ambos obrigatórios no schema | `200`, JSON com `reply` |
+| Enviar gravação | `POST /api/v1/audio`, `multipart/form-data` com campo `audio`; o navegador define o cabeçalho e a fronteira multipart | `201`, JSON com `id`, `status: "received"` e `message` |
+| Transcrever gravação | `POST /api/v1/audio/{audio_id}/transcribe?language=pt-BR`, sem corpo | `200`, JSON com `audio_id`, `text`, `language`, `confidence` e `duration_seconds`; `confidence` pode ser nulo |
+| Ouvir resposta | `POST /api/v1/text-to-speech`, JSON com `text`, `voice: "Kore"` e `format: "wav"` | `200`, conteúdo binário WAV, consumido como `Blob` |
 
-### 5.4.1 Arquitetura da Integração
+Exemplo do contrato de chat:
 
-### 5.4.2 Configuração e Contratos das APIs
+```json
+{
+  "message": "Resuma o que conversamos até agora.",
+  "conversation_id": "2fb1983e-f558-40ec-82eb-5263e983b81c"
+}
+```
 
-### 5.4.3 Fluxos Integrados
+A resposta contém apenas `reply`: o contrato atual não inclui fontes documentais, intenção classificada ou alterações de projetos. O serviço limita a mensagem a 4.000 caracteres após remover espaços nas extremidades. A síntese de fala também limita o texto a 4.000 caracteres. O upload aceita WAV, MP3, M4A e WebM, sujeito à validação do conteúdo, ao limite de 10 MB e à duração máxima de cinco minutos. A transcrição aceita apenas `pt-BR`.
 
-### 5.4.4 Tratamento de Erros e Falhas de Comunicação
+Os contratos estão definidos em [schemas/chat.py](../src/schemas/chat.py), [schemas/audio.py](../src/schemas/audio.py), [schemas/transcription.py](../src/schemas/transcription.py) e [schemas/speech.py](../src/schemas/speech.py).
 
-### 5.4.5 Testes de Integração
+### 5.2.3 Fluxos Integrados
+
+#### Autenticação e acesso
+
+O [AuthProvider](../src/frontend/src/contexts/AuthContext.jsx) acompanha a sessão pelo evento `onAuthStateChange`. O [App.jsx](../src/frontend/src/App.jsx) apresenta o estado de carregamento, a tela de login ou a página do agente conforme essa sessão. O login chama `signInWithOAuth` com provedor `azure`, escopo `email` e retorno à origem da aplicação. O cliente Supabase usa PKCE e `sessionStorage`; o logout chama `supabase.auth.signOut()`.
+
+Na API, `require_authenticated_user` protege áudio, transcrição, análise, chat, RAG, síntese de fala, alertas e auditoria. A verificação confere assinatura, expiração, emissor, audiência `authenticated` e provedor `azure`. O padrão usa JWKS; há configuração alternativa por segredo compartilhado. O modo `AZ1_AUTH_MODE=disabled` dispensa a autenticação no backend para desenvolvimento, mas não remove a tela de login do frontend.
+
+A associação do usuário autenticado a `portfolio.usuario` é tentada quando o banco está configurado; uma falha nessa associação não invalida o login. `/health` permanece público e os webhooks verificam seus próprios segredos, conforme a Seção 5.1.
+
+#### Conversa por texto e histórico
+
+1. O usuário envia o texto pelo botão ou por Enter. Mensagens contendo apenas espaços não são enviadas pela página.
+2. A página gera um UUID para uma conversa nova e reutiliza o mesmo `conversation_id` nas mensagens seguintes. O texto do usuário aparece na tela e o indicador de processamento é ativado.
+3. O backend valida a mensagem e chama `GeminiChatModel`, que utiliza o SDK Google GenAI. O modelo é configurável pela variável `GEMINI_MODEL`.
+4. Antes de gerar a resposta, `GeminiChatModel` consulta `rag.retriever.buscar` com a mensagem do usuário. Os até cinco trechos recuperados de `src/rag` são anexados ao texto enviado ao Gemini nessa chamada; se a busca falhar ou não retornar nada, a mensagem original segue sem alteração, sem interromper a conversa.
+5. A resposta em `reply` é acrescentada ao chat. Na resposta bem-sucedida, a rota agenda a gravação de auditoria por `BackgroundTasks`, com mensagem, resposta, identificador da conversa e duração.
+6. A barra lateral permite criar e alternar conversas mantidas no estado da página.
+
+Há duas memórias distintas: o histórico visual fica no estado React e o contexto enviado ao modelo fica no dicionário `_historico` do adaptador Gemini, indexado por `conversation_id`. Não existe restauração do histórico visual após recarregar a página nem armazenamento compartilhado desse contexto entre processos da API. A configuração de produção prevê múltiplos workers; portanto, a continuidade do contexto não está garantida quando as requisições chegam a workers diferentes. A auditoria persistida não é usada para reconstruir a conversa.
+
+O histórico guarda a mensagem original do usuário, não a versão com os trechos do RAG anexados: cada turno é aumentado só na chamada em que ocorre, e o histórico não cresce a cada resposta com o mesmo material recuperado repetido. A resposta ao frontend continua contendo apenas `reply`: não há indicação de quais trechos foram usados, nem uma citação de fonte, e o modelo é instruído a não mencionar a existência da busca.
+
+#### Entrada por áudio com confirmação
+
+1. O botão de microfone do chat solicita acesso ao dispositivo e inicia `MediaRecorder`; a forma de onda acompanha o volume captado.
+2. Ao parar, os fragmentos gravados formam um `Blob`, enviado ao endpoint de upload.
+3. A API valida e armazena o áudio em S3/MinIO, devolvendo seu identificador.
+4. O frontend usa esse identificador na chamada de transcrição; o backend recupera o áudio e utiliza Deepgram, com modelo `nova-3`.
+5. O texto retornado preenche o campo de entrada. O usuário pode revisar, editar, enviar ou descartar. A transcrição não é enviada automaticamente ao chat.
+6. Se confirmada, a entrada segue o mesmo fluxo de mensagem textual.
+
+A aba separada de voz exibe uma apresentação de escuta, mas não monta o `PromptBar` responsável pela gravação. Assim, o fluxo de captura integrado descrito acima é o botão de microfone dentro do chat; a aba de voz não constitui uma conversa contínua implementada.
+
+#### Reprodução da resposta
+
+O botão “Ouvir resposta” envia o conteúdo textual da mensagem ao endpoint de síntese de fala. O componente cria uma URL temporária para o WAV retornado, reproduz o áudio e permite pausar e retomar. O arquivo é reutilizado pelo componente enquanto ele permanece montado; a URL é liberada na desmontagem. A reprodução depende da ação do usuário.
+
+#### Fronteiras da integração entregue
+
+| Componente presente no repositório | Integração atual com a interface |
+|---|---|
+| Análise de intenção em `POST /api/v1/audio/{audio_id}/analyze` | A rota integra transcrição, classificador PLN e despacho de alertas em segundo plano. O frontend chama `/transcribe`, não `/analyze`; gravar no chat não aciona essa classificação nem esse despacho. |
+| RAG em `POST /api/v1/rag/search` e pipeline em `src/rag` | A busca segue exposta como endpoint próprio, mas passou a ser chamada também pelo `GeminiChatModel`: toda resposta do chat consulta `rag.retriever.buscar` antes de gerar a resposta e anexa os trechos recuperados à mensagem enviada ao Gemini, com falha silenciosa quando a busca não retorna nada ou não está disponível. |
+| Webhooks de Drive e Microsoft Graph | Recebem notificações dos provedores e registram o processamento no backend, conforme a Seção 5.1. Não há canal implementado de atualização dessas notificações na interface. |
+| Alertas e auditoria | Possuem rotas e serviços no backend. A auditoria está acoplada ao chat como efeito lateral; não há tela consumindo sua consulta nem painel conectado às rotas de alertas. Sem banco configurado, a gravação lateral é desativada, preservando a resposta do chat. |
+| Tarefas | A tela tenta `GET /api/v1/tasks` e `PATCH /api/v1/tasks/{id}`, mas essas rotas não estão registradas na API atual. Mantém tarefas de exemplo e alterações apenas no estado local quando a chamada falha. |
+| Agenda | A tela tenta `GET /api/v1/calendar/events`, também sem rota implementada. Mantém os eventos de exemplo. |
+
+Esses limites são verificáveis comparando [api.js](../src/frontend/src/lib/api.js), [TasksView](../src/frontend/src/components/TasksView/TasksView.jsx), [CalendarView](../src/frontend/src/components/CalendarView/CalendarView.jsx), [routes/analysis.py](../src/routes/analysis.py), [routes/rag.py](../src/routes/rag.py) e [services/gemini_service.py](../src/services/gemini_service.py). A interface ainda não comprova consulta ao portfólio real, apresentação de fontes ou persistência de edições de tarefas.
+
+### 5.2.4 Tratamento de Erros e Falhas de Comunicação
+
+| Situação | Comportamento implementado |
+|---|---|
+| Token ausente ou inválido | A API responde `401`, com `error: "unauthorized"`, mensagem fixa e `WWW-Authenticate: Bearer`. O cliente HTTP não implementa redirecionamento específico ao receber `401`; a troca entre login e agente depende do estado do Supabase. |
+| Sobrecarga do modelo | Erros de servidor do Gemini e limite de requisições `429` são convertidos em `503 service_unavailable`. A página apresenta a mensagem de indisponibilidade. |
+| Falha de rede no envio de texto | `sendMessage` produz `ChatRequestError` com `network_error`; o chat orienta a verificar a conexão e tentar novamente. |
+| Outros erros no chat | A página exibe mensagem genérica. O cliente preserva status e código quando recebe JSON de erro e usa valores substitutos quando esse corpo não pode ser lido. |
+| Upload inválido | A API distingue arquivo acima do limite (`413`), formato não suportado (`415`) e conteúdo inválido ou duração excessiva (`422`). A interface mostra uma mensagem geral de falha de transcrição. |
+| Áudio inexistente ou falha no transcritor | A API retorna `404 audio_not_found` ou `502 transcription_failed`. A interface informa que não conseguiu transcrever; texto vazio recebe orientação para gravar novamente. |
+| Falha na geração inicial da voz | O componente informa que não conseguiu gerar o áudio e mantém a resposta disponível em texto. |
+| Banco não configurado | As rotas cuja operação depende do banco, como alertas e auditoria, retornam `503`. Os efeitos laterais de chat e análise têm implementação desativada para esse caso. |
+| Falha em tarefas ou agenda | Os componentes mantêm dados de exemplo e registram a situação no console. A edição de tarefa permanece local, sem confirmação de persistência. |
+
+Os erros controlados de domínio usam `error` e `message`; erros de validação do FastAPI podem usar `detail`. Portanto, não há envelope único para toda resposta de erro. Exceções inesperadas são registradas no backend e respondidas com `500 internal_error`, sem expor seus detalhes.
+
+O cliente não define timeout, cancelamento ou repetição automática das chamadas. O [nginx](../docker/frontend/default.conf.template) configura 10 segundos para conexão e 120 segundos para envio e leitura do proxy, além de limite de corpo de 12 MB para acomodar o envelope multipart. O indicador de processamento do chat não bloqueia novos envios enquanto uma resposta está pendente; serialização de envios não deve ser considerada uma garantia desta versão.
+
+### 5.2.5 Testes de Integração
+
+Os testes automatizados verificam os contratos HTTP e o comportamento dos componentes com dependências substituídas. Ela deve ser distinguida dos testes sistêmicos planejados na Seção 6, que envolvem o fluxo completo e os serviços reais.
+
+| Testes existentes | Cobertura observada no código dos testes |
+|---|---|
+| [api.test.js](../src/frontend/src/lib/api.test.js) | Cinco casos: erro `503`, falha de rede, erro inesperado, inclusão do Bearer token e ausência do cabeçalho quando não há sessão. Usa `fetch` e sessão simulados. |
+| [AgentPage.test.jsx](../src/frontend/src/pages/AgentPage.test.jsx) | Cinco casos: transcrição apresentada sem envio automático, confirmação, descarte, transcrição vazia e mensagem de sobrecarga. Substitui captura e chamadas HTTP por dublês. |
+| [useMicVolume.test.js](../src/frontend/src/hooks/useMicVolume.test.js) | Dois casos: cancelamento enquanto a permissão do microfone está pendente e início normal da gravação, com APIs do navegador simuladas. |
+| [test_audio_api.py](../tests/test_audio_api.py) e [test_transcription_api.py](../tests/test_transcription_api.py) | Upload e transcrição, campos obrigatórios e mapeamento de falhas, usando `TestClient` e serviços substituídos. |
+| [test_chat_api.py](../tests/test_chat_api.py) e [test_speech_api.py](../tests/test_speech_api.py) | Contratos de mensagem e geração de voz, respostas de sucesso e erros controlados. Não executam chamadas reais ao Gemini. |
+| [test_auth_api.py](../tests/test_auth_api.py) e [test_auth_service.py](../tests/test_auth_service.py) | Aceitação e rejeição de tokens, verificadas com chaves de teste; não equivalem a executar o redirecionamento OAuth no navegador. |
+| [test_dependencias_sem_banco.py](../tests/test_dependencias_sem_banco.py) | Degradação dos efeitos laterais quando o banco não está configurado. |
+
+Os comandos para execução dos testes, após preparar as dependências, são:
+
+```bash
+# Na raiz do repositório: suíte Python
+python -m unittest discover -v tests
+
+# Em src/frontend: suíte de componentes e cliente HTTP
+npm test
+```
+
+O [.gitlab-ci.yml](../.gitlab-ci.yml) configura compilação Python, execução da suíte por `unittest` e lint da aplicação. Não há job do frontend executando `npm test` nesse arquivo. A configuração de CI e a existência dos testes não demonstram, por si, uma execução aprovada.
+
+Não foram identificados testes automatizados que percorram conjuntamente login Microsoft real, navegador, proxy, API, armazenamento, transcrição e resposta de voz. A validação desse percurso, das condições de falha e da continuidade de conversa entre workers permanece necessária para afirmar integração sistêmica completa.
 
 ---
 
@@ -7765,7 +7885,7 @@ A retenção de sete dias de `incoming/` está em `infra/minio/lifecycle.json` e
 
 Os testes de integração têm como objetivo validar a comunicação entre os componentes da arquitetura do AZ1 (as rotas do FastAPI, os serviços de domínio que elas invocam por injeção de dependência e o pipeline de PLN) e as dependências que cada um consome: o armazenamento de objetos MinIO/Amazon S3, os provedores externos Deepgram e Gemini, o PostgreSQL/vecs acessado pelo RAG e o DDL relacional existente, cuja integração de auditoria ainda depende de implementação, e os dois webhooks e o barramento de mensagens previstos para as Sprints 4 e 5. Esta camada assegura que os contratos HTTP, S3 e SQL são respeitados de ponta a ponta, que a persistência ocorre em serviços reais e não em dublês de memória, e que os mecanismos de resiliência (tradução de falha externa em código HTTP, idempotência de eventos, cache determinístico do módulo VHS) atuam conforme especificado. O critério que distingue um caso desta seção de um teste de unidade é operacional: um caso de integração exercita ao menos uma fronteira de processo, de rede ou de biblioteca de terceiro, ao contrário dos testes atuais de `tests/test_audio_api.py`, `tests/test_chat_api.py`, `tests/test_transcription_api.py` e `tests/test_analysis_api.py`, que verificam a rota com a dependência substituída por `app.dependency_overrides`.
 
-Os casos referentes aos webhooks (seção 5.1) e ao sistema de troca de mensagens (seção 5.3) são especificados como suítes de contrato: uma classe que descreve o comportamento exigido de qualquer provedor ou barramento, com um único ponto de extensão (o método de fábrica que constrói o objeto sob teste). Na implementação futura, a suíte será exercitada contra um dublê determinístico em memória; quando a tecnologia for selecionada nas Sprints 4 e 5, uma nova subclasse injeta o adaptador real e herda os mesmos casos, sem reescrevê-los. O arranjo estende às duas dependências ainda não escolhidas o mesmo padrão de portas e adaptadores que `AudioStorage`, `AudioFetcher` e `ChatModel` já praticam como `Protocol` nos serviços existentes.
+Os casos referentes aos webhooks (Seção 5.1) e ao sistema de troca de mensagens, cuja arquitetura ainda não foi detalhada em seção própria, são especificados como suítes de contrato: uma classe que descreve o comportamento exigido de qualquer provedor ou barramento, com um único ponto de extensão (o método de fábrica que constrói o objeto sob teste). Na implementação futura, a suíte será exercitada contra um dublê determinístico em memória; quando a tecnologia for selecionada nas Sprints 4 e 5, uma nova subclasse injeta o adaptador real e herda os mesmos casos, sem reescrevê-los. O arranjo estende às duas dependências ainda não escolhidas o mesmo padrão de portas e adaptadores que `AudioStorage`, `AudioFetcher` e `ChatModel` já praticam como `Protocol` nos serviços existentes.
 
 ### 6.4.1 Integrações entre Componentes Internos
 

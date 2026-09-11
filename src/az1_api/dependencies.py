@@ -9,6 +9,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from psycopg_pool import ConnectionPool
 
 from database.conexao import BancoNaoConfigurado, obter_engine
+from rag.retriever import buscar as buscar_contexto_rag
 from services.alerta_service import (
     ConfiguracaoAlertas,
     DesativarAssinante,
@@ -124,7 +125,8 @@ def get_analyzer() -> AnalyzeAudio:
 @lru_cache
 def get_chat_answerer() -> AnswerChatMessage:
     settings = GeminiSettings.from_environment()
-    return AnswerChatMessage(model=GeminiChatModel.from_settings(settings))
+    model = GeminiChatModel.from_settings(settings, buscar_contexto=buscar_contexto_rag)
+    return AnswerChatMessage(model=model)
 
 
 @lru_cache
