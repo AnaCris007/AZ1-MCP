@@ -15,7 +15,8 @@ SYSTEM_INSTRUCTION = (
     "Você é o AZ1, assistente conversacional do PMO do Metrô de São Paulo. "
     "Responda em texto corrido, como numa conversa de chat — sem títulos, "
     "tabelas, listas longas ou notação matemática. Seja direto: poucas "
-    "frases bastam, a menos que o usuário peça explicitamente mais detalhe."
+    "frases bastam, a menos que o usuário peça explicitamente mais detalhe. "
+    "Nunca comece respostas com saudações como 'Olá!' — vá direto ao ponto."
 )
 
 
@@ -39,16 +40,20 @@ class GeminiChatModel:
     def __init__(self, client: genai.Client, model: str) -> None:
         self._client = client
         self._model = model
+        self._historico: dict[str, list] = {}
 
     @classmethod
     def from_settings(cls, settings: GeminiSettings) -> GeminiChatModel:
         return cls(client=genai.Client(api_key=settings.api_key), model=settings.model)
 
-    def generate_reply(self, message: str) -> str:
+    def generate_reply(self, message: str, *, conversation_id: str | None = None) -> str:
+        historico = self._historico.get(conversation_id, []) if conversation_id else []
+        contents = historico + [{"role": "user", "parts": [{"text": message}]}]
+
         try:
             response = self._client.models.generate_content(
                 model=self._model,
-                contents=message,
+                contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_INSTRUCTION,
                     max_output_tokens=MAX_OUTPUT_TOKENS,
@@ -61,4 +66,12 @@ class GeminiChatModel:
             if exc.code == 429:
                 raise ChatModelUnavailableError from exc
             raise
-        return response.text
+
+        reply_text = response.text
+
+        if conversation_id:
+            self._historico[conversation_id] = contents + [
+                {"role": "model", "parts": [{"text": reply_text}]}
+            ]
+
+        return reply_text

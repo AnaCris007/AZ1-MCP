@@ -10,9 +10,14 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_connection_pool, get_document_searcher
+from az1_api.dependencies import (
+    get_connection_pool,
+    get_document_searcher,
+    require_authenticated_user,
+)
 from az1_api.main import app
 from rag.retriever import ResultadoBusca
+from services.auth_service import AuthenticatedUser
 from services.database_service import BancoNaoConfigurado
 
 RESULTADO = ResultadoBusca(
@@ -26,9 +31,23 @@ RESULTADO = ResultadoBusca(
 )
 
 
+_USUARIO_DE_TESTE = AuthenticatedUser(
+    subject="test-user",
+    email="teste@example.com",
+    name="Usuário de Teste",
+    provider="azure",
+)
+
+
 class _BaseDeApi(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
+        # As rotas de /api/v1 passaram a exigir sessão válida (RNF02, via
+        # `_auth_dependency` em main.py). Sem substituir a autenticação, cada
+        # requisição constrói o verificador de token de verdade e morre em
+        # "SUPABASE_URL não configurada" — erro que nada tem a ver com o que
+        # estes testes verificam.
+        app.dependency_overrides[require_authenticated_user] = lambda: _USUARIO_DE_TESTE
         self.addCleanup(app.dependency_overrides.clear)
 
 
@@ -136,7 +155,11 @@ class TesteSaude(_BaseDeApi):
 
         resposta = self.client.get("/health/ready")
         self.assertEqual(resposta.status_code, 503)
-        self.assertIn("SUPABASE_DB_URL", resposta.json()["motivo"])
+        # Este 503 vem do MANIPULADOR — a exceção sobe na resolução da
+        # dependência, antes do corpo da rota — e o manipulador usa o
+        # `ErrorResponse` padrão do projeto. Já o teste seguinte cobre o 503
+        # que a própria rota monta, que mantém {"status", "motivo"}.
+        self.assertIn("SUPABASE_DB_URL", resposta.json()["message"])
 
     def test_ready_responde_503_quando_a_conexao_falha(self):
         # O pool abre sem bloquear: `open()` só sobe os trabalhadores de fundo.

@@ -122,7 +122,7 @@ python -m unittest discover tests  # a suite completa
 A pilha inteira — interface, API, armazenamento de áudio e criação do bucket — sobe com um comando. É o caminho recomendado: não exige Python, Node nem MinIO instalados na máquina, e é o mesmo empacotamento que vai para a nuvem.
 
 ```bash
-cp .env.example .env      # preencha DEEPGRAM_API_KEY e GEMINI_API_KEY
+cp .env.example .env      # preencha DEEPGRAM_API_KEY, GEMINI_API_KEY e a autenticação (ver abaixo)
 docker compose up -d --build
 ```
 
@@ -133,6 +133,8 @@ docker compose up -d --build
 | http://localhost:9001 | console do MinIO (as chaves `AUDIO_STORAGE_*` do seu `.env`) |
 
 O código do repositório é montado dentro dos contêineres: editar um arquivo recarrega a API ou a interface, sem reconstruir imagem.
+
+A interface pede login com uma conta Microsoft (RNF02, ver `docs/Projeto.md` Seção 3.4). Isso exige configurar `SUPABASE_URL` e `SUPABASE_ANON_KEY` no `.env` — os comentários do `.env.example` têm o passo a passo do app registration no Entra ID e do provider no Supabase. Para desenvolver sem passar por essa configuração, defina `AZ1_AUTH_MODE=disabled` no `.env`: as rotas protegidas ficam abertas sem token. Essa válvula **não funciona em produção** — `docker-compose.prod.yml` recusa a subida se ela estiver ligada.
 
 ```bash
 docker compose --profile ci run --rm tests      # a suite completa, dentro da imagem

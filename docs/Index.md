@@ -22,13 +22,17 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | As personas, jornadas e o fluxo de negócio | [Projeto.md, Personas e Jornada](./Projeto.md#15-personas-e-jornada-do-usuário) |
 | Os requisitos e a solução técnica | [Projeto.md, Especificação de Requisitos](./Projeto.md#2-especificação-de-requisitos-de-software-sprint-1) |
 | Os riscos do projeto, na identificação inicial | [Projeto.md, Matriz de Risco](./Projeto.md#19-matriz-de-risco-do-projeto) |
-| Os riscos atualizados e seu histórico por sprint | [GestaoProjeto.md, Matriz de Risco do Projeto](./GestaoProjeto.md#43-matriz-de-risco-do-projeto) |
+| Os riscos atualizados e seu histórico por sprint | [GestaoProjeto.md, Matriz de Risco do Projeto](./GestaoProjeto.md#53-matriz-de-risco-do-projeto) |
 | As APIs de voz, com endpoints, limites e exemplos | [Projeto.md, API de Speech to Text e Text to Speech](./Projeto.md#32-api-de-speech-to-text-e-text-to-speech) |
 | O contrato da API de recebimento de áudios | [Projeto.md, API para Recebimento de Áudios](./Projeto.md#34-api-para-recebimento-de-áudios) |
 | A pilha de tecnologias e as razões de cada escolha | [Projeto.md, Pilha de Tecnologias](./Projeto.md#35-pilha-de-tecnologias) |
 | Os modelos conceitual, lógico e físico dos dados | [Projeto.md, Modelagem Conceitual e Lógica dos Dados](./Projeto.md#36-modelagem-conceitual-e-lógica-dos-dados) |
 | Como criar, popular e verificar o banco de dados | [src/database/README.md](../src/database/README.md) |
 | Como implantar a solução em nuvem | [Projeto.md, Processo de Deploy em Nuvem](./Projeto.md#37-processo-de-deploy-em-nuvem) |
+| Os webhooks, sua escolha, contrato e tratamento de erros | [Projeto.md, Webhooks](./Projeto.md#51-webhooks) |
+| Como ligar o webhook ao Google Drive, passo a passo | [Projeto.md, Manual de operação — Google Drive](./Projeto.md#516-exemplos-e-testes) |
+| Como ligar o webhook ao SharePoint, passo a passo | [Projeto.md, Manual de operação — Microsoft Graph](./Projeto.md#516-exemplos-e-testes) |
+| Por que as assinaturas de webhook expiram, e como renovar | [Projeto.md, Expiração das Assinaturas](./Projeto.md#517-expiração-das-assinaturas) |
 | O que será entregue em cada uma das Sprints 3, 4 e 5 | [Projeto.md, Estratégia de Entrega](./Projeto.md#38-estratégia-de-entrega-para-as-sprints-3-4-e-5) |
 | Os diagramas de classes, de componentes e de sequência | [Projeto.md, Projeto Técnico e Arquitetural](./Projeto.md#39-projeto-técnico-e-arquitetural) |
 | O algoritmo de PLN, como ele foi escolhido e como rodá-lo | [Projeto.md, Algoritmo de NLP e Implementação](./Projeto.md#33-algoritmo-de-nlp-e-implementação) |
@@ -48,7 +52,7 @@ Os diagramas e as imagens utilizados pelos documentos estão armazenados na past
 - personas do Diretor, da Analista de PMO e do Líder de Projeto;
 - jornadas das três personas;
 - Matriz SWOT;
-- Matriz de Riscos da Sprint 1 e sua atualização na Sprint 2;
+- Matriz de Riscos da Sprint 1 e suas atualizações nas Sprints 2 e 3;
 - diagramas de classes, de componentes e de sequência;
 - diagramas BPMN dos fluxos AS-IS e TO-BE e a cadeia de valor;
 - registros visuais dos protótipos A e B;

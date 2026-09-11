@@ -139,6 +139,11 @@ services:
         # Vazio de propósito: o cliente chama /api na própria origem e o nginx
         # deste contêiner encaminha. Ver o comentário no Dockerfile do frontend.
         VITE_API_BASE_URL: ""
+        # Mesmas duas variáveis que a API lê como SUPABASE_URL, abaixo — um
+        # projeto Supabase, dois consumidores. Nome VITE_ diferente porque o
+        # valor vai para dentro do bundle, não do processo do contêiner.
+        VITE_SUPABASE_URL: ${SUPABASE_URL:-}
+        VITE_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-}
         VERSION: ${AZ1_VERSION:-0.1.0}
         VCS_REF: ${AZ1_VCS_REF:-unknown}
         BUILD_DATE: ${AZ1_BUILD_DATE:-unknown}
@@ -259,6 +264,37 @@ services:
     restart: "no"
 
   # ---------------------------------------------------------------------------
+  # postgres — persistência estruturada (Seções 3.6 e 5.1.4)
+  # ---------------------------------------------------------------------------
+  postgres:
+    <<: [*logging, *restart]
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: az1
+      POSTGRES_PASSWORD: az1
+      POSTGRES_DB: az1
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Monta só o DDL, e não a pasta src/database inteira: 02_initial_data.sql
+      # ainda é o molde genérico do template inicial do repositório (commit
+      # 805d797), nunca preenchido com dados de verdade, e o Postgres o
+      # executaria como SQL se a pasta inteira fosse montada aqui.
+      # Recriar o banco do zero é `docker compose down -v`.
+      - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create_database.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U az1 -d az1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # Sem "ports" aqui, seguindo o padrão do minio: publicado só no override de
+    # desenvolvimento (docker-compose.override.yml). A API containerizada
+    # alcança em "postgres:5432" pela rede interna; o webhook, que hoje roda
+    # fora do contêiner (uvicorn no host), depende desse mapeamento de porta
+    # para falar com "localhost:5432", conforme DATABASE_URL no .env.example.
+    networks:
+      - backend
+
+  # ---------------------------------------------------------------------------
   # trainer — retreina o classificador (perfil "ml")
   # ---------------------------------------------------------------------------
   #   docker compose --profile ml run --rm trainer
@@ -333,3 +369,5 @@ networks:
 volumes:
   minio_data:
     name: az1_minio_data
+  postgres_data:
+    name: az1_postgres_data
