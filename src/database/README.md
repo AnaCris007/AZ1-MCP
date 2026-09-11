@@ -13,7 +13,7 @@ informação no lado errado:
 
 | | Onde | O quê | Quem escreve |
 |---|---|---|---|
-| **Vetorial** | `vecs.documentos_metro` | Conteúdo dos documentos, em chunks com embedding de 3072 dimensões | `src/rag/indexador.py` |
+| **Vetorial** | `vecs.documentos_metro` | Conteúdo dos documentos, em chunks com embedding de 1536 dimensões | `src/rag/indexador.py` |
 | **Relacional** | schemas `portfolio` e `auditoria` | Identidade, domínio do portfólio, conversas, auditoria, avaliações | scripts desta pasta e a camada de serviços |
 
 **Os dois vivem no mesmo banco PostgreSQL** — o projeto Supabase apontado por

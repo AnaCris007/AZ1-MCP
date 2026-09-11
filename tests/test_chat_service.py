@@ -9,22 +9,27 @@ from services.chat_service import (
     ChatReceptionError,
     ChatReceptionErrorCode,
 )
+from services.gemini_service import RespostaGerada
 
 
 class FakeChatModel:
-    def __init__(self, reply: str = "resposta") -> None:
+    # `generate_reply` devolve um objeto com `texto` e `fontes`, e nao uma
+    # string: as fontes precisam chegar a rota para serem citadas na resposta e
+    # gravadas em auditoria.mensagem_fonte.
+    def __init__(self, reply: str = "resposta", fontes: tuple = ()) -> None:
         self.reply = reply
+        self.fontes = fontes
         self.received_messages: list[str] = []
         self.received_conversation_ids: list[str | None] = []
 
-    def generate_reply(self, message: str, *, conversation_id: str | None = None) -> str:
+    def generate_reply(self, message: str, *, conversation_id: str | None = None):
         self.received_messages.append(message)
         self.received_conversation_ids.append(conversation_id)
-        return self.reply
+        return RespostaGerada(texto=self.reply, fontes=self.fontes)
 
 
 class UnavailableChatModel:
-    def generate_reply(self, message: str, *, conversation_id: str | None = None) -> str:
+    def generate_reply(self, message: str, *, conversation_id: str | None = None):
         raise ChatModelUnavailableError
 
 
@@ -37,6 +42,7 @@ class TestAnswerChatMessage(unittest.TestCase):
 
         self.assertEqual(result.text, "Olá!")
         self.assertEqual(model.received_messages, ["Oi, tudo bem?"])
+        self.assertEqual(result.fontes, ())
 
     def test_rejeita_mensagem_vazia(self) -> None:
         answerer = AnswerChatMessage(model=FakeChatModel())

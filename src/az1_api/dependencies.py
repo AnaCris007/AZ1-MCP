@@ -8,7 +8,10 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from psycopg_pool import ConnectionPool
 
-from database.conexao import BancoNaoConfigurado, obter_engine
+# `BancoNaoConfigurado` NÃO vem daqui: `database/conexao.py` apenas reexporta a
+# classe de `services/database_service.py`, importada mais abaixo. Duas classes
+# homônimas fariam `@app.exception_handler` registrar só uma delas.
+from database.conexao import obter_engine
 from rag.retriever import buscar as buscar_contexto_rag
 from services.alerta_service import (
     ConfiguracaoAlertas,
@@ -20,7 +23,7 @@ from services.alerta_service import (
 )
 from services.analysis_service import AnalyzeAudio
 from services.audio_service import ReceiveAudio
-from services.auditoria_service import GravacaoDesligada, GravarConsulta, ListarConsultas
+from services.auditoria_service import ListarConsultas
 from services.auth_service import (
     AuthenticatedUser,
     AuthError,
@@ -29,6 +32,8 @@ from services.auth_service import (
     SupabaseTokenVerifier,
 )
 from services.chat_service import AnswerChatMessage
+from services.conversa_repository import ConversaRepository, PersistenciaDesligada
+from services.database_service import BancoNaoConfigurado, PostgresSettings, abrir_pool
 from services.drive_push_service import PROVEDOR as PROVEDOR_DRIVE
 from services.drive_push_service import TIPOS_PROCESSAVEIS as TIPOS_DRIVE
 from services.drive_push_service import (
@@ -46,12 +51,12 @@ from services.graph_push_service import (
     VerificadorClientState,
     VerificadorEmCadeia,
 )
+from services.portfolio_repository import PortfolioRepository
 from services.speech_service import GenerateSpeech
-from services.storage_service import S3AudioStorage, S3StorageSettings
+from services.storage_service import S3ObjectStorage, S3StorageSettings
 from services.transcription_service import TranscribeAudio
 from services.usuario_service import ResolveOrCreateUsuario
 from services.webhook_registry_service import (
-    PostgresSettings,
     ProcessadorVarreduraPendente,
     RegistroConexoesPostgres,
     RegistroEventosPostgres,
@@ -82,7 +87,7 @@ class AuthAPIError(Exception):
 @lru_cache
 def get_audio_receiver() -> ReceiveAudio:
     settings = S3StorageSettings.from_environment()
-    return ReceiveAudio(storage=S3AudioStorage.from_settings(settings))
+    return ReceiveAudio(storage=S3ObjectStorage.from_settings(settings))
 
 
 @lru_cache
@@ -90,7 +95,7 @@ def get_transcriber() -> TranscribeAudio:
     settings = S3StorageSettings.from_environment()
     api_key = os.environ["DEEPGRAM_API_KEY"]
     return TranscribeAudio(
-        fetcher=S3AudioStorage.from_settings(settings),
+        fetcher=S3ObjectStorage.from_settings(settings),
         api_key=api_key,
     )
 
@@ -138,6 +143,60 @@ def get_speech_generator() -> GenerateSpeech:
     return GenerateSpeech(model=GeminiSpeechModel.from_api_key(api_key, model))
 
 
+# O pool é compartilhado pelo processo inteiro e aberto sob demanda, e não na
+# subida da aplicação: uma instalação sem `SUPABASE_DB_URL` continua servindo
+# as rotas que não dependem de banco, em vez de não subir.
+#
+# `lru_cache` aqui é o que garante um pool só. Dois pools dobrariam as conexões
+# contra o Supabase, que as cobra.
+@lru_cache
+def get_connection_pool() -> ConnectionPool:
+    return abrir_pool(PostgresSettings.from_environment())
+
+
+# A busca semântica passa por aqui, e não por import direto em `routes/rag.py`,
+# para poder ser substituída em teste com `app.dependency_overrides`. É o mesmo
+# motivo dos cinco provedores acima.
+def get_document_searcher():
+    from rag.retriever import buscar
+
+    return buscar
+
+
+# O repositório junta as duas pontas do RNF04: o objeto no S3 e a linha em
+# `auditoria`. Depende do pool, então herda o comportamento dele — sem
+# `SUPABASE_DB_URL` levanta `BancoNaoConfigurado`, que o manipulador de
+# `main.py` traduz em 503.
+#
+# A identidade vem de `AuthenticatedUser.domain_user_id`, preenchido por
+# `ResolveOrCreateUsuario`. Substituiu o `GravarConsulta`, que gravava as mesmas
+# linhas com `usuario_id = 0` — um id que, sendo a coluna GENERATED ALWAYS AS
+# IDENTITY, não existe em banco algum criado pelo DDL. Ele só existia neste
+# Supabase, inserido à mão, e foi aposentado por `05_migracao_usuario_zero.sql`.
+#
+# Degrada em vez de levantar porque gravar a trilha é EFEITO COLATERAL de
+# `POST /chat`: sem `SUPABASE_DB_URL`, levantar aqui derrubaria a conversa
+# inteira com 500. Mesma escolha de `get_alerta_dispatcher`, logo abaixo.
+@lru_cache
+def get_conversa_repository() -> ConversaRepository | PersistenciaDesligada:
+    try:
+        return ConversaRepository(
+            pool=get_connection_pool(),
+            armazenamento=S3ObjectStorage.from_settings(S3StorageSettings.from_environment()),
+        )
+    except BancoNaoConfigurado as erro:
+        return PersistenciaDesligada(str(erro))
+
+
+# Diferente de `get_conversa_repository`, este NÃO degrada: aqui o banco não é
+# acessório, é a razão de o endpoint existir. Um `/tasks` que responde 200 com
+# lista vazia sem banco seria a mesma mentira que os dados de exemplo do
+# frontend. `BancoNaoConfigurado` vira 503 no manipulador de `main.py`.
+@lru_cache
+def get_portfolio_repository() -> PortfolioRepository:
+    return PortfolioRepository(pool=get_connection_pool())
+
+
 @lru_cache
 def get_alerta_registrador() -> RegistrarAssinante:
     return RegistrarAssinante(engine=obter_engine())
@@ -171,14 +230,6 @@ def get_alerta_dispatcher() -> DispatcherAlerta | DespachoDesligado:
         )
     except BancoNaoConfigurado as erro:
         return DespachoDesligado(str(erro))
-
-
-@lru_cache
-def get_gravador_auditoria() -> GravarConsulta | GravacaoDesligada:
-    try:
-        return GravarConsulta(engine=obter_engine())
-    except BancoNaoConfigurado as erro:
-        return GravacaoDesligada(str(erro))
 
 
 @lru_cache
@@ -242,18 +293,35 @@ def require_authenticated_user(
 
 
 @lru_cache
-def get_connection_pool() -> ConnectionPool:
-    """Pool compartilhado pelos dois receptores de webhook.
+def get_webhook_connection_pool() -> ConnectionPool:
+    """Pool dos dois receptores de webhook.
 
-    É `lru_cache` e não uma variável de módulo para que o pool só seja aberto
-    quando alguém precisar dele. Uma instalação que ainda não subiu o Postgres
-    continua servindo as demais rotas, e o handshake de validação do Graph
-    responde mesmo assim — que é o que permite criar a assinatura antes de o
-    banco existir.
+    Chamava-se `get_connection_pool`, igual ao provedor do pool do Supabase, e a
+    colisão só apareceu no merge: duas funções homônimas no mesmo módulo, a
+    segunda apagando a primeira em silêncio.
+
+    POR PADRÃO É O MESMO BANCO do `get_connection_pool()`.
+    `auditoria.evento_webhook` é definida no mesmo `01_create_database.sql` que
+    `auditoria.conversa` e `auditoria.mensagem`; mandá-la para outro servidor
+    torna impossível responder "que evento precedeu esta conversa" sem consulta
+    cruzada entre instâncias — e foi o que deixou a tabela com zero linhas no
+    Supabase, enquanto o código escrevia num Postgres local que nem sobe.
+
+    `DATABASE_URL` continua existindo como ESCAPE: aponta para o serviço
+    `postgres` do docker-compose, e serve ao desenvolvimento offline e à suíte
+    destrutiva de `tests/test_integracao_webhook_postgres.py`. Quando definida,
+    ela vence.
+
+    O pool é construído por `abrir_pool`, e não por `ConnectionPool(...)` direto,
+    porque é `abrir_pool` que instala o `configure=` com o `SET ROLE`. Um pool
+    montado à mão ignora `AZ1_DB_ROLE` e, com ele, a RLS — sem falhar.
     """
-    pool = ConnectionPool(PostgresSettings.from_environment().dsn, min_size=1, max_size=4, open=False)
-    pool.open()
-    return pool
+    dsn = os.environ.get("DATABASE_URL", "").strip()
+    if not dsn:
+        return get_connection_pool()
+
+    papel = os.environ.get("AZ1_DB_ROLE", "").strip() or None
+    return abrir_pool(PostgresSettings(dsn=dsn, papel=papel))
 
 
 def _segredo(variavel: str, provedor: str) -> str:
@@ -282,7 +350,7 @@ def get_webhook_receiver() -> ReceberEventoWebhook:
     Os testes de API substituem esta função por `app.dependency_overrides`, como
     as demais dependências deste módulo.
     """
-    pool = get_connection_pool()
+    pool = get_webhook_connection_pool()
     conexoes = RegistroConexoesPostgres(pool, PROVEDOR_GRAPH)
 
     return ReceberEventoWebhook(
@@ -308,7 +376,7 @@ def get_drive_webhook_receiver() -> ReceberEventoWebhook:
     provedor. É essa simetria que a Seção 5.1 apresenta como evidência de que o
     núcleo é desacoplado da plataforma.
     """
-    pool = get_connection_pool()
+    pool = get_webhook_connection_pool()
     conexoes = RegistroConexoesPostgres(pool, PROVEDOR_DRIVE)
 
     return ReceberEventoWebhook(

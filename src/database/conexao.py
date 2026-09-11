@@ -5,15 +5,19 @@ from functools import lru_cache
 
 import sqlalchemy
 
+# UMA definição só, reexportada — não uma classe própria com o mesmo nome.
+#
+# Este módulo declarava a sua, e `services/database_service.py` já declarava
+# outra. Duas classes homônimas subindo a mesma pilha significam que
+# `@app.exception_handler(BancoNaoConfigurado)` registra UMA delas: a que vier do
+# outro módulo escapa e cai no manipulador genérico de 500 — sem erro de import,
+# sem aviso, com a resposta errada.
+#
+# O `ruff` pega a redefinição dentro de um arquivo (F811), mas não entre
+# arquivos. A reexportação é o que fecha essa porta.
+from services.database_service import BancoNaoConfigurado  # noqa: F401
 
-class BancoNaoConfigurado(RuntimeError):
-    """`SUPABASE_DB_URL` ausente ou vazia.
-
-    Tipo próprio, e não `RuntimeError` cru, porque a distinção importa na
-    borda HTTP: banco ausente é indisponibilidade de dependência (503), não
-    erro de programação (500). Sem um tipo para reconhecer, o manipulador
-    teria de capturar `RuntimeError` inteiro e engoliria defeitos de verdade.
-    """
+__all__ = ["BancoNaoConfigurado", "obter_engine"]
 
 
 @lru_cache(maxsize=1)

@@ -7,7 +7,13 @@ from google.genai import errors
 
 from rag.retriever import ResultadoBusca
 from services.chat_service import ChatModelUnavailableError
-from services.gemini_service import MAX_OUTPUT_TOKENS, GeminiChatModel
+from services.gemini_service import (
+    MAX_OUTPUT_TOKENS,
+    MENSAGEM_BASE_INDISPONIVEL,
+    MENSAGEM_SEM_FUNDAMENTO,
+    SCORE_MINIMO_CONTEXTO,
+    GeminiChatModel,
+)
 
 
 class TestGeminiChatModel(unittest.TestCase):
@@ -18,7 +24,8 @@ class TestGeminiChatModel(unittest.TestCase):
 
         reply = model.generate_reply("Oi")
 
-        self.assertEqual(reply, "resposta do modelo")
+        self.assertEqual(reply.texto, "resposta do modelo")
+        self.assertEqual(reply.fontes, ())
         client.models.generate_content.assert_called_once()
         kwargs = client.models.generate_content.call_args.kwargs
         self.assertEqual(kwargs["model"], "gemini-3.5-flash-lite")
@@ -85,21 +92,53 @@ class TestGeminiChatModel(unittest.TestCase):
         self.assertIn("O SLA de resposta é de 24 horas.", texto_enviado)
         self.assertIn("Qual é o SLA de resposta?", texto_enviado)
 
-    def test_ignora_contexto_quando_busca_nao_retorna_resultados(self) -> None:
+    def test_sem_trecho_relevante_devolve_mensagem_padrao_sem_chamar_o_modelo(self) -> None:
+        # ANTES este teste fixava o oposto: sem resultado, a pergunta crua ia
+        # para o Gemini e ele respondia do proprio conhecimento. Num agente de
+        # PMO isso produz percentual e data com a forma certa e sem lastro --
+        # que foi o que aconteceu enquanto a colecao vetorial esteve com
+        # dimensao incompativel.
+        #
+        # A recusa e deterministica de proposito: nao chamar o modelo e a unica
+        # forma de garantir que ela aconteca 100% das vezes.
         client = Mock()
-        client.models.generate_content.return_value = Mock(text="resposta")
         model = GeminiChatModel(
             client=client,
             model="gemini-3.5-flash-lite",
             buscar_contexto=lambda query: [],
         )
 
-        model.generate_reply("Oi")
+        reply = model.generate_reply("Qual o avanco do SYN-04?")
 
-        kwargs = client.models.generate_content.call_args.kwargs
-        self.assertEqual(kwargs["contents"], [{"role": "user", "parts": [{"text": "Oi"}]}])
+        self.assertEqual(reply.texto, MENSAGEM_SEM_FUNDAMENTO)
+        self.assertEqual(reply.fontes, ())
+        client.models.generate_content.assert_not_called()
 
-    def test_responde_sem_contexto_quando_busca_falha(self) -> None:
+    def test_trecho_abaixo_do_score_minimo_nao_conta_como_fundamento(self) -> None:
+        # A busca vetorial sempre devolve os k mais proximos, mesmo para uma
+        # pergunta fora do assunto. Sem um piso de similaridade, qualquer coisa
+        # "tem fonte" e a citacao vira teatro.
+        client = Mock()
+        irrelevante = ResultadoBusca(
+            texto="Trecho qualquer.",
+            score=SCORE_MINIMO_CONTEXTO - 0.01,
+            projeto_id="az1",
+            tipo_documento="gestao",
+            secao="1",
+            arquivo_origem="Projeto.md",
+        )
+        model = GeminiChatModel(
+            client=client,
+            model="gemini-3.5-flash-lite",
+            buscar_contexto=lambda query: [irrelevante],
+        )
+
+        reply = model.generate_reply("Pergunta fora do assunto")
+
+        self.assertEqual(reply.texto, MENSAGEM_SEM_FUNDAMENTO)
+        client.models.generate_content.assert_not_called()
+
+    def test_busca_indisponivel_e_dita_e_nao_disfarcada(self) -> None:
         client = Mock()
         client.models.generate_content.return_value = Mock(text="resposta")
 
@@ -114,9 +153,12 @@ class TestGeminiChatModel(unittest.TestCase):
 
         reply = model.generate_reply("Oi")
 
-        self.assertEqual(reply, "resposta")
-        kwargs = client.models.generate_content.call_args.kwargs
-        self.assertEqual(kwargs["contents"], [{"role": "user", "parts": [{"text": "Oi"}]}])
+        # Indisponibilidade da base agora e DITA, nao disfarcada de resposta.
+        # Responder sem contexto quando a busca falha foi o que manteve uma
+        # incompatibilidade de esquema invisivel por semanas.
+        self.assertEqual(reply.texto, MENSAGEM_BASE_INDISPONIVEL)
+        self.assertEqual(reply.fontes, ())
+        client.models.generate_content.assert_not_called()
 
     def test_historico_guarda_mensagem_original_sem_contexto_recuperado(self) -> None:
         client = Mock()

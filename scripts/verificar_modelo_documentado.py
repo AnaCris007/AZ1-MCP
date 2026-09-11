@@ -150,7 +150,27 @@ def _por_psql(url: str) -> dict[str, list[str]] | None:
     return modelo
 
 
+def _carregar_env() -> None:
+    """Lê o `.env`, como fazem os demais pontos de entrada do projeto.
+
+    Sem isto, este script era um verificador de DUAS pontas se dizendo de três:
+    `SUPABASE_DB_URL` mora no `.env`, nunca no ambiente do shell, então a
+    comparação com o banco caía sempre no ramo "não definida" — e o aviso
+    sugeria configuração ausente, não um `load_dotenv` faltando.
+
+    O import é local e tolerante porque o cabeçalho promete que o script roda
+    em qualquer máquina, inclusive na CI, onde `python-dotenv` pode não estar
+    instalado e a variável vem do próprio ambiente.
+    """
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+    load_dotenv(RAIZ / ".env")
+
+
 def do_banco() -> dict[str, list[str]] | None:
+    _carregar_env()
     url = os.environ.get("SUPABASE_DB_URL", "")
     if not url:
         print("  (SUPABASE_DB_URL não definida — banco não verificado)")

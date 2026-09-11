@@ -19,54 +19,6 @@ const PRIORITY_LABELS = {
   baixa: 'Baixa',
 }
 
-const FALLBACK_TASKS = [
-  {
-    id: 't1',
-    title: 'Atualizar status de risco pendente na Linha 6',
-    project: 'Linha 6 — Laranja',
-    priority: 'alta',
-    dueDate: '2026-08-27',
-    description:
-      'O relatório de riscos está desatualizado desde a última vistoria. O agente identificou 2 riscos sem responsável definido.',
-    done: false,
-  },
-  {
-    id: 't2',
-    title: 'Revisar marco de licenciamento antes do prazo',
-    project: 'Linha 6 — Laranja',
-    priority: 'alta',
-    dueDate: '2026-08-28',
-    description: '',
-    done: false,
-  },
-  {
-    id: 't3',
-    title: 'Confirmar presença na reunião com equipe de obras',
-    project: 'Linha 2 — Verde',
-    priority: 'media',
-    dueDate: '',
-    description: '',
-    done: false,
-  },
-  {
-    id: 't4',
-    title: 'Preencher formulário de acompanhamento mensal',
-    project: 'Linha 15 — Prata',
-    priority: 'media',
-    dueDate: '2026-09-02',
-    description: '',
-    done: false,
-  },
-  {
-    id: 't5',
-    title: 'Arquivar documentos de escopo já validados',
-    project: 'Linha 15 — Prata',
-    priority: 'baixa',
-    dueDate: '',
-    description: '',
-    done: true,
-  },
-]
 
 function formatDueDate(dueDate) {
   if (!dueDate) return null
@@ -75,7 +27,7 @@ function formatDueDate(dueDate) {
 }
 
 export default function TasksView() {
-  const [tasks, setTasks] = useState(FALLBACK_TASKS)
+  const [tasks, setTasks] = useState([])
   const [editingTaskId, setEditingTaskId] = useState(null)
 
   useEffect(() => {
@@ -86,7 +38,10 @@ export default function TasksView() {
         if (!cancelled) setTasks(data)
       })
       .catch(() => {
-        console.info('[tasks] backend indisponível, usando dados de exemplo')
+        // Antes isto caía numa lista fixa e mostrava tarefa inventada como se
+        // fosse real. Numa ferramenta de PMO, lista vazia é mais honesta.
+        console.error('[tasks] não foi possível carregar as pendências do portfólio')
+        if (!cancelled) setTasks([])
       })
 
     return () => {
@@ -109,9 +64,16 @@ export default function TasksView() {
     setTasks((prev) =>
       prev.map((task) => (task.id === id ? { ...task, ...updates } : task)),
     )
-    updateTask(id, updates).catch(() => {
-      console.info('[tasks] backend indisponível, atualização mantida só localmente')
-    })
+    // A resposta traz a linha relida do banco: `em_tratamento` desmarcada
+    // volta como `aberta`, e só o servidor sabe disso. Aplicar o que ele
+    // devolveu evita a interface exibir um estado que o banco não aceitou.
+    updateTask(id, updates)
+      .then((atualizada) => {
+        setTasks((prev) => prev.map((task) => (task.id === id ? atualizada : task)))
+      })
+      .catch(() => {
+        console.error('[tasks] não foi possível salvar a alteração')
+      })
   }
 
   const toggleTask = (id) => {

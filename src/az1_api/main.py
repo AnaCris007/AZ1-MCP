@@ -1,19 +1,25 @@
 import logging
+from typing import Annotated
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from psycopg_pool import ConnectionPool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from az1_api.dependencies import AuthAPIError, require_authenticated_user
-from database.conexao import BancoNaoConfigurado
+from az1_api.dependencies import (
+    AuthAPIError,
+    get_connection_pool,
+    require_authenticated_user,
+)
 from routes import (
     alerta_router,
     analysis_router,
     audio_router,
     auditoria_router,
     chat_router,
+    portfolio_router,
     rag_router,
     speech_router,
     transcription_router,
@@ -23,10 +29,12 @@ from routes.alerta import AlertaAPIError
 from routes.audio import AudioAPIError
 from routes.auditoria import AuditoriaAPIError
 from routes.chat import ChatAPIError
+from routes.portfolio import PortfolioAPIError
 from routes.speech import SpeechAPIError
 from routes.transcription import TranscriptionAPIError
 from routes.webhooks import WebhookAPIError
 from schemas.common import ErrorResponse
+from services.database_service import BancoNaoConfigurado, verificar_conexao
 
 load_dotenv()
 
@@ -49,6 +57,7 @@ app.include_router(transcription_router, prefix="/api/v1", dependencies=_auth_de
 app.include_router(analysis_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(chat_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(rag_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(portfolio_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(speech_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(alerta_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(auditoria_router, prefix="/api/v1", dependencies=_auth_dependency)
@@ -59,9 +68,38 @@ app.include_router(auditoria_router, prefix="/api/v1", dependencies=_auth_depend
 app.include_router(webhooks_router, prefix="/api/v1")
 
 
+# Deliberadamente raso: não toca banco, MinIO, Deepgram nem Gemini. O RNF07
+# exige HTTP 200 em até dois segundos, e checar dependência externa aqui faria o
+# próprio requisito depender da latência de terceiros. Quem verifica dependência
+# é `/health/ready`, abaixo.
 @app.get("/health", tags=["infra"])
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+# Prontidão, separada da vivacidade. Responde 503 quando o banco não está
+# utilizável.
+#
+# O pool chega por `Depends`, e não por chamada direta a `get_connection_pool()`:
+# chamada direta ignora `app.dependency_overrides` e deixa a rota intestável sem
+# um Supabase de verdade.
+#
+# Banco não configurado sai daqui como `BancoNaoConfigurado` e é convertido em
+# 503 pelo manipulador registrado no fim deste módulo — indisponibilidade do
+# ponto de vista de quem chama, não erro de programação.
+@app.get("/health/ready", tags=["infra"])
+def health_ready(pool: Annotated[ConnectionPool, Depends(get_connection_pool)]) -> JSONResponse:
+    try:
+        pronto = verificar_conexao(pool)
+    except Exception as erro:  # noqa: BLE001 — qualquer falha de conexão é indisponibilidade
+        return JSONResponse(
+            status_code=503,
+            content={"status": "indisponivel", "motivo": f"{type(erro).__name__}: {erro}"},
+        )
+
+    if not pronto:
+        return JSONResponse(status_code=503, content={"status": "indisponivel"})
+    return JSONResponse(status_code=200, content={"status": "ok"})
 
 
 @app.exception_handler(AlertaAPIError)
@@ -90,6 +128,14 @@ def transcription_api_error_handler(request: Request, exc: TranscriptionAPIError
 
 @app.exception_handler(AudioAPIError)
 def audio_api_error_handler(request: Request, exc: AudioAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
+
+
+@app.exception_handler(PortfolioAPIError)
+def portfolio_api_error_handler(request: Request, exc: PortfolioAPIError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
@@ -133,7 +179,7 @@ def webhook_api_error_handler(request: Request, exc: WebhookAPIError) -> JSONRes
 # precisa sair como 503, e não pelo manipulador genérico de 500 abaixo. Vale
 # para os endpoints cuja razão de existir É o banco — alertas e auditoria. Os
 # efeitos colaterais de /chat e /analyze não chegam aqui: degradam nos próprios
-# provedores, ver `dependencies.get_gravador_auditoria`.
+# provedores, ver `dependencies.get_conversa_repository`.
 @app.exception_handler(BancoNaoConfigurado)
 def banco_nao_configurado_handler(request: Request, exc: BancoNaoConfigurado) -> JSONResponse:
     return JSONResponse(

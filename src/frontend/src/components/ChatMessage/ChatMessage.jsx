@@ -1,10 +1,56 @@
 import { motion } from 'framer-motion'
-import { LoaderCircle, Pause, Volume2 } from 'lucide-react'
+import { FileText, LoaderCircle, Pause, Volume2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { generateSpeech } from '../../lib/api'
 import AgentOrb from '../AgentOrb/AgentOrb'
 
-export default function ChatMessage({ role, content }) {
+
+// O numero entre colchetes na resposta -- "[3]" -- nao significa nada sozinho.
+// Esta lista e o que o transforma em referencia: mostra QUAL documento e de que
+// projeto, e deixa abrir o trecho exato que sustentou a afirmacao. E o que o
+// RNF12 cobra, e a diferenca entre citar e parecer que cita.
+function ListaDeFontes({ fontes }) {
+  const [aberta, setAberta] = useState(null)
+
+  return (
+    <div className="mt-3 border-l-2 border-surface pl-3">
+      <p className="mb-1.5 text-xs font-medium text-text-secondary">
+        {fontes.length === 1 ? 'Fonte' : 'Fontes'}
+      </p>
+      <ul className="flex flex-col gap-1">
+        {fontes.map((fonte) => (
+          <li key={fonte.posicao}>
+            <button
+              type="button"
+              onClick={() => setAberta(aberta === fonte.posicao ? null : fonte.posicao)}
+              className="flex w-full items-start gap-2 rounded-lg px-1.5 py-1 text-left text-xs text-text-secondary transition-colors hover:bg-surface hover:text-text-primary"
+              aria-expanded={aberta === fonte.posicao}
+            >
+              <span className="mt-px shrink-0 font-mono text-text-primary">
+                [{fonte.posicao}]
+              </span>
+              <span className="min-w-0">
+                {fonte.projeto_id && (
+                  <span className="font-medium text-text-primary">{fonte.projeto_id} · </span>
+                )}
+                {fonte.arquivo_origem}
+                {fonte.secao && <span className="opacity-70"> · {fonte.secao}</span>}
+              </span>
+              <FileText size={12} className="mt-0.5 ml-auto shrink-0 opacity-60" />
+            </button>
+            {aberta === fonte.posicao && fonte.trecho && (
+              <p className="mt-1 mb-1 ml-6 whitespace-pre-wrap rounded-lg bg-surface px-2.5 py-2 text-xs leading-relaxed text-text-secondary">
+                {fonte.trecho}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export default function ChatMessage({ role, content, fontes = [] }) {
   const isUser = role === 'user'
   const [audioState, setAudioState] = useState('idle')
   const [audioError, setAudioError] = useState('')
@@ -70,6 +116,7 @@ export default function ChatMessage({ role, content }) {
         }`}
       >
         <div>{content}</div>
+        {!isUser && fontes.length > 0 && <ListaDeFontes fontes={fontes} />}
         {!isUser && (
           <div className="mt-2">
             <button

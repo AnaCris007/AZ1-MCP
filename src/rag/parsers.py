@@ -42,11 +42,34 @@ def _tipo_documento(caminho: Path) -> str:
     return "desconhecido"
 
 
+def _nome_de_origem(caminho: Path) -> str:
+    """O NOME do arquivo, nunca o caminho.
+
+    Aqui ficava `str(caminho)`, o caminho absoluto da máquina de quem rodou a
+    indexação. A coleção atual guarda coisas como
+    "/Users/<alguém>/Downloads/base_sintetica_metro/SYN-04.../02_Cronograma.xlsx".
+
+    Duas consequências, e a segunda é irreversível:
+
+      1. O RNF12 pede referência RECUPERÁVEL, e um caminho no computador de
+         outra pessoa não é recuperável por mais ninguém. O campo aparece na
+         resposta da API e na interface.
+      2. O valor vai para `auditoria.mensagem_fonte.arquivo_origem`, que é NOT
+         NULL e está sob `REVOKE UPDATE, DELETE`. Errado ali, fica errado para
+         sempre.
+
+    O nome sozinho não é ambíguo porque `projeto_id` viaja ao lado: dois
+    projetos têm "02_Cronograma.xlsx", mas o par (projeto_id, arquivo_origem)
+    distingue. Os dois são gravados nas duas pontas, no índice e na trilha.
+    """
+    return caminho.name
+
+
 def extrair_docx(caminho: Path) -> list[TextoExtraido]:
     doc = Document(caminho)
     projeto_id = _projeto_id(caminho)
     tipo = _tipo_documento(caminho)
-    arquivo = str(caminho)
+    arquivo = _nome_de_origem(caminho)
 
     resultado: list[TextoExtraido] = []
     secao_atual = ""
@@ -86,7 +109,7 @@ def extrair_xlsx(caminho: Path) -> list[TextoExtraido]:
     wb = openpyxl.load_workbook(caminho, data_only=True)
     projeto_id = _projeto_id(caminho)
     tipo = _tipo_documento(caminho)
-    arquivo = str(caminho)
+    arquivo = _nome_de_origem(caminho)
 
     resultado: list[TextoExtraido] = []
 
