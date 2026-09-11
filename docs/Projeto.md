@@ -2393,7 +2393,7 @@ listar_palavras_de_maior_peso_por_intencao(modelo, quantas=4)
 
 ### 3.3.9 Testes
 
-O pipeline tem **124 testes automatizados**, organizados por módulo. Eles são a evidência de que o
+O pipeline tem **153 testes automatizados**, organizados por módulo. Eles são a evidência de que o
 comportamento descrito nesta seção é o que o código faz, e não apenas o que se pretendia.
 
 ```bash

@@ -112,6 +112,7 @@ MODULOS_DO_PIPELINE = (
     "test_bancada.py",
     "test_classificador.py",
     "test_experimento.py",
+    "test_metricas.py",
     "test_preprocessamento.py",
     "test_reprodutibilidade.py",
     "test_vetorizacao.py",

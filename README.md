@@ -99,7 +99,8 @@ python -m pln.experimento          # varre pré-processamento e vetorização
 python -m pln.ajuste_fino          # varre os hiperparâmetros do modelo
 python -m pln.classificador        # treina, avalia e salva o modelo
 python -m pln.bancada              # mede latência, tempo de treino e memória
-python -m unittest discover tests  # 169 testes
+python -m pln.metricas             # mede as três métricas do RNF03
+python -m unittest discover tests  # 198 testes
 ```
 
 - `assets/`: imagens e diagramas utilizados na documentação.
@@ -113,7 +114,8 @@ python -m unittest discover tests  # 169 testes
 - `src/az1_api/main.py`: ponto de entrada da aplicação FastAPI.
 - `resultados/`: saída gerada. Nada ali é editado à mão. Os comparativos vêm de
   `python -m pln.experimento` e `python -m pln.ajuste_fino`, o modelo treinado de
-  `python -m pln.classificador`, e as medições de desempenho de `python -m pln.bancada`.
+  `python -m pln.classificador`, as medições de desempenho de `python -m pln.bancada` e as do RNF03 de
+  `python -m pln.metricas`.
 
 ##  Rodando com Docker
 
@@ -133,7 +135,7 @@ docker compose up -d --build
 O código do repositório é montado dentro dos contêineres: editar um arquivo recarrega a API ou a interface, sem reconstruir imagem.
 
 ```bash
-docker compose --profile ci run --rm tests      # os 169 testes, dentro da imagem
+docker compose --profile ci run --rm tests      # os 198 testes, dentro da imagem
 docker compose --profile ml run --rm trainer    # retreina o classificador
 docker compose logs -f api                      # acompanha os logs
 docker compose down                             # derruba, preservando os áudios
