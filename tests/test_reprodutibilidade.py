@@ -124,31 +124,40 @@ def _contar_testes(arquivos) -> int:
     return sum(len(padrao.findall(a.read_text(encoding="utf-8"))) for a in arquivos)
 
 
-class TesteContagensDocumentadas(unittest.TestCase):
-    # README e documentação afirmavam 106, 145 e 100 testes ao mesmo tempo. Dois
-    # desses números estavam certos para escopos diferentes e um estava obsoleto,
-    # o que é pior que estar tudo errado: não dá para saber qual acreditar sem
-    # contar à mão. Estes testes contam.
-    def test_readme_declara_o_total_da_suite(self):
-        total = _contar_testes(sorted((RAIZ / "tests").glob("test_*.py")))
-        readme = (RAIZ / "README.md").read_text(encoding="utf-8")
-        self.assertIn(
-            f"# {total} testes", readme,
-            f"a suíte tem {total} testes, mas o README declara outro número. "
-            f"Atualize as duas ocorrências em README.md.",
-        )
-        self.assertIn(
-            f"# os {total} testes, dentro da imagem", readme,
-            f"a suíte tem {total} testes, mas o README declara outro número no bloco Docker.",
+class TesteContagemDocumentada(unittest.TestCase):
+    # ESTE GUARD JÁ FOI DE IGUALDADE EXATA, E ISSO ESTAVA ERRADO.
+    #
+    # A primeira versão afirmava "a suíte tem exatamente N testes, e o README
+    # precisa dizer N". Isso funciona numa branch só e quebra assim que existem
+    # duas: o pipeline de merge request roda sobre o RESULTADO DO MERGE, que tem
+    # os testes desta branch mais os que a `develop` ganhou enquanto isso. Não
+    # existe número que satisfaça os dois ao mesmo tempo — escrever o da branch
+    # reprova o MR, escrever o do merge reprova a branch.
+    #
+    # Aconteceu de verdade: 198 aqui, 159 na develop, 212 no merge.
+    #
+    # A diferença para o guard de versões, logo acima, é que versão fixada é
+    # fato único e global, enquanto contagem de teste muda em toda branch que
+    # acrescenta um teste. Só o primeiro comporta igualdade.
+    #
+    # Piso resolve: acrescentar testes nunca reprova, e remover em massa ainda
+    # reprova, que é o que de fato interessa vigiar.
+    def test_documentacao_nao_promete_mais_testes_do_que_existem(self):
+        doc = (RAIZ / "docs" / "Projeto.md").read_text(encoding="utf-8")
+        declarado = re.search(r"mais de \*\*(\d+) testes automatizados\*\*", doc)
+        self.assertIsNotNone(
+            declarado,
+            "a Seção 3.3.9 precisa declarar um piso no formato "
+            "'mais de **N testes automatizados**'.",
         )
 
-    def test_documentacao_declara_os_testes_do_pipeline(self):
-        pipeline = _contar_testes(RAIZ / "tests" / nome for nome in MODULOS_DO_PIPELINE)
-        doc = (RAIZ / "docs" / "Projeto.md").read_text(encoding="utf-8")
-        self.assertIn(
-            f"O pipeline tem **{pipeline} testes automatizados**", doc,
-            f"os módulos do pipeline de PLN somam {pipeline} testes, mas a Seção 3.3.9 "
-            f"declara outro número.",
+        piso = int(declarado.group(1))
+        real = _contar_testes(RAIZ / "tests" / nome for nome in MODULOS_DO_PIPELINE)
+        self.assertGreater(
+            real, piso,
+            f"a Seção 3.3.9 promete mais de {piso} testes no pipeline de PLN, mas os "
+            f"módulos somam {real}. Ou faltam testes, ou o piso da documentação está alto "
+            f"demais.",
         )
 
 

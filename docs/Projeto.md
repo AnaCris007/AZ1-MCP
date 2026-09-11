@@ -2486,7 +2486,7 @@ listar_palavras_de_maior_peso_por_intencao(modelo, quantas=4)
 
 ### 3.3.9 Testes
 
-O pipeline tem **153 testes automatizados**, organizados por módulo. Eles são a evidência de que o
+O pipeline tem mais de **150 testes automatizados**, organizados por módulo. Eles são a evidência de que o
 comportamento descrito nesta seção é o que o código faz, e não apenas o que se pretendia.
 
 ```bash
@@ -5430,7 +5430,7 @@ O planejamento cobre os seis requisitos funcionais, e não apenas os que já pos
 
 #### Propósito e delimitação em relação aos testes já existentes
 
-O repositório já contém 145 testes automatizados, executados por `python -m unittest discover tests`. Eles são **testes de unidade e de contrato de componente**: verificam que `probe_audio` rejeita um arquivo corrompido, que a rota devolve `413` quando o serviço levanta `FILE_TOO_LARGE`, que o pré-processamento aplica o radicalizador na ordem esperada. Seu objeto é a peça isolada, e a referência contra a qual eles julgam é a decisão de implementação.
+O repositório já contém mais de 190 testes automatizados, executados por `python -m unittest discover tests`. Eles são **testes de unidade e de contrato de componente**: verificam que `probe_audio` rejeita um arquivo corrompido, que a rota devolve `413` quando o serviço levanta `FILE_TOO_LARGE`, que o pré-processamento aplica o radicalizador na ordem esperada. Seu objeto é a peça isolada, e a referência contra a qual eles julgam é a decisão de implementação.
 
 Os testes de funcionalidade planejados aqui têm outro objeto e outra referência. O objeto é o **comportamento observável pelo usuário**, atravessando as peças que forem necessárias; a referência é o **critério de aceitação escrito na Seção 2.2**, e não a implementação. A distinção é prática: um teste de unidade pode passar sobre um componente que cumpre perfeitamente seu contrato interno enquanto o critério de aceitação do requisito permanece descumprido. É exatamente o caso do RF01 no estado atual do repositório, como a subseção seguinte demonstra.
 

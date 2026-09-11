@@ -100,7 +100,7 @@ python -m pln.ajuste_fino          # varre os hiperparâmetros do modelo
 python -m pln.classificador        # treina, avalia e salva o modelo
 python -m pln.bancada              # mede latência, tempo de treino e memória
 python -m pln.metricas             # mede as três métricas do RNF03
-python -m unittest discover tests  # 198 testes
+python -m unittest discover tests  # a suite completa
 ```
 
 - `assets/`: imagens e diagramas utilizados na documentação.
@@ -135,7 +135,7 @@ docker compose up -d --build
 O código do repositório é montado dentro dos contêineres: editar um arquivo recarrega a API ou a interface, sem reconstruir imagem.
 
 ```bash
-docker compose --profile ci run --rm tests      # os 198 testes, dentro da imagem
+docker compose --profile ci run --rm tests      # a suite completa, dentro da imagem
 docker compose --profile ml run --rm trainer    # retreina o classificador
 docker compose logs -f api                      # acompanha os logs
 docker compose down                             # derruba, preservando os áudios
