@@ -172,19 +172,29 @@ proíbe explicitamente.
 
 ## Ganchos para a autenticação
 
-A autenticação (RNF02) é frente de outra pessoa. O banco já está preparado para
-recebê-la, e a preparação é pequena de propósito:
+A autenticação (RNF02) foi implementada em `feat/autenticacao-login` (Supabase
+Auth com Microsoft Entra ID como provedor de identidade; detalhes em
+`docs/Projeto.md`, Seção 3.10). O banco já estava preparado para recebê-la, e a
+preparação era pequena de propósito:
 
-1. `portfolio.usuario.auth_user_id UUID UNIQUE`, hoje nula. Guarda o id da conta
+1. `portfolio.usuario.auth_user_id UUID UNIQUE`. Guarda o id da conta
    no provedor de SSO.
 2. `portfolio.usuario_atual()` traduz a identidade do JWT para
    `portfolio.usuario.id`. **Todas as políticas de RLS passam por essa função**,
-   então nenhuma delas precisará ser reescrita.
+   então nenhuma delas precisou ser reescrita.
 3. Nenhuma senha, token ou segredo é armazenado. O provedor de SSO detém a
    credencial; o banco guarda só a correspondência.
 
-Para ligar a autenticação, basta que o login preencha `auth_user_id` e, se a
-escolha for o Supabase Auth, promover a coluna a chave estrangeira:
+`auth_user_id` já é preenchida no login: `src/services/usuario_service.py`
+(`ResolveOrCreateUsuario`) procura o usuário por `auth_user_id` e, se não achar,
+por e-mail; se nenhum dos dois encontrar nada — o caso de qualquer conta real,
+já que os 10 usuários sintéticos de `02_initial_data.sql` usam e-mails
+`@metro.example` —, cria um registro novo com `perfil` padrão `lider_projeto`.
+A chamada acontece em `src/az1_api/dependencies.py`, a cada requisição
+autenticada, e é best-effort: se o banco estiver fora do ar, a autenticação
+continua funcionando, só sem ligar `auth_user_id` naquela requisição.
+
+O que ainda não foi feito é promover a coluna a chave estrangeira:
 
 ```sql
 ALTER TABLE portfolio.usuario
@@ -192,10 +202,10 @@ ALTER TABLE portfolio.usuario
   FOREIGN KEY (auth_user_id) REFERENCES auth.users (id) ON DELETE SET NULL;
 ```
 
-A FK não é criada agora porque impediria semear usuários antes de existirem
-contas de SSO. Enquanto `auth_user_id` for nula para todo mundo,
-`portfolio.usuario_atual()` devolve `NULL` e as políticas negam tudo — o
-comportamento correto: sem identidade, sem acesso.
+Isso já seria seguro — os usuários sintéticos remanescentes continuam com
+`auth_user_id` nulo, e uma FK não rejeita nulo —, mas é uma migração de esquema,
+categoria de mudança diferente de código de aplicação escrevendo dados, e por
+isso ficou como decisão separada da equipe em vez de ser aplicada junto.
 
 ## Evolução em relação à modelagem da Sprint 2
 

@@ -1,9 +1,18 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ChatRequestError, sendMessage } from './api'
 
+const { getSession } = vi.hoisted(() => ({
+  getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+}))
+
+vi.mock('./supabase', () => ({
+  supabase: { auth: { getSession } },
+}))
+
 describe('sendMessage', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
+    getSession.mockClear()
   })
 
   it('lança ChatRequestError com error "service_unavailable" quando a API responde 503', async () => {
@@ -54,5 +63,32 @@ describe('sendMessage', () => {
       error: 'internal_error',
       status: 500,
     })
+  })
+
+  it('inclui o header Authorization com o token da sessão ativa', async () => {
+    getSession.mockResolvedValueOnce({ data: { session: { access_token: 'token-123' } } })
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ reply: 'Olá!' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await sendMessage('Oi', 'conv_1')
+
+    const [, options] = fetchMock.mock.calls[0]
+    expect(options.headers.Authorization).toBe('Bearer token-123')
+  })
+
+  it('não inclui o header Authorization quando não há sessão ativa', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ reply: 'Olá!' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await sendMessage('Oi', 'conv_1')
+
+    const [, options] = fetchMock.mock.calls[0]
+    expect(options.headers.Authorization).toBeUndefined()
   })
 })

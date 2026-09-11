@@ -1,8 +1,19 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { AuthProvider } from '../contexts/AuthContext'
 import AgentPage from './AgentPage'
 import { ChatRequestError } from '../lib/api'
+
+// TopBar lê a sessão via useAuth(); sem o provider ao redor, o teste quebra
+// com "useAuth deve ser usado dentro de AuthProvider" antes mesmo de renderizar.
+function renderAgentPage() {
+  return render(
+    <AuthProvider>
+      <AgentPage />
+    </AuthProvider>,
+  )
+}
 
 let capturedOnRecordingComplete
 
@@ -46,7 +57,7 @@ describe('AgentPage — confirmação de transcrição', () => {
   })
 
   it('apresenta a transcrição no campo de texto sem enviá-la automaticamente', async () => {
-    render(<AgentPage />)
+    renderAgentPage()
 
     await completeRecording('Qual o status do projeto Linha 6?')
 
@@ -59,7 +70,7 @@ describe('AgentPage — confirmação de transcrição', () => {
   it('envia a transcrição quando o usuário confirma', async () => {
     const user = userEvent.setup()
     sendMessage.mockResolvedValue({ reply: 'Está em andamento.' })
-    render(<AgentPage />)
+    renderAgentPage()
 
     await completeRecording('Qual o status do projeto Linha 6?')
     await waitFor(() =>
@@ -78,7 +89,7 @@ describe('AgentPage — confirmação de transcrição', () => {
 
   it('não envia a transcrição quando o usuário descarta', async () => {
     const user = userEvent.setup()
-    render(<AgentPage />)
+    renderAgentPage()
 
     await completeRecording('Qual o status do projeto Linha 6?')
     await waitFor(() =>
@@ -92,7 +103,7 @@ describe('AgentPage — confirmação de transcrição', () => {
   })
 
   it('apresenta feedback quando a transcrição vem vazia', async () => {
-    render(<AgentPage />)
+    renderAgentPage()
 
     await completeRecording('   ')
 
@@ -119,7 +130,7 @@ describe('AgentPage — erros do chat', () => {
         'O serviço de IA está sobrecarregado no momento. Tente novamente em instantes.',
       ),
     )
-    render(<AgentPage />)
+    renderAgentPage()
 
     await user.type(promptTextarea(), 'Oi')
     await user.click(screen.getByRole('button', { name: 'Enviar mensagem' }))

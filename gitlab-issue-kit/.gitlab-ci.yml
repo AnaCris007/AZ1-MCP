@@ -1,12 +1,15 @@
 # =============================================================================
-# Pipeline CI do projeto — build → test → quality
+# Jobs de CI do gitlab-issue-kit — build → test → quality
 # =============================================================================
-# A presença deste arquivo desliga o Auto DevOps: o GitLab só usa o pipeline
-# automático quando não encontra uma configuração de CI alternativa.
+# Este arquivo cobre SOMENTE os scripts de automação de issues. Ele não é lido
+# pelo GitLab por conta própria: o pipeline é declarado em `.gitlab-ci.yml` na
+# raiz do repositório, que traz estes jobs por `include`. Os stages usados aqui
+# são os mesmos declarados lá.
 #
-# O projeto é um conjunto de scripts Python de automação (gitlab-issue-kit),
-# SQL e documentação — não há aplicação para containerizar. Por isso o
-# pipeline não constrói imagem Docker e não depende de Container Registry.
+# O comentário anterior dizia que não havia aplicação para containerizar. Isso
+# deixou de valer quando a API, a interface e o pipeline de PLN entraram no
+# repositório, com Dockerfiles em `docker/`. Quem cobre essa parte é o arquivo
+# da raiz; aqui não se constrói imagem porque estes scripts não viram imagem.
 # =============================================================================
 
 stages:
