@@ -2090,6 +2090,10 @@ Três decisões estão visíveis nesse desenho. A primeira é que o serviço nun
 
 A retenção de sete dias é curta de propósito e responde a duas exigências que puxam em direções opostas. De um lado, o áudio precisa sobreviver ao ciclo da requisição, para que a retranscrição seja possível sem novo envio e para que a coluna `audio_referencia` da trilha de auditoria, definida na Seção 3.6.5, tenha a que apontar. De outro, gravação de voz é o dado mais sensível que a solução manipula, e mantê-la indefinidamente ampliaria a superfície de exposição sem ganho proporcional. Antes de qualquer uso com dado real, a janela deve ser reavaliada junto às políticas de privacidade do parceiro e às exigências da LGPD aplicáveis ao tratamento de voz.
 
+O mesmo arquivo `infra/minio/lifecycle.json` passou a conter uma segunda regra, e a distância entre as duas é deliberada. O prefixo `conversas/`, onde `src/services/conversa_repository.py` arquiva o texto de cada turno, expira em **365 dias**, e não em sete: o RNF09 exige retenção mínima de noventa dias para a trilha de auditoria, de modo que a janela curta do áudio seria uma violação se aplicada ao texto. Os dois prefixos convivem no mesmo bucket porque compartilham credencial e endpoint, mas nada além disso — são dados de sensibilidade e de prazo diferentes, e é a regra de ciclo de vida que mantém essa diferença em vigor sem depender de rotina da aplicação.
+
+A escolha de 365 dias, e não dos noventa exatos do requisito, evita o problema de fronteira: uma regra de exatamente noventa dias apaga o objeto no dia em que a retenção mínima ainda deveria estar valendo. O número também é o teto, e não o piso, da exposição — passado o prazo, o descarte é automático, pelo mesmo motivo registrado acima para o áudio.
+
 ### 3.2.6 Serviço de Text to Speech
 
 **Decisão:** utilizar a **API Gemini Text-to-Speech**, por meio do SDK oficial `google-genai`, para sintetizar em áudio as respostas textuais do agente. O projeto já utilizava o Gemini no serviço de chat e já declarava o SDK e a variável `GEMINI_API_KEY`; a escolha evita introduzir uma segunda credencial para geração de conteúdo e mantém o cliente externo na mesma família tecnológica. O Gemini TTS também aceita português e oferece vozes predefinidas. Como o recurso e o modelo utilizados estão em *preview*, a decisão deve ser reavaliada antes de uma implantação de produção.
@@ -2603,7 +2607,7 @@ O vínculo entre as duas é o `audio_id` e o objeto gravado no armazenamento: o 
 | Limite de 5 minutos | **Implementada** | `MAX_DURATION_SECONDS` |
 | Validação de formato pela assinatura binária, e não pela extensão ou MIME type declarados | **Implementada** | `_detect_audio_format` e `probe_audio` |
 | Corpo de erro padronizado com `error` e `message` | **Implementada** | `ErrorResponse` e os manipuladores de exceção em `src/az1_api/main.py` |
-| Armazenamento em bucket compatível com S3 sob `incoming/{audio_id}` | **Implementada** | `S3AudioStorage.store` em `src/services/storage_service.py` |
+| Armazenamento em bucket compatível com S3 sob `incoming/{audio_id}` | **Implementada** | `S3ObjectStorage.store` em `src/services/storage_service.py` |
 | Cobertura por testes automatizados | **Implementada** | 4 testes de rota e 13 de serviço, em `tests/test_audio_api.py` e `tests/test_audio_service.py` |
 | **Autenticação por Bearer Token e resposta `401`** | **Planejada, não implementada** | A rota não declara nenhuma dependência de autenticação |
 | **HTTPS obrigatório** | **Planejada, não implementada** | O ambiente local serve por HTTP; ver Seção 3.7.4 |
@@ -4405,10 +4409,10 @@ classDiagram
         +fetch(key) bytes
     }
 
-    class S3AudioStorage {
+    class S3ObjectStorage {
         -client
         -string bucket_name
-        +from_settings(settings) S3AudioStorage
+        +from_settings(settings) S3ObjectStorage
         +store(key, content, content_type, metadata) void
         +fetch(key) bytes
     }
@@ -4460,8 +4464,8 @@ classDiagram
         +tuple ordem
     }
 
-    S3AudioStorage ..|> AudioStorage
-    S3AudioStorage ..|> AudioFetcher
+    S3ObjectStorage ..|> AudioStorage
+    S3ObjectStorage ..|> AudioFetcher
     ReceiveAudio ..> AudioStorage : usa
     TranscribeAudio ..> AudioFetcher : usa
     AnalyzeAudio --> TranscribeAudio
@@ -4473,7 +4477,7 @@ classDiagram
 
 **Leitura do diagrama.** Três decisões de projeto ficam visíveis na estrutura, e nenhuma delas é acidental.
 
-A primeira é que **`ReceiveAudio` e `TranscribeAudio` não se conhecem**. O recebimento depende de `AudioStorage`, a transcrição depende de `AudioFetcher`, e a mesma classe concreta `S3AudioStorage` realiza as duas interfaces. O vínculo entre recebimento e transcrição é o `audio_id` e o objeto gravado, exatamente como a Seção 2.4 registra. Consequência prática: trocar o armazenamento afeta uma classe, e trocar o provedor de transcrição afeta outra, sem que uma mudança force a outra.
+A primeira é que **`ReceiveAudio` e `TranscribeAudio` não se conhecem**. O recebimento depende de `AudioStorage`, a transcrição depende de `AudioFetcher`, e a mesma classe concreta `S3ObjectStorage` realiza as duas interfaces. O vínculo entre recebimento e transcrição é o `audio_id` e o objeto gravado, exatamente como a Seção 2.4 registra. Consequência prática: trocar o armazenamento afeta uma classe, e trocar o provedor de transcrição afeta outra, sem que uma mudança force a outra. A classe chamava-se `S3AudioStorage` e foi renomeada quando passou a ter um terceiro consumidor: `ConversaRepository` arquiva nela o texto de cada turno, sob o prefixo `conversas/`. Nada no comportamento mudou — `store` e `fetch` sempre operaram sobre uma chave e bytes, sem nada específico de áudio —, de modo que a alternativa seria manter duas classes idênticas e, com elas, dois clientes `boto3` a configurar.
 
 A segunda é que **o classificador não sabe que existe uma API**. `ClassificadorPLN` expõe funções que recebem texto e devolvem intenção, e é `AnalyzeAudio` — uma classe da camada de serviço — que encadeia transcrição e classificação. É esse desacoplamento que a oportunidade OP1 registra como concretizada na Seção 4.3.3 do `GestaoProjeto.md`.
 
@@ -6390,7 +6394,7 @@ Quatro serviços externos sustentam o fluxo de voz e de conversação do agente,
 
 | Suíte | Serviço | Adaptador | Mecanismo | Requisito |
 |---|---|---|---|---|
-| Armazenamento de áudio | MinIO em ambiente local, Amazon S3 em nuvem | `S3AudioStorage` | API S3 sobre HTTP, via `boto3` | RF01 |
+| Armazenamento de áudio | MinIO em ambiente local, Amazon S3 em nuvem | `S3ObjectStorage` | API S3 sobre HTTP, via `boto3` | RF01 |
 | Transcrição de fala | Deepgram, modelo Nova-3 | `TranscribeAudio` | HTTPS, `AsyncDeepgramClient` | RNF06, RF01 |
 | Síntese de fala | Google Gemini, modelo `gemini-2.5-flash-preview-tts` | `GeminiSpeechModel` | HTTPS, `google-genai` | Não documentado (seção 6.4.4) |
 | Geração de resposta | Google Gemini, modelo `gemini-3.5-flash-lite` | `GeminiChatModel` | HTTPS, `google-genai` | RF02, RNF11 |

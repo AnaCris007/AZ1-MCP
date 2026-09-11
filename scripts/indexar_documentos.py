@@ -17,6 +17,16 @@ Variáveis de ambiente necessárias:
 Pré-requisito no Supabase:
     Habilite pgvector via SQL Editor:
         create extension if not exists vector;
+
+ATENÇÃO — MIGRAÇÃO DE COLEÇÃO EXISTENTE:
+    A dimensão do embedding passou de 3072 para 1536 e o `task_type` passou a
+    distinguir documento de consulta. Uma coleção indexada antes disso guarda
+    vetores incompatíveis: o tamanho não bate e a projeção é outra. Reindexar
+    por cima não corrige, porque o upsert só substitui os chunks que reaparecem
+    com o mesmo id.
+
+    Antes da primeira execução com esta versão, derrube a coleção:
+        drop table if exists vecs."documentos_metro";
 """
 
 from __future__ import annotations
@@ -35,7 +45,7 @@ load_dotenv()
 
 from rag import indexador  # noqa: E402
 from rag.chunker import chunkar  # noqa: E402
-from rag.embedder import vetorizar  # noqa: E402
+from rag.embedder import vetorizar_documentos  # noqa: E402
 from rag.parsers import extrair  # noqa: E402
 
 
@@ -62,7 +72,7 @@ def indexar_pasta(pasta_base: Path) -> None:
             continue
 
         chunks = chunkar(textos)
-        embeddings = vetorizar([c.texto for c in chunks])
+        embeddings = vetorizar_documentos([c.texto for c in chunks])
         n = indexador.indexar(chunks, embeddings)
 
         print(f"→ {len(textos)} unidades → {n} chunks indexados")
@@ -72,6 +82,23 @@ def indexar_pasta(pasta_base: Path) -> None:
     print("\nIndexação concluída.")
     print(f"  Arquivos processados : {total_arquivos}/{len(arquivos)}")
     print(f"  Chunks no índice     : {indexador.contar()}")
+
+    # O índice é criado aqui, e não a cada arquivo, porque o HNSW é construído
+    # sobre o conjunto inteiro: refazê-lo a cada lote custaria caro e daria no
+    # mesmo. Até esta versão `criar_indice` não tinha chamador nenhum, ou seja,
+    # a coleção existia sem índice e toda busca varria a tabela inteira.
+    print()
+    print("Criando índice HNSW...", end=" ", flush=True)
+    try:
+        indexador.criar_indice()
+        print("pronto.")
+    except Exception as erro:  # noqa: BLE001 — a busca funciona sem índice, só que devagar
+        # Os chunks já foram gravados, então não se perde trabalho. Sem índice a
+        # busca continua respondendo por varredura sequencial, com latência
+        # crescendo linear com o tamanho da base: vale avisar alto e seguir.
+        print("FALHOU.")
+        print(f"  {type(erro).__name__}: {erro}")
+        print("  Os chunks estão indexados, mas a busca fará varredura sequencial.")
 
 
 if __name__ == "__main__":

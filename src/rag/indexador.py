@@ -9,9 +9,14 @@ from sqlalchemy import text
 from vecs import IndexMeasure, IndexMethod
 
 from rag.chunker import Chunk
+from rag.embedder import DIMENSAO_EMBEDDING
 
 NOME_COLECAO = "documentos_metro"
-DIMENSAO_EMBEDDING = 3072  # gemini-embedding-001
+
+# `DIMENSAO_EMBEDDING` vem de `embedder` em vez de ser declarada aqui: são duas
+# pontas da mesma decisão, e duas constantes separadas divergem em silêncio —
+# a coleção aceitaria vetores de tamanho diferente do que o modelo produz e o
+# erro só apareceria no upsert.
 
 
 def _db_url() -> str:
@@ -66,7 +71,12 @@ def indexar(chunks: list[Chunk], embeddings: list[list[float]]) -> int:
 
 
 def criar_indice() -> None:
-    """Cria índice HNSW cosine. Chamar uma vez após a carga inicial completa."""
+    """Cria índice HNSW cosine. Chamar uma vez após a carga inicial completa.
+
+    Só funciona porque `DIMENSAO_EMBEDDING` cabe no limite de 2000 dimensões
+    que o pgvector impõe a índices HNSW e IVFFlat. Sem índice, `buscar` cai em
+    varredura sequencial da coleção inteira.
+    """
     obter_colecao().create_index(
         method=IndexMethod.hnsw,
         measure=IndexMeasure.cosine_distance,

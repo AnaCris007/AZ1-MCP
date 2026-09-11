@@ -1,17 +1,21 @@
 import logging
+from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from psycopg_pool import ConnectionPool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from az1_api.dependencies import get_connection_pool
 from routes import analysis_router, audio_router, chat_router, rag_router, speech_router, transcription_router
 from routes.audio import AudioAPIError
 from routes.chat import ChatAPIError
 from routes.speech import SpeechAPIError
 from routes.transcription import TranscriptionAPIError
 from schemas.common import ErrorResponse
+from services.database_service import BancoNaoConfigurado, verificar_conexao
 
 load_dotenv()
 
@@ -32,9 +36,48 @@ app.include_router(rag_router, prefix="/api/v1")
 app.include_router(speech_router, prefix="/api/v1")
 
 
+# Deliberadamente raso: não toca banco, MinIO, Deepgram nem Gemini. O RNF07
+# exige HTTP 200 em até dois segundos, e checar dependência externa aqui faria o
+# próprio requisito depender da latência de terceiros. Quem verifica dependência
+# é `/health/ready`, abaixo.
 @app.get("/health", tags=["infra"])
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+# Prontidão, separada da vivacidade. Responde 503 quando o banco não está
+# utilizável.
+#
+# O pool chega por `Depends`, e não por chamada direta a `get_connection_pool()`:
+# chamada direta ignora `app.dependency_overrides` e deixa a rota intestável sem
+# um Supabase de verdade.
+#
+# Banco não configurado sai daqui como `BancoNaoConfigurado` e é convertido em
+# 503 pelo manipulador registrado no fim deste módulo — indisponibilidade do
+# ponto de vista de quem chama, não erro de programação.
+@app.get("/health/ready", tags=["infra"])
+def health_ready(pool: Annotated[ConnectionPool, Depends(get_connection_pool)]) -> JSONResponse:
+    try:
+        pronto = verificar_conexao(pool)
+    except Exception as erro:  # noqa: BLE001 — qualquer falha de conexão é indisponibilidade
+        return JSONResponse(
+            status_code=503,
+            content={"status": "indisponivel", "motivo": f"{type(erro).__name__}: {erro}"},
+        )
+
+    if not pronto:
+        return JSONResponse(status_code=503, content={"status": "indisponivel"})
+    return JSONResponse(status_code=200, content={"status": "ok"})
+
+
+# Falta de configuração de banco vira 503, e não 500: quem chama precisa saber
+# que o serviço está indisponível, não que a aplicação quebrou.
+@app.exception_handler(BancoNaoConfigurado)
+def banco_nao_configurado_handler(request: Request, exc: BancoNaoConfigurado) -> JSONResponse:
+    return JSONResponse(
+        status_code=503,
+        content={"status": "indisponivel", "motivo": str(exc)},
+    )
 
 
 @app.exception_handler(TranscriptionAPIError)
