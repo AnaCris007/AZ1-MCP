@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+import dataclasses
 import unittest
 
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_chat_answerer, require_authenticated_user
+from az1_api.dependencies import (
+    get_chat_answerer,
+    get_conversa_repository,
+    require_authenticated_user,
+)
 from az1_api.main import app
 from rag.retriever import ResultadoBusca
 from routes.chat import fontes_citadas, limpar_citacoes
 from services.auth_service import AuthenticatedUser
 from services.chat_service import ChatReceptionError, ChatReceptionErrorCode, ChatReply
+from services.conversa_repository import TurnoDoChat
 
 
 class FakeAnswerer:
@@ -220,6 +226,148 @@ class TesteLimpezaDasCitacoes(unittest.TestCase):
         self.assertEqual([f.posicao for f in fontes], [2])
         self.assertEqual(limpo, "Risco A.")
         self.assertEqual(fontes_citadas(limpo, recuperadas), [])
+
+
+
+class _RepositorioEspiao:
+    """Registra os turnos recebidos, ou levanta, conforme o caso sob teste."""
+
+    def __init__(self, erro: Exception | None = None) -> None:
+        self.turnos: list[TurnoDoChat] = []
+        self._erro = erro
+
+    def registrar_turno(self, turno: TurnoDoChat) -> None:
+        if self._erro is not None:
+            raise self._erro
+        self.turnos.append(turno)
+
+
+_UUID_VALIDO = "3f1c0c4e-0000-4000-8000-000000000001"
+
+
+class TesteTrilhaDaConversa(unittest.TestCase):
+    """O que a rota grava — e, principalmente, quando ela decide não gravar.
+
+    O `TestClient` executa as tarefas de fundo de forma síncrona ao encerrar a
+    requisição, então as asserções depois do `post` já enxergam o efeito.
+    """
+
+    def setUp(self) -> None:
+        self.espiao = _RepositorioEspiao()
+        self.usuario = dataclasses.replace(_TEST_USER, domain_user_id=7)
+        self.addCleanup(app.dependency_overrides.clear)
+
+    def _cliente(self, reply: ChatReply, usuario: AuthenticatedUser | None = None) -> TestClient:
+        app.dependency_overrides[get_chat_answerer] = lambda: FakeAnswerer(reply)
+        app.dependency_overrides[require_authenticated_user] = lambda: usuario or self.usuario
+        app.dependency_overrides[get_conversa_repository] = lambda: self.espiao
+        return TestClient(app, raise_server_exceptions=False)
+
+    @staticmethod
+    def _fonte() -> ResultadoBusca:
+        return ResultadoBusca(
+            texto="ID: R01 | Título: Atraso na entrega",
+            score=0.71,
+            projeto_id="SYN-01",
+            tipo_documento="riscos_problemas",
+            secao="Riscos",
+            arquivo_origem="04_Riscos_e_Problemas.xlsx",
+            chunk_id="abc123",
+        )
+
+    def test_grava_com_a_identidade_autenticada(self) -> None:
+        # O `usuario_id` vem de `domain_user_id`, e não de um literal. Foi um
+        # literal — o zero — que produziu 9 conversas atribuídas a um id que não
+        # existe em banco algum criado pelo DDL.
+        cliente = self._cliente(ChatReply(text="Resposta.", modelo="gemini-3.5-flash-lite"))
+
+        resposta = cliente.post(
+            "/api/v1/chat", json={"message": "oi", "conversation_id": _UUID_VALIDO}
+        )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(len(self.espiao.turnos), 1)
+        turno = self.espiao.turnos[0]
+        self.assertEqual(turno.usuario_id, 7)
+        self.assertEqual(turno.conversa_id, _UUID_VALIDO)
+        self.assertEqual(turno.modelo, "gemini-3.5-flash-lite")
+        self.assertGreaterEqual(turno.tempo_processamento_ms, 0)
+
+    def test_sem_identidade_nao_grava_e_ainda_responde(self) -> None:
+        # `domain_user_id` é None com AZ1_AUTH_MODE=disabled e quando o resolver
+        # falhou. Inventar um id para preencher a coluna NOT NULL seria repetir
+        # exatamente o defeito do `usuario_id = 0`.
+        sem_identidade = dataclasses.replace(_TEST_USER, domain_user_id=None)
+        cliente = self._cliente(ChatReply(text="Resposta."), usuario=sem_identidade)
+
+        with self.assertLogs("routes.chat", level="WARNING"):
+            resposta = cliente.post(
+                "/api/v1/chat", json={"message": "oi", "conversation_id": _UUID_VALIDO}
+            )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(self.espiao.turnos, [])
+
+    def test_conversation_id_nao_uuid_nao_custa_a_resposta(self) -> None:
+        # `auditoria.conversa.id` é UUID. Recusar a requisição com 422 faria a
+        # trilha — que é acessório — derrubar a conversa.
+        cliente = self._cliente(ChatReply(text="Resposta."))
+
+        with self.assertLogs("routes.chat", level="WARNING"):
+            resposta = cliente.post(
+                "/api/v1/chat", json={"message": "oi", "conversation_id": "conv_123"}
+            )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.json()["reply"], "Resposta.")
+        self.assertEqual(self.espiao.turnos, [])
+
+    def test_falha_ao_gravar_nao_escapa_da_tarefa_de_fundo(self) -> None:
+        # Tarefa de fundo roda depois de a resposta ter sido enviada: uma exceção
+        # ali não vira resposta de erro, vira traceback solto na pilha ASGI.
+        self.espiao = _RepositorioEspiao(erro=OSError("banco fora"))
+        cliente = self._cliente(ChatReply(text="Resposta."))
+
+        with self.assertLogs("routes.chat", level="ERROR"):
+            resposta = cliente.post(
+                "/api/v1/chat", json={"message": "oi", "conversation_id": _UUID_VALIDO}
+            )
+
+        self.assertEqual(resposta.status_code, 200)
+
+    def test_resultado_recusada_chega_a_trilha(self) -> None:
+        # Gravado como 'sucesso' literal, como era antes, o relatório não
+        # consegue distinguir resposta fundamentada de recusa.
+        cliente = self._cliente(ChatReply(text="Não encontrei.", resultado="recusada"))
+
+        cliente.post("/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO})
+
+        self.assertEqual(self.espiao.turnos[0].resultado, "recusada")
+
+    def test_posicao_gravada_e_o_numero_citado_no_texto(self) -> None:
+        # É o elo do RNF12: o `[2]` que a resposta escreveu tem de ser o mesmo
+        # inteiro em `mensagem_fonte.posicao`. Renumerar quebra a conferência.
+        reply = ChatReply(
+            text="Uma afirmação [2].",
+            fontes=(self._fonte(), self._fonte()),
+        )
+        cliente = self._cliente(reply)
+
+        corpo = cliente.post(
+            "/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO}
+        ).json()
+
+        gravadas = self.espiao.turnos[0].fontes
+        self.assertEqual([f.posicao for f in gravadas], [2])
+        self.assertEqual([f["posicao"] for f in corpo["fontes"]], [2])
+        self.assertEqual(gravadas[0].chunk_id, "abc123")
+
+    def test_intencao_fica_vazia_de_proposito(self) -> None:
+        # O classificador mede F1-macro 0,6736 e não está no caminho do chat.
+        # Rótulo errado numa tabela sem UPDATE nem DELETE é pior que nulo.
+        cliente = self._cliente(ChatReply(text="Resposta."))
+        cliente.post("/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO})
+        self.assertIsNone(self.espiao.turnos[0].intencao)
 
 
 if __name__ == "__main__":

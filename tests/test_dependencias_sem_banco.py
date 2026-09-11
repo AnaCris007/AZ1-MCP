@@ -27,13 +27,27 @@ from unittest import mock
 from az1_api import dependencies as dep
 from database.conexao import BancoNaoConfigurado, obter_engine
 from services.alerta_service import DespachoDesligado
-from services.auditoria_service import GravacaoDesligada
+from services.conversa_repository import PersistenciaDesligada, TurnoDoChat
+
+_TURNO = TurnoDoChat(
+    conversa_id="3f1c0c4e-0000-4000-8000-000000000001",
+    usuario_id=1,
+    prompt="pergunta",
+    resposta="resposta",
+    resultado="sucesso",
+)
 
 # Os provedores e o engine são `lru_cache`: sem limpar, um teste enxergaria o
 # objeto que outro construiu com o ambiente anterior.
 _COM_CACHE = (
     obter_engine,
-    dep.get_gravador_auditoria,
+    # `get_connection_pool` precisa estar aqui mesmo não sendo testado
+    # diretamente: `get_conversa_repository` o chama, e um pool real deixado
+    # em cache por outro módulo de teste faria o repositório ser construído
+    # com sucesso — o caminho de degradação nunca seria exercitado, e o
+    # teste passaria sozinho e falharia na suíte completa.
+    dep.get_connection_pool,
+    dep.get_conversa_repository,
     dep.get_alerta_dispatcher,
     dep.get_listador_auditoria,
     dep.get_alerta_registrador,
@@ -58,15 +72,13 @@ class _SemBanco(unittest.TestCase):
 
 
 class TesteDependenciasAcessoriasDegradam(_SemBanco):
-    def test_gravador_de_auditoria_vira_objeto_nulo(self):
-        self.assertIsInstance(dep.get_gravador_auditoria(), GravacaoDesligada)
+    def test_repositorio_de_conversas_vira_objeto_nulo(self):
+        self.assertIsInstance(dep.get_conversa_repository(), PersistenciaDesligada)
 
-    def test_gravar_sem_banco_nao_levanta(self):
+    def test_registrar_turno_sem_banco_nao_levanta(self):
         # É o que mantém `POST /chat` respondendo: a trilha se perde, a conversa
         # não.
-        dep.get_gravador_auditoria().gravar(
-            mensagem="oi", resposta="olá", conversation_id="c", duracao_ms=1
-        )
+        dep.get_conversa_repository().registrar_turno(_TURNO)
 
     def test_despachante_de_alertas_vira_objeto_nulo(self):
         self.assertIsInstance(dep.get_alerta_dispatcher(), DespachoDesligado)
@@ -83,11 +95,11 @@ class TesteDependenciasAcessoriasDegradam(_SemBanco):
     def test_avisa_uma_vez_e_nao_a_cada_chamada(self):
         # Em desenvolvimento sem banco, um aviso por requisição encheria o log a
         # ponto de esconder o que importa.
-        gravador = dep.get_gravador_auditoria()
-        with self.assertLogs("services.auditoria_service", level="WARNING") as capturado:
-            gravador.gravar(mensagem="a", resposta="b", conversation_id="c", duracao_ms=1)
-            gravador.gravar(mensagem="a", resposta="b", conversation_id="c", duracao_ms=1)
-            gravador.gravar(mensagem="a", resposta="b", conversation_id="c", duracao_ms=1)
+        repositorio = dep.get_conversa_repository()
+        with self.assertLogs("services.conversa_repository", level="WARNING") as capturado:
+            repositorio.registrar_turno(_TURNO)
+            repositorio.registrar_turno(_TURNO)
+            repositorio.registrar_turno(_TURNO)
 
         self.assertEqual(len(capturado.output), 1)
         self.assertIn("SUPABASE_DB_URL", capturado.output[0])

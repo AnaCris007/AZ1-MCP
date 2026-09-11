@@ -18,6 +18,8 @@ class RespostaDoModelo(Protocol):
 
     texto: str
     fontes: tuple[ResultadoBusca, ...]
+    resultado: str
+    modelo: str
 
 
 class ChatModel(Protocol):
@@ -55,6 +57,9 @@ class ChatReply:
     # e gravar em `auditoria.mensagem_fonte` (RNF04). A ordem é a mesma da
     # numeração usada no prompt, então `[2]` na resposta é `fontes[1]`.
     fontes: tuple[ResultadoBusca, ...] = field(default_factory=tuple)
+    # Os dois seguem para `auditoria.mensagem`, na linha do agente.
+    resultado: str = "sucesso"
+    modelo: str = ""
 
 
 class AnswerChatMessage:
@@ -70,6 +75,11 @@ class AnswerChatMessage:
 
         try:
             resposta = self._model.generate_reply(trimmed, conversation_id=conversation_id)
-            return ChatReply(text=resposta.texto, fontes=tuple(resposta.fontes))
+            return ChatReply(
+                text=resposta.texto,
+                fontes=tuple(resposta.fontes),
+                resultado=resposta.resultado,
+                modelo=resposta.modelo,
+            )
         except ChatModelUnavailableError as exc:
             raise ChatReceptionError(ChatReceptionErrorCode.SERVICE_UNAVAILABLE) from exc

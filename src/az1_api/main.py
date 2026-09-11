@@ -19,6 +19,7 @@ from routes import (
     audio_router,
     auditoria_router,
     chat_router,
+    portfolio_router,
     rag_router,
     speech_router,
     transcription_router,
@@ -28,6 +29,7 @@ from routes.alerta import AlertaAPIError
 from routes.audio import AudioAPIError
 from routes.auditoria import AuditoriaAPIError
 from routes.chat import ChatAPIError
+from routes.portfolio import PortfolioAPIError
 from routes.speech import SpeechAPIError
 from routes.transcription import TranscriptionAPIError
 from routes.webhooks import WebhookAPIError
@@ -55,6 +57,7 @@ app.include_router(transcription_router, prefix="/api/v1", dependencies=_auth_de
 app.include_router(analysis_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(chat_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(rag_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(portfolio_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(speech_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(alerta_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(auditoria_router, prefix="/api/v1", dependencies=_auth_dependency)
@@ -131,6 +134,14 @@ def audio_api_error_handler(request: Request, exc: AudioAPIError) -> JSONRespons
     )
 
 
+@app.exception_handler(PortfolioAPIError)
+def portfolio_api_error_handler(request: Request, exc: PortfolioAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
+
+
 @app.exception_handler(ChatAPIError)
 def chat_api_error_handler(request: Request, exc: ChatAPIError) -> JSONResponse:
     return JSONResponse(
@@ -168,7 +179,7 @@ def webhook_api_error_handler(request: Request, exc: WebhookAPIError) -> JSONRes
 # precisa sair como 503, e não pelo manipulador genérico de 500 abaixo. Vale
 # para os endpoints cuja razão de existir É o banco — alertas e auditoria. Os
 # efeitos colaterais de /chat e /analyze não chegam aqui: degradam nos próprios
-# provedores, ver `dependencies.get_gravador_auditoria`.
+# provedores, ver `dependencies.get_conversa_repository`.
 @app.exception_handler(BancoNaoConfigurado)
 def banco_nao_configurado_handler(request: Request, exc: BancoNaoConfigurado) -> JSONResponse:
     return JSONResponse(

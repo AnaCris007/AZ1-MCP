@@ -138,7 +138,7 @@ class ListarAssinantes:
 class DespachoDesligado:
     """Substitui `DispatcherAlerta` quando não há banco configurado.
 
-    Mesmo raciocínio de `GravacaoDesligada`, em `auditoria_service.py`: o
+    Mesmo raciocínio de `PersistenciaDesligada`, em `conversa_repository.py`: o
     despacho de alertas pendura-se em `POST /audio/{id}/analyze` como efeito
     colateral, e sem banco a análise inteira respondia 500.
     """

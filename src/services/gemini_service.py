@@ -137,6 +137,14 @@ class RespostaGerada:
     texto: str
     fontes: tuple[ResultadoBusca, ...] = ()
 
+    # `auditoria.mensagem.resultado` tem CHECK ('sucesso','esclarecimento',
+    # 'recusada','falha'). Quem sabe qual foi o desfecho é este módulo, não a
+    # rota: a recusa por falta de fundamento acontece aqui dentro. Gravado como
+    # 'sucesso' literal, como era antes, o relatório de auditoria não consegue
+    # distinguir uma resposta fundamentada de uma recusa.
+    resultado: str = "sucesso"
+    modelo: str = ""
+
 
 @dataclass(frozen=True)
 class GeminiSettings:
@@ -191,9 +199,9 @@ class GeminiChatModel:
         # modelo. Mandar a pergunta crua nesses casos é o que produzia respostas
         # inventadas — ver o comentário em MENSAGEM_SEM_FUNDAMENTO.
         if situacao is _Situacao.SEM_FUNDAMENTO:
-            return RespostaGerada(texto=MENSAGEM_SEM_FUNDAMENTO)
+            return RespostaGerada(texto=MENSAGEM_SEM_FUNDAMENTO, resultado="recusada")
         if situacao is _Situacao.BASE_INDISPONIVEL:
-            return RespostaGerada(texto=MENSAGEM_BASE_INDISPONIVEL)
+            return RespostaGerada(texto=MENSAGEM_BASE_INDISPONIVEL, resultado="falha")
 
         contents = historico + [{"role": "user", "parts": [{"text": texto_enviado}]}]
 
@@ -222,7 +230,7 @@ class GeminiChatModel:
                 {"role": "model", "parts": [{"text": reply_text}]},
             ]
 
-        return RespostaGerada(texto=reply_text, fontes=fontes)
+        return RespostaGerada(texto=reply_text, fontes=fontes, modelo=self._model)
 
     def _preparar(self, message: str) -> tuple[str, tuple[ResultadoBusca, ...], _Situacao]:
         """Decide o que enviar ao modelo, e se vale enviar alguma coisa.

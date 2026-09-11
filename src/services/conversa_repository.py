@@ -46,10 +46,14 @@
 from __future__ import annotations
 
 import io
+import logging
+import uuid
 from dataclasses import dataclass
 from typing import Any, BinaryIO, Protocol
 
 from psycopg_pool import ConnectionPool
+
+logger = logging.getLogger(__name__)
 
 # Prefixo próprio, e deliberadamente diferente de `incoming/`: a regra de ciclo
 # de vida daquele expira em 7 dias, e o RNF09 exige no mínimo 90.
@@ -118,6 +122,26 @@ class FonteDaResposta:
     tipo_documento: str | None = None
     secao: str | None = None
     trecho: str | None = None
+
+
+def conversa_uuid(valor: str | None) -> str | None:
+    """O identificador normalizado, ou None se ele não serve como chave.
+
+    `auditoria.conversa.id` é UUID. O frontend gera `crypto.randomUUID()`, mas o
+    Swagger, os testes e qualquer outro cliente mandam o que quiserem — e um
+    valor malformado só falharia lá dentro da tarefa de fundo, com
+    `InvalidTextRepresentation`, depois da resposta já ter sido enviada.
+
+    Recusar aqui, e devolvendo None em vez de levantar, é deliberado: a trilha é
+    efeito colateral de `POST /chat`. Um identificador ruim não pode custar a
+    resposta ao usuário — no máximo custa o registro dela.
+    """
+    if not valor:
+        return None
+    try:
+        return str(uuid.UUID(valor))
+    except ValueError:
+        return None
 
 
 @dataclass(frozen=True)
@@ -210,6 +234,29 @@ INSERT INTO auditoria.mensagem_fonte (
 
 class ConversaNaoGravada(RuntimeError):
     """Turno recusado antes de tocar o banco, por dado incoerente."""
+
+
+class PersistenciaDesligada:
+    """Ocupa o lugar de `ConversaRepository` quando não há banco configurado.
+
+    Gravar a trilha é efeito colateral de `POST /chat`, não a razão de a rota
+    existir. Sem este objeto nulo, `get_connection_pool()` levanta durante a
+    RESOLUÇÃO das dependências do FastAPI e a conversa inteira vira 500 — a
+    ausência de banco derrubaria o produto em vez de apenas deixar de auditá-lo.
+
+    Foi exatamente essa a falha de pipeline que
+    `tests/test_dependencias_sem_banco.py` passou a vigiar. O aviso sai UMA vez,
+    e não a cada requisição.
+    """
+
+    def __init__(self, motivo: str) -> None:
+        self._motivo = motivo
+        self._avisou = False
+
+    def registrar_turno(self, turno: TurnoDoChat) -> None:
+        if not self._avisou:
+            logger.warning("Persistência de conversas desligada: %s", self._motivo)
+            self._avisou = True
 
 
 class ConversaRepository:
