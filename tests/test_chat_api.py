@@ -14,7 +14,7 @@ class FakeAnswerer:
     def __init__(self, result: ChatReply | Exception) -> None:
         self.result = result
 
-    def answer(self, message: str) -> ChatReply:
+    def answer(self, message: str, conversation_id: str | None = None) -> ChatReply:
         if isinstance(self.result, Exception):
             raise self.result
         return self.result

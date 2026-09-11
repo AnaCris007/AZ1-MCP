@@ -7,16 +7,21 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from az1_api.dependencies import AuthAPIError, require_authenticated_user
+from database.conexao import BancoNaoConfigurado
 from routes import (
+    alerta_router,
     analysis_router,
     audio_router,
+    auditoria_router,
     chat_router,
     rag_router,
     speech_router,
     transcription_router,
     webhooks_router,
 )
+from routes.alerta import AlertaAPIError
 from routes.audio import AudioAPIError
+from routes.auditoria import AuditoriaAPIError
 from routes.chat import ChatAPIError
 from routes.speech import SpeechAPIError
 from routes.transcription import TranscriptionAPIError
@@ -45,6 +50,8 @@ app.include_router(analysis_router, prefix="/api/v1", dependencies=_auth_depende
 app.include_router(chat_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(rag_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(speech_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(alerta_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(auditoria_router, prefix="/api/v1", dependencies=_auth_dependency)
 
 # Webhooks ficam fora do RNF02: quem chama é o provedor (Google Drive /
 # Microsoft Graph), que não tem token do SSO. A autenticidade dessas entregas
@@ -55,6 +62,22 @@ app.include_router(webhooks_router, prefix="/api/v1")
 @app.get("/health", tags=["infra"])
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.exception_handler(AlertaAPIError)
+def alerta_api_error_handler(request: Request, exc: AlertaAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
+
+
+@app.exception_handler(AuditoriaAPIError)
+def auditoria_api_error_handler(request: Request, exc: AuditoriaAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
 
 
 @app.exception_handler(TranscriptionAPIError)
@@ -103,6 +126,19 @@ def webhook_api_error_handler(request: Request, exc: WebhookAPIError) -> JSONRes
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
+
+
+# Banco ausente é indisponibilidade de dependência, não defeito de programação:
+# precisa sair como 503, e não pelo manipulador genérico de 500 abaixo. Vale
+# para os endpoints cuja razão de existir É o banco — alertas e auditoria. Os
+# efeitos colaterais de /chat e /analyze não chegam aqui: degradam nos próprios
+# provedores, ver `dependencies.get_gravador_auditoria`.
+@app.exception_handler(BancoNaoConfigurado)
+def banco_nao_configurado_handler(request: Request, exc: BancoNaoConfigurado) -> JSONResponse:
+    return JSONResponse(
+        status_code=503,
+        content=ErrorResponse(error="service_unavailable", message=str(exc)).model_dump(),
     )
 
 

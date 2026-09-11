@@ -61,7 +61,7 @@ class FakeAnswerer:
     def __init__(self) -> None:
         self.foi_chamado = False
 
-    def answer(self, message: str) -> ChatReply:
+    def answer(self, message: str, conversation_id: str | None = None) -> ChatReply:
         self.foi_chamado = True
         return ChatReply(text="resposta")
 
