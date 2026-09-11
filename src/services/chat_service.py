@@ -1,10 +1,23 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Protocol
 
+from rag.retriever import ResultadoBusca
+
 MAX_MESSAGE_LENGTH = 4000
+
+
+class RespostaDoModelo(Protocol):
+    """O que um `ChatModel` devolve: o texto e o que o fundamentou.
+
+    Estrutural, e não a classe concreta de `gemini_service`, porque este módulo
+    é importado por ele — herdar a classe daqui fecharia um ciclo de import.
+    """
+
+    texto: str
+    fontes: tuple[ResultadoBusca, ...]
 
 
 class ChatModel(Protocol):
@@ -14,7 +27,9 @@ class ChatModel(Protocol):
     # quebrou com TypeError em tempo de execução, não de verificação, porque
     # `Protocol` não é checado. Palavra-chave mantém essa porta fechada para o
     # próximo parâmetro também.
-    def generate_reply(self, message: str, *, conversation_id: str | None = None) -> str: ...
+    def generate_reply(
+        self, message: str, *, conversation_id: str | None = None
+    ) -> RespostaDoModelo: ...
 
 
 class ChatModelUnavailableError(Exception):
@@ -36,6 +51,10 @@ class ChatReceptionError(Exception):
 @dataclass(frozen=True)
 class ChatReply:
     text: str
+    # As fontes atravessam até a rota por dois motivos: citar na resposta (RNF12)
+    # e gravar em `auditoria.mensagem_fonte` (RNF04). A ordem é a mesma da
+    # numeração usada no prompt, então `[2]` na resposta é `fontes[1]`.
+    fontes: tuple[ResultadoBusca, ...] = field(default_factory=tuple)
 
 
 class AnswerChatMessage:
@@ -50,8 +69,7 @@ class AnswerChatMessage:
             raise ChatReceptionError(ChatReceptionErrorCode.MESSAGE_TOO_LONG)
 
         try:
-            return ChatReply(
-                text=self._model.generate_reply(trimmed, conversation_id=conversation_id)
-            )
+            resposta = self._model.generate_reply(trimmed, conversation_id=conversation_id)
+            return ChatReply(text=resposta.texto, fontes=tuple(resposta.fontes))
         except ChatModelUnavailableError as exc:
             raise ChatReceptionError(ChatReceptionErrorCode.SERVICE_UNAVAILABLE) from exc

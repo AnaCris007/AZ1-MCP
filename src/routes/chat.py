@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from fastapi import APIRouter, BackgroundTasks, Depends
 
 from az1_api.dependencies import get_chat_answerer, get_gravador_auditoria
-from schemas.chat import ChatErrorCode, ChatRequest, ChatResponse
+from schemas.chat import ChatErrorCode, ChatRequest, ChatResponse, FonteCitada
 from services.auditoria_service import GravarConsulta
 from services.chat_service import (
     MAX_MESSAGE_LENGTH,
@@ -79,4 +79,17 @@ def send_chat_message(
             duracao_ms=duracao_ms,
         )
 
-    return ChatResponse(reply=reply.text)
+    return ChatResponse(
+        reply=reply.text,
+        fontes=[
+            FonteCitada(
+                posicao=n,
+                arquivo_origem=fonte.arquivo_origem,
+                secao=fonte.secao,
+                score=fonte.score,
+                chunk_id=fonte.chunk_id,
+                trecho=fonte.texto,
+            )
+            for n, fonte in enumerate(reply.fontes, start=1)
+        ],
+    )

@@ -8,7 +8,11 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from psycopg_pool import ConnectionPool
 
+# `BancoNaoConfigurado` NÃO vem daqui: `database/conexao.py` apenas reexporta a
+# classe de `services/database_service.py`, importada mais abaixo. Duas classes
+# homônimas fariam `@app.exception_handler` registrar só uma delas.
 from database.conexao import obter_engine
+from rag.retriever import buscar as buscar_contexto_rag
 from services.alerta_service import (
     ConfiguracaoAlertas,
     DesativarAssinante,
@@ -125,7 +129,8 @@ def get_analyzer() -> AnalyzeAudio:
 @lru_cache
 def get_chat_answerer() -> AnswerChatMessage:
     settings = GeminiSettings.from_environment()
-    return AnswerChatMessage(model=GeminiChatModel.from_settings(settings))
+    model = GeminiChatModel.from_settings(settings, buscar_contexto=buscar_contexto_rag)
+    return AnswerChatMessage(model=model)
 
 
 @lru_cache
@@ -180,6 +185,8 @@ def get_conversa_repository() -> ConversaRepository:
         pool=get_connection_pool(),
         armazenamento=S3ObjectStorage.from_settings(S3StorageSettings.from_environment()),
     )
+
+
 @lru_cache
 def get_alerta_registrador() -> RegistrarAssinante:
     return RegistrarAssinante(engine=obter_engine())
