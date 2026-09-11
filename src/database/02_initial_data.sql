@@ -1,278 +1,261 @@
-<Table>
-  <tr>
-    <td><a href= "https://www.btgpactual.com/"><img src="img/logo-btg.png" alt="Centro Paula Souza" border="0"></td>
-    <td>
-      <a href= "https://www.inteli.edu.br/"><img src="img/logo-Inteli.png" alt="Inteli - Instituto de Tecnologia e Liderança" border="0"></a>
-    </td>
-  </tr>
-</table>
-
-# Nome do Projeto: <nome do projeto>
-
-## Nome do Grupo: <nome do grupo>
-
-## Integrantes:
-
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-
-# Sumário
-
-- [1. Introdução](#1-introdução)
-  - [1.1 Termos e Abreviações](#11-termos-e-abreviações)
-  - [1.2 Objetivo do Documento](#12-objetivo-do-documento)
-- [2. Entendimento do Projeto e do Negócio](#2-entendimento-do-projeto-e-do-negócio)
-  - [2.1 Contexto da Indústria do Parceiro](#21-contexto-da-indústria-do-parceiro)
-  - [2.2 Problema](#22-problema)
-  - [2.3 Visão do Projeto e do Produto](#23-visão-do-projeto-e-do-produto)
-  - [2.4 Personas e Jornada do Usuário](#24-personas-e-jornada-do-usuário)
-  - [2.5 Modelagem do Fluxo de Negócio](#25-modelagem-do-fluxo-de-negócio)
-    - [2.5.1 Cadeia de Valor](#251-cadeia-de-valor)
-    - [2.5.2 Fluxo de Negócio Proposto (AS-IS e TO-BE)](#252-fluxo-de-negócio-proposto-as-is-e-to-be)
-  - [2.6 Matriz de Risco do Projeto](#26-matriz-de-risco-do-projeto)
-  - [2.7 Ideação](#27-ideação)
-  - [2.8 Canvas do Projeto](#28-canvas-do-projeto)
-- [3. Requisitos do Projeto](#3-requisitos-do-projeto)
-  - [3.1 Requisitos Funcionais (RFs)](#31-requisitos-funcionais-rfs)
-  - [3.2 Requisitos Não Funcionais (RNFs)](#32-requisitos-não-funcionais-rnfs)
-  - [3.3 Correlação RFs e RNFs](#33-correlação-rfs-e-rnfs)
-  - [3.4 Casos de Uso](#34-casos-de-uso)
-  - [3.5 Casos de Uso x Requisitos Funcionais](#35-casos-de-uso-x-requisitos-funcionais)
-- [4. Modelagem de Dados](#4-modelagem-de-dados)
-  - [4.1 Especificação da Base de Dados para Modelo de Recomendação](#41-especificação-da-base-de-dados-para-modelo-de-recomendação)
-  - [4.2 Modelo Conceitual de Dados](#42-modelo-conceitual-de-dados)
-  - [4.3 Modelo Lógico de Dados](#43-modelo-lógico-de-dados)
-  - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
-- [5. Solução Técnica (Design)](#5-solução-técnica-design)
-  - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
-  - [5.2 Diagrama de Componentes da UML](#52-diagrama-de-componentes-da-uml)
-  - [5.3 Diagramas de Sequência da UML](#53-diagramas-de-sequência-da-uml)
-- [6. Mapeamento Técnico de Infraestrutura e Implantação](#6-mapeamento-técnico-de-infraestrutura-e-implantação)
-  - [6.1 Diagrama de Implantação da UML](#61-diagrama-de-implantação-da-uml)
-  - [6.2 Justificativa das Escolhas de Implantação](#62-justificativa-das-escolhas-de-implantação)
-  - [6.3 Considerações sobre Desempenho e Segurança](#63-considerações-sobre-desempenho-e-segurança)
-- [7. Projeto Visual da Solução](#7-projeto-visual-da-solução)
-  - [7.1 Desenvolvimento de Wireframes](#71-desenvolvimento-de-wireframes)
-  - [7.2 Desenvolvimento de Mockups](#72-desenvolvimento-de-mockups)
-  - [7.3 Guia Visual](#73-guia-visual)
-- [8. Desenvolvimento do Projeto](#8-desenvolvimento-do-projeto)
-  - [8.1 Arquitetura de Codificação e Estrutura de Diretórios](#81-arquitetura-de-codificação-e-estrutura-de-diretórios)
-  - [8.2 Modelo de Recomendação](#82-modelo-de-recomendação)
-  - [8.3 Desenvolvimento de Features](#83-desenvolvimento-de-features)
-    - [8.3.1 Sprint 3](#831-sprint-3)
-    - [8.3.2 Sprint 4](#832-sprint-4)
-    - [8.3.3 Sprint 5](#833-sprint-5)
-  - [8.4 Testes Unitários e de Integração](#84-testes-unitários-e-de-integração)
-  - [8.5 Documentações automáticas](#85-documentações-automáticas)
-- [9. Planejamento e Execução de Testes](#9-planejamento-e-execução-de-testes)
-  - [9.1 Testes Funcionais](#91-testes-funcionais)
-    - [9.1.1 Planejamento](#911-planejamento)
-    - [9.1.2 Resultados](#912-resultados)
-  - [9.2 Testes de RNFs](#92-testes-de-rnfs)
-    - [9.2.1 Planejamento](#921-planejamento)
-    - [9.2.2 Resultados](#922-resultados)
-  - [9.3 Testes de Usabilidade](#93-testes-de-usabilidade)
-    - [9.3.1 Planejamento](#931-planejamento)
-    - [9.3.2 Resultados](#932-resultados)
-- [10. Procedimentos de Implantação](#10-procedimentos-de-implantação)
-  - [10.1 Implantação e Configuração do Banco de Dados](#101-implantação-e-configuração-do-banco-de-dados)
-  - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
-- [Referências](#referências)
-
-
-# 1. Introdução
-_conteúdo_
-
-## 1.1 Termos e Abreviações
-_conteúdo_
-
-## 1.2 Objetivo do Documento
-_conteúdo_
-
-# 2. Entendimento do Projeto e do Negócio
-_conteúdo_
-
-## 2.1 Contexto da Indústria do Parceiro
-_conteúdo_
-
-## 2.2 Problema
-_conteúdo_
-
-## 2.3 Visão do Projeto e do Produto
-  _conteúdo_
-
-  **Nota**: _Insira aqui informações sobre o que se trata o projeto e que valor ele vai entregar, Objetivos do Produto e O que o produto faz e não faz._
-
-## 2.4 Personas e Jornada do Usuário
-_conteúdo_
-
-## 2.5 Modelagem do Fluxo de Negócio
-_conteúdo_
-
-## 2.5.1 Cadeia de Valor
-_conteúdo_
-
-## 2.5.2 Fluxo de Negócio Proposto (AS-IS e TO-BE)
-_conteúdo_
-
-## 2.6 Matriz de Risco do Projeto
-_conteúdo_
-
-## 2.7 Ideação
-_conteúdo_
-Obs.: Seção dedicada a discussão sobre ideias e priorização de features.
-
-## 2.8 Canvas do Projeto
-_conteúdo_
-
-# 3. Requisitos do Projeto
-_conteúdo_
-
-## 3.1 Requisitos Funcionais (RFs)
-_conteúdo_ 
-
-## 3.2 Requisitos Não Funcionais (RNFs)
-_conteúdo_
-
-## 3.3 Correlação RFs e RNFs
-_conteúdo_
-
-## 3.4 Casos de Uso
-_conteúdo_
-
-## 3.5 Casos de Uso x Requisitos Funcionais
-_conteúdo_
-
-# 4. Modelagem de Dados
-_conteúdo_
-
-## 4.1 Especificação da Base de Dados para Modelo de Recomendação
-_conteúdo_
-Obs.: Insira aqui informações sobre a construção do artefato da Sprint 1. 
-
-## 4.2 Modelo Conceitual de Dados
-_conteúdo_
-
-## 4.3 Modelo Lógico de Dados
-_conteúdo_
-
-## 4.4 Modelo Físico de Dados
-_conteúdo_
-
-**Nota:** Insira uma explicação e direcionamento para o readme.md da pasta database.
-
-# 5. Solução Técnica (Design)
-_conteúdo_
-
-## 5.1 Diagrama de Classes
-_conteúdo_
-
-## 5.2 Diagrama de Componentes da UML
-_conteúdo_
-
-## 5.3 Diagramas de Sequência da UML
-_conteúdo_
-
-# 6. Mapeamento Técnico de Infraestrutura e Implantação
-_conteúdo_
-
-## 6.1 Diagrama de Implantação da UML
-_conteúdo_
-
-## 6.2 Justificativa das Escolhas de Implantação
-_conteúdo_
-
-## 6.3 Considerações sobre Desempenho e Segurança
-_conteúdo_
-
-# 7. Projeto Visual da Solução
-_conteúdo_
-
-## 7.1 Desenvolvimento de Wireframes
-_conteúdo_
-
-## 7.2 Desenvolvimento de Mockups
-_conteúdo_
-
-## 7.3 Guia Visual
-_conteúdo_
-
-# 8. Desenvolvimento do Projeto
-_conteúdo_
-
-## 8.1 Arquitetura de Codificação e Estrutura de Diretórios
-_conteúdo_
-
-## 8.2 Modelo de Recomendação
-_conteúdo_
-
-## 8.3 Desenvolvimento de Features
-_conteúdo_
-
-**Nota:** Insira uma explicação de entregas em cada Sprint.
-
-## 8.3.1 Sprint 3
-_conteúdo_
-
-## 8.3.2 Sprint 4
-_conteúdo_
-
-## 8.3.3 Sprint 5
-_conteúdo_
-
-## 8.4 Testes Unitários e de Integração
-_conteúdo_
-Obs.: Insira informações sobre estratégias para realização dos testes
-
-## 8.5 Documentações automáticas
-_conteúdo_
-Obs.: Insira informações sobre quais frameworks foram usados e como acessar.
-
-# 9. Planejamento e Execução de Testes
-_conteúdo_
-
-## 9.1 Testes Funcionais
-_conteúdo_
-
-## 9.1.1 Planejamento
-_conteúdo_
-
-## 9.1.2 Resultados
-_conteúdo_
-
-## 9.2 Testes de RNFs
-_conteúdo_
-
-## 9.2.1 Planejamento
-_conteúdo_
-
-## 9.2.2 Resultados
-_conteúdo_
-
-## 9.3 Testes de Usabilidade
-_conteúdo_
-
-## 9.3.1 Planejamento
-_conteúdo_
-
-## 9.3.2 Resultados
-_conteúdo_
-
-# 10. Procedimentos de Implantação
-_conteúdo_
-
-## 10.1 Implantação e Configuração do Banco de Dados
-_conteúdo_
-
-## 10.2 Implantação do Protótipo para uso por equipe de desenvolvimento
-_conteúdo_
-
-# Referências
-_conteúdo_
+-- =============================================================================
+-- AZ1 — Carga inicial da base sintética
+--
+-- Os valores NÃO foram inventados: projetos, situações, percentuais, relações
+-- entre projetos e pendências vêm dos documentos que já estão indexados em
+-- vecs.documentos_metro (planilha de portfólio e planilhas 04_Riscos_e_Problemas).
+-- Manter os dois lados idênticos é o que impede o agente de responder uma coisa
+-- pelo banco e outra pelo RAG — divergência que o RNF12 mede diretamente.
+--
+-- Os nomes de pessoas são fictícios: a base sintética identifica responsáveis
+-- por gerência, não por indivíduo, e projeto.lider_id exige um usuário.
+--
+-- Reexecutável: apaga a carga anterior antes de inserir.
+--   psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f 02_initial_data.sql
+-- =============================================================================
+
+\set ON_ERROR_STOP on
+
+BEGIN;
+
+-- Idempotência. A ordem respeita as dependências; as tabelas de auditoria são
+-- limpas aqui porque esta é a carga de desenvolvimento. Em produção o REVOKE
+-- DELETE do 01_create_database.sql impede que este bloco seja executado por
+-- qualquer papel que não seja o dono do schema.
+TRUNCATE auditoria.mensagem_fonte, auditoria.avaliacao, auditoria.evento_plataforma,
+         auditoria.notificacao, auditoria.mensagem, auditoria.conversa RESTART IDENTITY CASCADE;
+TRUNCATE portfolio.usuario_projeto, portfolio.projeto_relacionado, portfolio.campo_artefato,
+         portfolio.pendencia, portfolio.artefato, portfolio.projeto,
+         portfolio.usuario, portfolio.portfolio RESTART IDENTITY CASCADE;
+
+
+-- 1. Portfólios ---------------------------------------------------------------
+-- Correspondem aos subportfólios declarados na planilha de portfólio, que é o
+-- nível pelo qual o PMO agrupa os projetos de fato.
+INSERT INTO portfolio.portfolio (nome, ano_exercicio) VALUES
+    ('Desempenho, Eficiência e Segurança Operacional', 2026),
+    ('Expansão da Rede', 2026),
+    ('Gestão e Finanças', 2026),
+    ('Pessoas e Patrimônio', 2026);
+
+
+-- 2. Usuários -----------------------------------------------------------------
+-- As três personas da Seção 1.5 mais um líder por projeto. auth_user_id fica
+-- nulo até a frente de autenticação (RNF02) associar cada um ao SSO.
+INSERT INTO portfolio.usuario (nome, email, perfil) VALUES
+    ('Robson Oliveira', 'robson.oliveira@metro.example', 'diretor'),
+    ('Maria Eduarda Santos', 'maria.santos@metro.example', 'pmo'),
+    ('Rafael Antunes', 'rafael.antunes@metro.example', 'lider_projeto'),
+    ('Camila Nogueira', 'camila.nogueira@metro.example', 'lider_projeto'),
+    ('Eduardo Tanaka', 'eduardo.tanaka@metro.example', 'lider_projeto'),
+    ('Patrícia Moraes', 'patricia.moraes@metro.example', 'lider_projeto'),
+    ('Sérgio Vilela', 'sergio.vilela@metro.example', 'lider_projeto'),
+    ('Juliana Prado', 'juliana.prado@metro.example', 'lider_projeto'),
+    ('Marcos Ribeiro', 'marcos.ribeiro@metro.example', 'lider_projeto'),
+    ('Ana Beatriz Lima', 'ana.lima@metro.example', 'lider_projeto');
+
+
+-- 3. Projetos -----------------------------------------------------------------
+-- percentual_previsto e percentual_avanco são as colunas Previsto e Realizado
+-- da planilha, convertidas de fração para percentual. desvio_pp é gerado.
+INSERT INTO portfolio.projeto
+    (codigo, nome, fase, status, data_inicio, data_termino_prevista,
+     percentual_previsto, percentual_avanco, portfolio_id, lider_id)
+VALUES
+    ('SYN-01', 'Modernização da Ventilação Operacional', 'Execução', 'Atrasado', DATE '2026-02-15', DATE '2026-11-30', 82, 64,
+     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
+     (SELECT id FROM portfolio.usuario   WHERE nome = 'Rafael Antunes')),
+    ('SYN-02', 'Sistema Integrado de Monitoramento de Ativos', 'Execução', 'Dentro do previsto', DATE '2026-03-01', DATE '2026-12-15', 68, 71,
+     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
+     (SELECT id FROM portfolio.usuario   WHERE nome = 'Camila Nogueira')),
+    ('SYN-03', 'Ampliação da Estação Horizonte', 'Execução', 'Em risco', DATE '2026-01-10', DATE '2027-06-30', 43, 41,
+     (SELECT id FROM portfolio.portfolio WHERE nome = 'Expansão da Rede' AND ano_exercicio = 2026),
+     (SELECT id FROM portfolio.usuario   WHERE nome = 'Eduardo Tanaka')),
+    ('SYN-04', 'Integração de Comunicação Operacional', 'Execução', 'Parcialmente atrasado', DATE '2026-02-01', DATE '2026-10-31', 79, 70,
+     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
+     (SELECT id FROM portfolio.usuario   WHERE nome = 'Patrícia Moraes')),
+    ('SYN-05', 'Programa de Eficiência Energética das Instalações', 'Execução', 'Acima do previsto', DATE '2026-01-15', DATE '2026-12-15', 70, 78,
+     (SELECT id FROM portfolio.portfolio WHERE nome = 'Gestão e Finanças' AND ano_exercicio = 2026),
+     (SELECT id FROM portfolio.usuario   WHERE nome = 'Sérgio Vilela')),
+    ('SYN-06', 'Plataforma de Gestão do Conhecimento Técnico', 'Iniciação', 'Em estruturação', DATE '2026-07-01', DATE '2027-06-30', 18, 15,
+     (SELECT id FROM portfolio.portfolio WHERE nome = 'Pessoas e Patrimônio' AND ano_exercicio = 2026),
+     (SELECT id FROM portfolio.usuario   WHERE nome = 'Juliana Prado')),
+    ('SYN-07', 'Otimização da Manutenção Preventiva', 'Execução', 'Crítico', DATE '2026-01-01', DATE '2027-04-30', 61, 47,
+     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
+     (SELECT id FROM portfolio.usuario   WHERE nome = 'Marcos Ribeiro')),
+    ('SYN-08', 'Modernização do Centro Integrado de Controle', 'Encerramento', 'Concluído', DATE '2025-01-10', DATE '2026-06-30', 100, 100,
+     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
+     (SELECT id FROM portfolio.usuario   WHERE nome = 'Ana Beatriz Lima'));
+
+
+-- 4. Dependências entre projetos ----------------------------------------------
+INSERT INTO portfolio.projeto_relacionado (projeto_id, relacionado_id, relacao) VALUES
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'),
+     (SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'Fornece dados de monitoramento'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-03'),
+     (SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'Compartilha recurso técnico especializado'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'),
+     (SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'Depende de infraestrutura entregue'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'),
+     (SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-03'), 'Compartilha recurso técnico especializado'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'),
+     (SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'), 'Utiliza dados de monitoramento'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'),
+     (SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'Fornece infraestrutura utilizada');
+
+
+-- 5. Artefatos ----------------------------------------------------------------
+-- Os 37 documentos de projeto que estão indexados. Os três documentos sem
+-- projeto (planilha de portfólio e os dois materiais normativos) ficam de fora:
+-- artefato.projeto_id é NOT NULL e a Seção 3.6.7 registra essa limitação. Eles
+-- continuam citáveis como fonte por auditoria.mensagem_fonte.artefato_id nulo.
+--
+-- `data` usa a data de referência da carga: a base sintética não traz data de
+-- emissão por documento.
+INSERT INTO portfolio.artefato (projeto_id, tipo, referencia, titulo, data) VALUES
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'cronograma', 'base_sintetica_metro/SYN-01_modernizacao_da_ventilacao_operacional/02_Cronograma.xlsx', 'Cronograma', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'mapa_beneficios', 'base_sintetica_metro/SYN-01_modernizacao_da_ventilacao_operacional/03_Mapa_de_Beneficios.xlsx', 'Mapa de Beneficios', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'mudancas', 'base_sintetica_metro/SYN-01_modernizacao_da_ventilacao_operacional/05_Mudancas.xlsx', 'Mudancas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'riscos_problemas', 'base_sintetica_metro/SYN-01_modernizacao_da_ventilacao_operacional/04_Riscos_e_Problemas.xlsx', 'Riscos e Problemas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'termo_abertura', 'base_sintetica_metro/SYN-01_modernizacao_da_ventilacao_operacional/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'), 'cronograma', 'base_sintetica_metro/SYN-02_sistema_integrado_de_monitoramento_de_ativos/02_Cronograma.xlsx', 'Cronograma', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'), 'mapa_beneficios', 'base_sintetica_metro/SYN-02_sistema_integrado_de_monitoramento_de_ativos/03_Mapa_de_Beneficios.xlsx', 'Mapa de Beneficios', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'), 'riscos_problemas', 'base_sintetica_metro/SYN-02_sistema_integrado_de_monitoramento_de_ativos/04_Riscos_e_Problemas.xlsx', 'Riscos e Problemas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'), 'termo_abertura', 'base_sintetica_metro/SYN-02_sistema_integrado_de_monitoramento_de_ativos/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-03'), 'cronograma', 'base_sintetica_metro/SYN-03_ampliacao_da_estacao_horizonte/02_Cronograma.xlsx', 'Cronograma', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-03'), 'mapa_beneficios', 'base_sintetica_metro/SYN-03_ampliacao_da_estacao_horizonte/03_Mapa_de_Beneficios.xlsx', 'Mapa de Beneficios', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-03'), 'riscos_problemas', 'base_sintetica_metro/SYN-03_ampliacao_da_estacao_horizonte/04_Riscos_e_Problemas.xlsx', 'Riscos e Problemas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-03'), 'termo_abertura', 'base_sintetica_metro/SYN-03_ampliacao_da_estacao_horizonte/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'cronograma', 'base_sintetica_metro/SYN-04_integracao_de_comunicacao_operacional/02_Cronograma.xlsx', 'Cronograma', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'mapa_beneficios', 'base_sintetica_metro/SYN-04_integracao_de_comunicacao_operacional/03_Mapa_de_Beneficios.xlsx', 'Mapa de Beneficios', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'mudancas', 'base_sintetica_metro/SYN-04_integracao_de_comunicacao_operacional/05_Mudancas.xlsx', 'Mudancas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'riscos_problemas', 'base_sintetica_metro/SYN-04_integracao_de_comunicacao_operacional/04_Riscos_e_Problemas.xlsx', 'Riscos e Problemas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'termo_abertura', 'base_sintetica_metro/SYN-04_integracao_de_comunicacao_operacional/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-05'), 'cronograma', 'base_sintetica_metro/SYN-05_programa_de_eficiência_energética_das_instalacões/02_Cronograma.xlsx', 'Cronograma', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-05'), 'mapa_beneficios', 'base_sintetica_metro/SYN-05_programa_de_eficiência_energética_das_instalacões/03_Mapa_de_Beneficios.xlsx', 'Mapa de Beneficios', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-05'), 'riscos_problemas', 'base_sintetica_metro/SYN-05_programa_de_eficiência_energética_das_instalacões/04_Riscos_e_Problemas.xlsx', 'Riscos e Problemas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-05'), 'termo_abertura', 'base_sintetica_metro/SYN-05_programa_de_eficiência_energética_das_instalacões/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-06'), 'cronograma', 'base_sintetica_metro/SYN-06_plataforma_de_gestao_do_conhecimento_técnico/02_Cronograma.xlsx', 'Cronograma', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-06'), 'mapa_beneficios', 'base_sintetica_metro/SYN-06_plataforma_de_gestao_do_conhecimento_técnico/03_Mapa_de_Beneficios.xlsx', 'Mapa de Beneficios', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-06'), 'riscos_problemas', 'base_sintetica_metro/SYN-06_plataforma_de_gestao_do_conhecimento_técnico/04_Riscos_e_Problemas.xlsx', 'Riscos e Problemas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-06'), 'termo_abertura', 'base_sintetica_metro/SYN-06_plataforma_de_gestao_do_conhecimento_técnico/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'cronograma', 'base_sintetica_metro/SYN-07_otimizacao_da_manutencao_preventiva/02_Cronograma.xlsx', 'Cronograma', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'mapa_beneficios', 'base_sintetica_metro/SYN-07_otimizacao_da_manutencao_preventiva/03_Mapa_de_Beneficios.xlsx', 'Mapa de Beneficios', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'mudancas', 'base_sintetica_metro/SYN-07_otimizacao_da_manutencao_preventiva/05_Mudancas.xlsx', 'Mudancas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'riscos_problemas', 'base_sintetica_metro/SYN-07_otimizacao_da_manutencao_preventiva/04_Riscos_e_Problemas.xlsx', 'Riscos e Problemas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'termo_abertura', 'base_sintetica_metro/SYN-07_otimizacao_da_manutencao_preventiva/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'cronograma', 'base_sintetica_metro/SYN-08_modernizacao_do_centro_integrado_de_controle/02_Cronograma.xlsx', 'Cronograma', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'mapa_beneficios', 'base_sintetica_metro/SYN-08_modernizacao_do_centro_integrado_de_controle/03_Mapa_de_Beneficios.xlsx', 'Mapa de Beneficios', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'mudancas', 'base_sintetica_metro/SYN-08_modernizacao_do_centro_integrado_de_controle/05_Mudancas.xlsx', 'Mudancas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'relatorio_encerramento', 'base_sintetica_metro/SYN-08_modernizacao_do_centro_integrado_de_controle/06_Relatorio_Anual_Encerramento.docx', 'Relatorio Anual Encerramento', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'riscos_problemas', 'base_sintetica_metro/SYN-08_modernizacao_do_centro_integrado_de_controle/04_Riscos_e_Problemas.xlsx', 'Riscos e Problemas', TIMESTAMPTZ '2026-08-31 00:00:00-03'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'termo_abertura', 'base_sintetica_metro/SYN-08_modernizacao_do_centro_integrado_de_controle/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03');
+
+
+-- 6. Pendências ---------------------------------------------------------------
+-- Os 18 riscos e problemas registrados nas planilhas 04_Riscos_e_Problemas.
+INSERT INTO portfolio.pendencia
+    (projeto_id, codigo, tipo, titulo, descricao, criticidade, responsavel,
+     acao_resposta, situacao)
+VALUES
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'P01', 'problema',
+     'Entrega parcial de equipamentos fora do prazo', 'Parte dos equipamentos foi entregue após a data planejada',
+     'Alto', 'Gerência de Engenharia', 'Replanejar instalação e reforçar acompanhamento', 'em_tratamento'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'R01', 'risco',
+     'Atraso adicional na entrega de equipamentos', 'Fornecedor pode postergar entregas remanescentes',
+     'Crítico', 'Gerência de Engenharia', 'Diligenciar fornecedor e priorizar itens críticos', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'R02', 'risco',
+     'Adequações elétricas não previstas', 'Infraestrutura existente pode exigir intervenções adicionais',
+     'Moderado', 'Gerência de Sistemas', 'Realizar inspeções antecipadas', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-01'), 'R03', 'risco',
+     'Janela operacional insuficiente', 'Disponibilidade de janelas pode limitar instalações',
+     'Alto', 'Gerência Operacional', 'Planejar janelas alternativas', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'), 'R04', 'risco',
+     'Incompatibilidade com equipamentos antigos', 'Parte do parque pode exigir adaptadores',
+     'Moderado', 'Gerência de Manutenção', 'Executar testes de compatibilidade', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'), 'R05', 'risco',
+     'Baixa qualidade inicial dos dados', 'Sensores podem demandar calibração adicional',
+     'Baixo', 'Gerência de Dados', 'Aplicar rotina de validação', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'), 'R06', 'risco',
+     'Atraso na aquisição de sensores', 'Prazo de fornecimento pode aumentar',
+     'Moderado', 'Gerência de Suprimentos', 'Antecipar pedidos críticos', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-03'), 'R07', 'risco',
+     'Atraso na liberação de área', 'Liberação de área necessária à frente de obra pode ocorrer após o previsto',
+     'Crítico', 'Gerência de Implantação', 'Acompanhar autorizações e preparar frente alternativa', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'P02', 'problema',
+     'Atraso na integração de infraestrutura', 'Integração de parte da infraestrutura ocorreu após a data-base',
+     'Moderado', 'Gerência de Sistemas', 'Reordenar sequência de testes', 'em_tratamento'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'R08', 'risco',
+     'Indisponibilidade de ambientes para testes', 'Ambientes operacionais podem não estar disponíveis na janela prevista',
+     'Moderado', 'Gerência Operacional', 'Reservar janelas alternativas', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'R09', 'risco',
+     'Incompatibilidade entre equipamentos', 'Interfaces podem exigir ajustes adicionais',
+     'Alto', 'Gerência de Sistemas', 'Realizar testes integrados antecipados', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-05'), 'R10', 'risco',
+     'Indisponibilidade de componentes', 'Componentes podem ter prazo de fornecimento superior ao previsto',
+     'Baixo', 'Gerência de Suprimentos', 'Manter alternativas homologadas', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-05'), 'R11', 'risco',
+     'Economia inferior à estimada', 'Resultados podem ficar abaixo da estimativa inicial',
+     'Baixo', 'Gerência de Energia', 'Acompanhar medição e ajustar parâmetros', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-06'), 'R12', 'risco',
+     'Baixa adesão das áreas', 'Áreas podem não priorizar as entrevistas e registros',
+     'Moderado', 'Gerência de Conhecimento', 'Reservar agenda antecipadamente', 'aberta'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'P03', 'problema',
+     'Equipamento crítico indisponível', 'Falha prematura de componente suspendeu testes e afetou entregas',
+     'Crítico', 'Gerência de Manutenção', 'Substituir componente e revisar plano de testes', 'em_tratamento'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'R14', 'risco',
+     'Indisponibilidade prolongada de equipamento crítico', 'Falha de componente pode impedir testes planejados',
+     'Crítico', 'Gerência de Manutenção', 'Manter sobressalente e plano de contingência', 'materializada'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'P04', 'problema',
+     'Infraestrutura intermediária entregue com atraso', 'Atraso pontual exigiu reprogramação de testes',
+     'Moderado', 'Gerência de Tecnologia', 'Replanejamento concluído', 'resolvida'),
+    ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'R15', 'risco',
+     'Atraso de infraestrutura intermediária', 'A entrega de infraestrutura poderia afetar a sequência de testes',
+     'Moderado', 'Gerência de Tecnologia', 'Reprogramar atividades sem impacto final', 'resolvida');
+
+
+-- 7. Acompanhamento -----------------------------------------------------------
+-- O diretor e a analista de PMO acompanham o portfólio inteiro; cada líder
+-- acompanha o próprio projeto. Define os destinatários da notificação do RF05.
+INSERT INTO portfolio.usuario_projeto (usuario_id, projeto_id)
+SELECT u.id, p.id FROM portfolio.usuario u CROSS JOIN portfolio.projeto p
+ WHERE u.perfil IN ('diretor', 'pmo')
+UNION
+SELECT p.lider_id, p.id FROM portfolio.projeto p;
+
+
+COMMIT;
+
+
+-- =============================================================================
+-- Verificação da carga (T25: validar leitura e escrita)
+-- =============================================================================
+\echo ''
+\echo '== Contagem por tabela =='
+SELECT 'portfolio'   AS tabela, count(*) FROM portfolio.portfolio
+UNION ALL SELECT 'usuario',            count(*) FROM portfolio.usuario
+UNION ALL SELECT 'projeto',            count(*) FROM portfolio.projeto
+UNION ALL SELECT 'projeto_relacionado',count(*) FROM portfolio.projeto_relacionado
+UNION ALL SELECT 'artefato',           count(*) FROM portfolio.artefato
+UNION ALL SELECT 'pendencia',          count(*) FROM portfolio.pendencia
+UNION ALL SELECT 'usuario_projeto',    count(*) FROM portfolio.usuario_projeto;
+
+\echo ''
+\echo '== Situação do portfólio (a pergunta do Diretor) =='
+SELECT codigo, status, percentual_previsto AS prev, percentual_avanco AS real,
+       desvio_pp, pendencias_abertas, artefatos, lider
+  FROM portfolio.vw_projeto_situacao ORDER BY desvio_pp;
+
+\echo ''
+\echo '== Cobertura: artefatos no banco x documentos indexados no RAG =='
+-- As duas contagens devem bater, projeto a projeto. Divergência significa que
+-- alguém indexou um documento sem cadastrá-lo, ou o contrário.
+SELECT p.codigo,
+       count(a.id)                                  AS artefatos_no_banco,
+       (SELECT count(DISTINCT v.metadata->>'arquivo_origem')
+          FROM vecs.documentos_metro v
+         WHERE v.metadata->>'projeto_id' = p.codigo) AS documentos_indexados
+  FROM portfolio.projeto p
+  LEFT JOIN portfolio.artefato a ON a.projeto_id = p.id
+ GROUP BY p.codigo ORDER BY p.codigo;
 

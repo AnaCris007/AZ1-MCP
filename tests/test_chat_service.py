@@ -5,6 +5,7 @@ import unittest
 from services.chat_service import (
     MAX_MESSAGE_LENGTH,
     AnswerChatMessage,
+    ChatModelUnavailableError,
     ChatReceptionError,
     ChatReceptionErrorCode,
 )
@@ -18,6 +19,11 @@ class FakeChatModel:
     def generate_reply(self, message: str) -> str:
         self.received_messages.append(message)
         return self.reply
+
+
+class UnavailableChatModel:
+    def generate_reply(self, message: str) -> str:
+        raise ChatModelUnavailableError
 
 
 class TestAnswerChatMessage(unittest.TestCase):
@@ -45,6 +51,14 @@ class TestAnswerChatMessage(unittest.TestCase):
             answerer.answer("a" * (MAX_MESSAGE_LENGTH + 1))
 
         self.assertEqual(ctx.exception.code, ChatReceptionErrorCode.MESSAGE_TOO_LONG)
+
+    def test_converte_indisponibilidade_do_modelo_em_service_unavailable(self) -> None:
+        answerer = AnswerChatMessage(model=UnavailableChatModel())
+
+        with self.assertRaises(ChatReceptionError) as ctx:
+            answerer.answer("Oi")
+
+        self.assertEqual(ctx.exception.code, ChatReceptionErrorCode.SERVICE_UNAVAILABLE)
 
 
 if __name__ == "__main__":
