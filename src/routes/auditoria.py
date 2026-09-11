@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query
 
 from az1_api.dependencies import get_listador_auditoria
 from schemas.auditoria import AuditoriaErrorCode, AuditoriaListResponse, ConsultaLog
-from services.auditoria_service import ListarConsultas, MensagemRegistrada
+from services.auditoria_service import ListarConsultas
 
 router = APIRouter(tags=["auditoria"])
 

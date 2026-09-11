@@ -21,7 +21,12 @@ class TestGeminiChatModel(unittest.TestCase):
         client.models.generate_content.assert_called_once()
         kwargs = client.models.generate_content.call_args.kwargs
         self.assertEqual(kwargs["model"], "gemini-3.5-flash-lite")
-        self.assertEqual(kwargs["contents"], "Oi")
+        # `contents` deixou de ser a string crua quando o histórico por conversa
+        # entrou: agora é sempre a lista de turnos, mesmo com um turno só. Fixar
+        # a forma `role`/`parts` aqui é o que impede que um refactor volte a
+        # mandar texto solto — o SDK aceita os dois, e o histórico sumiria sem
+        # erro nenhum.
+        self.assertEqual(kwargs["contents"], [{"role": "user", "parts": [{"text": "Oi"}]}])
         self.assertTrue(kwargs["config"].system_instruction)
         self.assertEqual(kwargs["config"].max_output_tokens, MAX_OUTPUT_TOKENS)
         self.assertEqual(kwargs["config"].thinking_config.thinking_level, "MINIMAL")

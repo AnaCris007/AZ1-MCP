@@ -5,8 +5,21 @@ from dataclasses import dataclass
 from fastapi import APIRouter, Depends
 
 from az1_api.dependencies import get_alerta_desativador, get_alerta_listador, get_alerta_registrador
-from schemas.alerta import AlertaErrorCode, AssinanteCreatedResponse, AssinantePublicResponse, AssinanteRequest, AssinantesListResponse, MensagemResponse
-from services.alerta_service import AlertaServiceError, AlertaServiceErrorCode, DesativarAssinante, ListarAssinantes, RegistrarAssinante
+from schemas.alerta import (
+    AlertaErrorCode,
+    AssinanteCreatedResponse,
+    AssinantePublicResponse,
+    AssinanteRequest,
+    AssinantesListResponse,
+    MensagemResponse,
+)
+from services.alerta_service import (
+    AlertaServiceError,
+    AlertaServiceErrorCode,
+    DesativarAssinante,
+    ListarAssinantes,
+    RegistrarAssinante,
+)
 
 router = APIRouter(tags=["alertas"])
 

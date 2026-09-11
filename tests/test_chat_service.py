@@ -15,14 +15,16 @@ class FakeChatModel:
     def __init__(self, reply: str = "resposta") -> None:
         self.reply = reply
         self.received_messages: list[str] = []
+        self.received_conversation_ids: list[str | None] = []
 
-    def generate_reply(self, message: str) -> str:
+    def generate_reply(self, message: str, *, conversation_id: str | None = None) -> str:
         self.received_messages.append(message)
+        self.received_conversation_ids.append(conversation_id)
         return self.reply
 
 
 class UnavailableChatModel:
-    def generate_reply(self, message: str) -> str:
+    def generate_reply(self, message: str, *, conversation_id: str | None = None) -> str:
         raise ChatModelUnavailableError
 
 

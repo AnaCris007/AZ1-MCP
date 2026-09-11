@@ -4,14 +4,22 @@ import os
 from collections.abc import Callable
 from functools import lru_cache
 
-from database.conexao import obter_engine
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from psycopg_pool import ConnectionPool
 
-from services.alerta_service import ConfiguracaoAlertas, DesativarAssinante, DispatcherAlerta, ListarAssinantes, RegistrarAssinante
+from database.conexao import BancoNaoConfigurado, obter_engine
+from services.alerta_service import (
+    ConfiguracaoAlertas,
+    DesativarAssinante,
+    DespachoDesligado,
+    DispatcherAlerta,
+    ListarAssinantes,
+    RegistrarAssinante,
+)
 from services.analysis_service import AnalyzeAudio
 from services.audio_service import ReceiveAudio
+from services.auditoria_service import GravacaoDesligada, GravarConsulta, ListarConsultas
 from services.auth_service import (
     AuthenticatedUser,
     AuthError,
@@ -19,7 +27,6 @@ from services.auth_service import (
     SupabaseAuthSettings,
     SupabaseTokenVerifier,
 )
-from services.auditoria_service import GravarConsulta, ListarConsultas
 from services.chat_service import AnswerChatMessage
 from services.drive_push_service import PROVEDOR as PROVEDOR_DRIVE
 from services.drive_push_service import TIPOS_PROCESSAVEIS as TIPOS_DRIVE
@@ -144,14 +151,32 @@ def get_alerta_listador() -> ListarAssinantes:
     return ListarAssinantes(engine=obter_engine())
 
 
+# Os dois provedores abaixo sustentam EFEITOS COLATERAIS de rotas que existem
+# por outro motivo — gravar a trilha em `POST /chat`, despachar alerta em
+# `POST /audio/{id}/analyze`. Por isso degradam em vez de levantar: sem
+# `SUPABASE_DB_URL`, `obter_engine()` estoura durante a resolução das
+# dependências e a rota inteira responde 500, mesmo que a resposta ao usuário
+# não dependesse de banco nenhum.
+#
+# Os outros quatro provedores continuam levantando de propósito: ali o banco
+# não é acessório, é a razão do endpoint. `BancoNaoConfigurado` vira 503 no
+# manipulador de `main.py`.
 @lru_cache
-def get_alerta_dispatcher() -> DispatcherAlerta:
-    return DispatcherAlerta(engine=obter_engine(), configuracao=ConfiguracaoAlertas.carregar())
+def get_alerta_dispatcher() -> DispatcherAlerta | DespachoDesligado:
+    try:
+        return DispatcherAlerta(
+            engine=obter_engine(), configuracao=ConfiguracaoAlertas.carregar()
+        )
+    except BancoNaoConfigurado as erro:
+        return DespachoDesligado(str(erro))
 
 
 @lru_cache
-def get_gravador_auditoria() -> GravarConsulta:
-    return GravarConsulta(engine=obter_engine())
+def get_gravador_auditoria() -> GravarConsulta | GravacaoDesligada:
+    try:
+        return GravarConsulta(engine=obter_engine())
+    except BancoNaoConfigurado as erro:
+        return GravacaoDesligada(str(erro))
 
 
 @lru_cache

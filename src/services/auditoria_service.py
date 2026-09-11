@@ -92,6 +92,29 @@ class GravarConsulta:
             logger.exception("Falha ao registrar auditoria para conversa %s", conversa_uuid)
 
 
+class GravacaoDesligada:
+    """Substitui `GravarConsulta` quando não há banco configurado.
+
+    A gravação da trilha é um efeito colateral de `POST /chat`, não a razão de
+    a rota existir. Sem este objeto nulo, `obter_engine()` levanta durante a
+    resolução das dependências e a conversa inteira vira 500 — ou seja, a
+    ausência de banco derruba o produto em vez de apenas deixar de auditá-lo.
+    Era o que acontecia na CI, onde não há `SUPABASE_DB_URL`.
+
+    O aviso sai UMA vez, e não a cada requisição: em desenvolvimento sem banco
+    isso encheria o log a ponto de esconder o que importa.
+    """
+
+    def __init__(self, motivo: str) -> None:
+        self._motivo = motivo
+        self._avisou = False
+
+    def gravar(self, **_: object) -> None:
+        if not self._avisou:
+            logger.warning("Auditoria de conversas desligada: %s", self._motivo)
+            self._avisou = True
+
+
 class ListarConsultas:
     def __init__(self, engine: sqlalchemy.Engine) -> None:
         self._engine = engine

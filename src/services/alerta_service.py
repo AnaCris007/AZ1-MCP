@@ -6,7 +6,7 @@ import json
 import logging
 import secrets
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum, auto
 from functools import lru_cache
 from pathlib import Path
@@ -68,7 +68,7 @@ class ConfiguracaoAlertas:
 
 
 def _agora_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 class RegistrarAssinante:
@@ -133,6 +133,24 @@ class ListarAssinantes:
             )
             for r in rows
         ]
+
+
+class DespachoDesligado:
+    """Substitui `DispatcherAlerta` quando não há banco configurado.
+
+    Mesmo raciocínio de `GravacaoDesligada`, em `auditoria_service.py`: o
+    despacho de alertas pendura-se em `POST /audio/{id}/analyze` como efeito
+    colateral, e sem banco a análise inteira respondia 500.
+    """
+
+    def __init__(self, motivo: str) -> None:
+        self._motivo = motivo
+        self._avisou = False
+
+    def despachar(self, **_: object) -> None:
+        if not self._avisou:
+            logger.warning("Despacho de alertas desligado: %s", self._motivo)
+            self._avisou = True
 
 
 class DispatcherAlerta:

@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from az1_api.dependencies import AuthAPIError, require_authenticated_user
+from database.conexao import BancoNaoConfigurado
 from routes import (
     alerta_router,
     analysis_router,
@@ -125,6 +126,19 @@ def webhook_api_error_handler(request: Request, exc: WebhookAPIError) -> JSONRes
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
+    )
+
+
+# Banco ausente é indisponibilidade de dependência, não defeito de programação:
+# precisa sair como 503, e não pelo manipulador genérico de 500 abaixo. Vale
+# para os endpoints cuja razão de existir É o banco — alertas e auditoria. Os
+# efeitos colaterais de /chat e /analyze não chegam aqui: degradam nos próprios
+# provedores, ver `dependencies.get_gravador_auditoria`.
+@app.exception_handler(BancoNaoConfigurado)
+def banco_nao_configurado_handler(request: Request, exc: BancoNaoConfigurado) -> JSONResponse:
+    return JSONResponse(
+        status_code=503,
+        content=ErrorResponse(error="service_unavailable", message=str(exc)).model_dump(),
     )
 
 

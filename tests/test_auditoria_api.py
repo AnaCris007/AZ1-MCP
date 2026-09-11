@@ -4,9 +4,10 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_listador_auditoria
+from az1_api.dependencies import get_listador_auditoria, require_authenticated_user
 from az1_api.main import app
 from services.auditoria_service import MensagemRegistrada
+from services.auth_service import AuthenticatedUser
 
 
 class FakeListador:
@@ -19,7 +20,24 @@ class FakeListador:
         return self.registros[:limit]
 
 
+
+# As rotas de alertas e auditoria estão atrás do RNF02, como todas as demais de
+# /api/v1 (ver `_auth_dependency` em src/az1_api/main.py). Sem substituir a
+# autenticação, cada requisição destes testes construía o verificador de token
+# de verdade e morria em `SUPABASE_URL não configurada` — 500 no lugar do código
+# esperado, e nada na falha apontava para a autenticação.
+_TEST_USER = AuthenticatedUser(
+    subject="test-user",
+    email="teste@example.com",
+    name="Usuário de Teste",
+    provider="azure",
+)
+
+
 class TestAuditoriaAPI(unittest.TestCase):
+    def setUp(self) -> None:
+        app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
+
     def tearDown(self) -> None:
         app.dependency_overrides.clear()
 

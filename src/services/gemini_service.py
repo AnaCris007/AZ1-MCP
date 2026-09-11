@@ -46,7 +46,7 @@ class GeminiChatModel:
     def from_settings(cls, settings: GeminiSettings) -> GeminiChatModel:
         return cls(client=genai.Client(api_key=settings.api_key), model=settings.model)
 
-    def generate_reply(self, message: str, conversation_id: str | None = None) -> str:
+    def generate_reply(self, message: str, *, conversation_id: str | None = None) -> str:
         historico = self._historico.get(conversation_id, []) if conversation_id else []
         contents = historico + [{"role": "user", "parts": [{"text": message}]}]
 
