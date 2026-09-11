@@ -22,7 +22,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | As personas, jornadas e o fluxo de negócio | [Projeto.md, Personas e Jornada](./Projeto.md#15-personas-e-jornada-do-usuário) |
 | Os requisitos e a solução técnica | [Projeto.md, Especificação de Requisitos](./Projeto.md#2-especificação-de-requisitos-de-software-sprint-1) |
 | Os riscos do projeto, na identificação inicial | [Projeto.md, Matriz de Risco](./Projeto.md#19-matriz-de-risco-do-projeto) |
-| Os riscos atualizados e seu histórico por sprint | [GestaoProjeto.md, Matriz de Risco do Projeto](./GestaoProjeto.md#43-matriz-de-risco-do-projeto) |
+| Os riscos atualizados e seu histórico por sprint | [GestaoProjeto.md, Matriz de Risco do Projeto](./GestaoProjeto.md#53-matriz-de-risco-do-projeto) |
 | As APIs de voz, com endpoints, limites e exemplos | [Projeto.md, API de Speech to Text e Text to Speech](./Projeto.md#32-api-de-speech-to-text-e-text-to-speech) |
 | O contrato da API de recebimento de áudios | [Projeto.md, API para Recebimento de Áudios](./Projeto.md#34-api-para-recebimento-de-áudios) |
 | A pilha de tecnologias e as razões de cada escolha | [Projeto.md, Pilha de Tecnologias](./Projeto.md#35-pilha-de-tecnologias) |
@@ -52,7 +52,7 @@ Os diagramas e as imagens utilizados pelos documentos estão armazenados na past
 - personas do Diretor, da Analista de PMO e do Líder de Projeto;
 - jornadas das três personas;
 - Matriz SWOT;
-- Matriz de Riscos da Sprint 1 e sua atualização na Sprint 2;
+- Matriz de Riscos da Sprint 1 e suas atualizações nas Sprints 2 e 3;
 - diagramas de classes, de componentes e de sequência;
 - diagramas BPMN dos fluxos AS-IS e TO-BE e a cadeia de valor;
 - registros visuais dos protótipos A e B;
