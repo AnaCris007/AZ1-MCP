@@ -5498,6 +5498,8 @@ Comandos de preparação para ambiente futuro: `python -m pip install -e ".[dev]
 
 A entrega atual encerra o planejamento. A sequência abaixo organiza sua implementação; cada etapa produz um insumo verificável para a seguinte, sem representar trabalho já realizado.
 
+**Recorte de entrada da próxima sprint:** iniciar por ambiente e massas, contratos já disponíveis e VHS (etapas 1–3); em seguida, instrumentar desempenho e preparar as sessões. Os testes de fluxos dependentes de novos componentes acompanham sua integração. Escrita nas fontes e autorização histórica por cargo ficam fora da campanha do MVP, conforme 6.1.2.
+
 | Ordem | Trabalho previsto | Entrega para revisão | Condição de conclusão futura |
 |---|---|---|---|
 | 1 | Preparar ambiente dedicado, manifestos e massas sintéticas de 6.1.3 | Configuração reproduzível, versões e gabaritos por ID | Ambiente inicia; massa possui hashes e resultados esperados; nenhum dado do parceiro é necessário |
@@ -5512,7 +5514,7 @@ A escrita do RF06 permanece fora do MVP. Os casos dependentes de funcionalidades
 
 ## 6.2 Planejamento dos Testes de Funcionalidade
 
-Esta seção deriva dos requisitos funcionais da Seção 2.2 o conjunto de casos de teste que verificam se a solução faz o que foi especificado. Ela cumpre o papel atribuído à Sprint 3 pela Seção 3.8.10: **planejar** os casos, não executá-los. A execução ocorre na Sprint 4 e a complementação na Sprint 5, conforme a mesma seção.
+Esta seção deriva os casos funcionais dos requisitos de 2.2. O cronograma e as regras comuns seguem 6.1; as fichas detalhadas estão em 6.2.3 e 6.2.6.
 
 O planejamento cobre os seis requisitos funcionais, e não apenas os que já possuem implementação. Cada caso carrega uma marca de estado que declara se ele pode ser executado sobre o repositório atual ou se depende de um componente ainda por construir. Essa marca é o que impede que o plano seja lido como um retrato do que funciona: um caso planejado sobre um componente inexistente continua sendo um compromisso de verificação, mas não é evidência de nada até que a construção o alcance.
 
@@ -5688,6 +5690,8 @@ Essa distribuição preserva IDs históricos, inclusive os suspensos por D04/D07
 
 ### 6.2.3 Procedimentos de Teste
 
+As fichas abaixo reúnem propósito, procedimento, resultado esperado, aprovação e evidência por ID. As pré-condições ficam no início de cada RF; as massas são definidas nesta subseção. Cenário, componente e recorte permanecem no catálogo de 6.2.2. Aplicar a preparação e o registro comuns de 6.1.1 a cada ficha.
+
 Esta subseção reúne, para cada requisito, as pré-condições comuns, a massa de dados necessária e o roteiro de execução caso a caso. O agrupamento por requisito evita repetir em quarenta e seis fichas o mesmo ambiente e a mesma massa de dados, e mantém legível a parte que efetivamente varia: o propósito do caso, o passo executado e a observação a registrar. A coluna **Propósito do teste** registra a finalidade de cada caso, e é o que distingue um caso de outro dentro do mesmo requisito.
 
 #### Ambiente e ferramental comuns a todos os casos
@@ -5728,23 +5732,156 @@ O conjunto C merece registro à parte. A base atual foi gerada por gabarito e a 
 
 **Pré-condições comuns.** Aplicação em execução; bucket compatível com S3 acessível; credencial do provedor de Speech to Text configurada nos casos de integração; conjuntos A e B disponíveis.
 
-| Caso | Propósito do teste | Passos | Observação a registrar |
-|---|---|---|---|
-| CT-RF01-01 | Confirmar que os quatro formatos aceitos entram no sistema e ficam armazenados | Enviar `POST /api/v1/audio` com `multipart/form-data`, campo `audio`, usando cada um dos seis arquivos do conjunto A | Código HTTP, corpo da resposta e presença do objeto sob `incoming/{audio_id}` no bucket |
-| CT-RF01-02 | Confirmar que o áudio armazenado é convertido em texto com os metadados do reconhecimento | Preparar upload próprio e, a partir do `audio_id` retornado, enviar `POST /api/v1/audio/{audio_id}/transcribe?language=pt-BR` | Código HTTP e os campos `text`, `language`, `confidence` e `duration_seconds` |
-| CT-RF01-03 | Confirmar que o usuário vê e pode conferir a transcrição antes de ela ser processada | Pela interface, gravar uma solicitação por voz e acompanhar a tela até a resposta | Se a transcrição aparece na tela **antes** de a resposta ser solicitada, e se o usuário pode conferi-la nesse intervalo |
-| CT-RF01-04 | Confirmar que a solicitação em texto é processada sem passar pelo canal de voz | Enviar `POST /api/v1/chat` com `{"message": "...", "conversation_id": "..."}` usando cinco solicitações do conjunto C | Código HTTP e o campo `reply`, verificando que é texto não vazio |
-| CT-RF01-05 | Confirmar que os dois canais de entrada levam ao mesmo entendimento da solicitação | Submeter a mesma solicitação pelos dois canais: gravada em áudio do conjunto A e digitada em texto; comparar a intenção classificada nos dois caminhos | Resposta textual; intenção/confiança somente quando expostas pelo fluxo integrado |
-| CT-RF01-06 | Confirmar que formato fora da lista é recusado como formato, e não como arquivo inválido | `POST /api/v1/audio` com o arquivo `.ogg` do conjunto B | Código HTTP e o campo `error` do corpo |
-| CT-RF01-07 | Confirmar que o limite de 10 MB é aplicado antes de qualquer processamento | `POST /api/v1/audio` com o arquivo de 12 MB | Código HTTP e o campo `error` |
-| CT-RF01-08 | Confirmar que o limite de 5 minutos é aplicado sobre a duração real, e não sobre o tamanho | `POST /api/v1/audio` com a gravação de 6 minutos | Código HTTP e o campo `error` |
-| CT-RF01-09 | Confirmar que arquivo vazio e arquivo corrompido são recusados pelo conteúdo binário | `POST /api/v1/audio` com o arquivo de zero byte e, em seguida, com o `.wav` truncado | Código HTTP e o campo `error` em cada envio |
-| CT-RF01-10 | Confirmar que requisição estruturalmente inválida é distinguida de arquivo inválido | `POST /api/v1/audio` com corpo `application/json`, e não `multipart/form-data` | Código HTTP e o campo `error` |
-| CT-RF01-11 | Confirmar que identificador inexistente não é tratado como falha do provedor externo | `POST /api/v1/audio/aud_inexistente/transcribe` | Código HTTP e o campo `error` |
-| CT-RF01-12 | Confirmar que a falha do serviço externo chega ao cliente como erro previsto, sem vazar exceção | Executar a transcrição com o provedor de Speech to Text configurado para falhar, usando a resposta de erro armazenada conforme a Seção 6.4.3 | Código HTTP, o campo `error` e a mensagem devolvida ao cliente |
-| CT-RF01-13 | Confirmar que mensagem vazia é recusada antes de consumir o modelo de linguagem | `POST /api/v1/chat` com `message` vazia e, em seguida, com apenas espaços | Código HTTP e o campo `error` em cada envio |
-| CT-RF01-14 | Confirmar que o limite de 4.000 caracteres da mensagem é aplicado | `POST /api/v1/chat` com `message` de 4.001 caracteres | Código HTTP e o campo `error` |
-| CT-RF01-15 | Confirmar que a indisponibilidade do backend é comunicada, e não substituída por conteúdo de exemplo | Pela interface, enviar uma mensagem com o backend interrompido | O que a tela apresenta ao usuário: mensagem de erro identificável ou resposta indistinguível de uma resposta real |
+
+##### CT-RF01-01
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que os quatro formatos aceitos entram no sistema e ficam armazenados |
+| Procedimento | Enviar `POST /api/v1/audio` com `multipart/form-data`, campo `audio`, usando cada um dos seis arquivos do conjunto A |
+| Resultado esperado | `201` com corpo `{"id": "...", "status": "received", "message": "Áudio recebido com sucesso."}` e objeto gravado sob `incoming/{audio_id}` |
+| Critério de aprovação | Os quatro formatos do conjunto A aprovados, sem exceção |
+| Evidência a registrar | Código HTTP, corpo da resposta e presença do objeto sob `incoming/{audio_id}` no bucket |
+
+##### CT-RF01-02
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o áudio armazenado é convertido em texto com os metadados do reconhecimento |
+| Procedimento | Preparar upload próprio e, a partir do `audio_id` retornado, enviar `POST /api/v1/audio/{audio_id}/transcribe?language=pt-BR` |
+| Resultado esperado | `200` com `text` não vazio, `language` igual a `pt-BR`, `confidence` numérico ou nulo conforme schema e `duration_seconds` compatível com a gravação |
+| Critério de aprovação | Transcrição inteligível em todos os quatro áudios; a fidelidade é medida no teste de RNF06 da Seção 6.3 |
+| Evidência a registrar | Código HTTP e os campos `text`, `language`, `confidence` e `duration_seconds` |
+
+##### CT-RF01-03
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o usuário vê e pode conferir a transcrição antes de ela ser processada |
+| Procedimento | Pela interface, gravar uma solicitação por voz e acompanhar a tela até a resposta |
+| Resultado esperado | A transcrição é exibida na tela e permanece visível antes de a solicitação seguir para processamento |
+| Critério de aprovação | A transcrição precede a resposta na tela e é legível pelo usuário |
+| Evidência a registrar | Se a transcrição aparece na tela **antes** de a resposta ser solicitada, e se o usuário pode conferi-la nesse intervalo |
+
+##### CT-RF01-04
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a solicitação em texto é processada sem passar pelo canal de voz |
+| Procedimento | Enviar `POST /api/v1/chat` com `{"message": "...", "conversation_id": "..."}` usando cinco solicitações do conjunto C |
+| Resultado esperado | `200` com `reply` em texto não vazio |
+| Critério de aprovação | Cinco solicitações de cinco aprovadas |
+| Evidência a registrar | Código HTTP e o campo `reply`, verificando que é texto não vazio |
+
+##### CT-RF01-05
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que os dois canais de entrada levam ao mesmo entendimento da solicitação |
+| Procedimento | Submeter a mesma solicitação pelos dois canais: gravada em áudio do conjunto A e digitada em texto; comparar a intenção classificada nos dois caminhos |
+| Resultado esperado | Resposta textual nos dois canais; intenção equivalente quando o pipeline comum existir |
+| Critério de aprovação | Todas as cinco duplas apresentam texto. `/chat` não retorna intenção; essa comparação depende de integração/instrumentação. Não atribuir divergência à transcrição sem evidência |
+| Evidência a registrar | Resposta textual; intenção/confiança somente quando expostas pelo fluxo integrado |
+
+##### CT-RF01-06
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que formato fora da lista é recusado como formato, e não como arquivo inválido |
+| Procedimento | `POST /api/v1/audio` com o arquivo `.ogg` do conjunto B |
+| Resultado esperado | `415` com `error` igual a `unsupported_format` |
+| Critério de aprovação | Correspondência exata de código HTTP e de `error` |
+| Evidência a registrar | Código HTTP e o campo `error` do corpo |
+
+##### CT-RF01-07
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o limite de 10 MB é aplicado antes de qualquer processamento |
+| Procedimento | `POST /api/v1/audio` com o arquivo de 12 MB |
+| Resultado esperado | `413` com `error` igual a `file_too_large` |
+| Critério de aprovação | Correspondência exata |
+| Evidência a registrar | Código HTTP e o campo `error` |
+
+##### CT-RF01-08
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o limite de 5 minutos é aplicado sobre a duração real, e não sobre o tamanho |
+| Procedimento | `POST /api/v1/audio` com a gravação de 6 minutos |
+| Resultado esperado | `422` com `error` igual a `audio_too_long` |
+| Critério de aprovação | Correspondência exata |
+| Evidência a registrar | Código HTTP e o campo `error` |
+
+##### CT-RF01-09
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que arquivo vazio e arquivo corrompido são recusados pelo conteúdo binário |
+| Procedimento | `POST /api/v1/audio` com o arquivo de zero byte e, em seguida, com o `.wav` truncado |
+| Resultado esperado | `422` com `error` igual a `invalid_audio` nos dois envios |
+| Critério de aprovação | Correspondência exata nos dois |
+| Evidência a registrar | Código HTTP e o campo `error` em cada envio |
+
+##### CT-RF01-10
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que requisição estruturalmente inválida é distinguida de arquivo inválido |
+| Procedimento | `POST /api/v1/audio` com corpo `application/json`, e não `multipart/form-data` |
+| Resultado esperado | `422` com `detail` apontando campo `audio` ausente para corpo JSON |
+| Critério de aprovação | Nenhum armazenamento; `400 bad_request` é erro de parsing HTTP/multipart, não este caso |
+| Evidência a registrar | Código HTTP e o campo `error` |
+
+##### CT-RF01-11
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que identificador inexistente não é tratado como falha do provedor externo |
+| Procedimento | `POST /api/v1/audio/aud_inexistente/transcribe` |
+| Resultado esperado | `404` com `error` igual a `audio_not_found` |
+| Critério de aprovação | Correspondência exata |
+| Evidência a registrar | Código HTTP e o campo `error` |
+
+##### CT-RF01-12
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a falha do serviço externo chega ao cliente como erro previsto, sem vazar exceção |
+| Procedimento | Executar a transcrição com o provedor de Speech to Text configurado para falhar, usando a resposta de erro armazenada conforme a Seção 6.4.3 |
+| Resultado esperado | `502` com `error` igual a `transcription_failed` e mensagem orientando nova tentativa |
+| Critério de aprovação | Correspondência exata, e ausência de rastro de exceção no corpo devolvido |
+| Evidência a registrar | Código HTTP, o campo `error` e a mensagem devolvida ao cliente |
+
+##### CT-RF01-13
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que mensagem vazia é recusada antes de consumir o modelo de linguagem |
+| Procedimento | `POST /api/v1/chat` com `message` vazia e, em seguida, com apenas espaços |
+| Resultado esperado | `422` com `error` igual a `empty_message` nos dois envios |
+| Critério de aprovação | Correspondência exata nos dois |
+| Evidência a registrar | Código HTTP e o campo `error` em cada envio |
+
+##### CT-RF01-14
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o limite de 4.000 caracteres da mensagem é aplicado |
+| Procedimento | `POST /api/v1/chat` com `message` de 4.001 caracteres |
+| Resultado esperado | `422` com `error` igual a `message_too_long` |
+| Critério de aprovação | Correspondência exata |
+| Evidência a registrar | Código HTTP e o campo `error` |
+
+##### CT-RF01-15
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a indisponibilidade do backend é comunicada, e não substituída por conteúdo de exemplo |
+| Procedimento | Pela interface, enviar uma mensagem com o backend interrompido |
+| Resultado esperado | A interface informa que o serviço está indisponível |
+| Critério de aprovação | Nenhum conteúdo de demonstração é apresentado como resposta do agente |
+| Evidência a registrar | O que a tela apresenta ao usuário: mensagem de erro identificável ou resposta indistinguível de uma resposta real |
 
 O CT-RF01-15 protege contra conteúdo de demonstração apresentado como resposta real. O código atual já exibe erro de rede, sobrecarga e erro genérico. A aprovação depende da execução pelo navegador.
 
@@ -5756,18 +5893,106 @@ O CT-RF01-15 protege contra conteúdo de demonstração apresentado como respost
 
 **Pré-condições comuns.** Modelo de classificação treinado e carregado; partição de teste da task T14 disponível; conjuntos C, D, E e I conforme o caso.
 
-| Caso | Propósito do teste | Passos | Observação a registrar |
-|---|---|---|---|
-| CT-RF02-01 | Confirmar que solicitação sobre projeto é reconhecida como consulta ao portfólio | Submeter dez solicitações do conjunto C rotuladas como `consultar_projeto_sintetico` a `POST /api/v1/audio/{audio_id}/analyze` ou diretamente ao classificador | Intenção prevista, confiança e rótulo esperado de cada solicitação |
-| CT-RF02-02 | Confirmar que solicitação sobre norma é distinguida de solicitação sobre projeto | Repetir com dez solicitações rotuladas como `consultar_documentos_normativos` | Os mesmos campos |
-| CT-RF02-03 | Medir se o classificador separa as dez classes do catálogo em condição não vista no treinamento | Executar o protocolo cego de CT-RNF03-P/N e apurar F1-macro, cobertura, rejeição e matriz de confusão | F1-macro, precisão/recall/F1 por classe, cobertura, aceitação indevida e confusões |
-| CT-RF02-04 | Confirmar que o projeto nomeado na solicitação é associado ao registro correto | Submeter dez solicitações que nomeiem projetos do conjunto E e verificar a entidade extraída e o registro correspondente | Entidade extraída, registro associado e se corresponde ao projeto nomeado |
-| CT-RF02-05 | Confirmar que o dado devolvido vem da fonte, e não da geração livre do modelo | Consultar cinco dados específicos de projetos do conjunto E e comparar o valor devolvido com o registro na fonte | Valor devolvido, valor na fonte e se coincidem |
-| CT-RF02-06 | Confirmar que o esclarecimento pede apenas o que falta e preserva o que já foi informado | Enviar "qual é o status do projeto?", sem nomear o projeto; responder à pergunta de esclarecimento com o nome; verificar se o dado originalmente pedido foi preservado | Texto da pergunta de esclarecimento, resposta final e se o pedido original foi mantido |
-| CT-RF02-07 | Confirmar que pedido fora do escopo é recusado antes de qualquer consulta às fontes | Submeter as vinte solicitações do conjunto D e observar a classificação e a resposta | Intenção atribuída, teor da resposta e, nos registros de auditoria, se houve consulta às fontes |
-| CT-RF02-08 | Confirmar que o agente admite não ter o dado em vez de fabricá-lo | Consultar um projeto que não existe no conjunto E | Teor da resposta, verificando se declara não ter encontrado o projeto ou se apresenta conteúdo fabricado |
-| CT-RF02-09 | Confirmar que a resposta dentro de um fluxo guiado não reinicia a classificação de intenção | Iniciar um fluxo guiado, responder à pergunta do agente com um valor simples, como uma data, e observar se o sistema trata a resposta como preenchimento de entidade ou como nova intenção | Estado do fluxo após a resposta e intenção registrada, se houver |
-| CT-RF02-10 | Confirmar que o alcance do perfil limita o que é devolvido | Autenticado como líder do projeto P1, consultar um dado do projeto P2, liderado por outro perfil | Código HTTP, teor da resposta e registro de auditoria da tentativa |
+
+##### CT-RF02-01
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que solicitação sobre projeto é reconhecida como consulta ao portfólio |
+| Procedimento | Submeter dez solicitações do conjunto C rotuladas como `consultar_projeto_sintetico` a `POST /api/v1/audio/{audio_id}/analyze` ou diretamente ao classificador |
+| Resultado esperado | Intenção `consultar_projeto_sintetico` nas dez solicitações |
+| Critério de aprovação | Registrar dez previsões; aprovação estatística exclusivamente em CT-RNF03-P/N, sem inferir F1 a partir de nove acertos |
+| Evidência a registrar | Intenção prevista, confiança e rótulo esperado de cada solicitação |
+
+##### CT-RF02-02
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que solicitação sobre norma é distinguida de solicitação sobre projeto |
+| Procedimento | Repetir com dez solicitações rotuladas como `consultar_documentos_normativos` |
+| Resultado esperado | Intenção e confiança nas dez solicitações normativas |
+| Critério de aprovação | Registrar dez previsões; métricas e aprovação agregada em CT-RNF03-P/N |
+| Evidência a registrar | Os mesmos campos |
+
+##### CT-RF02-03
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Medir se o classificador separa as dez classes do catálogo em condição não vista no treinamento |
+| Procedimento | Executar o protocolo cego de CT-RNF03-P/N e apurar F1-macro, cobertura, rejeição e matriz de confusão |
+| Resultado esperado | Relatório do conjunto cego de CT-RNF03-P/N |
+| Critério de aprovação | F1-macro ≥ 0,85, cobertura ≥ 90%, aceitação indevida ≤ 15%; acurácia complementar, sem piso por classe inventado |
+| Evidência a registrar | F1-macro, precisão/recall/F1 por classe, cobertura, aceitação indevida e confusões |
+
+##### CT-RF02-04
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o projeto nomeado na solicitação é associado ao registro correto |
+| Procedimento | Submeter dez solicitações que nomeiem projetos do conjunto E e verificar a entidade extraída e o registro correspondente |
+| Resultado esperado | A entidade `nome_projeto` é extraída e associada ao registro correto |
+| Critério de aprovação | Correspondência correta em pelo menos nove das dez solicitações, conforme o indicador de 90% da Seção 2.1 |
+| Evidência a registrar | Entidade extraída, registro associado e se corresponde ao projeto nomeado |
+
+##### CT-RF02-05
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o dado devolvido vem da fonte, e não da geração livre do modelo |
+| Procedimento | Consultar cinco dados específicos de projetos do conjunto E e comparar o valor devolvido com o registro na fonte |
+| Resultado esperado | O valor devolvido é idêntico ao registrado na fonte |
+| Critério de aprovação | Coincidência exata nas cinco consultas |
+| Evidência a registrar | Valor devolvido, valor na fonte e se coincidem |
+
+##### CT-RF02-06
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o esclarecimento pede apenas o que falta e preserva o que já foi informado |
+| Procedimento | Enviar "qual é o status do projeto?", sem nomear o projeto; responder à pergunta de esclarecimento com o nome; verificar se o dado originalmente pedido foi preservado |
+| Resultado esperado | O agente pergunta qual é o projeto, e a resposta final traz o dado originalmente pedido |
+| Critério de aprovação | O pedido original é preservado; o usuário não precisa reformular a pergunta inteira |
+| Evidência a registrar | Texto da pergunta de esclarecimento, resposta final e se o pedido original foi mantido |
+
+##### CT-RF02-07
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que pedido fora do escopo é recusado antes de qualquer consulta às fontes |
+| Procedimento | Submeter as vinte solicitações do conjunto D e observar a classificação e a resposta |
+| Resultado esperado | Intenção `fora_do_catalogo`, resposta explicando o limite e indicando as interações disponíveis, sem registro de consulta às fontes |
+| Critério de aprovação | No máximo três de vinte aceitas indevidamente, conforme RNF03; todas as rejeitadas informam limite sem consultar fontes. Verificar chamadas com spy, além da auditoria |
+| Evidência a registrar | Intenção atribuída, teor da resposta e, nos registros de auditoria, se houve consulta às fontes |
+
+##### CT-RF02-08
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o agente admite não ter o dado em vez de fabricá-lo |
+| Procedimento | Consultar um projeto que não existe no conjunto E |
+| Resultado esperado | O agente declara não ter encontrado o projeto |
+| Critério de aprovação | Nenhuma resposta apresenta dado sobre projeto inexistente; o caso é a verificação direta do risco de alucinação registrado na Seção 1.9.2 |
+| Evidência a registrar | Teor da resposta, verificando se declara não ter encontrado o projeto ou se apresenta conteúdo fabricado |
+
+##### CT-RF02-09
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a resposta dentro de um fluxo guiado não reinicia a classificação de intenção |
+| Procedimento | Iniciar um fluxo guiado, responder à pergunta do agente com um valor simples, como uma data, e observar se o sistema trata a resposta como preenchimento de entidade ou como nova intenção |
+| Resultado esperado | A resposta é tratada como preenchimento da entidade em curso, sem nova classificação de intenção |
+| Critério de aprovação | O fluxo guiado avança para o passo seguinte, conforme a regra da Seção 3.1 |
+| Evidência a registrar | Estado do fluxo após a resposta e intenção registrada, se houver |
+
+##### CT-RF02-10
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o alcance do perfil limita o que é devolvido |
+| Procedimento | Autenticado como líder do projeto P1, consultar um dado do projeto P2, liderado por outro perfil |
+| Resultado esperado | O dado de P2 não é devolvido, e a tentativa é registrada |
+| Critério de aprovação | Nenhum dado de P2 aparece na resposta |
+| Evidência a registrar | Código HTTP, teor da resposta e registro de auditoria da tentativa |
 
 O CT-RF02-07 é o caso que o plano identifica como *executável em parte*. A classificação como `fora_do_catalogo` pode ser verificada hoje; a exigência de que a recusa ocorra **sem consultar as fontes** só se torna verificável quando existirem fontes a consultar e registro de auditoria que evidencie a ausência da consulta, ambos previstos para a Sprint 4.
 
@@ -5777,13 +6002,56 @@ O CT-RF02-07 é o caso que o plano identifica como *executável em parte*. A cla
 
 **Pré-condições comuns.** Conjuntos E e F carregados; atributos `referencia` e `data` da classe `Artefato` implementados conforme a Seção 2.2.1; resposta do agente fundamentada em fonte, e não gerada livremente.
 
-| Caso | Propósito do teste | Passos | Observação a registrar |
-|---|---|---|---|
-| CT-RF03-01 | Confirmar que os três elementos de origem acompanham o dado de negócio | Consultar um dado de projeto cuja origem seja um único artefato do conjunto F | Os três elementos exigidos na resposta: documento, referência e data |
-| CT-RF03-02 | Confirmar que nenhuma fonte usada na composição da resposta é omitida | Formular uma consulta cuja resposta exija combinar dois artefatos distintos | Quantidade de fontes listadas e se corresponde às efetivamente utilizadas |
-| CT-RF03-03 | Confirmar que a referência é acionável, e não apenas presente na tela | Preparar consulta própria com fonte conhecida e tomar a referência exibida e tentar localizar o documento no repositório a partir dela | Se a referência levou ao documento correto, sem informação adicional |
-| CT-RF03-04 | Confirmar que dado sem origem não é apresentado como fundamentado | Consultar o dado de negócio que, no conjunto F, não possui artefato de origem | Se a resposta declara a ausência de fonte ou apresenta o dado como fundamentado |
-| CT-RF03-05 | Confirmar que a lacuna de data é declarada em vez de preenchida | Consultar o dado cujo artefato de origem está sem `data` preenchida | Se a resposta indica a lacuna ou exibe data vazia, nula ou inventada |
+
+##### CT-RF03-01
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que os três elementos de origem acompanham o dado de negócio |
+| Procedimento | Consultar um dado de projeto cuja origem seja um único artefato do conjunto F |
+| Resultado esperado | A resposta traz documento de origem, referência e data da última atualização |
+| Critério de aprovação | Os três elementos presentes; a ausência de qualquer um reprova o caso |
+| Evidência a registrar | Os três elementos exigidos na resposta: documento, referência e data |
+
+##### CT-RF03-02
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que nenhuma fonte usada na composição da resposta é omitida |
+| Procedimento | Formular uma consulta cuja resposta exija combinar dois artefatos distintos |
+| Resultado esperado | As duas fontes utilizadas são listadas |
+| Critério de aprovação | Nenhuma fonte utilizada fica omitida |
+| Evidência a registrar | Quantidade de fontes listadas e se corresponde às efetivamente utilizadas |
+
+##### CT-RF03-03
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a referência é acionável, e não apenas presente na tela |
+| Procedimento | Preparar consulta própria com fonte conhecida e tomar a referência exibida e tentar localizar o documento no repositório a partir dela |
+| Resultado esperado | O documento é localizado no repositório a partir da referência exibida |
+| Critério de aprovação | A localização ocorre sem informação além da referência |
+| Evidência a registrar | Se a referência levou ao documento correto, sem informação adicional |
+
+##### CT-RF03-04
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que dado sem origem não é apresentado como fundamentado |
+| Procedimento | Consultar o dado de negócio que, no conjunto F, não possui artefato de origem |
+| Resultado esperado | O agente declara não haver fonte para o dado, ou não o apresenta |
+| Critério de aprovação | O dado não é apresentado como fundamentado |
+| Evidência a registrar | Se a resposta declara a ausência de fonte ou apresenta o dado como fundamentado |
+
+##### CT-RF03-05
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a lacuna de data é declarada em vez de preenchida |
+| Procedimento | Consultar o dado cujo artefato de origem está sem `data` preenchida |
+| Resultado esperado | O agente indica que a data de atualização não está disponível |
+| Critério de aprovação | Nenhuma data vazia, nula ou estimada é exibida |
+| Evidência a registrar | Se a resposta indica a lacuna ou exibe data vazia, nula ou inventada |
 
 #### RF04 — Sugerir o preenchimento de documentos
 
@@ -5791,14 +6059,66 @@ O CT-RF02-07 é o caso que o plano identifica como *executável em parte*. A cla
 
 **Pré-condições comuns.** Conjunto G carregado; atributos `obrigatorio` e `preenchido` da classe `CampoArtefato` implementados; cópia do documento de origem preservada para comparação.
 
-| Caso | Propósito do teste | Passos | Observação a registrar |
-|---|---|---|---|
-| CT-RF04-01 | Confirmar a correspondência de um para um entre campo pendente e sugestão | Solicitar apoio no preenchimento do TAP com três campos pendentes | Quantidade de sugestões apresentadas e a qual campo cada uma corresponde |
-| CT-RF04-02 | Confirmar que a cópia isola exatamente a sugestão escolhida | Acionar a cópia de uma sugestão individual na interface e colar em um editor | Conteúdo efetivamente copiado e se corresponde apenas àquela sugestão |
-| CT-RF04-03 | Confirmar que a interação não escreve no documento de origem | Comparar o documento de origem antes e depois da interação, por soma de verificação | Somas de verificação antes e depois e se coincidem |
-| CT-RF04-04 | Confirmar que a sugestão é rastreável até a fonte que a fundamenta | Examinar cada sugestão de CT-RF04-01 quanto à fonte e à justificativa apresentadas | Presença de fonte identificável e de justificativa em cada sugestão |
-| CT-RF04-05 | Confirmar que ausência de pendência não é preenchida com sugestão desnecessária | Solicitar apoio no preenchimento do mapa de benefícios integralmente preenchido | Teor da resposta, verificando se informa a ausência de pendências ou produz sugestões sem necessidade |
-| CT-RF04-06 | Confirmar que o limite do conjunto suportado é declarado ao usuário | Solicitar apoio para o documento de tipo não previsto no catálogo | Teor da resposta e se a limitação é explicada ao usuário |
+
+##### CT-RF04-01
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar a correspondência de um para um entre campo pendente e sugestão |
+| Procedimento | Solicitar apoio no preenchimento do TAP com três campos pendentes |
+| Resultado esperado | Três sugestões, uma para cada campo pendente, cada uma identificando o campo |
+| Critério de aprovação | Correspondência de um para um entre campos pendentes e sugestões |
+| Evidência a registrar | Quantidade de sugestões apresentadas e a qual campo cada uma corresponde |
+
+##### CT-RF04-02
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a cópia isola exatamente a sugestão escolhida |
+| Procedimento | Acionar a cópia de uma sugestão individual na interface e colar em um editor |
+| Resultado esperado | O conteúdo copiado corresponde exatamente à sugestão escolhida |
+| Critério de aprovação | Nenhum conteúdo de outra sugestão é incluído |
+| Evidência a registrar | Conteúdo efetivamente copiado e se corresponde apenas àquela sugestão |
+
+##### CT-RF04-03
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a interação não escreve no documento de origem |
+| Procedimento | Comparar o documento de origem antes e depois da interação, por soma de verificação |
+| Resultado esperado | O documento de origem permanece inalterado |
+| Critério de aprovação | Somas de verificação idênticas antes e depois |
+| Evidência a registrar | Somas de verificação antes e depois e se coincidem |
+
+##### CT-RF04-04
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a sugestão é rastreável até a fonte que a fundamenta |
+| Procedimento | Examinar cada sugestão de CT-RF04-01 quanto à fonte e à justificativa apresentadas |
+| Resultado esperado | Cada sugestão apresenta fonte e justificativa |
+| Critério de aprovação | As três sugestões atendem, coerente com o piso de 85% do RNF11 |
+| Evidência a registrar | Presença de fonte identificável e de justificativa em cada sugestão |
+
+##### CT-RF04-05
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que ausência de pendência não é preenchida com sugestão desnecessária |
+| Procedimento | Solicitar apoio no preenchimento do mapa de benefícios integralmente preenchido |
+| Resultado esperado | O agente informa que não há campos pendentes |
+| Critério de aprovação | Nenhuma sugestão é produzida para campo já preenchido |
+| Evidência a registrar | Teor da resposta, verificando se informa a ausência de pendências ou produz sugestões sem necessidade |
+
+##### CT-RF04-06
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o limite do conjunto suportado é declarado ao usuário |
+| Procedimento | Solicitar apoio para o documento de tipo não previsto no catálogo |
+| Resultado esperado | O agente explica que o tipo de documento não é suportado |
+| Critério de aprovação | A limitação é declarada, e não substituída por sugestão genérica |
+| Evidência a registrar | Teor da resposta e se a limitação é explicada ao usuário |
 
 #### RF05 — Notificar proativamente o usuário de pendências
 
@@ -5806,13 +6126,56 @@ O CT-RF02-07 é o caso que o plano identifica como *executável em parte*. A cla
 
 **Pré-condições comuns.** Conjuntos E e H carregados; associação `acompanha` da Seção 2.2.1 populada; agendador de verificação em execução, com o intervalo reduzido para permitir a observação dentro da janela de teste.
 
-| Caso | Propósito do teste | Passos | Observação a registrar |
-|---|---|---|---|
-| CT-RF05-01 | Confirmar que a notificação parte do sistema, e não de uma solicitação do usuário | Inserir uma pendência nova em projeto acompanhado pelo usuário de teste e aguardar o ciclo do agendador, sem realizar nenhuma solicitação | Se a notificação ocorreu, e se identifica o projeto e a pendência |
-| CT-RF05-02 | Confirmar que o alcance da notificação segue a relação `acompanha` | Preparar pendência própria, executar um ciclo e verificar quais usuários receberam a notificação | Lista de destinatários confrontada com a lista de quem acompanha o projeto |
-| CT-RF05-03 | Confirmar que o alerta não se repete a cada ciclo do agendador | Executar um segundo ciclo do agendador sem alterar as pendências | Se houve nova notificação sobre a mesma pendência |
-| CT-RF05-04 | Confirmar que quem não acompanha o projeto não é alcançado | Inserir uma pendência em projeto que o usuário de teste não acompanha e aguardar o ciclo | Se o usuário recebeu notificação indevida |
-| CT-RF05-05 | Confirmar que pendência incompleta não vira notificação com campo vazio | Inserir a pendência sem prazo do conjunto H e aguardar o ciclo | Se houve notificação, e, havendo, se o conteúdo está completo ou apresenta campo vazio ao usuário |
+
+##### CT-RF05-01
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a notificação parte do sistema, e não de uma solicitação do usuário |
+| Procedimento | Inserir uma pendência nova em projeto acompanhado pelo usuário de teste e aguardar o ciclo do agendador, sem realizar nenhuma solicitação |
+| Resultado esperado | Notificação entregue por iniciativa do sistema, contendo projeto e pendência |
+| Critério de aprovação | Notificação recebida sem nenhuma solicitação do usuário, com os dois elementos presentes |
+| Evidência a registrar | Se a notificação ocorreu, e se identifica o projeto e a pendência |
+
+##### CT-RF05-02
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o alcance da notificação segue a relação `acompanha` |
+| Procedimento | Preparar pendência própria, executar um ciclo e verificar quais usuários receberam a notificação |
+| Resultado esperado | Somente quem acompanha o projeto recebeu a notificação |
+| Critério de aprovação | Lista de destinatários idêntica à lista de acompanhantes |
+| Evidência a registrar | Lista de destinatários confrontada com a lista de quem acompanha o projeto |
+
+##### CT-RF05-03
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que o alerta não se repete a cada ciclo do agendador |
+| Procedimento | Executar um segundo ciclo do agendador sem alterar as pendências |
+| Resultado esperado | Nenhuma notificação nova sobre a mesma pendência |
+| Critério de aprovação | Zero notificações repetidas |
+| Evidência a registrar | Se houve nova notificação sobre a mesma pendência |
+
+##### CT-RF05-04
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que quem não acompanha o projeto não é alcançado |
+| Procedimento | Inserir uma pendência em projeto que o usuário de teste não acompanha e aguardar o ciclo |
+| Resultado esperado | O usuário que não acompanha o projeto não recebe notificação |
+| Critério de aprovação | Zero notificações indevidas |
+| Evidência a registrar | Se o usuário recebeu notificação indevida |
+
+##### CT-RF05-05
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que pendência incompleta não vira notificação com campo vazio |
+| Procedimento | Inserir a pendência sem prazo do conjunto H e aguardar o ciclo |
+| Resultado esperado | Nenhuma notificação é emitida, ou a notificação declara a ausência do prazo |
+| Critério de aprovação | Nenhum campo vazio, nulo ou de preenchimento automático é exibido ao usuário |
+| Evidência a registrar | Se houve notificação, e, havendo, se o conteúdo está completo ou apresenta campo vazio ao usuário |
 
 #### RF06 — Atualizar o cadastro de projetos a partir de instruções do usuário
 
@@ -5820,95 +6183,61 @@ O CT-RF02-07 é o caso que o plano identifica como *executável em parte*. A cla
 
 **Pré-condições comuns.** Conjuntos E e I carregados; escrita nas fontes habilitada, o que hoje a Seção 3.1 exclui do MVP; registro de auditoria em operação conforme o RNF09.
 
-| Caso | Propósito do teste | Passos | Observação a registrar |
-|---|---|---|---|
-| CT-RF06-01 | Confirmar que a instrução em linguagem natural vira alteração explícita e revisável | Autenticado como líder de P1, enviar "atualiza o avanço do projeto P1 para 45% neste mês" | Projeto e campos identificados e os valores exibidos antes da gravação |
-| CT-RF06-02 | Confirmar que a gravação ocorre e deixa rastro de autoria e data | Confirmar explicitamente a alteração proposta no caso anterior | Valor gravado na fonte e os campos de autor e data do registro de auditoria |
-| CT-RF06-03 | Confirmar que a ausência de confirmação preserva o valor anterior | Repetir a instrução e, em vez de confirmar, recusar ou abandonar a conversa | Valor do campo na fonte após a interação |
-| CT-RF06-04 | Confirmar que a permissão de alteração segue a relação `lidera` | Autenticado como líder de P1, instruir a atualização de um campo do projeto P2 | Código HTTP, teor da resposta e valor do campo em P2 após a tentativa |
-| CT-RF06-05 | Confirmar que valor ambíguo não é resolvido por conta própria pelo agente | Enviar "atualiza a data de término do projeto P1 para amanhã de manhã cedo", com valor incompatível com o tipo `date` do campo | Teor da resposta e se o sistema pede correção ou grava uma interpretação própria |
+
+##### CT-RF06-01
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a instrução em linguagem natural vira alteração explícita e revisável |
+| Procedimento | Autenticado como líder de P1, enviar "atualiza o avanço do projeto P1 para 45% neste mês" |
+| Resultado esperado | Projeto e campo corretamente identificados, com os valores exibidos antes da gravação |
+| Critério de aprovação | O usuário vê o valor que será gravado antes de qualquer escrita |
+| Evidência a registrar | Projeto e campos identificados e os valores exibidos antes da gravação |
+
+##### CT-RF06-02
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a gravação ocorre e deixa rastro de autoria e data |
+| Procedimento | Confirmar explicitamente a alteração proposta no caso anterior |
+| Resultado esperado | O valor é gravado, e o registro de auditoria contém autor e data |
+| Critério de aprovação | Valor na fonte igual ao confirmado; autor e data presentes no registro |
+| Evidência a registrar | Valor gravado na fonte e os campos de autor e data do registro de auditoria |
+
+##### CT-RF06-03
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a ausência de confirmação preserva o valor anterior |
+| Procedimento | Repetir a instrução e, em vez de confirmar, recusar ou abandonar a conversa |
+| Resultado esperado | Nenhuma alteração é gravada |
+| Critério de aprovação | O campo permanece com o valor anterior |
+| Evidência a registrar | Valor do campo na fonte após a interação |
+
+##### CT-RF06-04
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que a permissão de alteração segue a relação `lidera` |
+| Procedimento | Autenticado como líder de P1, instruir a atualização de um campo do projeto P2 |
+| Resultado esperado | A alteração é recusada e o campo de P2 permanece inalterado |
+| Critério de aprovação | Recusa explícita e valor original preservado |
+| Evidência a registrar | Código HTTP, teor da resposta e valor do campo em P2 após a tentativa |
+
+##### CT-RF06-05
+
+| Campo | Planejamento |
+|---|---|
+| Propósito | Confirmar que valor ambíguo não é resolvido por conta própria pelo agente |
+| Procedimento | Enviar "atualiza a data de término do projeto P1 para amanhã de manhã cedo", com valor incompatível com o tipo `date` do campo |
+| Resultado esperado | O agente pede a data em formato preciso |
+| Critério de aprovação | Nenhuma data é gravada por interpretação própria do agente |
+| Evidência a registrar | Teor da resposta e se o sistema pede correção ou grava uma interpretação própria |
+
 
 ### 6.2.4 Resultados Esperados
 
-O resultado esperado é declarado antes da execução e não é ajustado depois dela. Se a execução na Sprint 4 produzir um resultado diferente do previsto aqui, o caso é reprovado e a divergência é registrada como defeito ou como revisão de requisito, com a decisão registrada na Seção 7; alterar o resultado esperado para acomodar o comportamento observado descaracterizaria o teste.
-
-Nos casos de conjunto, o critério de aprovação é um limiar sobre o lote inteiro. Nos demais, é a correspondência exata com o resultado descrito.
-
-#### RF01
-
-| Caso | Resultado esperado | Critério de aprovação |
-|---|---|---|
-| CT-RF01-01 | `201` com corpo `{"id": "...", "status": "received", "message": "Áudio recebido com sucesso."}` e objeto gravado sob `incoming/{audio_id}` | Os quatro formatos do conjunto A aprovados, sem exceção |
-| CT-RF01-02 | `200` com `text` não vazio, `language` igual a `pt-BR`, `confidence` numérico ou nulo conforme schema e `duration_seconds` compatível com a gravação | Transcrição inteligível em todos os quatro áudios; a fidelidade é medida no teste de RNF06 da Seção 6.3 |
-| CT-RF01-03 | A transcrição é exibida na tela e permanece visível antes de a solicitação seguir para processamento | A transcrição precede a resposta na tela e é legível pelo usuário |
-| CT-RF01-04 | `200` com `reply` em texto não vazio | Cinco solicitações de cinco aprovadas |
-| CT-RF01-05 | Resposta textual nos dois canais; intenção equivalente quando o pipeline comum existir | Todas as cinco duplas apresentam texto. `/chat` não retorna intenção; essa comparação depende de integração/instrumentação. Não atribuir divergência à transcrição sem evidência |
-| CT-RF01-06 | `415` com `error` igual a `unsupported_format` | Correspondência exata de código HTTP e de `error` |
-| CT-RF01-07 | `413` com `error` igual a `file_too_large` | Correspondência exata |
-| CT-RF01-08 | `422` com `error` igual a `audio_too_long` | Correspondência exata |
-| CT-RF01-09 | `422` com `error` igual a `invalid_audio` nos dois envios | Correspondência exata nos dois |
-| CT-RF01-10 | `422` com `detail` apontando campo `audio` ausente para corpo JSON | Nenhum armazenamento; `400 bad_request` é erro de parsing HTTP/multipart, não este caso |
-| CT-RF01-11 | `404` com `error` igual a `audio_not_found` | Correspondência exata |
-| CT-RF01-12 | `502` com `error` igual a `transcription_failed` e mensagem orientando nova tentativa | Correspondência exata, e ausência de rastro de exceção no corpo devolvido |
-| CT-RF01-13 | `422` com `error` igual a `empty_message` nos dois envios | Correspondência exata nos dois |
-| CT-RF01-14 | `422` com `error` igual a `message_too_long` | Correspondência exata |
-| CT-RF01-15 | A interface informa que o serviço está indisponível | Nenhum conteúdo de demonstração é apresentado como resposta do agente |
-
-#### RF02
-
-| Caso | Resultado esperado | Critério de aprovação |
-|---|---|---|
-| CT-RF02-01 | Intenção `consultar_projeto_sintetico` nas dez solicitações | Registrar dez previsões; aprovação estatística exclusivamente em CT-RNF03-P/N, sem inferir F1 a partir de nove acertos |
-| CT-RF02-02 | Intenção e confiança nas dez solicitações normativas | Registrar dez previsões; métricas e aprovação agregada em CT-RNF03-P/N |
-| CT-RF02-03 | Relatório do conjunto cego de CT-RNF03-P/N | F1-macro ≥ 0,85, cobertura ≥ 90%, aceitação indevida ≤ 15%; acurácia complementar, sem piso por classe inventado |
-| CT-RF02-04 | A entidade `nome_projeto` é extraída e associada ao registro correto | Correspondência correta em pelo menos nove das dez solicitações, conforme o indicador de 90% da Seção 2.1 |
-| CT-RF02-05 | O valor devolvido é idêntico ao registrado na fonte | Coincidência exata nas cinco consultas |
-| CT-RF02-06 | O agente pergunta qual é o projeto, e a resposta final traz o dado originalmente pedido | O pedido original é preservado; o usuário não precisa reformular a pergunta inteira |
-| CT-RF02-07 | Intenção `fora_do_catalogo`, resposta explicando o limite e indicando as interações disponíveis, sem registro de consulta às fontes | No máximo três de vinte aceitas indevidamente, conforme RNF03; todas as rejeitadas informam limite sem consultar fontes. Verificar chamadas com spy, além da auditoria |
-| CT-RF02-08 | O agente declara não ter encontrado o projeto | Nenhuma resposta apresenta dado sobre projeto inexistente; o caso é a verificação direta do risco de alucinação registrado na Seção 1.9.2 |
-| CT-RF02-09 | A resposta é tratada como preenchimento da entidade em curso, sem nova classificação de intenção | O fluxo guiado avança para o passo seguinte, conforme a regra da Seção 3.1 |
-| CT-RF02-10 | O dado de P2 não é devolvido, e a tentativa é registrada | Nenhum dado de P2 aparece na resposta |
-
-#### RF03
-
-| Caso | Resultado esperado | Critério de aprovação |
-|---|---|---|
-| CT-RF03-01 | A resposta traz documento de origem, referência e data da última atualização | Os três elementos presentes; a ausência de qualquer um reprova o caso |
-| CT-RF03-02 | As duas fontes utilizadas são listadas | Nenhuma fonte utilizada fica omitida |
-| CT-RF03-03 | O documento é localizado no repositório a partir da referência exibida | A localização ocorre sem informação além da referência |
-| CT-RF03-04 | O agente declara não haver fonte para o dado, ou não o apresenta | O dado não é apresentado como fundamentado |
-| CT-RF03-05 | O agente indica que a data de atualização não está disponível | Nenhuma data vazia, nula ou estimada é exibida |
-
-#### RF04
-
-| Caso | Resultado esperado | Critério de aprovação |
-|---|---|---|
-| CT-RF04-01 | Três sugestões, uma para cada campo pendente, cada uma identificando o campo | Correspondência de um para um entre campos pendentes e sugestões |
-| CT-RF04-02 | O conteúdo copiado corresponde exatamente à sugestão escolhida | Nenhum conteúdo de outra sugestão é incluído |
-| CT-RF04-03 | O documento de origem permanece inalterado | Somas de verificação idênticas antes e depois |
-| CT-RF04-04 | Cada sugestão apresenta fonte e justificativa | As três sugestões atendem, coerente com o piso de 85% do RNF11 |
-| CT-RF04-05 | O agente informa que não há campos pendentes | Nenhuma sugestão é produzida para campo já preenchido |
-| CT-RF04-06 | O agente explica que o tipo de documento não é suportado | A limitação é declarada, e não substituída por sugestão genérica |
-
-#### RF05
-
-| Caso | Resultado esperado | Critério de aprovação |
-|---|---|---|
-| CT-RF05-01 | Notificação entregue por iniciativa do sistema, contendo projeto e pendência | Notificação recebida sem nenhuma solicitação do usuário, com os dois elementos presentes |
-| CT-RF05-02 | Somente quem acompanha o projeto recebeu a notificação | Lista de destinatários idêntica à lista de acompanhantes |
-| CT-RF05-03 | Nenhuma notificação nova sobre a mesma pendência | Zero notificações repetidas |
-| CT-RF05-04 | O usuário que não acompanha o projeto não recebe notificação | Zero notificações indevidas |
-| CT-RF05-05 | Nenhuma notificação é emitida, ou a notificação declara a ausência do prazo | Nenhum campo vazio, nulo ou de preenchimento automático é exibido ao usuário |
-
-#### RF06
-
-| Caso | Resultado esperado | Critério de aprovação |
-|---|---|---|
-| CT-RF06-01 | Projeto e campo corretamente identificados, com os valores exibidos antes da gravação | O usuário vê o valor que será gravado antes de qualquer escrita |
-| CT-RF06-02 | O valor é gravado, e o registro de auditoria contém autor e data | Valor na fonte igual ao confirmado; autor e data presentes no registro |
-| CT-RF06-03 | Nenhuma alteração é gravada | O campo permanece com o valor anterior |
-| CT-RF06-04 | A alteração é recusada e o campo de P2 permanece inalterado | Recusa explícita e valor original preservado |
-| CT-RF06-05 | O agente pede a data em formato preciso | Nenhuma data é gravada por interpretação própria do agente |
+Os resultados esperados e critérios de aprovação estão reunidos com os procedimentos de cada caso em 6.2.3; os complementares estão em 6.2.6. Nos ensaios por lote, aplicar o limiar indicado à amostra inteira; nos demais, exigir todos os observáveis da ficha. Definir o gabarito antes da execução e registrar divergências, sem alterar o critério para acomodar a resposta do sistema.
 
 #### Critérios de encerramento da execução
 
