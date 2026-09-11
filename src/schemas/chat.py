@@ -25,6 +25,11 @@ class FonteCitada(BaseModel):
     """
 
     posicao: int
+    # O projeto é o que distingue uma fonte da outra: todo projeto tem um
+    # `04_Riscos_e_Problemas.xlsx`. Mostrar só o nome do arquivo faria duas
+    # fontes de projetos diferentes parecerem a mesma.
+    projeto_id: str = ""
+    tipo_documento: str = ""
     arquivo_origem: str
     secao: str = ""
     score: float

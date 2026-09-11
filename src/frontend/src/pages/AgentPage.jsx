@@ -87,7 +87,10 @@ export default function AgentPage() {
 
     sendMessage(trimmed, conversationId)
       .then((data) => {
-        setMessages((prev) => [...prev, { role: 'agent', content: data.reply }])
+        setMessages((prev) => [
+          ...prev,
+          { role: 'agent', content: data.reply, fontes: data.fontes ?? [] },
+        ])
       })
       .catch((err) => {
         let content = GENERIC_ERROR_FALLBACK
@@ -340,6 +343,7 @@ export default function AgentPage() {
                       key={index}
                       role={message.role}
                       content={message.content}
+                      fontes={message.fontes}
                     />
                   ))}
                 </AnimatePresence>

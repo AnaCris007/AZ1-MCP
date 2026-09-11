@@ -31,7 +31,13 @@ CONTEXTO_INSTRUCAO = (
     "trecho, cite o número dele entre colchetes, assim: [1]. Se os trechos não "
     "contiverem a informação pedida, diga isso e pare — não complete com "
     "conhecimento próprio, não estime percentuais, não deduza datas nem valores. "
-    "Não invente número de trecho nem cite um que você não usou."
+    "Não invente número de trecho nem cite um que você não usou.\n\n"
+    "ATENÇÃO AO PROJETO: cada trecho começa indicando a que projeto pertence. "
+    "A busca traz trechos de projetos diferentes, e todos os projetos têm "
+    "documentos com o mesmo nome. Nunca atribua a um projeto uma informação "
+    "que veio do trecho de outro. Se a pergunta é sobre um projeto específico, "
+    "use apenas os trechos daquele projeto; se algum trecho relevante for de "
+    "outro, diga de qual é em vez de misturar."
 )
 
 # Respostas canônicas: são devolvidas SEM chamar o modelo, de propósito.
@@ -62,18 +68,48 @@ MENSAGEM_BASE_INDISPONIVEL = (
 # fora do assunto — sem um piso, qualquer coisa "tem fonte" e a citação vira
 # teatro.
 #
-# MEDIDO contra a base reindexada (164 chunks, 1536 dimensões), com quatro
-# consultas de sondagem:
+# MEDIDO contra a base reindexada (164 chunks, 1536 dimensões). São TRÊS faixas,
+# e não duas — foi a terceira que surpreendeu:
 #
-#   dentro do escopo  0,668 – 0,724   ("riscos da ventilação", "avanço do portfólio")
-#   fora do escopo    0,504 – 0,569   ("capital da França", "bolo de chocolate")
+#   assunto alheio      0,504 – 0,569   ("capital da França", "bolo de chocolate")
+#   saudação / meta     0,607 – 0,666   ("oi", "bom dia", "obrigado")
+#   dentro do escopo    0,668 – 0,724   ("riscos da ventilação", "avanço do portfólio")
 #
-# 0,60 cai na folga entre as duas faixas, com margem dos dois lados. Quatro
-# consultas é amostra pequena: se perguntas legítimas começarem a receber a
-# mensagem padrão, o valor está alto; se assunto alheio voltar a "ter fonte",
-# está baixo. Reavaliar quando a base crescer — a distância entre as faixas
-# tende a encolher com mais documentos.
+# 0,60 separa a PRIMEIRA faixa das outras duas. Saudação passa de propósito: ela
+# chega ao modelo com contexto, e quem a trata bem é a instrução ("se os trechos
+# não contiverem a informação, diga isso") — que a devolve como um convite a
+# perguntar, em vez da recusa seca da mensagem padrão. Como o modelo não cita
+# nada nesse caso, nenhuma fonte é exibida.
+#
+# ESPAÇO DE MANOBRA É MÍNIMO PARA CIMA: a distância entre saudação (0,666) e
+# pergunta legítima (0,668) é de 0,002. Subir o limiar para barrar assunto
+# alheio com mais folga barra as saudações primeiro e, logo em seguida, começa a
+# recusar pergunta boa. Para cima, praticamente não há espaço; para baixo, há.
+#
+# A amostra ainda é pequena. Reavaliar quando a base crescer: mais documentos
+# aproximam as faixas, e a separação tende a piorar, não melhorar.
 SCORE_MINIMO_CONTEXTO = 0.60
+
+
+def _formatar_trecho(numero: int, resultado: ResultadoBusca) -> str:
+    """Cabeçalho do trecho no prompt.
+
+    O `projeto_id` é obrigatório aqui, e a razão é concreta: TODO projeto tem um
+    arquivo chamado `04_Riscos_e_Problemas.xlsx`. Sem o código do projeto no
+    cabeçalho, o modelo não tem como distinguir os riscos do SYN-01 dos do
+    SYN-02 — e, perguntado sobre um, respondeu misturando os dois, atribuindo à
+    ventilação três riscos que eram de outro projeto.
+
+    O nome do arquivo sozinho identifica o TIPO de documento, nunca a que
+    projeto ele pertence.
+    """
+    partes = [f"[{numero}] Projeto {resultado.projeto_id}"]
+    if resultado.tipo_documento and resultado.tipo_documento != "desconhecido":
+        partes.append(resultado.tipo_documento.replace("_", " "))
+    partes.append(resultado.arquivo_origem)
+    if resultado.secao:
+        partes.append(resultado.secao)
+    return " — ".join(partes) + f"\n{resultado.texto}"
 
 
 class _Situacao(Enum):
@@ -214,9 +250,6 @@ class GeminiChatModel:
             )
             return message, (), _Situacao.SEM_FUNDAMENTO
 
-        trechos = "\n\n".join(
-            f"[{n}] {r.arquivo_origem}" + (f" — {r.secao}" if r.secao else "") + f"\n{r.texto}"
-            for n, r in enumerate(relevantes, start=1)
-        )
+        trechos = "\n\n".join(_formatar_trecho(n, r) for n, r in enumerate(relevantes, start=1))
         prompt = f"{CONTEXTO_INSTRUCAO}\n\n{trechos}\n\nPergunta do usuário: {message}"
         return prompt, relevantes, _Situacao.COM_FUNDAMENTO
