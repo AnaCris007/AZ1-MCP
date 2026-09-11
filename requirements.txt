@@ -4,9 +4,21 @@ python-dotenv>=1.0
 PyYAML>=6.0
 
 # Dependências do pipeline de PLN (src/pln)
-nltk>=3.8
-scikit-learn>=1.4
-spacy>=3.7
+#
+# Estas cinco estão fixadas em versão exata, e não em piso, porque são as que
+# determinam o F1-macro publicado em `resultados/`. Com piso, um rebuild puxa
+# uma versão nova, o número medido muda e nenhum teste acusa — o relatório
+# deixa de ser reproduzível sem que ninguém perceba. As versões abaixo são as
+# que produzem o F1-macro de 0,6736 registrado na Seção 3.3.6 da documentação.
+#
+# Para atualizar qualquer uma delas: suba a versão aqui, regere os relatórios
+# com `python -m pln.experimento` e `python -m pln.ajuste_fino`, e atualize a
+# tabela da Seção 3.3.7. Nessa ordem.
+nltk==3.10.3
+scikit-learn==1.9.0
+spacy==3.8.16
+numpy==2.5.2
+joblib==1.6.0
 
 # Dependências da API de recebimento de áudio
 fastapi>=0.115
