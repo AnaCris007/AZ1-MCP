@@ -7,11 +7,20 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from az1_api.dependencies import AuthAPIError, require_authenticated_user
-from routes import analysis_router, audio_router, chat_router, rag_router, speech_router, transcription_router
+from routes import (
+    analysis_router,
+    audio_router,
+    chat_router,
+    rag_router,
+    speech_router,
+    transcription_router,
+    webhooks_router,
+)
 from routes.audio import AudioAPIError
 from routes.chat import ChatAPIError
 from routes.speech import SpeechAPIError
 from routes.transcription import TranscriptionAPIError
+from routes.webhooks import WebhookAPIError
 from schemas.common import ErrorResponse
 
 load_dotenv()
@@ -36,6 +45,11 @@ app.include_router(analysis_router, prefix="/api/v1", dependencies=_auth_depende
 app.include_router(chat_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(rag_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(speech_router, prefix="/api/v1", dependencies=_auth_dependency)
+
+# Webhooks ficam fora do RNF02: quem chama é o provedor (Google Drive /
+# Microsoft Graph), que não tem token do SSO. A autenticidade dessas entregas
+# vem do segredo compartilhado verificado em src/services/webhook_*.
+app.include_router(webhooks_router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["infra"])
@@ -81,6 +95,14 @@ def auth_api_error_handler(request: Request, exc: AuthAPIError) -> JSONResponse:
         status_code=exc.status_code,
         content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
         headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
+@app.exception_handler(WebhookAPIError)
+def webhook_api_error_handler(request: Request, exc: WebhookAPIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(error=exc.error, message=exc.message).model_dump(),
     )
 
 

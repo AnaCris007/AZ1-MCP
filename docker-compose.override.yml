@@ -124,3 +124,10 @@ services:
       # Em produção nenhuma das duas é publicada.
       - "${MINIO_API_PORT:-9000}:9000"
       - "${MINIO_CONSOLE_PORT:-9001}:9001"
+
+  postgres:
+    ports:
+      # Útil para o webhook, que ainda roda fora do contêiner (uvicorn no
+      # host) e fala com "localhost:5432", conforme DATABASE_URL no
+      # .env.example. Em produção não é publicada.
+      - "${POSTGRES_PORT:-5432}:5432"

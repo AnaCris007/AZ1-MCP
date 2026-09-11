@@ -5360,17 +5360,811 @@ O próximo passo é implementar essa interface, seguindo os passos da seção 4.
 
 ## 5.1 Webhooks
 
+Um webhook inverte a direção usual de uma integração. Nas APIs descritas nas Seções 3.2 e 3.4, é a solução que inicia a chamada e o provedor externo que responde; aqui, a solução se inscreve previamente junto ao provedor e passa a ser **chamada por ele**, no instante em que um evento de interesse ocorre na origem observada. Essa inversão é o que elimina a varredura periódica: em vez de perguntar repetidamente "mudou alguma coisa?", o sistema registra o interesse uma única vez e aguarda ser avisado. É um modelo de assinatura — o termo é literal nos dois provedores integrados, `subscription` no Microsoft Graph e `channel` no Google Drive —, com um contrato implícito comum a qualquer implementação: a inscrição tem prazo de validade, o provedor entrega no melhor esforço e espera confirmação em uma janela curta, e cabe a quem recebe decidir se a entrega é autêntica antes de agir sobre ela.
+
+Esta seção documenta como esse modelo foi implementado para dois provedores — Microsoft Graph e Google Drive —, por que a implementação para os dois compartilha o mesmo núcleo, e por que a assinatura de cada um expira segundo prazos diferentes, tema que a Seção 5.1.7 aprofunda.
+
+### Como o webhook funciona: o ciclo de uma entrega
+
+Do instante em que um documento é criado ou alterado na origem observada até o momento em que o AZ1 sabe que precisa reindexá-lo, a entrega atravessa cinco etapas, sempre na mesma ordem, independentemente do provedor:
+
+1. **Notificação.** O provedor detecta a mudança e envia uma requisição `POST` à URL registrada na assinatura, dentro de segundos a poucos minutos do evento real.
+2. **Verificação.** O receptor confirma que a entrega é autêntica — que veio de fato do provedor esperado, para a assinatura correta, dentro do prazo de validade dela — antes de tocar em qualquer efeito.
+3. **Tradução.** O formato específico do provedor (corpo JSON no Microsoft Graph, cabeçalhos HTTP no Google Drive) é convertido em um envelope canônico, único, que o restante do sistema consome sem saber de qual provedor ele veio.
+4. **Registro.** O envelope é gravado de forma imutável na trilha de auditoria, com uma chave que impede o mesmo evento de ser processado duas vezes, mesmo que o provedor o reentregue.
+5. **Efeito.** O sistema reage à mudança — nesta sprint, marcando a origem como pendente de varredura — e confirma o recebimento ao provedor.
+
+A ordem entre as etapas 2 a 5 não é estilística: um provedor que reentrega diante de silêncio ou de erro só o faz se a confirmação chegar depois que o efeito tiver sido garantido, e não antes. Se a confirmação fosse emitida antes da gravação, uma falha entre as duas deixaria o evento perdido, sem que o provedor jamais soubesse que precisava reentregá-lo. A Seção 5.1.4 detalha essa ordem e as garantias que ela sustenta.
+
+### Como foi construído: um núcleo comum, dois adaptadores
+
+A implementação segue o padrão de portas e adaptadores. O núcleo — a classe `ReceberEventoWebhook`, em [`src/services/webhook_service.py`](../src/services/webhook_service.py) — não conhece Microsoft Graph nem Google Drive. Ele conhece apenas quatro portas, declaradas como `Protocol` do Python, que descrevem o que qualquer provedor precisa fornecer:
+
+| Porta | Responsabilidade |
+|---|---|
+| `VerificadorAssinatura` | Confirma a autenticidade de uma entrega bruta |
+| `TradutorDeEvento` | Converte a entrega no envelope canônico |
+| `RegistroEventos` | Persiste o envelope e garante a idempotência |
+| `ProcessadorEvento` | Aplica o efeito de domínio |
+
+Cada provedor implementa as duas primeiras portas com uma classe própria — `VerificadorClientState` e `TradutorGraph` para o Microsoft Graph, em [`src/services/graph_push_service.py`](../src/services/graph_push_service.py); `VerificadorChannelToken` e `TradutorDrive` para o Google Drive, em [`src/services/drive_push_service.py`](../src/services/drive_push_service.py). As duas últimas portas — persistência e efeito — são as mesmas classes para os dois provedores, parametrizadas pelo nome do provedor: `RegistroEventosPostgres` e `ProcessadorVarreduraPendente`, em [`src/services/webhook_registry_service.py`](../src/services/webhook_registry_service.py).
+
+Essa divisão não é uma preferência estética. Ela é o que permite à Seção 5.1.1 sustentar, com evidência e não apenas com afirmação, que o núcleo é desacoplado da plataforma: acrescentar o segundo provedor custou dois arquivos de adaptador e uma subclasse de teste, sem alterar a rota, o serviço ou o esquema do banco. A Seção 5.1.1 detalha a comparação entre os dois adaptadores; a Seção 5.1.4 detalha o funcionamento interno do núcleo.
+
 ### 5.1.1 Definição dos Webhooks
+
+**Decisão:** implementar dois webhooks de entrada — **Microsoft Graph** e **Google Drive** — sobre o mesmo receptor, com papéis distintos: o primeiro é o alvo do ambiente do parceiro, o segundo é o provedor demonstrado ao vivo.
+
+A escolha partiu da arquitetura atual do PMO, apresentada pelo parceiro em 22/10/2025. Nela, o SharePoint ocupa a posição central: é onde ocorrem o preenchimento e a atualização dos dados de projetos e subportfólio, onde ficam as páginas de informações do portfólio e os materiais de apoio, e é a ele que o cronograma construído no Project é anexado. O Power Automate já opera nesse ambiente, automatizando o fluxo do termo de aceite. É esse acervo documental que o agente precisa consultar, e é dele que decorre o caso de uso do webhook: **quando um documento é criado ou alterado na origem, o sistema é avisado e agenda a reindexação, sem varredura periódica**.
+
+O Microsoft Graph é o mecanismo que o próprio ecossistema Microsoft oferece para isso. A observação recai sobre um recurso do tipo `driveItem`, e não sobre uma lista do SharePoint, por uma razão de portabilidade: o OneDrive pessoal usado em desenvolvimento e a biblioteca de documentos do site do parceiro são **o mesmo tipo de recurso**, com o mesmo formato de notificação. A migração de um para o outro é a troca de uma variável de ambiente, sem alteração de código:
+
+| Ambiente | `MS_RECURSO` | Tipo |
+|---|---|---|
+| Desenvolvimento | `/me/drive/root` | `driveItem` |
+| Produção (parceiro) | `/drives/{drive-id}/root` | `driveItem` |
+
+Observar `/sites/{site-id}/lists/{list-id}` foi considerado e descartado: a lista é do tipo `list`, com estrutura de notificação distinta, o que exigiria um segundo tradutor para atender ao mesmo propósito. Além disso, a lista guarda campos, e o que se vetoriza são documentos.
+
+#### Por que o segundo webhook é o Google Drive
+
+Criar uma assinatura no Microsoft Graph exige registrar uma aplicação, e registrar uma aplicação exige um *tenant* do Microsoft Entra ID. É esse provisionamento que se mostrou inacessível ao grupo. Convém ser preciso sobre a natureza do obstáculo, porque ele não é o que aparenta:
+
+> A Graph API, o registro de aplicação e as assinaturas de notificação **não têm custo**. O que não é gratuito é o provisionamento do *tenant*, que depende de uma assinatura do Azure (com cartão de crédito), de verificação acadêmica ou de um *tenant* corporativo preexistente.
+
+As três vias foram tentadas. A conta pessoal gratuita recai no *tenant* compartilhado "Microsoft Services", onde o registro de aplicação é vedado (erro `AADSTS50020`). A criação de diretório próprio não se completou. O Azure for Students recusou a inscrição, por o domínio `sou.inteli.edu.br` não constar da base de verificação acadêmica da Microsoft. Restaria o pagamento por uso, com cartão.
+
+Esse é precisamente o risco **AM4 — indisponibilidade do ambiente Microsoft do parceiro**, estimado em 70% de probabilidade na Seção 2.5, materializando-se um nível antes do previsto: não no acesso ao ambiente do Metrô, mas no acesso a qualquer ambiente Microsoft. A resposta adotada é a mitigação já registrada para ele, e a mesma que a oportunidade **OP1 — núcleo desacoplado da plataforma** antecipava: como o receptor não depende de provedor, acrescentar um segundo custou um arquivo de adaptador e uma subclasse de teste.
+
+O Google Drive foi escolhido para esse papel por ser o único provedor de notificação de mudanças em acervo documental acessível sem cartão de crédito: projeto no Google Cloud, habilitação da Drive API, tela de consentimento e credencial OAuth são todos gratuitos, e a verificação de domínio da URL receptora deixou de ser exigida.
+
+#### Alternativas avaliadas e recusadas
+
+| Alternativa | Situação | Motivo |
+|---|---|---|
+| Lista do SharePoint (`list`) | Recusada | Tipo de recurso distinto do `driveItem`, exigiria segundo tradutor para o mesmo fim; guarda campos, não documentos |
+| Google Calendar | Recusada | Sem aderência ao problema: o agente consulta documentos de portfólio, não agenda |
+| Power Automate | Registrada para evolução | Já opera no ambiente do parceiro e permitiria ao PMO alterar o gatilho sem código; a ação HTTP genérica, porém, é conector *premium* |
+| Google Drive | **Implementada** | Único provedor de acervo documental acessível sem cartão; sustenta a demonstração ao vivo |
+| Microsoft Graph | **Implementada** | Mecanismo nativo do ecossistema do parceiro; sem demonstração ao vivo por indisponibilidade de *tenant* |
+
+#### O que o par demonstra
+
+Os dois adaptadores não são duas cópias do mesmo código. Eles diferem em tudo que é específico de provedor e coincidem em tudo que não é, o que transforma a alegação de desacoplamento em evidência verificável:
+
+| | Microsoft Graph | Google Drive |
+|---|---|---|
+| Onde vem a informação | Corpo JSON | Cabeçalhos `X-Goog-*`, **corpo vazio** |
+| Segredo compartilhado | `clientState`, no corpo | `X-Goog-Channel-Token`, no cabeçalho |
+| Validade da origem | `subscriptionExpirationDateTime` | `X-Goog-Channel-Expiration` |
+| Chave de idempotência | `subscriptionId:itemId` | `Channel-ID:Message-Number` |
+| Agrupamento | Agrupa mudanças próximas | Uma notificação por mudança |
+| Validação da URL | Handshake com `validationToken` | Mensagem `sync` de abertura |
+| Descoberta do que mudou | `delta` | `changes.list` |
+| Vida da origem | 30 dias | 7 dias |
+
+O que **não** muda entre os dois: o serviço `ReceberEventoWebhook`, o envelope canônico, o esquema do banco, a suíte de contrato e os oito casos de teste. Que o contraste entre corpo e cabeçalho seja absorvido sem alteração no núcleo é o que justifica a assinatura da porta `TradutorDeEvento`, que recebe os dois.
+
+---
 
 ### 5.1.2 Rotas e Endpoints
 
+**Decisão:** uma rota por provedor, ambas sob o prefixo versionado `/api/v1`, aceitando apenas `POST`.
+
+```http
+POST /api/v1/webhooks/microsoft
+POST /api/v1/webhooks/google
+```
+
+| Aspecto | Microsoft Graph | Google Drive |
+|---|---|---|
+| Método aceito | `POST` | `POST` |
+| `Content-Type` esperado | `application/json` | irrelevante — corpo vazio |
+| Autenticação | `clientState` no corpo + assinatura ativa | `X-Goog-Channel-Token` + canal ativo |
+| Modos | Dois: handshake e notificação | Um |
+| Implementação | [`src/routes/webhooks.py`](../src/routes/webhooks.py) | idem |
+
+As rotas não exigem `Authorization`, e a omissão é deliberada: quem chama é o provedor, não um usuário do sistema, e nenhum dos dois assina requisição com credencial nossa. A autenticidade é estabelecida pelo segredo compartilhado, definido por nós no momento em que a origem é criada e devolvido pelo provedor em cada entrega.
+
+#### O handshake do Microsoft Graph
+
+Ao receber um pedido de criação de assinatura, e **antes** de confirmá-lo, o Graph chama a URL informada acrescentando o parâmetro `validationToken`, e exige o token de volta em texto puro, com `200`, em até dez segundos:
+
+```http
+POST /api/v1/webhooks/microsoft?validationToken=Validation%3A+Testing...
+→ 200 OK
+   Content-Type: text/plain
+   Validation: Testing...
+```
+
+Devolver JSON, devolver o token escapado ou demorar mais que a janela faz a criação da assinatura falhar. Como a rota é a mesma das notificações, e o FastAPI resolve as dependências antes de entrar no manipulador, o receptor é injetado como **fábrica** e não como objeto pronto: assim o handshake responde mesmo numa instalação em que o banco ainda não subiu — que é exatamente a situação de quem está criando a primeira assinatura.
+
+#### A mensagem de abertura do Google Drive
+
+O Drive não valida a URL previamente. Ele abre o canal e envia como primeira entrega uma notificação de estado `sync`, número 1, que não corresponde a mudança alguma no acervo. Ela é registrada e encerrada sem efeito, pelo mesmo caminho de qualquer evento fora do catálogo de processáveis (caso TI-40).
+
+---
+
 ### 5.1.3 Estrutura dos Dados Recebidos
+
+#### Microsoft Graph — corpo JSON
+
+O corpo é um `changeNotificationCollection`. O campo `value` é sempre uma lista, porque o provedor agrupa mudanças próximas numa entrega só.
+
+```json
+{
+  "value": [
+    {
+      "subscriptionId": "b3a1...-...-4f2c",
+      "changeType": "updated",
+      "resource": "drives/b!x9K.../root",
+      "clientState": "<segredo definido na criação da assinatura>",
+      "subscriptionExpirationDateTime": "2026-10-07T14:22:03.0000000Z",
+      "tenantId": "9f4e...-...-4a93",
+      "resourceData": {
+        "id": "01BYE5RZ6QN3ZWBTUFOFD3GSPGOHDJD36K",
+        "@odata.type": "#microsoft.graph.driveItem",
+        "@odata.id": "drives/b!x9K.../items/01BYE5...",
+        "@odata.etag": "\"{4F2C...},2\""
+      }
+    }
+  ]
+}
+```
+
+| Campo | Tipo | Obrigatório | Papel |
+|---|---|---|---|
+| `subscriptionId` | `string` | Sim | Identifica a origem; confrontado com `integracao.conexao` |
+| `changeType` | `string` | Sim | `created`, `updated` ou `deleted` |
+| `resource` | `string` | Sim | Caminho do recurso observado |
+| `clientState` | `string` | Sim | Segredo compartilhado; sua ausência é recusada com `401` |
+| `subscriptionExpirationDateTime` | `string` (ISO 8601) | Não | Validade da assinatura |
+| `resourceData.id` | `string` | Sim | Item alterado; compõe a chave de idempotência |
+| `tenantId` | `string` | Não | Registrado para auditoria |
+
+Modelado em [`src/schemas/webhook.py`](../src/schemas/webhook.py) e traduzido por `TradutorGraph`, em [`src/services/graph_push_service.py`](../src/services/graph_push_service.py).
+
+#### Google Drive — cabeçalhos, corpo vazio
+
+O corpo chega com `Content-Length: 0`. Toda a informação vem em cabeçalhos:
+
+```http
+POST /api/v1/webhooks/google
+X-Goog-Channel-ID: 6f1e...-...-9c02
+X-Goog-Channel-Token: <segredo definido na abertura do canal>
+X-Goog-Channel-Expiration: Tue, 15 Sep 2026 18:00:00 GMT
+X-Goog-Resource-ID: o3hgv1538sdjfh
+X-Goog-Resource-URI: https://www.googleapis.com/drive/v3/changes?alt=json
+X-Goog-Resource-State: change
+X-Goog-Message-Number: 217
+```
+
+| Cabeçalho | Obrigatório | Papel |
+|---|---|---|
+| `X-Goog-Channel-ID` | Sim | Identifica o canal; confrontado com `integracao.conexao` |
+| `X-Goog-Message-Number` | Sim | Sequencial do canal; compõe a chave de idempotência |
+| `X-Goog-Resource-State` | Sim | `sync` ou `change` no feed de mudanças |
+| `X-Goog-Channel-Token` | Sim | Segredo compartilhado |
+| `X-Goog-Channel-Expiration` | Não | Validade do canal, em data HTTP (RFC 2822), **não** ISO 8601 |
+| `X-Goog-Resource-ID` / `-URI` | Não | Registrados para auditoria e para o encerramento do canal |
+
+Note a divergência de formato de data entre os provedores. É o tipo de detalhe que fica contido no adaptador e não vaza para o restante do sistema.
+
+#### O envelope canônico
+
+Os dois tradutores produzem o mesmo objeto, `EventoWebhook`, com seis campos:
+
+| Campo | Origem no Graph | Origem no Drive |
+|---|---|---|
+| `identificador` | `subscriptionId:resourceData.id` | `Channel-ID:Message-Number` |
+| `tipo` | `graph.<changeType>` | `drive.<resourceState>` |
+| `versao` | `"1"` | `"1"` |
+| `marca_de_tempo` | Instante da recepção | Instante da recepção |
+| `correlacao` | `subscriptionId` | `Channel-ID` |
+| `conteudo` | Campos restantes | Cabeçalhos restantes |
+
+Os seis campos são os mesmos que a Seção 6.4 especifica para o envelope do barramento de mensagens da Sprint 5. A coincidência é deliberada: o receptor do webhook é o produtor daquele barramento, e publicar passará a ser repassar este objeto, sem tradução intermediária.
+
+---
 
 ### 5.1.4 Processamento e Armazenamento
 
+**Decisão:** processar na ordem **verifica → registra → processa**, com a confirmação ao provedor emitida somente após a persistência.
+
+A ordem não é arbitrária. A Seção 6.4.1 estabelece que a validação de entrada precede sempre o efeito colateral, e o caso TI-38 exige que a confirmação só ocorra depois da gravação. Uma entrega que falhe no processamento precisa receber `5xx`, para que o provedor reentregue.
+
+1. **Verificação.** A cadeia de verificadores é aplicada sobre a entrega bruta. Se recusar, **nada é escrito** — registrar entregas não autenticadas daria a qualquer um na internet uma forma de escrever na trilha de auditoria.
+2. **Tradução.** O adaptador do provedor converte a entrega em uma sequência de envelopes. Se a entrega for autêntica mas ininterpretável, o corpo bruto é gravado como recusa (caso TI-39).
+3. **Registro.** Cada envelope é gravado em `auditoria.evento_webhook`.
+4. **Processamento.** O efeito de domínio é aplicado e a linha é marcada como concluída.
+
+#### Idempotência
+
+A garantia do caso TI-37 **não está em Python**: é a restrição `UNIQUE (provedor, subscription_id, notificacao_id)` do esquema. O adaptador apenas consulta o resultado do `ON CONFLICT DO NOTHING` para saber se a entrega era inédita.
+
+A escolha importa. Uma verificação feita em Python antes do `INSERT` perderia a corrida entre duas réplicas da API recebendo a mesma reentrega simultaneamente. Deixando a garantia no banco, ela vale mesmo nesse cenário.
+
+Uma sutileza necessária: a linha gravada mas **não concluída** (`concluido_em IS NULL`) é o estado de uma entrega interrompida por falha. A reentrega precisa poder retomá-la, e não descartá-la como duplicata — por isso a distinção entre "já existe" e "já concluiu".
+
+#### Tabelas
+
+`integracao.conexao` — uma linha por origem observada:
+
+| Coluna | Papel |
+|---|---|
+| `provedor` | `microsoft_graph`, `google_drive` ou `power_automate` |
+| `recurso` | Caminho observado; a única diferença entre desenvolvimento e produção |
+| `client_state` | Segredo compartilhado registrado na criação |
+| `subscription_id` | Assinatura (Graph) ou canal (Drive) |
+| `recurso_id` | Exigido pelo `channels.stop` do Google |
+| `expira_em` | Validade; base da recusa por origem vencida |
+| `delta_token` | Ponto de retomada do feed de mudanças |
+| `delta_pendente` | Marca de varredura pendente — o ponto de encaixe da Sprint 5 |
+| `ativa` | Desativar a linha invalida imediatamente qualquer entrega capturada antes |
+
+`auditoria.evento_webhook` — registro imutável de cada entrega. Guarda tanto os eventos com envelope quanto as entregas autênticas porém ininterpretáveis (`situacao = 'recusado'`, sem envelope, com corpo bruto e motivo). Manter as duas coisas numa tabela só preserva uma ordem única do que o provedor enviou, que é o que a auditoria precisa responder; a restrição `ck_evento_ou_recusa` impede os estados intermediários. As tabelas de auditoria sofrem `REVOKE UPDATE, DELETE ... FROM PUBLIC`, com exceção pontual para as colunas `concluido_em` e `situacao`, cuja conclusão só é conhecida após a gravação.
+
+#### O efeito de domínio, e por que ele é pequeno
+
+Nem o Graph nem o Drive dizem **o que** mudou: os dois dizem apenas que algo mudou na origem observada. Descobrir o quê exige uma chamada posterior — `delta` num, `changes.list` no outro — seguida de download, extração de texto e vetorização. Nada disso cabe na janela de poucos segundos que os provedores concedem antes de considerar a entrega falha.
+
+Por isso o receptor confirma com `202` e para em `delta_pendente = TRUE`. A varredura é trabalho do consumidor do barramento da Sprint 5, e essa coluna é a marca que ele vai ler. **O receptor de webhook é, portanto, o produtor do barramento da Sprint 5** — é esse o ponto que amarra a Seção 5.1 à Seção 5.3. Trocar `ProcessadorVarreduraPendente` por uma implementação que publique numa fila é trocar uma classe, sem tocar em rota, serviço ou banco.
+
+---
+
 ### 5.1.5 Respostas e Tratamento de Erros
 
+**Decisão:** o código de status faz parte do contrato com o provedor, e não da camada de apresentação — é ele que determina se haverá reentrega. Por isso o mapeamento vive no serviço, junto das causas, e a rota apenas o consulta.
+
+| Situação | Código | Corpo | Reentrega? |
+|---|---|---|---|
+| Entrega aceita (processada, ignorada ou duplicada) | `202` | Contagem por situação | Não |
+| Handshake de validação (Graph) | `200` | Token em `text/plain` | — |
+| Segredo ausente, divergente, ou origem expirada/desconhecida | `401` | `error: unauthorized` | Não |
+| Corpo ou cabeçalhos malformados | `400` | `error: malformed_payload` | Não |
+| Falha de persistência ou de processamento | `503` | `error: processing_unavailable` | **Sim** |
+
+O `202` e não `200` porque o efeito completo é aplicado fora da janela concedida, e é o que a documentação do Graph recomenda. As três situações de aceite compartilham o código porque, para o provedor, todas significam a mesma coisa: entrega aceita, não reenvie. A distinção interessa à auditoria, e vai no corpo:
+
+```json
+{ "eventos": 3, "processados": 2, "ignorados": 0, "duplicados": 1 }
+```
+
+O Graph reentrega diante de `5xx` por até quatro horas; o Drive reentrega com recuo exponencial diante de `500`, `502`, `503` e `504`. Os demais códigos encerram a tentativa nos dois.
+
+#### Limitação: o Graph não oferece prova de frescor para `driveItem`
+
+Este é o ponto em que a implementação diverge do que a Seção 6.4.4 antecipava, e a divergência é do provedor, não do projeto.
+
+O caso **TI-36** prevê três causas de recusa por autenticidade, sendo a terceira a "assinatura válida porém antiga", cuja rejeição impede a reapresentação de uma entrega capturada anteriormente. Para obtê-la seria preciso que a notificação viesse assinada e carimbada. O Microsoft Graph oferece esse mecanismo — o `validationTokens`, um JWT com *claim* `exp` — **apenas em notificações com dados de recurso** (`includeResourceData: true`). A lista de recursos que suportam notificações desse tipo é fechada e compreende Outlook, Teams e `aiInteraction`. **`driveItem` não está nela, e a lista do SharePoint tampouco.**
+
+Ou seja: para o recurso que o projeto precisa observar, o Graph fornece somente o `clientState` — um segredo constante ao longo de toda a vida da assinatura, que trafega no próprio corpo da notificação. Quem capturar uma única entrega tem o segredo indefinidamente. O Google Drive tem exatamente a mesma limitação, com o `X-Goog-Channel-Token` no lugar.
+
+A resposta do projeto compõe três camadas, e nenhuma delas é frescor por entrega:
+
+1. **Segredo compartilhado** — cobre as duas primeiras causas do TI-36: ausência e divergência.
+2. **Validade da origem** — o `subscriptionId`/`Channel-ID` é confrontado com as origens ativas em `integracao.conexao`, e a data de expiração da própria notificação é verificada. Uma entrega capturada e reapresentada depois que a origem expirou ou foi desativada é recusada com `401`. É o que sustenta, de forma honesta, o código `ASSINATURA_EXPIRADA`.
+3. **Idempotência** — dentro da janela de validade, quem impede o efeito repetido não é o verificador, e sim a unicidade do esquema. Uma entrega reapresentada encontra a linha já concluída e devolve `202 duplicado`, sem efeito.
+
+**Em resumo: a proteção contra reapresentação vem do TI-37, não do TI-36.** Registrar isso é preferível a exibir um verificador que confira metade e pareça completo. O código `ASSINATURA_EXPIRADA` permanece no catálogo porque um provedor cujo contrato nós definamos — o Power Automate da Seção 5.1.1 — pode assinar com HMAC e carimbo de tempo, e aí o código recupera o sentido pleno.
+
+#### Divergência deliberada da recomendação do provedor
+
+A documentação do Graph recomenda responder `202` **antes** de validar, para não vazar o resultado da validação e não provocar reentregas. O contrato desta solução manda `401` para entrega inautêntica.
+
+As duas coisas convivem. A recomendação existe para evitar reentrega desnecessária e para não informar um atacante sobre o resultado da validação; ora, uma requisição forjada **não veio do provedor**, logo o `401` não provoca reentrega alguma. O ganho de responder o código correto — diagnóstico claro em operação e um contrato testável — supera o risco residual, dado o volume de uma prova de conceito. A decisão está registrada aqui por ser uma divergência consciente de uma recomendação oficial.
+
+---
+
 ### 5.1.6 Exemplos e Testes
+
+#### Exemplo — notificação do Google Drive
+
+```bash
+curl -i -X POST "http://localhost:8000/api/v1/webhooks/google" \
+  -H "X-Goog-Channel-ID: 6f1e0b7a-1c2d-4e3f-9a8b-000000000001" \
+  -H "X-Goog-Channel-Token: $GOOGLE_WEBHOOK_CHANNEL_TOKEN" \
+  -H "X-Goog-Resource-State: change" \
+  -H "X-Goog-Message-Number: 217" \
+  -H "X-Goog-Resource-ID: o3hgv1538sdjfh"
+```
+
+```http
+HTTP/1.1 202 Accepted
+Content-Type: application/json
+
+{"eventos":1,"processados":1,"ignorados":0,"duplicados":0}
+```
+
+Repetir a mesma chamada devolve `{"eventos":1,"processados":0,"ignorados":0,"duplicados":1}`, sem novo efeito.
+
+#### Exemplo — notificação do Microsoft Graph
+
+```bash
+curl -i -X POST "http://localhost:8000/api/v1/webhooks/microsoft" \
+  -H "Content-Type: application/json" \
+  -d '{"value":[{"subscriptionId":"b3a1-4f2c","changeType":"updated",
+       "resource":"drives/b!x9K/root","clientState":"'"$MS_WEBHOOK_CLIENT_STATE"'",
+       "resourceData":{"id":"01BYE5RZ6"}}]}'
+```
+
+#### Exemplo — segredo divergente
+
+```http
+HTTP/1.1 401 Unauthorized
+
+{"error":"unauthorized","message":"Segredo compartilhado divergente do registrado para a assinatura."}
+```
+
+#### Suíte de contrato
+
+Os casos são executados por uma classe que descreve o comportamento exigido de **qualquer** provedor, com um único ponto de extensão: o método de fábrica que constrói o ambiente. Quatro subclasses herdam os mesmos casos sem reescrevê-los:
+
+| Subclasse | O que exercita | Arquivo |
+|---|---|---|
+| `TestContratoWebhookEmMemoria` | O serviço, contra dublê determinístico | `tests/test_integracao_contrato_webhook.py` |
+| `TestContratoWebhookHTTP` | Rota + adaptador do Graph | `tests/test_integracao_webhook.py` |
+| `TestContratoWebhookDrive` | Rota + adaptador do Drive | `tests/test_integracao_webhook_drive.py` |
+| `TestContratoWebhookPostgres` | Rota + Drive + **persistência real** | `tests/test_integracao_webhook_postgres.py` |
+
+| Caso | Tipo | Entrada | Resultado esperado | Situação |
+|---|---|---|---|---|
+| TI-35 | Positivo | Evento com segredo válido | `2xx`; efeito aplicado exatamente uma vez | **Passa** |
+| TI-36 | Negativo | Segredo ausente, divergente, ou origem vencida | `401` nas três; nenhum efeito, nenhuma escrita | **Passa** |
+| TI-37 | Negativo | Mesmo evento entregue duas vezes | `2xx` nas duas; efeito único | **Passa** |
+| TI-38 | Negativo | Falha no processamento após a entrega | `503`, provocando reentrega; a reentrega conclui | **Passa** |
+| TI-39 | Negativo | Corpo ou cabeçalho obrigatório ausente | `400`; entrega registrada sem efeito | **Passa** |
+| TI-40 | Positivo | Evento de tipo não catalogado (inclui o `sync` do Drive) | `2xx`; registrado sem processamento | **Passa** |
+| **TI-41** | Positivo | Três mudanças na origem | Três efeitos, agrupadas ou não pelo provedor | **Passa** |
+| **TI-42** | Negativo | Falha no meio de um lote, seguida de reentrega | Completa sem repetir o que já passara | **Passa** |
+
+Os casos **TI-41 e TI-42 foram acrescentados nesta sprint**. A especificação da Seção 6.4.4 não previa que uma entrega pudesse carregar várias mudanças, e a implementação do provedor revelou que o Graph agrupa mudanças próximas — e não reenvia o que sobrou depois de receber `2xx`. Um receptor que tratasse apenas a primeira notificação de cada entrega confirmaria o lote inteiro e perderia as demais em silêncio, sem erro visível. O TI-41 fixa a invariante correta, que vale igualmente para quem agrupa e para quem não agrupa: **três mudanças na origem produzem três efeitos**. O TI-42 cobre o encontro do TI-38 com o TI-41, em que a reentrega de um lote parcialmente processado precisa completar sem repetir.
+
+Execução:
+
+```bash
+python -m unittest discover -s tests -t .
+```
+
+São 195 testes no repositório. Os onze da suíte com persistência real são pulados, e não falham, quando o Postgres não está no ar; na sessão de testes de 09/09/2026, documentada na evidência ao final desta subseção, o Postgres esteve disponível e os onze foram de fato exercitados, com resultado `ok` em todos.
+
+#### Estado da implementação
+
+| Regra do contrato | Situação | Evidência no repositório |
+|---|---|---|
+| Rota `POST /api/v1/webhooks/google`, resposta `202` | **Implementada** | `src/routes/webhooks.py` |
+| Rota `POST /api/v1/webhooks/microsoft`, com handshake | **Implementada** | idem |
+| Verificação de segredo compartilhado nos dois provedores | **Implementada** | `VerificadorClientState`, `VerificadorChannelToken` |
+| Recusa por origem expirada ou desativada | **Implementada** | `VerificadorAssinaturaAtiva`, `VerificadorCanalAtivo` |
+| Idempotência por restrição de esquema | **Implementada** | `UNIQUE (provedor, subscription_id, notificacao_id)` |
+| Registro de entrega autêntica ininterpretável | **Implementada** | `RegistroEventosPostgres.registrar_recusa` |
+| Tratamento de lote sem perda de notificação | **Implementada** | `ReceberEventoWebhook.receber`, casos TI-41 e TI-42 |
+| Abertura, encerramento e listagem do canal do Drive | **Implementada** | `python -m services.drive_channel_service` |
+| Cobertura por suíte de contrato, quatro ambientes | **Implementada** | 8 casos × 4 subclasses |
+| Demonstração ao vivo do Google Drive | **Realizada em 09/09/2026** | Evidência abaixo — upload real, notificação real, efeito real |
+| Demonstração ao vivo do Microsoft Graph | **Não realizada** | *Tenant* do Entra ID indisponível; ver Seção 5.1.1 |
+| Criação, renovação e remoção da assinatura do Graph | **Implementada, não exercitada** | `python -m services.graph_subscription_service`; sem *tenant* para executar ponta a ponta |
+| Verificação por `validationTokens` | **Inviável para este recurso** | Não suportado para `driveItem`; ver Seção 5.1.5 |
+| Varredura `delta` e vetorização do documento alterado | **Prevista para a Sprint 5** | Marca em `integracao.conexao.delta_pendente` |
+
+#### Evidência da demonstração ao vivo (Google Drive)
+
+A sequência abaixo foi capturada em 09/09/2026, contra a infraestrutura real do Google — não contra dublê, não em ambiente local isolado. O canal foi aberto por `drive_channel_service.py abrir`, observando o Drive da conta autorizada; a rota respondeu através do túnel público, com o Postgres do `docker-compose.yml` como persistência.
+
+A primeira linha é a notificação de abertura do canal, que o Drive envia automaticamente e sem correspondência a nenhuma mudança real (Seção 5.1.2); as três seguintes correspondem ao upload de um único arquivo de teste, e a duplicidade de notificações para o mesmo evento é comportamento normal do provedor, absorvido pela idempotência da Seção 5.1.4:
+
+| `tipo` | `situacao` | `recebido_em` (UTC) | `concluido_em` (UTC) |
+|---|---|---|---|
+| `drive.sync` | `ignorado` | 13:21:33.183825 | 13:21:33.194204 |
+| `drive.change` | `processado` | 13:27:28.320016 | 13:27:28.343499 |
+| `drive.change` | `processado` | 13:27:31.023776 | 13:27:31.034165 |
+| `drive.change` | `processado` | 13:27:49.548451 | 13:27:49.582568 |
+
+Após a terceira entrega, a coluna `delta_pendente` de `integracao.conexao` passou de `FALSE` para `TRUE` para o canal correspondente — o efeito de domínio descrito na Seção 5.1.4 sendo aplicado por uma chamada real do Google, e não por um teste automatizado.
+
+O log da aplicação, no mesmo intervalo, registra a origem das chamadas por IP público, confirmando que a entrega partiu da infraestrutura do provedor, e não de uma requisição local forjada para o teste:
+
+```
+INFO: 66.102.8.202:0 - "POST /api/v1/webhooks/google HTTP/1.1" 202 Accepted
+INFO: 66.102.8.200:0 - "POST /api/v1/webhooks/google HTTP/1.1" 401 Unauthorized
+INFO: 66.102.6.195:0 - "POST /api/v1/webhooks/google HTTP/1.1" 202 Accepted
+INFO: 66.102.6.197:0 - "POST /api/v1/webhooks/google HTTP/1.1" 401 Unauthorized
+```
+
+A alternância entre `202` e `401` não indica falha intermitente. Durante a preparação deste teste, uma tentativa anterior de abertura de canal foi interrompida por indisponibilidade momentânea do banco de dados **depois** que o Google já havia confirmado a criação do canal — de modo que um canal ficou registrado do lado do provedor sem ter sido gravado em `integracao.conexao`. Como o Drive observa mudanças por conta, e não por canal, esse canal órfão recebeu notificação do mesmo upload em paralelo ao canal válido. O `401` corresponde exatamente a essa segunda notificação: `VerificadorCanalAtivo` (Seção 5.1.5) recusou-a corretamente, por não haver, na base, nenhuma origem ativa com aquele identificador de canal. O par `202`/`401` é, portanto, uma evidência adicional, e não planejada, de que a rejeição de origem desconhecida opera corretamente sob tráfego real.
+
+#### Manual de operação — Google Drive
+
+Este é o webhook **demonstrado ao vivo** do projeto. O roteiro abaixo é operacional, para ser seguido de cima para baixo, e cobre a instalação completa: ao final, subir ou alterar um arquivo no Drive faz o AZ1 ser avisado em segundos, sem varredura periódica.
+
+##### Antes de começar
+
+| Você precisa de | Como conferir |
+|---|---|
+| Conta **@gmail.com pessoal** | Ver a ressalva logo abaixo |
+| Python 3.12 ou superior | `python --version` |
+| Docker | `docker --version` |
+| `cloudflared` | `cloudflared --version` (se faltar: `sudo apt install cloudflared`) |
+
+Instale o projeto uma vez:
+
+```bash
+pip install -e ".[dev]"
+```
+
+A conta observada deve ser pessoal (`@gmail.com`); contas de Google Workspace gerenciado costumam restringir a criação de projeto e a tela de consentimento.
+
+**Nada aqui tem custo.** Projeto, Drive API, tela de consentimento e credencial OAuth são gratuitos e não pedem cartão. O que custa, e não é usado neste guia, são os serviços de computação do Google Cloud.
+
+##### Parte 1 — Criar o projeto e a credencial
+
+Feito **uma vez**, leva cerca de cinco minutos.
+
+**1. Projeto.** Acesse [console.cloud.google.com](https://console.cloud.google.com) → seletor de projeto na barra do topo → **New project**. Nome sugerido: `az1-webhook`. Confirme que o projeto novo está selecionado na barra do topo antes de seguir. Trabalhar no projeto errado é a causa mais comum de "criei a credencial mas ela não aparece".
+
+**2. Habilitar a Drive API.** **APIs & Services** → **Enable APIs and services** → busque **Google Drive API** → **Enable**. Habilitar a API **não** cria credencial nenhuma; são passos separados, e é aqui que a maioria para achando que terminou.
+
+**3. Tela de consentimento.** **APIs & Services** → **OAuth consent screen**.
+
+| Campo | Valor |
+|---|---|
+| **User type** | **External** |
+| **App name** | `AZ1` |
+| **User support email** | seu e-mail |
+| **Developer contact** | seu e-mail |
+
+Salve e avance até **Test users** → **Add users** → adicione **o seu próprio e-mail**. Sem isso, a autorização da Parte 3 falha com `Error 403: access_denied`, mesmo sendo você o dono do projeto.
+
+Deixe o status em **Testing**. Publicar exigiria verificação com auditoria de segurança, porque `drive.readonly` é escopo sensível, o que a torna inviável e desnecessária aqui. A consequência está na subseção Manutenção, adiante.
+
+**4. Credencial OAuth.** **APIs & Services** → **Credentials** → **+ CREATE CREDENTIALS** → **OAuth client ID**.
+
+| Campo | Valor |
+|---|---|
+| **Application type** | **Desktop app** |
+| **Name** | `az1-cli` |
+
+Clique em **Create**. Abre um modal com **Client ID** e **Client secret**, os valores que vão para o `.env`. **Não crie uma API key**: ela aparece no mesmo menu e não serve, porque notificação de mudança exige autorização de usuário, que só o OAuth client ID fornece. Para consultar depois: **Credentials** → clique no nome do cliente.
+
+##### Parte 2 — Preencher o `.env`
+
+Copie o arquivo de exemplo, se ainda não existir, e gere o segredo compartilhado:
+
+```bash
+cp .env.example .env
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Preencha estas quatro linhas:
+
+| Variável | De onde vem |
+|---|---|
+| `GOOGLE_CLIENT_ID` | O **Client ID** da Parte 1, passo 4 |
+| `GOOGLE_CLIENT_SECRET` | O **Client secret** do mesmo passo |
+| `GOOGLE_WEBHOOK_CHANNEL_TOKEN` | O valor gerado pelo comando acima |
+| `WEBHOOK_PUBLIC_URL` | Preenchida na Parte 3, passo 2 |
+
+##### Parte 3 — Ligar
+
+Estes quatro passos se repetem a cada sessão de trabalho. Use quatro terminais, ou deixe os dois primeiros em segundo plano.
+
+**1. Banco de dados:**
+
+```bash
+docker compose up -d postgres
+```
+
+**2. Túnel.** O Google precisa alcançar sua máquina por um endereço público com HTTPS:
+
+```bash
+cloudflared tunnel --url http://localhost:8000
+```
+
+Copie a URL que ele imprime (algo como `https://palavra-palavra-palavra.trycloudflare.com`) e coloque em `WEBHOOK_PUBLIC_URL` no `.env`. Somente a raiz, sem caminho depois.
+
+**3. API:**
+
+```bash
+uvicorn az1_api.main:app --port 8000
+```
+
+**4. Abrir o canal:**
+
+```bash
+python -m services.drive_channel_service abrir
+```
+
+O comando abre o navegador. Entre com a conta, e na tela "O Google não verificou este app" clique em **Avançado** → **Acessar AZ1 (não seguro)**. Isso é esperado, porque o app está em modo *Testing*. Autorize o acesso ao Drive.
+
+Ao voltar ao terminal, a saída esperada:
+
+```
+Canal aberto.
+  id:        6f1e0b7a-...
+  expira em: 2026-09-15T18:00:00+00:00
+  endereço:  https://....trycloudflare.com/api/v1/webhooks/google
+```
+
+O Google envia imediatamente uma notificação de estado `sync`, que é registrada e ignorada: ela apenas avisa que o canal abriu.
+
+##### Parte 4 — Testar
+
+Suba ou edite um arquivo no Drive da conta autorizada. Em segundos, o terminal da API registra a chamada:
+
+```bash
+python -m services.drive_channel_service listar
+```
+
+A saída mostra `varredura_pendente=True`, que é o efeito de domínio desta sprint. Para ver o que foi gravado:
+
+```bash
+docker compose exec postgres psql -U az1 -d az1 \
+  -c "SELECT tipo, situacao, recebido_em FROM auditoria.evento_webhook ORDER BY id DESC LIMIT 5;"
+```
+
+Confirme também a idempotência, reenviando manualmente uma notificação já recebida:
+
+```bash
+curl -i -X POST "http://localhost:8000/api/v1/webhooks/google" \
+  -H "X-Goog-Channel-ID: <o id impresso pelo abrir>" \
+  -H "X-Goog-Channel-Token: $GOOGLE_WEBHOOK_CHANNEL_TOKEN" \
+  -H "X-Goog-Resource-State: change" \
+  -H "X-Goog-Message-Number: 2"
+```
+
+A primeira vez responde `"processados":1`; a segunda, `"duplicados":1`, sem novo efeito.
+
+##### Manutenção
+
+| Quando | O que fazer |
+|---|---|
+| A cada 7 dias | `python -m services.drive_channel_service renovar` |
+| A cada reinício do túnel | `fechar`, atualizar `WEBHOOK_PUBLIC_URL`, `abrir` |
+| Ao encerrar | `fechar` |
+
+O `renovar` encerra o canal atual e abre outro preservando o ponto de retomada do feed. Sem isso, as mudanças ocorridas entre o fechamento e a abertura se perderiam em silêncio.
+
+O canal expira em até 7 dias, sem possibilidade de extensão; encerrar e abrir outro é o único caminho, e é o que o `renovar` automatiza. Enquanto o app estiver em modo *Testing*, o `refresh token` da autorização também expira em 7 dias, o que exige reautorizar no navegador a cada renovação; publicar o aplicativo (*APIs & Services* → *OAuth consent screen* → **PUBLISH APP**) remove essa segunda expiração para aplicações com menos de 100 usuários, sem exigir a verificação completa do Google, e permite agendar a renovação sem intervenção humana:
+
+```cron
+0 6 * * 1 cd /caminho/do/projeto && .venv/bin/python -m services.drive_channel_service renovar
+```
+
+**Enquanto o app estiver em *Testing*, reabra o canal no dia da apresentação.** Um ambiente montado com mais de uma semana de antecedência para de funcionar em silêncio, sem notificação e sem erro.
+
+> **A pegadinha do túnel.** A URL do `cloudflared` gratuito muda a cada reinício, e o Google não permite alterar o endereço de um canal já criado. Num servidor com endereço fixo isso deixa de existir, e aí só o `renovar` semanal importa.
+
+##### Quando algo dá errado (Google Drive)
+
+| Sintoma | Causa | O que fazer |
+|---|---|---|
+| Não acho o Client ID | Só a API foi habilitada, sem criar credencial | Parte 1, passo 4 |
+| Credencial sumiu | Projeto errado selecionado | Confira o seletor na barra do topo |
+| `Error 403: access_denied` | Seu e-mail não está em *Test users* | Parte 1, passo 3 |
+| `Error 403: org_internal` | Conta de Workspace gerenciado | Use conta @gmail.com pessoal |
+| `invalid_grant` | Refresh token expirado (7 dias em *Testing*) | Rode `abrir` e autorize de novo |
+| `pushNotificationCallbackUrlUnauthorized` | `WEBHOOK_PUBLIC_URL` inacessível ou sem HTTPS | Confira o túnel e a variável |
+| Canal aberto, mas nada chega | URL antiga após reinício do túnel | `fechar`, atualizar a URL, `abrir` |
+| Notificação chega e volta `401` | Canal não registrado ou desativado no banco | `listar`; se vazio, rode `abrir` |
+| Notificação chega e volta `503` | Postgres fora do ar | `docker compose up -d postgres` |
+| `WEBHOOK_PUBLIC_URL precisa começar com https://` | Endereço local no `.env` | Use a URL do túnel, não `localhost` |
+
+Para ver o que o receptor decidiu sobre cada entrega, incluindo as recusadas:
+
+```bash
+docker compose exec postgres psql -U az1 -d az1 \
+  -c "SELECT recebido_em, tipo, situacao, motivo FROM auditoria.evento_webhook ORDER BY id DESC LIMIT 20;"
+```
+
+O receptor (rota, verificação de autenticidade, tradução, idempotência e persistência) é o mesmo usado pelo Microsoft Graph, e está coberto por oito casos de teste automatizados executados em quatro ambientes, entre eles um com Postgres real:
+
+```bash
+python -m unittest discover -s tests -t .
+```
+
+Os casos que dependem de Postgres são pulados, e não falham, quando o banco não está no ar.
+
+#### Manual de operação — Microsoft Graph
+
+Este roteiro liga o AZ1 ao SharePoint ou ao OneDrive da organização, escrito para ser seguido sem conhecimento prévio de OAuth ou do Graph. Ao final, subir ou alterar um arquivo na biblioteca observada faz o AZ1 ser avisado em segundos, sem varredura periódica.
+
+> **Este roteiro não foi executado contra um *tenant* real.** O grupo não conseguiu provisionar um tenant do Entra ID durante a Sprint 4: a conta pessoal gratuita recai num diretório compartilhado onde o registro de aplicativo é vedado, e o Azure for Students recusou a inscrição por o domínio acadêmico não constar da base de verificação da Microsoft. A demonstração ao vivo foi feita com o Google Drive, sobre o mesmo receptor; os motivos estão na Seção 5.1.1. Para quem já tem um tenant, caso do parceiro, isso não é obstáculo: o roteiro segue a documentação do provedor e configura o mesmo receptor coberto pelos testes; espere apenas ajustar detalhes na primeira execução.
+
+##### Antes de começar (Microsoft Graph)
+
+| Você precisa de | Como conferir |
+|---|---|
+| Conta Microsoft da organização, com acesso à biblioteca | É a mesma com que você entra no SharePoint |
+| Permissão para registrar aplicativo no Entra ID | Parte 1, passo 1. Se o botão não existir, peça ao TI |
+| Python 3.12 ou superior | `python --version` |
+| Docker | `docker --version` |
+| `cloudflared` | `cloudflared --version` (se faltar: `sudo apt install cloudflared`) |
+
+Instale o projeto uma vez:
+
+```bash
+pip install -e ".[dev]"
+```
+
+**Nada aqui tem custo.** A Graph API, o registro do aplicativo e as assinaturas de notificação são gratuitos. O que custa, e não é usado neste guia, são serviços de computação do Azure.
+
+##### Parte 1 — Registrar o aplicativo
+
+Feito **uma vez por organização**, leva cerca de cinco minutos. É o que autoriza o AZ1 a ler a biblioteca e a pedir notificações.
+
+**1. Criar o registro.** Acesse [portal.azure.com](https://portal.azure.com) → busque **Microsoft Entra ID** → **App registrations** → **New registration**.
+
+| Campo | Valor |
+|---|---|
+| **Name** | `az1-webhook` |
+| **Supported account types** | **Accounts in any organizational directory and personal Microsoft accounts** |
+| **Redirect URI** | Deixe vazio |
+
+Clique em **Register**. Marcar "Single tenant" aqui funciona se o aplicativo e a biblioteca estiverem na mesma organização, mas impede testar com conta pessoal depois. A opção acima serve aos dois casos.
+
+**2. Anotar o identificador.** Na tela que abre, copie o **Application (client) ID** (formato `11111111-2222-3333-4444-555555555555`), que vai para o `.env` na Parte 2. Copie também o **Directory (tenant) ID**, necessário apenas se a biblioteca for da organização, e não de uma conta pessoal.
+
+**3. Permitir a autenticação sem segredo.** Menu lateral → **Authentication** → role até **Advanced settings** → em *Allow public client flows*, marque **Yes** → **Save**. Este é o passo mais esquecido do guia: sem ele, o comando `abrir` da Parte 3 falha com `AADSTS7000218`, e a mensagem do erro não diz que o problema está aqui.
+
+**4. Conceder as permissões.** Menu lateral → **API permissions** → **Add a permission** → **Microsoft Graph** → **Delegated permissions**. Marque `Files.Read.All` e `offline_access` → **Add permissions**. Se a organização exigir, clique em **Grant admin consent**; para conta pessoal não é necessário, o consentimento acontece no login.
+
+##### Parte 2 — Preencher o `.env` (Microsoft Graph)
+
+Copie o arquivo de exemplo, se ainda não existir, e gere o segredo compartilhado:
+
+```bash
+cp .env.example .env
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Preencha estas cinco linhas:
+
+| Variável | De onde vem |
+|---|---|
+| `MS_CLIENT_ID` | O **Application (client) ID** da Parte 1, passo 2 |
+| `MS_TENANT` | `consumers` para conta pessoal; o **Directory (tenant) ID** para conta da organização |
+| `MS_WEBHOOK_CLIENT_STATE` | O valor gerado pelo comando acima |
+| `MS_RECURSO` | Ver a tabela abaixo |
+| `WEBHOOK_PUBLIC_URL` | Preenchida na Parte 3, passo 2 |
+
+**Usando uma conta corporativa.** Se a conta for de uma organização (caso de quem recebeu acesso ao ambiente Microsoft do parceiro), valem dois ajustes e uma ressalva. Os ajustes: `MS_TENANT` recebe o **Directory (tenant) ID** da organização, e não `consumers`; e o registro do aplicativo pode depender do TI, porque muitas empresas desabilitam o registro por usuários comuns. Se o botão *New registration* não aparecer, a Parte 1 deste roteiro foi escrita para poder ser encaminhada ao TI como pedido.
+
+A ressalva é sobre qual recurso observar, e é importante:
+
+> **Não aponte o `MS_RECURSO` para a biblioteca de documentos do portfólio.** A Seção 1 deste documento estabelece que o MVP "não será integrado ao portfólio real do Metrô nesta etapa, não utilizará dados corporativos sensíveis e não será implantado em ambiente de produção", e classifica a integração com o portfólio real como evolução posterior. Assinar o acervo do PMO contraria esse escopo. Há também a razão operacional: uma assinatura sobre a biblioteca real faz documentos corporativos trafegarem para uma máquina de desenvolvimento através de um túnel público, e o túnel existe para tornar a máquina alcançável durante o teste, não para carregar acervo de uma companhia. **O caminho recomendado** é usar a conta corporativa para registrar o aplicativo e obter o *tenant*, e observar o OneDrive do próprio usuário dentro dele (`MS_RECURSO=/me/drive/root`), com arquivos de teste. Isso exercita a integração ponta a ponta num ambiente corporativo real, sem tocar em dado do portfólio. Apontar para a biblioteca do PMO continua sendo a troca de uma variável, para quando a organização decidir fazê-la com as aprovações que ela exige.
+
+**Qual recurso observar:**
+
+| Situação | `MS_RECURSO` |
+|---|---|
+| Teste, no seu próprio OneDrive (**recomendado durante o MVP**) | `/me/drive/root` |
+| Biblioteca de documentos de um site do SharePoint (requer as aprovações da ressalva acima) | `/drives/{drive-id}/root` |
+
+Para descobrir o `drive-id` da biblioteca, use o [Graph Explorer](https://developer.microsoft.com/graph/graph-explorer), entrando com a conta da organização, e faça duas chamadas:
+
+```http
+GET https://graph.microsoft.com/v1.0/sites/{host}:/sites/{caminho-do-site}
+```
+
+Copie o `id` devolvido e use na segunda:
+
+```http
+GET https://graph.microsoft.com/v1.0/sites/{id-do-passo-anterior}/drives
+```
+
+O `id` da biblioteca desejada é o `drive-id`:
+
+```
+MS_RECURSO=/drives/b!x9KpQ7mF20WvT-nBcE.../root
+```
+
+> **Por que a biblioteca, e não a lista do SharePoint.** O OneDrive e a biblioteca de documentos são o mesmo tipo de recurso no Graph (`driveItem`), com o mesmo formato de notificação. Isso torna a mudança de teste para produção uma troca desta única variável, sem alteração de código. Uma lista (`/sites/{id}/lists/{id}`) tem formato diferente e exigiria outro tradutor, além de guardar campos, e não arquivos.
+
+##### Parte 3 — Ligar (Microsoft Graph)
+
+Estes quatro passos se repetem a cada sessão de trabalho. Use quatro terminais, ou deixe os dois primeiros em segundo plano.
+
+**1. Banco de dados:**
+
+```bash
+docker compose up -d postgres
+```
+
+**2. Túnel.** O Graph precisa alcançar sua máquina por um endereço público com HTTPS:
+
+```bash
+cloudflared tunnel --url http://localhost:8000
+```
+
+Copie a URL que ele imprime e coloque em `WEBHOOK_PUBLIC_URL` no `.env`. Somente a raiz, sem caminho depois.
+
+**3. API:**
+
+```bash
+uvicorn az1_api.main:app --port 8000
+```
+
+**4. Criar a assinatura:**
+
+```bash
+python -m services.graph_subscription_service abrir
+```
+
+O comando imprime um código e um endereço. Abra o endereço no navegador, informe o código, entre com a conta da organização e autorize.
+
+Ao voltar ao terminal, a assinatura terá sido criada e registrada:
+
+```
+Assinatura criada.
+  id:        a1b2c3d4-...
+  expira em: 2026-10-07T14:22:03+00:00
+```
+
+> **O que acontece por baixo.** Antes de confirmar a criação, o Graph chama a sua URL com um `validationToken` e exige a resposta em até dez segundos. Por isso os passos 2 e 3 precisam estar no ar **antes** deste. Se falhar aqui, a assinatura não chega a existir.
+
+##### Parte 4 — Testar (Microsoft Graph)
+
+Suba ou edite um arquivo na biblioteca observada. Em segundos, o terminal da API registra a chamada, e o comando abaixo mostra a origem com varredura pendente:
+
+```bash
+python -m services.graph_subscription_service listar
+```
+
+Para ver o que foi gravado:
+
+```bash
+docker compose exec postgres psql -U az1 -d az1 \
+  -c "SELECT tipo, situacao, recebido_em FROM auditoria.evento_webhook ORDER BY id DESC LIMIT 5;"
+```
+
+Confirme também a idempotência: reenviar a mesma notificação não repete o efeito, e a resposta traz `"duplicados":1` e nenhum processamento novo.
+
+##### Manutenção (Microsoft Graph)
+
+| Quando | Comando |
+|---|---|
+| A cada reinício do túnel | `fechar`, depois `abrir` |
+| Antes de 29 dias | `renovar` |
+| Ao encerrar | `fechar` |
+
+A autorização usa o fluxo de **código de dispositivo**, escolhido em vez do laço de retorno local porque dispensa *client secret* e dispensa registrar URI de redirecionamento, dois passos a menos no portal do Azure. Em contrapartida, exige que *Allow public client flows* esteja habilitado no registro da aplicação, que é o passo mais esquecido do procedimento.
+
+A assinatura vale 29 dias, e `renovar` a estende sem recriar:
+
+```bash
+python -m services.graph_subscription_service renovar
+```
+
+Recriar só é necessário quando a URL de notificação muda, porque nenhum dos dois provedores permite alterá-la depois, limitação que desaparece quando a aplicação estiver num endereço fixo, e não atrás de um túnel de desenvolvimento.
+
+> **A pegadinha que mais atrapalha.** A URL do `cloudflared` gratuito muda a cada reinício, e o Graph **não permite alterar a URL** de uma assinatura já criada. Toda vez que o túnel reiniciar, atualize `WEBHOOK_PUBLIC_URL` no `.env` e rode `fechar` seguido de `abrir`. Num servidor com endereço fixo isso deixa de existir, e aí só o `renovar` mensal importa.
+
+##### Quando algo dá errado (Microsoft Graph)
+
+| Sintoma | Causa | O que fazer |
+|---|---|---|
+| `AADSTS7000218` | *Allow public client flows* desligado | Parte 1, passo 3 |
+| `AADSTS50020` / "conta não existe no locatário" | Conta pessoal num portal que exige diretório da organização | Entre com a conta da organização, ou use `MS_TENANT=consumers` |
+| `AADSTS65001` / consentimento ausente | Permissões não concedidas | Parte 1, passo 4, incluindo *Grant admin consent* |
+| `Subscription validation request failed` | Túnel ou API fora do ar quando `abrir` rodou | Confirme os passos 2 e 3 e rode `abrir` de novo |
+| `ExtensionError` com `resource` inválido | `MS_RECURSO` errado | Confira o `drive-id` no Graph Explorer |
+| Assinatura criada, mas nada chega | URL antiga após reinício do túnel | `fechar`, atualizar `WEBHOOK_PUBLIC_URL`, `abrir` |
+| Notificação chega e volta `401` | Origem não registrada ou desativada no banco | `listar`; se vazio, rode `abrir` |
+| Notificação chega e volta `503` | Postgres fora do ar | `docker compose up -d postgres` |
+| `WEBHOOK_PUBLIC_URL precisa começar com https://` | Endereço local no `.env` | Use a URL do túnel, não `localhost` |
+
+Para ver o que o receptor decidiu sobre cada entrega, incluindo as recusadas:
+
+```bash
+docker compose exec postgres psql -U az1 -d az1 \
+  -c "SELECT recebido_em, tipo, situacao, motivo FROM auditoria.evento_webhook ORDER BY id DESC LIMIT 20;"
+```
+
+O receptor (a rota, a verificação de autenticidade, a tradução, a idempotência e a persistência) está implementado e coberto por oito casos de teste automatizados, executados em quatro ambientes distintos, entre eles um com Postgres real. Uma limitação que **não** se resolve com *tenant*, e que vale conhecer: o Graph não oferece prova de frescor por entrega para este tipo de recurso, porque o `validationTokens` só acompanha notificações com dados de recurso, e `driveItem` não as suporta. A proteção contra reapresentação vem da idempotência, não da assinatura, e o raciocínio completo está na Seção 5.1.5.
+
+### 5.1.7 Expiração das Assinaturas
+
+Nenhuma das duas assinaturas é permanente: o Microsoft Graph aceita validade de até 30 dias para o recurso observado, renovável por `PATCH` sem recriar; o Google Drive limita o canal a 7 dias, sem possibilidade de extensão. Ao expirar, a origem para de gerar notificações sem aviso do provedor. A renovação é feita pelos comandos `renovar` (Graph) e `renovar`/`abrir` (Drive), descritos nos manuais de operação da Seção 5.1.6.
 
 ## 5.2 Módulo VHS
 

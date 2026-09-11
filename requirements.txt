@@ -22,6 +22,8 @@ google-genai>=1.0
 
 # Dependências de autenticação (RNF02 — Supabase Auth / Microsoft Entra ID)
 PyJWT[crypto]>=2.10
+
+# Dependências da integração por webhook e do banco (src/services/webhook_*)
 psycopg[binary,pool]>=3.2
 
 # Dependências do pipeline RAG (src/rag)
