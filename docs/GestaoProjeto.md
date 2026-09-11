@@ -119,6 +119,10 @@
   - [5.3.1 Papéis, responsabilidades e rotação](#531-papéis-responsabilidades-e-rotação)
   - [5.3.2 Evidência versionada e colaborações efetivas](#532-evidência-versionada-e-colaborações-efetivas)
   - [5.3.3 Avaliação da distribuição](#533-avaliação-da-distribuição)
+- [5.4 Revisão do Contrato de Convivência, SLA e Rituais](#54-revisão-do-contrato-de-convivência-sla-e-rituais)
+- [5.5 Revisão da Gestão do Processo de Desenvolvimento](#55-revisão-da-gestão-do-processo-de-desenvolvimento)
+  - [5.5.1 Aderência das políticas na Sprint 3](#551-aderência-das-políticas-na-sprint-3)
+  - [5.5.2 Ferramenta pessoal de apoio ao backlog](#552-ferramenta-pessoal-de-apoio-ao-backlog)
 
 </details>
 
@@ -209,12 +213,13 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 |---|---|---|---|
 | 1 | Contrato firmado | Não se aplica | Seção 3.2 |
 | 2 | Revisado e mantido integralmente | Nenhum | Seção 4.5 |
+| 3 | Revisado e mantido integralmente | Nenhum | Seção 5.4 |
 
  Como nenhuma regra do contrato foi alterada até aqui, a tabela de histórico por regra permanece sem linhas de alteração. Ela é mantida com a estrutura definida, para que a primeira mudança já entre no formato correto:
 
 | Regra | Versão anterior | Versão atual | Motivo | Evidência de aceite |
 |---|---|---|---|---|
-| — | — | — | Nenhuma regra do contrato foi alterada nas Sprints 1 e 2 | Não se aplica |
+| — | — | — | Nenhuma regra do contrato foi alterada nas Sprints 1, 2 e 3 | Não se aplica |
 
  **O que mudou fora do contrato.** A única regra efetivamente revisada na Sprint 2 não pertence ao contrato, e sim à tabela de ações: o critério de verificação da rotação de revisores. Ela está registrada com sua justificativa na Seção 4.2.4, e não aqui, para que a distinção entre acordo de convivência e critério de acompanhamento permaneça clara.
 
@@ -1106,5 +1111,48 @@ A distribuição do backlog, por outro lado, apresenta uma fragilidade objetiva:
 Não há evidência de centralização absoluta, pois os sete integrantes possuem autoria e as revisões registradas se distribuem entre seis pessoas. Das quatro revisões nominalmente planejadas, duas são verificáveis como cumpridas: Matheus revisou o TTS e Rui revisou o frontend. A revisão de webhooks, planejada para Tobias, foi assumida por Rui, e a revisão do NLP, planejada para Ana, depende da conclusão da entrega correspondente. Nos demais casos, a Planning não definiu revisor; os nomes registrados na matriz decorrem da prática observada nos MRs.
 
 Na consulta de 10/09, Tobias ainda não possuía revisão registrada e o MR `!72`, referente a este artefato de gestão, continuava aberto sem reviewer designado. Como as revisões finais estão previstas para 11/09, a matriz preserva esse estado parcial e deve ser atualizada após a conclusão dos MRs, sem antecipar os nomes ainda não registrados.
+
+---
+
+## 5.4 Revisão do Contrato de Convivência, SLA e Rituais
+
+O contrato vigente na Seção 2.1 foi revisado a partir da experiência da Sprint 3. **A decisão da equipe foi mantê-lo integralmente, sem alteração de regras.** As fragilidades observadas — especialmente a cadência irregular, alguns atrasos na atualização do Kanban e a concentração de revisões no encerramento — já são cobertas pelo contrato e pelas políticas permanentes. Por isso, exigem melhoria na execução, e não a criação de novas regras.
+
+| Item do contrato | Aderência observada na Sprint 3 | Evidência e avaliação | Decisão |
+|---|---|---|---|
+| 2.1.1 Regra de Ouro | Parcial, sujeita à conferência final | Parte das entregas chegou à revisão na reta final e algumas revisões foram programadas para 11/09. A aferição definitiva depende do encerramento dos MRs | Mantida sem alteração; tratar pela ação de antecipação das revisões da Seção 5.2.5 |
+| 2.1.2 Resolução de impasses | Não acionada | A equipe informou que não ocorreu impasse que exigisse votação ou roleta | Mantida sem alteração |
+| 2.1.3 Gestão de conflitos | Não acionada | Não houve conflito, descumprimento reiterado ou situação que exigisse escalonamento ao orientador | Mantida sem alteração |
+| 2.1.4 Quadro Kanban | Parcial | O quadro refletiu o trabalho executado na maior parte do ciclo, embora tenha havido poucos atrasos de atualização. A existência de issues sem responsável e de itens redundantes decorreu do refinamento do backlog, e não de ausência de regra no contrato | Mantida sem alteração; aplicar o refinamento e os critérios mínimos definidos na Seção 5.2.5 |
+| 2.1.5 Comunicação oficial e SLA | Atendida | Não houve descumprimento de SLA, bloqueio sem resposta ou necessidade de acionar docentes e orientadores | Mantida sem alteração |
+| 2.1.6 Dailies e demais rituais | Atendida | Conforme registro da equipe, as dailies ocorreram normalmente; os atrasos pontuais do Kanban não impediram a sincronização cotidiana | Mantida sem alteração |
+| 2.1.7 Acordos adicionais | Parcial, sujeita à conferência final | Os MRs integrados possuíam revisão, mas parte das revisões finais ainda estava prevista para 11/09 e alguns revisores não haviam sido definidos na Planning | Mantida sem alteração; atualizar a matriz de papéis após as revisões finais |
+
+O resultado não indica que todos os acordos foram executados sem desvio. Ele indica que as regras continuam adequadas para tratar os problemas encontrados. A Sprint 4 deve verificar a efetividade das ações da Seção 5.2.5 antes de considerar qualquer alteração normativa. O histórico desta decisão foi acrescentado à Seção 2.1.8; como não houve mudança de texto no contrato, não existe nova versão de regra nem evidência de aceite de alteração a anexar.
+
+---
+
+## 5.5 Revisão da Gestão do Processo de Desenvolvimento
+
+### 5.5.1 Aderência das políticas na Sprint 3
+
+As políticas da Seção 2.2 também foram revisadas e permanecem vigentes. A Sprint 3 confirmou que o fluxo técnico básico funciona, mas evidenciou diferença entre possuir uma política e aplicá-la de maneira constante. A tabela registra a aderência observada até 10/09; os itens dependentes do encerramento devem ser reconferidos depois dos últimos merges.
+
+| Política | Aderência observada na Sprint 3 | Evidência | Decisão |
+|---|---|---|---|
+| 2.2.1 Fluxo de trabalho | Parcial | As branches de trabalho partiram de `develop` e os MRs retornaram para `develop`. Entretanto, o planejamento gerou issues redundantes ou sem aderência clara, e 13 das 50 issues estavam sem assignee na fotografia de 09/09 | Manter o fluxo; aplicar refinamento coletivo antes da publicação do backlog |
+| 2.2.2 Política de atualização do GitLab | Parcial | O Kanban refletiu o trabalho executado na maior parte do ciclo e apoiou as dailies, mas ocorreram atrasos pontuais de atualização. Em 09/09 havia 14 issues em `Waiting Review` e 21 em `Backlog` | Manter a política; acompanhar também o tempo dos cards e o volume simultâneo em revisão |
+| 2.2.3 Política de commits | Parcial | Os 31 commits autorais observados até 09/09 mantiveram 100% de referência `#N` e de tipo válido. O infinitivo foi atendido em 17 de 31 mensagens, ou 54,8%, e o limite de 72 caracteres em 26 de 31, ou 83,9%. A atividade ocorreu em seis datas, com interrupção entre 05 e 07/09 | Manter as quatro regras e adotar validação compartilhada antes do commit |
+| 2.2.4 Revisão e melhoria contínua | Parcial | Os MRs integrados consultados possuíam aprovação, mas cinco dos onze MRs da sprint ainda estavam abertos em 09/09 e parte das revisões foi concentrada no encerramento | Manter a revisão obrigatória e antecipar a abertura dos MRs; reconferir reviewers em 11/09 |
+| 2.2.5 Critérios de início e conclusão | Parcial | O card `#207` demonstra aplicação robusta de DoR e DoD, mas a milestone também continha issues sem responsável, duplicadas ou incompatíveis com o fluxo efetivamente adotado | Manter os critérios; impedir a entrada no backlog enquanto os campos mínimos não estiverem atendidos |
+| 2.2.6 Atualização de branches e conflitos | Alta | Segundo a equipe, as branches foram criadas a partir de `develop` e os MRs apontaram de volta para `develop`. Não houve conflito ou decisão técnica que exigisse escalonamento | Manter; confirmar nomenclatura e destinos na auditoria final de configuração |
+
+As ações correspondentes já estão registradas na Seção 5.2.5 com responsáveis, prazos, evidências e critérios verificáveis. Assim, a revisão não cria regras paralelas: ela liga cada desvio observado ao mecanismo de correção que será acompanhado na Sprint 4.
+
+### 5.5.2 Ferramenta pessoal de apoio ao backlog
+
+Na Sprint 3, a criação das tasks no GitLab foi apoiada por uma ferramenta pessoal desenvolvida pelo próprio Scrum Master. Esse recurso foi utilizado para reduzir o trabalho manual de cadastro dos cards e apoiar a preparação do quadro.
+
+A automação da criação não substitui o refinamento coletivo. As duplicidades e os itens sem responsável observados na Sprint 3 mostram que uma issue pode ser criada corretamente pela ferramenta e ainda assim não representar um compromisso útil ou coerente com a entrega. Por isso, o fluxo da Sprint 4 deve ser: refinar e aprovar o backlog em equipe e somente então utilizar a ferramenta para cadastrar as issues. O quadro do GitLab continua sendo a fonte oficial do planejamento e do acompanhamento.
 
 ---
