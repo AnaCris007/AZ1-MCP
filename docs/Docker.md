@@ -80,7 +80,7 @@ docker buildx version
 ## 3. Desenvolvimento
 
 ```bash
-cp .env.example .env      # preencha DEEPGRAM_API_KEY e GEMINI_API_KEY
+cp .env.example .env      # preencha DEEPGRAM_API_KEY, GEMINI_API_KEY e a autenticação (ver Seção 6)
 docker compose up -d --build
 ```
 
@@ -96,6 +96,13 @@ automaticamente. Sobem então:
 O código do host entra por bind mount: editar um `.py` reinicia o uvicorn,
 editar um `.jsx` atualiza o navegador. Não é preciso reconstruir a imagem para
 nenhuma das duas coisas — só quando as *dependências* mudam.
+
+A interface exige login com Microsoft (RNF02). Sem `SUPABASE_URL` e
+`SUPABASE_ANON_KEY` configurados, a API responde 500 em toda rota protegida —
+não 401 — porque é uma falha de configuração, não de credencial do usuário. Para
+desenvolver sem configurar Entra ID/Supabase, defina `AZ1_AUTH_MODE=disabled`
+no `.env` (ver Seção 6); só funciona em desenvolvimento, a produção recusa
+subir com esse valor (Seção 4).
 
 ```bash
 docker compose logs -f api     # acompanha os logs da API
@@ -138,7 +145,10 @@ O que muda em relação ao desenvolvimento:
 - `restart: always`;
 - `AUDIO_STORAGE_ACCESS_KEY` e `AUDIO_STORAGE_SECRET_KEY` passam a ser
   **obrigatórias** — sem elas a subida falha, em vez de silenciosamente usar
-  `minioadmin/minioadmin`.
+  `minioadmin/minioadmin`;
+- `AZ1_AUTH_MODE=disabled` (válvula de desenvolvimento do RNF02 — ver Seção 6)
+  passa a **derrubar a subida**, em vez de deixar as rotas protegidas abertas
+  sem token em produção.
 
 ```bash
 # .env do servidor
@@ -146,6 +156,8 @@ AUDIO_STORAGE_ACCESS_KEY=az1                # 3+ caracteres
 AUDIO_STORAGE_SECRET_KEY=<senha forte>      # 8+ caracteres
 DEEPGRAM_API_KEY=<chave>
 GEMINI_API_KEY=<chave>
+SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_ANON_KEY=<chave anônima do projeto>
 ```
 
 Essas duas chaves são a credencial única do armazenamento: a API assina as
@@ -198,6 +210,8 @@ Docker:
 | `AZ1_API_PORT` | 8010 | Porta da API publicada em desenvolvimento. |
 | `MINIO_API_PORT` / `MINIO_CONSOLE_PORT` | 9000 / 9001 | Portas do MinIO em desenvolvimento. |
 | `AUDIO_STORAGE_ACCESS_KEY` / `AUDIO_STORAGE_SECRET_KEY` | `minioadmin` | Credencial única do armazenamento: a API assina as requisições S3 com ela e o MinIO sobe com ela. Obrigatórias em produção. Mínimo de 3 e 8 caracteres. |
+| `AZ1_AUTH_MODE` | `enabled` | Com `disabled`, todas as rotas protegidas do RNF02 ficam abertas sem token — só para desenvolvimento. Em produção a subida é recusada se estiver `disabled` (ver Seção 4). |
+| `SUPABASE_URL` / `SUPABASE_ANON_KEY` | — | Projeto Supabase usado pelo Supabase Auth (RNF02). A mesma URL é repassada ao build do frontend como `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` — não precisa duplicar a variável no `.env`. |
 | `UVICORN_WORKERS` | 2 | Workers do uvicorn em produção. |
 | `AZ1_VERSION` | `dev` | Tag das imagens e label OCI de versão. |
 | `DOCKER_UID` / `DOCKER_GID` | 0 | Dono dos arquivos gerados pelo `trainer` (só Linux). |
