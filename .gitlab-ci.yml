@@ -58,14 +58,20 @@ build:app:
 # ------------------------------------------------------------------ test
 # A suíte inteira: pipeline de PLN, API e serviços.
 #
-# O modelo do spaCy é baixado aqui e não no `before_script` comum porque só
-# os testes de lematização precisam dele — são 13 MB que os outros jobs não
-# têm por que pagar.
+# O modelo do spaCy fica no `before_script` deste job (e não no anchor
+# compartilhado) porque só os testes de lematização precisam dele — são
+# 13 MB que os outros jobs não têm por que pagar. A instalação usa pip
+# internamente, portanto o wheel fica em `.cache/pip` após a primeira
+# execução: a partir daí não há download da internet.
 test:app:
   stage: test
-  <<: *python_app
-  script:
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install -e ".[dev]"
+    - python -m nltk.downloader -d "$NLTK_DATA" stopwords rslp
     - python -m spacy download pt_core_news_sm
+  script:
     - python -m unittest discover -v tests
 
 # --------------------------------------------------------------- quality
