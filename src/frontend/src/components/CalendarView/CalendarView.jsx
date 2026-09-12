@@ -18,6 +18,8 @@ const TYPE_LABELS = {
 
 export default function CalendarView() {
   const [days, setDays] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -25,11 +27,11 @@ export default function CalendarView() {
     fetchCalendarEvents()
       .then((data) => {
         // A resposta vem como {days: [...]}; o componente lista os dias.
-        if (!cancelled) setDays(data.days ?? [])
+        if (!cancelled) { setDays(data.days ?? []); setLoading(false) }
       })
       .catch(() => {
         console.error('[calendar] não foi possível carregar a agenda do portfólio')
-        if (!cancelled) setDays([])
+        if (!cancelled) { setLoading(false); setError('Não foi possível carregar a agenda. Tente novamente ao abrir esta tela.') }
       })
 
     return () => {
@@ -50,6 +52,9 @@ export default function CalendarView() {
           </span>
         </div>
 
+        {loading && <p role="status">Carregando agenda...</p>}
+        {error && <p role="alert">{error}</p>}
+        {!loading && !error && days.length === 0 && <p>Nenhum marco ou prazo registrado.</p>}
         <div className="flex flex-col gap-6">
           {days.map((day, dayIndex) => (
             <motion.div

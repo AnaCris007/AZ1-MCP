@@ -95,6 +95,7 @@ class TesteConfiguracaoDaConexao(unittest.TestCase):
         conexao, cursor = _conexao_falsa()
         _configurar_conexao(conexao, "az1_app")
         cursor.execute.assert_called_once_with("SET ROLE az1_app")
+        conexao.commit.assert_called_once()
 
     def test_papel_invalido_levanta_antes_de_tocar_o_banco(self):
         conexao, cursor = _conexao_falsa()

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthProvider } from '../contexts/AuthContext'
@@ -42,7 +42,9 @@ function promptTextarea() {
 async function completeRecording(text) {
   sendAudio.mockResolvedValue({ id: 'audio-1' })
   transcribeAudio.mockResolvedValue({ text })
-  await capturedOnRecordingComplete(new Blob(['fake-audio']))
+  await act(async () => {
+    await capturedOnRecordingComplete(new Blob(['fake-audio']))
+  })
 }
 
 describe('AgentPage — confirmação de transcrição', () => {

@@ -14,7 +14,8 @@ from services.webhook_service import (
 )
 
 # Como a situação é gravada no banco. `duplicado` não aparece aqui de propósito:
-# uma entrega repetida não gera linha nova, ela encontra a que já existe.
+# repetir um identificador estável encontra a linha existente. Avisos mínimos
+# OneDrive usam UUID novo e são registrados como novos recebimentos.
 _SITUACAO_NO_BANCO = {
     SituacaoEvento.PROCESSADO: "processado",
     SituacaoEvento.IGNORADO: "ignorado",
@@ -27,15 +28,18 @@ class PostgresSettings:
 
     @classmethod
     def from_environment(cls) -> PostgresSettings:
-        return cls(dsn=os.environ.get("DATABASE_URL", "postgresql://az1:az1@localhost:5432/az1"))
+        return cls(dsn=(os.environ.get("DATABASE_URL", "").strip()
+                        or os.environ.get("SUPABASE_DB_URL", "").strip()
+                        or "postgresql://az1:az1@localhost:5432/az1"))
 
 
 def _partes(evento: EventoWebhook) -> tuple[str, str]:
     """Separa o identificador do envelope nas duas colunas do banco.
 
-    O identificador canônico é `<origem>:<item>` — assinatura e item no Graph,
-    canal e número da mensagem no Drive. O banco guarda os dois separados porque
-    é sobre eles que a unicidade é declarada, e é ela que dá a idempotência.
+    O identificador canônico é `<origem>:<evento-ou-recebimento>`. Graph usa
+    identidade de evento/versão quando disponível, ou UUID por recebimento;
+    Drive usa canal e número da mensagem. O UNIQUE só deduplica identidades
+    estáveis, não os UUIDs distintos de avisos mínimos OneDrive.
     """
     origem, _, item = evento.identificador.partition(":")
     return origem, item
@@ -88,7 +92,7 @@ class _ReivindicacaoPostgres:
 class RegistroEventosPostgres:
     """Grava a trilha de entregas em `auditoria.evento_webhook`.
 
-    A idempotência do caso TI-37 e a retomada após falha do caso TI-38 são a
+    Para identificadores estáveis, a deduplicação do TI-37 e a retomada do TI-38 são a
     mesma exclusividade, vista em dois desfechos — não dois mecanismos
     separados. `reivindicar` tenta o INSERT; se a linha já existe, trava-a com
     `SELECT ... FOR UPDATE` e esse `SELECT` *bloqueia* caso outra transação já
@@ -112,49 +116,61 @@ class RegistroEventosPostgres:
         origem, item = _partes(evento)
         conexao = self._pool.getconn()
 
-        inserida = conexao.execute(
-            """
-            INSERT INTO auditoria.evento_webhook
-                (provedor, subscription_id, notificacao_id, tipo, versao_envelope,
-                 correlacao, conteudo, recebido_em)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (provedor, subscription_id, notificacao_id) DO NOTHING
-            RETURNING id
-            """,
-            (
-                self._provedor,
-                origem,
-                item,
-                evento.tipo,
-                evento.versao,
-                evento.correlacao,
-                Jsonb(dict(evento.conteudo)),
-                evento.marca_de_tempo,
-            ),
-        ).fetchone()
+        transferida = False
+        try:
+            inserida = conexao.execute(
+                """
+                INSERT INTO auditoria.evento_webhook
+                    (provedor, subscription_id, notificacao_id, tipo, versao_envelope,
+                     correlacao, conteudo, recebido_em)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (provedor, subscription_id, notificacao_id) DO NOTHING
+                RETURNING id
+                """,
+                (
+                    self._provedor,
+                    origem,
+                    item,
+                    evento.tipo,
+                    evento.versao,
+                    evento.correlacao,
+                    Jsonb(dict(evento.conteudo)),
+                    evento.marca_de_tempo,
+                ),
+            ).fetchone()
 
-        if inserida is not None:
-            return _ReivindicacaoPostgres(self._pool, conexao, self._provedor, origem, item)
+            if inserida is not None:
+                transferida = True
+                return _ReivindicacaoPostgres(self._pool, conexao, self._provedor, origem, item)
 
-        # A linha já existia: FOR UPDATE trava-a, bloqueando aqui mesmo se
-        # outra transação a estiver segurando neste instante. Ao desbloquear —
-        # depois que a outra concluir ou liberar —, o estado já é definitivo.
-        linha = conexao.execute(
-            """
-            SELECT concluido_em FROM auditoria.evento_webhook
-             WHERE provedor = %s AND subscription_id = %s AND notificacao_id = %s
-             FOR UPDATE
-            """,
-            (self._provedor, origem, item),
-        ).fetchone()
+            # A linha já existia: FOR UPDATE trava-a, bloqueando aqui mesmo se
+            # outra transação a estiver segurando neste instante. Ao desbloquear —
+            # depois que a outra concluir ou liberar —, o estado já é definitivo.
+            linha = conexao.execute(
+                """
+                SELECT concluido_em FROM auditoria.evento_webhook
+                 WHERE provedor = %s AND subscription_id = %s AND notificacao_id = %s
+                 FOR UPDATE
+                """,
+                (self._provedor, origem, item),
+            ).fetchone()
 
-        if linha is not None and linha[0] is None:
-            return _ReivindicacaoPostgres(self._pool, conexao, self._provedor, origem, item)
+            if linha is not None and linha[0] is None:
+                transferida = True
+                return _ReivindicacaoPostgres(self._pool, conexao, self._provedor, origem, item)
 
-        # Concluída por outra tentativa: duplicata de verdade (TI-37).
-        conexao.commit()
-        self._pool.putconn(conexao)
-        return None
+            # Concluída por outra tentativa: duplicata de verdade (TI-37).
+            conexao.commit()
+            return None
+        except BaseException:
+            try:
+                conexao.rollback()
+            except Exception:
+                conexao.close()
+            raise
+        finally:
+            if not transferida:
+                self._pool.putconn(conexao)
 
     def registrar_recusa(self, *, motivo: str, corpo: bytes) -> None:
         # A entrega provou vir do provedor mas não pôde ser interpretada (TI-39).

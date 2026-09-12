@@ -294,34 +294,15 @@ def require_authenticated_user(
 
 @lru_cache
 def get_webhook_connection_pool() -> ConnectionPool:
-    """Pool dos dois receptores de webhook.
+    """Mesmo banco do domínio por padrão, em sessão restrita aos webhooks.
 
-    Chamava-se `get_connection_pool`, igual ao provedor do pool do Supabase, e a
-    colisão só apareceu no merge: duas funções homônimas no mesmo módulo, a
-    segunda apagando a primeira em silêncio.
-
-    POR PADRÃO É O MESMO BANCO do `get_connection_pool()`.
-    `auditoria.evento_webhook` é definida no mesmo `01_create_database.sql` que
-    `auditoria.conversa` e `auditoria.mensagem`; mandá-la para outro servidor
-    torna impossível responder "que evento precedeu esta conversa" sem consulta
-    cruzada entre instâncias — e foi o que deixou a tabela com zero linhas no
-    Supabase, enquanto o código escrevia num Postgres local que nem sobe.
-
-    `DATABASE_URL` continua existindo como ESCAPE: aponta para o serviço
-    `postgres` do docker-compose, e serve ao desenvolvimento offline e à suíte
-    destrutiva de `tests/test_integracao_webhook_postgres.py`. Quando definida,
-    ela vence.
-
-    O pool é construído por `abrir_pool`, e não por `ConnectionPool(...)` direto,
-    porque é `abrir_pool` que instala o `configure=` com o `SET ROLE`. Um pool
-    montado à mão ignora `AZ1_DB_ROLE` e, com ele, a RLS — sem falhar.
+    DATABASE_URL seleciona uma base explícita; sem ela, usa SUPABASE_DB_URL.
+    O papel az1_webhook é obrigatório e não compartilha sessões com az1_app.
     """
     dsn = os.environ.get("DATABASE_URL", "").strip()
     if not dsn:
-        return get_connection_pool()
-
-    papel = os.environ.get("AZ1_DB_ROLE", "").strip() or None
-    return abrir_pool(PostgresSettings(dsn=dsn, papel=papel))
+        dsn = PostgresSettings.from_environment().dsn
+    return abrir_pool(PostgresSettings(dsn=dsn, papel="az1_webhook"))
 
 
 def _segredo(variavel: str, provedor: str) -> str:

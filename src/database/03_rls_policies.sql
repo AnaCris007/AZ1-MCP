@@ -266,6 +266,9 @@ CREATE POLICY avaliacao_propria_atualizacao ON auditoria.avaliacao
 
 COMMIT;
 
+-- Sessões de webhook usam papel separado das sessões de usuário.
+\ir 06_webhook_permissions.sql
+
 
 -- =============================================================================
 -- Verificação

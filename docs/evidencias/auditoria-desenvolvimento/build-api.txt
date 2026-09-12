@@ -1,0 +1,288 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 10.30kB done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1.7
+#2 DONE 0.9s
+
+#3 docker-image://docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
+#3 resolve docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e done
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm
+#4 DONE 1.1s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 1.84kB done
+#5 DONE 0.0s
+
+#6 [base 1/2] FROM docker.io/library/python:3.12-slim-bookworm@sha256:782412e85d0f0984994c290652577d4018aff08145c85b262bb63dc0c7522254
+#6 resolve docker.io/library/python:3.12-slim-bookworm@sha256:782412e85d0f0984994c290652577d4018aff08145c85b262bb63dc0c7522254 done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 60.86kB done
+#7 DONE 0.0s
+
+#8 [builder  2/10] RUN python -m venv "/app/.venv"
+#8 CACHED
+
+#9 [builder  3/10] COPY pyproject.toml ./
+#9 CACHED
+
+#10 [builder  4/10] RUN python -c "import tomllib, pathlib; print('\n'.join(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['dependencies']))"     > /tmp/requirements.txt     && cat /tmp/requirements.txt
+#10 CACHED
+
+#11 [builder  6/10] RUN python -m nltk.downloader -d "/opt/nltk_data" stopwords rslp
+#11 CACHED
+
+#12 [builder  1/10] RUN --mount=type=cache,target=/var/cache/apt,sharing=locked     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked     rm -f /etc/apt/apt.conf.d/docker-clean     && apt-get update     && apt-get install -y --no-install-recommends build-essential
+#12 CACHED
+
+#13 [builder  5/10] RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked     pip install --requirement /tmp/requirements.txt
+#13 CACHED
+
+#14 [base 2/2] WORKDIR /app
+#14 CACHED
+
+#15 [builder  7/10] COPY ruff.toml ./
+#15 CACHED
+
+#16 [builder  8/10] COPY src ./src
+#16 DONE 0.0s
+
+#17 [builder  9/10] RUN chmod -R a-x,a+X src
+#17 DONE 0.1s
+
+#18 [builder 10/10] RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked     pip install --no-deps .
+#18 0.413 Processing /app
+#18 0.413   Installing build dependencies: started
+#18 1.067   Installing build dependencies: finished with status 'done'
+#18 1.067   Getting requirements to build wheel: started
+#18 1.182   Getting requirements to build wheel: finished with status 'done'
+#18 1.182   Preparing metadata (pyproject.toml): started
+#18 1.359   Preparing metadata (pyproject.toml): finished with status 'done'
+#18 1.360 Building wheels for collected packages: az1
+#18 1.361   Building wheel for az1 (pyproject.toml): started
+#18 1.408   Building wheel for az1 (pyproject.toml): finished with status 'done'
+#18 1.408   Created wheel for az1: filename=az1-0.1.0-py3-none-any.whl size=174187 sha256=ed1f9d44f18264501c2e6441a3fe991df663d68b76240c64ab4342528e1ddc3f
+#18 1.408   Stored in directory: /tmp/pip-ephem-wheel-cache-k3sqnw1x/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#18 1.410 Successfully built az1
+#18 1.410 Installing collected packages: az1
+#18 1.446 Successfully installed az1-0.1.0
+#18 DONE 1.5s
+
+#19 [trainer 1/4] RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked     if [ "1" = "1" ]; then python -m spacy download pt_core_news_sm; fi
+#19 0.900 Collecting pt-core-news-sm==3.8.0
+#19 1.293   Downloading https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.8.0/pt_core_news_sm-3.8.0-py3-none-any.whl (13.0 MB)
+#19 1.605      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.0/13.0 MB 48.2 MB/s eta 0:00:00
+#19 1.659 Installing collected packages: pt-core-news-sm
+#19 1.725 Successfully installed pt-core-news-sm-3.8.0
+#19 1.749 ✔ Download and installation successful
+#19 1.749 You can now load the package via spacy.load('pt_core_news_sm')
+#19 DONE 1.8s
+
+#20 [trainer 2/4] COPY tests ./tests
+#20 DONE 0.0s
+
+#21 [trainer 3/4] RUN chmod -R a-x,a+X tests
+#21 DONE 0.1s
+
+#22 [trainer 4/4] RUN python -m pln.classificador     && test -f /app/resultados/classificador.joblib
+#22 0.734 Dataset: /app/.venv/lib/python3.12/site-packages/pln/dados/intencoes_exemplos.csv  (400 exemplos, 10 classes)
+#22 0.734 Pré-processamento: [tok:regex] remover_numeros > stemming
+#22 0.734 Vetorização      : bow n=1
+#22 0.734 Classificador    : MultinomialNB(alpha=1.0, fit_prior=True)
+#22 0.734 
+#22 0.888 F1-macro (validação cruzada de 5 dobras): 0.6736
+#22 0.888 
+#22 0.888                                  precision    recall  f1-score   support
+#22 0.888 
+#22 0.888   analisar_completude_coerencia      0.733     0.825     0.776        40
+#22 0.888 consultar_documentos_normativos      0.676     0.575     0.622        40
+#22 0.888     consultar_projeto_sintetico      0.640     0.800     0.711        40
+#22 0.888                fora_do_catalogo      0.727     0.200     0.314        40
+#22 0.888        gerar_alertas_pendencias      0.880     0.550     0.677        40
+#22 0.888          orientar_avanco_mensal      0.745     0.875     0.805        40
+#22 0.888    orientar_entregas_cronograma      0.718     0.700     0.709        40
+#22 0.888        orientar_mapa_beneficios      0.632     0.900     0.742        40
+#22 0.888       orientar_riscos_problemas      0.762     0.800     0.780        40
+#22 0.888                    orientar_tap      0.540     0.675     0.600        40
+#22 0.888 
+#22 0.888                        accuracy                          0.690       400
+#22 0.888                       macro avg      0.705     0.690     0.674       400
+#22 0.888                    weighted avg      0.705     0.690     0.674       400
+#22 0.888 
+#22 0.888 Matriz de confusão: linha = intenção real, coluna = prevista
+#22 0.888                                      analisar_completude_coerencia  consultar_documentos_normativos      consultar_projeto_sintetico                 fora_do_catalogo         gerar_alertas_pendencias           orientar_avanco_mensal     orientar_entregas_cronograma         orientar_mapa_beneficios        orientar_riscos_problemas                     orientar_tap
+#22 0.888     analisar_completude_coerencia                               33                                0                                0                                0                                0                                2                                2                                2                                0                                1
+#22 0.888   consultar_documentos_normativos                                1                               23                                0                                2                                1                                1                                3                                3                                3                                3
+#22 0.888       consultar_projeto_sintetico                                0                                2                               32                                1                                0                                0                                1                                1                                0                                3
+#22 0.888                  fora_do_catalogo                                3                                3                               11                                8                                1                                0                                5                                3                                2                                4
+#22 0.888          gerar_alertas_pendencias                                3                                3                                3                                0                               22                                3                                0                                0                                2                                4
+#22 0.888            orientar_avanco_mensal                                1                                1                                0                                0                                0                               35                                0                                1                                0                                2
+#22 0.888      orientar_entregas_cronograma                                0                                1                                2                                0                                0                                2                               28                                3                                0                                4
+#22 0.888          orientar_mapa_beneficios                                1                                0                                1                                0                                0                                0                                0                               36                                1                                1
+#22 0.888         orientar_riscos_problemas                                0                                1                                0                                0                                1                                3                                0                                2                               32                                1
+#22 0.888                      orientar_tap                                3                                0                                1                                0                                0                                1                                0                                6                                2                               27
+#22 0.894 
+#22 0.894 Palavras que mais distinguem cada intenção
+#22 0.895      analisar_completude_coerencia: se, verif, meu, analis, as, coer, falt, ta
+#22 0.895    consultar_documentos_normativos: norm, sobr, segund, document, defin, metodolog, man, process
+#22 0.895        consultar_projeto_sintetico: linh, quant, foi, da, expans, últ, sinal, qual
+#22 0.895                   fora_do_catalogo: pro, uma, pra, amanhã, equip, fornec, mand, mim
+#22 0.895           gerar_alertas_pendencias: venc, sem, avis, tem, pend, algum, exist, it
+#22 0.895             orientar_avanco_mensal: avanç, report, mê, mens, avanc, inform, ajud, preench
+#22 0.895       orientar_entregas_cronograma: ativ, entreg, depend, ess, uma, cronogram, fas, marc
+#22 0.895           orientar_mapa_beneficios: benefíci, map, benefici, indic, met, par, reduç, preench
+#22 0.895          orientar_riscos_problemas: risc, problem, ess, ajud, mitig, critic, impact, dess
+#22 0.895                       orientar_tap: tap, term, abert, premiss, sug, obje, camp, projet
+#22 0.896 
+#22 0.896 Modelo treinado no dataset completo e salvo em /app/resultados/classificador.joblib
+#22 0.896 Teste: python -m pln.classificador --prever "Quais prazos vencem esta semana?"
+#22 DONE 1.0s
+
+#23 [dev 1/3] RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked     pip install --editable ".[dev]"
+#23 0.425 Obtaining file:///app
+#23 0.426   Installing build dependencies: started
+#23 4.350   Installing build dependencies: finished with status 'done'
+#23 4.350   Checking if build backend supports build_editable: started
+#23 4.404   Checking if build backend supports build_editable: finished with status 'done'
+#23 4.404   Getting requirements to build editable: started
+#23 4.518   Getting requirements to build editable: finished with status 'done'
+#23 4.518   Installing backend dependencies: started
+#23 4.952   Installing backend dependencies: finished with status 'done'
+#23 4.952   Preparing editable metadata (pyproject.toml): started
+#23 5.119   Preparing editable metadata (pyproject.toml): finished with status 'done'
+#23 5.121 Requirement already satisfied: av>=14.0 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (18.1.0)
+#23 5.121 Requirement already satisfied: boto3>=1.35 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (1.43.92)
+#23 5.121 Requirement already satisfied: deepgram-sdk>=5.0 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (7.8.1)
+#23 5.121 Requirement already satisfied: fastapi>=0.115 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (0.141.1)
+#23 5.121 Requirement already satisfied: google-genai>=1.0 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (2.23.0)
+#23 5.122 Requirement already satisfied: httpx>=0.27 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (0.28.1)
+#23 5.122 Requirement already satisfied: joblib==1.6.0 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (1.6.0)
+#23 5.122 Requirement already satisfied: nltk==3.10.3 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (3.10.3)
+#23 5.122 Requirement already satisfied: numpy==2.5.2 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (2.5.2)
+#23 5.122 Requirement already satisfied: openpyxl>=3.1 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (3.1.5)
+#23 5.122 Requirement already satisfied: psycopg>=3.2 in ./.venv/lib/python3.12/site-packages (from psycopg[binary,pool]>=3.2->az1==0.1.0) (3.3.5)
+#23 5.122 Requirement already satisfied: pydantic>=2 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (2.13.5)
+#23 5.122 Requirement already satisfied: pyjwt>=2.10 in ./.venv/lib/python3.12/site-packages (from pyjwt[crypto]>=2.10->az1==0.1.0) (2.14.0)
+#23 5.123 Requirement already satisfied: python-docx>=1.1 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (1.2.0)
+#23 5.123 Requirement already satisfied: python-dotenv>=1.0 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (1.2.3)
+#23 5.123 Requirement already satisfied: python-multipart>=0.0.12 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (0.0.32)
+#23 5.123 Requirement already satisfied: pyyaml>=6.0 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (6.0.3)
+#23 5.123 Requirement already satisfied: scikit-learn==1.9.0 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (1.9.0)
+#23 5.123 Requirement already satisfied: spacy==3.8.16 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (3.8.16)
+#23 5.123 Requirement already satisfied: sqlalchemy>=2.0 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (2.0.52)
+#23 5.123 Requirement already satisfied: uvicorn>=0.30 in ./.venv/lib/python3.12/site-packages (from uvicorn[standard]>=0.30->az1==0.1.0) (0.52.4)
+#23 5.124 Requirement already satisfied: vecs>=0.4 in ./.venv/lib/python3.12/site-packages (from az1==0.1.0) (0.4.5)
+#23 5.125 Requirement already satisfied: cloudpickle>=3.0 in ./.venv/lib/python3.12/site-packages (from joblib==1.6.0->az1==0.1.0) (3.1.2)
+#23 5.125 Requirement already satisfied: defusedxml in ./.venv/lib/python3.12/site-packages (from nltk==3.10.3->az1==0.1.0) (0.7.1)
+#23 5.126 Requirement already satisfied: click in ./.venv/lib/python3.12/site-packages (from nltk==3.10.3->az1==0.1.0) (8.5.0)
+#23 5.126 Requirement already satisfied: regex>=2021.8.3 in ./.venv/lib/python3.12/site-packages (from nltk==3.10.3->az1==0.1.0) (2026.9.10)
+#23 5.126 Requirement already satisfied: tqdm in ./.venv/lib/python3.12/site-packages (from nltk==3.10.3->az1==0.1.0) (4.70.1)
+#23 5.128 Requirement already satisfied: scipy>=1.10.0 in ./.venv/lib/python3.12/site-packages (from scikit-learn==1.9.0->az1==0.1.0) (1.18.1)
+#23 5.129 Requirement already satisfied: narwhals>=2.0.1 in ./.venv/lib/python3.12/site-packages (from scikit-learn==1.9.0->az1==0.1.0) (2.26.0)
+#23 5.129 Requirement already satisfied: threadpoolctl>=3.5.0 in ./.venv/lib/python3.12/site-packages (from scikit-learn==1.9.0->az1==0.1.0) (3.6.0)
+#23 5.131 Requirement already satisfied: spacy-legacy<3.1.0,>=3.0.11 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (3.0.12)
+#23 5.131 Requirement already satisfied: spacy-loggers<2.0.0,>=1.0.0 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (1.0.5)
+#23 5.131 Requirement already satisfied: murmurhash<1.1.0,>=0.28.0 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (1.0.15)
+#23 5.131 Requirement already satisfied: cymem<2.1.0,>=2.0.2 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (2.0.13)
+#23 5.132 Requirement already satisfied: preshed<3.1.0,>=3.0.2 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (3.0.13)
+#23 5.132 Requirement already satisfied: thinc<8.4.0,>=8.3.12 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (8.3.13)
+#23 5.132 Requirement already satisfied: wasabi<1.2.0,>=0.9.1 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (1.1.3)
+#23 5.132 Requirement already satisfied: srsly<3.0.0,>=2.5.3 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (2.5.3)
+#23 5.132 Requirement already satisfied: catalogue<2.1.0,>=2.0.6 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (2.0.10)
+#23 5.132 Requirement already satisfied: weasel<2.0.0,>=1.0.0 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (1.0.0)
+#23 5.132 Requirement already satisfied: confection<2.0.0,>=1.3.2 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (1.3.3)
+#23 5.132 Requirement already satisfied: typer<1.0.0,>=0.3.0 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (0.27.2)
+#23 5.132 Requirement already satisfied: requests<3.0.0,>=2.13.0 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (2.34.2)
+#23 5.133 Requirement already satisfied: jinja2 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (3.1.6)
+#23 5.133 Requirement already satisfied: setuptools in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (84.0.0)
+#23 5.133 Requirement already satisfied: packaging>=20.0 in ./.venv/lib/python3.12/site-packages (from spacy==3.8.16->az1==0.1.0) (26.3)
+#23 5.630 Collecting ruff==0.16.2 (from az1==0.1.0)
+#23 5.631   Using cached ruff-0.16.2-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (26 kB)
+#23 5.633 Requirement already satisfied: botocore<1.44.0,>=1.43.92 in ./.venv/lib/python3.12/site-packages (from boto3>=1.35->az1==0.1.0) (1.43.92)
+#23 5.634 Requirement already satisfied: jmespath<2.0.0,>=0.7.1 in ./.venv/lib/python3.12/site-packages (from boto3>=1.35->az1==0.1.0) (1.1.0)
+#23 5.634 Requirement already satisfied: s3transfer<0.20.0,>=0.19.0 in ./.venv/lib/python3.12/site-packages (from boto3>=1.35->az1==0.1.0) (0.19.2)
+#23 5.635 Requirement already satisfied: pydantic-core<3.0.0,>=2.18.2 in ./.venv/lib/python3.12/site-packages (from deepgram-sdk>=5.0->az1==0.1.0) (2.46.5)
+#23 5.635 Requirement already satisfied: typing_extensions>=4.0.0 in ./.venv/lib/python3.12/site-packages (from deepgram-sdk>=5.0->az1==0.1.0) (4.16.0)
+#23 5.635 Requirement already satisfied: websockets>=12.0 in ./.venv/lib/python3.12/site-packages (from deepgram-sdk>=5.0->az1==0.1.0) (16.1.1)
+#23 5.636 Requirement already satisfied: starlette>=0.46.0 in ./.venv/lib/python3.12/site-packages (from fastapi>=0.115->az1==0.1.0) (1.6.0)
+#23 5.637 Requirement already satisfied: typing-inspection>=0.4.2 in ./.venv/lib/python3.12/site-packages (from fastapi>=0.115->az1==0.1.0) (0.4.4)
+#23 5.637 Requirement already satisfied: annotated-doc>=0.0.2 in ./.venv/lib/python3.12/site-packages (from fastapi>=0.115->az1==0.1.0) (0.0.5)
+#23 5.638 Requirement already satisfied: anyio<5.0.0,>=4.8.0 in ./.venv/lib/python3.12/site-packages (from google-genai>=1.0->az1==0.1.0) (4.15.1)
+#23 5.638 Requirement already satisfied: google-auth<3.0.0,>=2.56.0 in ./.venv/lib/python3.12/site-packages (from google-auth[requests]<3.0.0,>=2.56.0->google-genai>=1.0->az1==0.1.0) (2.58.0)
+#23 5.639 Requirement already satisfied: tenacity<9.2.0,>=8.2.3 in ./.venv/lib/python3.12/site-packages (from google-genai>=1.0->az1==0.1.0) (9.1.4)
+#23 5.639 Requirement already satisfied: distro<2,>=1.7.0 in ./.venv/lib/python3.12/site-packages (from google-genai>=1.0->az1==0.1.0) (1.9.0)
+#23 5.639 Requirement already satisfied: sniffio in ./.venv/lib/python3.12/site-packages (from google-genai>=1.0->az1==0.1.0) (1.3.1)
+#23 5.640 Requirement already satisfied: certifi in ./.venv/lib/python3.12/site-packages (from httpx>=0.27->az1==0.1.0) (2026.7.22)
+#23 5.640 Requirement already satisfied: httpcore==1.* in ./.venv/lib/python3.12/site-packages (from httpx>=0.27->az1==0.1.0) (1.0.9)
+#23 5.640 Requirement already satisfied: idna in ./.venv/lib/python3.12/site-packages (from httpx>=0.27->az1==0.1.0) (3.19)
+#23 5.641 Requirement already satisfied: h11>=0.16 in ./.venv/lib/python3.12/site-packages (from httpcore==1.*->httpx>=0.27->az1==0.1.0) (0.16.0)
+#23 5.642 Requirement already satisfied: et-xmlfile in ./.venv/lib/python3.12/site-packages (from openpyxl>=3.1->az1==0.1.0) (2.0.0)
+#23 5.643 Requirement already satisfied: psycopg-binary==3.3.5 in ./.venv/lib/python3.12/site-packages (from psycopg[binary,pool]>=3.2->az1==0.1.0) (3.3.5)
+#23 5.644 Requirement already satisfied: psycopg-pool in ./.venv/lib/python3.12/site-packages (from psycopg[binary,pool]>=3.2->az1==0.1.0) (3.3.1)
+#23 5.645 Requirement already satisfied: annotated-types>=0.6.0 in ./.venv/lib/python3.12/site-packages (from pydantic>=2->az1==0.1.0) (0.8.0)
+#23 5.647 Requirement already satisfied: cryptography>=3.4.0 in ./.venv/lib/python3.12/site-packages (from pyjwt[crypto]>=2.10->az1==0.1.0) (50.0.1)
+#23 5.647 Requirement already satisfied: lxml>=3.1.0 in ./.venv/lib/python3.12/site-packages (from python-docx>=1.1->az1==0.1.0) (6.1.3)
+#23 5.650 Requirement already satisfied: greenlet>=1 in ./.venv/lib/python3.12/site-packages (from sqlalchemy>=2.0->az1==0.1.0) (3.5.5)
+#23 5.652 Requirement already satisfied: httptools>=0.8.0 in ./.venv/lib/python3.12/site-packages (from uvicorn[standard]>=0.30->az1==0.1.0) (0.8.0)
+#23 5.653 Requirement already satisfied: uvloop>=0.15.1 in ./.venv/lib/python3.12/site-packages (from uvicorn[standard]>=0.30->az1==0.1.0) (0.22.1)
+#23 5.653 Requirement already satisfied: watchfiles>=0.20 in ./.venv/lib/python3.12/site-packages (from uvicorn[standard]>=0.30->az1==0.1.0) (1.2.0)
+#23 5.654 Requirement already satisfied: pgvector==0.3.* in ./.venv/lib/python3.12/site-packages (from vecs>=0.4->az1==0.1.0) (0.3.6)
+#23 5.654 Requirement already satisfied: psycopg2-binary==2.9.* in ./.venv/lib/python3.12/site-packages (from vecs>=0.4->az1==0.1.0) (2.9.13)
+#23 5.654 Requirement already satisfied: flupy==1.* in ./.venv/lib/python3.12/site-packages (from vecs>=0.4->az1==0.1.0) (1.2.4)
+#23 5.654 Requirement already satisfied: deprecated==1.2.* in ./.venv/lib/python3.12/site-packages (from vecs>=0.4->az1==0.1.0) (1.2.18)
+#23 5.655 Requirement already satisfied: wrapt<2,>=1.10 in ./.venv/lib/python3.12/site-packages (from deprecated==1.2.*->vecs>=0.4->az1==0.1.0) (1.17.3)
+#23 5.660 Requirement already satisfied: python-dateutil<3.0.0,>=2.1 in ./.venv/lib/python3.12/site-packages (from botocore<1.44.0,>=1.43.92->boto3>=1.35->az1==0.1.0) (2.9.0.post0)
+#23 5.660 Requirement already satisfied: urllib3!=2.2.0,<3,>=1.25.4 in ./.venv/lib/python3.12/site-packages (from botocore<1.44.0,>=1.43.92->boto3>=1.35->az1==0.1.0) (2.7.0)
+#23 5.663 Requirement already satisfied: cffi>=2.0.0 in ./.venv/lib/python3.12/site-packages (from cryptography>=3.4.0->pyjwt[crypto]>=2.10->az1==0.1.0) (2.1.1)
+#23 5.667 Requirement already satisfied: pyasn1-modules>=0.2.1 in ./.venv/lib/python3.12/site-packages (from google-auth<3.0.0,>=2.56.0->google-auth[requests]<3.0.0,>=2.56.0->google-genai>=1.0->az1==0.1.0) (0.4.2)
+#23 5.676 Requirement already satisfied: charset_normalizer<4,>=2 in ./.venv/lib/python3.12/site-packages (from requests<3.0.0,>=2.13.0->spacy==3.8.16->az1==0.1.0) (3.5.1)
+#23 5.685 Requirement already satisfied: blis<1.4.0,>=1.3.0 in ./.venv/lib/python3.12/site-packages (from thinc<8.4.0,>=8.3.12->spacy==3.8.16->az1==0.1.0) (1.3.3)
+#23 5.689 Requirement already satisfied: shellingham>=1.3.0 in ./.venv/lib/python3.12/site-packages (from typer<1.0.0,>=0.3.0->spacy==3.8.16->az1==0.1.0) (1.5.4)
+#23 5.689 Requirement already satisfied: rich>=13.8.0 in ./.venv/lib/python3.12/site-packages (from typer<1.0.0,>=0.3.0->spacy==3.8.16->az1==0.1.0) (15.0.0)
+#23 5.695 Requirement already satisfied: cloudpathlib>=0.7.0 in ./.venv/lib/python3.12/site-packages (from weasel<2.0.0,>=1.0.0->spacy==3.8.16->az1==0.1.0) (0.25.0)
+#23 5.695 Requirement already satisfied: smart-open>=5.2.1 in ./.venv/lib/python3.12/site-packages (from weasel<2.0.0,>=1.0.0->spacy==3.8.16->az1==0.1.0) (8.0.1)
+#23 5.699 Requirement already satisfied: MarkupSafe>=2.0 in ./.venv/lib/python3.12/site-packages (from jinja2->spacy==3.8.16->az1==0.1.0) (3.0.3)
+#23 5.705 Requirement already satisfied: pycparser in ./.venv/lib/python3.12/site-packages (from cffi>=2.0.0->cryptography>=3.4.0->pyjwt[crypto]>=2.10->az1==0.1.0) (3.0)
+#23 5.709 Requirement already satisfied: pyasn1<0.7.0,>=0.6.1 in ./.venv/lib/python3.12/site-packages (from pyasn1-modules>=0.2.1->google-auth<3.0.0,>=2.56.0->google-auth[requests]<3.0.0,>=2.56.0->google-genai>=1.0->az1==0.1.0) (0.6.4)
+#23 5.710 Requirement already satisfied: six>=1.5 in ./.venv/lib/python3.12/site-packages (from python-dateutil<3.0.0,>=2.1->botocore<1.44.0,>=1.43.92->boto3>=1.35->az1==0.1.0) (1.17.0)
+#23 5.711 Requirement already satisfied: markdown-it-py>=2.2.0 in ./.venv/lib/python3.12/site-packages (from rich>=13.8.0->typer<1.0.0,>=0.3.0->spacy==3.8.16->az1==0.1.0) (4.2.0)
+#23 5.711 Requirement already satisfied: pygments<3.0.0,>=2.13.0 in ./.venv/lib/python3.12/site-packages (from rich>=13.8.0->typer<1.0.0,>=0.3.0->spacy==3.8.16->az1==0.1.0) (2.21.0)
+#23 5.717 Requirement already satisfied: mdurl~=0.1 in ./.venv/lib/python3.12/site-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer<1.0.0,>=0.3.0->spacy==3.8.16->az1==0.1.0) (0.1.2)
+#23 5.723 Using cached ruff-0.16.2-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (11.0 MB)
+#23 5.733 Building wheels for collected packages: az1
+#23 5.734   Building editable for az1 (pyproject.toml): started
+#23 5.792   Building editable for az1 (pyproject.toml): finished with status 'done'
+#23 5.792   Created wheel for az1: filename=az1-0.1.0-py3-none-any.whl size=1258 sha256=ce7a46b166c9f10625b6113693fdc1f29d88b61c0f45e7b75c89459f7b2c082d
+#23 5.793   Stored in directory: /tmp/pip-ephem-wheel-cache-i27ehk5r/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#23 5.793 Successfully built az1
+#23 5.811 Installing collected packages: ruff, az1
+#23 5.887   Attempting uninstall: az1
+#23 5.887     Found existing installation: az1 0.1.0
+#23 5.890     Uninstalling az1-0.1.0:
+#23 5.902       Successfully uninstalled az1-0.1.0
+#23 5.907 Successfully installed az1-0.1.0 ruff-0.16.2
+#23 DONE 6.0s
+
+#24 [dev 2/3] COPY docker/api/entrypoint.sh /usr/local/bin/az1-entrypoint
+#24 DONE 0.0s
+
+#25 [dev 3/3] RUN chmod 0755 /usr/local/bin/az1-entrypoint
+#25 DONE 0.1s
+
+#26 exporting to image
+#26 exporting layers
+#26 exporting layers 0.4s done
+#26 exporting manifest sha256:9b4758a57729cc4316cbfbe5d45865bab68336000b9a4c0c890a0b438970c5e3 done
+#26 exporting config sha256:416e55f33796e025bf31e36dd4cfe9f21db29bf5a13d0da5bdd31049af82a05e done
+#26 exporting attestation manifest sha256:17190eaa0f59dc7660e454fec3f127adf4bf4dbc1fc42cd7a9dc98efd0618b12 done
+#26 exporting manifest list sha256:3ed9e88ae5428503de1ff16e990ac893176251cc050cc947756e74a0a1dc656a done
+#26 naming to docker.io/az1/auditoria-api:local done
+#26 unpacking to docker.io/az1/auditoria-api:local
+#26 unpacking to docker.io/az1/auditoria-api:local 0.2s done
+#26 DONE 0.6s

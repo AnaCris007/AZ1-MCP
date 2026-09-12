@@ -33,7 +33,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 DOC = RAIZ / "docs" / "Projeto.md"
 DDL = RAIZ / "src" / "database" / "01_create_database.sql"
 
-SCHEMAS = ("portfolio", "auditoria")
+SCHEMAS = ("portfolio", "auditoria", "integracao")
 
 # Linhas que abrem uma restrição de tabela, e não uma coluna.
 INICIO_DE_RESTRICAO = re.compile(
@@ -108,7 +108,7 @@ CONSULTA_COLUNAS = """
       JOIN information_schema.tables t
         ON t.table_schema = c.table_schema
        AND t.table_name = c.table_name
-     WHERE c.table_schema IN ('portfolio', 'auditoria')
+     WHERE c.table_schema IN ('portfolio', 'auditoria', 'integracao')
        AND t.table_type = 'BASE TABLE'
      ORDER BY c.table_schema, c.table_name, c.ordinal_position
 """

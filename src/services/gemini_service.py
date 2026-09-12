@@ -94,7 +94,7 @@ SCORE_MINIMO_CONTEXTO = 0.60
 def _formatar_trecho(numero: int, resultado: ResultadoBusca) -> str:
     """Cabeçalho do trecho no prompt.
 
-    O `projeto_id` é obrigatório aqui, e a razão é concreta: TODO projeto tem um
+    O `projeto_id` é obrigatório aqui, e a razão é concreta: cada projeto tem um
     arquivo chamado `04_Riscos_e_Problemas.xlsx`. Sem o código do projeto no
     cabeçalho, o modelo não tem como distinguir os riscos do SYN-01 dos do
     SYN-02 — e, perguntado sobre um, respondeu misturando os dois, atribuindo à

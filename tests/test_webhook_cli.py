@@ -84,3 +84,32 @@ class TestErroHTTP(unittest.TestCase):
 
         self.assertEqual(erro.codigo, "")
         self.assertIn("Bad Gateway", str(erro))
+
+
+class TestAberturaDrive(unittest.TestCase):
+    def test_canal_ativo_nao_dispara_watch_nem_compensacao(self):
+        from services import drive_channel_service as drive
+        config = drive.Config("id", "secret", "token", "https://example.org", "dsn")
+        with (mock.patch.object(drive, "obter_token", return_value="access"),
+              mock.patch.object(drive, "_pedir", return_value={"startPageToken": "inicio"}) as pedir,
+              mock.patch.object(drive.psycopg, "connect") as connect):
+            conn = connect.return_value.__enter__.return_value
+            conn.execute.return_value.fetchone.return_value = None
+            with self.assertRaisesRegex(ErroDeOperacao, "Já existe um canal ativo"):
+                drive.abrir(config)
+            self.assertEqual(pedir.call_count, 1)
+            self.assertEqual(conn.execute.call_count, 1)
+
+    def test_falha_watch_desativa_apenas_a_reserva_nova(self):
+        from services import drive_channel_service as drive
+        config = drive.Config("id", "secret", "token", "https://example.org", "dsn")
+        with (mock.patch.object(drive, "obter_token", return_value="access"),
+              mock.patch.object(drive, "_pedir", side_effect=[{"startPageToken": "inicio"}, ErroDeOperacao("watch falhou")]),
+              mock.patch.object(drive.uuid, "uuid4", return_value="novo-canal"),
+              mock.patch.object(drive.psycopg, "connect") as connect):
+            conn = connect.return_value.__enter__.return_value
+            conn.execute.return_value.fetchone.return_value = (1,)
+            with self.assertRaisesRegex(ErroDeOperacao, "watch falhou"):
+                drive.abrir(config)
+            self.assertEqual(conn.execute.call_count, 2)
+            self.assertEqual(conn.execute.call_args.args[1], (drive.PROVEDOR, "novo-canal"))

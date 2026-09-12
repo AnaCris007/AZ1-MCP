@@ -8,7 +8,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 
 | Documento | Descrição | Uso esperado |
 |---|---|---|
-| [Projeto](./Projeto.md) | Documento central do projeto. Reúne o entendimento de negócio (Seção 1), a especificação de requisitos (Seção 2), a definição técnica e arquitetural — APIs de voz, algoritmo de PLN, API de áudio, pilha, modelagem de dados, deploy, estratégia das Sprints 3 a 5 e projeto técnico e arquitetural (Seção 3) — e a prototipação exploratória de design e UX (Seção 4). | Consulta principal para compreensão técnica e de negócio da solução. |
+| [Projeto](./Projeto.md) | Documento central do projeto. Reúne o entendimento de negócio (Seção 1), a especificação de requisitos (Seção 2), a definição técnica e arquitetural: APIs de voz, algoritmo de PLN, API de áudio, pilha, modelagem de dados, deploy, estratégia das Sprints 3 a 5 e projeto técnico e arquitetural (Seção 3): e a prototipação exploratória de design e UX (Seção 4). | Consulta principal para compreensão técnica e de negócio da solução. |
 | [Gestão do Projeto](./GestaoProjeto.md) | Consolida os acordos permanentes da equipe, o processo de desenvolvimento, o acompanhamento de riscos, as retrospectivas, as ações de melhoria e o planejamento das sprints. | Referência para acompanhamento da organização da equipe e da evolução do projeto. |
 | [Gestão de Configuração](./GestaoConfiguracao.md) | Define o Gitflow adotado, o papel das branches, as convenções de nomenclatura, as políticas de commits e Merge Requests, os procedimentos de integração e os exemplos de aplicação. | Referência para versionamento, rastreabilidade e colaboração no GitLab. |
 | [Docker](./Docker.md) | Descreve a conteinerização da solução: as imagens de frontend e de API, a topologia dos serviços, os perfis de treino e de teste, as variáveis de ambiente, o uso de segredos, a build multiarquitetura e o processo de deploy. | Referência de operação para subir, testar e implantar a pilha. |
@@ -30,13 +30,13 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | Como criar, popular e verificar o banco de dados | [src/database/README.md](../src/database/README.md) |
 | Como implantar a solução em nuvem | [Projeto.md, Processo de Deploy em Nuvem](./Projeto.md#37-processo-de-deploy-em-nuvem) |
 | Os webhooks, sua escolha, contrato e tratamento de erros | [Projeto.md, Webhooks](./Projeto.md#51-webhooks) |
-| Como ligar o webhook ao Google Drive, passo a passo | [Projeto.md, Manual de operação — Google Drive](./Projeto.md#516-exemplos-e-testes) |
-| Como ligar o webhook ao SharePoint, passo a passo | [Projeto.md, Manual de operação — Microsoft Graph](./Projeto.md#516-exemplos-e-testes) |
+| Como ligar o webhook ao Google Drive, passo a passo | [Projeto.md, Manual de operação: Google Drive](./Projeto.md#516-exemplos-e-testes) |
+| Como ligar o webhook ao SharePoint, passo a passo | [Projeto.md, Manual de operação: Microsoft Graph](./Projeto.md#516-exemplos-e-testes) |
 | Por que as assinaturas de webhook expiram, e como renovar | [Projeto.md, Expiração das Assinaturas](./Projeto.md#517-expiração-das-assinaturas) |
 | O que será entregue em cada uma das Sprints 3, 4 e 5 | [Projeto.md, Estratégia de Entrega](./Projeto.md#38-estratégia-de-entrega-para-as-sprints-3-4-e-5) |
 | Os diagramas de classes, de componentes e de sequência | [Projeto.md, Projeto Técnico e Arquitetural](./Projeto.md#39-projeto-técnico-e-arquitetural) |
 | O algoritmo de PLN, como ele foi escolhido e como rodá-lo | [Projeto.md, Algoritmo de NLP e Implementação](./Projeto.md#33-algoritmo-de-nlp-e-implementação) |
-| Como os protótipos foram construídos e executados | [Projeto.md, Prototipação Exploratória](./Projeto.md#4-prototipação-exploratória--design-e-ux) |
+| Como os protótipos foram construídos e executados | [Projeto.md, Prototipação Exploratória](./Projeto.md#4-prototipação-exploratória-design-e-ux) |
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
 | Os papéis de cada integrante e a evidência da rotação | [GestaoProjeto.md, Matriz de Papéis da Sprint 2](./GestaoProjeto.md#44-matriz-de-papéis-e-responsabilidades-da-sprint-2) |
 | O planejamento da Sprint 3, com estimativas, DoR e DoD | [GestaoProjeto.md, Planejamento da Sprint 3](./GestaoProjeto.md#47-planejamento-da-sprint-3) |
@@ -58,7 +58,7 @@ Os diagramas e as imagens utilizados pelos documentos estão armazenados na past
 - registros visuais dos protótipos A e B;
 - diagrama do fluxo Gitflow;
 - diagrama de implantação em nuvem e as capturas dos cinco passos de provisionamento da instância;
-- modelos conceitual e lógico-relacional dos dados — o lógico foi regerado na
+- modelos conceitual e lógico-relacional dos dados: o lógico foi regerado na
   Sprint 3 com as tabelas de conversa, trilha, avaliação e eventos;
 - linha do tempo de entrega das Sprints 3, 4 e 5.
 
@@ -75,3 +75,4 @@ docs/
 ├── Docker.md
 └── RoteiroPrototipoA.md
 ```
+A [auditoria do desenvolvimento](AuditoriaDesenvolvimento.md) reúne rastreabilidade e resultados executados da revisão técnica da Sprint 3.
