@@ -13,3 +13,10 @@ dist/
 # chaves privadas de acesso
 *.pem
 *.ppk
+
+# Credenciais OAuth do Google gravadas pelo services.drive_channel_service
+.google_token.json
+.microsoft_token.json
+
+# cache local das builds do buildx bake
+.docker-cache/

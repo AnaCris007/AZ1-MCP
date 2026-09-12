@@ -4,9 +4,10 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_analyzer
+from az1_api.dependencies import get_analyzer, require_authenticated_user
 from az1_api.main import app
 from services.analysis_service import AnalysisResult
+from services.auth_service import AuthenticatedUser
 from services.transcription_service import TranscriptionError, TranscriptionErrorCode
 
 
@@ -29,6 +30,8 @@ _RESULTADO_PADRAO = AnalysisResult(
     confianca_pln=0.88,
 )
 
+_TEST_USER = AuthenticatedUser(subject="test-user", email="teste@example.com", name="Usuário de Teste", provider="azure")
+
 
 class TestAnalysisAPI(unittest.TestCase):
     def tearDown(self) -> None:
@@ -36,6 +39,7 @@ class TestAnalysisAPI(unittest.TestCase):
 
     def _client_with(self, result: AnalysisResult | Exception) -> TestClient:
         app.dependency_overrides[get_analyzer] = lambda: FakeAnalyzer(result)
+        app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
         return TestClient(app, raise_server_exceptions=False)
 
     def test_retorna_analise_completa(self) -> None:

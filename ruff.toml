@@ -28,4 +28,4 @@ select = [
 ]
 
 [lint.isort]
-known-first-party = ["az1_api", "gitlab_kit", "pln", "routes", "schemas", "services"]
+known-first-party = ["az1_api", "gitlab_kit", "pln", "rag", "routes", "schemas", "services"]

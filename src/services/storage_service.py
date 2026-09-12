@@ -27,13 +27,22 @@ class S3StorageSettings:
         )
 
 
-class S3AudioStorage:
+class S3ObjectStorage:
+    """Armazenamento de objetos por chave, sobre S3 ou MinIO.
+
+    Chamava-se `S3AudioStorage`, mas nunca teve nada de áudio: `store` e `fetch`
+    recebem uma chave e bytes. O nome antigo passou a estorvar quando o texto
+    das conversas foi para o mesmo bucket (`conversas/`, ver
+    `conversa_repository.py`) — a alternativa era duplicar a classe sob outro
+    nome, o que daria dois clientes boto3 para manter.
+    """
+
     def __init__(self, client: Any, bucket_name: str) -> None:
         self._client = client
         self._bucket_name = bucket_name
 
     @classmethod
-    def from_settings(cls, settings: S3StorageSettings) -> S3AudioStorage:
+    def from_settings(cls, settings: S3StorageSettings) -> S3ObjectStorage:
         client = boto3.client(
             "s3",
             endpoint_url=settings.endpoint_url,

@@ -1,11 +1,11 @@
-# Protótipo A — Interação Proativa e Contextual
+# Protótipo A: Interação Proativa e Contextual
 
 ## Roteiro do vídeo encenado
 
-**Participantes:** Karol e Matheus  
+**Participantes:** Karol e Matheus
 **Estado:** roteiro em construção, sujeito a alterações durante os ensaios e a execução do protótipo.
 
-## Cena 1 — O problema
+## Cena 1: O problema
 
 **Karol:** Eu sei que eu vi isso em algum lugar.
 
@@ -29,7 +29,7 @@
 
 > E se a IA não precisasse esperar uma pergunta para ajudar?
 
-## Cena 2 — A ideia
+## Cena 2: A ideia
 
 **Matheus:** Foi pensando nessa pergunta que a gente trouxe uma solução.
 
@@ -39,7 +39,7 @@
 
 **Karol:** Calma, ele não sai mexendo em nada sozinho. Ele só observa e sugere. Quem decide se aceita continua sendo você.
 
-## Cena 3 — A bolinha
+## Cena 3: A bolinha
 
 **Matheus:** Imagina que você está trabalhando normalmente em um cronograma...
 
@@ -57,7 +57,7 @@
 
 **Matheus:** Essa é a ideia: a IA aparece para ajudar, mas quem continua no controle é você.
 
-## Cena 4 — Quando a recomendação é aceita
+## Cena 4: Quando a recomendação é aceita
 
 **Karol:** Mas, se eu aceitar, o que eu vejo?
 
@@ -67,7 +67,7 @@
 
 **Matheus:** Exatamente. Ele interpreta o contexto da atividade e recomenda os documentos considerados mais relevantes.
 
-## Cena 5 — O contexto muda
+## Cena 5: O contexto muda
 
 **Karol:** Só que, ao longo do dia, o usuário não trabalha em uma coisa só. Ele pode terminar uma atividade, entrar em uma reunião ou até mudar de projeto.
 
@@ -75,7 +75,7 @@
 
 **Karol:** A proposta é que a recomendação acompanhe o contexto atual do usuário. Mas foi justamente aí que encontramos uma questão importante: contexto, sozinho, pode não ser suficiente.
 
-## Cena 6 — E quando a IA erra?
+## Cena 6: E quando a IA erra?
 
 **Matheus:** Mesmo identificando corretamente o projeto em que o usuário está trabalhando, a IA ainda pode recomendar um documento que não seja relevante para aquilo que ele realmente pretende fazer.
 
@@ -85,7 +85,7 @@
 
 **Karol:** Ou seja, entender o contexto é importante, mas entender a intenção também é um desafio que precisa ser considerado.
 
-## Cena 7 — Para onde vão essas informações?
+## Cena 7: Para onde vão essas informações?
 
 **Karol:** Outro ponto que exploramos foi o que acontece com as informações e recomendações recebidas ao longo do dia.
 
@@ -93,7 +93,7 @@
 
 **Karol:** Dessa forma, uma informação importante encontrada pela manhã, por exemplo, não precisa ser procurada novamente mais tarde.
 
-## Cena 8 — Antes de encerrar o dia
+## Cena 8: Antes de encerrar o dia
 
 **Matheus:** Também pensamos em como o agente poderia ajudar no encerramento do dia sem tomar decisões pelo usuário.
 
@@ -103,7 +103,7 @@
 
 **Karol:** O objetivo não é dizer ao usuário o que ele deve fazer, mas ajudá-lo a visualizar o que aconteceu durante o dia e o que pode exigir sua atenção depois.
 
-## Cena 9 — Quando a ideia começa a ser questionada
+## Cena 9: Quando a ideia começa a ser questionada
 
 **Karol:** Durante a construção do protótipo, percebemos que essa ideia também levanta várias questões que ainda precisam ser exploradas.
 
@@ -113,7 +113,7 @@
 
 **Matheus:** No fim, chegamos a uma questão ainda mais importante: como diferenciar aquilo que simplesmente está na tela do usuário daquilo que ele realmente pretende fazer?
 
-## Cena 10 — Encerramento
+## Cena 10: Encerramento
 
 **Karol:** No começo, a pergunta era simples.
 
@@ -127,5 +127,5 @@
 
 *[Encerramento na tela.]*
 
-> **Protótipo A — Interação Proativa e Contextual**  
+> **Protótipo A: Interação Proativa e Contextual**
 > Informação certa. No momento certo.

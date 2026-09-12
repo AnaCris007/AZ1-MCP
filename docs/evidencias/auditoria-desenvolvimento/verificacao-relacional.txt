@@ -1,0 +1,67 @@
+BEGIN
+
+==========================================================================
+ PARTE 1 — Caminho feliz: uma conversa de dois turnos
+==========================================================================
+SELECT 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+Etapa de fontes RAG não executada: índice vetorial não existe nesta base.
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+
+-- A conversa, turno a turno (view auditoria.vw_turno) --
+ ordem_prompt | formato_prompt |                     prompt                     |          intencao           |                    resposta                    | resultado |  ms  | qtd_fontes | avaliacao_nota 
+--------------+----------------+------------------------------------------------+-----------------------------+------------------------------------------------+-----------+------+------------+----------------
+            1 | texto          | Quais projetos estão mais atrasados no portfól | consultar_projeto_sintetico | Os dois maiores desvios são o SYN-01, com -18  | sucesso   | 2140 |          0 |               
+            3 | audio          | E quais são os riscos abertos do SYN-07?       | orientar_riscos_problemas   | O SYN-07 tem dois itens em aberto, ambos sob a | sucesso   | 1890 |          0 |              5
+(2 rows)
+
+
+-- Fontes citadas pela primeira resposta (RF03, RNF12) --
+ posicao | projeto_codigo | tipo_documento | secao | tem_artefato | chunk 
+---------+----------------+----------------+-------+--------------+-------
+(0 rows)
+
+
+-- O gatilho atualizou conversa.atualizada_em? (deve ser t) --
+ atualizada_em_coerente 
+------------------------
+ t
+(1 row)
+
+
+==========================================================================
+ PARTE 2 — O banco recusa dado incoerente
+ Cada bloco DEVE imprimir "RECUSADO (ok)". "ACEITOU" indica falha.
+==========================================================================
+psql:/sql/04_verificacao.sql:146: NOTICE:  RECUSADO (ok) — prompt do usuário não pode ter resultado
+DO
+psql:/sql/04_verificacao.sql:155: NOTICE:  RECUSADO (ok) — resposta do agente não classifica intenção
+DO
+psql:/sql/04_verificacao.sql:163: NOTICE:  RECUSADO (ok) — só mensagem de áudio referencia áudio
+DO
+psql:/sql/04_verificacao.sql:172: NOTICE:  RECUSADO (ok) — intenção fora do catálogo da Seção 3.1
+DO
+psql:/sql/04_verificacao.sql:180: NOTICE:  RECUSADO (ok) — a ordem é única dentro da conversa
+DO
+psql:/sql/04_verificacao.sql:189: NOTICE:  RECUSADO (ok) — a avaliação recai sobre um alvo só
+DO
+psql:/sql/04_verificacao.sql:198: NOTICE:  RECUSADO (ok) — avaliação exige nota ou polaridade
+DO
+psql:/sql/04_verificacao.sql:205: NOTICE:  RECUSADO (ok) — avanço físico fora de 0..100
+DO
+
+-- Colunas geradas continuam coerentes com a origem --
+ codigo | percentual_previsto | percentual_avanco | desvio_pp | desvio_coerente 
+--------+---------------------+-------------------+-----------+-----------------
+ SYN-01 |               82.00 |             64.00 |    -18.00 | t
+ SYN-05 |               70.00 |             78.00 |      8.00 | t
+(2 rows)
+
+ROLLBACK
+
+== ROLLBACK executado: nenhum resíduo gravado ==

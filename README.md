@@ -49,23 +49,35 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 ├── assets/
 │   ├── design/
 │   └── negócios/
+├── docker/
+│   ├── api/         # Dockerfile e entrypoint da API
+│   └── frontend/    # Dockerfile e configuração do nginx
 ├── docs/
+│   ├── Docker.md
 │   ├── GestaoConfiguracao.md
 │   ├── GestaoProjeto.md
 │   ├── Index.md
 │   └── Projeto.md
+├── infra/
+│   └── minio/       # regra de ciclo de vida do bucket de áudio
 ├── resultados/      # comparativos e modelo treinado, saída gerada
 ├── src/
 │   ├── database/    # scripts SQL
+│   ├── frontend/    # interface em React + Vite
 │   ├── pln/         # pipeline de linguagem natural
 │   ├── routes/      # endpoints da API (FastAPI)
 │   ├── schemas/     # contratos de entrada da API
 │   ├── services/    # casos de uso e adaptadores externos
 │   └── az1_api/     # composição e ponto de entrada da API
 ├── tests/
+├── .dockerignore
 ├── .env.example
 ├── .gitignore
-├── docker-compose.yml
+├── docker-bake.hcl            # build paralela e multiarquitetura
+├── docker-compose.yml         # composição base
+├── docker-compose.override.yml # desenvolvimento (carregado automaticamente)
+├── docker-compose.prod.yml    # produção
+├── Makefile
 ├── pyproject.toml
 ├── README.md
 ├── requirements.txt
@@ -86,7 +98,9 @@ python -m spacy download pt_core_news_md
 python -m pln.experimento          # varre pré-processamento e vetorização
 python -m pln.ajuste_fino          # varre os hiperparâmetros do modelo
 python -m pln.classificador        # treina, avalia e salva o modelo
-python -m unittest discover tests  # 106 testes
+python -m pln.bancada              # mede latência, tempo de treino e memória
+python -m pln.metricas             # mede as três métricas do RNF03
+python -m unittest discover tests  # a suite completa
 ```
 
 - `assets/`: imagens e diagramas utilizados na documentação.
@@ -99,15 +113,50 @@ python -m unittest discover tests  # 106 testes
 - `src/services/`: casos de uso e integração com armazenamento S3-compatível.
 - `src/az1_api/main.py`: ponto de entrada da aplicação FastAPI.
 - `resultados/`: saída gerada. Nada ali é editado à mão. Os comparativos vêm de
-  `python -m pln.experimento` e `python -m pln.ajuste_fino`, e o modelo treinado de
-  `python -m pln.classificador`.
+  `python -m pln.experimento` e `python -m pln.ajuste_fino`, o modelo treinado de
+  `python -m pln.classificador`, as medições de desempenho de `python -m pln.bancada` e as do RNF03 de
+  `python -m pln.metricas`.
 
-##  Rodando a API
+##  Rodando com Docker
 
-O endpoint de recebimento de áudio armazena os arquivos em um bucket S3-compatível. Para desenvolvimento local, suba o MinIO (já com o bucket `az1-audio` criado automaticamente):
+A pilha inteira — interface, API, armazenamento de áudio e criação do bucket — sobe com um comando. É o caminho recomendado: não exige Python, Node nem MinIO instalados na máquina, e é o mesmo empacotamento que vai para a nuvem.
 
 ```bash
-docker compose up -d
+cp .env.example .env      # preencha DEEPGRAM_API_KEY, GEMINI_API_KEY e a autenticação (ver abaixo)
+docker compose up -d --build
+```
+
+| Endereço | O quê |
+|---|---|
+| http://localhost:5173 | interface, com recarga automática |
+| http://localhost:8010/docs | documentação interativa da API (Swagger) |
+| http://localhost:9001 | console do MinIO (as chaves `AUDIO_STORAGE_*` do seu `.env`) |
+
+O código do repositório é montado dentro dos contêineres: editar um arquivo recarrega a API ou a interface, sem reconstruir imagem.
+
+A interface pede login com uma conta Microsoft (RNF02, ver `docs/Projeto.md` Seção 3.4). Isso exige configurar `SUPABASE_URL` e `SUPABASE_ANON_KEY` no `.env` — os comentários do `.env.example` têm o passo a passo do app registration no Entra ID e do provider no Supabase. Para desenvolver sem passar por essa configuração, defina `AZ1_AUTH_MODE=disabled` no `.env`: as rotas protegidas ficam abertas sem token. Essa válvula **não funciona em produção** — `docker-compose.prod.yml` recusa a subida se ela estiver ligada.
+
+```bash
+docker compose --profile ci run --rm tests      # a suite completa, dentro da imagem
+docker compose --profile ml run --rm trainer    # retreina o classificador
+docker compose logs -f api                      # acompanha os logs
+docker compose down                             # derruba, preservando os áudios
+```
+
+Para subir em modo produção — interface na porta 80, API e MinIO fechados na rede interna, limites de recurso e credenciais obrigatórias:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+A [documentação de Docker](docs/Docker.md) detalha a topologia, as variáveis de ambiente, o uso de segredos, a build multiarquitetura e o processo de deploy.
+
+##  Rodando a API sem Docker
+
+O endpoint de recebimento de áudio armazena os arquivos em um bucket S3-compatível. Para desenvolvimento local, suba apenas o MinIO (já com o bucket `az1-audio` criado automaticamente):
+
+```bash
+docker compose up -d minio minio-init
 ```
 
 Depois, com o projeto instalado por `pip install -e .`, rode a API normalmente:
@@ -116,7 +165,7 @@ Depois, com o projeto instalado por `pip install -e .`, rode a API normalmente:
 uvicorn az1_api.main:app --reload
 ```
 
-A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000/docs`. O console do MinIO fica em `http://127.0.0.1:9001` (usuário/senha: `minioadmin`/`minioadmin`).
+A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000/docs`. O console do MinIO fica em `http://127.0.0.1:9001`, com o usuário e a senha definidos em `AUDIO_STORAGE_ACCESS_KEY` e `AUDIO_STORAGE_SECRET_KEY` no `.env` — as mesmas chaves com que a API assina as requisições S3.
 
 Os arquivos são armazenados com a chave `incoming/{audio_id}` e expiram automaticamente após sete dias. O componente de Speech-to-Text recebe o `audio_id` do orquestrador e recupera o objeto diretamente do bucket `az1-audio`; esta API não oferece endpoint de download nem inicia a transcrição.
 
