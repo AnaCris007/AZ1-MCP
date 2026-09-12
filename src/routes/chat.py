@@ -3,12 +3,17 @@ from __future__ import annotations
 import logging
 import re
 import time
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from fastapi import APIRouter, BackgroundTasks, Depends
 
-from az1_api.dependencies import get_chat_answerer, get_conversa_repository, require_authenticated_user
+from az1_api.dependencies import (
+    get_chat_answerer,
+    get_classificador_de_intencao,
+    get_conversa_repository,
+    require_authenticated_user,
+)
 from rag.retriever import ResultadoBusca
 from schemas.chat import ChatErrorCode, ChatRequest, ChatResponse, FonteCitada
 from services.auth_service import AuthenticatedUser
@@ -145,6 +150,30 @@ def fontes_para_auditoria(citadas: Sequence[FonteCitada]) -> tuple[FonteDaRespos
     )
 
 
+def classificar_sem_interferir(
+    classificador: Callable[[str], tuple[str, float]] | None, texto: str
+) -> tuple[str | None, float | None]:
+    """A intenção prevista, ou (None, None) se não foi possível prevê-la.
+
+    OBSERVAÇÃO, NÃO DECISÃO. O rótulo vai para `auditoria.mensagem.intencao` e
+    não influencia busca, recusa nem resposta. Com F1-macro de 0,6736 contra os
+    0,85 do RNF03, dar-lhe controle de fluxo erraria em cerca de um terço das
+    interações; observando, ele torna o requisito mensurável sobre tráfego real
+    — hoje a coluna é NULL em 100% das linhas — sem custar nada a quem pergunta.
+
+    Qualquer falha é engolida de propósito: classificar é acessório, e um
+    modelo com problema não pode derrubar a conversa.
+    """
+    if classificador is None:
+        return None, None
+    try:
+        rotulo, confianca = classificador(texto)
+    except Exception:
+        logger.exception("Falha ao classificar a intenção; seguindo sem registrá-la.")
+        return None, None
+    return rotulo, float(confianca)
+
+
 def registrar_turno_em_segundo_plano(
     repositorio: ConversaRepository | PersistenciaDesligada, turno: TurnoDoChat
 ) -> None:
@@ -173,6 +202,7 @@ def send_chat_message(
     answerer: AnswerChatMessage = Depends(get_chat_answerer),
     repositorio: ConversaRepository | PersistenciaDesligada = Depends(get_conversa_repository),
     usuario: AuthenticatedUser = Depends(require_authenticated_user),
+    classificador=Depends(get_classificador_de_intencao),
 ) -> ChatResponse:
     inicio = time.monotonic()
     try:
@@ -191,7 +221,10 @@ def send_chat_message(
     resposta_texto = limpar_citacoes(reply.text)
     duracao_ms = int((time.monotonic() - inicio) * 1000)
 
-    turno = _turno_da_conversa(payload, usuario, reply, resposta_texto, fontes, duracao_ms)
+    intencao, confianca = classificar_sem_interferir(classificador, payload.message)
+    turno = _turno_da_conversa(
+        payload, usuario, reply, resposta_texto, fontes, duracao_ms, intencao, confianca
+    )
     if turno is not None:
         background_tasks.add_task(registrar_turno_em_segundo_plano, repositorio, turno)
 
@@ -208,6 +241,8 @@ def _turno_da_conversa(
     resposta_texto: str,
     fontes: Sequence[FonteCitada],
     duracao_ms: int,
+    intencao: str | None,
+    confianca: float | None,
 ) -> TurnoDoChat | None:
     """O turno a gravar, ou None quando gravá-lo seria registrar uma falsidade.
 
@@ -220,10 +255,9 @@ def _turno_da_conversa(
        produziu o `usuario_id = 0` que este projeto acabou de aposentar.
     2. IDENTIFICADOR INVÁLIDO. `conversa.id` é UUID.
 
-    `intencao` fica None de propósito. O classificador mede F1-macro 0,6736 e
-    não está no caminho do chat; gravar rótulo errado em cerca de um terço das
-    linhas, numa tabela que não admite UPDATE nem DELETE, é pior que coluna
-    vazia.
+    `intencao` é OBSERVADA, não usada: vem do classificador e vai para a linha
+    do usuário — o CHECK `mensagem_papel_coerente` a recusa na do agente —, sem
+    influenciar a resposta. Ver `classificar_sem_interferir`.
     """
     conversa_id = conversa_uuid(payload.conversation_id)
     if conversa_id is None:
@@ -246,5 +280,7 @@ def _turno_da_conversa(
         resultado=reply.resultado,
         modelo=reply.modelo or None,
         tempo_processamento_ms=duracao_ms,
+        intencao=intencao,
+        confianca_intencao=confianca,
         fontes=fontes_para_auditoria(fontes),
     )

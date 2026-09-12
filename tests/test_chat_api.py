@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from az1_api.dependencies import (
     get_chat_answerer,
+    get_classificador_de_intencao,
     get_conversa_repository,
     require_authenticated_user,
 )
@@ -362,11 +363,45 @@ class TesteTrilhaDaConversa(unittest.TestCase):
         self.assertEqual([f["posicao"] for f in corpo["fontes"]], [2])
         self.assertEqual(gravadas[0].chunk_id, "abc123")
 
-    def test_intencao_fica_vazia_de_proposito(self) -> None:
-        # O classificador mede F1-macro 0,6736 e não está no caminho do chat.
-        # Rótulo errado numa tabela sem UPDATE nem DELETE é pior que nulo.
+    def test_intencao_observada_vai_para_a_trilha(self) -> None:
+        # O classificador entrou no chat como OBSERVADOR: o rótulo é gravado e
+        # não decide nada. É o que torna o RNF03 mensurável sobre tráfego real —
+        # antes disso, `intencao` era NULL em 100% das linhas.
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: (
+            lambda texto: ("orientar_tap", 0.42)
+        )
         cliente = self._cliente(ChatReply(text="Resposta."))
+
         cliente.post("/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO})
+
+        turno = self.espiao.turnos[0]
+        self.assertEqual(turno.intencao, "orientar_tap")
+        self.assertAlmostEqual(turno.confianca_intencao, 0.42)
+
+    def test_classificador_ausente_nao_impede_a_gravacao(self) -> None:
+        # Instalação sem o `.joblib` treinado continua conversando e auditando,
+        # apenas sem registrar a intenção.
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: None
+        cliente = self._cliente(ChatReply(text="Resposta."))
+
+        cliente.post("/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO})
+
+        self.assertIsNone(self.espiao.turnos[0].intencao)
+
+    def test_classificador_com_defeito_nao_derruba_a_conversa(self) -> None:
+        # Classificar é acessório. Um modelo quebrado não pode custar a resposta.
+        def explodir(texto):
+            raise RuntimeError("modelo corrompido")
+
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: explodir
+        cliente = self._cliente(ChatReply(text="Resposta."))
+
+        with self.assertLogs("routes.chat", level="ERROR"):
+            resposta = cliente.post(
+                "/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO}
+            )
+
+        self.assertEqual(resposta.status_code, 200)
         self.assertIsNone(self.espiao.turnos[0].intencao)
 
 

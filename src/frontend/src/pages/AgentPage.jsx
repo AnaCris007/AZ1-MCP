@@ -13,7 +13,14 @@ import TopBar from '../components/TopBar/TopBar'
 import metroMapPattern from '../assets/metro-map-pattern.svg'
 import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
-import { ChatRequestError, sendAudio, sendMessage, transcribeAudio } from '../lib/api'
+import {
+  ChatRequestError,
+  fetchConversas,
+  fetchMensagens,
+  sendAudio,
+  sendMessage,
+  transcribeAudio,
+} from '../lib/api'
 
 const SERVICE_UNAVAILABLE_FALLBACK =
   'O serviço de IA está sobrecarregado no momento. Tente novamente em instantes.'
@@ -42,6 +49,28 @@ export default function AgentPage() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [conversations, setConversations] = useState([])
+
+  // A barra lateral vem de `auditoria.conversa`. Antes vivia só em memória:
+  // recarregar a página apagava o histórico, mesmo com as conversas gravadas
+  // no banco com título e data.
+  useEffect(() => {
+    let cancelled = false
+
+    fetchConversas()
+      .then((data) => {
+        if (cancelled) return
+        setConversations(
+          (data.conversas ?? []).map((c) => ({ id: c.id, title: c.titulo })),
+        )
+      })
+      .catch(() => {
+        console.error('[conversas] não foi possível carregar o histórico')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
   const [conversationHistory, setConversationHistory] = useState({})
   const [activeId, setActiveId] = useState(null)
   const [messages, setMessages] = useState([])
@@ -156,7 +185,27 @@ export default function AgentPage() {
 
   const handleSelectConversation = (id) => {
     setActiveId(id)
-    setMessages(conversationHistory[id] ?? [])
+    // O que está em memória cobre a conversa em andamento; para as
+    // anteriores, a fonte é o banco.
+    const emMemoria = conversationHistory[id]
+    if (emMemoria?.length) {
+      setMessages(emMemoria)
+      return
+    }
+
+    setMessages([])
+    fetchMensagens(id)
+      .then((data) => {
+        setMessages(
+          (data.mensagens ?? []).map((m) => ({
+            role: m.papel === 'usuario' ? 'user' : 'agent',
+            content: m.conteudo,
+          })),
+        )
+      })
+      .catch(() => {
+        console.error('[conversas] não foi possível carregar esta conversa')
+      })
   }
 
   const handleToggleListening = () => {
@@ -344,6 +393,11 @@ export default function AgentPage() {
                       role={message.role}
                       content={message.content}
                       fontes={message.fontes}
+                      conversaId={activeId}
+                      // `ordem` em auditoria.mensagem começa em 1 e alterna
+                      // usuário/agente, então o índice do array + 1 é a ordem
+                      // da linha correspondente no banco.
+                      ordem={index + 1}
                     />
                   ))}
                 </AnimatePresence>

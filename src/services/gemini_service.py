@@ -169,11 +169,17 @@ class GeminiChatModel:
         model: str,
         *,
         buscar_contexto: Callable[[str], Sequence[ResultadoBusca]] | None = None,
+        carregar_historico: Callable[[str], Sequence[tuple[str, str]]] | None = None,
     ) -> None:
         self._client = client
         self._model = model
-        self._historico: dict[str, list] = {}
         self._buscar_contexto = buscar_contexto
+        self._carregar_historico = carregar_historico
+        # Só usado quando não há `carregar_historico`. Um `dict` de processo que
+        # nunca expira é vazamento de memória e, com mais de um worker, devolve
+        # históricos diferentes conforme quem atende. Com o banco gravando a
+        # trilha, ele deixou de ser a fonte — virou o modo degradado.
+        self._historico_em_memoria: dict[str, list] = {}
 
     @classmethod
     def from_settings(
@@ -181,17 +187,19 @@ class GeminiChatModel:
         settings: GeminiSettings,
         *,
         buscar_contexto: Callable[[str], Sequence[ResultadoBusca]] | None = None,
+        carregar_historico: Callable[[str], Sequence[tuple[str, str]]] | None = None,
     ) -> GeminiChatModel:
         return cls(
             client=genai.Client(api_key=settings.api_key),
             model=settings.model,
             buscar_contexto=buscar_contexto,
+            carregar_historico=carregar_historico,
         )
 
     def generate_reply(
         self, message: str, *, conversation_id: str | None = None
     ) -> RespostaGerada:
-        historico = self._historico.get(conversation_id, []) if conversation_id else []
+        historico = self._historico_de(conversation_id)
 
         texto_enviado, fontes, situacao = self._preparar(message)
 
@@ -224,13 +232,43 @@ class GeminiChatModel:
 
         reply_text = response.text
 
-        if conversation_id:
-            self._historico[conversation_id] = historico + [
+        # Só alimenta o cache de memória quando ele É a fonte. Com o histórico
+        # vindo do banco, guardar aqui seria manter duas verdades.
+        if conversation_id and self._carregar_historico is None:
+            self._historico_em_memoria[conversation_id] = historico + [
                 {"role": "user", "parts": [{"text": message}]},
                 {"role": "model", "parts": [{"text": reply_text}]},
             ]
 
         return RespostaGerada(texto=reply_text, fontes=fontes, modelo=self._model)
+
+    def _historico_de(self, conversation_id: str | None) -> list:
+        """Os turnos anteriores da conversa, do banco quando possível.
+
+        A trilha em `auditoria.mensagem` é a fonte: sobrevive a recarregar a
+        página, a reiniciar o processo e a mais de um worker — nenhuma das três
+        coisas o `dict` de memória fazia.
+
+        Falha de leitura degrada para "sem histórico" em vez de derrubar a
+        conversa: perder o contexto de turnos anteriores é ruim, não responder é
+        pior.
+        """
+        if not conversation_id:
+            return []
+
+        if self._carregar_historico is None:
+            return self._historico_em_memoria.get(conversation_id, [])
+
+        try:
+            turnos = self._carregar_historico(conversation_id)
+        except Exception:
+            logger.exception("Falha ao carregar o histórico; seguindo sem ele.")
+            return []
+
+        return [
+            {"role": "user" if papel == "usuario" else "model", "parts": [{"text": texto}]}
+            for papel, texto in turnos
+        ]
 
     def _preparar(self, message: str) -> tuple[str, tuple[ResultadoBusca, ...], _Situacao]:
         """Decide o que enviar ao modelo, e se vale enviar alguma coisa.

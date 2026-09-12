@@ -32,7 +32,11 @@ from services.auth_service import (
     SupabaseTokenVerifier,
 )
 from services.chat_service import AnswerChatMessage
-from services.conversa_repository import ConversaRepository, PersistenciaDesligada
+from services.conversa_repository import (
+    ConversaRepository,
+    PersistenciaDesligada,
+    conversa_uuid,
+)
 from services.database_service import BancoNaoConfigurado, PostgresSettings, abrir_pool
 from services.drive_push_service import PROVEDOR as PROVEDOR_DRIVE
 from services.drive_push_service import TIPOS_PROCESSAVEIS as TIPOS_DRIVE
@@ -100,8 +104,12 @@ def get_transcriber() -> TranscribeAudio:
     )
 
 
+# O `.joblib` é carregado uma vez e compartilhado. Estava embutido em
+# `get_analyzer`; com o classificador passando a ser observado também no chat,
+# deixá-lo lá faria o modelo ser desserializado duas vezes — e o shim de
+# `sys.modules` viveria duplicado em dois lugares que teriam de concordar.
 @lru_cache
-def get_analyzer() -> AnalyzeAudio:
+def carregar_modelo_padrao():
     import sys
 
     import pln.classificador as _pln_mod
@@ -116,7 +124,7 @@ def get_analyzer() -> AnalyzeAudio:
     for k in _aliases:
         sys.modules[k] = _pln_mod
     try:
-        modelo = carregar_modelo(MODELO_PADRAO)
+        return carregar_modelo(MODELO_PADRAO)
     finally:
         for k, v in _saved.items():
             if v is None:
@@ -124,13 +132,67 @@ def get_analyzer() -> AnalyzeAudio:
             else:
                 sys.modules[k] = v
 
-    return AnalyzeAudio(transcriber=get_transcriber(), modelo=modelo)
+
+@lru_cache
+def get_analyzer() -> AnalyzeAudio:
+    return AnalyzeAudio(transcriber=get_transcriber(), modelo=carregar_modelo_padrao())
+
+
+# O classificador entra no chat como OBSERVADOR, e nada mais: o rótulo vai para
+# `auditoria.mensagem.intencao` e não decide nem a busca, nem a recusa, nem a
+# resposta.
+#
+# A distinção é o ponto. O modelo mede F1-macro 0,6736 contra os 0,85 do RNF03 —
+# colocá-lo para decidir algo erraria em cerca de um terço das interações. Como
+# observador, ele torna o RNF03 mensurável sobre tráfego real (hoje `intencao` é
+# NULL em 100% das linhas) sem colocar a qualidade da resposta em suas mãos.
+#
+# Devolve None quando o modelo não pôde ser carregado: uma instalação sem o
+# `.joblib` treinado continua conversando, apenas sem registrar a intenção.
+@lru_cache
+def get_classificador_de_intencao() -> Callable[[str], tuple[str, float]] | None:
+    try:
+        modelo = carregar_modelo_padrao()
+    except Exception:
+        logger.exception("Classificador indisponível; a intenção não será registrada.")
+        return None
+
+    from pln.classificador import prever_intencao
+
+    return lambda texto: prever_intencao(modelo, texto)
+
+
+def _historico_do_banco(conversa_id: str) -> list[tuple[str, str]]:
+    """Turnos anteriores, lidos de `auditoria.mensagem`.
+
+    Sem o `usuario_id` no filtro porque quem chama é o próprio modelo, já dentro
+    de uma requisição autenticada cujo `conversation_id` veio do cliente. A rota
+    de LEITURA da trilha (`routes/conversas.py`) filtra por usuário; aqui o que
+    se busca é o contexto da conversa em andamento.
+    """
+    repositorio = get_conversa_repository()
+    if isinstance(repositorio, PersistenciaDesligada):
+        return []
+    identificador = conversa_uuid(conversa_id)
+    if identificador is None:
+        return []
+    with get_connection_pool().connection() as conexao, conexao.cursor() as cursor:
+        cursor.execute(
+            "SELECT papel, conteudo FROM auditoria.mensagem "
+            "WHERE conversa_id = %s ORDER BY ordem",
+            (identificador,),
+        )
+        return [(papel, conteudo) for papel, conteudo in cursor.fetchall()]
 
 
 @lru_cache
 def get_chat_answerer() -> AnswerChatMessage:
     settings = GeminiSettings.from_environment()
-    model = GeminiChatModel.from_settings(settings, buscar_contexto=buscar_contexto_rag)
+    model = GeminiChatModel.from_settings(
+        settings,
+        buscar_contexto=buscar_contexto_rag,
+        carregar_historico=_historico_do_banco,
+    )
     return AnswerChatMessage(model=model)
 
 

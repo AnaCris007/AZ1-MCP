@@ -3,6 +3,7 @@ from .analysis import router as analysis_router
 from .audio import router as audio_router
 from .auditoria import router as auditoria_router
 from .chat import router as chat_router
+from .conversas import router as conversas_router
 from .portfolio import router as portfolio_router
 from .rag import router as rag_router
 from .speech import router as speech_router
@@ -15,6 +16,7 @@ __all__ = [
     "audio_router",
     "auditoria_router",
     "chat_router",
+    "conversas_router",
     "portfolio_router",
     "rag_router",
     "speech_router",
