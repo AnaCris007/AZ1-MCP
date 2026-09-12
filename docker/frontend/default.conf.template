@@ -1,0 +1,135 @@
+# =============================================================================
+# AZ1 — nginx: servidor de estáticos e proxy reverso da API
+# =============================================================================
+# Este arquivo é um TEMPLATE. O entrypoint da imagem nginx roda envsubst sobre
+# ele na subida do contêiner e grava o resultado em conf.d/default.conf. Só as
+# variáveis realmente exportadas no ambiente são substituídas, então as
+# variáveis do próprio nginx ($host, $remote_addr) precisam ser escritas sem
+# chaves — como estão abaixo — para sobreviverem à substituição.
+#
+# O papel deste contêiner é ser a única porta de entrada: ele serve o bundle do
+# React e encaminha /api/ para a API na rede interna. Com isso a API não precisa
+# ser publicada no host, e o navegador enxerga uma origem só (sem CORS).
+# =============================================================================
+
+server {
+    listen ${NGINX_PORT};
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # O endpoint de áudio aceita até 10 MB. O limite aqui é maior porque o
+    # envelope multipart acrescenta cabeçalhos e fronteiras ao corpo: cortar em
+    # 10 MB exatos devolveria 413 do nginx para um arquivo que a API aceitaria.
+    client_max_body_size 12m;
+
+    # --- Cabeçalhos de segurança ---------------------------------------------
+    # Vêm de um include porque add_header não é cumulativo entre níveis no
+    # nginx: toda location que declara um add_header próprio descarta os
+    # herdados. O arquivo explica a armadilha por inteiro.
+    include /etc/nginx/security-headers.conf;
+
+    # Esconde a versão do nginx no cabeçalho Server: informação gratuita para
+    # quem procura uma versão com CVE conhecida.
+    server_tokens off;
+
+    # --- Compressão -----------------------------------------------------------
+    # Só faz diferença em texto. Imagens e fontes woff2 já vêm comprimidas, e
+    # recomprimi-las gasta CPU para economizar bytes que não existem.
+    gzip              on;
+    gzip_vary         on;
+    gzip_min_length   1024;
+    gzip_proxied      any;
+    gzip_comp_level   6;
+    gzip_types        text/plain text/css text/xml application/json
+                      application/javascript application/xml+rss
+                      image/svg+xml font/ttf;
+
+    # --- Saúde do contêiner ---------------------------------------------------
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+    }
+
+    # --- API ------------------------------------------------------------------
+    # O endereço vai para uma variável, e não direto no proxy_pass, de propósito.
+    # Com um nome literal, o nginx resolve o DNS UMA vez, ao carregar a
+    # configuração, e guarda o IP para sempre. Basta o contêiner da API ser
+    # recriado (deploy, reinício, `--scale api=3`) para ganhar outro IP e o
+    # frontend passar a devolver 502 até alguém reiniciar o nginx.
+    #
+    # Com a variável, a resolução passa a ser por requisição, usando o DNS
+    # embutido do Docker (sempre 127.0.0.11), com cache de 10 segundos. Deploy da
+    # API deixa de exigir reinício do frontend, e escalar passa a distribuir
+    # entre as réplicas.
+    #
+    # Efeito colateral a conhecer: com variável e sem componente de URI no
+    # proxy_pass, o nginx repassa a URI original inalterada — que é exatamente o
+    # comportamento desejado aqui, já que o FastAPI registrou as rotas COM o
+    # prefixo /api/v1. (Com nome literal, a regra é outra: uma barra final no
+    # proxy_pass cortaria o prefixo e toda rota daria 404.)
+    resolver 127.0.0.11 valid=10s ipv6=off;
+
+    location /api/ {
+        set $az1_api ${API_UPSTREAM};
+        proxy_pass $az1_api;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Transcrição e chamada ao Gemini são chamadas de rede a terceiros e
+        # levam dezenas de segundos. Com o padrão de 60s, o nginx devolveria 504
+        # enquanto a API ainda estivesse trabalhando.
+        proxy_connect_timeout 10s;
+        proxy_send_timeout    120s;
+        proxy_read_timeout    120s;
+
+        # Repassa o upload conforme chega, em vez de acumular o arquivo inteiro
+        # em disco antes de falar com a API. Reduz latência e o I/O do proxy.
+        proxy_request_buffering off;
+    }
+
+    # --- Estáticos ------------------------------------------------------------
+    # O Vite grava o hash do conteúdo no nome dos arquivos de dist/assets. Nome
+    # novo a cada mudança é o que torna `immutable` seguro: não existe versão
+    # velha em cache com o mesmo nome, então o navegador pode guardar por um ano
+    # sem nunca revalidar.
+    location /assets/ {
+        include /etc/nginx/security-headers.conf;
+        # Um Cache-Control só, montado à mão. Com "expires 1y" junto, o nginx
+        # emite DOIS cabeçalhos Cache-Control na mesma resposta e fica a critério
+        # do cliente qual obedecer.
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        access_log off;
+        try_files $uri =404;
+    }
+
+    # O index.html é a exceção e precisa ser o oposto: é ele que aponta para os
+    # bundles com hash. Cacheado, o usuário continuaria carregando a versão
+    # antiga do app depois do deploy, por tempo indeterminado.
+    location = /index.html {
+        include /etc/nginx/security-headers.conf;
+        add_header Cache-Control "no-store, must-revalidate";
+    }
+
+    # --- SPA ------------------------------------------------------------------
+    # O roteamento é do React, não do nginx: /tarefas não existe como arquivo.
+    # Sem este fallback, recarregar a página numa rota interna daria 404 —
+    # funcionaria navegando pelo app e quebraria no F5.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Arquivos ocultos (.env, .git) que por acaso acabem em dist/ não devem ser
+    # serviveis. `log_not_found off` evita encher o log com varreduras.
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+}

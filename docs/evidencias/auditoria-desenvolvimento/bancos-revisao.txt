@@ -1,0 +1,22 @@
+Revisão de 11/09/2026
+
+Desenvolvimento: PostgreSQL 16.14; usuário az1.
+Migração 06 aplicada com webhook_login=az1.
+Antes: az1_webhook ausente e RLS desativada nas duas tabelas.
+Depois: az1_webhook disponível; RLS ativada em auditoria.evento_webhook e integracao.conexao; COMMENT ON TABLE corrigido.
+Contagens preservadas: auditoria.evento_webhook: 0; integracao.conexao: 0.
+Comparação determinística do conteúdo integral das duas tabelas antes/depois da migração e depois dos testes revertidos: idêntica.
+Cópia local do esquema anterior guardada em /tmp/az1-auditoria/dev-esquema-anterior.sql, fora do Git.
+
+Pool do receptor: current_user=az1_webhook
+INSERT de evento, UPDATE de conclusão e UPDATE de delta_pendente: permitidos; transação revertida ao final.
+DELETE: permission denied confirmado
+TRUNCATE: permission denied confirmado
+alterar corpo: permission denied confirmado
+alterar client_state: permission denied confirmado
+ler refresh_token: permission denied confirmado
+Oito reutilizações após rollback: papel restrito preservado.
+
+Supabase configurado: PostgreSQL 17.6; current_user=postgres; az1_app presente e az1_webhook ausente. Consulta somente leitura; migração não aplicada à base compartilhada. Versão compatível com a migração 06, que exige PostgreSQL 16 ou superior.
+
+Não foram registrados DSNs, chaves, tokens nem conteúdo das tabelas.

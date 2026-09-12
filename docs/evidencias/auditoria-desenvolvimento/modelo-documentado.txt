@@ -1,0 +1,6 @@
+All checks passed!
+Seção 3.6.6 do Projeto.md : 16 tabelas, 132 colunas
+01_create_database.sql    : 16 tabelas, 132 colunas
+Banco em execução         : 16 tabelas, 132 colunas
+
+OK — documento, script e banco descrevem o mesmo modelo.

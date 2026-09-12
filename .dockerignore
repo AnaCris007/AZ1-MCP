@@ -1,0 +1,42 @@
+# =============================================================================
+# Contexto de build — política de negação por padrão
+# =============================================================================
+# A primeira linha exclui TUDO; abaixo dela, só o que a build precisa é
+# reautorizado. O inverso (listar o que excluir) é o arranjo comum e o que
+# vaza: basta alguém criar `credenciais.json` na raiz para o arquivo entrar na
+# imagem sem que ninguém perceba. Aqui, o arquivo novo fica de fora até que
+# alguém o libere explicitamente.
+#
+# O que este arquivo mantém fora e por quê:
+#   .env, *.pem  → segredos e chave privada de acesso; segredo em imagem é
+#                  segredo publicado, porque `docker history` mostra as camadas.
+#   .venv/       → virtualenv do host (Windows/macOS), inútil e quebrado no Linux.
+#   node_modules → reinstalado na imagem com `npm ci`, a partir do lockfile.
+#   .git/        → centenas de MB de histórico que nada acrescentam ao runtime.
+# =============================================================================
+
+*
+
+# --- Necessário para construir a imagem da API -------------------------------
+!pyproject.toml
+!src
+!tests
+!docker
+
+# O ruff.toml precisa entrar: sem ele, o lint dentro do contêiner cai no
+# conjunto de regras PADRÃO do ruff, e passa a reportar coisas que o projeto não
+# selecionou — enquanto deixa de aplicar as que selecionou. Um lint que discorda
+# do lint do CI é pior do que nenhum.
+!ruff.toml
+
+# --- Reexclusões dentro do que foi liberado acima ----------------------------
+# O frontend mora em src/, então precisa ser podado aqui.
+src/frontend/node_modules
+src/frontend/dist
+src/frontend/.oxlintrc.json
+
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.ruff_cache
+**/*.egg-info

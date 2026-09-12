@@ -34,27 +34,40 @@ name = "az1"
 version = "0.1.0"
 description = "Agente de apoio à gestão do portfólio de projetos do PMO do Metrô de São Paulo"
 requires-python = ">=3.12"
+# As cinco dependências do pipeline de PLN (`joblib`, `nltk`, `numpy`,
+# `scikit-learn`, `spacy`) estão fixadas em versão exata, e não em piso.
+# O motivo está em `requirements.txt`, junto do procedimento de atualização:
+# são elas que determinam o F1-macro publicado em `resultados/`, e um piso
+# deixa o número mudar em um rebuild sem que nenhum teste acuse. Os dois
+# arquivos precisam concordar.
 dependencies = [
     "av>=14.0",
     "boto3>=1.35",
     "deepgram-sdk>=5.0",
     "fastapi>=0.115",
     "google-genai>=1.0",
-    "joblib>=1.3",
-    "nltk>=3.8",
-    "numpy>=1.26",
+    "httpx>=0.27",
+    "joblib==1.6.0",
+    "nltk==3.10.3",
+    "numpy==2.5.2",
+    "openpyxl>=3.1",
+    "psycopg[binary,pool]>=3.2",
     "pydantic>=2",
+    "pyjwt[crypto]>=2.10",
+    "pyyaml>=6.0",
+    "python-docx>=1.1",
     "python-dotenv>=1.0",
     "python-multipart>=0.0.12",
-    "scikit-learn>=1.4",
-    "spacy>=3.7",
+    "scikit-learn==1.9.0",
+    "spacy==3.8.16",
+    "sqlalchemy>=2.0",
     "uvicorn[standard]>=0.30",
+    "vecs>=0.4",
 ]
 
 [project.optional-dependencies]
 # Ferramentas de desenvolvimento, não necessárias para executar o agente.
 dev = [
-    "httpx>=0.27",
     "ruff==0.16.2",
 ]
 
@@ -68,7 +81,10 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = [
     "src/az1_api",
+    "src/config",
+    "src/database",
     "src/pln",
+    "src/rag",
     "src/routes",
     "src/schemas",
     "src/services",

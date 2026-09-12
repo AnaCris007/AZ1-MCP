@@ -1,0 +1,32 @@
+CREATE ROLE
+BEGIN
+DO
+GRANT ROLE
+REVOKE
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+ALTER TABLE
+ALTER TABLE
+DROP POLICY
+DROP POLICY
+DROP POLICY
+DROP POLICY
+DROP POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+DO
+COMMENT
+COMMIT
+ granted_role |        login        | inherit_option | set_option 
+--------------+---------------------+----------------+------------
+ az1_webhook  | auditor             | f              | t
+ az1_webhook  | webhook_login_teste | f              | t
+(2 rows)
+
