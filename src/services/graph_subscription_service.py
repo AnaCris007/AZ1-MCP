@@ -40,6 +40,7 @@ from dotenv import load_dotenv
 
 from services.webhook_http import ErroDeOperacao, ErroHTTP
 from services.webhook_http import pedir as _pedir
+from services.webhook_registry_service import PostgresSettings
 
 GRAPH = "https://graph.microsoft.com/v1.0"
 
@@ -92,7 +93,7 @@ class Config:
             recurso=os.environ.get("MS_RECURSO", "/me/drive/root"),
             client_state=os.environ["MS_WEBHOOK_CLIENT_STATE"],
             url_publica=url,
-            dsn=os.environ.get("DATABASE_URL", "postgresql://az1:az1@localhost:5432/az1"),
+            dsn=PostgresSettings.from_environment().dsn,
         )
 
     @property

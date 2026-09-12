@@ -82,6 +82,8 @@ def _configurar_conexao(conexao: Connection, papel: str | None) -> None:
     # construção das settings e não vem de entrada de usuário.
     with conexao.cursor() as cursor:
         cursor.execute(f"SET ROLE {_identificador_seguro(papel)}")
+    # O callback do pool deve terminar sem transação aberta.
+    conexao.commit()
 
 
 # `SET ROLE` não aceita parâmetro ligado, então o nome entra no SQL por

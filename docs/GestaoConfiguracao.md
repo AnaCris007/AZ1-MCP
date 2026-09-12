@@ -132,7 +132,7 @@
 | `hotfix/<descricao>` | Correção urgente sobre versão já promovida | `main` | `main` e `develop`, por MRs separados | Somente quando a falha estiver em `main` e não puder aguardar o ciclo regular | Um revisor diferente do autor, em cada um dos dois MRs | Após os dois merges concluídos | `hotfix/corrigir-falha-classificador` |
 | `release/<versao>` | Estabilização e etiquetagem da versão candidata | `develop` | `hmg` e, havendo ajustes, `develop`, por MRs separados | Quando a versão exigir ajustes de estabilização que não devam voltar diretamente para `develop` | Um revisor diferente do autor, em cada MR | Após a criação da tag em `main` | `release/v1.0.0` |
 
-**Estado observado no repositório.** Os tipos com uso registrado no histórico são: `main`, `develop`, `hmg` e as temporárias `feature/`, `feat/`, `docs/` e `fix/`. **Não há registro de uso de `release/*` nem de `hotfix/*`** — os exemplos dessas duas linhas descrevem a política e não constituem evidência de execução, conforme a Seção 5.3. Registra-se também que **o repositório não possui nenhuma tag**, portanto a etiquetagem prevista nas Seções 4.4 e 6.4 não está demonstrada no corte. Ausência de tag atual não prova que uma tag nunca tenha existido.
+**Estado observado no repositório.** Os tipos com uso registrado no histórico são: `main`, `develop`, `hmg` e as temporárias `feature/`, `feat/`, `docs/` e `fix/`. **Não há registro de uso de `release/*` nem de `hotfix/*`**: os exemplos dessas duas linhas descrevem a política e não constituem evidência de execução, conforme a Seção 5.3. Registra-se também que **o repositório não possui nenhuma tag**, portanto a etiquetagem prevista nas Seções 4.4 e 6.4 não está demonstrada no corte. Ausência de tag atual não prova que uma tag nunca tenha existido.
 
  A `hmg` e a `release/*` cumprem papéis distintos e não se substituem. A `hmg` é permanente e concentra a homologação de cada ciclo: é por ela que o conteúdo de promoção regular passa antes de chegar à `main`, com a exceção urgente de hotfix descrita acima. A `release/*` é temporária e existe para estabilizar e etiquetar uma versão específica quando houver ajustes que não devam voltar diretamente para `develop`. Até o momento, a equipe promoveu para `main` exclusivamente pela `hmg`; a `release/*` permanece definida conforme o enunciado do módulo, sem uso registrado no histórico do repositório.
 
@@ -190,7 +190,7 @@ A branch `release/*` é criada a partir de `develop` para estabilizar e etiqueta
 - Descrição curta e objetiva, que identifique a issue sem precisar abri-la;
 - Nunca usar nome de pessoa, número de sprint isolado ou termos genéricos como `desenvolvimento`, `tarefa` ou `atualização`.
 
-**Sobre o número da issue no nome da branch.** Uma convenção difundida inclui o número da issue no próprio nome, no formato `tipo/numero-descricao`, como em `feat/123-recebimento-audio`. **A equipe não adota esse formato**, e a escolha é deliberada: o vínculo com a issue já é estabelecido em dois pontos obrigatórios — a referência `#N` em cada commit autoral e o `Closes #N` na descrição do Merge Request —, de modo que acrescentá-lo ao nome da branch seria uma terceira repetição do mesmo dado. O que se perde é a legibilidade do vínculo na listagem de branches; o que se ganha é um nome que descreve o trabalho, e não um número que exige consulta para significar algo. A convenção adotada é a única válida no projeto, e a aferição da Seção 7 mostra conformidade do prefixo, mas também uma exceção de maiúscula na descrição na Sprint 2.
+**Sobre o número da issue no nome da branch.** Uma convenção difundida inclui o número da issue no próprio nome, no formato `tipo/numero-descricao`, como em `feat/123-recebimento-audio`. **A equipe não adota esse formato**, e a escolha é deliberada: o vínculo com a issue já é estabelecido em dois pontos obrigatórios (a referência `#N` em cada commit autoral e o `Closes #N` na descrição do Merge Request), de modo que acrescentá-lo ao nome da branch seria uma terceira repetição do mesmo dado. O que se perde é a legibilidade do vínculo na listagem de branches; o que se ganha é um nome que descreve o trabalho, e não um número que exige consulta para significar algo. A convenção adotada é a única válida no projeto, e a aferição da Seção 7 mostra conformidade do prefixo, mas também uma exceção de maiúscula na descrição na Sprint 2.
 
 **Exemplos válidos:**
 
@@ -415,7 +415,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 
  A equipe optou por manter as regras como estão e registrar o desvio, em vez de flexibilizar a convenção para acomodar a prática. O histórico já integrado não é reescrito, e a correção vale para os commits das próximas sprints, apoiada no hook da Seção 6.5, que recusa a mensagem antes de o commit ser criado. A ação correspondente está registrada na Seção 4.2.4 do `GestaoProjeto.md`, e a criação do hook é a task T37 do planejamento da Sprint 3.
 
-**Distribuição ao longo da sprint.** A quinta regra da Seção 5.2 — commits distribuídos ao longo do ciclo — é a única que não se afere por mensagem, e sim por data. Sobre os mesmos 94 commits:
+**Distribuição ao longo da sprint.** A quinta regra da Seção 5.2 (commits distribuídos ao longo do ciclo) é a única que não se afere por mensagem, e sim por data. Sobre os mesmos 94 commits:
 
 | Dia | Commits | Participação |
 |---|---:|---:|
@@ -443,7 +443,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 | Ana Cristina Jardim | 13 | 13,8% |
 | Tobias Viana | 9 | 9,6% |
 
- A diferença entre o integrante com mais e o com menos commits é de sete registros, e todos os sete contribuíram em volume comparável. Commits são uma medida grosseira de esforço — uma seção longa de documentação pode caber em um commit, e um ajuste pequeno de código pode render três —, de modo que a leitura correta desta tabela é a ausência de concentração, e não a equivalência de carga.
+ A diferença entre o integrante com mais e o com menos commits é de sete registros, e todos os sete contribuíram em volume comparável. Commits são uma medida grosseira de esforço (uma seção longa de documentação pode caber em um commit, e um ajuste pequeno de código pode render três), de modo que a leitura correta desta tabela é a ausência de concentração, e não a equivalência de carga.
 
 ---
 
@@ -571,7 +571,7 @@ chmod +x .git/hooks/commit-msg
 
 | Item | Política documentada | Prática observada | Desvio | Ação para a Sprint 3 |
 |---|---|---|---|---|
-| Nomenclatura de branches | `<prefixo>/<descricao-em-kebab-case>`, com prefixo da lista da Seção 3.1 | As 25 branches distintas da sprint usam prefixo válido — `docs`, `feat`, `feature` e `fix` — e descrição em kebab-case. Uma delas, `docs/diario-de-construcao-prototipo-B`, termina com letra maiúscula | **Desvio pontual**: 24 de 25 em conformidade integral | Manter a convenção; conferir o nome na abertura do MR, quando ainda é barato renomear |
+| Nomenclatura de branches | `<prefixo>/<descricao-em-kebab-case>`, com prefixo da lista da Seção 3.1 | As 25 branches distintas da sprint usam prefixo válido: `docs`, `feat`, `feature` e `fix`: e descrição em kebab-case. Uma delas, `docs/diario-de-construcao-prototipo-B`, termina com letra maiúscula | **Desvio pontual**: 24 de 25 em conformidade integral | Manter a convenção; conferir o nome na abertura do MR, quando ainda é barato renomear |
 | Origem das branches | Branches de trabalho partem de `develop` | Verificado nos 26 merges: em todos, o ponto de bifurcação entre a branch e o destino pertence à `develop` | Nenhum | Manter |
 | Destino dos Merge Requests | Branches de trabalho apontam para `develop` | Os 26 MRs da sprint apontam para `develop` | Nenhum | Manter |
 | Proteção de branches permanentes | Sem commit direto em `main`, `hmg` e `develop` | Nenhum commit direto observado no histórico das três branches | Nenhum | Manter |
@@ -597,7 +597,7 @@ chmod +x .git/hooks/commit-msg
 
  O quadro registra a avaliação da Sprint 2 e suas ações para o ciclo seguinte. A promoção por hmg e a participação dos revisores, confirmadas no feedback, permanecem registradas. Os avanços posteriores de configuração são descritos abaixo, sem substituir o histórico.
 
- Os seis desvios comprovados se organizam em quatro grupos, e o agrupamento sugere tratamentos distintos. O primeiro é **forma da mensagem de commit**, com dois itens que têm a mesma causa e a mesma solução: são conhecidos, dependem de atenção manual e o hook da Seção 6.5 pode reduzir parte dos desvios formais. O segundo é **cadência**, um item que não se resolve por ferramenta e depende de mudança de comportamento, razão pela qual está tratado como ação verificável, com critério numérico. O terceiro é **encerramento de ciclo**, com dois itens — branches não excluídas e tag ausente — que compartilham a característica de serem etapas finais que podem ser esquecidas quando a entrega já parece pronta. A promoção por `hmg`, anteriormente classificada de forma incorreta como não executada, foi confirmada no histórico e não integra esse grupo. Para os desvios restantes, a providência mais eficaz é o checklist da Seção 8.
+ Os seis desvios comprovados se organizam em quatro grupos, e o agrupamento sugere tratamentos distintos. O primeiro é **forma da mensagem de commit**, com dois itens que têm a mesma causa e a mesma solução: são conhecidos, dependem de atenção manual e o hook da Seção 6.5 pode reduzir parte dos desvios formais. O segundo é **cadência**, um item que não se resolve por ferramenta e depende de mudança de comportamento, razão pela qual está tratado como ação verificável, com critério numérico. O terceiro é **encerramento de ciclo**, com dois itens (branches não excluídas e tag ausente) que compartilham a característica de serem etapas finais que podem ser esquecidas quando a entrega já parece pronta. A promoção por `hmg`, anteriormente classificada de forma incorreta como não executada, foi confirmada no histórico e não integra esse grupo. Para os desvios restantes, a providência mais eficaz é o checklist da Seção 8.
 
  A avaliação histórica da Sprint 2 registrava uma esteira ainda não implementada. Na Sprint 3, os arquivos de CI passaram a existir; os arquivos `.gitlab-ci.yml` e `gitlab-issue-kit/.gitlab-ci.yml` registram build, testes e qualidade. A execução de cada pipeline deve ser conferida no MR.
 

@@ -129,3 +129,37 @@ export async function fetchCalendarEvents() {
 
   return response.json()
 }
+
+export async function fetchConversas() {
+  const response = await apiFetch('/api/v1/conversas')
+
+  if (!response.ok) {
+    throw new Error(`Falha ao buscar conversas: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function fetchMensagens(conversaId) {
+  const response = await apiFetch(`/api/v1/conversas/${conversaId}/mensagens`)
+
+  if (!response.ok) {
+    throw new Error(`Falha ao buscar mensagens: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function avaliarResposta({ conversaId, ordem, polaridade }) {
+  const response = await apiFetch('/api/v1/conversas/avaliacoes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ conversa_id: conversaId, ordem, polaridade }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Falha ao registrar avaliação: ${response.status}`)
+  }
+
+  return response.json()
+}

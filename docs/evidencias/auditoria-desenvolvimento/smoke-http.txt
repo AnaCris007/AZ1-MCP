@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+date: Fri, 11 Sep 2026 23:44:59 GMT
+server: uvicorn
+content-length: 15
+content-type: application/json
+
+{"status":"ok"}HTTP/1.1 202 Accepted
+date: Fri, 11 Sep 2026 23:44:59 GMT
+server: uvicorn
+content-length: 58
+content-type: application/json
+
+{"eventos":1,"processados":1,"ignorados":0,"duplicados":0}

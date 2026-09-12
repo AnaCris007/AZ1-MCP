@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
-import { FileText, LoaderCircle, Pause, Volume2 } from 'lucide-react'
+import { FileText, LoaderCircle, Pause, ThumbsDown, ThumbsUp, Volume2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { generateSpeech } from '../../lib/api'
+import { avaliarResposta, generateSpeech } from '../../lib/api'
 import AgentOrb from '../AgentOrb/AgentOrb'
 
 
@@ -9,6 +9,52 @@ import AgentOrb from '../AgentOrb/AgentOrb'
 // Esta lista e o que o transforma em referencia: mostra QUAL documento e de que
 // projeto, e deixa abrir o trecho exato que sustentou a afirmacao. E o que o
 // RNF12 cobra, e a diferenca entre citar e parecer que cita.
+
+// Sem isto, `auditoria.avaliacao` ficava vazia: a tabela estava modelada, com
+// policies e colunas para polaridade, nota e motivo, e nada escrevia nela. Sem
+// feedback não há sinal para melhorar o modelo.
+function Avaliacao({ conversaId, ordem, escolhida, aoEscolher }) {
+  const registrar = (polaridade) => {
+    if (escolhida) return
+    aoEscolher(polaridade)
+    avaliarResposta({ conversaId, ordem, polaridade }).catch(() => {
+      // Desfaz a marcação: exibir um polegar que o banco não registrou faria a
+      // interface mentir sobre o que foi salvo.
+      aoEscolher(null)
+      console.error('[avaliacao] não foi possível registrar seu feedback')
+    })
+  }
+
+  return (
+    <span className="ml-1 inline-flex items-center gap-0.5">
+      <button
+        type="button"
+        onClick={() => registrar('positiva')}
+        disabled={Boolean(escolhida)}
+        aria-label="Resposta útil"
+        aria-pressed={escolhida === 'positiva'}
+        className={`rounded-lg p-1.5 transition-colors hover:bg-surface disabled:cursor-default ${
+          escolhida === 'positiva' ? 'text-text-primary' : 'text-text-secondary'
+        }`}
+      >
+        <ThumbsUp size={14} />
+      </button>
+      <button
+        type="button"
+        onClick={() => registrar('negativa')}
+        disabled={Boolean(escolhida)}
+        aria-label="Resposta não ajudou"
+        aria-pressed={escolhida === 'negativa'}
+        className={`rounded-lg p-1.5 transition-colors hover:bg-surface disabled:cursor-default ${
+          escolhida === 'negativa' ? 'text-text-primary' : 'text-text-secondary'
+        }`}
+      >
+        <ThumbsDown size={14} />
+      </button>
+    </span>
+  )
+}
+
 function ListaDeFontes({ fontes }) {
   const [aberta, setAberta] = useState(null)
 
@@ -50,7 +96,8 @@ function ListaDeFontes({ fontes }) {
   )
 }
 
-export default function ChatMessage({ role, content, fontes = [] }) {
+export default function ChatMessage({ role, content, fontes = [], conversaId, ordem }) {
+  const [avaliacao, setAvaliacao] = useState(null)
   const isUser = role === 'user'
   const [audioState, setAudioState] = useState('idle')
   const [audioError, setAudioError] = useState('')
@@ -139,6 +186,14 @@ export default function ChatMessage({ role, content, fontes = [] }) {
                   ? 'Pausar'
                   : 'Ouvir resposta'}
             </button>
+            {conversaId && ordem != null && (
+              <Avaliacao
+                conversaId={conversaId}
+                ordem={ordem}
+                escolhida={avaliacao}
+                aoEscolher={setAvaliacao}
+              />
+            )}
             {audioError && (
               <p role="alert" className="mt-1 text-xs text-red-500">
                 {audioError}

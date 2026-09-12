@@ -39,6 +39,7 @@ from dotenv import load_dotenv
 
 from services.webhook_http import ErroDeOperacao, ErroHTTP
 from services.webhook_http import pedir as _pedir
+from services.webhook_registry_service import PostgresSettings
 
 AUTORIZACAO = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN = "https://oauth2.googleapis.com/token"
@@ -94,7 +95,7 @@ class Config:
             client_secret=os.environ["GOOGLE_CLIENT_SECRET"],
             channel_token=os.environ["GOOGLE_WEBHOOK_CHANNEL_TOKEN"],
             url_publica=url,
-            dsn=os.environ.get("DATABASE_URL", "postgresql://az1:az1@localhost:5432/az1"),
+            dsn=PostgresSettings.from_environment().dsn,
         )
 
 
@@ -226,7 +227,7 @@ def abrir(config: Config, *, retomar_de: str | None = None) -> None:
     # já é conhecido neste ponto porque o UUID é gerado por nós, não pelo Google;
     # só `recurso_id` (que o Google atribui) fica pendente até a resposta.
     with psycopg.connect(config.dsn) as conexao:
-        conexao.execute(
+        reservada = conexao.execute(
             """
             INSERT INTO integracao.conexao
                 (provedor, conta, recurso, client_state, subscription_id, recurso_id,
@@ -239,9 +240,13 @@ def abrir(config: Config, *, retomar_de: str | None = None) -> None:
                    expira_em = EXCLUDED.expira_em,
                    delta_token = EXCLUDED.delta_token,
                    ativa = TRUE
+             WHERE NOT integracao.conexao.ativa
+            RETURNING id
             """,
             (PROVEDOR, "padrao", "changes", config.channel_token, canal_id, expira_em, inicio),
-        )
+        ).fetchone()
+        if reservada is None:
+            raise ErroDeOperacao("Já existe um canal ativo. Use renovar ou fechar antes de abrir.")
 
     try:
         resposta = _pedir(

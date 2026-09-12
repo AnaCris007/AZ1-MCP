@@ -49,6 +49,8 @@ SELECT conversa_id, 2, 'agente', 'texto',
        'sucesso', 'gemini-3.5-flash-lite', 2140
   FROM _ctx;
 
+SELECT to_regclass('vecs.documentos_metro') IS NOT NULL AS tem_indice_rag \gset
+\if :tem_indice_rag
 -- Fontes da resposta: chunks reais do índice, com o artefato correspondente
 -- resolvido pelo caminho do arquivo quando ele existe no banco.
 INSERT INTO auditoria.mensagem_fonte
@@ -72,6 +74,10 @@ SELECT m.id,
        ) v ON TRUE
   LEFT JOIN portfolio.artefato a
          ON v.metadata->>'arquivo_origem' LIKE '%' || a.referencia;
+
+\else
+\echo 'Etapa de fontes RAG não executada: índice vetorial não existe nesta base.'
+\endif
 
 -- Turno 2 — prompt por voz, com transcrição e referência ao objeto no MinIO.
 INSERT INTO auditoria.mensagem

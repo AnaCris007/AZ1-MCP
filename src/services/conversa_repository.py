@@ -236,6 +236,40 @@ class ConversaNaoGravada(RuntimeError):
     """Turno recusado antes de tocar o banco, por dado incoerente."""
 
 
+@dataclass(frozen=True)
+class ConversaResumida:
+    id: str
+    titulo: str
+    atualizada_em: str
+
+
+@dataclass(frozen=True)
+class MensagemRegistrada:
+    ordem: int
+    papel: str
+    conteudo: str
+
+
+_SQL_LISTAR_CONVERSAS = """
+SELECT id, coalesce(titulo, '(sem título)'), atualizada_em
+  FROM auditoria.conversa
+ WHERE usuario_id = %s AND arquivada_em IS NULL
+ ORDER BY atualizada_em DESC
+ LIMIT %s
+"""
+
+# O `usuario_id` entra no WHERE, e não só a conversa: enquanto a RLS não estiver
+# em vigor (a aplicação conecta como dono), é este filtro que impede alguém de
+# ler a conversa de outra pessoa passando o UUID dela.
+_SQL_MENSAGENS_DA_CONVERSA = """
+SELECT m.ordem, m.papel, m.conteudo
+  FROM auditoria.mensagem m
+  JOIN auditoria.conversa c ON c.id = m.conversa_id
+ WHERE m.conversa_id = %s AND c.usuario_id = %s
+ ORDER BY m.ordem
+"""
+
+
 class PersistenciaDesligada:
     """Ocupa o lugar de `ConversaRepository` quando não há banco configurado.
 
@@ -254,15 +288,122 @@ class PersistenciaDesligada:
         self._avisou = False
 
     def registrar_turno(self, turno: TurnoDoChat) -> None:
+        self._avisar()
+
+    def listar_conversas(self, usuario_id: int, limite: int = 50) -> tuple:
+        self._avisar()
+        return ()
+
+    def mensagens_da_conversa(self, conversa_id: str, usuario_id: int) -> tuple:
+        self._avisar()
+        return ()
+
+    def registrar_avaliacao(self, **_: object) -> bool:
+        self._avisar()
+        return False
+
+    def _avisar(self) -> None:
         if not self._avisou:
             logger.warning("Persistência de conversas desligada: %s", self._motivo)
             self._avisou = True
+
+
+# `auditoria.avaliacao` tem CHECK em polaridade e motivo. Mesma regra de sempre:
+# duplicar os domínios aqui dá erro legível antes da transação, e um teste que lê
+# o DDL impede que as listas se afastem.
+POLARIDADES_VALIDAS = frozenset({"positiva", "negativa"})
+MOTIVOS_VALIDOS = frozenset(
+    {
+        "resposta_incorreta",
+        "fonte_irrelevante",
+        "resposta_incompleta",
+        "nao_entendeu_pergunta",
+        "demorou_demais",
+        "resposta_util",
+        "outro",
+    }
+)
+
+# A avaliação recai sobre a mensagem, e não sobre a conversa: o CHECK
+# `avaliacao_alvo_unico` aceita um ou outro, e por mensagem é o que permite
+# saber QUAL resposta foi ruim — que é o sinal útil para melhorar o modelo.
+#
+# `mensagem_id` é resolvido a partir de (conversa_id, ordem), que a tabela
+# mantém UNIQUE. O cliente não conhece o id: ele é gerado por IDENTITY numa
+# tarefa de fundo, depois de a resposta já ter saído.
+_SQL_AVALIAR = """
+INSERT INTO auditoria.avaliacao (usuario_id, mensagem_id, polaridade, motivo, comentario)
+SELECT %s, m.id, %s, %s, %s
+  FROM auditoria.mensagem m
+  JOIN auditoria.conversa c ON c.id = m.conversa_id
+ WHERE m.conversa_id = %s AND m.ordem = %s AND c.usuario_id = %s
+RETURNING id
+"""
 
 
 class ConversaRepository:
     def __init__(self, pool: ConnectionPool, armazenamento: Armazenamento) -> None:
         self._pool = pool
         self._armazenamento = armazenamento
+
+    def listar_conversas(self, usuario_id: int, limite: int = 50) -> tuple[ConversaResumida, ...]:
+        """As conversas da pessoa, da mais recente para a mais antiga.
+
+        Arquivadas ficam de fora: `arquivada_em` é exclusão lógica — o RNF09
+        exige reter 90 dias, então "apagar conversa" na interface é ocultar, não
+        remover.
+        """
+        with self._pool.connection() as conexao, conexao.cursor() as cursor:
+            cursor.execute(_SQL_LISTAR_CONVERSAS, (usuario_id, limite))
+            return tuple(
+                ConversaResumida(id=str(i), titulo=tit, atualizada_em=at.isoformat())
+                for i, tit, at in cursor.fetchall()
+            )
+
+    def mensagens_da_conversa(
+        self, conversa_id: str, usuario_id: int
+    ) -> tuple[MensagemRegistrada, ...]:
+        """Os turnos de uma conversa, se ela for da pessoa que pediu."""
+        with self._pool.connection() as conexao, conexao.cursor() as cursor:
+            cursor.execute(_SQL_MENSAGENS_DA_CONVERSA, (conversa_id, usuario_id))
+            return tuple(
+                MensagemRegistrada(ordem=o, papel=p, conteudo=c)
+                for o, p, c in cursor.fetchall()
+            )
+
+
+    def registrar_avaliacao(
+        self,
+        *,
+        usuario_id: int,
+        conversa_id: str,
+        ordem: int,
+        polaridade: str,
+        motivo: str | None = None,
+        comentario: str | None = None,
+    ) -> bool:
+        """Registra o juízo sobre uma resposta. False se o alvo não existe.
+
+        O INSERT é um `INSERT ... SELECT` com o filtro de dono embutido: uma
+        mensagem de outra pessoa simplesmente não produz linha, e o método
+        devolve False — sem consulta prévia e sem janela entre verificar e
+        gravar.
+        """
+        if polaridade not in POLARIDADES_VALIDAS:
+            raise ConversaNaoGravada(
+                f"polaridade {polaridade!r} fora do domínio: {sorted(POLARIDADES_VALIDAS)}."
+            )
+        if motivo is not None and motivo not in MOTIVOS_VALIDOS:
+            raise ConversaNaoGravada(
+                f"motivo {motivo!r} fora do domínio: {sorted(MOTIVOS_VALIDOS)}."
+            )
+
+        with self._pool.connection() as conexao, conexao.cursor() as cursor:
+            cursor.execute(
+                _SQL_AVALIAR,
+                (usuario_id, polaridade, motivo, comentario, conversa_id, ordem, usuario_id),
+            )
+            return cursor.fetchone() is not None
 
     def registrar_turno(self, turno: TurnoDoChat) -> TurnoGravado:
         _validar(turno)
