@@ -84,6 +84,7 @@
 - [7.1 O que foi inspecionado, e com que alcance](#71-o-que-foi-inspecionado-e-com-que-alcance)
 - [7.2 Quadro de aderência](#72-quadro-de-aderência)
 - [7.3 Leitura do quadro](#73-leitura-do-quadro)
+- [7.4 Atualização de aderência na Sprint 3](#74-atualização-de-aderência-na-sprint-3)
 
 </details>
 
@@ -101,7 +102,7 @@
 
 ## 1.2 Princípios da gestão de configuração
 
- A gestão de configuração do projeto AZ1 é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches permanentes**: `main` e `develop` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
+ A gestão de configuração do projeto AZ1 é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches permanentes**: `main`, `develop` e `hmg` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
 
 ---
 
@@ -246,8 +247,6 @@ git merge develop
 | Critérios de aprovação | Aprovação por par e comentário técnico, conforme política do grupo. Na auditoria de participação, aprovação registrada também é revisão efetiva; a conformidade com a exigência local de comentário é verificada separadamente |
 | Tratamento de conflitos | O autor resolve os conflitos antes de solicitar a revisão |
 | Evidências obrigatórias | `Closes #N` na descrição, seções `## O que foi feito` e `## Como testar`, labels e milestone preenchidos |
-
-O modelo de MR também possui suporte automatizado: [`setup_mr_template.py`](../gitlab-issue-kit/scripts/setup_mr_template.py) lê a convenção de [`config.yml`](../gitlab-issue-kit/scripts/config.yml) e gera `.gitlab/merge_request_templates/Default.md` na raiz. O modo `--dry-run` mostra o resultado sem gravar; `--apply-remote` também aplica o texto à configuração do GitLab. A presença do script é um entregável do processo, enquanto sua execução e publicação são etapas distintas. O [guia do kit](../gitlab-issue-kit/docs/README.md) documenta o procedimento.
 
 **Conteúdo mínimo da descrição:** a seção “O que foi feito” explica o problema, o resultado e os arquivos afetados. “Como testar” informa comandos, ambiente, SHA e resultado esperado, com links para a evidência obtida. O vínculo de fechamento usa o número real da issue, após conferir que o MR entrega todo o seu escopo; uma contribuição parcial deve referenciar a issue sem declarar sua conclusão.
 
@@ -571,7 +570,7 @@ chmod +x .git/hooks/commit-msg
 
 | Item | Política documentada | Prática observada | Desvio | Ação para a Sprint 3 |
 |---|---|---|---|---|
-| Nomenclatura de branches | `<prefixo>/<descricao-em-kebab-case>`, com prefixo da lista da Seção 3.1 | As 25 branches distintas da sprint usam prefixo válido: `docs`, `feat`, `feature` e `fix`: e descrição em kebab-case. Uma delas, `docs/diario-de-construcao-prototipo-B`, termina com letra maiúscula | **Desvio pontual**: 24 de 25 em conformidade integral | Manter a convenção; conferir o nome na abertura do MR, quando ainda é barato renomear |
+| Nomenclatura de branches | `<prefixo>/<descricao-em-kebab-case>`, com prefixo da lista da Seção 3.1 | As 25 branches distintas da sprint usam prefixo válido — `docs`, `feat`, `feature` e `fix` — e descrição em kebab-case. Uma delas, `docs/diario-de-construcao-prototipo-B`, termina com letra maiúscula | **Desvio pontual**: 24 de 25 em conformidade integral | Manter a convenção; conferir o nome na abertura do MR, quando ainda é barato renomear |
 | Origem das branches | Branches de trabalho partem de `develop` | Verificado nos 26 merges: em todos, o ponto de bifurcação entre a branch e o destino pertence à `develop` | Nenhum | Manter |
 | Destino dos Merge Requests | Branches de trabalho apontam para `develop` | Os 26 MRs da sprint apontam para `develop` | Nenhum | Manter |
 | Proteção de branches permanentes | Sem commit direto em `main`, `hmg` e `develop` | Nenhum commit direto observado no histórico das três branches | Nenhum | Manter |
@@ -602,6 +601,28 @@ chmod +x .git/hooks/commit-msg
  A avaliação histórica da Sprint 2 registrava uma esteira ainda não implementada. Na Sprint 3, os arquivos de CI passaram a existir; os arquivos `.gitlab-ci.yml` e `gitlab-issue-kit/.gitlab-ci.yml` registram build, testes e qualidade. A execução de cada pipeline deve ser conferida no MR.
 
  Além do vínculo `Closes #N`, a cobertura de revisão exige registros primários de aprovações e comentários. A participação dos sete integrantes na Sprint 2 foi confirmada no feedback; no acompanhamento das próximas sprints, cada revisão deve continuar vinculada à aprovação ou ao comentário correspondente.
+
+## 7.4 Atualização de aderência na Sprint 3
+
+Esta atualização foi reconferida em **11/09/2026, às 23h21 (BRT)**. A análise local está fixada em `develop@2993257`; o GitLab foi consultado para estado dos MRs, reviewers, pipelines, branches e milestone. O quadro da Seção 7.2 permanece como histórico da Sprint 2 e não é sobrescrito.
+
+| Item | Prática observada na Sprint 3 | Situação | Encaminhamento para a Sprint 4 |
+|---|---|---|---|
+| Origem e destino das branches | As 24 branches de trabalho foram integradas por MR em `develop`, mantendo o fluxo informado pela equipe de partir de `develop` e retornar a ela | **Conforme** | Manter o fluxo e a atualização com a base antes do MR |
+| Nomenclatura das branches | Os 24 MRs usam prefixos válidos (`feat`, `feature`, `fix` ou `docs`) e descrição legível; `docs/autenticacao-SSO-login` contém maiúsculas | **23 de 24 em conformidade integral** | Validar lowercase antes do primeiro push |
+| Rastreabilidade dos commits | 92 de 92 commits autorais possuem referência `#N` e tipo Conventional Commits válido | **100% conforme** | Manter |
+| Descrição no infinitivo | 74 de 92 mensagens começam com palavra terminada em `ar`, `er` ou `ir`, segundo a heurística da Seção 6.5 | **80,4%; desvio em 18** | Versionar validação compartilhada, sem reescrever o histórico |
+| Limite de 72 caracteres | 70 de 92 primeiras linhas respeitam o limite | **76,1%; desvio em 22** | Aplicar a mesma validação antes do commit |
+| Cadência | O pico foi 10/09, com 33 de 92 commits (35,9%), mas 68 commits (73,9%) ocorreram de 09 a 11/09 e não houve atividade autoral entre 05 e 07/09 | **Parcial** | Acompanhar idade dos cards e antecipar o primeiro MR, além do teto diário |
+| Revisão por pares | Os 24 MRs possuem reviewer diferente do autor e os sete integrantes revisaram, conforme a atribuição e os registros de revisão | **Conforme** | Manter reviewer diferente do autor e registrar comentários quando houver ajuste técnico |
+| Estratégia de merge | Os 24 MRs geraram commits de merge em `develop` | **Conforme** | Manter |
+| Exclusão de branches | A página de branches ainda exibe fontes já mescladas, entre elas `feat/modelo-openrouter`, `feat/autenticacao-login`, `feat/receber-webhook-microsoft-graph` e `feature/implementar-text-to-speech` | **Desvio comprovado** | Excluir somente após conferir que o MR foi mesclado e não há trabalho adicional |
+| Esteira de verificação | `.gitlab-ci.yml` na raiz executa build, testes e lint; o pipeline associado a `develop@2993257` passou | **Evolução concluída na Sprint 3** | Manter a execução obrigatória e tratar falhas antes do merge |
+| Promoção `develop → hmg → main` | No corte, `develop` estava 138 commits à frente de `main`; a promoção está programada para depois da integração desta revisão final do artefato | **Etapa final programada** | Após integrar a correção final do artefato, abrir os dois MRs de promoção e realizar a revisão em cada etapa |
+| Tag da versão | A tag da Sprint 3 depende da promoção do conteúdo para `main` | **Etapa posterior à promoção** | Criar a tag anotada em `main` depois da conclusão do fluxo `develop → hmg → main` |
+| `release/*` e `hotfix/*` | Não houve condição nem uso registrado dessas branches | **Não aplicável nesta sprint** | Manter os procedimentos como política condicional |
+
+O resultado confirma evolução em rastreabilidade, revisão distribuída e CI. Permanecem como desvios observados a nomenclatura de uma branch, a forma de parte das mensagens de commit, a cadência concentrada e a manutenção de branches temporárias já mescladas. A promoção por `hmg` e a tag não são classificadas como falhas neste corte, pois constituem as etapas finais programadas para depois da integração desta revisão.
 
 ---
 
