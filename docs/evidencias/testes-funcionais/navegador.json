@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-18",
+  "timezone": "America/Sao_Paulo",
+  "case": "CT-RF01-15",
+  "executor": "Codex via CUA; Google Chrome nativo",
+  "url": "http://127.0.0.1:5175/tests/functional.html",
+  "scope": "AgentPage e cliente HTTP reais; harness de desenvolvimento sem Gate SSO; API indisponível",
+  "input": "Qual o status do SYN-01?",
+  "steps": ["Carregar harness", "Digitar consulta", "Acionar Enviar mensagem", "Verificar erro e ausência de resposta fictícia", "Capturar tela e recortar barra do navegador"],
+  "observed": {
+    "message": "Ocorreu um erro inesperado ao processar sua mensagem. Tente novamente.",
+    "proxy_error": "connect ECONNREFUSED 127.0.0.1:8010",
+    "business_reply": false,
+    "error_has_speech_feedback_buttons": true
+  },
+  "status": "Parcial",
+  "pending": "Fluxo autenticado normal e compreensão por usuário externo",
+  "evidence": "CT-RF01-15.png"
+}
