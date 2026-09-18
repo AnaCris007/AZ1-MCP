@@ -5,14 +5,39 @@ Mantém 62 IDs estáveis, incluindo seis fora do recorte. Gera catálogo detalha
 matriz CSV e relatório Markdown; não altera critérios para acomodar o código.
 """
 import csv
+import hashlib
 import json
 import re
+import subprocess
 from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs/evidencias/testes-funcionais"
 DOCUMENT = ROOT / "docs/Projeto.md"
+
+
+def guardar_manifesto(report):
+    """Atualiza hashes após consolidar, preservando a versão da execução HTTP."""
+    paths = [DOCUMENT, ROOT / "scripts/executar_testes_funcionais.py",
+             ROOT / "scripts/consolidar_testes_funcionais.py",
+             ROOT / "src/frontend/src/pages/AgentPage.test.jsx",
+             ROOT / "src/frontend/tests/functional.html",
+             ROOT / "src/frontend/tests/functional.jsx", ROOT / "pyproject.toml",
+             ROOT / "requirements.txt", ROOT / "src/frontend/package-lock.json"]
+    paths.extend(path for path in OUT.iterdir() if path.is_file() and path.name != "manifesto.json")
+    manifest = {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "base_commit": report.get("commit", "não registrado"),
+        "consolidation_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+        "scope": "Campanha acadêmica local; hashes dos arquivos atuais. Atualizar documentação não reexecuta testes nem altera resultados históricos.",
+        "functional_run_started_at_utc": report.get("started_at_utc"),
+        "functional_run_finished_at_utc": report.get("finished_at_utc"),
+        "sha256": {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+                   for path in sorted(set(paths)) if path.exists()},
+    }
+    (OUT / "manifesto.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
 
 
 def main():
@@ -130,6 +155,7 @@ def main():
         ]
         text = text.split(results_start)[0] + results_start + "\n".join(results) + results_end + text.split(results_end, 1)[1]
         DOCUMENT.write_text(text)
+    guardar_manifesto(report)
     print(json.dumps(Counter(row["status"] for row in rows), ensure_ascii=False))
 
 

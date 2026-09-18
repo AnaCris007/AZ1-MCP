@@ -2,8 +2,9 @@
 
 Commit candidato: `f1b3591123f2488791012dfeebaa0b6b04c601bb`. Rodada de
 18/09/2026. Nenhuma correção de regra de negócio foi aplicada nesta task de
-testes. Os registros abaixo estão preparados para issues; **não foram abertas
-issues no GitLab**. Responsáveis e prazos devem ser atribuídos pela equipe.
+testes. Este documento é o registro local dos problemas da campanha acadêmica;
+as evidências e ações propostas são suficientes para registrar as reprovações.
+Não se exige abrir issues no GitLab nesta task.
 
 ## DF-01 — RF02 consulta fontes para solicitação fora do domínio
 
@@ -19,9 +20,15 @@ issues no GitLab**. Responsáveis e prazos devem ser atribuídos pela equipe.
   [log da campanha](funcionais.log). Cliente externo do modelo não foi chamado.
 - **Ação proposta:** identificar intenção/escopo antes da recuperação; recusar
   fora do domínio sem consulta. Não mudar o oráculo para aceitar a busca atual.
+- **Diagnóstico adicional:** o modelo treinado classificou a pergunta sobre
+  Marte como `consultar_projeto_sintetico`, com confiança aproximadamente 0,382.
+  Ver [previsões do classificador](classificador-diagnostico.json). Ligar esse
+  classificador antes da busca, isoladamente, não corrige o exemplo. Não foi
+  introduzido um limiar arbitrário nem uma regra específica para a frase apenas
+  para obter aprovação; a melhoria depende de revisar classificação/diálogo.
 - **Reteste necessário:** casos cegos fora do domínio, negação e consultas
   legítimas; contar zero buscas nas recusas e preservar consulta válida.
-- **Estado:** aberto no registro local; issue, correção e reteste pendentes.
+- **Estado:** falha documentada; correção e reteste são melhorias futuras.
 
 ## DF-02 — RF02 consulta fontes antes de esclarecer projeto ausente
 
@@ -38,7 +45,7 @@ issues no GitLab**. Responsáveis e prazos devem ser atribuídos pela equipe.
   implementar esclarecimento explícito e retomada após resposta do usuário.
 - **Reteste necessário:** projeto ausente, indicador ausente, nomes semelhantes
   e retomada; nenhuma busca de negócio antes de dados suficientes.
-- **Estado:** aberto no registro local; issue, correção e reteste pendentes.
+- **Estado:** falha documentada; correção e reteste são melhorias futuras.
 
 ## OBS-01 — feedback de indisponibilidade genérico na interface
 

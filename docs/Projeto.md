@@ -7087,7 +7087,7 @@ A execução dos testes de funcionalidade na Sprint 4 é considerada concluída 
 | Condição | Definição |
 |---|---|
 | Cobertura executada | Todos os casos aplicáveis ao commit candidato tiveram execução ou bloqueio registrado; aprovação parcial não equivale a aprovação do caso inteiro |
-| Tratamento das reprovações | Cada caso reprovado possui issue aberta no GitLab, com a evidência anexada e a classificação entre defeito de implementação e divergência de requisito |
+| Tratamento das reprovações | Cada caso reprovado possui registro local com evidência, classificação entre defeito de implementação e divergência de requisito e ação corretiva proposta. Nesta campanha acadêmica, o registro está em `docs/evidencias/testes-funcionais/defeitos.md`; não se exige abertura de issue remota |
 | Registro dos não executados | Cada caso marcado como *Planejado* permanece no plano com a sprint de execução atualizada, e nenhum é retirado sem decisão registrada na Seção 7 |
 
 Nenhum caso é considerado aprovado por inspeção de código. A aprovação exige execução com evidência registrada, o que vale inclusive para os casos cujo comportamento já está coberto pela suíte de unidade: a proximidade entre um teste de unidade existente e um caso funcional não dispensa a execução do caso.
@@ -8268,18 +8268,27 @@ Os testes com mocks e replay serão complementados por chamadas reais controlada
 Esta seção registra a execução técnica da campanha funcional iniciada em
 18/09/2026, dando continuidade às Seções 6.1, 6.2 e 6.6. O objetivo é verificar
 o comportamento da solução pelos critérios dos requisitos, identificar
-problemas antes da liberação e preservar evidências reproduzíveis. A execução
-automatizada foi conduzida pelo agente Codex sob orientação de Felipe Simão;
-a revisão pela equipe e o aceite humano permanecem pendentes.
+problemas antes da apresentação do protótipo e preservar evidências
+reproduzíveis. A execução técnica utiliza os scripts e comandos documentados
+abaixo; seus resultados não representam avaliação por usuários externos.
 
-O commit candidato é `f1b3591123f2488791012dfeebaa0b6b04c601bb`, acrescido dos
-scripts de campanha e dos testes de interface desta entrega. Os resultados
+Os resultados
 não se estendem a versões posteriores. Não se alteraram os critérios oficiais
 para acomodar o comportamento observado. A orientação de entrega recebida
 exige ferramentas justificadas, casos completos, scripts, evidências,
 participação externa e análise crítica; esses elementos foram organizados nas
 subseções abaixo. Não foi fornecido feedback específico do professor que
 permita atribuir uma alteração a essa revisão.
+
+A entrega é a execução e documentação local dos
+testes funcionais disponíveis nesta versão do protótipo acadêmico. Os casos
+futuros continuam no inventário com suas dependências; sua implementação não
+faz parte desta task. Falhas ficam registradas localmente com evidências e
+melhorias propostas, sem operações no GitLab. A execução pode ser encerrada
+com reprovações e bloqueios documentados; isso não significa que os requisitos
+tenham sido integralmente atendidos. Sessões com participantes pertencem à
+parte de usabilidade do artefato maior e não serão inventadas para encerrar
+a campanha técnica.
 
 | Planejamento anterior | Atualização operacional desta campanha |
 |---|---|
@@ -8481,10 +8490,10 @@ Os casos de interface permanecem parciais. Evidências HTTP registram respostas,
 hashes e efeitos, sem tokens ou chaves reais.
 
 Problemas funcionais e ações propostas são registrados no
-[registro de defeitos](evidencias/testes-funcionais/defeitos.md). A abertura das
-issues correspondentes no GitLab, atribuição de responsáveis, correção e
-reteste devem ser vinculados antes do encerramento definido em 6.2.4. Um
-defeito registrado localmente não é uma issue remota aberta nem uma correção.
+[registro de defeitos](evidencias/testes-funcionais/defeitos.md). Esse arquivo
+é o registro de problemas desta campanha. Correções de regras de negócio
+ficam como melhorias propostas e exigirão reteste quando implementadas;
+nenhuma reprovação foi convertida em aprovação para concluir a documentação.
 
 ### 6.7.6 Execução com usuários externos e melhorias de interface
 
@@ -8534,11 +8543,16 @@ somente os seis IDs históricos, manter os bloqueios visíveis e separar
 variantes de casos. Não se publica percentual de cobertura de linhas,
 fidedignidade de fala ou sucesso sistêmico a partir destas contagens.
 
-**Condição de liberação:** esta rodada não autoriza homologação integral.
-É necessário tratar/retestar as reprovações, executar os casos críticos
-bloqueados no ambiente adequado, vincular defeitos às issues e obter revisão
-da equipe e sessões externas. A documentação registra execução e limitações;
-o encerramento documental de uma rodada não equivale à aprovação da solução.
+**Conclusão da campanha funcional:** a execução técnica local e seu registro
+estão concluídos para a versão disponível, com 12 casos aprovados no recorte
+controlado, cinco parciais, duas reprovações, 37 bloqueios e seis IDs fora do
+MVP. Todos os IDs receberam resultado ou justificativa; os problemas têm
+evidência e ação proposta. O protótipo não atende integralmente aos seis RFs.
+As próximas melhorias são esclarecer o projeto antes da busca, reconhecer
+pedidos fora do domínio e completar sugestões/notificações conforme a equipe
+implementar esses fluxos. O relatório permite apresentar o que foi testado e
+os limites da versão, sem afirmar aprovação integral da solução. A avaliação
+com usuários externos permanece pendente na parte de usabilidade do artefato.
 
 # 7. Registro de Decisões
 
