@@ -14,6 +14,7 @@ import metroMapPattern from '../assets/metro-map-pattern.svg'
 import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
 import {
+  AudioRequestError,
   ChatRequestError,
   fetchConversas,
   fetchMensagens,
@@ -30,6 +31,7 @@ const GENERIC_ERROR_FALLBACK =
   'Ocorreu um erro inesperado ao processar sua mensagem. Tente novamente.'
 const EMPTY_TRANSCRIPTION_MESSAGE =
   'Não foi possível identificar nenhuma fala. Tente gravar novamente.'
+const AUDIO_ERROR_FALLBACK = 'Não consegui processar o áudio. Tente novamente.'
 
 const TITLE_MAX_LENGTH = 42
 
@@ -163,11 +165,12 @@ export default function AgentPage() {
           ])
         }
       })
-      .catch(() => {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'agent', content: 'Não consegui transcrever o áudio. Tente novamente.' },
-        ])
+      .catch((err) => {
+        // Antes, todo erro de áudio (arquivo grande demais, formato recusado,
+        // falha na transcrição) caía na mesma frase genérica. A API já manda
+        // a causa em `message` — ver `AudioRequestError` em `lib/api.js`.
+        const content = err instanceof AudioRequestError ? err.message : AUDIO_ERROR_FALLBACK
+        setMessages((prev) => [...prev, { role: 'agent', content }])
       })
       .finally(() => setIsTranscribing(false))
   }
