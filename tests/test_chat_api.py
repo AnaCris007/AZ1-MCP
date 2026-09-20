@@ -6,6 +6,7 @@ import unittest
 from fastapi.testclient import TestClient
 
 from az1_api.dependencies import (
+    get_agente,
     get_chat_answerer,
     get_classificador_de_intencao,
     get_conversa_repository,
@@ -14,9 +15,12 @@ from az1_api.dependencies import (
 from az1_api.main import app
 from rag.retriever import ResultadoBusca
 from routes.chat import fontes_citadas, limpar_citacoes
+from services.agente_service import ResultadoAcao, RespostaDoAgente
 from services.auth_service import AuthenticatedUser
 from services.chat_service import ChatReceptionError, ChatReceptionErrorCode, ChatReply
 from services.conversa_repository import TurnoDoChat
+from services.portfolio_repository import Pendencia
+from pln.entidades import EntidadesExtraidas
 
 
 class FakeAnswerer:
@@ -403,6 +407,91 @@ class TesteTrilhaDaConversa(unittest.TestCase):
 
         self.assertEqual(resposta.status_code, 200)
         self.assertIsNone(self.espiao.turnos[0].intencao)
+
+
+class FakeAgente:
+    def __init__(self, resposta: RespostaDoAgente | Exception) -> None:
+        self._resposta = resposta
+
+    def executar(self, *, intencao: str, confianca: float, texto: str) -> RespostaDoAgente:
+        if isinstance(self._resposta, Exception):
+            raise self._resposta
+        return self._resposta
+
+
+class TesteAgenteNoChat(unittest.TestCase):
+    """A intenção classificada passa a poder AGIR, não só ser observada.
+
+    `FakeAgente` substitui o Agente real: o que se testa aqui é a decisão da
+    rota (sobrepor a resposta ou não, o que grava na trilha), não a lógica de
+    `ExecutarIntencao` em si — essa tem sua própria suíte em
+    `test_agente_service.py`.
+    """
+
+    def setUp(self) -> None:
+        self.espiao = _RepositorioEspiao()
+        self.usuario = dataclasses.replace(_TEST_USER, domain_user_id=7)
+        self.addCleanup(app.dependency_overrides.clear)
+
+    def _cliente(self, reply: ChatReply, resposta_do_agente: RespostaDoAgente | Exception) -> TestClient:
+        app.dependency_overrides[get_chat_answerer] = lambda: FakeAnswerer(reply)
+        app.dependency_overrides[require_authenticated_user] = lambda: self.usuario
+        app.dependency_overrides[get_conversa_repository] = lambda: self.espiao
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: (
+            lambda texto: ("gerar_alertas_pendencias", 0.9)
+        )
+        app.dependency_overrides[get_agente] = lambda: FakeAgente(resposta_do_agente)
+        return TestClient(app, raise_server_exceptions=False)
+
+    def test_acao_confiante_sobrepoe_a_resposta_do_rag(self) -> None:
+        pendencia = Pendencia(
+            id=1, projeto_codigo="SYN-01", projeto_nome="Projeto", codigo=None,
+            tipo="risco", titulo="Licença ambiental vencendo", descricao=None,
+            criticidade=None, responsavel=None, prazo=None, situacao="aberta",
+        )
+        resposta_do_agente = RespostaDoAgente(
+            ResultadoAcao.PENDENCIAS, EntidadesExtraidas(), pendencias=(pendencia,)
+        )
+        cliente = self._cliente(ChatReply(text="resposta do RAG, ignorada"), resposta_do_agente)
+
+        corpo = cliente.post(
+            "/api/v1/chat", json={"message": "o que precisa da minha atenção?", "conversation_id": _UUID_VALIDO}
+        ).json()
+
+        self.assertIn("Licença ambiental vencendo", corpo["reply"])
+        self.assertEqual(corpo["fontes"], [])
+        self.assertEqual(self.espiao.turnos[0].resultado, "sucesso")
+
+    def test_sem_acao_mantem_a_resposta_do_rag(self) -> None:
+        resposta_do_agente = RespostaDoAgente(ResultadoAcao.SEM_ACAO, EntidadesExtraidas())
+        cliente = self._cliente(ChatReply(text="Resposta do RAG."), resposta_do_agente)
+
+        corpo = cliente.post(
+            "/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO}
+        ).json()
+
+        self.assertEqual(corpo["reply"], "Resposta do RAG.")
+
+    def test_recusa_fora_do_catalogo_grava_resultado_recusada(self) -> None:
+        resposta_do_agente = RespostaDoAgente(ResultadoAcao.RECUSADA_FORA_DO_CATALOGO, EntidadesExtraidas())
+        cliente = self._cliente(ChatReply(text="resposta do RAG, ignorada"), resposta_do_agente)
+
+        cliente.post("/api/v1/chat", json={"message": "qual a previsão do tempo?", "conversation_id": _UUID_VALIDO})
+
+        turno = self.espiao.turnos[0]
+        self.assertEqual(turno.resultado, "recusada")
+        self.assertIsNone(turno.modelo)
+
+    def test_falha_no_agente_nao_derruba_a_conversa(self) -> None:
+        cliente = self._cliente(ChatReply(text="Resposta do RAG."), RuntimeError("agente quebrado"))
+
+        with self.assertLogs("routes.chat", level="ERROR"):
+            resposta = cliente.post(
+                "/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO}
+            )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.json()["reply"], "Resposta do RAG.")
 
 
 if __name__ == "__main__":

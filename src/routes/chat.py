@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from fastapi import APIRouter, BackgroundTasks, Depends
 
 from az1_api.dependencies import (
+    get_agente,
     get_chat_answerer,
     get_classificador_de_intencao,
     get_conversa_repository,
@@ -16,6 +17,7 @@ from az1_api.dependencies import (
 )
 from rag.retriever import ResultadoBusca
 from schemas.chat import ChatErrorCode, ChatRequest, ChatResponse, FonteCitada
+from services.agente_service import AgenteDesligado, ExecutarIntencao, ResultadoAcao, RespostaDoAgente
 from services.auth_service import AuthenticatedUser
 from services.chat_service import (
     MAX_MESSAGE_LENGTH,
@@ -174,6 +176,70 @@ def classificar_sem_interferir(
     return rotulo, float(confianca)
 
 
+def executar_acao_sem_interferir(
+    agente: ExecutarIntencao | AgenteDesligado,
+    intencao: str | None,
+    confianca: float | None,
+    texto: str,
+) -> RespostaDoAgente | None:
+    """A ação do Agente para esta mensagem, ou None se não há o que executar.
+
+    Mesma postura de `classificar_sem_interferir`: qualquer falha do Agente é
+    engolida, e a resposta do RAG que já foi calculada continua valendo — agir
+    é um recurso a mais, não pode ser um jeito novo de a conversa quebrar.
+    """
+    if intencao is None or confianca is None:
+        return None
+    try:
+        resposta = agente.executar(intencao=intencao, confianca=confianca, texto=texto)
+    except Exception:
+        logger.exception("Falha ao executar a ação do Agente; mantendo a resposta do RAG.")
+        return None
+    return None if resposta.resultado is ResultadoAcao.SEM_ACAO else resposta
+
+
+def texto_da_acao(resposta: RespostaDoAgente) -> str:
+    """O texto que substitui a resposta do RAG quando o Agente agiu.
+
+    `resposta.pendencias`/`resposta.projetos` já vêm filtrados por
+    `ExecutarIntencao` — aqui só se formata o que chegou.
+    """
+    if resposta.resultado is ResultadoAcao.RECUSADA_FORA_DO_CATALOGO:
+        return (
+            "Não consigo ajudar com esse tipo de pedido. Posso consultar documentos "
+            "normativos, a situação de um projeto ou as pendências que precisam de atenção."
+        )
+
+    if resposta.resultado is ResultadoAcao.PENDENCIAS:
+        abertas = [p for p in resposta.pendencias if not p.resolvida]
+        if not abertas:
+            return "Não há pendências em aberto no momento."
+        linhas = (
+            f"- [{p.projeto_codigo}] {p.titulo}" + (f" (prazo {p.prazo.isoformat()})" if p.prazo else "")
+            for p in abertas
+        )
+        return "Pendências que precisam de atenção:\n" + "\n".join(linhas)
+
+    if resposta.resultado is ResultadoAcao.PROJETO:
+        if not resposta.projetos:
+            return "Não encontrei o projeto informado."
+        linhas = (
+            f"- {p.codigo} — {p.nome}: {p.percentual_avanco:.0f}% concluído "
+            f"(previsto {p.percentual_previsto:.0f}%), status {p.status}"
+            for p in resposta.projetos
+        )
+        return "Situação do(s) projeto(s):\n" + "\n".join(linhas)
+
+    return ""
+
+
+_RESULTADO_POR_ACAO = {
+    ResultadoAcao.RECUSADA_FORA_DO_CATALOGO: "recusada",
+    ResultadoAcao.PENDENCIAS: "sucesso",
+    ResultadoAcao.PROJETO: "sucesso",
+}
+
+
 def registrar_turno_em_segundo_plano(
     repositorio: ConversaRepository | PersistenciaDesligada, turno: TurnoDoChat
 ) -> None:
@@ -203,6 +269,7 @@ def send_chat_message(
     repositorio: ConversaRepository | PersistenciaDesligada = Depends(get_conversa_repository),
     usuario: AuthenticatedUser = Depends(require_authenticated_user),
     classificador=Depends(get_classificador_de_intencao),
+    agente: ExecutarIntencao | AgenteDesligado = Depends(get_agente),
 ) -> ChatResponse:
     inicio = time.monotonic()
     try:
@@ -219,11 +286,23 @@ def send_chat_message(
     # modelo usou.
     fontes = fontes_citadas(reply.text, reply.fontes)
     resposta_texto = limpar_citacoes(reply.text)
-    duracao_ms = int((time.monotonic() - inicio) * 1000)
 
     intencao, confianca = classificar_sem_interferir(classificador, payload.message)
+
+    # O Agente só SOBREPÕE a resposta do RAG quando a intenção classificada,
+    # com confiança suficiente, corresponde a uma ação implementada — do
+    # contrário, `resposta_do_agente` é None e o RAG segue sendo a resposta,
+    # exatamente como antes desta funcionalidade existir.
+    resposta_do_agente = executar_acao_sem_interferir(agente, intencao, confianca, payload.message)
+    if resposta_do_agente is not None:
+        resposta_texto = texto_da_acao(resposta_do_agente)
+        fontes = []
+
+    duracao_ms = int((time.monotonic() - inicio) * 1000)
+
     turno = _turno_da_conversa(
-        payload, usuario, reply, resposta_texto, fontes, duracao_ms, intencao, confianca
+        payload, usuario, reply, resposta_texto, fontes, duracao_ms, intencao, confianca,
+        resposta_do_agente,
     )
     if turno is not None:
         background_tasks.add_task(registrar_turno_em_segundo_plano, repositorio, turno)
@@ -243,6 +322,7 @@ def _turno_da_conversa(
     duracao_ms: int,
     intencao: str | None,
     confianca: float | None,
+    resposta_do_agente: RespostaDoAgente | None,
 ) -> TurnoDoChat | None:
     """O turno a gravar, ou None quando gravá-lo seria registrar uma falsidade.
 
@@ -255,9 +335,11 @@ def _turno_da_conversa(
        produziu o `usuario_id = 0` que este projeto acabou de aposentar.
     2. IDENTIFICADOR INVÁLIDO. `conversa.id` é UUID.
 
-    `intencao` é OBSERVADA, não usada: vem do classificador e vai para a linha
-    do usuário — o CHECK `mensagem_papel_coerente` a recusa na do agente —, sem
-    influenciar a resposta. Ver `classificar_sem_interferir`.
+    `intencao` vem do classificador e vai para a linha do usuário — o CHECK
+    `mensagem_papel_coerente` a recusa na do agente. `resultado`/`modelo` vêm
+    do RAG por padrão, mas quando o Agente agiu (`resposta_do_agente` não é
+    None) são os dele: `recusada` para fora-do-catálogo, `sucesso` para uma
+    ação de portfólio executada, sem `modelo` nenhum por trás.
     """
     conversa_id = conversa_uuid(payload.conversation_id)
     if conversa_id is None:
@@ -272,13 +354,20 @@ def _turno_da_conversa(
         )
         return None
 
+    if resposta_do_agente is not None:
+        resultado = _RESULTADO_POR_ACAO[resposta_do_agente.resultado]
+        modelo = None
+    else:
+        resultado = reply.resultado
+        modelo = reply.modelo or None
+
     return TurnoDoChat(
         conversa_id=conversa_id,
         usuario_id=usuario.domain_user_id,
         prompt=payload.message,
         resposta=resposta_texto,
-        resultado=reply.resultado,
-        modelo=reply.modelo or None,
+        resultado=resultado,
+        modelo=modelo,
         tempo_processamento_ms=duracao_ms,
         intencao=intencao,
         confianca_intencao=confianca,

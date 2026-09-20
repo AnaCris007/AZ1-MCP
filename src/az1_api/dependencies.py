@@ -13,6 +13,7 @@ from psycopg_pool import ConnectionPool
 # homônimas fariam `@app.exception_handler` registrar só uma delas.
 from database.conexao import obter_engine
 from rag.retriever import buscar as buscar_contexto_rag
+from services.agente_service import AgenteDesligado, ExecutarIntencao
 from services.alerta_service import (
     ConfiguracaoAlertas,
     DesativarAssinante,
@@ -257,6 +258,18 @@ def get_conversa_repository() -> ConversaRepository | PersistenciaDesligada:
 @lru_cache
 def get_portfolio_repository() -> PortfolioRepository:
     return PortfolioRepository(pool=get_connection_pool())
+
+
+# Mesmo raciocínio de `get_alerta_dispatcher`, logo abaixo: o Agente é EFEITO
+# de `POST /chat` existir, não a razão do endpoint. Sem `SUPABASE_DB_URL`,
+# degrada para `AgenteDesligado` em vez de estourar a resolução das
+# dependências e derrubar a rota inteira com 500.
+@lru_cache
+def get_agente() -> ExecutarIntencao | AgenteDesligado:
+    try:
+        return ExecutarIntencao(portfolio=get_portfolio_repository())
+    except BancoNaoConfigurado as erro:
+        return AgenteDesligado(str(erro))
 
 
 @lru_cache
