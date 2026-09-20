@@ -1,0 +1,82 @@
+{
+  "campanha": {
+    "inicio": "2026-09-20T13:20:54.224575+00:00",
+    "encerramento": null,
+    "limite_chamadas_reais": 8,
+    "chamadas_reais": 1
+  },
+  "registros": {
+    "deepgram/nova-3/credencial-invalida/v1/d1efea9f29dbb151.yaml": {
+      "sha256": "ce5f6a219b2285dca007b71355ac2b3319d8ed397468dbdb584fbca31f27ddee",
+      "provedor": "deepgram",
+      "modelo": "nova-3",
+      "cenario": "credencial-invalida",
+      "versao_contrato": "v1",
+      "versao_sdk": "2.22.0",
+      "gravado_em": "2026-09-20T13:17:46.724046+00:00",
+      "validade_dias": 30,
+      "origem": "real",
+      "temporario": false
+    },
+    "deepgram/nova-3/sem-fala/v1/3b6727d0ea3ba590.yaml": {
+      "sha256": "08ac87fca9f7c17c73ee051aef90bc272610922f679487c1a706629d74ddfa08",
+      "provedor": "deepgram",
+      "modelo": "nova-3",
+      "cenario": "sem-fala",
+      "versao_contrato": "v1",
+      "versao_sdk": "2.22.0",
+      "gravado_em": "2026-09-20T13:17:45.598275+00:00",
+      "validade_dias": 30,
+      "origem": "real",
+      "temporario": false
+    },
+    "deepgram/nova-3/sucesso/v1/6d91f9a75a4e1a43.yaml": {
+      "sha256": "b3c16ccbb662d991d2bc71a67b738b6d3d9f57fac55fd35ad463069e238b99d9",
+      "provedor": "deepgram",
+      "modelo": "nova-3",
+      "cenario": "sucesso",
+      "versao_contrato": "v1",
+      "versao_sdk": "2.22.0",
+      "gravado_em": "2026-09-20T13:17:44.196366+00:00",
+      "validade_dias": 30,
+      "origem": "real",
+      "temporario": false
+    },
+    "gemini-embedding/gemini-embedding-001/sucesso/v1/587868628c6b0169.yaml": {
+      "sha256": "05fedf3bb937b8a6bf86ceceedac942be53d51eef9d3be2ba5f2440fe91b012b",
+      "provedor": "gemini-embedding",
+      "modelo": "gemini-embedding-001",
+      "cenario": "sucesso",
+      "versao_contrato": "v1",
+      "versao_sdk": "2.22.0",
+      "gravado_em": "2026-09-20T13:18:02.404954+00:00",
+      "validade_dias": 30,
+      "origem": "real",
+      "temporario": false
+    },
+    "gemini-tts/gemini-2.5-flash-preview-tts/sucesso/v1/6e1d6ce984b2361b.yaml": {
+      "sha256": "9540e188c2dd8a8b577f0f047ec295a222170a959c2bed467dcc14414ab3bd39",
+      "provedor": "gemini-tts",
+      "modelo": "gemini-2.5-flash-preview-tts",
+      "cenario": "sucesso",
+      "versao_contrato": "v1",
+      "versao_sdk": "2.22.0",
+      "gravado_em": "2026-09-20T13:17:42.400310+00:00",
+      "validade_dias": 30,
+      "origem": "real",
+      "temporario": false
+    },
+    "gemini/gemini-flash-lite-latest/sucesso/v1/b4054c2443f32bd1.yaml": {
+      "sha256": "f4dcd08ba00e488c25c5bd6ec44bc998949ae62318003394e1c4a5b5cbd2692c",
+      "provedor": "gemini",
+      "modelo": "gemini-flash-lite-latest",
+      "cenario": "sucesso",
+      "versao_contrato": "v1",
+      "versao_sdk": "2.22.0",
+      "gravado_em": "2026-09-20T13:20:56.584953+00:00",
+      "validade_dias": 30,
+      "origem": "real",
+      "temporario": false
+    }
+  }
+}
