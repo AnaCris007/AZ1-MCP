@@ -2697,21 +2697,14 @@ Caso a duração do áudio ultrapasse esse limite, a API retorna `422 Unprocessa
 ### Exemplo de requisição
 
 ```bash
-# Contrato-alvo, com a autenticação já implementada
-curl -X POST https://<host-da-api>/api/v1/audio \
+curl -X POST http://localhost:8000/api/v1/audio \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -F "audio=@consulta.wav"
 ```
 
-No estado atual da implementação, em que a autenticação ainda não existe e a API roda localmente, a mesma requisição é feita sem o cabeçalho de autorização:
+O `<ACCESS_TOKEN>` é o JWT emitido pelo Supabase Auth (ver a subseção Autenticação, acima); sem ele, ou com um token inválido, a API responde `401` antes de qualquer processamento do áudio — comportamento coberto por teste automatizado em `tests/test_auth_api.py`.
 
-```bash
-# Execução local, estado atual do repositório
-curl -X POST http://localhost:8000/api/v1/audio \
-  -F "audio=@consulta.wav"
-```
-
-O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida. O host `<host-da-api>` é um marcador: nenhum endereço público foi provisionado até o encerramento desta sprint, conforme a Seção 3.7.
+O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida. O host usado acima é o da execução local; nenhum endereço público foi provisionado até o encerramento desta sprint, conforme a Seção 3.7.
 
 ### Resposta de sucesso
 
@@ -2830,7 +2823,7 @@ A tabela confronta cada situação de erro exigida pelo canal de voz com a respo
 | Arquivo vazio | `422 invalid_audio` | `POST /api/v1/audio` | Implementada |
 | Arquivo corrompido, ou aceito porém ilegível | `422 invalid_audio` | `POST /api/v1/audio` | Implementada |
 | Áudio acima de 5 minutos | `422 audio_too_long` | `POST /api/v1/audio` | Implementada |
-| Usuário não autenticado | `401 unauthorized` | `POST /api/v1/audio` | **Planejada**, não implementada |
+| Usuário não autenticado | `401 unauthorized` | `POST /api/v1/audio` | Implementada, ver a subseção Autenticação |
 | Áudio inexistente na hora de transcrever | `404 audio_not_found` | `POST /api/v1/audio/{audio_id}/transcribe` | Implementada, Seção 3.2.2 |
 | Serviço de transcrição indisponível | `502 transcription_failed` | `POST /api/v1/audio/{audio_id}/transcribe` | Implementada, Seção 3.2.2 |
 | Tempo limite da transcrição excedido | `502 transcription_failed` | `POST /api/v1/audio/{audio_id}/transcribe` | Coberta pelo tratamento genérico de exceção; o tempo limite explícito é **DECISÃO TÉCNICA EM ABERTO**, Seção 3.2.2 |
@@ -2850,14 +2843,14 @@ A tabela separa os controles vigentes dos previstos. A separação importa porqu
 | Identificador opaco | **Implementado** | O `audio_id` é um UUID em hexadecimal prefixado por `aud_`, sem relação com o nome do arquivo original, que é descartado |
 | Descarte automático do áudio | **Implementado** | Expiração de sete dias no prefixo `incoming/`, conforme a Seção 3.2.5 |
 | Log sem conteúdo sensível | **Implementado** | Nenhuma rota registra o conteúdo do arquivo nem o texto transcrito |
-| Autenticação por SSO | **Planejado** | Bearer Token definido no contrato; provedor Microsoft ou Google ainda a selecionar, sem alteração do contrato do RNF02 |
+| Autenticação por SSO | **Implementado** | Bearer Token emitido pelo Supabase Auth, com o Microsoft Entra ID como provedor de identidade; validado por `require_authenticated_user` em todas as rotas de `/api/v1`, coberto por teste automatizado em `tests/test_auth_api.py` — ver a subseção Autenticação, acima |
 | Criptografia em trânsito | **Planejado** | HTTPS exigido pelo contrato; o ambiente local ainda serve por HTTP |
-| Limitação de taxa de requisições | **DECISÃO TÉCNICA EM ABERTO** | Sem mecanismo no código. Sem autenticação e sem limite de taxa, o endpoint não deve ser exposto publicamente |
+| Limitação de taxa de requisições | **DECISÃO TÉCNICA EM ABERTO** | Sem mecanismo no código |
 | Inspeção antivírus do arquivo recebido | **DECISÃO TÉCNICA EM ABERTO** | Não previsto no MVP. A mitigação atual é indireta: o arquivo é validado como áudio íntegro, nunca é executado e nunca é servido de volta a outro usuário |
 | Registro de auditoria do envio | **Planejado** | Depende do schema `auditoria` da Seção 3.6.5, adiado para a Sprint 3 conforme a decisão registrada na Seção 2.4 |
 | Conformidade com a LGPD | **Restrição de escopo vigente** | Nenhum dado pessoal ou corporativo real trafega no MVP (Seção 1.3). Antes de qualquer uso real, é necessário definir base legal, prazo de retenção e direitos do titular sobre a gravação |
 
-> **Consequência prática desta tabela.** Enquanto autenticação e limitação de taxa não estiverem implementadas, a API deve ser executada apenas em ambiente local ou de laboratório com acesso restrito. A publicação em endereço público sem esses controles é o principal risco de segurança aberto do MVP e está encaminhada na Seção 3.7.9, item 11, junto da regra de SSH aberta na instância.
+> **Consequência prática desta tabela.** Com autenticação implementada mas sem HTTPS nem limitação de taxa, a API deve ser executada apenas em ambiente local ou de laboratório com acesso restrito. A publicação em endereço público sem os dois últimos controles é o principal risco de segurança aberto do MVP e está encaminhada na Seção 3.7.9, item 11, junto da regra de SSH aberta na instância.
 
 ### Requisitos adicionais
 

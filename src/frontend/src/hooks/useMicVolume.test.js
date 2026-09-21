@@ -3,8 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useMicVolume } from './useMicVolume'
 
 class FakeMediaRecorder {
-  constructor(stream) {
+  constructor(stream, options) {
     this.stream = stream
+    this.options = options
     this.state = 'inactive'
     FakeMediaRecorder.instances.push(this)
   }
@@ -19,6 +20,7 @@ class FakeMediaRecorder {
   }
 }
 FakeMediaRecorder.instances = []
+FakeMediaRecorder.isTypeSupported = () => false
 
 class FakeAudioContext {
   createMediaStreamSource() {
@@ -100,5 +102,39 @@ describe('useMicVolume', () => {
     expect(FakeMediaRecorder.instances).toHaveLength(1)
     expect(FakeMediaRecorder.instances[0].state).toBe('recording')
     expect(stream.track.stop).not.toHaveBeenCalled()
+  })
+
+  it('grava sem mimeType quando o navegador não suporta nenhum dos preferidos', async () => {
+    const { result } = renderHook(() => useMicVolume({}))
+
+    let startPromise
+    act(() => {
+      startPromise = result.current.start()
+    })
+    const stream = createFakeStream()
+    await act(async () => {
+      resolveGetUserMedia(stream)
+      await startPromise
+    })
+
+    expect(FakeMediaRecorder.instances[0].options).toBeUndefined()
+  })
+
+  it('pede audio/webm;codecs=opus quando o navegador o suporta', async () => {
+    FakeMediaRecorder.isTypeSupported = (tipo) => tipo === 'audio/webm;codecs=opus'
+    const { result } = renderHook(() => useMicVolume({}))
+
+    let startPromise
+    act(() => {
+      startPromise = result.current.start()
+    })
+    const stream = createFakeStream()
+    await act(async () => {
+      resolveGetUserMedia(stream)
+      await startPromise
+    })
+
+    expect(FakeMediaRecorder.instances[0].options).toEqual({ mimeType: 'audio/webm;codecs=opus' })
+    FakeMediaRecorder.isTypeSupported = () => false
   })
 })
