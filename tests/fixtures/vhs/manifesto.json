@@ -66,10 +66,10 @@
       "origem": "real",
       "temporario": false
     },
-    "gemini/gemini-flash-lite-latest/sucesso/v1/b4054c2443f32bd1.yaml": {
+    "gemini/gemini-3.5-flash-lite/sucesso/v1/e1437e33ae0e8379.yaml": {
       "sha256": "f4dcd08ba00e488c25c5bd6ec44bc998949ae62318003394e1c4a5b5cbd2692c",
       "provedor": "gemini",
-      "modelo": "gemini-flash-lite-latest",
+      "modelo": "gemini-3.5-flash-lite",
       "cenario": "sucesso",
       "versao_contrato": "v1",
       "versao_sdk": "2.22.0",

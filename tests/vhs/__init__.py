@@ -34,6 +34,7 @@ from tests.vhs.chave import (
     chave_tts,
 )
 from tests.vhs.erros import (
+    CampanhaEmAndamento,
     CampanhaEncerrada,
     ErroVhs,
     LimiteDeChamadasReais,
@@ -63,6 +64,7 @@ __all__ = [
     "VALIDADE_PADRAO_DIAS",
     "VERSAO_CONTRATO_PADRAO",
     "Campanha",
+    "CampanhaEmAndamento",
     "CampanhaEncerrada",
     "ChaveVhs",
     "ContadorDeRede",

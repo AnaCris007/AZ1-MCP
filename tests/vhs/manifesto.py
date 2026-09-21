@@ -32,6 +32,7 @@ from pathlib import Path
 
 from tests.vhs.chave import ChaveVhs
 from tests.vhs.erros import (
+    CampanhaEmAndamento,
     CampanhaEncerrada,
     LimiteDeChamadasReais,
     RegistroAusente,
@@ -203,7 +204,27 @@ class Manifesto:
 
     # -- campanha -----------------------------------------------------------
 
-    def abrir_campanha(self, *, limite_chamadas_reais: int = LIMITE_PADRAO_DE_CHAMADAS_REAIS) -> None:
+    def abrir_campanha(
+        self,
+        *,
+        limite_chamadas_reais: int = LIMITE_PADRAO_DE_CHAMADAS_REAIS,
+        forcar: bool = False,
+    ) -> None:
+        """Fixa o teto de chamadas reais e zera o contador da campanha.
+
+        Zerar é o ponto, e por isso a guarda: abrir sobre uma campanha aberta
+        que já gastou chamadas devolve o orçamento inteiro e apaga o rastro do
+        que foi gasto — o teto do item 10 viraria um limite por execução, e não
+        por campanha. Reabrir de propósito continua valendo, com `forcar`.
+        """
+        em_andamento = self.campanha.encerramento is None and self.campanha.chamadas_reais > 0
+        if em_andamento and not forcar:
+            raise CampanhaEmAndamento(
+                f"campanha aberta em {self.campanha.inicio} já gastou "
+                f"{self.campanha.chamadas_reais} de {self.campanha.limite_chamadas_reais} chamadas reais; "
+                "encerre-a ou reabra explicitamente"
+            )
+
         self.campanha = Campanha(inicio=self.agora().isoformat(), limite_chamadas_reais=limite_chamadas_reais)
         self.salvar()
 

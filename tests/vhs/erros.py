@@ -50,3 +50,14 @@ class LimiteDeChamadasReais(ErroVhs):
 
 class CampanhaEncerrada(ErroVhs):
     """A campanha foi encerrada; gravar de novo exige abrir outra."""
+
+
+class CampanhaEmAndamento(ErroVhs):
+    """Pediram para abrir campanha sobre outra que já gastou chamadas reais.
+
+    Abrir zera o contador. Se isso acontecer sem querer — rodar o roteiro de
+    gravação duas vezes, por exemplo —, o teto do item 10 deixa de limitar
+    coisa alguma: cada execução ganha o orçamento inteiro de novo, e o
+    manifesto passa a declarar menos chamadas do que foram feitas. Reabrir
+    continua possível, e agora é decisão explícita de quem grava.
+    """

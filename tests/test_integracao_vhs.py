@@ -48,7 +48,7 @@ from tests.vhs import (
     chave_stt,
     versao_de_pacote,
 )
-from tests.vhs.erros import CampanhaEncerrada, LimiteDeChamadasReais
+from tests.vhs.erros import CampanhaEmAndamento, CampanhaEncerrada, LimiteDeChamadasReais
 from tests.vhs.manifesto import ORIGEM_SIMULADA
 from tests.vhs.sanitizacao import MARCA
 
@@ -499,6 +499,28 @@ class TestManifestoVhs(unittest.TestCase):
             self.fail("o teto deveria barrar antes da chamada")
 
         self.assertEqual(self.provedor.chamadas, 1)
+
+    def test_abrir_campanha_nao_devolve_orcamento_ja_gasto(self) -> None:
+        """Abrir zera o contador, e por isso não pode acontecer sem querer.
+
+        O roteiro de gravação abre campanha antes de gravar. Rodado duas vezes,
+        ele devolveria o orçamento inteiro e o manifesto passaria a declarar
+        menos chamadas do que foram feitas — o teto do item 10 limitaria a
+        execução, e não a campanha. Reabrir continua valendo, dito em voz alta.
+        """
+        vhs = Vhs(raiz=self.raiz, modo=Modo.GRAVAR, agora=self.relogio)
+        vhs.manifesto.abrir_campanha(limite_chamadas_reais=2)
+
+        with vhs.fita(self.chave):
+            adaptador(self.provedor.url())
+        self.assertEqual(vhs.manifesto.campanha.chamadas_reais, 1)
+
+        with self.assertRaises(CampanhaEmAndamento):
+            vhs.manifesto.abrir_campanha(limite_chamadas_reais=2)
+        self.assertEqual(vhs.manifesto.campanha.chamadas_reais, 1, "a recusa não pode ter mexido no contador")
+
+        vhs.manifesto.abrir_campanha(limite_chamadas_reais=2, forcar=True)
+        self.assertEqual(vhs.manifesto.campanha.chamadas_reais, 0)
 
     def test_encerramento_remove_temporarios_e_barra_nova_gravacao(self) -> None:
         """O que não foi selecionado para regressão sai ao fechar a campanha."""
