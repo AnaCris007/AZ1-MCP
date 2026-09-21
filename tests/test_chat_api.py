@@ -13,14 +13,14 @@ from az1_api.dependencies import (
     require_authenticated_user,
 )
 from az1_api.main import app
+from pln.entidades import EntidadesExtraidas
 from rag.retriever import ResultadoBusca
 from routes.chat import fontes_citadas, limpar_citacoes
-from services.agente_service import ResultadoAcao, RespostaDoAgente
+from services.agente_service import RespostaDoAgente, ResultadoAcao
 from services.auth_service import AuthenticatedUser
 from services.chat_service import ChatReceptionError, ChatReceptionErrorCode, ChatReply
 from services.conversa_repository import TurnoDoChat
 from services.portfolio_repository import Pendencia
-from pln.entidades import EntidadesExtraidas
 
 
 class FakeAnswerer:

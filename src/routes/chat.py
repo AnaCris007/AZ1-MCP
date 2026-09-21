@@ -17,7 +17,7 @@ from az1_api.dependencies import (
 )
 from rag.retriever import ResultadoBusca
 from schemas.chat import ChatErrorCode, ChatRequest, ChatResponse, FonteCitada
-from services.agente_service import AgenteDesligado, ExecutarIntencao, ResultadoAcao, RespostaDoAgente
+from services.agente_service import AgenteDesligado, ExecutarIntencao, RespostaDoAgente, ResultadoAcao
 from services.auth_service import AuthenticatedUser
 from services.chat_service import (
     MAX_MESSAGE_LENGTH,
