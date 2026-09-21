@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
   // quebre o outro.
   const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL || ''
   const supabaseAnonKey = env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY || ''
+  const authDisabled = env.AZ1_AUTH_MODE === 'disabled'
 
   return {
     plugins: [react(), tailwindcss()],
@@ -41,6 +42,7 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(supabaseUrl),
       'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(supabaseAnonKey),
+      'import.meta.env.VITE_AUTH_DISABLED': JSON.stringify(String(authDisabled)),
     },
     server: {
       // Sem host, o Vite escuta só em 127.0.0.1 DENTRO do contêiner, e a porta

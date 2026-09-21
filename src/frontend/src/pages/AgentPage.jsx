@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Menu, Mic } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import AgentOrb from '../components/AgentOrb/AgentOrb'
 import CalendarView from '../components/CalendarView/CalendarView'
@@ -10,10 +10,17 @@ import SettingsModal from '../components/SettingsModal/SettingsModal'
 import Sidebar, { SidebarOpenButton } from '../components/Sidebar/Sidebar'
 import TasksView from '../components/TasksView/TasksView'
 import TopBar from '../components/TopBar/TopBar'
+import VoiceCall from '../components/VoiceCall/VoiceCall'
 import metroMapPattern from '../assets/metro-map-pattern.svg'
 import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
-import { ChatRequestError, sendAudio, sendMessage, transcribeAudio } from '../lib/api'
+import {
+  ChatRequestError,
+  generateSpeech,
+  sendAudio,
+  sendMessage,
+  transcribeAudio,
+} from '../lib/api'
 
 const SERVICE_UNAVAILABLE_FALLBACK =
   'O serviço de IA está sobrecarregado no momento. Tente novamente em instantes.'
@@ -50,8 +57,12 @@ export default function AgentPage() {
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [hasPendingTranscription, setHasPendingTranscription] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [voiceState, setVoiceState] = useState('idle')
+  const [voiceError, setVoiceError] = useState('')
   const [shareCopied, setShareCopied] = useState(false)
   const scrollRef = useRef(null)
+  const voiceAudioRef = useRef(null)
+  const voiceRunRef = useRef(0)
 
   const hasStarted = messages.length > 0
 
@@ -161,8 +172,109 @@ export default function AgentPage() {
   }
 
   const handleSelectTab = (tab) => {
+    if (activeTab === 'voice' && tab !== 'voice') {
+      voiceRunRef.current += 1
+      const currentAudio = voiceAudioRef.current
+      if (currentAudio) {
+        currentAudio.audio.pause()
+        URL.revokeObjectURL(currentAudio.url)
+        voiceAudioRef.current = null
+      }
+      setVoiceState('idle')
+      setVoiceError('')
+    }
     setActiveTab(tab)
-    setIsListening(tab === 'voice')
+    setIsListening(false)
+  }
+
+  const ensureConversation = (firstMessage) => {
+    const conversationId = activeId ?? crypto.randomUUID()
+    if (!activeId) {
+      setActiveId(conversationId)
+      setConversations((prev) => [
+        { id: conversationId, title: titleFromMessage(firstMessage) },
+        ...prev,
+      ])
+    }
+    return conversationId
+  }
+
+  const handleVoiceRecordingComplete = async (blob) => {
+    const runId = ++voiceRunRef.current
+    setVoiceError('')
+
+    if (!blob || blob.size === 0) {
+      setVoiceError('Não consegui acessar o microfone. Verifique a permissão do navegador.')
+      setVoiceState('error')
+      return
+    }
+
+    try {
+      setVoiceState('transcribing')
+      const upload = await sendAudio(blob)
+      const transcription = await transcribeAudio(upload.id)
+      if (runId !== voiceRunRef.current) return
+
+      const text = transcription.text.trim()
+      if (!text) {
+        setVoiceError(EMPTY_TRANSCRIPTION_MESSAGE)
+        setVoiceState('error')
+        return
+      }
+
+      const conversationId = ensureConversation(text)
+      setMessages((prev) => [...prev, { role: 'user', content: text }])
+      setVoiceState('processing')
+
+      const data = await sendMessage(text, conversationId)
+      if (runId !== voiceRunRef.current) return
+      setMessages((prev) => [...prev, { role: 'agent', content: data.reply }])
+
+      setVoiceState('speaking')
+      const speech = await generateSpeech(data.reply)
+      if (runId !== voiceRunRef.current) return
+
+      const url = URL.createObjectURL(speech)
+      const audio = new Audio(url)
+      voiceAudioRef.current = { audio, url }
+      await audio.play()
+      await new Promise((resolve) => {
+        audio.onended = resolve
+        audio.onerror = resolve
+      })
+      URL.revokeObjectURL(url)
+      voiceAudioRef.current = null
+      if (runId === voiceRunRef.current) setVoiceState('idle')
+    } catch (err) {
+      if (runId !== voiceRunRef.current) return
+      const currentAudio = voiceAudioRef.current
+      if (currentAudio) {
+        currentAudio.audio.pause()
+        URL.revokeObjectURL(currentAudio.url)
+        voiceAudioRef.current = null
+      }
+      let message = 'Não foi possível concluir essa interação. Tente novamente.'
+      if (err instanceof ChatRequestError && err.error === 'service_unavailable') {
+        message = err.message || SERVICE_UNAVAILABLE_FALLBACK
+      } else if (err instanceof ChatRequestError && err.error === 'network_error') {
+        message = NETWORK_ERROR_FALLBACK
+      }
+      setVoiceError(message)
+      setVoiceState('error')
+    }
+  }
+
+  const handleEndVoiceCall = () => {
+    voiceRunRef.current += 1
+    const currentAudio = voiceAudioRef.current
+    if (currentAudio) {
+      currentAudio.audio.pause()
+      URL.revokeObjectURL(currentAudio.url)
+      voiceAudioRef.current = null
+    }
+    setVoiceState('idle')
+    setVoiceError('')
+    setActiveTab('chat')
   }
 
   const handleShare = async () => {
@@ -269,31 +381,16 @@ export default function AgentPage() {
           }}
         >
           {activeTab === 'voice' ? (
-            <div className="flex flex-1 flex-col items-center justify-center px-4 pb-10">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="mb-8"
-              >
-                <AgentOrb state="listening" size={128} />
-              </motion.div>
-              <p className="flex items-center gap-2 text-[16px] font-medium text-text-primary">
-                <Mic size={16} strokeWidth={1.75} />
-                Ouvindo...
-              </p>
-              <p className="mt-2 max-w-xs text-center text-[13px] text-text-secondary">
-                Fale naturalmente. O AZ1 vai transcrever e responder assim
-                que você terminar.
-              </p>
-              <button
-                type="button"
-                onClick={() => handleSelectTab('chat')}
-                className="mt-8 rounded-xl border border-border bg-surface px-4 py-2 text-[13px] font-medium text-text-primary transition-colors hover:bg-surface-hover"
-              >
-                Voltar para o chat
-              </button>
-            </div>
+            <VoiceCall
+              state={voiceState}
+              error={voiceError}
+              onStateChange={(nextState) => {
+                setVoiceError('')
+                setVoiceState(nextState)
+              }}
+              onRecordingComplete={handleVoiceRecordingComplete}
+              onEnd={handleEndVoiceCall}
+            />
           ) : activeTab === 'calendar' ? (
             <CalendarView />
           ) : activeTab === 'tasks' ? (

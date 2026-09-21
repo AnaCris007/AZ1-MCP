@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthProvider } from '../contexts/AuthContext'
@@ -24,7 +24,8 @@ vi.mock('../hooks/useMicVolume', () => ({
   },
 }))
 
-const { sendAudio, transcribeAudio, sendMessage } = vi.hoisted(() => ({
+const { generateSpeech, sendAudio, transcribeAudio, sendMessage } = vi.hoisted(() => ({
+  generateSpeech: vi.fn(),
   sendAudio: vi.fn(),
   transcribeAudio: vi.fn(),
   sendMessage: vi.fn(),
@@ -32,7 +33,7 @@ const { sendAudio, transcribeAudio, sendMessage } = vi.hoisted(() => ({
 
 vi.mock('../lib/api', async (importOriginal) => {
   const actual = await importOriginal()
-  return { ...actual, sendAudio, transcribeAudio, sendMessage }
+  return { ...actual, generateSpeech, sendAudio, transcribeAudio, sendMessage }
 })
 
 function promptTextarea() {
@@ -50,6 +51,7 @@ describe('AgentPage — confirmação de transcrição', () => {
     sendAudio.mockReset()
     transcribeAudio.mockReset()
     sendMessage.mockReset()
+    generateSpeech.mockReset()
   })
 
   afterEach(() => {
@@ -111,6 +113,56 @@ describe('AgentPage — confirmação de transcrição', () => {
       await screen.findByText('Não foi possível identificar nenhuma fala. Tente gravar novamente.'),
     ).toBeInTheDocument()
     expect(sendMessage).not.toHaveBeenCalled()
+  })
+})
+
+describe('AgentPage — chamada por voz', () => {
+  beforeEach(() => {
+    sendAudio.mockReset()
+    transcribeAudio.mockReset()
+    sendMessage.mockReset()
+    generateSpeech.mockReset()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    capturedOnRecordingComplete = undefined
+  })
+
+  it('transcreve a fala, consulta o agente e gera a resposta em áudio', async () => {
+    const user = userEvent.setup()
+    sendAudio.mockResolvedValue({ id: 'audio-voz-1' })
+    transcribeAudio.mockResolvedValue({ text: 'Como está o projeto?' })
+    sendMessage.mockResolvedValue({ reply: 'O projeto está em andamento.' })
+    generateSpeech.mockResolvedValue(new Blob(['audio-da-resposta']))
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn(() => 'blob:resposta'),
+      revokeObjectURL: vi.fn(),
+    })
+    vi.stubGlobal('Audio', class {
+      play() {
+        setTimeout(() => this.onended?.(), 0)
+        return Promise.resolve()
+      }
+
+      pause() {}
+    })
+
+    renderAgentPage()
+    await user.click(screen.getByRole('button', { name: 'Voz' }))
+    await user.click(screen.getByRole('button', { name: 'Começar a falar' }))
+    await user.click(screen.getByRole('button', { name: 'Finalizar fala' }))
+    await act(async () => {
+      await capturedOnRecordingComplete(new Blob(['fala']))
+    })
+
+    await waitFor(() =>
+      expect(sendMessage).toHaveBeenCalledWith('Como está o projeto?', expect.any(String)),
+    )
+    await waitFor(() =>
+      expect(generateSpeech).toHaveBeenCalledWith('O projeto está em andamento.'),
+    )
+    expect(await screen.findByText('Pronto para ouvir')).toBeInTheDocument()
   })
 })
 
