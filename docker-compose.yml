@@ -341,6 +341,25 @@ services:
       args:
         PYTHON_VERSION: "3.12"
     image: az1/api-dev:${AZ1_VERSION:-dev}
+
+    # Três caminhos do repositório que a imagem não carrega, montados apenas
+    # para leitura. A imagem copia o que a aplicação executa — `src`, `tests` e
+    # `pyproject.toml` —, e três suítes verificam coerência entre o código e
+    # arquivos que ficam fora dele: `test_reprodutibilidade` compara as versões
+    # fixadas em `requirements.txt` e declaradas na Seção 3.3.7 do `Projeto.md`
+    # com as instaladas, e `TesteRegraDeCicloDeVida` confere a retenção de
+    # `lifecycle.json` contra o mínimo do RNF09.
+    #
+    # Montar é melhor do que copiar para a imagem por dois motivos: a
+    # documentação muda a cada sprint e invalidaria a camada a cada commit, e
+    # uma imagem de aplicação não tem por que carregar `docs/`. Sem estes três
+    # mounts, `make test` termina com oito erros de arquivo ausente — que não
+    # são defeito do código, e escondem os que seriam.
+    volumes:
+      - ./requirements.txt:/app/requirements.txt:ro
+      - ./docs:/app/docs:ro
+      - ./infra:/app/infra:ro
+
     environment:
       # Os testes de API sobem o app com dependências substituídas por dublês,
       # mas a construção das dependências reais lê estas variáveis. Valores

@@ -6321,7 +6321,7 @@ No host, o proxy Vite usa `http://127.0.0.1:8010`; iniciar a API nessa porta ou 
 | Recursos | `psutil` | Amostrar RSS e CPU de processos identificados | Proposto; ausente do ambiente inspecionado e das dependências declaradas |
 | Métricas PLN | scikit-learn, NumPy | F1, precisão, recall, matriz de confusão e consolidação numérica | Declarados e utilizados no PLN; avaliação sistêmica cega planejada |
 | Integração/persistência | Docker Compose, boto3, PostgreSQL/vecs | MinIO real e banco de testes; releitura independente de persistência | Compose/S3 e RAG implementados; `vecs` declarado, mas necessário no ambiente de integração |
-| VHS | VCR.py (`vcrpy`), conforme Seção 6.4.3 | Gravar/reproduzir HTTP externo em Python | Escolhido neste planejamento; instalação e integração previstas para a próxima sprint |
+| VHS | VCR.py (`vcrpy`), conforme Seção 6.4.3 | Gravar/reproduzir HTTP externo em Python | Implementado em [`tests/vhs/`](../tests/vhs) na Sprint 4, com `vcrpy==8.3.0` no extra `dev`; interceptação do transporte `httpx` verificada nos dois SDKs. Integração das suítes de provedor pendente (TI-59) |
 | Cobertura | Inventário por ID e matriz de requisitos | Medir cobertura documental e executada separadamente | Este plano; nenhuma porcentagem de cobertura de linhas foi obtida |
 | Relatórios | CSV/JSON e Markdown | Guardar dados brutos e interpretação auditável por caso | Formato proposto; arquivos de resultados futuros não foram criados |
 | CI/CD | Serviço `tests` no perfil `ci` do Compose | Executar suíte na imagem de desenvolvimento | Configuração existe; pipeline da aplicação e execução automatizada não comprovados. O CI do `gitlab-issue-kit` não comprova CI do AZ1 |
@@ -6343,6 +6343,8 @@ A entrega atual encerra o planejamento. A sequência abaixo organiza sua impleme
 | 5 | Implementar o gerador de desempenho de 6.3.2 | `scripts/carga_testes.py`, massa JSONL e saída CSV | Instrumento registra todas as tentativas, percentis, erros e recursos; distingue desempenho real de replay |
 | 6 | Preparar sessões de usabilidade de 6.5 | Cinco pessoas externas recrutadas, consentimento, protótipo identificado, gabaritos e fichas SUS | Tarefas correspondem às funções da versão; moderador e observador conseguem aplicar o roteiro sem improvisação |
 | 7 | Executar a campanha e consolidar os resultados em etapa posterior | Registros por ID/commit, defeitos e relatório | Critérios avaliados individualmente; falhas vinculadas e retestes identificados, conforme saída de 6.1.3 |
+
+**Atualização da Sprint 4.** A etapa 3 foi implementada: o módulo VHS está em [`tests/vhs/`](../tests/vhs), com a suíte [`tests/test_integracao_vhs.py`](../tests/test_integracao_vhs.py) executada. As condições de conclusão desta tabela permanecem como foram escritas na Sprint 3; o estado item a item do contrato de implementação está na Seção 6.4.3.
 
 A escrita do RF06 permanece fora do MVP. Os casos dependentes de funcionalidades de Sprint 5 acompanham a entrega desses componentes, preservando a continuidade prevista em 3.8.10. Implementar primeiro os casos independentes dessas funcionalidades permite iniciar a próxima sprint sem redefinir o plano.
 
@@ -7739,11 +7741,13 @@ O adaptador de armazenamento traduz apenas o erro `NoSuchKey` do `botocore`, con
 
 O chat converte `ServerError` e `ClientError` 429 do Gemini em `503 service_unavailable`. Outras exceções não tratadas resultam em `500 internal_error`. Texto nulo provoca 500 na serialização, mas string vazia é aceita pelo schema atual (200), embora não seja resposta útil. TI-21 separa essas variantes; 429 externo não equivale a 429 público.
 
-### 6.4.3 Uso Planejado do Módulo VHS
+### 6.4.3 Módulo VHS: Planejamento e Implementação
 
-**Ferramenta escolhida para o planejamento: VCR.py (`vcrpy`).** O módulo VHS será implementado como gravação e reprodução de interações HTTP externas na suíte Python, atendendo ao mecanismo descrito na entrega e na Seção 3.8.10. A escolha é técnica deste plano, sem atribuir aprovação específica ao professor. A instalação e a integração com Deepgram e Google GenAI compõem a próxima sprint.
+**Ferramenta escolhida para o planejamento: VCR.py (`vcrpy`).** O módulo VHS grava e reproduz interações HTTP externas na suíte Python, atendendo ao mecanismo descrito na entrega e na Seção 3.8.10. A escolha é técnica deste plano, sem atribuir aprovação específica ao professor.
 
-A interceptação deve preservar o SDK e a serialização utilizados pela aplicação. A primeira tarefa de implementação será verificar, para cada transporte, gravação em arquivo, replay em novo processo e ausência de nova chamada externa. Caso algum transporte não seja interceptado, o adaptador deverá ser ajustado antes de considerar esse provedor coberto pelo VHS. [Instalação do VCR.py](https://vcrpy.readthedocs.io/en/latest/installation.html).
+**Estado na Sprint 4.** O módulo foi implementado em [`tests/vhs/`](../tests/vhs), com a suíte [`tests/test_integracao_vhs.py`](../tests/test_integracao_vhs.py), e `vcrpy` está fixado na versão 8.3.0 no extra `dev` do `pyproject.toml` — e não em `requirements.txt`, porque a imagem de produção não reproduz fita. A integração com Deepgram e Google GenAI permanece pendente: é o conteúdo de TI-59, e exige sessão controlada com credencial. O quadro de estado item a item está ao final desta seção.
+
+A interceptação deve preservar o SDK e a serialização utilizados pela aplicação. A prova de compatibilidade foi executada antes de escrever o módulo, como esta seção previa: `deepgram-sdk` 7.8.1 e `google-genai` 2.22.0 constroem clientes `httpx`, e o `httpx_stubs` do VCR.py intercepta tanto o transporte síncrono quanto o assíncrono — uma chamada real na gravação, nenhuma no replay, com `play_count` incrementado. A mesma prova mostrou o que acontece sem os callbacks de sanitização: o `Authorization` enviado e o `Set-Cookie` recebido ficam legíveis no arquivo gravado. É essa a falha que o item 3 previne e que TI-50 vigia. Caso algum transporte deixe de ser interceptado, o adaptador deverá ser ajustado antes de considerar esse provedor coberto pelo VHS. [Instalação do VCR.py](https://vcrpy.readthedocs.io/en/latest/installation.html).
 
 **Mock** fornece comportamento controlado, inclusive uma exceção sem resposta HTTP. **Cache** reaproveita respostas por chave durante uma validade. **VHS/VCR** preserva interação real para replay posterior. Uma fixture escrita manualmente é simulada, não uma gravação real. Timeout de rede sem resposta será produzido por mock do transporte ou atraso controlado: não se afirma que VCR.py grave automaticamente essa ausência de resposta. O replay elimina variabilidade da resposta gravada, mas não prova contrato atual, qualidade do modelo atual nem latência de produção.
 
@@ -7759,7 +7763,7 @@ Esses modos pertencem ao VCR.py, conforme a [documentação de gravação e repr
 **Contrato de implementação para a próxima sprint:**
 
 1. Instalar apenas no ambiente de desenvolvimento: `python -m pip install vcrpy`. Registrar a versão resolvida e aprová-la para a stack antes de incluir nas dependências em uma tarefa de implementação separada.
-2. Criar futuramente `tests/test_integracao_vhs.py` e `tests/fixtures/vhs/`. Separar cassette por provedor, modelo, cenário e versão de contrato. Para chat, considerar mensagem exata, instrução e parâmetros; para STT, hash do áudio, idioma, modelo e termos; para TTS, texto, voz, modelo e formato; para embeddings, texto, modelo e dimensão. Não normalizar diferenças semanticamente relevantes.
+2. Criar `tests/test_integracao_vhs.py` e `tests/fixtures/vhs/`. Separar cassette por provedor, modelo, cenário e versão de contrato. Para chat, considerar mensagem exata, instrução e parâmetros; para STT, hash do áudio, idioma, modelo e termos; para TTS, texto, voz, modelo e formato; para embeddings, texto, modelo e dimensão. Não normalizar diferenças semanticamente relevantes.
 3. Configurar `vcr.VCR` com `record_mode="none"`, `match_on=["method", "scheme", "host", "port", "path", "query", "body"]`. Remover `authorization`, `x-goog-api-key`, cookies e parâmetros de chave antes de persistir; usar callbacks para corpos e cabeçalhos de resposta. Revisar a proteção em ambos os sentidos. A configuração exata dos callbacks deve acompanhar o teste de sanitização, conforme os [filtros e callbacks do VCR.py](https://vcrpy.readthedocs.io/en/latest/advanced.html).
 4. Gravar uma interação sintética com `once` e a porta real do SDK, medindo chamadas de rede no transporte abaixo da interceptação. Fechar o contexto para persistir. Reabrir com `none`, repetir a mesma operação e confirmar igualdade do contrato/conteúdo e zero novas saídas de rede. `cassette.play_count` mede replay; não substitui contador externo de chamadas reais. O segundo teste deve funcionar em novo processo, não depender da memória da primeira execução.
 5. Para dados dinâmicos, normalizar somente identificadores/horários sem efeito semântico, mantendo correspondência entre referências; não apagar versão do modelo, texto, projeto, voz ou instrução. Não alterar o conteúdo de resposta para fazê-lo passar. Se a sanitização quebrar o contrato, descartar a gravação e usar outra massa sintética.
@@ -7769,7 +7773,24 @@ Esses modos pertencem ao VCR.py, conforme a [documentação de gravação e repr
 9. Rodar primeiro prova de compatibilidade com cada SDK. Depois integrar as suítes STT, TTS, chat e embedding ao replay. Manter MinIO e PostgreSQL reais nas suítes que verificam persistência. Isolar gravações de processos concorrentes para evitar corrupção de arquivo.
 10. Antes de uma entrega e após mudança de SDK/modelo/contrato, executar smoke real controlado e comparar esquema, status e conteúdo estrutural com o registro. Aprovação de replay antigo não aprova o provedor atual. Antes da gravação, fixar no manifesto o número máximo de chamadas reais e interromper a campanha ao atingir esse limite; repetir a verificação em cada entrega ou mudança dessas dependências.
 
-**Comando futuro:** `python -m unittest tests.test_integracao_vhs -v`, após criar o módulo e instalar a biblioteca. A suíte deve falhar na ausência de cassette obrigatório, jamais informar sucesso com zero testes. Não foi executada nesta revisão.
+**Estado dos dez itens do contrato.** O quadro abaixo registra o que a implementação atendeu, e onde. "Parcial"
+não é ressalva de estilo: significa que a parte pendente depende de credencial de provedor e de sessão de
+gravação controlada, que não ocorreram nesta entrega.
+
+| Item do contrato | Estado | Onde, e o que ficou de fora |
+|---|---|---|
+| 1. Instalar só em desenvolvimento e registrar a versão resolvida | Atendido | `vcrpy==8.3.0` no extra `dev` do `pyproject.toml`; ausente de `requirements.txt` |
+| 2. Suíte e fixtures, com cassette por provedor, modelo, cenário e versão | Atendido | `tests/test_integracao_vhs.py` e `tests/fixtures/vhs/`; chave em `tests/vhs/chave.py`, com construtores para STT, chat, TTS e embedding |
+| 3. `match_on` completo e remoção de credenciais nos dois sentidos | Atendido | `tests/vhs/sanitizacao.py`, com remoção por nome e por valor; critério de correspondência em `tests/vhs/fita.py`. Verificado por TI-50 |
+| 4. Gravar com `once`, reproduzir em processo novo, contar abaixo da interceptação | Atendido com provedor sintético | TI-48 grava, reproduz em subprocesso com o servidor desligado e confere o contador do próprio servidor, independente do `play_count` |
+| 5. Normalizar apenas o que não tem efeito semântico | Atendido por construção | `tests/vhs/chave.py` não aplica `strip`, `lower` nem remoção de acento ao conteúdo; TI-52 cobre idioma, modelo, termos, massa e instrução |
+| 6. Manifesto com hash, versões, instante, validade e origem | Atendido | `tests/vhs/manifesto.py`, com campanha, marca `real`/`simulado` e remoção de temporários no encerramento |
+| 7. Validade verificada no harness, com relógio injetável | Atendido | `Manifesto.validar` distingue ausente, corrompido e vencido; TI-47 cobre antes e depois do prazo sem esperar dias |
+| 8. Versionar apenas amostra sintética sanitizada | Atendido | política em `tests/fixtures/vhs/README.md`; `*.candidato.yaml` fora do versionamento |
+| 9. Prova de compatibilidade por SDK, depois integrar as suítes | Parcial | compatibilidade do transporte verificada; a integração de STT, TTS, chat e embedding ao replay é TI-59 |
+| 10. Teto de chamadas reais e smoke real antes da entrega | Parcial | o teto está implementado e testado em `TestManifestoVhs`, e abrir campanha sobre outra em andamento é recusado, para que o limite valha por campanha e não por execução; o smoke real depende de sessão controlada com credencial |
+
+**Comando de execução:** `python -m unittest tests.test_integracao_vhs -v`. Em 19/09/2026 a suíte executou 10 testes, todos aprovados: os seis casos TI-47 a TI-52 e quatro casos do próprio contrato do harness — teto de chamadas reais, guarda de reabertura de campanha, encerramento de campanha e recarga do manifesto. A exigência original permanece: a suíte falha na ausência de cassette obrigatório, e zero testes não é sucesso.
 
 **Evidências esperadas:** cassette sanitizado e manifesto; log de gravação e replay; contagem de cache hit/miss; contador de rede/spy indicando uma primeira chamada e nenhuma segunda chamada externa; saída do executor; comparação de tempo real versus replay; teste offline e inspeção de ausência de segredos.
 
@@ -7777,7 +7798,7 @@ Esses modos pertencem ao VCR.py, conforme a [documentação de gravação e repr
 
 Casos de teste detalhados. Os identificadores seguem a numeração `TI-nn`, sequencial por suíte. O nome de cada caso corresponde à convenção de classe e método já adotada em `tests/` (`TestNomeDoCaso.test_descricao_do_cenario`). Quando duas ou mais causas produzem exatamente a mesma resposta do sistema, o catálogo reúne essas causas num único caso, com a entrada listando as variantes e o resultado esperado cobrindo todas elas; é o caso, por exemplo, de `test_falha_de_infraestrutura_retorna_500`, que cobre bucket inexistente, credencial inválida e serviço indisponível porque as três produzem hoje o mesmo `500 internal_error` sem distinção.
 
-A tabela relaciona cada suíte à dependência que ela isola e ao mecanismo usado para isolá-la. O replay planejado cobre respostas HTTP de sucesso e erro capturáveis. Falhas sem resposta e parâmetros de chamadas usam mocks/spies, com origem simulada identificada; nenhuma dessas suítes foi implementada como VHS.
+A tabela relaciona cada suíte à dependência que ela isola e ao mecanismo usado para isolá-la. O replay planejado cobre respostas HTTP de sucesso e erro capturáveis. Falhas sem resposta e parâmetros de chamadas usam mocks/spies, com origem simulada identificada. O módulo VHS existe desde a Sprint 4 (Seção 6.4.3), e nenhuma destas suítes de provedor foi ligada a ele ainda: as gravações de Deepgram e Google dependem de sessão controlada com credencial, que é o objeto de TI-59.
 
 | Suíte | Dependência isolada nos testes | Mecanismo |
 |---|---|---|
@@ -7910,6 +7931,8 @@ Suíte de contrato `ContratoBarramentoMensagens`, planejada para um intermediár
 | TI-51 | Positivo | `TestVhsIntegracao.test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado` | Execução nos modos `ignorar` e `atualizar` | Sem contexto VCR não há leitura/gravação; `all` grava versão candidata. Modos antigos ignorar/atualizar não são variáveis implementadas | RNF01 |
 | TI-52 | Positivo | `TestVhsIntegracao.test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao` | Alteração de idioma, modelo ou instrução de sistema | Nova chave gerada; registro anterior não é reaproveitado | RNF01, RNF11 |
 
+Os seis casos acima foram implementados em [`tests/test_integracao_vhs.py`](../tests/test_integracao_vhs.py) e executados na Sprint 4. O provedor que eles exercitam é um servidor HTTP local e sintético, alcançado pelo mesmo transporte `httpx` dos dois SDKs — o que o item 4 da Seção 6.4.3 autoriza como interação sintética pela porta real do SDK. O que essa execução demonstra é o harness: chave, validade, sanitização, ausência de rede no replay e o comportamento dos quatro modos. O que ela não demonstra é o replay de uma gravação da Deepgram ou do Google, que continua sendo TI-59.
+
 #### Integrações adicionais, VHS e contratos revisados
 
 Os duplicados de persistência anteriormente chamados TI-30 e TI-31 passam a TI-53 e TI-54. TI-30/TI-31 continuam identificando frontend/chat e frontend/áudio; referências antigas precisam mencionar a suíte para desambiguar. Os demais IDs foram preservados.
@@ -7962,17 +7985,19 @@ Ferramentas e bibliotecas, com justificativa.
 
 `app.dependency_overrides`: mecanismo de composição que substitui o adaptador real pelo dublê ou pelo módulo VHS nos casos que o exigem.
 
-`httpx`: dependência de transporte do `TestClient`, incluída no extra de desenvolvimento do `pyproject.toml`.
+`httpx`: dependência de transporte do `TestClient`, incluída no extra de desenvolvimento do `pyproject.toml`. É também o transporte que `deepgram-sdk` e `google-genai` usam por baixo, e o ponto em que o VHS intercepta.
+
+`vcrpy`: biblioteca do módulo VHS, fixada na versão 8.3.0 no extra `dev`. Grava a interação real e a reproduz depois; o que o módulo de [`tests/vhs/`](../tests/vhs) acrescenta em volta dela — chave, validade, sanitização, manifesto e bloqueio de rede — está na Seção 6.4.3.
 
 `docker compose`: provisiona MinIO e `minio-init`; PostgreSQL de teste deve ser preparado separadamente, pois não há serviço de banco nessa composição.
 
 `boto3`: cliente independente do usado pela aplicação, para conferir de fora o estado do bucket após cada operação.
 
-`ContratoWebhookInbound` e `ContratoBarramentoMensagens`: classes ainda não implementadas, propostas para descrever o comportamento exigido de webhooks e do barramento de mensagens independentemente do provedor selecionado, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste.
+`ContratoWebhookInbound` e `ContratoBarramentoMensagens`: classes que descrevem o comportamento exigido de webhooks e do barramento de mensagens independentemente do provedor selecionado, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste. `ContratoWebhookInbound` foi implementada em [`tests/test_integracao_contrato_webhook.py`](../tests/test_integracao_contrato_webhook.py) e é reexecutada, sem reescrever caso algum, contra o dublê em memória, o Microsoft Graph, o Google Drive e o PostgreSQL. `ContratoBarramentoMensagens` continua proposta, à espera da escolha do barramento.
 
 Padrão de validação. Cada caso verifica o código de status HTTP ou o efeito observável da operação, a integridade do payload desserializado para o schema Pydantic correspondente e, quando aplicável, o estado persistido (releitura do objeto no bucket, ou da linha na tabela) e o comportamento do módulo VHS, comparando o número de chamadas ao adaptador real entre a primeira e a segunda execução com a mesma chave.
 
-Ambiente e comandos futuros. A execução unitária existente é `python -m unittest discover -s tests -v`. A execução de integração planejada deverá usar `python -m unittest discover -s tests -p "test_integracao_*.py" -v`, depois de implementar os módulos; hoje esse padrão não corresponde a suíte existente e zero testes não é sucesso do artefato. O módulo VHS planejado usa configuração VCR explícita, não `VHS_MODO` inexistente.
+Ambiente e comandos. A execução unitária é `python -m unittest discover -s tests -v`. A execução de integração usa `python -m unittest discover -s tests -p "test_integracao_*.py" -v`, e o padrão hoje corresponde a 65 testes: as quatro suítes de webhook (TI-35 a TI-42) e a suíte do módulo VHS. Dezoito deles são pulados quando não há PostgreSQL de teste alcançável, o que é registro de execução parcial, não aprovação — a advertência original continua valendo, e zero testes não é sucesso do artefato. O módulo VHS usa configuração VCR explícita, e não uma variável `VHS_MODO`, que segue não existindo.
 
 Para a preparação local do MinIO, usar a composição existente em ambiente dedicado; não iniciar indiscriminadamente toda a pilha para testar uma única dependência. A base PostgreSQL de testes deve ser provisionada separadamente, com os scripts da pasta `src/database` revisados para aquele destino. `python scripts/verificar_modelo_documentado.py --sem-banco` compara documento e DDL sem acesso remoto. Executar a verificação real de SQL e retenção somente na base dedicada, registrando consultas, identidades e estado antes/depois.
 
@@ -8210,7 +8235,7 @@ A matriz abaixo complementa a decomposição C1.1-C6.5 e as fichas de cada categ
 | RNF10 | 10x concorrência: p95 ≤ 20 s e ≤ 2x baseline; memória treinamento ≤ 8x e serviço ≤ 2x | CT-RNF10-C-P/N, CT-RNF10-M-P/N; CT-DES-01-05 | Desempenho | Servidor, PLN, RAG | HTTPX, psutil | Baselines, RSS/CPU, percentis e erros | Planejado; carga nominal proposta |
 | RNF11 | ≥ 85% das sugestões com fonte sustentadora e justificativa compreensível | CT-RNF11-P/N; CT-RF04-04/07; TU-09 | RNF, funcional, usabilidade | Sugestões | Rubricas independentes | Fontes, sugestões, julgamentos e desempates | Planejado |
 | RNF12 | 100% das referências recuperáveis; ≥ 90% das afirmações sustentadas; limitação segura | CT-RNF12-P/N; CT-RF03-06; TI-55/58/63 | RNF, funcional, integração | RAG e gerador | Duas rubricas, HTTPX | Afirmações atômicas e evidências citadas | Planejado |
-| Seção 3.8.10 / VHS | Reuso temporário de interações externas | TI-47-52, TI-59-61; CT-DES-03 | Integração, desempenho | Transporte dos SDKs | VCR.py escolhido, contador de rede | Cassette, hit/miss, sanitização e offline | Planejado com VCR.py |
+| Seção 3.8.10 / VHS | Reuso temporário de interações externas | TI-47-52, TI-59-61; CT-DES-03 | Integração, desempenho | Transporte dos SDKs | VCR.py 8.3.0, contador de rede | Cassette, hit/miss, sanitização e offline | TI-47-52 implementados e executados; TI-59-61 pendentes de gravação com os SDKs reais |
 | Contrato TTS / risco de canal adicional | WAV válido ou erro controlado; não substituir texto | TI-11-15 | Integração | GenerateSpeech/Gemini | HTTPX/SDK | WAV, headers, erro e ausência de chamada inválida | Planejado; não cria RF de voz de saída |
 | Seção 3.2.5 | Expiração do áudio incoming em sete dias | TI-62 | Integração | MinIO/S3 | boto3 e relógio/monitor | Política e expurgo real | Planejado |
 
