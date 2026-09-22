@@ -204,6 +204,18 @@ def conferir() -> int:
     leitor = Vhs(raiz=FITAS, modo=Modo.REPRODUZIR)
     gemini = os.environ.get("GEMINI_API_KEY", "irrelevante-no-replay")
     deepgram = os.environ.get("DEEPGRAM_API_KEY", "irrelevante-no-replay")
+
+    # O embedding é o único passo que NÃO recebe a credencial por parâmetro:
+    # `rag.embedder._cliente` a lê do ambiente por dentro e recusa subir sem
+    # ela, mesmo quando nada vai à rede. Sem este `setdefault`, `--conferir`
+    # quebra em qualquer lugar sem `.env` — foi assim que o pipeline do GitLab
+    # falhou, e não localmente, onde o `.env` existe no disco e é carregado.
+    #
+    # `setdefault`, e não atribuição: numa sessão de gravação a chave real já
+    # está no ambiente e é ela que deve valer. Aqui a de fachada só preenche o
+    # vazio, e não chega ao provedor — quem responde é a fita.
+    os.environ.setdefault("GEMINI_API_KEY", gemini)
+
     # Montado à mão, e não por `from_environment`, para que conferir o replay
     # não dependa de credencial: o modelo é o que importa aqui, porque é ele
     # que compõe a chave da fita, e a chave da API não chega ao provedor.
