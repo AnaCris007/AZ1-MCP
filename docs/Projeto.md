@@ -6256,7 +6256,7 @@ Não foram identificados testes automatizados que percorram conjuntamente login 
 
 Este artefato planeja a verificação do agente AZ1 a partir dos requisitos funcionais da Seção 2.2, dos requisitos não funcionais da Seção 2.3, da arquitetura e do desenvolvimento realizado. Abrange funcionalidade, desempenho, integração com serviços externos e usabilidade, definindo propósito, procedimentos, cenários positivos e negativos, critérios de aprovação e ferramentas.
 
-Os casos desta seção são planejados. Sua execução e o registro dos resultados seguem a estratégia incremental da Seção 3.8.10: planejamento na Sprint 3, execução na Sprint 4 e complementação na Sprint 5.
+O catálogo desta seção registra o planejamento da Sprint 3. A execução técnica da Sprint 4 e seus resultados estão na Seção 6.7, com complementação prevista na Sprint 5 conforme a estratégia incremental de 3.8.10. Estado de prontidão e resultado executado são registros distintos.
 
 **Convenção de ficha.** Cada caso é a união das tabelas de catálogo, procedimento, resultado e rastreabilidade pelo seu ID. Os campos comuns abaixo são herdados explicitamente; uma variante de entrada é uma execução adicional do mesmo caso, não um novo ID. `Tipo` significa funcional, RNF, desempenho, integração ou usabilidade; positivo, negativo, alternativo e erro são valores de `Cenário`. A coluna histórica `Estado` indica prontidão de implementação, nunca aprovação.
 
@@ -6292,7 +6292,7 @@ Os testes de componentes futuros serão aplicados após sua integração. As car
 
 ### 6.1.3 Ambientes, massas e critérios de entrada e saída
 
-Ambiente de referência: Python 3.12, pacote instalado com extra `dev`, frontend React/Vite, MinIO da composição Docker e PostgreSQL com extensão vetorial compatível com `vecs`. O repositório contém DDL relacional e RAG via `SUPABASE_DB_URL`; não contém serviço PostgreSQL no Compose. Para integração, usar base exclusiva de testes com as mesmas extensões, sem aplicar a carga que limpa dados em uma base compartilhada. A existência de scripts não comprova provisionamento.
+Ambiente de referência: Python 3.12, pacote instalado com extra `dev`, frontend React/Vite, MinIO da composição Docker e PostgreSQL com extensão vetorial compatível com `vecs`. O repositório contém DDL relacional, RAG via `SUPABASE_DB_URL` e serviço PostgreSQL 16 no Compose. Esse serviço usa imagem PostgreSQL padrão; sua presença não comprova provisionamento de pgvector nem do índice RAG. Para integração, usar base exclusiva de testes com as mesmas extensões, sem aplicar a carga que limpa dados em uma base compartilhada. A existência de scripts não comprova provisionamento.
 
 No host, o proxy Vite usa `http://127.0.0.1:8010`; iniciar a API nessa porta ou registrar `VITE_DEV_API_PROXY` explicitamente. No Docker, a API atende em `api:8000`. Homologação exige registrar URL, commit, sistema, CPU/RAM, workers, versões, limites, configuração não secreta, fuso e condição de rede. Valores de carga e amostra definidos pelo plano são propostas de engenharia para os ensaios, sem representar demanda medida do parceiro ou alterar metas oficiais.
 
@@ -6315,7 +6315,7 @@ No host, o proxy Vite usa `http://127.0.0.1:8010`; iniciar a API nessa porta ou 
 | Unidade backend | `unittest`, `IsolatedAsyncioTestCase` | Executor já usado nos testes Python síncronos e assíncronos | Utilizados em `tests/`; biblioteca padrão |
 | API/contrato | FastAPI `TestClient`, HTTPX, Pydantic | Rotas, validação e serialização; TestClient em processo não executa frontend | Declarados e utilizados; preparação com as dependências do projeto |
 | Mocks | `unittest.mock`, `dependency_overrides`, mocks do Vitest | Injetar falhas e inspecionar chamadas sem consumir provedores | Utilizados; não equivalem a chamadas reais |
-| Interface/componente | Vitest, Testing Library e jsdom | Interação React e cliente HTTP com dependências controladas | Declarados e configurados; três arquivos de teste; execução prevista com `npm test` |
+| Interface/componente | Vitest, Testing Library e jsdom | Interação React e cliente HTTP com dependências controladas | Declarados e configurados; cinco arquivos de teste; execução com `npm test`, evidenciada em 6.7 |
 | Ponta a ponta/usabilidade | Navegador, DevTools, cronômetro e ficha | Exercitar interface real, microfone, rede e compreensão por pessoa externa | Escolhidos para os ensaios manuais planejados |
 | Desempenho | HTTPX + `asyncio`, `perf_counter`, CSV | Uma única implementação Python de carga, reaproveitando a stack | Gerador proposto, ainda não implementado |
 | Recursos | `psutil` | Amostrar RSS e CPU de processos identificados | Proposto; ausente do ambiente inspecionado e das dependências declaradas |
@@ -6324,7 +6324,7 @@ No host, o proxy Vite usa `http://127.0.0.1:8010`; iniciar a API nessa porta ou 
 | VHS | VCR.py (`vcrpy`), conforme Seção 6.4.3 | Gravar/reproduzir HTTP externo em Python | Implementado em [`tests/vhs/`](../tests/vhs) na Sprint 4, com `vcrpy==8.3.0` no extra `dev`; interceptação do transporte `httpx` verificada nos dois SDKs. Integração das suítes de provedor pendente (TI-59) |
 | Cobertura | Inventário por ID e matriz de requisitos | Medir cobertura documental e executada separadamente | Este plano; nenhuma porcentagem de cobertura de linhas foi obtida |
 | Relatórios | CSV/JSON e Markdown | Guardar dados brutos e interpretação auditável por caso | Formato proposto; arquivos de resultados futuros não foram criados |
-| CI/CD | Serviço `tests` no perfil `ci` do Compose | Executar suíte na imagem de desenvolvimento | Configuração existe; pipeline da aplicação e execução automatizada não comprovados. O CI do `gitlab-issue-kit` não comprova CI do AZ1 |
+| CI/CD | Serviço `tests` no perfil `ci` do Compose e `.gitlab-ci.yml` da aplicação | Executar suíte na imagem de desenvolvimento e pipeline remoto | Configurações existem; campanha local em 6.7 não comprova resultado do pipeline remoto. O CI do `gitlab-issue-kit` não comprova CI do AZ1 |
 
 Comandos de preparação para ambiente futuro: `python -m pip install -e ".[dev]"`, `python -m nltk.downloader stopwords rslp`, `python -m spacy download pt_core_news_sm` e `npm ci` em `src/frontend`. Preparar essas dependências antes de implementar e executar as suítes descritas abaixo.
 
@@ -6459,7 +6459,7 @@ Um caso negativo só é aprovado quando o sistema apresenta o **comportamento pr
 
 #### Quadro geral dos casos planejados
 
-A coluna **Sprint** registra a janela planejada, não a data em que o componente necessariamente existe. **Estado** indica prontidão do fluxo: executável depende de ambiente/massa válidos, parcial depende de integração e planejado depende de construção. Todos os casos sistêmicos continuam não executados; o cronograma e os executores serão registrados na abertura da campanha.
+A coluna **Sprint** registra a janela planejada, não a data em que o componente necessariamente existe. **Estado** indica prontidão do fluxo: executável depende de ambiente/massa válidos, parcial depende de integração e planejado depende de construção. No corte da Sprint 3, os casos sistêmicos ainda não tinham execução registrada. A campanha da Sprint 4, seu executor, resultados e bloqueios estão documentados em 6.7; esta coluna histórica não representa aprovação.
 
 | ID | RF | Condição | Tipo | Nível | Sprint | Estado |
 |---|---|---|---|---|---|---|
@@ -7082,7 +7082,7 @@ A execução dos testes de funcionalidade na Sprint 4 é considerada concluída 
 | Condição | Definição |
 |---|---|
 | Cobertura executada | Todos os casos aplicáveis ao commit candidato tiveram execução ou bloqueio registrado; aprovação parcial não equivale a aprovação do caso inteiro |
-| Tratamento das reprovações | Cada caso reprovado possui issue aberta no GitLab, com a evidência anexada e a classificação entre defeito de implementação e divergência de requisito |
+| Tratamento das reprovações | Cada caso reprovado possui registro local com evidência, classificação entre defeito de implementação e divergência de requisito e ação corretiva proposta. Nesta campanha acadêmica, o registro está em `docs/evidencias/testes-funcionais/defeitos.md`; não se exige abertura de issue remota |
 | Registro dos não executados | Cada caso marcado como *Planejado* permanece no plano com a sprint de execução atualizada, e nenhum é retirado sem decisão registrada na Seção 7 |
 
 Nenhum caso é considerado aprovado por inspeção de código. A aprovação exige execução com evidência registrada, o que vale inclusive para os casos cujo comportamento já está coberto pela suíte de unidade: a proximidade entre um teste de unidade existente e um caso funcional não dispensa a execução do caso.
@@ -8278,6 +8278,299 @@ Os resultados serão registrados por caso, contendo versão, ambiente, entrada u
 Os testes com mocks e replay serão complementados por chamadas reais controladas para verificar os contratos externos. As sessões com usuários avaliarão somente funcionalidades disponíveis na versão apresentada. A amostra de usabilidade e a base sintética delimitam as conclusões ao contexto acadêmico do projeto.
 
 ---
+
+## 6.7 Execução dos testes sistêmicos — campanha funcional da Sprint 4
+
+### 6.7.1 Objetivo, versão e atualização do planejamento
+
+Esta seção registra a execução técnica da campanha funcional iniciada em
+18/09/2026, dando continuidade às Seções 6.1, 6.2 e 6.6. O objetivo é verificar
+o comportamento da solução pelos critérios dos requisitos, identificar
+problemas antes da apresentação do protótipo e preservar evidências
+reproduzíveis. A execução técnica utiliza os scripts e comandos documentados
+abaixo; seus resultados não representam avaliação por usuários externos.
+
+Os resultados
+não se estendem a versões posteriores. Não se alteraram os critérios oficiais
+para acomodar o comportamento observado. A orientação de entrega recebida
+exige ferramentas justificadas, casos completos, scripts, evidências,
+participação externa e análise crítica; esses elementos foram organizados nas
+subseções abaixo. Não foi fornecido feedback específico do professor que
+permita atribuir uma alteração a essa revisão.
+
+A entrega é a execução e documentação local dos
+testes funcionais disponíveis nesta versão do protótipo acadêmico. Os casos
+futuros continuam no inventário com suas dependências; sua implementação não
+faz parte desta task. Falhas ficam registradas localmente com evidências e
+melhorias propostas, sem operações no GitLab. A execução pode ser encerrada
+com reprovações e bloqueios documentados; isso não significa que os requisitos
+tenham sido integralmente atendidos. Sessões com participantes pertencem à
+parte de usabilidade do artefato maior e não serão inventadas para encerrar
+a campanha técnica.
+
+| Planejamento anterior | Atualização operacional desta campanha |
+|---|---|
+| SSO e persistência descritos em alguns trechos como futuros | Código atual possui autenticação e registro lateral do chat. Prontidão é conferida por caso; presença de código não equivale a aprovação |
+| Ausência de PostgreSQL no Compose declarada em 6.1.3 | Compose atual contém PostgreSQL 16. Utilizou-se outro contêiner, exclusivo de testes, para a suíte destrutiva |
+| Três arquivos de teste frontend e CI ainda futuro | Há cinco arquivos frontend e configuração `.gitlab-ci.yml`. Esta campanha produziu logs locais, sem afirmar execução do pipeline remoto |
+| Estado histórico do catálogo | Preservado como fotografia do planejamento; o resultado atual está na matriz de 6.7.3 |
+| Casos de RF06 com escrita e autorização por cargo | Seis IDs históricos continuam fora do recorte por D04/D07; RF06-06 continua aplicável ao MVP |
+| Evidências previstas sem arquivos | Scripts, matrizes, observáveis HTTP e logs versionados em `docs/evidencias/testes-funcionais/` |
+
+As correções operacionais acima prevalecem sobre as afirmações históricas de
+prontidão para esta rodada. As fichas de 6.2.3 e 6.2.6 continuam sendo o oráculo.
+A campanha não substitui desempenho, fidelidade de transcrição, avaliação
+estatística cega, integração externa real ou usabilidade de 6.3 a 6.5.
+
+### 6.7.2 Ferramentas, ambiente e massas efetivamente utilizados
+
+| Ferramenta / biblioteca | Uso e justificativa | Limite da evidência |
+|---|---|---|
+| Docker e imagem `dev` do Dockerfile da API | Dependências instaladas conforme `pyproject.toml`, Python 3.12; evita usar Python 3.14 do host sem dependências | Build local, sem comprovar implantação em nuvem |
+| `unittest` | Regressão existente com logs detalhados e banco dedicado | Testes de componente não substituem casos funcionais |
+| FastAPI `TestClient` / HTTPX | Requisição, validação, rota e serviço reais em processo; resposta HTTP e efeitos registrados por variante | Não percorre proxy/navegador; autenticação de campanha injetada |
+| `wave`, PyAV e boto3 | WAVs binariamente válidos, sondagem real e releitura independente no MinIO | PCM sintético não comprova reconhecimento de fala |
+| MinIO real, release `2025-09-07T16-13-09Z` | Bucket exclusivo; comprovar persistência e ausência de objetos rejeitados | Não comprova armazenamento de produção |
+| PostgreSQL 16 Alpine e psycopg | DDL, massa sintética, políticas e regressão de persistência | Banco relacional dedicado; índice vetorial não provisionado |
+| Vitest, Testing Library e jsdom | Verificar confirmação, edição/descarte e comunicação de falha na interface | Microfone, permissões e navegador reais não exercitados |
+| JSON, CSV e Markdown | Observáveis brutos por variante, catálogo estável e agregação por ID | Contagens não são cobertura de linhas |
+
+O ambiente é local, em macOS ARM64 com contêineres Linux. Versões e recursos
+do Docker estão nos [registros de versão](evidencias/testes-funcionais/docker-versao.log)
+e [recursos](evidencias/testes-funcionais/docker-recursos.log); os recursos
+registrados pertencem à VM Docker e não são uma medição de desempenho.
+A rede dedicada
+`az1-functional-test` não publica o banco nem o MinIO para serviços externos.
+Não se carregou `.env` no backend (`PYTHON_DOTENV_DISABLED=1`), não se alterou
+Supabase compartilhado nem se consumiram Deepgram/Gemini reais. O Python do
+host foi usado apenas para extração/consolidação com biblioteca padrão.
+
+A massa de áudio é gerada pelo script: WAV mono PCM, vazio, RIFF truncado,
+assinatura Ogg, arquivo de 12 MiB, WAV de 360 segundos, WAVs de 300 e 300,001
+segundos, arquivo válido de exatamente 10 MiB e variante de 10 MiB + 1 byte.
+O teste de tamanho usa PCM a 48 kHz para não ultrapassar o limite de duração.
+As entradas textuais incluem cinco consultas sintéticas, vazio, espaços,
+3.999/4.000/4.001 caracteres e espaços externos. Hash, tamanho e resposta são
+registrados no JSON; mensagens extensas são representadas por comprimento e
+hash, evitando logs redundantes. Cada variante observa novos objetos e
+chamadas ao gerador quando aplicável.
+
+Para RF01-04, o lote C de avaliação estatística foi substituído operacionalmente
+por cinco consultas sintéticas fixadas no script, exclusivamente para verificar
+transporte e resposta textual. Isso não habilita os casos de classificação
+RF02-01 a 03 nem comprova conteúdo correto de negócio. A alteração de massa
+e o modelo controlado limitam expressamente a aprovação desse ensaio.
+
+Os modelos de texto/fala da campanha são dublês determinísticos; o
+orquestrador Gemini é real nos ensaios de recusa/esclarecimento, com recuperação
+instrumentada. A falha STT é injetada no cliente do provedor sobre objeto real,
+sem cassette VHS. Não se apresenta essa injeção como execução do módulo VHS.
+
+### 6.7.3 Casos completos e matriz de execução
+
+Os 62 IDs são preservados, com propósito, entradas, pré-condições, passos,
+resultado e critério nas Seções 6.2.3 e 6.2.6. As massas e passos comuns estão
+em 6.1.3 e 6.2.3. O [catálogo operacional detalhado](evidencias/testes-funcionais/catalogo.md)
+reúne essas fichas sem redefinir os requisitos. A [matriz CSV](evidencias/testes-funcionais/matriz.csv)
+registra prioridade, resultado, motivo, variantes, evidência e próxima etapa.
+
+**Convenção de resultados.** Aprovado controlado significa que todos os
+observáveis do caso passaram no recorte descrito, com dependências externas
+explicitamente controladas. Parcial significa que variantes passaram, mas
+faltam pré-condições ou observáveis; não conta como aprovação integral.
+Reprovado indica divergência executada e demonstrável. Bloqueado indica falta
+de pré-condição ou instrumento. Fora do recorte identifica os seis casos
+históricos excluídos do MVP. Não há aprovação por inspeção de código.
+
+<!-- MATRIZ-FUNCIONAL-INICIO -->
+**Resultado agregado:** 5 parciais; 37 bloqueados; 12 aprovados no recorte controlado; 2 reprovados; 6 fora do recorte. São 56 IDs aplicáveis e seis históricos fora do recorte. Aprovação controlada não equivale a homologação sistêmica.
+
+| Caso | Prioridade | Resultado | Variantes | Motivo / dependência |
+|---|---|---|---:|---|
+| CT-RF01-01 | Alta | Parcial | 1 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF01-02 | Alta | Bloqueado | 0 | Falta execução navegador/microfone real ou gravações faladas nos quatro formatos; comparação comum de intenção pendente. |
+| CT-RF01-03 | Alta | Parcial | 1 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF01-04 | Alta | Aprovado controlado | 5 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-05 | Alta | Bloqueado | 0 | Falta execução navegador/microfone real ou gravações faladas nos quatro formatos; comparação comum de intenção pendente. |
+| CT-RF01-06 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-07 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-08 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-09 | Alta | Aprovado controlado | 2 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-10 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-11 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-12 | Alta | Parcial | 1 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF01-13 | Alta | Aprovado controlado | 2 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-14 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-15 | Alta | Parcial | 2 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF01-16 | Alta | Aprovado controlado | 4 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-17 | Alta | Aprovado controlado | 2 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-18 | Alta | Aprovado controlado | 10 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-19 | Alta | Parcial | 2 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF02-01 | Alta | Bloqueado | 0 | Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito. |
+| CT-RF02-02 | Alta | Bloqueado | 0 | Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito. |
+| CT-RF02-03 | Alta | Bloqueado | 0 | Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito. |
+| CT-RF02-04 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-05 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-06 | Alta | Reprovado | 1 | Observável obrigatório divergente; consultar funcionais.json e registro de defeitos. |
+| CT-RF02-07 | Alta | Reprovado | 1 | Observável obrigatório divergente; consultar funcionais.json e registro de defeitos. |
+| CT-RF02-08 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-09 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-10 | Alta | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF02-11 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-12 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-13 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-14 | Alta | Bloqueado | 0 | Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito. |
+| CT-RF03-01 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-02 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-03 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-04 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-05 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-06 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF04-01 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-02 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-03 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-04 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-05 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-06 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-07 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-08 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF05-01 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-02 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-03 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-04 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-05 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-06 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-07 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-08 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-09 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF06-01 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-02 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-03 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-04 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-05 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-06 | Média | Bloqueado | 0 | Fonte dedicada para comparação antes/depois e diálogo explicativo do MVP ainda precisam ser exercitados conjuntamente. |
+<!-- MATRIZ-FUNCIONAL-FIM -->
+
+As prioridades desta rodada adotam ordenação conservadora: RF01/RF02/RF03/RF05
+antes de RF04/RF06, em função do fluxo central, fundamentação e proatividade.
+Não alteram a prioridade comercial nem os critérios qualitativos de 6.6.2.
+Nos casos bloqueados, a próxima janela é Sprint 4/5 conforme disponibilidade;
+prazo e responsável humano devem ser confirmados no Kanban antes da execução.
+
+### 6.7.4 Scripts, estrutura e reprodução
+
+| Script / arquivo | Responsabilidade |
+|---|---|
+| `scripts/executar_testes_funcionais.py` | Gerar massas, executar variantes HTTP com serviços reais e dublês identificados, comparar resultados/efeitos e escrever JSON/log; retorno 1 para reprovação e 2 para falha do instrumento |
+| `scripts/consolidar_testes_funcionais.py` | Extrair todas as fichas, validar os 62 IDs e gerar catálogo JSON/Markdown e matriz CSV/Markdown; nunca converter parcial/bloqueio em aprovação |
+| `src/frontend/src/pages/AgentPage.test.jsx` | Regressão de transcrição e chat; acrescenta correção confirmada CT-RF01-19 e feedback de rede CT-RF01-15 |
+| `tests/` | Suíte de regressão existente, executada com `TEST_DATABASE_URL` dedicado |
+
+O [procedimento de reprodução](evidencias/testes-funcionais/REPRODUCAO.md)
+contém preparação, comandos, isolamento e interpretação dos códigos de saída.
+O [manifesto da rodada](evidencias/testes-funcionais/manifesto.json) identifica
+commit base, hashes dos arquivos de execução e evidências finais, permitindo
+distinguir esta versão de scripts e resultados de alterações posteriores.
+Cada ensaio constrói suas pré-condições. O script funcional conta efeitos
+antes/depois de cada requisição e relê o conteúdo aceito por S3. Sob o limite
+de mensagem, o modelo controlado deve ser chamado; acima dele ou com vazio,
+não deve ser consumido. Saídas e oráculos devem ser preservados antes de uma
+nova rodada. Mudanças de implementação exigem reteste identificado.
+
+### 6.7.5 Registros, resultados e ações corretivas
+
+<!-- RESULTADOS-FUNCIONAIS-INICIO -->
+| Execução | Resultado desta rodada | Evidência |
+|---|---|---|
+| Variantes funcionais HTTP | 35 variantes; 33 passaram nos observáveis técnicos e 2 reprovaram. Agregação por caso somente em 6.7.3 | [JSON](evidencias/testes-funcionais/funcionais.json), [log](evidencias/testes-funcionais/funcionais.log) |
+| Regressão backend | 502 testes: aprovados, sem falhas nem testes ignorados; PostgreSQL real exclusivo | [Log final](evidencias/testes-funcionais/backend.log) |
+| Regressão frontend | 20/20 testes passaram, 0 falhas; jsdom e dependências controladas | [JSON](evidencias/testes-funcionais/frontend.json), [log](evidencias/testes-funcionais/frontend.log) |
+| Build API | Imagem dev construída com as dependências do projeto | [Log](evidencias/testes-funcionais/build-api.log) |
+| DDL, massa e políticas | Executados no PostgreSQL de testes; índice vetorial ausente, comparação RAG não executada | [DDL](evidencias/testes-funcionais/database-ddl.log), [massa](evidencias/testes-funcionais/database-massa.log), [políticas](evidencias/testes-funcionais/database-permissoes.log) |
+| Build frontend | Aprovado; aviso sobre bundle superior a 500 kB | [Log](evidencias/testes-funcionais/frontend-build.log) |
+| Lint frontend | Comando terminou com sucesso, mas emitiu oito avisos React; não apresentar como zero avisos | [Log](evidencias/testes-funcionais/frontend-lint.log) |
+| Navegador | Envio real com API ausente, pelo harness; erro genérico e nenhum conteúdo fictício; resultado parcial | [Registro](evidencias/testes-funcionais/navegador.json), [captura](evidencias/testes-funcionais/CT-RF01-15.png) |
+
+A primeira rodada da regressão teve oito erros de preparação por arquivos não montados. Os mounts foram corrigidos e a suíte inteira foi repetida; o [log inicial](evidencias/testes-funcionais/backend-rodada1.log) foi preservado. A repetição do instrumento funcional também revelou bucket já existente; corrigiu-se a preparação sem alterar os oráculos. Os registros de desenvolvimento `funcionais-rodada1.*` são anteriores à revisão de rastreabilidade: a entrada de projeto ausente estava identificada incorretamente como RF02-08, corrigida para RF02-06 na rodada final. Somente `funcionais.json`/`funcionais.log` finais alimentam a matriz.
+
+As duas reprovações finais são CT-RF02-06 (consulta sem projeto e sem esclarecimento prévio) e CT-RF02-07 (busca para pedido fora do domínio). A recuperação foi chamada uma vez em cada cenário; a recusa por falta de evidência não elimina essa divergência. Correção e reteste funcionais permanecem pendentes.
+<!-- RESULTADOS-FUNCIONAIS-FIM -->
+
+O controle de abas inicialmente retornou `No browser is available`. O acesso
+ao Chrome nativo via CUA permitiu executar o envio com API indisponível pelo
+harness de desenvolvimento, preservando `AgentPage` e o cliente HTTP reais,
+sem representar login SSO. A [captura de CT-RF01-15](evidencias/testes-funcionais/CT-RF01-15.png)
+mostra erro genérico e ausência de conteúdo fictício; a barra do navegador foi
+recortada. O [registro do ensaio](evidencias/testes-funcionais/navegador.json)
+e o [log do proxy](evidencias/testes-funcionais/navegador-proxy.log) documentam
+`ECONNREFUSED`. Não houve execução de microfone nem sessão humana externa.
+Os casos de interface permanecem parciais. Evidências HTTP registram respostas,
+hashes e efeitos, sem tokens ou chaves reais.
+
+Problemas funcionais e ações propostas são registrados no
+[registro de defeitos](evidencias/testes-funcionais/defeitos.md). Esse arquivo
+é o registro de problemas desta campanha. Correções de regras de negócio
+ficam como melhorias propostas e exigirão reteste quando implementadas;
+nenhuma reprovação foi convertida em aprovação para concluir a documentação.
+
+### 6.7.6 Execução com usuários externos e melhorias de interface
+
+Não foram realizadas sessões com usuários externos nesta rodada. Não existem
+participantes, respostas SUS, feedback humano ou aceite produzidos pela
+automação. Essa parte da entrega permanece pendente e impede afirmar
+conclusão do artefato sistêmico completo. O
+[roteiro e a ficha de sessão](evidencias/testes-funcionais/sessoes-externas.md)
+preparam cinco participantes externos, consentimento, tarefas disponíveis,
+gabarito, observação, tempo, erros, ajuda, feedback e SUS conforme 6.5.
+
+O procedimento será aplicado por moderador e observador na versão identificada,
+preservando feedback literal autorizado e evidências sanitizadas. Problemas
+que impeçam concluir tarefas ou entender erros/fontes terão prioridade de
+correção na Sprint 4; acessibilidade, responsividade e refinamentos serão
+avaliados na Sprint 5 conforme capacidade da equipe. As melhorias derivadas
+dessas sessões serão documentadas com issue, responsável, estimativa e reteste.
+Não se atribui a usuários uma melhoria sugerida apenas por inspeção técnica.
+
+### 6.7.7 Discussão crítica da abrangência e condição de liberação
+
+O inventário cobre os seis RFs e preserva 56 casos no recorte do MVP. Essa é
+cobertura documental, não aprovação dos seis requisitos. A execução
+controlada tem maior força no RF01: valida conteúdo binário, limites exatos,
+serialização de erros, persistência real e ausência de consumo indevido.
+Ainda faltam gravações faladas nos quatro formatos, reconhecimento real,
+microfone e fluxo completo no navegador. A síntese textual controlada não
+mede qualidade nem fundamentação das respostas de negócio.
+
+A instrumentação de RF02 permite detectar consulta prematura às fontes mesmo
+quando a resposta final é uma recusa segura. A base cega não fornecida impede
+validar estatisticamente classificação/entidades; reutilizar a base saturada
+seria uma conclusão fraca. RF03 exige massa vetorial dedicada, referências
+recuperáveis e datas conhecidas, inclusive versões conflitantes; passagem nos
+testes de citações de componente não garante esse requisito no sistema.
+
+RF04 depende de extração/orquestração por campo e massa própria. RF05 depende
+de agendamento, elegibilidade e entrega real, incluindo duplicidade e
+recuperação; receptor de webhook e cadastro de assinantes não bastam. RF06
+com escrita permanece fora do MVP; proteção sem escrita e explicação do limite
+devem ser exercitadas conjuntamente no caso RF06-06.
+
+A regressão e os ensaios funcionais detectam classes diferentes de problema.
+Uma suíte sem falhas pode coexistir com descumprimento de RF02, bloqueios de
+RF03/RF04/RF05 e ausência de avaliação humana. Os denominadores devem excluir
+somente os seis IDs históricos, manter os bloqueios visíveis e separar
+variantes de casos. Não se publica percentual de cobertura de linhas,
+fidedignidade de fala ou sucesso sistêmico a partir destas contagens.
+
+**Conclusão da campanha funcional:** a execução técnica local e seu registro
+estão concluídos para a versão disponível, com 12 casos aprovados no recorte
+controlado, cinco parciais, duas reprovações, 37 bloqueios e seis IDs fora do
+MVP. Todos os IDs receberam resultado ou justificativa; os problemas têm
+evidência e ação proposta. O protótipo não atende integralmente aos seis RFs.
+As próximas melhorias são esclarecer o projeto antes da busca, reconhecer
+pedidos fora do domínio e completar sugestões/notificações conforme a equipe
+implementar esses fluxos. O relatório permite apresentar o que foi testado e
+os limites da versão, sem afirmar aprovação integral da solução. A avaliação
+com usuários externos permanece pendente na parte de usabilidade do artefato.
 
 # 7. Registro de Decisões
 
