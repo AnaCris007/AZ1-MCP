@@ -232,7 +232,19 @@ class TestErrosDaBuscaRag(unittest.TestCase):
                 buscador = _BuscadorControlado(erro=erro)
                 http = cliente({get_document_searcher: lambda: buscador})
 
-                resposta = http.post("/api/v1/rag/search", json={"query": "avanço"})
+                # `assertLogs` CAPTURA o registro em vez de deixá-lo subir até o
+                # stderr — e isso não é cosmético. O manipulador global de
+                # `main.py` registra a exceção com `exc_info`, então a URI
+                # plantada acima apareceria na saída do executor e, dali, no
+                # arquivo de evidência versionado em `resultados/testes/`.
+                #
+                # Foi o que aconteceu: dois logs commitados carregaram a URI até
+                # o histórico do Git, contra o item 8 do contrato da Seção 6.4.3
+                # ("nunca publicar ... URI de banco"). O marcador continua
+                # realista, porque é disso que o caso precisa; o que muda é que
+                # ele não escapa mais do processo de teste.
+                with self.assertLogs(level="ERROR"):
+                    resposta = http.post("/api/v1/rag/search", json={"query": "avanço"})
 
                 self.assertEqual(resposta.status_code, 500)
                 corpo = resposta.json()
