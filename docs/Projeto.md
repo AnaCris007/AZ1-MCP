@@ -89,6 +89,8 @@
 - [6.4 Planejamento dos Testes de Integração](#64-planejamento-dos-testes-de-integração)
 - [6.5 Planejamento dos Testes de Usabilidade](#65-planejamento-dos-testes-de-usabilidade)
 - [6.6 Matriz de Cobertura Planejada](#66-matriz-de-cobertura-planejada)
+- [6.7 Execução dos testes sistêmicos — campanha funcional da Sprint 4](#67-execução-dos-testes-sistêmicos--campanha-funcional-da-sprint-4)
+- [6.8 Ferramentas e Bibliotecas Utilizadas](#68-ferramentas-e-bibliotecas-utilizadas)
 
 </details>
 
@@ -8571,6 +8573,124 @@ pedidos fora do domínio e completar sugestões/notificações conforme a equipe
 implementar esses fluxos. O relatório permite apresentar o que foi testado e
 os limites da versão, sem afirmar aprovação integral da solução. A avaliação
 com usuários externos permanece pendente na parte de usabilidade do artefato.
+
+## 6.8 Ferramentas e Bibliotecas Utilizadas
+
+Esta subseção registra as ferramentas e bibliotecas com que os testes planejados na Seção 6 foram executados, e serve de referência comum às campanhas registradas nas subseções anteriores. O plano não é reescrito: a Seção 6 permanece como foi entregue na Sprint 3, porque um plano corrigido depois de conhecido o resultado deixa de servir como critério. O que esta seção faz é declarar, sobre uma versão identificada do sistema, o que foi executado, com que instrumento, o que o instrumento mostrou e o que ficou de fora.
+
+Os identificadores de caso (`CT-RFxx-nn`, `CT-RNFxx-P/N`, `TI-nn` e `TU-nn`) são os mesmos da Seção 6 e não são renumerados, conforme a regra registrada em 6.2.5. Divergências entre o que o plano supunha e o que o repositório contém são registradas como correção explícita da premissa, e não por edição silenciosa da seção anterior.
+
+Esta subseção corresponde ao primeiro item do artefato: definir e justificar as ferramentas e bibliotecas usadas na execução dos testes e demonstrar o uso dos frameworks de automação. Ela dá continuidade ao quadro planejado em 6.1.4, onde cada ferramenta havia sido registrada com um **status verificável**; aqui esse status é reconferido contra o repositório e contra execuções reais, e cada linha passa a ter versão resolvida, local de uso e forma de conferência.
+
+O princípio que organiza a escolha é o mesmo adotado desde a Seção 3.5: **não acrescentar ferramenta que a linguagem, o framework da aplicação ou a pilha já instalada resolvam**. Cada dependência de teste precisa ser instalada, fixada, atualizada e explicada a quem entra no projeto; quando a biblioteca padrão faz o mesmo trabalho, o custo dessa manutenção não se paga. É por isso que a suíte de backend roda em `unittest` e não em `pytest`, e que a medição de memória do pipeline usa `tracemalloc` e não `psutil`.
+
+### 6.8.1 Execução de verificação que sustenta esta seção
+
+As afirmações desta subseção foram conferidas em uma execução real, e não por leitura de configuração. O registro abaixo identifica a versão avaliada, de modo que qualquer integrante possa repeti-la.
+
+| Item | Valor registrado |
+|---|---|
+| Data e responsável | 19/09/2026, execução local durante a Sprint 4 |
+| Versão avaliada | Commit `f1b3591`, branch `docs/ferramentas-e-bibliotecas-para-testes` |
+| Máquina | Ubuntu 24.04.5 LTS, 12 threads, 15 GB de RAM |
+| Interpretador e pacote | Python 3.12.3, pacote `az1` instalado em modo editável (`pip install -e ".[dev]"`) |
+| Node e npm | Node v24.10.0, npm 11.6.1 |
+| Docker | Docker 29.8.1 |
+
+| Comando executado | Resultado observado |
+|---|---|
+| `python -m unittest discover -s tests` | **502 testes em 35,074 s**, 1 falha e 18 pulados |
+| `python -m unittest discover -s tests -p "test_integracao_*.py"` | **55 testes em 0,495 s**, 37 executados e 18 pulados, sem falha |
+| `npm test` em `src/frontend` | **5 arquivos e 18 testes em 2,02 s**, todos aprovados, código de saída 0 |
+
+Os 18 pulos são os casos relacionais que exigem base dedicada, e a falha é o guarda de reprodutibilidade do ambiente; os dois mecanismos estão descritos em 6.8.4. Os 43 módulos de `tests/` produzem 502 casos porque parte deles é gerada por mixins de contrato reutilizados por mais de uma implementação.
+
+### 6.8.2 Ferramentas e bibliotecas adotadas, com justificativa
+
+O quadro abaixo substitui o de 6.1.4 para efeito de execução. A coluna de verificação indica como conferir a afirmação sem depender deste documento.
+
+| Camada | Ferramenta e versão resolvida | Por que esta escolha | Onde é usada | Como verificar |
+|---|---|---|---|---|
+| Executor da suíte de backend | `unittest` (biblioteca padrão do Python 3.12.3) | Não acrescenta dependência, roda em qualquer ambiente Python e já era o executor desde a Sprint 2; trocar por `pytest` exigiria reescrever 43 módulos sem ganho de capacidade para os casos planejados | Todos os módulos de `tests/` | `python -m unittest discover -s tests` |
+| Casos assíncronos | `unittest.IsolatedAsyncioTestCase` | Exercita as corrotinas `transcribe` e `analyze` diretamente, sem passar pelo `TestClient`, isolando o serviço da camada HTTP | `tests/test_transcription_service.py` e `tests/test_analysis_service.py` | `grep -l IsolatedAsyncioTestCase tests/*.py` |
+| Contrato das rotas HTTP | `fastapi.testclient.TestClient` (FastAPI 0.141.1, Starlette 1.6.0) | Sobe a aplicação em processo e exercita roteamento, injeção de dependências, serialização Pydantic e os manipuladores de exceção de `main.py` sem porta de rede aberta | 14 dos 43 módulos | `grep -l TestClient tests/*.py` |
+| Transporte do cliente de teste | HTTPX 0.28.1 | Dependência de transporte do `TestClient` e o mesmo cliente usado pelo gerador de carga de 6.3.2, o que evita manter dois clientes HTTP no projeto. A Starlette 1.6.0 anuncia `httpx2` como sucessor; a versão fica congelada durante a campanha para que uma troca de transporte não seja confundida com variação de latência da aplicação | Indireto, via `TestClient`; direto em `src/services/alerta_service.py` | `pip show httpx` |
+| Validação de payload | Pydantic 2.13.4 | Os schemas de `src/schemas` são o mesmo oráculo usado em produção e no teste: um corpo que desserializa no schema é um corpo válido por definição do contrato, sem asserção manual campo a campo | Suítes de API | Módulos `test_*_api.py` |
+| Substituição de dependências | `app.dependency_overrides` (FastAPI) | Ponto de extensão do próprio framework: troca o adaptador real pelo dublê sem alterar o código da rota nem variáveis de ambiente, e é revertido ao fim do caso | 14 módulos | `grep -l dependency_overrides tests/*.py` |
+| Injeção de falhas e espionagem de chamadas | `unittest.mock` (biblioteca padrão) | Produz o que uma gravação HTTP não produz: exceção sem resposta, tempo limite sem retorno e inspeção dos argumentos efetivamente passados ao provedor | 17 módulos | `grep -lE "unittest\.mock|patch\(" tests/*.py` |
+| Gravação e reprodução de chamadas externas | VCR.py (`vcrpy`), conforme o contrato de 6.4.3 | Um dublê mostra como a aplicação reage, não o que o provedor devolve. O VCR grava a interação real uma vez e a reproduz em `record_mode="none"` com a rede bloqueada: o teste fica determinístico, roda offline e não consome cota de Deepgram e Gemini a cada execução | Módulo `tests/test_integracao_vhs.py` e cassettes sanitizados em `tests/fixtures/vhs/`, construídos nesta sprint, separados por provedor, modelo e cenário | `python -m unittest tests.test_integracao_vhs -v` |
+| Interface e componentes | Vitest 5.0.0, Testing Library React 16.3.3, `user-event` 14.6.7, `jest-dom` 7.0.1, jsdom 29.1.1 | Reaproveita a configuração do Vite já usada no build, sem um segundo empacotador só para teste; a Testing Library consulta a árvore por papel e texto acessível, o que faz o teste falhar quando o usuário deixa de enxergar o elemento, e não quando a classe CSS muda | `src/frontend/src`, 5 arquivos `*.test.*` | `npm test` em `src/frontend` |
+| Métricas do classificador | scikit-learn 1.9.0 e NumPy 2.5.2 | São as bibliotecas que treinam o modelo; usar as mesmas para medir evita divergência entre a métrica do experimento e a do teste | `src/pln/metricas.py` (`f1_score`, `classification_report`, `StratifiedKFold`, `cross_val_predict`) | `make metricas` ou `python -m pln.metricas` |
+| Latência e memória do pipeline | `time.perf_counter` e `tracemalloc` (biblioteca padrão) | Relógio monotônico para percentis (p50, p80, p95) e medição de pico sem acrescentar `psutil` à stack fixada por versão exata. O limite é declarado no próprio módulo: `tracemalloc` contabiliza alocação do Python e não a feita em C por NumPy e scikit-learn, servindo para comparar razões entre tamanhos de dataset e não para dimensionar contêiner | `src/pln/bancada.py` | `make bancada` ou `python -m pln.bancada` |
+| Carga e latência HTTP | HTTPX assíncrono, `asyncio`, `time.perf_counter` e `csv` (biblioteca padrão) | Uma única implementação Python de carga, reaproveitando o cliente já usado pela suíte em vez de acrescentar JMeter ou Locust à pilha. O registro por requisição, e não só o agregado, é o que permite separar latência de sucesso da latência de erro | `scripts/carga_testes.py`, construído nesta sprint conforme o protocolo de sete passos de 6.3.2, com saída CSV por requisição | `python scripts/carga_testes.py` e os CSVs anexados às evidências |
+| CPU e memória residente dos processos | `psutil` | `tracemalloc` cobre a alocação do Python na bancada de PLN, mas não enxerga o que NumPy e scikit-learn alocam em C nem o consumo do processo que atende às requisições. O RSS exposto por `memory_info` é o que o RNF10 cobra | Coleta de RSS e CPU em processo monitor separado durante os ensaios RNF10, declarado em `pyproject.toml` e `requirements.txt` junto da implementação do gerador | Versão registrada na ficha de cada rodada |
+| Persistência real de objetos | Docker Compose 29.8.1 com MinIO e `minio-init` | Releitura do bucket por um cliente independente do usado pela aplicação; um mock de S3 aprovaria código que nunca gravou nada | Serviços `minio` e `minio-init` do `docker-compose.yml` | `docker compose up -d minio minio-init` |
+| Conferência externa do bucket | boto3 1.43.89 | Cliente separado do que a aplicação usa, para que a verificação não herde o mesmo defeito do código sob teste | Suítes de armazenamento | `tests/test_storage_service.py` |
+| Persistência real relacional | PostgreSQL 16 (`postgres:16-alpine`) e psycopg 3.3.5 com *pool* | O banco em contêiner executa as restrições de integridade, as permissões e o comportamento de concorrência que um dublê em memória não reproduz; as provas de reivindicação concorrente do TI-37 e TI-38 dependem de duas conexões reais | Serviço `postgres` do `docker-compose.yml`; `tests/test_integracao_webhook_postgres.py` | `docker compose up -d postgres` e `TEST_DATABASE_URL=... python -m unittest tests.test_integracao_webhook_postgres` |
+| Recuperação vetorial | vecs 0.4.5 e SQLAlchemy 2.0.52 | Mesma biblioteca de indexação usada pelo pipeline RAG; a suíte compara o que foi indexado com o que é recuperado | `src/rag`, `tests/test_rag_*.py` | `python -m unittest discover -s tests -p "test_rag_*.py"` |
+| Análise estática | Ruff 0.16.2, fixado | Substitui a combinação de linter, ordenador de imports e verificador de sintaxe moderna por uma ferramenta só; a versão é fixada porque, sem pino, uma versão nova altera o resultado do lint sem ninguém ter tocado no código | `ruff.toml` na raiz, regras `E4`, `E7`, `E9`, `F`, `I`, `UP`, `SIM` e `EXE` | `ruff check src tests` |
+| Automação da execução | GitLab CI (`.gitlab-ci.yml`) e serviço `tests` do perfil `ci` do Compose | O mesmo comando de suíte roda no pipeline e na imagem de desenvolvimento, de modo que "passa na minha máquina" e "passa na CI" não sejam execuções diferentes | Estágios `build`, `test` e `quality`; `make test` | `.gitlab-ci.yml` e `docker compose --profile ci run --rm tests` |
+| Registro dos resultados | Markdown e CSV gerados, nunca editados à mão | Relatório escrito por pessoa perde a correspondência com a medição na primeira atualização esquecida | `resultados/` | `resultados/ajuste_fino.md`, `resultados/metricas_rnf03.md`, `resultados/comparativo_preprocessamento.csv` |
+| Medida de cobertura | Inventário por identificador de caso e matriz da Seção 6.6 | Decisão mantida do plano: cobertura de linhas mede quanto do código foi tocado, não quantos requisitos foram verificados, que é o que o artefato cobra. Nenhuma ferramenta de cobertura de linhas foi adotada e nenhuma porcentagem desse tipo é apresentada | Seção 6.6 e consolidação desta seção | Matriz de 6.6.1 |
+
+### 6.8.3 Atualização do quadro planejado em 6.1.4
+
+Nem toda linha do plano se confirmou. A tabela registra cada divergência e o que ela exige.
+
+| Linha de 6.1.4 | Status declarado na Sprint 3 | Situação verificada em 19/09/2026 | Consequência |
+|---|---|---|---|
+| Interface/componente | "Três arquivos de teste; execução prevista com `npm test`" | **Cinco** arquivos e 18 casos, executados com código de saída 0 | Sai de previsto para executado; a contagem do plano ficou defasada |
+| Integração/persistência | "O repositório não contém serviço PostgreSQL no Compose" | O serviço `postgres` existe desde o commit `223f938`, de 09/09/2026, anterior à redação do plano | **Premissa do plano corrigida.** A base dedicada continua obrigatória, mas o provisionamento não precisa mais ser externo à composição |
+| Suítes de integração | "O padrão `test_integracao_*.py` não corresponde a suíte existente" | Quatro módulos correspondem ao padrão e somam 55 casos | Premissa corrigida; o comando de integração previsto em 6.4.5 passou a ser executável |
+| CI/CD | "Pipeline da aplicação e execução automatizada não comprovados" | `.gitlab-ci.yml` existe na raiz desde `0fbf76c`, de 09/09/2026, com `build:app`, `test:app` e `lint:app` | A configuração está versionada e é auditável. **A execução verde do pipeline não é verificável nesta auditoria local**: essa evidência é a página de pipelines do GitLab e deve ser anexada na subseção de registros e evidências desta Seção 7 |
+| Recursos (`psutil`) | "Proposto; ausente do ambiente e das dependências declaradas" | Confirmado como instrumento dos ensaios RNF10 | A declaração em `pyproject.toml` e `requirements.txt` acompanha a implementação do gerador de carga: medição feita com dependência não declarada não se reproduz na CI |
+| VHS (`vcrpy`) | "Escolhido no planejamento; instalação prevista para a próxima sprint" | Escolha confirmada, com o contrato de implementação de 6.4.3 mantido sem alteração | A gravação dos cassettes de Deepgram e Gemini e a suíte `tests/test_integracao_vhs.py` são a próxima tarefa da campanha, pelos dez passos já definidos em 6.4.3 |
+| Desempenho | "Gerador proposto, ainda não implementado" | Instrumento mantido: HTTPX assíncrono, `perf_counter` e saída CSV por requisição | O protocolo de 6.3.2 não foi alterado; o gerador é construído nesta sprint e sua versão entra na ficha de cada rodada |
+| API/contrato | "Declarados e utilizados" | Confirmado, com um aviso novo emitido pela Starlette 1.6.0: `Using 'httpx' with 'starlette.testclient' is deprecated; install 'httpx2' instead` | A migração para `httpx2` é avaliada em tarefa própria, fora da campanha, para não alterar o transporte no meio dos ensaios de desempenho |
+
+As demais linhas do quadro planejado foram confirmadas sem alteração.
+
+### 6.8.4 Uso dos frameworks de automação
+
+O artefato cobra "uso eficiente de frameworks de automação para a verificação". Eficiência aqui não é quantidade de testes: é quanto do trabalho de verificação o framework executa sozinho, sem alguém precisar lembrar de fazê-lo.
+
+**Descoberta automática em vez de lista mantida à mão.** `python -m unittest discover` encontra os 43 módulos pelo padrão de nome. Nenhum registro central precisa ser atualizado quando um módulo novo entra, e por isso nenhum módulo é esquecido fora da suíte.
+
+**Contratos reutilizáveis como mixin.** `ContratoWebhookInbound` descreve o comportamento exigido de um receptor de webhook independentemente do provedor e da persistência. As implementações de Drive, de Graph e a versão com PostgreSQL herdam a mesma classe e recebem os mesmos casos, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste. O mixin define 8 casos e tem quatro subclasses — receptor em memória, receptor HTTP, Drive e PostgreSQL —, de modo que o mesmo contrato é executado quatro vezes sem que uma linha de teste seja copiada. É também por isso que a contagem do executor (502 casos) supera a contagem de métodos escritos em `tests/` (481).
+
+**Substituição de dependência pelo mecanismo do próprio framework.** `dependency_overrides`, usado em 14 módulos, troca o adaptador externo pelo dublê no ponto em que o FastAPI resolve a injeção. A rota não sabe que está sob teste, e o código de produção não ganha nenhum ramo condicional para teste.
+
+**Pulo declarado com motivo, em vez de teste silenciosamente ausente.** A suíte relacional usa `unittest.skipIf` com a mensagem `TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.` Quem executa sem banco vê 18 pulos e o motivo, e não um "OK" que esconde a ausência de verificação. A exigência de uma variável separada de `DATABASE_URL` é proteção: a carga desses testes limpa tabelas.
+
+**Teste que guarda a reprodutibilidade da medição.** `tests/test_reprodutibilidade.py` compara três fontes — `requirements.txt`, `pyproject.toml` e a tabela da Seção 3.3.7 — e o ambiente instalado, para as cinco bibliotecas que determinam o F1-macro publicado em `resultados/`. É o mecanismo que transforma "as métricas são reproduzíveis" em afirmação verificada a cada execução, em vez de promessa escrita na documentação. Na execução de 19/09 ele acusou spaCy 3.8.15 no ambiente contra 3.8.16 fixado, o que basta para invalidar comparação com os números de `resultados/`: rodar `pip install -r requirements.txt` até o caso passar é critério de pronto do ambiente antes de qualquer ensaio de métrica.
+
+**Consulta por papel acessível no frontend.** As suítes de componente localizam elementos por papel e texto visível, não por classe ou identificador interno. O efeito prático é que a mudança de estilo não quebra o teste e a remoção de um rótulo acessível quebra — que é a direção desejada para um sistema cujo RNF08 trata de compreensão das respostas.
+
+**O mesmo comando em três lugares.** `python -m unittest discover -v tests` é o que roda localmente, o que o serviço `tests` do perfil `ci` executa na imagem de desenvolvimento (`make test`) e o que o job `test:app` executa no pipeline. Não há uma "versão de CI" da suíte que possa divergir da local.
+
+### 6.8.5 Preparação do ambiente e comandos padronizados
+
+Os comandos abaixo reproduzem, em ordem, o ambiente usado nesta verificação.
+
+| Passo | Comando | Para quê |
+|---|---|---|
+| 1 | `python -m pip install -r requirements.txt` | Instala as versões fixadas, inclusive as cinco que determinam as métricas de PLN |
+| 2 | `python -m pip install -e ".[dev]"` | Instala o pacote `az1` em modo editável; sem isso, o layout `src/` faz `from pln import ...` falhar |
+| 3 | `python -m nltk.downloader stopwords rslp` | Recursos do NLTK usados pelo pré-processamento |
+| 4 | `python -m spacy download pt_core_news_sm` | Modelo exigido apenas pelos testes de lematização |
+| 5 | `npm ci` em `src/frontend` | Instala as dependências de interface a partir do `package-lock.json` |
+| 6 | `python -m unittest discover -s tests` | Suíte completa de backend |
+| 7 | `python -m unittest discover -s tests -p "test_integracao_*.py"` | Somente as suítes de integração |
+| 8 | `docker compose up -d postgres`, criar a base descartável com os scripts de `src/database` e exportar `TEST_DATABASE_URL` apontando para ela | Habilita os 18 casos relacionais hoje pulados. A base precisa ser descartável e diferente da que `DATABASE_URL` aponta, porque a suíte apaga tabelas; exportar `PYTHON_DOTENV_DISABLED=1` impede que um `.env` local seja carregado por cima da configuração do ensaio |
+| 9 | `npm test` em `src/frontend` | Suíte de componentes e do cliente HTTP |
+| 10 | `ruff check src tests` | Análise estática com as regras de `ruff.toml` |
+| 11 | `make test` | Executa a suíte dentro da imagem de desenvolvimento, pelo perfil `ci` do Compose |
+
+O passo 8 exige uma base exclusiva de teste. Apontar `TEST_DATABASE_URL` para a base de desenvolvimento apaga dados, e é por isso que a variável é separada e o pulo é explícito quando ela não existe.
+
+---
+
+---
 
 # 7. Registro de Decisões
 
