@@ -124,6 +124,53 @@ _ERROR_DETAILS = {
 }
 
 
+def recusar_conversa_alheia(
+    repositorio: ConversaRepository | PersistenciaDesligada,
+    conversation_id: str,
+    usuario: AuthenticatedUser,
+) -> None:
+    """Barra o turno quando o `conversation_id` é de outra pessoa.
+
+    Precisa vir ANTES de `answerer.answer()`, não depois: é ali que
+    `_historico_do_banco` lê `auditoria.mensagem` pelo `conversa_id` sozinho,
+    sem `usuario_id`. Enviando o UUID de uma conversa alheia, o histórico dela
+    entrava no contexto do modelo e podia sair na resposta — o vazamento
+    acontecia mesmo que nada fosse gravado depois.
+
+    O identificador nasce no cliente (`crypto.randomUUID()` em `AgentPage.jsx`),
+    então ele é entrada do usuário, e não prova de nada.
+
+    Não engole exceção de banco de propósito. Deixar passar em caso de falha
+    seria abrir exatamente o buraco que este porteiro fecha, e o `SELECT` do
+    histórico, logo adiante, usa o mesmo pool: se este falhou, aquele falha
+    também. Falhar fechado aqui é a diferença entre um 500 e um vazamento.
+    """
+    conversa_id = conversa_uuid(conversation_id)
+    if conversa_id is None:
+        # UUID inválido não alcança o banco: `_historico_do_banco` também o
+        # recusa, e `_turno_da_conversa` já descarta o turno com aviso.
+        return
+
+    if usuario.domain_user_id is None:
+        # Sem ligação com `portfolio.usuario` não há com o que comparar. O turno
+        # tampouco será gravado (ver `_turno_da_conversa`), e o histórico volta
+        # vazio porque nenhuma conversa aponta para um dono inexistente.
+        return
+
+    dono = repositorio.dono_da_conversa(str(conversa_id))
+    if dono is not None and dono != usuario.domain_user_id:
+        logger.warning(
+            "Usuário %s tentou usar a conversa %s, que é de outro.",
+            usuario.domain_user_id,
+            conversa_id,
+        )
+        raise ChatAPIError(
+            403,
+            "forbidden",
+            "Esta conversa pertence a outro usuário.",
+        )
+
+
 def fontes_para_auditoria(citadas: Sequence[FonteCitada]) -> tuple[FonteDaResposta, ...]:
     """Converte as fontes do contrato HTTP nas que a trilha grava.
 
@@ -204,6 +251,8 @@ def send_chat_message(
     usuario: AuthenticatedUser = Depends(require_authenticated_user),
     classificador=Depends(get_classificador_de_intencao),
 ) -> ChatResponse:
+    recusar_conversa_alheia(repositorio, payload.conversation_id, usuario)
+
     inicio = time.monotonic()
     try:
         reply = answerer.answer(payload.message, payload.conversation_id)

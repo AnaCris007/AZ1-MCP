@@ -233,14 +233,20 @@ class TesteLimpezaDasCitacoes(unittest.TestCase):
 class _RepositorioEspiao:
     """Registra os turnos recebidos, ou levanta, conforme o caso sob teste."""
 
-    def __init__(self, erro: Exception | None = None) -> None:
+    def __init__(self, erro: Exception | None = None, dono: int | None = None) -> None:
         self.turnos: list[TurnoDoChat] = []
         self._erro = erro
+        # None = conversa inexistente, que é o caso da maioria dos testes: o
+        # porteiro da rota deixa passar e a gravação segue.
+        self._dono = dono
 
     def registrar_turno(self, turno: TurnoDoChat) -> None:
         if self._erro is not None:
             raise self._erro
         self.turnos.append(turno)
+
+    def dono_da_conversa(self, conversa_id: str) -> int | None:
+        return self._dono
 
 
 _UUID_VALIDO = "3f1c0c4e-0000-4000-8000-000000000001"
@@ -275,6 +281,41 @@ class TesteTrilhaDaConversa(unittest.TestCase):
             arquivo_origem="04_Riscos_e_Problemas.xlsx",
             chunk_id="abc123",
         )
+
+    def test_conversa_de_outro_usuario_e_recusada(self) -> None:
+        """A do vizinho não se abre, nem para ler nem para escrever.
+
+        O `conversation_id` vem do corpo da requisição — `crypto.randomUUID()`
+        no navegador —, então é entrada do usuário. Antes desta verificação,
+        enviar o UUID da conversa alheia fazia `_historico_do_banco` carregar os
+        turnos dela para o contexto do modelo, de onde podiam sair na resposta,
+        e ainda anexava o turno novo àquela conversa.
+
+        A recusa precisa vir ANTES de `answer()`: depois, o histórico já teria
+        sido lido.
+        """
+        self.espiao = _RepositorioEspiao(dono=99)
+        cliente = self._cliente(ChatReply(text="Resposta.", modelo="gemini-3.5-flash-lite"))
+
+        resposta = cliente.post(
+            "/api/v1/chat", json={"message": "oi", "conversation_id": _UUID_VALIDO}
+        )
+
+        self.assertEqual(resposta.status_code, 403)
+        self.assertEqual(resposta.json()["error"], "forbidden")
+        self.assertEqual(self.espiao.turnos, [])
+
+    def test_conversa_propria_continua_passando(self) -> None:
+        """A verificação não pode barrar a segunda mensagem da própria conversa."""
+        self.espiao = _RepositorioEspiao(dono=7)
+        cliente = self._cliente(ChatReply(text="Resposta.", modelo="gemini-3.5-flash-lite"))
+
+        resposta = cliente.post(
+            "/api/v1/chat", json={"message": "oi", "conversation_id": _UUID_VALIDO}
+        )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(len(self.espiao.turnos), 1)
 
     def test_grava_com_a_identidade_autenticada(self) -> None:
         # O `usuario_id` vem de `domain_user_id`, e não de um literal. Foi um

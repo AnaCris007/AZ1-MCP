@@ -43,15 +43,12 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- 1. DOMÍNIO DO PORTFÓLIO
 -- =============================================================================
 
--- Agrupamento organizacional de projetos. Na base sintética corresponde ao
--- subportfólio declarado na planilha de portfólio ("Expansão da Rede",
--- "Gestão e Finanças", ...), que é o nível pelo qual o PMO agrupa de fato.
-CREATE TABLE portfolio.portfolio (
-    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome          TEXT    NOT NULL,
-    ano_exercicio INTEGER NOT NULL,
-    UNIQUE (nome, ano_exercicio)
-);
+-- A tabela `portfolio.portfolio` foi removida (ver 08_remove_portfolio.sql).
+-- Ela agrupava projetos por subportfólio da planilha, mas o agrupamento nunca
+-- chegou a ser consultado: nenhum código lia a tabela nem `projeto.portfolio_id`,
+-- e o único consumidor era o JOIN de `vw_projeto_situacao`, cujo resultado
+-- atravessava a API até `ProjetoResponse.portfolio` sem que o frontend o
+-- exibisse. Agrupamento que ninguém lê não é modelo, é peso.
 
 -- Profissional autorizado a usar o agente.
 --
@@ -100,7 +97,6 @@ CREATE TABLE portfolio.projeto (
     -- divergir delas, e é o número que a persona do Diretor pede diretamente.
     desvio_pp             NUMERIC(6,2) GENERATED ALWAYS AS
                           (percentual_avanco - percentual_previsto) STORED,
-    portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
     lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
 );
 
@@ -421,7 +417,6 @@ CREATE TABLE auditoria.notificacao (
 -- 3. ÍNDICES DOS ACESSOS FREQUENTES
 -- =============================================================================
 
-CREATE INDEX idx_projeto_portfolio       ON portfolio.projeto (portfolio_id);
 CREATE INDEX idx_projeto_lider           ON portfolio.projeto (lider_id);
 CREATE INDEX idx_artefato_projeto        ON portfolio.artefato (projeto_id);
 CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_id);
@@ -480,7 +475,12 @@ CREATE TRIGGER trg_mensagem_toca_conversa
 -- Conversa com a resposta e as fontes já reunidas, no formato que a auditoria
 -- e a tela de histórico consomem. Evita que cada consumidor reescreva a
 -- junção de quatro tabelas — e que cada um a escreva de um jeito diferente.
-CREATE VIEW auditoria.vw_turno AS
+-- `security_invoker` não é detalhe: sem ele a view roda com os privilégios do
+-- DONO, e o `GRANT SELECT ON ALL TABLES IN SCHEMA auditoria` do
+-- 03_rls_policies.sql alcança views. Um `SELECT * FROM auditoria.vw_turno`
+-- devolveria prompt, resposta e avaliação de TODOS os usuários, contornando
+-- `conversa_propria_leitura` e `mensagem_da_propria_conversa_leitura`.
+CREATE VIEW auditoria.vw_turno WITH (security_invoker = true) AS
 SELECT
     c.id                        AS conversa_id,
     c.usuario_id,
@@ -520,12 +520,23 @@ COMMENT ON VIEW auditoria.vw_turno IS
     'Um par prompt/resposta por linha, com intenção, desfecho, contagem de fontes e avaliação (RNF04).';
 
 -- Situação consolidada de cada projeto, com o que o Diretor pergunta primeiro.
-CREATE VIEW portfolio.vw_projeto_situacao AS
+--
+-- `security_invoker` pela mesma razão de `auditoria.vw_turno`: sem ele a view
+-- roda com os privilégios do DONO e a RLS das tabelas de base é avaliada contra
+-- ele, o que faz de toda view um contorno das policies. Aqui o efeito prático
+-- hoje é nenhum — as policies de `portfolio` liberam leitura a qualquer
+-- autenticado —, mas deixar o padrão inseguro num lugar e seguro no outro é
+-- como a inconsistência volta.
+--
+-- A ordem das colunas é contrato: `_para_projeto` em
+-- `src/services/portfolio_repository.py` lê a linha POR POSIÇÃO. Inserir ou
+-- remover coluna aqui desloca todos os índices seguintes, e trocas entre
+-- colunas do mesmo tipo (lider/lider_email) não levantam erro.
+CREATE VIEW portfolio.vw_projeto_situacao WITH (security_invoker = true) AS
 SELECT
     pr.id,
     pr.codigo,
     pr.nome,
-    pf.nome  AS portfolio,
     pr.fase,
     pr.status,
     pr.data_inicio,
@@ -540,7 +551,6 @@ SELECT
     (SELECT count(*) FROM portfolio.artefato ar
       WHERE ar.projeto_id = pr.id)                                AS artefatos
 FROM portfolio.projeto pr
-JOIN portfolio.portfolio pf ON pf.id = pr.portfolio_id
 JOIN portfolio.usuario   li ON li.id = pr.lider_id;
 
 

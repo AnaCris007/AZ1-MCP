@@ -3083,7 +3083,7 @@ A tabela a seguir registra a correspondência entre cada elemento das modelagens
 | **Interação consulta Artefato** `(0,n)`-`(0,n)` | Tabela `mensagem_fonte` | Muitos-para-muitos materializado com atributos próprios de posição, score e cópia dos metadados (decisão 9 da seção 3.6.7) |
 | **Artefato documenta/pertence a Projeto** `(1,1)`-`(0,n)` | `artefato.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
 | **Artefato possui Campo Artefato** `(1,n)`-`(1,1)` | `campo_artefato.artefato_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata e unicidade de `nome` por artefato |
-| **Projeto pertence a Portfólio** `(1,1)`-`(1,n)` | `projeto.portfolio_id NOT NULL` | Um-para-muitos vira chave estrangeira |
+| **Projeto pertence a Portfólio** `(1,1)`-`(1,n)` | Não materializado | O agrupamento por subportfólio foi removido do modelo físico (`08_remove_portfolio.sql`): nenhuma consulta o usava, e a coluna atravessava a API até uma interface que não a exibe |
 | **Projeto origina Pendência** `(0,n)`-`(1,1)` | `pendencia.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
 | **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
 | **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
@@ -3099,14 +3099,6 @@ As cardinalidades mínimas do lado "muitos" (um portfólio reúne ao menos um pr
 O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. As chaves primárias substitutas usam `INTEGER` ou `BIGINT GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais; a exceção é `conversa`, cuja chave é `UUID` pela razão registrada na decisão 8 da seção 3.6.7.
 
 As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente, e o schema **`auditoria`** reúne os registros de conversa, mensagem, fonte, avaliação, evento e notificação, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
-
-**`portfolio.portfolio`**: agrupamento de projetos de um exercício.
-
-| Coluna | Tipo | Restrições | Finalidade |
-|---|---|---|---|
-| `id` | `INTEGER` | `PK`, identity | Identificador único do portfólio |
-| `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
-| `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
 
 **`portfolio.usuario`**: profissional autorizado a utilizar o agente.
 
@@ -3134,7 +3126,6 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `percentual_previsto` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Avanço planejado para a data de referência |
 | `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física realizado |
 | `desvio_pp` | `NUMERIC(6,2)` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Desvio em pontos percentuais entre realizado e previsto (decisão 2 da seção 3.6.7) |
-| `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
 | `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
 
 **`portfolio.projeto_relacionado`**: dependências declaradas entre projetos.
@@ -3300,13 +3291,6 @@ CREATE SCHEMA auditoria;
 CREATE SCHEMA integracao;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE TABLE portfolio.portfolio (
-    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome          TEXT    NOT NULL,
-    ano_exercicio INTEGER NOT NULL,
-    UNIQUE (nome, ano_exercicio)
-);
-
 CREATE TABLE portfolio.usuario (
     id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     auth_user_id UUID UNIQUE,
@@ -3332,7 +3316,6 @@ CREATE TABLE portfolio.projeto (
                           CHECK (percentual_avanco BETWEEN 0 AND 100),
     desvio_pp             NUMERIC(6,2) GENERATED ALWAYS AS
                           (percentual_avanco - percentual_previsto) STORED,
-    portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
     lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
 );
 

@@ -94,7 +94,6 @@ def _para_projeto(projeto: SituacaoProjeto) -> ProjetoResponse:
     return ProjetoResponse(
         codigo=projeto.codigo,
         nome=projeto.nome,
-        portfolio=projeto.portfolio,
         fase=projeto.fase,
         status=projeto.status,
         percentual_previsto=projeto.percentual_previsto,

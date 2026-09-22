@@ -345,7 +345,9 @@ def require_authenticated_user(
     if usuario_resolver is not None:
         try:
             domain_user = usuario_resolver.resolve(auth_user_id=user.subject, email=user.email, name=user.name)
-            user = dataclasses.replace(user, domain_user_id=domain_user.id)
+            user = dataclasses.replace(
+                user, domain_user_id=domain_user.id, perfil=domain_user.perfil
+            )
         except Exception:
             # Autenticação (RNF02) não depende de portfolio.usuario: uma falha
             # aqui não deve virar 401 nem 500 para quem só quer usar o agente.
