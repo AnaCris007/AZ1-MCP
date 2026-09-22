@@ -1,0 +1,74 @@
+interactions:
+- request:
+    body: '{"contents": [{"parts": [{"text": "Em uma frase, o que \u00e9 ader\u00eancia
+      de um projeto ao portf\u00f3lio?"}], "role": "user"}], "systemInstruction":
+      {"parts": [{"text": "Voc\u00ea \u00e9 o AZ1, assistente conversacional do PMO
+      do Metr\u00f4 de S\u00e3o Paulo. Responda em texto corrido, como numa conversa
+      de chat \u2014 sem t\u00edtulos, tabelas, listas longas ou nota\u00e7\u00e3o
+      matem\u00e1tica. Seja direto: poucas frases bastam, a menos que o usu\u00e1rio
+      pe\u00e7a explicitamente mais detalhe. Nunca comece respostas com sauda\u00e7\u00f5es
+      como ''Ol\u00e1!'' \u2014 v\u00e1 direto ao ponto."}], "role": "user"}, "generationConfig":
+      {"maxOutputTokens": 1024, "thinkingConfig": {"thinking_level": "MINIMAL"}}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '717'
+      content-type:
+      - application/json
+      host:
+      - generativelanguage.googleapis.com
+      user-agent:
+      - google-genai-sdk/2.22.0 gl-python/3.12.3
+      x-goog-api-client:
+      - google-genai-sdk/2.22.0 gl-python/3.12.3
+    method: POST
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent
+  response:
+    body:
+      string: "{\n  \"candidates\": [\n    {\n      \"content\": {\n        \"parts\":
+        [\n          {\n            \"text\": \"Ader\xEAncia de um projeto ao portf\xF3lio
+        \xE9 o grau de alinhamento entre os objetivos dessa iniciativa e as diretrizes
+        estrat\xE9gicas globais da companhia.\",\n            \"thoughtSignature\":
+        \"El4KXAFpFH0TlL/ksA3RmZPmko1MRi5npmehdL2ZNL1yxndJDfbSTLhTpukbHRPHOLsvtT72NHDpjx+tiPQdo2X4Az02bNb+5kEzkTL5EuoFMa4LXufKxPhmv8BS/k24\"\n
+        \         }\n        ],\n        \"role\": \"model\"\n      },\n      \"finishReason\":
+        \"STOP\",\n      \"index\": 0\n    }\n  ],\n  \"usageMetadata\": {\n    \"promptTokenCount\":
+        108,\n    \"candidatesTokenCount\": 34,\n    \"totalTokenCount\": 142,\n    \"promptTokensDetails\":
+        [\n      {\n        \"modality\": \"TEXT\",\n        \"tokenCount\": 108\n
+        \     }\n    ],\n    \"serviceTier\": \"standard\"\n  },\n  \"modelVersion\":
+        \"gemini-3.5-flash-lite\",\n  \"responseId\": \"t92vatP_MdGIz7IPidHk0AQ\"\n}\n"
+    headers:
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      content-length:
+      - '866'
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Sun, 20 Sep 2026 13:20:56 GMT
+      server:
+      - scaffolding on HTTPServer2
+      server-timing:
+      - gfet4t7; dur=1549
+      transfer-encoding:
+      - chunked
+      vary:
+      - Origin
+      - X-Origin
+      - Referer
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-gemini-service-tier:
+      - standard
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

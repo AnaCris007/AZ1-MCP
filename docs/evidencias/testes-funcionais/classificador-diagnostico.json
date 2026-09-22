@@ -1,0 +1,12 @@
+[
+  {
+    "texto": "Qual a previsão do tempo em Marte?",
+    "intencao": "consultar_projeto_sintetico",
+    "confianca": 0.3818910319092018
+  },
+  {
+    "texto": "Qual é o avanço do projeto?",
+    "intencao": "consultar_projeto_sintetico",
+    "confianca": 0.8481580473757409
+  }
+]

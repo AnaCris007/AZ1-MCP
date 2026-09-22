@@ -89,18 +89,13 @@
 - [6.4 Planejamento dos Testes de Integração](#64-planejamento-dos-testes-de-integração)
 - [6.5 Planejamento dos Testes de Usabilidade](#65-planejamento-dos-testes-de-usabilidade)
 - [6.6 Matriz de Cobertura Planejada](#66-matriz-de-cobertura-planejada)
+- [6.7 Execução dos testes sistêmicos — campanha funcional da Sprint 4](#67-execução-dos-testes-sistêmicos--campanha-funcional-da-sprint-4)
+- [6.8 Ferramentas e Bibliotecas Utilizadas](#68-ferramentas-e-bibliotecas-utilizadas)
 
 </details>
 
-<details>
-<summary><strong>7. Execução dos Testes Sistêmicos</strong></summary>
-
-- [7.1 Ferramentas e Bibliotecas Utilizadas](#71-ferramentas-e-bibliotecas-utilizadas)
-
-</details>
-
-- [8. Registro de Decisões](#8-registro-de-decisões)
-- [9. Fontes](#9-fontes)
+- [7. Registro de Decisões](#7-registro-de-decisões)
+- [8. Fontes](#8-fontes)
 
 ---
 
@@ -2704,21 +2699,14 @@ Caso a duração do áudio ultrapasse esse limite, a API retorna `422 Unprocessa
 ### Exemplo de requisição
 
 ```bash
-# Contrato-alvo, com a autenticação já implementada
-curl -X POST https://<host-da-api>/api/v1/audio \
+curl -X POST http://localhost:8000/api/v1/audio \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -F "audio=@consulta.wav"
 ```
 
-No estado atual da implementação, em que a autenticação ainda não existe e a API roda localmente, a mesma requisição é feita sem o cabeçalho de autorização:
+O `<ACCESS_TOKEN>` é o JWT emitido pelo Supabase Auth (ver a subseção Autenticação, acima); sem ele, ou com um token inválido, a API responde `401` antes de qualquer processamento do áudio — comportamento coberto por teste automatizado em `tests/test_auth_api.py`.
 
-```bash
-# Execução local, estado atual do repositório
-curl -X POST http://localhost:8000/api/v1/audio \
-  -F "audio=@consulta.wav"
-```
-
-O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida. O host `<host-da-api>` é um marcador: nenhum endereço público foi provisionado até o encerramento desta sprint, conforme a Seção 3.7.
+O header `Content-Type: multipart/form-data` não é definido manualmente: a flag `-F` do curl já monta a requisição como multipart e adiciona o boundary correto automaticamente. Defini-lo à mão, sem o boundary, resultaria em uma requisição inválida. O host usado acima é o da execução local; nenhum endereço público foi provisionado até o encerramento desta sprint, conforme a Seção 3.7.
 
 ### Resposta de sucesso
 
@@ -2837,7 +2825,7 @@ A tabela confronta cada situação de erro exigida pelo canal de voz com a respo
 | Arquivo vazio | `422 invalid_audio` | `POST /api/v1/audio` | Implementada |
 | Arquivo corrompido, ou aceito porém ilegível | `422 invalid_audio` | `POST /api/v1/audio` | Implementada |
 | Áudio acima de 5 minutos | `422 audio_too_long` | `POST /api/v1/audio` | Implementada |
-| Usuário não autenticado | `401 unauthorized` | `POST /api/v1/audio` | **Planejada**, não implementada |
+| Usuário não autenticado | `401 unauthorized` | `POST /api/v1/audio` | Implementada, ver a subseção Autenticação |
 | Áudio inexistente na hora de transcrever | `404 audio_not_found` | `POST /api/v1/audio/{audio_id}/transcribe` | Implementada, Seção 3.2.2 |
 | Serviço de transcrição indisponível | `502 transcription_failed` | `POST /api/v1/audio/{audio_id}/transcribe` | Implementada, Seção 3.2.2 |
 | Tempo limite da transcrição excedido | `502 transcription_failed` | `POST /api/v1/audio/{audio_id}/transcribe` | Coberta pelo tratamento genérico de exceção; o tempo limite explícito é **DECISÃO TÉCNICA EM ABERTO**, Seção 3.2.2 |
@@ -2857,14 +2845,14 @@ A tabela separa os controles vigentes dos previstos. A separação importa porqu
 | Identificador opaco | **Implementado** | O `audio_id` é um UUID em hexadecimal prefixado por `aud_`, sem relação com o nome do arquivo original, que é descartado |
 | Descarte automático do áudio | **Implementado** | Expiração de sete dias no prefixo `incoming/`, conforme a Seção 3.2.5 |
 | Log sem conteúdo sensível | **Implementado** | Nenhuma rota registra o conteúdo do arquivo nem o texto transcrito |
-| Autenticação por SSO | **Planejado** | Bearer Token definido no contrato; provedor Microsoft ou Google ainda a selecionar, sem alteração do contrato do RNF02 |
+| Autenticação por SSO | **Implementado** | Bearer Token emitido pelo Supabase Auth, com o Microsoft Entra ID como provedor de identidade; validado por `require_authenticated_user` em todas as rotas de `/api/v1`, coberto por teste automatizado em `tests/test_auth_api.py` — ver a subseção Autenticação, acima |
 | Criptografia em trânsito | **Planejado** | HTTPS exigido pelo contrato; o ambiente local ainda serve por HTTP |
-| Limitação de taxa de requisições | **DECISÃO TÉCNICA EM ABERTO** | Sem mecanismo no código. Sem autenticação e sem limite de taxa, o endpoint não deve ser exposto publicamente |
+| Limitação de taxa de requisições | **DECISÃO TÉCNICA EM ABERTO** | Sem mecanismo no código |
 | Inspeção antivírus do arquivo recebido | **DECISÃO TÉCNICA EM ABERTO** | Não previsto no MVP. A mitigação atual é indireta: o arquivo é validado como áudio íntegro, nunca é executado e nunca é servido de volta a outro usuário |
 | Registro de auditoria do envio | **Planejado** | Depende do schema `auditoria` da Seção 3.6.5, adiado para a Sprint 3 conforme a decisão registrada na Seção 2.4 |
 | Conformidade com a LGPD | **Restrição de escopo vigente** | Nenhum dado pessoal ou corporativo real trafega no MVP (Seção 1.3). Antes de qualquer uso real, é necessário definir base legal, prazo de retenção e direitos do titular sobre a gravação |
 
-> **Consequência prática desta tabela.** Enquanto autenticação e limitação de taxa não estiverem implementadas, a API deve ser executada apenas em ambiente local ou de laboratório com acesso restrito. A publicação em endereço público sem esses controles é o principal risco de segurança aberto do MVP e está encaminhada na Seção 3.7.9, item 11, junto da regra de SSH aberta na instância.
+> **Consequência prática desta tabela.** Com autenticação implementada mas sem HTTPS nem limitação de taxa, a API deve ser executada apenas em ambiente local ou de laboratório com acesso restrito. A publicação em endereço público sem os dois últimos controles é o principal risco de segurança aberto do MVP e está encaminhada na Seção 3.7.9, item 11, junto da regra de SSH aberta na instância.
 
 ### Requisitos adicionais
 
@@ -6270,7 +6258,7 @@ Não foram identificados testes automatizados que percorram conjuntamente login 
 
 Este artefato planeja a verificação do agente AZ1 a partir dos requisitos funcionais da Seção 2.2, dos requisitos não funcionais da Seção 2.3, da arquitetura e do desenvolvimento realizado. Abrange funcionalidade, desempenho, integração com serviços externos e usabilidade, definindo propósito, procedimentos, cenários positivos e negativos, critérios de aprovação e ferramentas.
 
-Os casos desta seção são planejados. Sua execução e o registro dos resultados seguem a estratégia incremental da Seção 3.8.10: planejamento na Sprint 3, execução na Sprint 4 e complementação na Sprint 5.
+O catálogo desta seção registra o planejamento da Sprint 3. A execução técnica da Sprint 4 e seus resultados estão na Seção 6.7, com complementação prevista na Sprint 5 conforme a estratégia incremental de 3.8.10. Estado de prontidão e resultado executado são registros distintos.
 
 **Convenção de ficha.** Cada caso é a união das tabelas de catálogo, procedimento, resultado e rastreabilidade pelo seu ID. Os campos comuns abaixo são herdados explicitamente; uma variante de entrada é uma execução adicional do mesmo caso, não um novo ID. `Tipo` significa funcional, RNF, desempenho, integração ou usabilidade; positivo, negativo, alternativo e erro são valores de `Cenário`. A coluna histórica `Estado` indica prontidão de implementação, nunca aprovação.
 
@@ -6288,7 +6276,7 @@ Os casos desta seção são planejados. Sua execução e o registro dos resultad
 
 ### 6.1.2 Referências e delimitação do planejamento
 
-A numeração utilizada corresponde aos requisitos oficiais: RF01 (entrada por texto e áudio), RF02 (consulta), RF03 (fontes), RF04 (sugestões), RF05 (notificações) e RF06 (atualização). O planejamento mantém rastreabilidade com as decisões de escopo da Seção 8.
+A numeração utilizada corresponde aos requisitos oficiais: RF01 (entrada por texto e áudio), RF02 (consulta), RF03 (fontes), RF04 (sugestões), RF05 (notificações) e RF06 (atualização). O planejamento mantém rastreabilidade com as decisões de escopo da Seção 7.
 
 Para implementar os testes, aplicar a seguinte base de avaliação. As decisões D04 e D07 delimitam o MVP; o comportamento atual do código serve para preparar os ensaios, não para substituir um critério oficial.
 
@@ -6306,7 +6294,7 @@ Os testes de componentes futuros serão aplicados após sua integração. As car
 
 ### 6.1.3 Ambientes, massas e critérios de entrada e saída
 
-Ambiente de referência: Python 3.12, pacote instalado com extra `dev`, frontend React/Vite, MinIO da composição Docker e PostgreSQL com extensão vetorial compatível com `vecs`. O repositório contém DDL relacional e RAG via `SUPABASE_DB_URL`; não contém serviço PostgreSQL no Compose. Para integração, usar base exclusiva de testes com as mesmas extensões, sem aplicar a carga que limpa dados em uma base compartilhada. A existência de scripts não comprova provisionamento.
+Ambiente de referência: Python 3.12, pacote instalado com extra `dev`, frontend React/Vite, MinIO da composição Docker e PostgreSQL com extensão vetorial compatível com `vecs`. O repositório contém DDL relacional, RAG via `SUPABASE_DB_URL` e serviço PostgreSQL 16 no Compose. Esse serviço usa imagem PostgreSQL padrão; sua presença não comprova provisionamento de pgvector nem do índice RAG. Para integração, usar base exclusiva de testes com as mesmas extensões, sem aplicar a carga que limpa dados em uma base compartilhada. A existência de scripts não comprova provisionamento.
 
 No host, o proxy Vite usa `http://127.0.0.1:8010`; iniciar a API nessa porta ou registrar `VITE_DEV_API_PROXY` explicitamente. No Docker, a API atende em `api:8000`. Homologação exige registrar URL, commit, sistema, CPU/RAM, workers, versões, limites, configuração não secreta, fuso e condição de rede. Valores de carga e amostra definidos pelo plano são propostas de engenharia para os ensaios, sem representar demanda medida do parceiro ou alterar metas oficiais.
 
@@ -6329,16 +6317,16 @@ No host, o proxy Vite usa `http://127.0.0.1:8010`; iniciar a API nessa porta ou 
 | Unidade backend | `unittest`, `IsolatedAsyncioTestCase` | Executor já usado nos testes Python síncronos e assíncronos | Utilizados em `tests/`; biblioteca padrão |
 | API/contrato | FastAPI `TestClient`, HTTPX, Pydantic | Rotas, validação e serialização; TestClient em processo não executa frontend | Declarados e utilizados; preparação com as dependências do projeto |
 | Mocks | `unittest.mock`, `dependency_overrides`, mocks do Vitest | Injetar falhas e inspecionar chamadas sem consumir provedores | Utilizados; não equivalem a chamadas reais |
-| Interface/componente | Vitest, Testing Library e jsdom | Interação React e cliente HTTP com dependências controladas | Declarados e configurados; três arquivos de teste; execução prevista com `npm test` |
+| Interface/componente | Vitest, Testing Library e jsdom | Interação React e cliente HTTP com dependências controladas | Declarados e configurados; cinco arquivos de teste; execução com `npm test`, evidenciada em 6.7 |
 | Ponta a ponta/usabilidade | Navegador, DevTools, cronômetro e ficha | Exercitar interface real, microfone, rede e compreensão por pessoa externa | Escolhidos para os ensaios manuais planejados |
 | Desempenho | HTTPX + `asyncio`, `perf_counter`, CSV | Uma única implementação Python de carga, reaproveitando a stack | Gerador proposto, ainda não implementado |
 | Recursos | `psutil` | Amostrar RSS e CPU de processos identificados | Proposto; ausente do ambiente inspecionado e das dependências declaradas |
 | Métricas PLN | scikit-learn, NumPy | F1, precisão, recall, matriz de confusão e consolidação numérica | Declarados e utilizados no PLN; avaliação sistêmica cega planejada |
 | Integração/persistência | Docker Compose, boto3, PostgreSQL/vecs | MinIO real e banco de testes; releitura independente de persistência | Compose/S3 e RAG implementados; `vecs` declarado, mas necessário no ambiente de integração |
-| VHS | VCR.py (`vcrpy`), conforme Seção 6.4.3 | Gravar/reproduzir HTTP externo em Python | Escolhido neste planejamento; instalação e integração previstas para a próxima sprint |
+| VHS | VCR.py (`vcrpy`), conforme Seção 6.4.3 | Gravar/reproduzir HTTP externo em Python | Implementado em [`tests/vhs/`](../tests/vhs) na Sprint 4, com `vcrpy==8.3.0` no extra `dev`; interceptação do transporte `httpx` verificada nos dois SDKs. Integração das suítes de provedor pendente (TI-59) |
 | Cobertura | Inventário por ID e matriz de requisitos | Medir cobertura documental e executada separadamente | Este plano; nenhuma porcentagem de cobertura de linhas foi obtida |
 | Relatórios | CSV/JSON e Markdown | Guardar dados brutos e interpretação auditável por caso | Formato proposto; arquivos de resultados futuros não foram criados |
-| CI/CD | Serviço `tests` no perfil `ci` do Compose | Executar suíte na imagem de desenvolvimento | Configuração existe; pipeline da aplicação e execução automatizada não comprovados. O CI do `gitlab-issue-kit` não comprova CI do AZ1 |
+| CI/CD | Serviço `tests` no perfil `ci` do Compose e `.gitlab-ci.yml` da aplicação | Executar suíte na imagem de desenvolvimento e pipeline remoto | Configurações existem; campanha local em 6.7 não comprova resultado do pipeline remoto. O CI do `gitlab-issue-kit` não comprova CI do AZ1 |
 
 Comandos de preparação para ambiente futuro: `python -m pip install -e ".[dev]"`, `python -m nltk.downloader stopwords rslp`, `python -m spacy download pt_core_news_sm` e `npm ci` em `src/frontend`. Preparar essas dependências antes de implementar e executar as suítes descritas abaixo.
 
@@ -6357,6 +6345,8 @@ A entrega atual encerra o planejamento. A sequência abaixo organiza sua impleme
 | 5 | Implementar o gerador de desempenho de 6.3.2 | `scripts/carga_testes.py`, massa JSONL e saída CSV | Instrumento registra todas as tentativas, percentis, erros e recursos; distingue desempenho real de replay |
 | 6 | Preparar sessões de usabilidade de 6.5 | Cinco pessoas externas recrutadas, consentimento, protótipo identificado, gabaritos e fichas SUS | Tarefas correspondem às funções da versão; moderador e observador conseguem aplicar o roteiro sem improvisação |
 | 7 | Executar a campanha e consolidar os resultados em etapa posterior | Registros por ID/commit, defeitos e relatório | Critérios avaliados individualmente; falhas vinculadas e retestes identificados, conforme saída de 6.1.3 |
+
+**Atualização da Sprint 4.** A etapa 3 foi implementada: o módulo VHS está em [`tests/vhs/`](../tests/vhs), com a suíte [`tests/test_integracao_vhs.py`](../tests/test_integracao_vhs.py) executada. As condições de conclusão desta tabela permanecem como foram escritas na Sprint 3; o estado item a item do contrato de implementação está na Seção 6.4.3.
 
 A escrita do RF06 permanece fora do MVP. Os casos dependentes de funcionalidades de Sprint 5 acompanham a entrega desses componentes, preservando a continuidade prevista em 3.8.10. Implementar primeiro os casos independentes dessas funcionalidades permite iniciar a próxima sprint sem redefinir o plano.
 
@@ -6471,7 +6461,7 @@ Um caso negativo só é aprovado quando o sistema apresenta o **comportamento pr
 
 #### Quadro geral dos casos planejados
 
-A coluna **Sprint** registra a janela planejada, não a data em que o componente necessariamente existe. **Estado** indica prontidão do fluxo: executável depende de ambiente/massa válidos, parcial depende de integração e planejado depende de construção. Todos os casos sistêmicos continuam não executados; o cronograma e os executores serão registrados na abertura da campanha.
+A coluna **Sprint** registra a janela planejada, não a data em que o componente necessariamente existe. **Estado** indica prontidão do fluxo: executável depende de ambiente/massa válidos, parcial depende de integração e planejado depende de construção. No corte da Sprint 3, os casos sistêmicos ainda não tinham execução registrada. A campanha da Sprint 4, seu executor, resultados e bloqueios estão documentados em 6.7; esta coluna histórica não representa aprovação.
 
 | ID | RF | Condição | Tipo | Nível | Sprint | Estado |
 |---|---|---|---|---|---|---|
@@ -7094,8 +7084,8 @@ A execução dos testes de funcionalidade na Sprint 4 é considerada concluída 
 | Condição | Definição |
 |---|---|
 | Cobertura executada | Todos os casos aplicáveis ao commit candidato tiveram execução ou bloqueio registrado; aprovação parcial não equivale a aprovação do caso inteiro |
-| Tratamento das reprovações | Cada caso reprovado possui issue aberta no GitLab, com a evidência anexada e a classificação entre defeito de implementação e divergência de requisito |
-| Registro dos não executados | Cada caso marcado como *Planejado* permanece no plano com a sprint de execução atualizada, e nenhum é retirado sem decisão registrada na Seção 8 |
+| Tratamento das reprovações | Cada caso reprovado possui registro local com evidência, classificação entre defeito de implementação e divergência de requisito e ação corretiva proposta. Nesta campanha acadêmica, o registro está em `docs/evidencias/testes-funcionais/defeitos.md`; não se exige abertura de issue remota |
+| Registro dos não executados | Cada caso marcado como *Planejado* permanece no plano com a sprint de execução atualizada, e nenhum é retirado sem decisão registrada na Seção 7 |
 
 Nenhum caso é considerado aprovado por inspeção de código. A aprovação exige execução com evidência registrada, o que vale inclusive para os casos cujo comportamento já está coberto pela suíte de unidade: a proximidade entre um teste de unidade existente e um caso funcional não dispensa a execução do caso.
 
@@ -7131,7 +7121,7 @@ Três limites afetam a força das conclusões que a execução deste plano poder
 
 #### Evolução do plano
 
-O plano é revisado ao final de cada sprint. A revisão atualiza a coluna **Estado** da Seção 6.2.2 conforme os componentes forem construídos, acrescenta casos quando a construção revelar comportamento não previsto na especificação e registra na Seção 8 toda remoção de caso, com a justificativa. Os identificadores `CT-RFxx-nn` não são renumerados entre revisões, de modo que a evidência anexada a uma issue da Sprint 4 continue localizável na Sprint 5.
+O plano é revisado ao final de cada sprint. A revisão atualiza a coluna **Estado** da Seção 6.2.2 conforme os componentes forem construídos, acrescenta casos quando a construção revelar comportamento não previsto na especificação e registra na Seção 7 toda remoção de caso, com a justificativa. Os identificadores `CT-RFxx-nn` não são renumerados entre revisões, de modo que a evidência anexada a uma issue da Sprint 4 continue localizável na Sprint 5.
 
 A consolidação da cobertura alcançada, confrontando o planejado nesta seção com o efetivamente executado, é objeto da Seção 6.6.
 
@@ -7753,11 +7743,13 @@ O adaptador de armazenamento traduz apenas o erro `NoSuchKey` do `botocore`, con
 
 O chat converte `ServerError` e `ClientError` 429 do Gemini em `503 service_unavailable`. Outras exceções não tratadas resultam em `500 internal_error`. Texto nulo provoca 500 na serialização, mas string vazia é aceita pelo schema atual (200), embora não seja resposta útil. TI-21 separa essas variantes; 429 externo não equivale a 429 público.
 
-### 6.4.3 Uso Planejado do Módulo VHS
+### 6.4.3 Módulo VHS: Planejamento e Implementação
 
-**Ferramenta escolhida para o planejamento: VCR.py (`vcrpy`).** O módulo VHS será implementado como gravação e reprodução de interações HTTP externas na suíte Python, atendendo ao mecanismo descrito na entrega e na Seção 3.8.10. A escolha é técnica deste plano, sem atribuir aprovação específica ao professor. A instalação e a integração com Deepgram e Google GenAI compõem a próxima sprint.
+**Ferramenta escolhida para o planejamento: VCR.py (`vcrpy`).** O módulo VHS grava e reproduz interações HTTP externas na suíte Python, atendendo ao mecanismo descrito na entrega e na Seção 3.8.10. A escolha é técnica deste plano, sem atribuir aprovação específica ao professor.
 
-A interceptação deve preservar o SDK e a serialização utilizados pela aplicação. A primeira tarefa de implementação será verificar, para cada transporte, gravação em arquivo, replay em novo processo e ausência de nova chamada externa. Caso algum transporte não seja interceptado, o adaptador deverá ser ajustado antes de considerar esse provedor coberto pelo VHS. [Instalação do VCR.py](https://vcrpy.readthedocs.io/en/latest/installation.html).
+**Estado na Sprint 4.** O módulo foi implementado em [`tests/vhs/`](../tests/vhs), com a suíte [`tests/test_integracao_vhs.py`](../tests/test_integracao_vhs.py), e `vcrpy` está fixado na versão 8.3.0 no extra `dev` do `pyproject.toml` — e não em `requirements.txt`, porque a imagem de produção não reproduz fita. A integração com Deepgram e Google GenAI permanece pendente: é o conteúdo de TI-59, e exige sessão controlada com credencial. O quadro de estado item a item está ao final desta seção.
+
+A interceptação deve preservar o SDK e a serialização utilizados pela aplicação. A prova de compatibilidade foi executada antes de escrever o módulo, como esta seção previa: `deepgram-sdk` 7.8.1 e `google-genai` 2.22.0 constroem clientes `httpx`, e o `httpx_stubs` do VCR.py intercepta tanto o transporte síncrono quanto o assíncrono — uma chamada real na gravação, nenhuma no replay, com `play_count` incrementado. A mesma prova mostrou o que acontece sem os callbacks de sanitização: o `Authorization` enviado e o `Set-Cookie` recebido ficam legíveis no arquivo gravado. É essa a falha que o item 3 previne e que TI-50 vigia. Caso algum transporte deixe de ser interceptado, o adaptador deverá ser ajustado antes de considerar esse provedor coberto pelo VHS. [Instalação do VCR.py](https://vcrpy.readthedocs.io/en/latest/installation.html).
 
 **Mock** fornece comportamento controlado, inclusive uma exceção sem resposta HTTP. **Cache** reaproveita respostas por chave durante uma validade. **VHS/VCR** preserva interação real para replay posterior. Uma fixture escrita manualmente é simulada, não uma gravação real. Timeout de rede sem resposta será produzido por mock do transporte ou atraso controlado: não se afirma que VCR.py grave automaticamente essa ausência de resposta. O replay elimina variabilidade da resposta gravada, mas não prova contrato atual, qualidade do modelo atual nem latência de produção.
 
@@ -7773,7 +7765,7 @@ Esses modos pertencem ao VCR.py, conforme a [documentação de gravação e repr
 **Contrato de implementação para a próxima sprint:**
 
 1. Instalar apenas no ambiente de desenvolvimento: `python -m pip install vcrpy`. Registrar a versão resolvida e aprová-la para a stack antes de incluir nas dependências em uma tarefa de implementação separada.
-2. Criar futuramente `tests/test_integracao_vhs.py` e `tests/fixtures/vhs/`. Separar cassette por provedor, modelo, cenário e versão de contrato. Para chat, considerar mensagem exata, instrução e parâmetros; para STT, hash do áudio, idioma, modelo e termos; para TTS, texto, voz, modelo e formato; para embeddings, texto, modelo e dimensão. Não normalizar diferenças semanticamente relevantes.
+2. Criar `tests/test_integracao_vhs.py` e `tests/fixtures/vhs/`. Separar cassette por provedor, modelo, cenário e versão de contrato. Para chat, considerar mensagem exata, instrução e parâmetros; para STT, hash do áudio, idioma, modelo e termos; para TTS, texto, voz, modelo e formato; para embeddings, texto, modelo e dimensão. Não normalizar diferenças semanticamente relevantes.
 3. Configurar `vcr.VCR` com `record_mode="none"`, `match_on=["method", "scheme", "host", "port", "path", "query", "body"]`. Remover `authorization`, `x-goog-api-key`, cookies e parâmetros de chave antes de persistir; usar callbacks para corpos e cabeçalhos de resposta. Revisar a proteção em ambos os sentidos. A configuração exata dos callbacks deve acompanhar o teste de sanitização, conforme os [filtros e callbacks do VCR.py](https://vcrpy.readthedocs.io/en/latest/advanced.html).
 4. Gravar uma interação sintética com `once` e a porta real do SDK, medindo chamadas de rede no transporte abaixo da interceptação. Fechar o contexto para persistir. Reabrir com `none`, repetir a mesma operação e confirmar igualdade do contrato/conteúdo e zero novas saídas de rede. `cassette.play_count` mede replay; não substitui contador externo de chamadas reais. O segundo teste deve funcionar em novo processo, não depender da memória da primeira execução.
 5. Para dados dinâmicos, normalizar somente identificadores/horários sem efeito semântico, mantendo correspondência entre referências; não apagar versão do modelo, texto, projeto, voz ou instrução. Não alterar o conteúdo de resposta para fazê-lo passar. Se a sanitização quebrar o contrato, descartar a gravação e usar outra massa sintética.
@@ -7783,7 +7775,24 @@ Esses modos pertencem ao VCR.py, conforme a [documentação de gravação e repr
 9. Rodar primeiro prova de compatibilidade com cada SDK. Depois integrar as suítes STT, TTS, chat e embedding ao replay. Manter MinIO e PostgreSQL reais nas suítes que verificam persistência. Isolar gravações de processos concorrentes para evitar corrupção de arquivo.
 10. Antes de uma entrega e após mudança de SDK/modelo/contrato, executar smoke real controlado e comparar esquema, status e conteúdo estrutural com o registro. Aprovação de replay antigo não aprova o provedor atual. Antes da gravação, fixar no manifesto o número máximo de chamadas reais e interromper a campanha ao atingir esse limite; repetir a verificação em cada entrega ou mudança dessas dependências.
 
-**Comando futuro:** `python -m unittest tests.test_integracao_vhs -v`, após criar o módulo e instalar a biblioteca. A suíte deve falhar na ausência de cassette obrigatório, jamais informar sucesso com zero testes. Não foi executada nesta revisão.
+**Estado dos dez itens do contrato.** O quadro abaixo registra o que a implementação atendeu, e onde. "Parcial"
+não é ressalva de estilo: significa que a parte pendente depende de credencial de provedor e de sessão de
+gravação controlada, que não ocorreram nesta entrega.
+
+| Item do contrato | Estado | Onde, e o que ficou de fora |
+|---|---|---|
+| 1. Instalar só em desenvolvimento e registrar a versão resolvida | Atendido | `vcrpy==8.3.0` no extra `dev` do `pyproject.toml`; ausente de `requirements.txt` |
+| 2. Suíte e fixtures, com cassette por provedor, modelo, cenário e versão | Atendido | `tests/test_integracao_vhs.py` e `tests/fixtures/vhs/`; chave em `tests/vhs/chave.py`, com construtores para STT, chat, TTS e embedding |
+| 3. `match_on` completo e remoção de credenciais nos dois sentidos | Atendido | `tests/vhs/sanitizacao.py`, com remoção por nome e por valor; critério de correspondência em `tests/vhs/fita.py`. Verificado por TI-50 |
+| 4. Gravar com `once`, reproduzir em processo novo, contar abaixo da interceptação | Atendido com provedor sintético | TI-48 grava, reproduz em subprocesso com o servidor desligado e confere o contador do próprio servidor, independente do `play_count` |
+| 5. Normalizar apenas o que não tem efeito semântico | Atendido por construção | `tests/vhs/chave.py` não aplica `strip`, `lower` nem remoção de acento ao conteúdo; TI-52 cobre idioma, modelo, termos, massa e instrução |
+| 6. Manifesto com hash, versões, instante, validade e origem | Atendido | `tests/vhs/manifesto.py`, com campanha, marca `real`/`simulado` e remoção de temporários no encerramento |
+| 7. Validade verificada no harness, com relógio injetável | Atendido | `Manifesto.validar` distingue ausente, corrompido e vencido; TI-47 cobre antes e depois do prazo sem esperar dias |
+| 8. Versionar apenas amostra sintética sanitizada | Atendido | política em `tests/fixtures/vhs/README.md`; `*.candidato.yaml` fora do versionamento |
+| 9. Prova de compatibilidade por SDK, depois integrar as suítes | Parcial | compatibilidade do transporte verificada; a integração de STT, TTS, chat e embedding ao replay é TI-59 |
+| 10. Teto de chamadas reais e smoke real antes da entrega | Parcial | o teto está implementado e testado em `TestManifestoVhs`, e abrir campanha sobre outra em andamento é recusado, para que o limite valha por campanha e não por execução; o smoke real depende de sessão controlada com credencial |
+
+**Comando de execução:** `python -m unittest tests.test_integracao_vhs -v`. Em 19/09/2026 a suíte executou 10 testes, todos aprovados: os seis casos TI-47 a TI-52 e quatro casos do próprio contrato do harness — teto de chamadas reais, guarda de reabertura de campanha, encerramento de campanha e recarga do manifesto. A exigência original permanece: a suíte falha na ausência de cassette obrigatório, e zero testes não é sucesso.
 
 **Evidências esperadas:** cassette sanitizado e manifesto; log de gravação e replay; contagem de cache hit/miss; contador de rede/spy indicando uma primeira chamada e nenhuma segunda chamada externa; saída do executor; comparação de tempo real versus replay; teste offline e inspeção de ausência de segredos.
 
@@ -7791,7 +7800,7 @@ Esses modos pertencem ao VCR.py, conforme a [documentação de gravação e repr
 
 Casos de teste detalhados. Os identificadores seguem a numeração `TI-nn`, sequencial por suíte. O nome de cada caso corresponde à convenção de classe e método já adotada em `tests/` (`TestNomeDoCaso.test_descricao_do_cenario`). Quando duas ou mais causas produzem exatamente a mesma resposta do sistema, o catálogo reúne essas causas num único caso, com a entrada listando as variantes e o resultado esperado cobrindo todas elas; é o caso, por exemplo, de `test_falha_de_infraestrutura_retorna_500`, que cobre bucket inexistente, credencial inválida e serviço indisponível porque as três produzem hoje o mesmo `500 internal_error` sem distinção.
 
-A tabela relaciona cada suíte à dependência que ela isola e ao mecanismo usado para isolá-la. O replay planejado cobre respostas HTTP de sucesso e erro capturáveis. Falhas sem resposta e parâmetros de chamadas usam mocks/spies, com origem simulada identificada; nenhuma dessas suítes foi implementada como VHS.
+A tabela relaciona cada suíte à dependência que ela isola e ao mecanismo usado para isolá-la. O replay planejado cobre respostas HTTP de sucesso e erro capturáveis. Falhas sem resposta e parâmetros de chamadas usam mocks/spies, com origem simulada identificada. O módulo VHS existe desde a Sprint 4 (Seção 6.4.3), e nenhuma destas suítes de provedor foi ligada a ele ainda: as gravações de Deepgram e Google dependem de sessão controlada com credencial, que é o objeto de TI-59.
 
 | Suíte | Dependência isolada nos testes | Mecanismo |
 |---|---|---|
@@ -7924,6 +7933,8 @@ Suíte de contrato `ContratoBarramentoMensagens`, planejada para um intermediár
 | TI-51 | Positivo | `TestVhsIntegracao.test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado` | Execução nos modos `ignorar` e `atualizar` | Sem contexto VCR não há leitura/gravação; `all` grava versão candidata. Modos antigos ignorar/atualizar não são variáveis implementadas | RNF01 |
 | TI-52 | Positivo | `TestVhsIntegracao.test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao` | Alteração de idioma, modelo ou instrução de sistema | Nova chave gerada; registro anterior não é reaproveitado | RNF01, RNF11 |
 
+Os seis casos acima foram implementados em [`tests/test_integracao_vhs.py`](../tests/test_integracao_vhs.py) e executados na Sprint 4. O provedor que eles exercitam é um servidor HTTP local e sintético, alcançado pelo mesmo transporte `httpx` dos dois SDKs — o que o item 4 da Seção 6.4.3 autoriza como interação sintética pela porta real do SDK. O que essa execução demonstra é o harness: chave, validade, sanitização, ausência de rede no replay e o comportamento dos quatro modos. O que ela não demonstra é o replay de uma gravação da Deepgram ou do Google, que continua sendo TI-59.
+
 #### Integrações adicionais, VHS e contratos revisados
 
 Os duplicados de persistência anteriormente chamados TI-30 e TI-31 passam a TI-53 e TI-54. TI-30/TI-31 continuam identificando frontend/chat e frontend/áudio; referências antigas precisam mencionar a suíte para desambiguar. Os demais IDs foram preservados.
@@ -7976,17 +7987,19 @@ Ferramentas e bibliotecas, com justificativa.
 
 `app.dependency_overrides`: mecanismo de composição que substitui o adaptador real pelo dublê ou pelo módulo VHS nos casos que o exigem.
 
-`httpx`: dependência de transporte do `TestClient`, incluída no extra de desenvolvimento do `pyproject.toml`.
+`httpx`: dependência de transporte do `TestClient`, incluída no extra de desenvolvimento do `pyproject.toml`. É também o transporte que `deepgram-sdk` e `google-genai` usam por baixo, e o ponto em que o VHS intercepta.
+
+`vcrpy`: biblioteca do módulo VHS, fixada na versão 8.3.0 no extra `dev`. Grava a interação real e a reproduz depois; o que o módulo de [`tests/vhs/`](../tests/vhs) acrescenta em volta dela — chave, validade, sanitização, manifesto e bloqueio de rede — está na Seção 6.4.3.
 
 `docker compose`: provisiona MinIO e `minio-init`; PostgreSQL de teste deve ser preparado separadamente, pois não há serviço de banco nessa composição.
 
 `boto3`: cliente independente do usado pela aplicação, para conferir de fora o estado do bucket após cada operação.
 
-`ContratoWebhookInbound` e `ContratoBarramentoMensagens`: classes ainda não implementadas, propostas para descrever o comportamento exigido de webhooks e do barramento de mensagens independentemente do provedor selecionado, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste.
+`ContratoWebhookInbound` e `ContratoBarramentoMensagens`: classes que descrevem o comportamento exigido de webhooks e do barramento de mensagens independentemente do provedor selecionado, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste. `ContratoWebhookInbound` foi implementada em [`tests/test_integracao_contrato_webhook.py`](../tests/test_integracao_contrato_webhook.py) e é reexecutada, sem reescrever caso algum, contra o dublê em memória, o Microsoft Graph, o Google Drive e o PostgreSQL. `ContratoBarramentoMensagens` continua proposta, à espera da escolha do barramento.
 
 Padrão de validação. Cada caso verifica o código de status HTTP ou o efeito observável da operação, a integridade do payload desserializado para o schema Pydantic correspondente e, quando aplicável, o estado persistido (releitura do objeto no bucket, ou da linha na tabela) e o comportamento do módulo VHS, comparando o número de chamadas ao adaptador real entre a primeira e a segunda execução com a mesma chave.
 
-Ambiente e comandos futuros. A execução unitária existente é `python -m unittest discover -s tests -v`. A execução de integração planejada deverá usar `python -m unittest discover -s tests -p "test_integracao_*.py" -v`, depois de implementar os módulos; hoje esse padrão não corresponde a suíte existente e zero testes não é sucesso do artefato. O módulo VHS planejado usa configuração VCR explícita, não `VHS_MODO` inexistente.
+Ambiente e comandos. A execução unitária é `python -m unittest discover -s tests -v`. A execução de integração usa `python -m unittest discover -s tests -p "test_integracao_*.py" -v`, e o padrão hoje corresponde a 65 testes: as quatro suítes de webhook (TI-35 a TI-42) e a suíte do módulo VHS. Dezoito deles são pulados quando não há PostgreSQL de teste alcançável, o que é registro de execução parcial, não aprovação — a advertência original continua valendo, e zero testes não é sucesso do artefato. O módulo VHS usa configuração VCR explícita, e não uma variável `VHS_MODO`, que segue não existindo.
 
 Para a preparação local do MinIO, usar a composição existente em ambiente dedicado; não iniciar indiscriminadamente toda a pilha para testar uma única dependência. A base PostgreSQL de testes deve ser provisionada separadamente, com os scripts da pasta `src/database` revisados para aquele destino. `python scripts/verificar_modelo_documentado.py --sem-banco` compara documento e DDL sem acesso remoto. Executar a verificação real de SQL e retenção somente na base dedicada, registrando consultas, identidades e estado antes/depois.
 
@@ -8224,7 +8237,7 @@ A matriz abaixo complementa a decomposição C1.1-C6.5 e as fichas de cada categ
 | RNF10 | 10x concorrência: p95 ≤ 20 s e ≤ 2x baseline; memória treinamento ≤ 8x e serviço ≤ 2x | CT-RNF10-C-P/N, CT-RNF10-M-P/N; CT-DES-01-05 | Desempenho | Servidor, PLN, RAG | HTTPX, psutil | Baselines, RSS/CPU, percentis e erros | Planejado; carga nominal proposta |
 | RNF11 | ≥ 85% das sugestões com fonte sustentadora e justificativa compreensível | CT-RNF11-P/N; CT-RF04-04/07; TU-09 | RNF, funcional, usabilidade | Sugestões | Rubricas independentes | Fontes, sugestões, julgamentos e desempates | Planejado |
 | RNF12 | 100% das referências recuperáveis; ≥ 90% das afirmações sustentadas; limitação segura | CT-RNF12-P/N; CT-RF03-06; TI-55/58/63 | RNF, funcional, integração | RAG e gerador | Duas rubricas, HTTPX | Afirmações atômicas e evidências citadas | Planejado |
-| Seção 3.8.10 / VHS | Reuso temporário de interações externas | TI-47-52, TI-59-61; CT-DES-03 | Integração, desempenho | Transporte dos SDKs | VCR.py escolhido, contador de rede | Cassette, hit/miss, sanitização e offline | Planejado com VCR.py |
+| Seção 3.8.10 / VHS | Reuso temporário de interações externas | TI-47-52, TI-59-61; CT-DES-03 | Integração, desempenho | Transporte dos SDKs | VCR.py 8.3.0, contador de rede | Cassette, hit/miss, sanitização e offline | TI-47-52 implementados e executados; TI-59-61 pendentes de gravação com os SDKs reais |
 | Contrato TTS / risco de canal adicional | WAV válido ou erro controlado; não substituir texto | TI-11-15 | Integração | GenerateSpeech/Gemini | HTTPX/SDK | WAV, headers, erro e ausência de chamada inválida | Planejado; não cria RF de voz de saída |
 | Seção 3.2.5 | Expiração do áudio incoming em sete dias | TI-62 | Integração | MinIO/S3 | boto3 e relógio/monitor | Política e expurgo real | Planejado |
 
@@ -8268,19 +8281,310 @@ Os testes com mocks e replay serão complementados por chamadas reais controlada
 
 ---
 
-# 7. Execução dos Testes Sistêmicos
+## 6.7 Execução dos testes sistêmicos — campanha funcional da Sprint 4
 
-Esta seção registra a execução dos testes planejados na Seção 6. O plano não é reescrito: a Seção 6 permanece como foi entregue na Sprint 3, porque um plano corrigido depois de conhecido o resultado deixa de servir como critério. O que esta seção faz é declarar, sobre uma versão identificada do sistema, o que foi executado, com que instrumento, o que o instrumento mostrou e o que ficou de fora.
+### 6.7.1 Objetivo, versão e atualização do planejamento
+
+Esta seção registra a execução técnica da campanha funcional iniciada em
+18/09/2026, dando continuidade às Seções 6.1, 6.2 e 6.6. O objetivo é verificar
+o comportamento da solução pelos critérios dos requisitos, identificar
+problemas antes da apresentação do protótipo e preservar evidências
+reproduzíveis. A execução técnica utiliza os scripts e comandos documentados
+abaixo; seus resultados não representam avaliação por usuários externos.
+
+Os resultados
+não se estendem a versões posteriores. Não se alteraram os critérios oficiais
+para acomodar o comportamento observado. A orientação de entrega recebida
+exige ferramentas justificadas, casos completos, scripts, evidências,
+participação externa e análise crítica; esses elementos foram organizados nas
+subseções abaixo. Não foi fornecido feedback específico do professor que
+permita atribuir uma alteração a essa revisão.
+
+A entrega é a execução e documentação local dos
+testes funcionais disponíveis nesta versão do protótipo acadêmico. Os casos
+futuros continuam no inventário com suas dependências; sua implementação não
+faz parte desta task. Falhas ficam registradas localmente com evidências e
+melhorias propostas, sem operações no GitLab. A execução pode ser encerrada
+com reprovações e bloqueios documentados; isso não significa que os requisitos
+tenham sido integralmente atendidos. Sessões com participantes pertencem à
+parte de usabilidade do artefato maior e não serão inventadas para encerrar
+a campanha técnica.
+
+| Planejamento anterior | Atualização operacional desta campanha |
+|---|---|
+| SSO e persistência descritos em alguns trechos como futuros | Código atual possui autenticação e registro lateral do chat. Prontidão é conferida por caso; presença de código não equivale a aprovação |
+| Ausência de PostgreSQL no Compose declarada em 6.1.3 | Compose atual contém PostgreSQL 16. Utilizou-se outro contêiner, exclusivo de testes, para a suíte destrutiva |
+| Três arquivos de teste frontend e CI ainda futuro | Há cinco arquivos frontend e configuração `.gitlab-ci.yml`. Esta campanha produziu logs locais, sem afirmar execução do pipeline remoto |
+| Estado histórico do catálogo | Preservado como fotografia do planejamento; o resultado atual está na matriz de 6.7.3 |
+| Casos de RF06 com escrita e autorização por cargo | Seis IDs históricos continuam fora do recorte por D04/D07; RF06-06 continua aplicável ao MVP |
+| Evidências previstas sem arquivos | Scripts, matrizes, observáveis HTTP e logs versionados em `docs/evidencias/testes-funcionais/` |
+
+As correções operacionais acima prevalecem sobre as afirmações históricas de
+prontidão para esta rodada. As fichas de 6.2.3 e 6.2.6 continuam sendo o oráculo.
+A campanha não substitui desempenho, fidelidade de transcrição, avaliação
+estatística cega, integração externa real ou usabilidade de 6.3 a 6.5.
+
+### 6.7.2 Ferramentas, ambiente e massas efetivamente utilizados
+
+| Ferramenta / biblioteca | Uso e justificativa | Limite da evidência |
+|---|---|---|
+| Docker e imagem `dev` do Dockerfile da API | Dependências instaladas conforme `pyproject.toml`, Python 3.12; evita usar Python 3.14 do host sem dependências | Build local, sem comprovar implantação em nuvem |
+| `unittest` | Regressão existente com logs detalhados e banco dedicado | Testes de componente não substituem casos funcionais |
+| FastAPI `TestClient` / HTTPX | Requisição, validação, rota e serviço reais em processo; resposta HTTP e efeitos registrados por variante | Não percorre proxy/navegador; autenticação de campanha injetada |
+| `wave`, PyAV e boto3 | WAVs binariamente válidos, sondagem real e releitura independente no MinIO | PCM sintético não comprova reconhecimento de fala |
+| MinIO real, release `2025-09-07T16-13-09Z` | Bucket exclusivo; comprovar persistência e ausência de objetos rejeitados | Não comprova armazenamento de produção |
+| PostgreSQL 16 Alpine e psycopg | DDL, massa sintética, políticas e regressão de persistência | Banco relacional dedicado; índice vetorial não provisionado |
+| Vitest, Testing Library e jsdom | Verificar confirmação, edição/descarte e comunicação de falha na interface | Microfone, permissões e navegador reais não exercitados |
+| JSON, CSV e Markdown | Observáveis brutos por variante, catálogo estável e agregação por ID | Contagens não são cobertura de linhas |
+
+O ambiente é local, em macOS ARM64 com contêineres Linux. Versões e recursos
+do Docker estão nos [registros de versão](evidencias/testes-funcionais/docker-versao.log)
+e [recursos](evidencias/testes-funcionais/docker-recursos.log); os recursos
+registrados pertencem à VM Docker e não são uma medição de desempenho.
+A rede dedicada
+`az1-functional-test` não publica o banco nem o MinIO para serviços externos.
+Não se carregou `.env` no backend (`PYTHON_DOTENV_DISABLED=1`), não se alterou
+Supabase compartilhado nem se consumiram Deepgram/Gemini reais. O Python do
+host foi usado apenas para extração/consolidação com biblioteca padrão.
+
+A massa de áudio é gerada pelo script: WAV mono PCM, vazio, RIFF truncado,
+assinatura Ogg, arquivo de 12 MiB, WAV de 360 segundos, WAVs de 300 e 300,001
+segundos, arquivo válido de exatamente 10 MiB e variante de 10 MiB + 1 byte.
+O teste de tamanho usa PCM a 48 kHz para não ultrapassar o limite de duração.
+As entradas textuais incluem cinco consultas sintéticas, vazio, espaços,
+3.999/4.000/4.001 caracteres e espaços externos. Hash, tamanho e resposta são
+registrados no JSON; mensagens extensas são representadas por comprimento e
+hash, evitando logs redundantes. Cada variante observa novos objetos e
+chamadas ao gerador quando aplicável.
+
+Para RF01-04, o lote C de avaliação estatística foi substituído operacionalmente
+por cinco consultas sintéticas fixadas no script, exclusivamente para verificar
+transporte e resposta textual. Isso não habilita os casos de classificação
+RF02-01 a 03 nem comprova conteúdo correto de negócio. A alteração de massa
+e o modelo controlado limitam expressamente a aprovação desse ensaio.
+
+Os modelos de texto/fala da campanha são dublês determinísticos; o
+orquestrador Gemini é real nos ensaios de recusa/esclarecimento, com recuperação
+instrumentada. A falha STT é injetada no cliente do provedor sobre objeto real,
+sem cassette VHS. Não se apresenta essa injeção como execução do módulo VHS.
+
+### 6.7.3 Casos completos e matriz de execução
+
+Os 62 IDs são preservados, com propósito, entradas, pré-condições, passos,
+resultado e critério nas Seções 6.2.3 e 6.2.6. As massas e passos comuns estão
+em 6.1.3 e 6.2.3. O [catálogo operacional detalhado](evidencias/testes-funcionais/catalogo.md)
+reúne essas fichas sem redefinir os requisitos. A [matriz CSV](evidencias/testes-funcionais/matriz.csv)
+registra prioridade, resultado, motivo, variantes, evidência e próxima etapa.
+
+**Convenção de resultados.** Aprovado controlado significa que todos os
+observáveis do caso passaram no recorte descrito, com dependências externas
+explicitamente controladas. Parcial significa que variantes passaram, mas
+faltam pré-condições ou observáveis; não conta como aprovação integral.
+Reprovado indica divergência executada e demonstrável. Bloqueado indica falta
+de pré-condição ou instrumento. Fora do recorte identifica os seis casos
+históricos excluídos do MVP. Não há aprovação por inspeção de código.
+
+<!-- MATRIZ-FUNCIONAL-INICIO -->
+**Resultado agregado:** 5 parciais; 37 bloqueados; 12 aprovados no recorte controlado; 2 reprovados; 6 fora do recorte. São 56 IDs aplicáveis e seis históricos fora do recorte. Aprovação controlada não equivale a homologação sistêmica.
+
+| Caso | Prioridade | Resultado | Variantes | Motivo / dependência |
+|---|---|---|---:|---|
+| CT-RF01-01 | Alta | Parcial | 1 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF01-02 | Alta | Bloqueado | 0 | Falta execução navegador/microfone real ou gravações faladas nos quatro formatos; comparação comum de intenção pendente. |
+| CT-RF01-03 | Alta | Parcial | 1 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF01-04 | Alta | Aprovado controlado | 5 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-05 | Alta | Bloqueado | 0 | Falta execução navegador/microfone real ou gravações faladas nos quatro formatos; comparação comum de intenção pendente. |
+| CT-RF01-06 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-07 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-08 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-09 | Alta | Aprovado controlado | 2 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-10 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-11 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-12 | Alta | Parcial | 1 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF01-13 | Alta | Aprovado controlado | 2 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-14 | Alta | Aprovado controlado | 1 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-15 | Alta | Parcial | 2 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF01-16 | Alta | Aprovado controlado | 4 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-17 | Alta | Aprovado controlado | 2 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-18 | Alta | Aprovado controlado | 10 | Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real. |
+| CT-RF01-19 | Alta | Parcial | 2 | Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral. |
+| CT-RF02-01 | Alta | Bloqueado | 0 | Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito. |
+| CT-RF02-02 | Alta | Bloqueado | 0 | Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito. |
+| CT-RF02-03 | Alta | Bloqueado | 0 | Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito. |
+| CT-RF02-04 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-05 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-06 | Alta | Reprovado | 1 | Observável obrigatório divergente; consultar funcionais.json e registro de defeitos. |
+| CT-RF02-07 | Alta | Reprovado | 1 | Observável obrigatório divergente; consultar funcionais.json e registro de defeitos. |
+| CT-RF02-08 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-09 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-10 | Alta | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF02-11 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-12 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-13 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF02-14 | Alta | Bloqueado | 0 | Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito. |
+| CT-RF03-01 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-02 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-03 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-04 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-05 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF03-06 | Alta | Bloqueado | 0 | Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha. |
+| CT-RF04-01 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-02 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-03 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-04 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-05 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-06 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-07 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF04-08 | Média | Bloqueado | 0 | Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha. |
+| CT-RF05-01 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-02 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-03 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-04 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-05 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-06 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-07 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-08 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF05-09 | Alta | Bloqueado | 0 | Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática. |
+| CT-RF06-01 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-02 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-03 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-04 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-05 | Média | Fora do recorte | 0 | D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP. |
+| CT-RF06-06 | Média | Bloqueado | 0 | Fonte dedicada para comparação antes/depois e diálogo explicativo do MVP ainda precisam ser exercitados conjuntamente. |
+<!-- MATRIZ-FUNCIONAL-FIM -->
+
+As prioridades desta rodada adotam ordenação conservadora: RF01/RF02/RF03/RF05
+antes de RF04/RF06, em função do fluxo central, fundamentação e proatividade.
+Não alteram a prioridade comercial nem os critérios qualitativos de 6.6.2.
+Nos casos bloqueados, a próxima janela é Sprint 4/5 conforme disponibilidade;
+prazo e responsável humano devem ser confirmados no Kanban antes da execução.
+
+### 6.7.4 Scripts, estrutura e reprodução
+
+| Script / arquivo | Responsabilidade |
+|---|---|
+| `scripts/executar_testes_funcionais.py` | Gerar massas, executar variantes HTTP com serviços reais e dublês identificados, comparar resultados/efeitos e escrever JSON/log; retorno 1 para reprovação e 2 para falha do instrumento |
+| `scripts/consolidar_testes_funcionais.py` | Extrair todas as fichas, validar os 62 IDs e gerar catálogo JSON/Markdown e matriz CSV/Markdown; nunca converter parcial/bloqueio em aprovação |
+| `src/frontend/src/pages/AgentPage.test.jsx` | Regressão de transcrição e chat; acrescenta correção confirmada CT-RF01-19 e feedback de rede CT-RF01-15 |
+| `tests/` | Suíte de regressão existente, executada com `TEST_DATABASE_URL` dedicado |
+
+O [procedimento de reprodução](evidencias/testes-funcionais/REPRODUCAO.md)
+contém preparação, comandos, isolamento e interpretação dos códigos de saída.
+O [manifesto da rodada](evidencias/testes-funcionais/manifesto.json) identifica
+commit base, hashes dos arquivos de execução e evidências finais, permitindo
+distinguir esta versão de scripts e resultados de alterações posteriores.
+Cada ensaio constrói suas pré-condições. O script funcional conta efeitos
+antes/depois de cada requisição e relê o conteúdo aceito por S3. Sob o limite
+de mensagem, o modelo controlado deve ser chamado; acima dele ou com vazio,
+não deve ser consumido. Saídas e oráculos devem ser preservados antes de uma
+nova rodada. Mudanças de implementação exigem reteste identificado.
+
+### 6.7.5 Registros, resultados e ações corretivas
+
+<!-- RESULTADOS-FUNCIONAIS-INICIO -->
+| Execução | Resultado desta rodada | Evidência |
+|---|---|---|
+| Variantes funcionais HTTP | 35 variantes; 33 passaram nos observáveis técnicos e 2 reprovaram. Agregação por caso somente em 6.7.3 | [JSON](evidencias/testes-funcionais/funcionais.json), [log](evidencias/testes-funcionais/funcionais.log) |
+| Regressão backend | 502 testes: aprovados, sem falhas nem testes ignorados; PostgreSQL real exclusivo | [Log final](evidencias/testes-funcionais/backend.log) |
+| Regressão frontend | 20/20 testes passaram, 0 falhas; jsdom e dependências controladas | [JSON](evidencias/testes-funcionais/frontend.json), [log](evidencias/testes-funcionais/frontend.log) |
+| Build API | Imagem dev construída com as dependências do projeto | [Log](evidencias/testes-funcionais/build-api.log) |
+| DDL, massa e políticas | Executados no PostgreSQL de testes; índice vetorial ausente, comparação RAG não executada | [DDL](evidencias/testes-funcionais/database-ddl.log), [massa](evidencias/testes-funcionais/database-massa.log), [políticas](evidencias/testes-funcionais/database-permissoes.log) |
+| Build frontend | Aprovado; aviso sobre bundle superior a 500 kB | [Log](evidencias/testes-funcionais/frontend-build.log) |
+| Lint frontend | Comando terminou com sucesso, mas emitiu oito avisos React; não apresentar como zero avisos | [Log](evidencias/testes-funcionais/frontend-lint.log) |
+| Navegador | Envio real com API ausente, pelo harness; erro genérico e nenhum conteúdo fictício; resultado parcial | [Registro](evidencias/testes-funcionais/navegador.json), [captura](evidencias/testes-funcionais/CT-RF01-15.png) |
+
+A primeira rodada da regressão teve oito erros de preparação por arquivos não montados. Os mounts foram corrigidos e a suíte inteira foi repetida; o [log inicial](evidencias/testes-funcionais/backend-rodada1.log) foi preservado. A repetição do instrumento funcional também revelou bucket já existente; corrigiu-se a preparação sem alterar os oráculos. Os registros de desenvolvimento `funcionais-rodada1.*` são anteriores à revisão de rastreabilidade: a entrada de projeto ausente estava identificada incorretamente como RF02-08, corrigida para RF02-06 na rodada final. Somente `funcionais.json`/`funcionais.log` finais alimentam a matriz.
+
+As duas reprovações finais são CT-RF02-06 (consulta sem projeto e sem esclarecimento prévio) e CT-RF02-07 (busca para pedido fora do domínio). A recuperação foi chamada uma vez em cada cenário; a recusa por falta de evidência não elimina essa divergência. Correção e reteste funcionais permanecem pendentes.
+<!-- RESULTADOS-FUNCIONAIS-FIM -->
+
+O controle de abas inicialmente retornou `No browser is available`. O acesso
+ao Chrome nativo via CUA permitiu executar o envio com API indisponível pelo
+harness de desenvolvimento, preservando `AgentPage` e o cliente HTTP reais,
+sem representar login SSO. A [captura de CT-RF01-15](evidencias/testes-funcionais/CT-RF01-15.png)
+mostra erro genérico e ausência de conteúdo fictício; a barra do navegador foi
+recortada. O [registro do ensaio](evidencias/testes-funcionais/navegador.json)
+e o [log do proxy](evidencias/testes-funcionais/navegador-proxy.log) documentam
+`ECONNREFUSED`. Não houve execução de microfone nem sessão humana externa.
+Os casos de interface permanecem parciais. Evidências HTTP registram respostas,
+hashes e efeitos, sem tokens ou chaves reais.
+
+Problemas funcionais e ações propostas são registrados no
+[registro de defeitos](evidencias/testes-funcionais/defeitos.md). Esse arquivo
+é o registro de problemas desta campanha. Correções de regras de negócio
+ficam como melhorias propostas e exigirão reteste quando implementadas;
+nenhuma reprovação foi convertida em aprovação para concluir a documentação.
+
+### 6.7.6 Execução com usuários externos e melhorias de interface
+
+Não foram realizadas sessões com usuários externos nesta rodada. Não existem
+participantes, respostas SUS, feedback humano ou aceite produzidos pela
+automação. Essa parte da entrega permanece pendente e impede afirmar
+conclusão do artefato sistêmico completo. O
+[roteiro e a ficha de sessão](evidencias/testes-funcionais/sessoes-externas.md)
+preparam cinco participantes externos, consentimento, tarefas disponíveis,
+gabarito, observação, tempo, erros, ajuda, feedback e SUS conforme 6.5.
+
+O procedimento será aplicado por moderador e observador na versão identificada,
+preservando feedback literal autorizado e evidências sanitizadas. Problemas
+que impeçam concluir tarefas ou entender erros/fontes terão prioridade de
+correção na Sprint 4; acessibilidade, responsividade e refinamentos serão
+avaliados na Sprint 5 conforme capacidade da equipe. As melhorias derivadas
+dessas sessões serão documentadas com issue, responsável, estimativa e reteste.
+Não se atribui a usuários uma melhoria sugerida apenas por inspeção técnica.
+
+### 6.7.7 Discussão crítica da abrangência e condição de liberação
+
+O inventário cobre os seis RFs e preserva 56 casos no recorte do MVP. Essa é
+cobertura documental, não aprovação dos seis requisitos. A execução
+controlada tem maior força no RF01: valida conteúdo binário, limites exatos,
+serialização de erros, persistência real e ausência de consumo indevido.
+Ainda faltam gravações faladas nos quatro formatos, reconhecimento real,
+microfone e fluxo completo no navegador. A síntese textual controlada não
+mede qualidade nem fundamentação das respostas de negócio.
+
+A instrumentação de RF02 permite detectar consulta prematura às fontes mesmo
+quando a resposta final é uma recusa segura. A base cega não fornecida impede
+validar estatisticamente classificação/entidades; reutilizar a base saturada
+seria uma conclusão fraca. RF03 exige massa vetorial dedicada, referências
+recuperáveis e datas conhecidas, inclusive versões conflitantes; passagem nos
+testes de citações de componente não garante esse requisito no sistema.
+
+RF04 depende de extração/orquestração por campo e massa própria. RF05 depende
+de agendamento, elegibilidade e entrega real, incluindo duplicidade e
+recuperação; receptor de webhook e cadastro de assinantes não bastam. RF06
+com escrita permanece fora do MVP; proteção sem escrita e explicação do limite
+devem ser exercitadas conjuntamente no caso RF06-06.
+
+A regressão e os ensaios funcionais detectam classes diferentes de problema.
+Uma suíte sem falhas pode coexistir com descumprimento de RF02, bloqueios de
+RF03/RF04/RF05 e ausência de avaliação humana. Os denominadores devem excluir
+somente os seis IDs históricos, manter os bloqueios visíveis e separar
+variantes de casos. Não se publica percentual de cobertura de linhas,
+fidedignidade de fala ou sucesso sistêmico a partir destas contagens.
+
+**Conclusão da campanha funcional:** a execução técnica local e seu registro
+estão concluídos para a versão disponível, com 12 casos aprovados no recorte
+controlado, cinco parciais, duas reprovações, 37 bloqueios e seis IDs fora do
+MVP. Todos os IDs receberam resultado ou justificativa; os problemas têm
+evidência e ação proposta. O protótipo não atende integralmente aos seis RFs.
+As próximas melhorias são esclarecer o projeto antes da busca, reconhecer
+pedidos fora do domínio e completar sugestões/notificações conforme a equipe
+implementar esses fluxos. O relatório permite apresentar o que foi testado e
+os limites da versão, sem afirmar aprovação integral da solução. A avaliação
+com usuários externos permanece pendente na parte de usabilidade do artefato.
+
+## 6.8 Ferramentas e Bibliotecas Utilizadas
+
+Esta subseção registra as ferramentas e bibliotecas com que os testes planejados na Seção 6 foram executados, e serve de referência comum às campanhas registradas nas subseções anteriores. O plano não é reescrito: a Seção 6 permanece como foi entregue na Sprint 3, porque um plano corrigido depois de conhecido o resultado deixa de servir como critério. O que esta seção faz é declarar, sobre uma versão identificada do sistema, o que foi executado, com que instrumento, o que o instrumento mostrou e o que ficou de fora.
 
 Os identificadores de caso (`CT-RFxx-nn`, `CT-RNFxx-P/N`, `TI-nn` e `TU-nn`) são os mesmos da Seção 6 e não são renumerados, conforme a regra registrada em 6.2.5. Divergências entre o que o plano supunha e o que o repositório contém são registradas como correção explícita da premissa, e não por edição silenciosa da seção anterior.
-
-## 7.1 Ferramentas e Bibliotecas Utilizadas
 
 Esta subseção corresponde ao primeiro item do artefato: definir e justificar as ferramentas e bibliotecas usadas na execução dos testes e demonstrar o uso dos frameworks de automação. Ela dá continuidade ao quadro planejado em 6.1.4, onde cada ferramenta havia sido registrada com um **status verificável**; aqui esse status é reconferido contra o repositório e contra execuções reais, e cada linha passa a ter versão resolvida, local de uso e forma de conferência.
 
 O princípio que organiza a escolha é o mesmo adotado desde a Seção 3.5: **não acrescentar ferramenta que a linguagem, o framework da aplicação ou a pilha já instalada resolvam**. Cada dependência de teste precisa ser instalada, fixada, atualizada e explicada a quem entra no projeto; quando a biblioteca padrão faz o mesmo trabalho, o custo dessa manutenção não se paga. É por isso que a suíte de backend roda em `unittest` e não em `pytest`, e que a medição de memória do pipeline usa `tracemalloc` e não `psutil`.
 
-### 7.1.1 Execução de verificação que sustenta esta seção
+### 6.8.1 Execução de verificação que sustenta esta seção
 
 As afirmações desta subseção foram conferidas em uma execução real, e não por leitura de configuração. O registro abaixo identifica a versão avaliada, de modo que qualquer integrante possa repeti-la.
 
@@ -8299,9 +8603,9 @@ As afirmações desta subseção foram conferidas em uma execução real, e não
 | `python -m unittest discover -s tests -p "test_integracao_*.py"` | **55 testes em 0,495 s**, 37 executados e 18 pulados, sem falha |
 | `npm test` em `src/frontend` | **5 arquivos e 18 testes em 2,02 s**, todos aprovados, código de saída 0 |
 
-Os 18 pulos são os casos relacionais que exigem base dedicada, e a falha é o guarda de reprodutibilidade do ambiente; os dois mecanismos estão descritos em 7.1.4. Os 43 módulos de `tests/` produzem 502 casos porque parte deles é gerada por mixins de contrato reutilizados por mais de uma implementação.
+Os 18 pulos são os casos relacionais que exigem base dedicada, e a falha é o guarda de reprodutibilidade do ambiente; os dois mecanismos estão descritos em 6.8.4. Os 43 módulos de `tests/` produzem 502 casos porque parte deles é gerada por mixins de contrato reutilizados por mais de uma implementação.
 
-### 7.1.2 Ferramentas e bibliotecas adotadas, com justificativa
+### 6.8.2 Ferramentas e bibliotecas adotadas, com justificativa
 
 O quadro abaixo substitui o de 6.1.4 para efeito de execução. A coluna de verificação indica como conferir a afirmação sem depender deste documento.
 
@@ -8329,7 +8633,7 @@ O quadro abaixo substitui o de 6.1.4 para efeito de execução. A coluna de veri
 | Registro dos resultados | Markdown e CSV gerados, nunca editados à mão | Relatório escrito por pessoa perde a correspondência com a medição na primeira atualização esquecida | `resultados/` | `resultados/ajuste_fino.md`, `resultados/metricas_rnf03.md`, `resultados/comparativo_preprocessamento.csv` |
 | Medida de cobertura | Inventário por identificador de caso e matriz da Seção 6.6 | Decisão mantida do plano: cobertura de linhas mede quanto do código foi tocado, não quantos requisitos foram verificados, que é o que o artefato cobra. Nenhuma ferramenta de cobertura de linhas foi adotada e nenhuma porcentagem desse tipo é apresentada | Seção 6.6 e consolidação desta seção | Matriz de 6.6.1 |
 
-### 7.1.3 Atualização do quadro planejado em 6.1.4
+### 6.8.3 Atualização do quadro planejado em 6.1.4
 
 Nem toda linha do plano se confirmou. A tabela registra cada divergência e o que ela exige.
 
@@ -8346,7 +8650,7 @@ Nem toda linha do plano se confirmou. A tabela registra cada divergência e o qu
 
 As demais linhas do quadro planejado foram confirmadas sem alteração.
 
-### 7.1.4 Uso dos frameworks de automação
+### 6.8.4 Uso dos frameworks de automação
 
 O artefato cobra "uso eficiente de frameworks de automação para a verificação". Eficiência aqui não é quantidade de testes: é quanto do trabalho de verificação o framework executa sozinho, sem alguém precisar lembrar de fazê-lo.
 
@@ -8364,7 +8668,7 @@ O artefato cobra "uso eficiente de frameworks de automação para a verificaçã
 
 **O mesmo comando em três lugares.** `python -m unittest discover -v tests` é o que roda localmente, o que o serviço `tests` do perfil `ci` executa na imagem de desenvolvimento (`make test`) e o que o job `test:app` executa no pipeline. Não há uma "versão de CI" da suíte que possa divergir da local.
 
-### 7.1.5 Preparação do ambiente e comandos padronizados
+### 6.8.5 Preparação do ambiente e comandos padronizados
 
 Os comandos abaixo reproduzem, em ordem, o ambiente usado nesta verificação.
 
@@ -8386,7 +8690,9 @@ O passo 8 exige uma base exclusiva de teste. Apontar `TEST_DATABASE_URL` para a 
 
 ---
 
-# 8. Registro de Decisões
+---
+
+# 7. Registro de Decisões
 
 Esta seção registra as principais decisões técnicas, de escopo e de processo tomadas durante a Sprint 1. O registro segue o formato: decisão, contexto, alternativas consideradas, justificativa, impacto, participantes e situação registrada.
 
@@ -8401,7 +8707,7 @@ Esta seção registra as principais decisões técnicas, de escopo e de processo
 | D07 | Reformular o RNF02 como autenticação por SSO sem autorização por cargo | A equipe decidiu que o MVP terá autenticação comum e não diferenciará o acesso às funcionalidades por perfil; a única distinção será o acesso administrativo aos registros, tratado pelo RNF09 | Manter autorização por perfil; escolher imediatamente Microsoft; escolher imediatamente Google | Um contrato baseado em Bearer Token permite planejar e testar a autenticação sem depender da escolha do provedor e evita atribuir aos perfis profissionais uma regra de autorização que não fará parte do MVP | O RNF02 passa a exigir 100% de rejeição das credenciais ausentes ou inválidas com HTTP 401; `usuario.perfil` permanece apenas como informação profissional e o RNF02 deixa de ser uma lacuna do planejamento | Equipe | 2026-09-03 | Aprovada |
 | D08 | Adicionar o RNF12 para fundamentação das respostas de consulta | O RF03 exige apresentar a referência, mas não mede se a fonte realmente sustenta as afirmações produzidas pelo modelo; o risco AM8 identifica alucinação como ameaça relevante | Tratar apenas como teste funcional do RF03; reutilizar o RNF11, restrito às sugestões | Separar existência da referência de sustentação factual permite medir diretamente o risco sem misturar respostas de consulta com sugestões de preenchimento | O inventário passa a ter doze RNFs e a Seção 6.3 inclui avaliação por afirmações atômicas, dois avaliadores e cenários sem evidência suficiente | Equipe | 2026-09-03 | Aprovada |
 
-# 9. Fontes
+# 8. Fontes
 
 - ANPTrilhos. [Balanço do Setor Metroferroviário 2024](https://anptrilhos.org.br/balanco-metroferroviario-2024-transporte-sobre-trilhos-cresce-e-transporta-257-bilhoes-de-passageiros/). Acesso em ago. 2026.
 - Microsoft. [Design effective language understanding: Microsoft Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/language-understanding). Acesso em ago. 2026.
