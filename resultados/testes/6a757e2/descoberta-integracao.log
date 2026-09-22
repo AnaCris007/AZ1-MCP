@@ -1,0 +1,715 @@
+/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+test_modelo_ausente_falha_na_composicao (test_integracao_analise_pln.TestAnaliseIntegracao.test_modelo_ausente_falha_na_composicao)
+Sem o `.joblib`, a composição falha e a requisição sai como 500. ... Erro não tratado ao processar POST /api/v1/audio/aud_massa/analyze
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 481, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 676, in solve_dependencies
+    solved = await run_in_threadpool(call, **solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/az1_api/dependencies.py", line 139, in get_analyzer
+    return AnalyzeAudio(transcriber=get_transcriber(), modelo=carregar_modelo_padrao())
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/az1_api/dependencies.py", line 128, in carregar_modelo_padrao
+    return carregar_modelo(MODELO_PADRAO)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/pln/classificador.py", line 142, in carregar_modelo
+    return joblib.load(caminho)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/joblib/numpy_pickle.py", line 741, in load
+    with open(filename, "rb") as f:
+         ^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/inteli/Documentos/g01/resultados/classificador-que-nao-existe.joblib'
+ok
+test_solicitacao_fora_do_catalogo_retorna_intencao_valida (test_integracao_analise_pln.TestAnaliseIntegracao.test_solicitacao_fora_do_catalogo_retorna_intencao_valida)
+Pedido fora do escopo recebe o rótulo `fora_do_catalogo`. ... ok
+test_texto_digitado_e_transcrito_produzem_a_mesma_intencao (test_integracao_analise_pln.TestAnaliseIntegracao.test_texto_digitado_e_transcrito_produzem_a_mesma_intencao)
+Caracterização: `/chat` classifica, mas não devolve a intenção. ... /home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/deepgram/core/websocket_compat.py:4: DeprecationWarning: websockets.exceptions.InvalidStatusCode is deprecated
+  from websockets.exceptions import InvalidStatusCode as InvalidWebSocketStatus  # type: ignore[attr-defined]
+/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  warnings.warn(  # deprecated in 14.0 - 2024-11-09
+Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_transcricao_recebe_intencao_do_catalogo (test_integracao_analise_pln.TestAnaliseIntegracao.test_transcricao_recebe_intencao_do_catalogo)
+O texto transcrito chega ao classificador e volta como rótulo válido. ... ok
+test_arquivo_rejeitado_nao_grava_objeto (test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_arquivo_rejeitado_nao_grava_objeto)
+Extensão não é formato: um `.txt` renomeado é recusado pela assinatura. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_audio_id_inexistente_retorna_404 (test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_audio_id_inexistente_retorna_404)
+A ausência do objeto vira `404 audio_not_found`, sem tocar no provedor. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_falha_de_infraestrutura_retorna_500 (test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_falha_de_infraestrutura_retorna_500)
+As três causas dão `500 internal_error`, sem detalhe de infraestrutura. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_leitura_devolve_bytes_identicos_ao_upload (test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_leitura_devolve_bytes_identicos_ao_upload)
+O que `TranscribeAudio` lê é byte a byte o que foi enviado. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_objeto_ausente_apos_expurgo_leva_a_404 (test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_objeto_ausente_apos_expurgo_leva_a_404)
+O efeito do expurgo, ensaiado por remoção direta. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_politica_de_ciclo_de_vida_corresponde_ao_arquivo_versionado (test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_politica_de_ciclo_de_vida_corresponde_ao_arquivo_versionado)
+A regra aplicada no bucket é a que está no repositório. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_upload_valido_grava_objeto_no_bucket (test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_upload_valido_grava_objeto_no_bucket)
+O `201` corresponde a um objeto que existe, com os metadados certos. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_429_do_provedor_nao_vira_429_publico (test_integracao_chat.TestChatIntegracao.test_429_do_provedor_nao_vira_429_publico)
+A tradução do limite excedido, separada por ser fácil de errar. ... ok
+test_mensagem_acima_do_limite_nao_aciona_o_provedor (test_integracao_chat.TestChatIntegracao.test_mensagem_acima_do_limite_nao_aciona_o_provedor)
+Acima de 4000 caracteres, a recusa vem antes da chamada. ... ok
+test_mensagem_no_limite_exato_e_aceita (test_integracao_chat.TestChatIntegracao.test_mensagem_no_limite_exato_e_aceita)
+A fronteira do limite: 4000 passam, 4001 não. Complementa TI-22. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_mensagem_vazia_nao_aciona_o_provedor (test_integracao_chat.TestChatIntegracao.test_mensagem_vazia_nao_aciona_o_provedor)
+Vazia e só-espaços param no serviço, sem chamada externa. ... ok
+test_resposta_gerada_pelo_provedor (test_integracao_chat.TestChatIntegracao.test_resposta_gerada_pelo_provedor)
+Mensagem típica atravessa até `reply`, com a resposta real gravada. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_variantes_de_falha_e_resposta_vazia (test_integracao_chat.TestChatIntegracao.test_variantes_de_falha_e_resposta_vazia)
+Cada variante isolada, com o status que o contrato de hoje produz. ... Erro não tratado ao processar POST /api/v1/chat
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/chat.py", line 276, in send_chat_message
+    reply = answerer.answer(payload.message, payload.conversation_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/services/chat_service.py", line 77, in answer
+    resposta = self._model.generate_reply(trimmed, conversation_id=conversation_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/services/gemini_service.py", line 217, in generate_reply
+    response = self._client.models.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/tests/test_integracao_chat.py", line 85, in generate_content
+    raise self._erro
+RuntimeError: falha inesperada (simulada)
+Erro não tratado ao processar POST /api/v1/chat
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/chat.py", line 287, in send_chat_message
+    fontes = fontes_citadas(reply.text, reply.fontes)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/chat.py", line 76, in fontes_citadas
+    for grupo in _CITACAO.findall(texto)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: expected string or bytes-like object, got 'NoneType'
+Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_confirmacao_remove_e_recusa_devolve_a_mensagem (test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_confirmacao_remove_e_recusa_devolve_a_mensagem)
+Confirmada não volta; recusada volta para a fila. ... ok
+test_consumidor_nao_depende_de_ordem_global (test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_consumidor_nao_depende_de_ordem_global)
+Publicadas fora de ordem, todas são processadas corretamente. ... ok
+test_consumo_duplicado_produz_efeito_unico (test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_consumo_duplicado_produz_efeito_unico)
+A mesma mensagem processada duas vezes aplica o efeito uma vez. ... ok
+test_falha_persistente_vai_para_dead_letter (test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_falha_persistente_vai_para_dead_letter)
+Contador cresce a cada reentrega; no limite, a mensagem é isolada. ... ok
+test_indisponibilidade_na_publicacao_e_reportada (test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_indisponibilidade_na_publicacao_e_reportada)
+Barramento fora do ar: erro explícito ao produtor, sem perda silenciosa. ... ok
+test_payload_indesserializavel_vai_direto_para_dead_letter (test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_payload_indesserializavel_vai_direto_para_dead_letter)
+A segunda causa de TI-43: sem reentrega, porque não há o que tentar. ... ok
+test_publica_e_consome_o_envelope_integro (test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_publica_e_consome_o_envelope_integro)
+Os seis campos do envelope chegam ao consumidor preservados. ... ok
+test_assinatura_invalida_e_rejeitada (test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_assinatura_invalida_e_rejeitada) ... ok
+test_confirmacao_so_ocorre_apos_persistencia (test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_confirmacao_so_ocorre_apos_persistencia) ... ok
+test_conteudo_malformado_e_rejeitado (test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_conteudo_malformado_e_rejeitado) ... ok
+test_entrega_com_assinatura_valida_e_processada (test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_entrega_com_assinatura_valida_e_processada) ... ok
+test_entrega_duplicada_produz_efeito_unico (test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_entrega_duplicada_produz_efeito_unico) ... ok
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... ok
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... ok
+test_reentrega_apos_falha_parcial_completa_sem_repetir (test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... ok
+test_contrato_da_rota_de_chat (test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_contrato_da_rota_de_chat)
+Os campos de `ChatRequest`/`ChatResponse` valem nos dois sentidos. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_contrato_do_envio_de_audio (test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_contrato_do_envio_de_audio)
+`Blob` sem nome de arquivo, como o `MediaRecorder` do navegador manda. ... ok
+test_conversation_id_e_obrigatorio_no_contrato_de_chat (test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_conversation_id_e_obrigatorio_no_contrato_de_chat)
+Faltando `conversation_id`, o backend recusa com 422. ... ok
+test_erro_4xx_5xx_e_tratado_pela_interface (test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_erro_4xx_5xx_e_tratado_pela_interface)
+O envelope de erro é sempre o mesmo, e é o que a interface lê. ... ok
+test_porta_do_proxy_coincide_com_a_porta_do_servidor (test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_porta_do_proxy_coincide_com_a_porta_do_servidor)
+O alvo padrão do proxy do Vite é a porta que o compose publica. ... ok
+test_prefixo_do_proxy_cobre_as_rotas_da_api (test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_prefixo_do_proxy_cobre_as_rotas_da_api)
+O proxy intercepta `/api`, e as rotas de negócio vivem sob `/api/v1`. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_rotas_de_portfolio_do_planejamento_foram_implementadas (test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_rotas_de_portfolio_do_planejamento_foram_implementadas)
+Complemento de TI-33: as três rotas da massa original hoje existem. ... ok
+test_rotas_nao_implementadas_retornam_404 (test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_rotas_nao_implementadas_retornam_404)
+Rota que não existe responde `404` limpo, e não 500 nem 405. ... ok
+test_verificador_nao_aponta_divergencia (test_integracao_persistencia.TestModeloDocumentado.test_verificador_nao_aponta_divergencia) ... ok
+test_feedback_autorizado_continua_permitido (test_integracao_persistencia.TestPermissoesDaAuditoria.test_feedback_autorizado_continua_permitido)
+O contraste que dá sentido ao caso acima. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_historico_de_um_usuario_nao_vaza_para_o_outro (test_integracao_persistencia.TestPermissoesDaAuditoria.test_historico_de_um_usuario_nao_vaza_para_o_outro)
+Duas identidades, cada uma enxergando a própria conversa. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_mensagens_de_conversa_alheia_nao_sao_devolvidas (test_integracao_persistencia.TestPermissoesDaAuditoria.test_mensagens_de_conversa_alheia_nao_sao_devolvidas)
+O mesmo isolamento, um nível abaixo: as mensagens da conversa. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_carga_inicial_esta_populada (test_integracao_persistencia.TestPersistenciaEsquema.test_carga_inicial_esta_populada)
+`02_initial_data.sql` deixou o portfólio com conteúdo. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_schemas_e_tabelas_do_ddl_estao_presentes (test_integracao_persistencia.TestPersistenciaEsquema.test_schemas_e_tabelas_do_ddl_estao_presentes)
+O mesmo resultado, conferido na base de teste já migrada. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_avaliacao_exige_alvo_e_juizo_unicos (test_integracao_persistencia.TestPersistenciaIntegracao.test_avaliacao_exige_alvo_e_juizo_unicos)
+Alvo único, juízo obrigatório, e reavaliar atualiza em vez de empilhar. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_banco_indisponivel_nao_perde_o_turno (test_integracao_persistencia.TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_o_turno)
+CARACTERIZAÇÃO: hoje o turno É perdido, e só sobra o registro no log. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_consulta_de_projeto_retorna_dados_e_fontes_registradas (test_integracao_persistencia.TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas)
+Uma linha em `mensagem_fonte` por trecho citado, com os metadados copiados. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_papel_da_mensagem_delimita_as_colunas (test_integracao_persistencia.TestPersistenciaIntegracao.test_papel_da_mensagem_delimita_as_colunas)
+`mensagem_papel_coerente` recusa as duas combinações cruzadas. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_papel_de_aplicacao_nao_altera_auditoria (test_integracao_persistencia.TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria)
+A aplicação insere e lê a trilha, e não a reescreve nem a apaga. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_schema_e_criado_em_base_vazia (test_integracao_persistencia.TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia)
+Os três arquivos de `src/database` aplicados a uma base recém-criada. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_segundo_turno_continua_a_numeracao_da_conversa (test_integracao_persistencia.TestPersistenciaIntegracao.test_segundo_turno_continua_a_numeracao_da_conversa)
+Ordens seguem crescendo na mesma conversa. Complementa TI-24. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_turno_por_texto_e_gravado_com_atributos_minimos (test_integracao_persistencia.TestPersistenciaIntegracao.test_turno_por_texto_e_gravado_com_atributos_minimos)
+Um turno vira duas linhas irmãs, com ordens consecutivas. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_turno_por_voz_vincula_o_audio_de_origem (test_integracao_persistencia.TestPersistenciaIntegracao.test_turno_por_voz_vincula_o_audio_de_origem)
+Formato `audio` aceita `audio_referencia`; formato `texto` não. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_busca_com_filtro_combinado_respeita_projeto_e_tipo (test_integracao_rag.TestBuscaRagPontaAPonta.test_busca_com_filtro_combinado_respeita_projeto_e_tipo)
+Dois documentos sintéticos de projetos distintos, e o filtro separa. ... skipped 'TEST_RAG_DB_URL não definido. Este bloco indexa em `vecs` sobre PostgreSQL e gasta chamadas reais de embedding; precisa de opt-in explícito.'
+test_filtro_sem_correspondencia_devolve_lista_vazia_com_200 (test_integracao_rag.TestContratoDaBuscaRag.test_filtro_sem_correspondencia_devolve_lista_vazia_com_200)
+Nenhum registro correspondente não é erro: é `200` com `resultados=[]`. ... ok
+test_limites_invalidos_e_campo_ausente_sao_recusados (test_integracao_rag.TestContratoDaBuscaRag.test_limites_invalidos_e_campo_ausente_sao_recusados)
+`n_resultados` fora de 1..20 e `query` ausente param no schema. ... ok
+test_limites_validos_nas_bordas_sao_aceitos (test_integracao_rag.TestContratoDaBuscaRag.test_limites_validos_nas_bordas_sao_aceitos)
+1 e 20 passam. O contraste que dá sentido ao caso acima. ... ok
+test_query_vazia_e_aceita_pelo_schema (test_integracao_rag.TestContratoDaBuscaRag.test_query_vazia_e_aceita_pelo_schema)
+CARACTERIZAÇÃO, não garantia. ... ok
+test_resultado_atravessa_com_os_metadados_do_indice (test_integracao_rag.TestContratoDaBuscaRag.test_resultado_atravessa_com_os_metadados_do_indice)
+Os campos que o RNF12 exige chegam ao cliente, incluindo `chunk_id`. ... ok
+test_falhas_do_embedding_ou_do_banco_saem_como_500_sem_segredo (test_integracao_rag.TestErrosDaBuscaRag.test_falhas_do_embedding_ou_do_banco_saem_como_500_sem_segredo)
+Contrato atual: exceção não tratada vira `500 internal_error`. ... Erro não tratado ao processar POST /api/v1/rag/search
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/rag.py", line 20, in search_rag
+    resultados = buscar(
+                 ^^^^^^^
+  File "/home/inteli/Documentos/g01/tests/test_integracao_rag.py", line 107, in __call__
+    raise self._erro
+RuntimeError: falha ao vetorizar (simulada)
+Erro não tratado ao processar POST /api/v1/rag/search
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/rag.py", line 20, in search_rag
+    resultados = buscar(
+                 ^^^^^^^
+  File "/home/inteli/Documentos/g01/tests/test_integracao_rag.py", line 107, in __call__
+    raise self._erro
+ValueError: resposta sem campo embeddings (simulada)
+Erro não tratado ao processar POST /api/v1/rag/search
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/rag.py", line 20, in search_rag
+    resultados = buscar(
+                 ^^^^^^^
+  File "/home/inteli/Documentos/g01/tests/test_integracao_rag.py", line 107, in __call__
+    raise self._erro
+ValueError: expected 1536 dimensions, got 3072 (simulada)
+Erro não tratado ao processar POST /api/v1/rag/search
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/rag.py", line 20, in search_rag
+    resultados = buscar(
+                 ^^^^^^^
+  File "/home/inteli/Documentos/g01/tests/test_integracao_rag.py", line 107, in __call__
+    raise self._erro
+ConnectionError: não foi possível conectar a postgresql://az1:senha-secreta@host-interno:5432/az1
+ok
+test_alterar_o_conteudo_muda_o_identificador_do_chunk (test_integracao_rag.TestIngestaoRag.test_alterar_o_conteudo_muda_o_identificador_do_chunk)
+E a outra metade: conteúdo diferente, identificador diferente. ... ok
+test_chunks_nao_misturam_secoes_nem_projetos (test_integracao_rag.TestIngestaoRag.test_chunks_nao_misturam_secoes_nem_projetos)
+A fragmentação respeita a fronteira de arquivo e de seção. ... ok
+test_docx_preserva_secao_e_projeto (test_integracao_rag.TestIngestaoRag.test_docx_preserva_secao_e_projeto)
+Título vira `secao`; parágrafos viram trechos do projeto da pasta. ... ok
+test_reindexar_a_mesma_massa_produz_os_mesmos_identificadores (test_integracao_rag.TestIngestaoRag.test_reindexar_a_mesma_massa_produz_os_mesmos_identificadores)
+Repetição idêntica não duplica: o `chunk_id` é função do conteúdo. ... ok
+test_tabela_de_docx_nao_e_extraida (test_integracao_rag.TestIngestaoRag.test_tabela_de_docx_nao_e_extraida)
+LACUNA CONHECIDA, registrada em vez de mascarada. ... ok
+test_xlsx_separa_abas_e_ignora_linhas_vazias (test_integracao_rag.TestIngestaoRag.test_xlsx_separa_abas_e_ignora_linhas_vazias)
+Cada aba vira `secao`; linhas sem conteúdo não geram trecho. ... ok
+test_401_vem_antes_da_regra_de_negocio (test_integracao_seguranca.TestAutenticacaoIntegracao.test_401_vem_antes_da_regra_de_negocio)
+A recusa acontece sem que o serviço de domínio seja construído. ... Falha de autenticação (MALFORMED): Not enough segments
+ok
+test_corpo_do_401_nao_serve_de_oraculo (test_integracao_seguranca.TestAutenticacaoIntegracao.test_corpo_do_401_nao_serve_de_oraculo)
+A resposta é a mesma para causas diferentes. ... Falha de autenticação (MALFORMED): Invalid header string: 'utf-8' codec can't decode byte 0xb7 in position 1: invalid start byte
+ok
+test_health_e_webhooks_ficam_fora_por_decisao_registrada (test_integracao_seguranca.TestAutenticacaoIntegracao.test_health_e_webhooks_ficam_fora_por_decisao_registrada)
+As duas exceções à autenticação, e por que cada uma existe. ... ok
+test_recusa_de_assinatura_e_recusa_de_sessao_sao_distinguiveis (test_integracao_seguranca.TestAutenticacaoIntegracao.test_recusa_de_assinatura_e_recusa_de_sessao_sao_distinguiveis)
+O contraste que dá sentido ao caso acima. ... ok
+test_toda_rota_de_negocio_exige_sessao (test_integracao_seguranca.TestAutenticacaoIntegracao.test_toda_rota_de_negocio_exige_sessao)
+Sem credencial, as doze rotas respondem 401 — nenhuma escapa. ... ok
+test_instrucao_adversaria_nao_produz_fonte_inventada (test_integracao_seguranca.TestEntradaHostilIntegracao.test_instrucao_adversaria_nao_produz_fonte_inventada)
+Sem trecho acima do piso, o modelo NÃO é chamado. Nada a subverter. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_marca_html_atravessa_como_dado_e_nao_como_documento (test_integracao_seguranca.TestEntradaHostilIntegracao.test_marca_html_atravessa_como_dado_e_nao_como_documento)
+Script no texto sai como string JSON, nunca como corpo HTML. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_segredo_nao_aparece_nos_registros_de_erro (test_integracao_seguranca.TestEntradaHostilIntegracao.test_segredo_nao_aparece_nos_registros_de_erro)
+Uma falha interna não pode arrastar credencial para o log. ... ok
+test_trecho_acima_do_piso_e_citado_e_o_de_baixo_nao (test_integracao_seguranca.TestEntradaHostilIntegracao.test_trecho_acima_do_piso_e_citado_e_o_de_baixo_nao)
+O contraste que dá sentido ao caso anterior. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_falha_ou_audio_vazio_do_provedor_retorna_502 (test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_falha_ou_audio_vazio_do_provedor_retorna_502)
+As duas causas dão o mesmo `502 speech_generation_failed`. ... ok
+test_gera_audio_wav_a_partir_do_texto (test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_gera_audio_wav_a_partir_do_texto)
+Texto típico atravessa até o WAV, com a resposta real do provedor. ... ok
+test_texto_acima_do_limite_nao_aciona_o_provedor (test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_texto_acima_do_limite_nao_aciona_o_provedor)
+Acima de 4000 caracteres, a recusa vem antes da chamada. ... ok
+test_texto_no_limite_exato_e_aceito (test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_texto_no_limite_exato_e_aceito)
+A fronteira do limite: 4000 caracteres passam, 4001 não. ... ok
+test_texto_vazio_nao_aciona_o_provedor (test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_texto_vazio_nao_aciona_o_provedor)
+Vazio e só-espaços param no serviço, antes do provedor de voz. ... ok
+test_voz_ou_formato_nao_suportado_retorna_422 (test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_voz_ou_formato_nao_suportado_retorna_422)
+Voz e formato fora do catálogo são recusados pelo schema Pydantic. ... ok
+test_audio_sem_fala_retorna_texto_vazio (test_integracao_transcricao.TestTranscricaoIntegracao.test_audio_sem_fala_retorna_texto_vazio)
+Silêncio não é erro: o provedor devolve 200 com transcrição vazia. ... ok
+test_falha_do_provedor_retorna_502 (test_integracao_transcricao.TestTranscricaoIntegracao.test_falha_do_provedor_retorna_502)
+As três causas de indisponibilidade dão o mesmo `502`, sem vazar SDK. ... ok
+test_idioma_nao_suportado_retorna_422_sem_chamar_provedor (test_integracao_transcricao.TestTranscricaoIntegracao.test_idioma_nao_suportado_retorna_422_sem_chamar_provedor)
+`en-US` é recusado pelo schema, antes de qualquer efeito colateral. ... ok
+test_termos_do_dominio_sao_enviados_ao_provedor (test_integracao_transcricao.TestTranscricaoIntegracao.test_termos_do_dominio_sao_enviados_ao_provedor)
+Os 12 termos do domínio e o modelo `nova-3` chegam ao SDK. ... ok
+test_transcreve_audio_de_referencia (test_integracao_transcricao.TestTranscricaoIntegracao.test_transcreve_audio_de_referencia)
+Áudio com fala em português atravessa até o schema de resposta. ... ok
+test_abrir_campanha_nao_devolve_orcamento_ja_gasto (test_integracao_vhs.TestManifestoVhs.test_abrir_campanha_nao_devolve_orcamento_ja_gasto)
+Abrir zera o contador, e por isso não pode acontecer sem querer. ... ok
+test_encerramento_remove_temporarios_e_barra_nova_gravacao (test_integracao_vhs.TestManifestoVhs.test_encerramento_remove_temporarios_e_barra_nova_gravacao)
+O que não foi selecionado para regressão sai ao fechar a campanha. ... ok
+test_manifesto_sobrevive_a_recarga (test_integracao_vhs.TestManifestoVhs.test_manifesto_sobrevive_a_recarga)
+O estado é o arquivo, não a memória: outra instância lê o mesmo. ... ok
+test_teto_de_chamadas_reais_interrompe_a_campanha (test_integracao_vhs.TestManifestoVhs.test_teto_de_chamadas_reais_interrompe_a_campanha)
+Atingido o limite do manifesto, a próxima gravação não sai. ... ok
+test_ausencia_ou_expiracao_aciona_o_adaptador_real (test_integracao_vhs.TestVhsIntegracao.test_ausencia_ou_expiracao_aciona_o_adaptador_real)
+Chave nova, ou registro vencido: grava chamando; reproduz falhando. ... ok
+test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao (test_integracao_vhs.TestVhsIntegracao.test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao)
+Mudou idioma, modelo ou instrução: chave nova, registro não reusado. ... ok
+test_modo_reproduzir_sem_registro_valido_falha_sem_acessar_a_rede (test_integracao_vhs.TestVhsIntegracao.test_modo_reproduzir_sem_registro_valido_falha_sem_acessar_a_rede)
+Ausência e corrupção falham, com mensagens distintas e sem rede. ... ok
+test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado (test_integracao_vhs.TestVhsIntegracao.test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado)
+Sem contexto não há fita; `atualizar` grava candidato, não sobrescreve. ... ok
+test_nenhum_segredo_e_gravado_no_registro (test_integracao_vhs.TestVhsIntegracao.test_nenhum_segredo_e_gravado_no_registro)
+Varredura das gravações de sucesso e de falha: nada de credencial. ... ok
+test_registro_existente_nao_aciona_o_adaptador (test_integracao_vhs.TestVhsIntegracao.test_registro_existente_nao_aciona_o_adaptador)
+Segunda chamada com a mesma entrada é servida pela fita. ... ok
+test_erro_http_gravado_reproduz_e_vira_o_status_da_rota (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_erro_http_gravado_reproduz_e_vira_o_status_da_rota)
+A recusa real do provedor é reproduzida e traduzida pelo contrato. ... ok
+test_gravacoes_dos_dois_sdks_reproduzem_sem_rede (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_gravacoes_dos_dois_sdks_reproduzem_sem_rede)
+Cada SDK reproduz sua gravação real, e o `play_count` incrementa. ... ok
+test_manifesto_declara_origem_real_para_cada_gravacao (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_manifesto_declara_origem_real_para_cada_gravacao)
+Toda fita versionada é interação genuína, e está dentro do prazo. ... ok
+test_mudanca_de_modelo_idioma_ou_termos_invalida_a_gravacao (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_mudanca_de_modelo_idioma_ou_termos_invalida_a_gravacao)
+Alterado o que é semanticamente relevante, a fita antiga não serve. ... ok
+test_nenhum_segredo_ou_marcador_sobrevive_nas_gravacoes (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_nenhum_segredo_ou_marcador_sobrevive_nas_gravacoes)
+Varredura das fitas versionadas, por nome e por valor. ... ok
+test_registro_vencido_ou_corrompido_falha_sem_rede (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_registro_vencido_ou_corrompido_falha_sem_rede)
+Validade e integridade barram o replay antes de a fita abrir. ... ok
+test_replay_com_chave_ausente_nao_alcanca_a_rede (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_replay_com_chave_ausente_nao_alcanca_a_rede)
+A falha por ausência acontece ANTES de qualquer tentativa de conexão. ... ok
+test_reproducao_funciona_em_processo_novo (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_reproducao_funciona_em_processo_novo)
+Item 4 do contrato: o replay não depende da memória da gravação. ... ok
+test_timeout_sem_resposta_nao_tem_fita_e_e_declarado_simulado (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_timeout_sem_resposta_nao_tem_fita_e_e_declarado_simulado)
+Ausência de resposta não é gravável, e o registro não finge que é. ... ok
+test_varredura_de_segredos_acha_o_que_deve_achar (test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_varredura_de_segredos_acha_o_que_deve_achar)
+Controle do próprio instrumento: a varredura não é vacuamente vazia. ... ok
+test_expiracao_do_onedrive_e_respeitada (test_integracao_webhook.TestAvisosOneDrive.test_expiracao_do_onedrive_e_respeitada) ... ok
+test_item_sem_versao_nao_e_chave_de_deduplicacao (test_integracao_webhook.TestAvisosOneDrive.test_item_sem_versao_nao_e_chave_de_deduplicacao) ... ok
+test_payload_minimo_oficial_aceito_e_nova_mudanca_nao_e_descartada (test_integracao_webhook.TestAvisosOneDrive.test_payload_minimo_oficial_aceito_e_nova_mudanca_nao_e_descartada) ... ok
+test_tipos_invalidos_nao_produzem_erro_interno (test_integracao_webhook.TestAvisosOneDrive.test_tipos_invalidos_nao_produzem_erro_interno) ... ok
+test_versoes_diferentes_do_item_produzem_chaves_diferentes (test_integracao_webhook.TestAvisosOneDrive.test_versoes_diferentes_do_item_produzem_chaves_diferentes) ... ok
+test_assinatura_invalida_e_rejeitada (test_integracao_webhook.TestContratoWebhookHTTP.test_assinatura_invalida_e_rejeitada) ... ok
+test_confirmacao_so_ocorre_apos_persistencia (test_integracao_webhook.TestContratoWebhookHTTP.test_confirmacao_so_ocorre_apos_persistencia) ... ok
+test_conteudo_malformado_e_rejeitado (test_integracao_webhook.TestContratoWebhookHTTP.test_conteudo_malformado_e_rejeitado) ... ok
+test_entrega_com_assinatura_valida_e_processada (test_integracao_webhook.TestContratoWebhookHTTP.test_entrega_com_assinatura_valida_e_processada) ... ok
+test_entrega_duplicada_produz_efeito_unico (test_integracao_webhook.TestContratoWebhookHTTP.test_entrega_duplicada_produz_efeito_unico) ... ok
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (test_integracao_webhook.TestContratoWebhookHTTP.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... ok
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (test_integracao_webhook.TestContratoWebhookHTTP.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... ok
+test_reentrega_apos_falha_parcial_completa_sem_repetir (test_integracao_webhook.TestContratoWebhookHTTP.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... ok
+test_devolve_o_token_em_texto_puro (test_integracao_webhook.TestHandshakeDeValidacao.test_devolve_o_token_em_texto_puro) ... ok
+test_handshake_nao_depende_do_receptor (test_integracao_webhook.TestHandshakeDeValidacao.test_handshake_nao_depende_do_receptor) ... ok
+test_entrega_com_varias_mudancas_e_desdobrada (test_integracao_webhook.TestTradutorGraph.test_entrega_com_varias_mudancas_e_desdobrada) ... ok
+test_identificador_combina_assinatura_e_item (test_integracao_webhook.TestTradutorGraph.test_identificador_combina_assinatura_e_item) ... ok
+test_assinatura_desativada_deixa_de_ser_aceita (test_integracao_webhook.TestVerificadorAssinaturaAtiva.test_assinatura_desativada_deixa_de_ser_aceita) ... ok
+test_assinatura_desconhecida_e_recusada (test_integracao_webhook.TestVerificadorAssinaturaAtiva.test_assinatura_desconhecida_e_recusada) ... ok
+test_assinatura_invalida_e_rejeitada (test_integracao_webhook_drive.TestContratoWebhookDrive.test_assinatura_invalida_e_rejeitada) ... ok
+test_confirmacao_so_ocorre_apos_persistencia (test_integracao_webhook_drive.TestContratoWebhookDrive.test_confirmacao_so_ocorre_apos_persistencia) ... ok
+test_conteudo_malformado_e_rejeitado (test_integracao_webhook_drive.TestContratoWebhookDrive.test_conteudo_malformado_e_rejeitado) ... ok
+test_entrega_com_assinatura_valida_e_processada (test_integracao_webhook_drive.TestContratoWebhookDrive.test_entrega_com_assinatura_valida_e_processada) ... ok
+test_entrega_duplicada_produz_efeito_unico (test_integracao_webhook_drive.TestContratoWebhookDrive.test_entrega_duplicada_produz_efeito_unico) ... ok
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (test_integracao_webhook_drive.TestContratoWebhookDrive.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... ok
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (test_integracao_webhook_drive.TestContratoWebhookDrive.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... ok
+test_reentrega_apos_falha_parcial_completa_sem_repetir (test_integracao_webhook_drive.TestContratoWebhookDrive.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... ok
+test_sync_e_confirmado_e_nao_produz_efeito (test_integracao_webhook_drive.TestMensagemDeAberturaDoCanal.test_sync_e_confirmado_e_nao_produz_efeito) ... ok
+test_le_os_cabecalhos_e_ignora_o_corpo_vazio (test_integracao_webhook_drive.TestTradutorDrive.test_le_os_cabecalhos_e_ignora_o_corpo_vazio) ... ok
+test_assinatura_invalida_e_rejeitada (test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_assinatura_invalida_e_rejeitada) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_confirmacao_so_ocorre_apos_persistencia (test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_confirmacao_so_ocorre_apos_persistencia) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_conteudo_malformado_e_rejeitado (test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_conteudo_malformado_e_rejeitado) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_entrega_com_assinatura_valida_e_processada (test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_entrega_com_assinatura_valida_e_processada) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_entrega_duplicada_produz_efeito_unico (test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_entrega_duplicada_produz_efeito_unico) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_reentrega_apos_falha_parcial_completa_sem_repetir (test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_abrir_preserva_canal_ativo_no_postgres (test_integracao_webhook_postgres.TestPermissoesWebhook.test_abrir_preserva_canal_ativo_no_postgres) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_aviso_minimo_onedrive_marca_novamente_apos_varredura (test_integracao_webhook_postgres.TestPermissoesWebhook.test_aviso_minimo_onedrive_marca_novamente_apos_varredura) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_papel_nao_pode_apagar_reescrever_corpo_ou_ler_segredos (test_integracao_webhook_postgres.TestPermissoesWebhook.test_papel_nao_pode_apagar_reescrever_corpo_ou_ler_segredos) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_receptor_restrito_persiste_conclui_e_marca_varredura (test_integracao_webhook_postgres.TestPermissoesWebhook.test_receptor_restrito_persiste_conclui_e_marca_varredura) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_usuario_da_aplicacao_nao_le_webhooks (test_integracao_webhook_postgres.TestPermissoesWebhook.test_usuario_da_aplicacao_nao_le_webhooks) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_processador_marca_varredura_pendente (test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_processador_marca_varredura_pendente) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_recusa_grava_o_corpo_bruto_sem_envelope (test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_recusa_grava_o_corpo_bruto_sem_envelope) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_reivindicacao_concorrente_espera_e_ve_a_conclusao (test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_concorrente_espera_e_ve_a_conclusao)
+Prova com duas threads de verdade que a segunda espera a primeira — ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_reivindicacao_concorrente_retoma_apos_a_primeira_liberar (test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_concorrente_retoma_apos_a_primeira_liberar)
+A reentrega de verdade do TI-38 — a primeira tentativa falhou. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_reivindicacao_e_duplicata_apos_concluida (test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_e_duplicata_apos_concluida)
+TI-37, sem concorrência: uma vez concluída, mais ninguém reivindica. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+
+----------------------------------------------------------------------
+Ran 155 tests in 11.555s
+
+OK (skipped=40)

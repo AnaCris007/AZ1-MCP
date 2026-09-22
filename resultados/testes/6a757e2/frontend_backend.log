@@ -1,0 +1,25 @@
+test_contrato_da_rota_de_chat (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_contrato_da_rota_de_chat)
+Os campos de `ChatRequest`/`ChatResponse` valem nos dois sentidos. ... /home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_contrato_do_envio_de_audio (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_contrato_do_envio_de_audio)
+`Blob` sem nome de arquivo, como o `MediaRecorder` do navegador manda. ... ok
+test_conversation_id_e_obrigatorio_no_contrato_de_chat (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_conversation_id_e_obrigatorio_no_contrato_de_chat)
+Faltando `conversation_id`, o backend recusa com 422. ... ok
+test_erro_4xx_5xx_e_tratado_pela_interface (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_erro_4xx_5xx_e_tratado_pela_interface)
+O envelope de erro é sempre o mesmo, e é o que a interface lê. ... ok
+test_porta_do_proxy_coincide_com_a_porta_do_servidor (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_porta_do_proxy_coincide_com_a_porta_do_servidor)
+O alvo padrão do proxy do Vite é a porta que o compose publica. ... ok
+test_prefixo_do_proxy_cobre_as_rotas_da_api (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_prefixo_do_proxy_cobre_as_rotas_da_api)
+O proxy intercepta `/api`, e as rotas de negócio vivem sob `/api/v1`. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_rotas_de_portfolio_do_planejamento_foram_implementadas (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_rotas_de_portfolio_do_planejamento_foram_implementadas)
+Complemento de TI-33: as três rotas da massa original hoje existem. ... ok
+test_rotas_nao_implementadas_retornam_404 (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_rotas_nao_implementadas_retornam_404)
+Rota que não existe responde `404` limpo, e não 500 nem 405. ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.104s
+
+OK

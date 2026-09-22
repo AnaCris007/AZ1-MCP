@@ -1,0 +1,7 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+  tts            223290 bytes de WAV                play_count=1, origem=real
+  stt            'Qual é a aderência do projeto '... play_count=1, origem=real
+  stt_sem_fala   texto ''                           play_count=1, origem=real
+  stt_credencial recusado, 2                        play_count=1, origem=real
+  chat           'Aderência de um projeto ao por'... play_count=1, origem=real
+  embedding      1536 dimensões                     play_count=1, origem=real
