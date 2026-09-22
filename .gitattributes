@@ -1,0 +1,49 @@
+# =============================================================================
+# Normalização de fim de linha
+# =============================================================================
+# O Git para Windows instala com `core.autocrlf=true`, que converte os arquivos
+# de texto para CRLF no checkout. Para código isso é inofensivo; para um script
+# que roda DENTRO de um contêiner Linux, não é.
+#
+# O sintoma é enganoso. Um shebang `#!/bin/sh\r` faz o kernel procurar o
+# interpretador chamado "/bin/sh\r", que de fato não existe, e o erro sai como:
+#
+#     exec /usr/local/bin/az1-entrypoint failed: No such file or directory
+#
+# ...apontando para o entrypoint, que está lá. Já custou uma sessão de
+# depuração: a API subia, morria no healthcheck, e `docker compose up` falhava
+# com "container az1-api-1 is unhealthy" sem dizer o motivo real.
+#
+# As regras abaixo prendem o fim de linha dos arquivos que atravessam a
+# fronteira Windows → Linux, independentemente da configuração de cada máquina.
+
+# Scripts de shell — executados nos contêineres de api e frontend.
+*.sh text eol=lf
+
+# O Makefile declara `SHELL := /bin/sh`; um CR no fim da linha da receita vira
+# argumento do comando.
+Makefile text eol=lf
+
+# Template do nginx, processado por envsubst no entrypoint do frontend.
+*.template text eol=lf
+
+# Scripts SQL rodados por psql dentro do contêiner. O psql tolera CRLF no meio
+# do SQL, mas não nos metacomandos de barra invertida (\set, \ir, \gset), que
+# este projeto usa em 01 a 08.
+*.sql text eol=lf
+
+# =============================================================================
+# Arquivos binários — nunca normalizar
+# =============================================================================
+# Sem isto, o modelo treinado e as imagens podem ser corrompidos por conversão
+# de fim de linha.
+*.joblib binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.ico    binary
+*.pdf    binary
+*.woff   binary
+*.woff2  binary
+*.xlsx   binary
+*.docx   binary
