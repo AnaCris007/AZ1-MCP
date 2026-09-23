@@ -1,0 +1,22 @@
+Referências locais verificadas: 369
+Problemas de arquivo ou marcadores: 0
+
+Âncoras para revisão: 0
+
+
+Conferência direcionada da revisão:
+UML referenciado: OK
+Descrição de nós: OK
+Caminhos de comunicação: OK
+Fluxos ponta a ponta: OK
+Mapeamento lógico/físico: OK
+Cinco passos EC2 e imagens: OK
+Sem ocorrências de pontuação quebrada tipo espaço-hífen-vírgula: OK
+Sem títulos de decisões com parêntese indevido: OK
+Apresentações de tabela sem dois-pontos final repetido: OK
+Sem alegação de Dockerfiles inexistentes: OK
+TI-37 com limite OneDrive na matriz: OK
+README preservados: OK
+Seção 3.7 após reintegração seletiva: 307 linhas.
+SVG original renderizado em página local no Chrome e inspecionado visualmente; figura completa, inclusive LLM externo. Captura: diagrama-uml-revisado.png.
+A conferência automática não certifica a correção gramatical de todo o documento. Os trechos de prosa afetados foram revistos em contexto.

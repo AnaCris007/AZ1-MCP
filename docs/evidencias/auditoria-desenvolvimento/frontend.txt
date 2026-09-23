@@ -1,0 +1,54 @@
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.0 /app
+
+ ✓ src/lib/api.test.js (5 tests) 3ms
+ ✓ src/hooks/useMicVolume.test.js (2 tests) 11ms
+stderr | src/pages/AgentPage.test.jsx
+VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY não configuradas — o login com Microsoft não vai funcionar. Preencha as duas no .env (ver .env.example).
+
+stderr | src/components/CalendarView/CalendarView.test.jsx > distingue falha de carregamento de uma agenda vazia
+[calendar] não foi possível carregar a agenda do portfólio
+
+stderr | src/components/TasksView/TasksView.test.jsx > informa falha de leitura sem apresentar uma lista vazia como sucesso
+[tasks] não foi possível carregar as pendências do portfólio
+
+ ✓ src/components/CalendarView/CalendarView.test.jsx (2 tests) 85ms
+ ✓ src/components/TasksView/TasksView.test.jsx (4 tests) 215ms
+ ✓ src/pages/AgentPage.test.jsx (5 tests) 298ms
+
+ Test Files  5 passed (5)
+      Tests  18 passed (18)
+   Start at  01:04:31
+   Duration  1.17s (environment 57%, tests 16%, import 11%, transform 10%, setup 6%)
+
+
+> frontend@0.0.0 build
+> vite build
+
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2275 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                           0.45 kB │ gzip:   0.29 kB
+dist/assets/az1-logo-CJfIvIPK.png       243.90 kB
+dist/assets/az1-logo-dark-DhgBxFzu.png  277.61 kB
+dist/assets/index-CPXCctlV.css           24.71 kB │ gzip:   5.68 kB
+dist/assets/index-gMxEX0sV.js           807.73 kB │ gzip: 231.41 kB
+
+✓ built in 327ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+> frontend@0.0.0 lint
+> oxlint src
+
+Found 0 warnings and 0 errors.
+Finished in 9ms on 29 files with 96 rules using 10 threads.

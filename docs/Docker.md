@@ -18,14 +18,14 @@ do código do repositório.
 | `frontend` | `docker/frontend/Dockerfile` | Serve o bundle React e encaminha `/api` para a API. Única porta de entrada. | 8080 (prod) / 5173 (dev) |
 | `api` | `docker/api/Dockerfile` | FastAPI, pipeline de PLN, integração com Deepgram e Gemini. | 8000 |
 | `minio` | `minio/minio` (oficial) | Armazenamento de áudio compatível com S3. | 9000 / 9001 |
-| `minio-init` | `minio/mc` (oficial) | Cria o bucket e aplica a regra de expiração. Roda uma vez e sai. | — |
+| `minio-init` | `minio/mc` (oficial) | Cria o bucket e aplica a regra de expiração. Roda uma vez e sai. |: |
 
 E dois contêineres sob demanda, controlados por `profiles`:
 
 | Contêiner | Perfil | Papel |
 |---|---|---|
 | `trainer` | `ml` | Retreina o classificador e roda as varreduras de experimento. |
-| `tests` | `ci` | Executa a suíte de testes dentro da imagem. |
+| `tests` | `ci` | Executa a suíte de testes dentro da imagem, com `requirements.txt`, `docs/` e `infra/` montados só para leitura. |
 
 ### Topologia
 
@@ -53,7 +53,7 @@ E dois contêineres sob demanda, controlados por `profiles`:
 ```
 
 Duas redes, e não uma: `frontend` recebe tráfego do host, `backend` conecta os
-serviços internos. O contêiner do nginx é o único que participa das duas — e,
+serviços internos. O contêiner do nginx é o único que participa das duas: e,
 portanto, o único caminho de fora para dentro. A segmentação é estrutural: um
 serviço novo colocado na rede `frontend` simplesmente não enxerga o MinIO, sem
 depender de ninguém lembrar de bloquear.
@@ -95,11 +95,11 @@ automaticamente. Sobem então:
 
 O código do host entra por bind mount: editar um `.py` reinicia o uvicorn,
 editar um `.jsx` atualiza o navegador. Não é preciso reconstruir a imagem para
-nenhuma das duas coisas — só quando as *dependências* mudam.
+nenhuma das duas coisas: só quando as *dependências* mudam.
 
 A interface exige login com Microsoft (RNF02). Sem `SUPABASE_URL` e
-`SUPABASE_ANON_KEY` configurados, a API responde 500 em toda rota protegida —
-não 401 — porque é uma falha de configuração, não de credencial do usuário. Para
+`SUPABASE_ANON_KEY` configurados, a API responde 500 em toda rota protegida -
+não 401: porque é uma falha de configuração, não de credencial do usuário. Para
 desenvolver sem configurar Entra ID/Supabase, defina `AZ1_AUTH_MODE=disabled`
 no `.env` (ver Seção 6); só funciona em desenvolvimento, a produção recusa
 subir com esse valor (Seção 4).
@@ -133,7 +133,7 @@ docker compose up -d          # já sobe em modo produção
 ```
 
 Definir `COMPOSE_FILE` também **desliga** o carregamento automático do override
-de desenvolvimento — que é o erro mais fácil de cometer num servidor, e o mais
+de desenvolvimento: que é o erro mais fácil de cometer num servidor, e o mais
 difícil de perceber depois.
 
 O que muda em relação ao desenvolvimento:
@@ -144,9 +144,9 @@ O que muda em relação ao desenvolvimento:
 - limites de CPU e memória por serviço;
 - `restart: always`;
 - `AUDIO_STORAGE_ACCESS_KEY` e `AUDIO_STORAGE_SECRET_KEY` passam a ser
-  **obrigatórias** — sem elas a subida falha, em vez de silenciosamente usar
+  **obrigatórias**: sem elas a subida falha, em vez de silenciosamente usar
   `minioadmin/minioadmin`;
-- `AZ1_AUTH_MODE=disabled` (válvula de desenvolvimento do RNF02 — ver Seção 6)
+- `AZ1_AUTH_MODE=disabled` (válvula de desenvolvimento do RNF02: ver Seção 6)
   passa a **derrubar a subida**, em vez de deixar as rotas protegidas abertas
   sem token em produção.
 
@@ -163,7 +163,7 @@ SUPABASE_ANON_KEY=<chave anônima do projeto>
 Essas duas chaves são a credencial única do armazenamento: a API assina as
 requisições S3 com elas **e** o contêiner do MinIO sobe com elas como usuário
 root. Não existe um segundo par de variáveis para o servidor. Um par só, num
-lugar só — porque credencial duplicada em dois nomes é credencial que um dia vai
+lugar só: porque credencial duplicada em dois nomes é credencial que um dia vai
 divergir, e a divergência aparece como um 403 na primeira gravação de áudio, sem
 dizer qual dos dois lados está errado.
 
@@ -184,9 +184,11 @@ docker compose --profile ml run --rm trainer python -m pln.experimento
 # varredura de hiperparâmetros
 docker compose --profile ml run --rm trainer python -m pln.ajuste_fino
 
-# suíte completa (145 testes)
+# suíte completa (mais de 500 testes)
 docker compose --profile ci run --rm tests
 ```
+
+O serviço `tests` monta três caminhos do repositório em modo somente leitura: `requirements.txt`, `docs/` e `infra/`. A imagem carrega apenas o que a aplicação executa, e três suítes comparam o código com arquivos que ficam fora dele — as versões fixadas contra as instaladas, e a retenção declarada em `infra/minio/lifecycle.json` contra o mínimo do RNF09. Montar em vez de copiar mantém `docs/` fora da imagem e evita invalidar a camada a cada alteração de documentação.
 
 O valor de treinar em contêiner é a correspondência de ambiente: o modelo que
 vai a produção é gerado com as mesmas versões de `scikit-learn`, `nltk` e
@@ -210,8 +212,8 @@ Docker:
 | `AZ1_API_PORT` | 8010 | Porta da API publicada em desenvolvimento. |
 | `MINIO_API_PORT` / `MINIO_CONSOLE_PORT` | 9000 / 9001 | Portas do MinIO em desenvolvimento. |
 | `AUDIO_STORAGE_ACCESS_KEY` / `AUDIO_STORAGE_SECRET_KEY` | `minioadmin` | Credencial única do armazenamento: a API assina as requisições S3 com ela e o MinIO sobe com ela. Obrigatórias em produção. Mínimo de 3 e 8 caracteres. |
-| `AZ1_AUTH_MODE` | `enabled` | Com `disabled`, todas as rotas protegidas do RNF02 ficam abertas sem token — só para desenvolvimento. Em produção a subida é recusada se estiver `disabled` (ver Seção 4). |
-| `SUPABASE_URL` / `SUPABASE_ANON_KEY` | — | Projeto Supabase usado pelo Supabase Auth (RNF02). A mesma URL é repassada ao build do frontend como `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` — não precisa duplicar a variável no `.env`. |
+| `AZ1_AUTH_MODE` | `enabled` | Com `disabled`, todas as rotas protegidas do RNF02 ficam abertas sem token: só para desenvolvimento. Em produção a subida é recusada se estiver `disabled` (ver Seção 4). |
+| `SUPABASE_URL` / `SUPABASE_ANON_KEY` |: | Projeto Supabase usado pelo Supabase Auth (RNF02). A mesma URL é repassada ao build do frontend como `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`: não precisa duplicar a variável no `.env`. |
 | `UVICORN_WORKERS` | 2 | Workers do uvicorn em produção. |
 | `AZ1_VERSION` | `dev` | Tag das imagens e label OCI de versão. |
 | `DOCKER_UID` / `DOCKER_GID` | 0 | Dono dos arquivos gerados pelo `trainer` (só Linux). |
@@ -246,7 +248,7 @@ secrets:
 
 O entrypoint lê o arquivo e exporta a variável antes de iniciar o uvicorn. O
 código da aplicação continua lendo apenas `os.environ` e não precisa saber de
-nada disso — a mesma imagem funciona com as duas formas.
+nada disso: a mesma imagem funciona com as duas formas.
 
 ---
 
@@ -275,7 +277,7 @@ docker buildx create --name az1 --driver docker-container --use
 
 Em CI, troque o cache local pelo cache de registro (o arquivo tem o trecho
 comentado). `mode=max` é o que importa num build multi-estágio como este: sem
-ele, o cache guarda apenas a imagem final e o estágio de dependências — o caro —
+ele, o cache guarda apenas a imagem final e o estágio de dependências: o caro -
 é refeito em todo pipeline.
 
 ---
@@ -317,41 +319,21 @@ docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revisi
 
 ---
 
-## 9. Banco de dados: ainda não conteinerizado
+## 9. Banco de dados e permissões dos webhooks
 
-A Seção 3.7 prevê PostgreSQL, e existe uma pasta `src/database/`. Os dois
-arquivos `.sql` de lá, porém, contêm o **template de README do Inteli**, e não
-schema — não há DDL para carregar, e nenhum ponto do código abre conexão com
-banco. Um serviço `postgres` no compose hoje subiria um banco vazio que ninguém
-consulta, então ele foi deliberadamente deixado de fora.
+O Compose inclui PostgreSQL 16 Alpine. Uma base local nova recebe `01_create_database.sql` e `06_webhook_permissions.sql`. A API aguarda o health check do banco e seleciona `DATABASE_URL`, depois `SUPABASE_DB_URL` e, sem as duas, `postgresql://az1:az1@postgres:5432/az1` para o receptor local. Ferramentas no host usam `localhost` pela porta publicada no override.
 
-Quando o schema existir, o serviço entra assim, e o restante da composição não
-muda:
+O receptor abre pool próprio e assume obrigatoriamente `az1_webhook`; o pool das consultas de usuário continua separado. Esse papel só pode inserir/ler eventos, atualizar sua conclusão e marcar a origem para varredura. Não recebe DELETE, alteração do corpo ou leitura dos segredos de integração.
 
-```yaml
-  postgres:
-    <<: [*logging, *restart]
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-az1}
-      POSTGRES_USER: ${POSTGRES_USER:?defina POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      # Scripts em /docker-entrypoint-initdb.d rodam em ordem alfabética, e
-      # SOMENTE quando o volume de dados está vazio. Alterar um .sql depois do
-      # primeiro boot não tem efeito nenhum — a partir daí, é migração.
-      - ./src/database:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    networks: [backend]
+Volumes existentes não reaplicam scripts de inicialização. Antes de iniciar o receptor atualizado, confira `SHOW server_version` e aplique as permissões sem apagar dados. A migração 06 exige PostgreSQL 16 ou superior:
+
+```bash
+docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -v webhook_login=az1 < src/database/06_webhook_permissions.sql
 ```
 
-E, no serviço `api`, `depends_on: postgres: {condition: service_healthy}`.
+Em outro ambiente, `webhook_login` deve ser o nome do usuário no DSN do receptor, mesmo que a migração seja executada por outro administrador. Se omitido, o script usa o usuário conectado. O receptor falha ao abrir o pool quando não consegue assumir `az1_webhook`; `/health` sozinho não verifica essas permissões.
+
+A base relacional completa pode receber `02_initial_data.sql` e `03_rls_policies.sql`, que inclui a migração 06. O RAG usa `SUPABASE_DB_URL` com extensão vetorial; a imagem PostgreSQL local não instala pgvector. Testes destrutivos usam base dedicada indicada por `TEST_DATABASE_URL`.
 
 ---
 
@@ -361,7 +343,7 @@ E, no serviço `api`, `depends_on: postgres: {condition: service_healthy}`.
 |---|---|---|
 | `docker compose up` falha com "required variable AUDIO_STORAGE_ACCESS_KEY" | Você está subindo o arquivo de produção sem as credenciais. | Defina `AUDIO_STORAGE_ACCESS_KEY` e `AUDIO_STORAGE_SECRET_KEY` no `.env`. É a proteção funcionando. |
 | MinIO reinicia em laço e a API nunca sobe | Segredo com menos de 8 caracteres (ou chave com menos de 3). | `docker compose logs minio` mostra a recusa. Aumente `AUDIO_STORAGE_SECRET_KEY`. |
-| Upload de áudio devolve 500 com `SignatureDoesNotMatch` | API e MinIO estão com valores diferentes: você editou o `.env` e usou `docker compose restart`, que reinicia o processo sem reler o arquivo. | `docker compose up -d` — ele detecta a mudança de configuração e recria os contêineres com os valores novos. |
+| Upload de áudio devolve 500 com `SignatureDoesNotMatch` | API e MinIO estão com valores diferentes: você editou o `.env` e usou `docker compose restart`, que reinicia o processo sem reler o arquivo. | `docker compose up -d`: ele detecta a mudança de configuração e recria os contêineres com os valores novos. |
 | Interface responde, mas `/api/...` dá 502 | A API não subiu ou está unhealthy. | `docker compose ps` e `docker compose logs api`. |
 | `analyze` devolve 500 | Modelo ausente em `resultados/`. | `docker compose --profile ml run --rm trainer`. O log do entrypoint avisa disso na subida. |
 | Hot reload não dispara | inotify não atravessa o bind mount no Windows/macOS. | Confirme `WATCHFILES_FORCE_POLLING=1` e `VITE_USE_POLLING=1`. |
@@ -405,7 +387,7 @@ na lematização e na tokenização linguística, que são caminhos exercitados 
 `experimento.py`.
 
 A imagem carrega o spaCy assim mesmo porque ele está declarado como dependência
-de núcleo no `pyproject.toml`, e a imagem deve refletir o contrato do pacote —
+de núcleo no `pyproject.toml`, e a imagem deve refletir o contrato do pacote -
 não uma versão podada que quebraria no dia em que alguém retreinasse o modelo
 com lematização. Se o tamanho vier a incomodar (custo de ECR, tempo de pull no
 deploy), o caminho correto é mover o spaCy para um extra opcional no
@@ -416,7 +398,7 @@ deploy), o caminho correto é mover o spaCy para um extra opcional no
 pln-avancado = ["spacy>=3.7"]
 ```
 
-Aí o estágio `trainer` instala `.[pln-avancado]` e o `runtime` não — uma
+Aí o estágio `trainer` instala `.[pln-avancado]` e o `runtime` não: uma
 economia de ~180 MB com a dependência explícita, em vez de implícita.
 
 ---

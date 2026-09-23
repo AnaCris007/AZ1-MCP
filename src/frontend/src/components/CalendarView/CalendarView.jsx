@@ -15,74 +15,23 @@ const TYPE_LABELS = {
   reuniao: 'Reunião',
 }
 
-const FALLBACK_DAYS = [
-  {
-    date: '26 de agosto',
-    weekday: 'Quarta-feira',
-    events: [
-      {
-        id: 'e1',
-        time: '09:00',
-        title: 'Entrega do relatório de status — Linha 6',
-        type: 'prazo',
-        project: 'Linha 6 — Laranja',
-      },
-      {
-        id: 'e2',
-        time: '14:30',
-        title: 'Alinhamento com equipe de obras',
-        type: 'reuniao',
-        project: 'Linha 2 — Verde',
-      },
-    ],
-  },
-  {
-    date: '28 de agosto',
-    weekday: 'Sexta-feira',
-    events: [
-      {
-        id: 'e3',
-        time: '11:00',
-        title: 'Conclusão da fase de licenciamento ambiental',
-        type: 'marco',
-        project: 'Linha 6 — Laranja',
-      },
-    ],
-  },
-  {
-    date: '02 de setembro',
-    weekday: 'Quarta-feira',
-    events: [
-      {
-        id: 'e4',
-        time: '10:00',
-        title: 'Prazo para envio de documentação de risco',
-        type: 'prazo',
-        project: 'Linha 15 — Prata',
-      },
-      {
-        id: 'e5',
-        time: '16:00',
-        title: 'Revisão de cronograma com PMO',
-        type: 'reuniao',
-        project: 'Linha 15 — Prata',
-      },
-    ],
-  },
-]
 
 export default function CalendarView() {
-  const [days, setDays] = useState(FALLBACK_DAYS)
+  const [days, setDays] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let cancelled = false
 
     fetchCalendarEvents()
       .then((data) => {
-        if (!cancelled) setDays(data)
+        // A resposta vem como {days: [...]}; o componente lista os dias.
+        if (!cancelled) { setDays(data.days ?? []); setLoading(false) }
       })
       .catch(() => {
-        console.info('[calendar] backend indisponível, usando dados de exemplo')
+        console.error('[calendar] não foi possível carregar a agenda do portfólio')
+        if (!cancelled) { setLoading(false); setError('Não foi possível carregar a agenda. Tente novamente ao abrir esta tela.') }
       })
 
     return () => {
@@ -99,10 +48,13 @@ export default function CalendarView() {
             <h1 className="text-[18px] font-semibold text-text-primary">Agenda</h1>
           </div>
           <span className="rounded-full border border-border-soft px-3 py-1 text-[12px] font-medium text-text-muted">
-            Dados de exemplo — integração com Google Calendar em breve
+            Marcos e prazos do portfólio
           </span>
         </div>
 
+        {loading && <p role="status">Carregando agenda...</p>}
+        {error && <p role="alert">{error}</p>}
+        {!loading && !error && days.length === 0 && <p>Nenhum marco ou prazo registrado.</p>}
         <div className="flex flex-col gap-6">
           {days.map((day, dayIndex) => (
             <motion.div

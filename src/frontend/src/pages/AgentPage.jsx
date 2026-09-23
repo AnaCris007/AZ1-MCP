@@ -15,7 +15,10 @@ import metroMapPattern from '../assets/metro-map-pattern.svg'
 import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
 import {
+  AudioRequestError,
   ChatRequestError,
+  fetchConversas,
+  fetchMensagens,
   sendAudio,
   sendMessage,
   transcribeAudio,
@@ -29,6 +32,7 @@ const GENERIC_ERROR_FALLBACK =
   'Ocorreu um erro inesperado ao processar sua mensagem. Tente novamente.'
 const EMPTY_TRANSCRIPTION_MESSAGE =
   'Não foi possível identificar nenhuma fala. Tente gravar novamente.'
+const AUDIO_ERROR_FALLBACK = 'Não consegui processar o áudio. Tente novamente.'
 
 const TITLE_MAX_LENGTH = 42
 
@@ -48,6 +52,28 @@ export default function AgentPage() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [conversations, setConversations] = useState([])
+
+  // A barra lateral vem de `auditoria.conversa`. Antes vivia só em memória:
+  // recarregar a página apagava o histórico, mesmo com as conversas gravadas
+  // no banco com título e data.
+  useEffect(() => {
+    let cancelled = false
+
+    fetchConversas()
+      .then((data) => {
+        if (cancelled) return
+        setConversations(
+          (data.conversas ?? []).map((c) => ({ id: c.id, title: c.titulo })),
+        )
+      })
+      .catch(() => {
+        console.error('[conversas] não foi possível carregar o histórico')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
   const [conversationHistory, setConversationHistory] = useState({})
   const [activeId, setActiveId] = useState(null)
   const [messages, setMessages] = useState([])
@@ -104,7 +130,10 @@ export default function AgentPage() {
 
     sendMessage(trimmed, conversationId)
       .then((data) => {
-        setMessages((prev) => [...prev, { role: 'agent', content: data.reply }])
+        setMessages((prev) => [
+          ...prev,
+          { role: 'agent', content: data.reply, fontes: data.fontes ?? [] },
+        ])
       })
       .catch((err) => {
         let content = GENERIC_ERROR_FALLBACK
@@ -148,11 +177,12 @@ export default function AgentPage() {
           ])
         }
       })
-      .catch(() => {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'agent', content: 'Não consegui transcrever o áudio. Tente novamente.' },
-        ])
+      .catch((err) => {
+        // Antes, todo erro de áudio (arquivo grande demais, formato recusado,
+        // falha na transcrição) caía na mesma frase genérica. A API já manda
+        // a causa em `message` — ver `AudioRequestError` em `lib/api.js`.
+        const content = err instanceof AudioRequestError ? err.message : AUDIO_ERROR_FALLBACK
+        setMessages((prev) => [...prev, { role: 'agent', content }])
       })
       .finally(() => setIsTranscribing(false))
   }
@@ -188,8 +218,28 @@ export default function AgentPage() {
       return
     }
     setActiveId(id)
-    setMessages(conversationHistory[id] ?? [])
     setActiveTab('chat')
+    // O que está em memória cobre a conversa em andamento; para as
+    // anteriores, a fonte é o banco.
+    const emMemoria = conversationHistory[id]
+    if (emMemoria?.length) {
+      setMessages(emMemoria)
+      return
+    }
+
+    setMessages([])
+    fetchMensagens(id)
+      .then((data) => {
+        setMessages(
+          (data.mensagens ?? []).map((m) => ({
+            role: m.papel === 'usuario' ? 'user' : 'agent',
+            content: m.conteudo,
+          })),
+        )
+      })
+      .catch(() => {
+        console.error('[conversas] não foi possível carregar esta conversa')
+      })
   }
 
   const handleToggleListening = () => {
@@ -414,6 +464,12 @@ export default function AgentPage() {
                       key={index}
                       role={message.role}
                       content={message.content}
+                      fontes={message.fontes}
+                      conversaId={activeId}
+                      // `ordem` em auditoria.mensagem começa em 1 e alterna
+                      // usuário/agente, então o índice do array + 1 é a ordem
+                      // da linha correspondente no banco.
+                      ordem={index + 1}
                     />
                   ))}
                 </AnimatePresence>

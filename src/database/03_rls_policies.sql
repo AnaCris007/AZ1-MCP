@@ -56,6 +56,32 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA portfolio TO az1_app;
 GRANT UPDATE (titulo, atualizada_em, arquivada_em) ON auditoria.conversa    TO az1_app;
 GRANT UPDATE (polaridade, nota, motivo, comentario) ON auditoria.avaliacao  TO az1_app;
 
+-- Torna `az1_app` ASSUMÍVEL por quem conecta. Sem esta linha o papel existe,
+-- recebe todos os GRANTs acima, e mesmo assim `SET ROLE az1_app` responde
+-- "permission denied to set role" — que foi exatamente o que o Supabase do
+-- projeto respondeu quando a camada de acesso tentou usá-lo.
+--
+-- A causa é uma mudança do PostgreSQL 16: quem cria um papel passou a receber
+-- ADMIN OPTION sobre ele, mas NÃO o direito de herdá-lo nem o de assumi-lo.
+-- Os três viraram opções independentes (`admin_option`, `inherit_option` e
+-- `set_option`, em pg_auth_members), e as duas últimas nascem falsas.
+--
+-- INHERIT fica FALSE de propósito: não se quer que o usuário da conexão ganhe
+-- os privilégios de az1_app em silêncio. Quer-se que ele os assuma
+-- explicitamente, com `SET ROLE`, que é o que faz `current_user` deixar de ser
+-- dono das tabelas e as 17 policies de RLS passarem a valer. Herdar sem
+-- assumir manteria a RLS inativa, que é o defeito que esta linha corrige.
+DO $$
+BEGIN
+    EXECUTE format('GRANT az1_app TO %I WITH INHERIT FALSE, SET TRUE', current_user);
+EXCEPTION
+    WHEN insufficient_privilege THEN
+        RAISE WARNING 'sem ADMIN OPTION sobre az1_app: rode como o dono do banco, '
+                      'ou peça a quem criou o papel para executar '
+                      '"GRANT az1_app TO <usuario> WITH SET TRUE".';
+END
+$$;
+
 -- Papéis do Supabase (podem não existir num PostgreSQL avulso).
 DO $$
 BEGIN
@@ -239,6 +265,9 @@ CREATE POLICY avaliacao_propria_atualizacao ON auditoria.avaliacao
 -- futuro, estará afrouxando o RNF09 e precisa dizer isso no MR.
 
 COMMIT;
+
+-- Sessões de webhook usam papel separado das sessões de usuário.
+\ir 06_webhook_permissions.sql
 
 
 -- =============================================================================

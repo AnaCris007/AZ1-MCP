@@ -73,13 +73,13 @@ def _banco_disponivel() -> str | None:
     """
     if not DSN:
         return "TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL."
-    if os.environ.get("DATABASE_URL") == DSN:
+    if DSN in (os.environ.get("DATABASE_URL"), os.environ.get("SUPABASE_DB_URL")):
         return "TEST_DATABASE_URL é igual a DATABASE_URL. Esta suíte é destrutiva; use um banco de teste separado."
     try:
         with psycopg.connect(DSN, connect_timeout=3) as conexao:
             conexao.execute("SELECT 1 FROM auditoria.evento_webhook LIMIT 0")
-    except psycopg.OperationalError as exc:
-        return f"Postgres indisponível em {DSN}: {exc}".strip()
+    except psycopg.OperationalError:
+        return "Postgres de teste indisponível; verifique o serviço e TEST_DATABASE_URL."
     except psycopg.Error as exc:
         return f"Esquema ausente — rode o DDL de src/database: {exc}".strip()
     return None
@@ -320,3 +320,87 @@ class TestPersistenciaDoEvento(unittest.TestCase):
             ).fetchone()
 
         self.assertEqual(linha, (True,))
+
+
+@unittest.skipIf(MOTIVO is not None, MOTIVO or "")
+class TestPermissoesWebhook(unittest.TestCase):
+    def setUp(self):
+        from services.database_service import PostgresSettings, abrir_pool
+        self.admin = ConnectionPool(DSN, min_size=1, max_size=2)
+        self.addCleanup(self.admin.close)
+        _limpar(self.admin)
+        self.pool = abrir_pool(PostgresSettings(dsn=DSN, papel="az1_webhook"))
+        self.addCleanup(self.pool.close)
+        self.pool.wait(timeout=5)
+
+    def test_receptor_restrito_persiste_conclui_e_marca_varredura(self):
+        from datetime import UTC, datetime
+        evento = EventoWebhook(identificador=f"{CANAL}:permissao", tipo="drive.change", versao="1",
+                               marca_de_tempo=datetime.now(UTC), correlacao=CANAL, conteudo={})
+        registro = RegistroEventosPostgres(self.pool, PROVEDOR_DRIVE)
+        self.assertTrue(RegistroConexoesPostgres(self.pool, PROVEDOR_DRIVE).assinatura_ativa(CANAL))
+        reivindicacao = registro.reivindicar(evento)
+        ProcessadorVarreduraPendente(self.pool, PROVEDOR_DRIVE, TIPOS_DRIVE).processar(evento)
+        reivindicacao.concluir(SituacaoEvento.PROCESSADO)
+        self.assertIsNone(registro.reivindicar(evento))
+        with self.admin.connection() as conn:
+            self.assertEqual(conn.execute("SELECT delta_pendente FROM integracao.conexao WHERE subscription_id=%s", (CANAL,)).fetchone(), (True,))
+        with self.pool.connection() as conn:
+            self.assertEqual(conn.execute("SELECT current_user").fetchone(), ("az1_webhook",))
+
+    def test_papel_nao_pode_apagar_reescrever_corpo_ou_ler_segredos(self):
+        for sql in ["DELETE FROM auditoria.evento_webhook", "TRUNCATE auditoria.evento_webhook",
+                    "UPDATE auditoria.evento_webhook SET conteudo='{}'",
+                    "SELECT client_state FROM integracao.conexao",
+                    "UPDATE integracao.conexao SET ativa=false"]:
+            with (self.subTest(sql=sql), self.assertRaises(psycopg.errors.InsufficientPrivilege),
+                  self.pool.connection() as conn):
+                conn.execute(sql)
+
+    def test_usuario_da_aplicacao_nao_le_webhooks(self):
+        with self.assertRaises(psycopg.errors.InsufficientPrivilege), self.admin.connection() as conn:
+            conn.execute("SET LOCAL ROLE az1_app")
+            conn.execute("SELECT * FROM auditoria.evento_webhook")
+
+    def test_abrir_preserva_canal_ativo_no_postgres(self):
+        from unittest import mock
+
+        from services import drive_channel_service as drive
+        with self.admin.connection() as conn:
+            conn.execute("UPDATE integracao.conexao SET conta='padrao', recurso_id='recurso-antigo' WHERE subscription_id=%s", (CANAL,))
+        config = drive.Config("id", "secret", "token", "https://example.org", DSN)
+        with (mock.patch.object(drive, "obter_token", return_value="access"),
+              mock.patch.object(drive, "_pedir", return_value={"startPageToken": "inicio"}) as pedir,
+              self.assertRaises(drive.ErroDeOperacao)):
+            drive.abrir(config)
+        self.assertEqual(pedir.call_count, 1)
+        with self.admin.connection() as conn:
+            self.assertEqual(conn.execute("SELECT subscription_id, recurso_id, ativa FROM integracao.conexao WHERE conta='padrao'").fetchone(), (CANAL, "recurso-antigo", True))
+
+    def test_aviso_minimo_onedrive_marca_novamente_apos_varredura(self):
+        import json
+
+        from services.graph_push_service import (
+            PROVEDOR,
+            TIPOS_PROCESSAVEIS,
+            TradutorGraph,
+            VerificadorAssinaturaAtiva,
+            VerificadorClientState,
+        )
+        with self.admin.connection() as conn:
+            conn.execute("DELETE FROM integracao.conexao WHERE provedor=%s", (PROVEDOR,))
+            conn.execute("INSERT INTO integracao.conexao (provedor, conta, recurso, client_state, subscription_id) VALUES (%s, 'teste', '/me/drive/root', 'segredo-teste', 'onedrive-teste')", (PROVEDOR,))
+        receptor = ReceberEventoWebhook(
+            verificador=VerificadorEmCadeia(verificadores=(VerificadorClientState('segredo-teste'),
+                VerificadorAssinaturaAtiva(RegistroConexoesPostgres(self.pool, PROVEDOR)))),
+            tradutor=TradutorGraph(), registro=RegistroEventosPostgres(self.pool, PROVEDOR),
+            processador=ProcessadorVarreduraPendente(self.pool, PROVEDOR, TIPOS_PROCESSAVEIS))
+        corpo = json.dumps({'value': [{'subscriptionId': 'onedrive-teste', 'resource': '/me/drive/root',
+                                     'clientState': 'segredo-teste'}]}).encode()
+        for _ in range(2):
+            receptor.receber(cabecalhos={}, corpo=corpo)
+            with self.admin.connection() as conn:
+                self.assertEqual(conn.execute("SELECT delta_pendente FROM integracao.conexao WHERE subscription_id='onedrive-teste'").fetchone(), (True,))
+                conn.execute("UPDATE integracao.conexao SET delta_pendente=false WHERE subscription_id='onedrive-teste'")
+        with self.admin.connection() as conn:
+            self.assertEqual(conn.execute("SELECT count(*) FROM auditoria.evento_webhook WHERE provedor=%s", (PROVEDOR,)).fetchone(), (2,))

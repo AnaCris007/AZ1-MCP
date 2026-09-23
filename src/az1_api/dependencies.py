@@ -8,7 +8,12 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from psycopg_pool import ConnectionPool
 
-from database.conexao import BancoNaoConfigurado, obter_engine
+# `BancoNaoConfigurado` NÃO vem daqui: `database/conexao.py` apenas reexporta a
+# classe de `services/database_service.py`, importada mais abaixo. Duas classes
+# homônimas fariam `@app.exception_handler` registrar só uma delas.
+from database.conexao import obter_engine
+from rag.retriever import buscar as buscar_contexto_rag
+from services.agente_service import AgenteDesligado, ExecutarIntencao
 from services.alerta_service import (
     ConfiguracaoAlertas,
     DesativarAssinante,
@@ -19,7 +24,7 @@ from services.alerta_service import (
 )
 from services.analysis_service import AnalyzeAudio
 from services.audio_service import ReceiveAudio
-from services.auditoria_service import GravacaoDesligada, GravarConsulta, ListarConsultas
+from services.auditoria_service import ListarConsultas
 from services.auth_service import (
     AuthenticatedUser,
     AuthError,
@@ -28,6 +33,12 @@ from services.auth_service import (
     SupabaseTokenVerifier,
 )
 from services.chat_service import AnswerChatMessage
+from services.conversa_repository import (
+    ConversaRepository,
+    PersistenciaDesligada,
+    conversa_uuid,
+)
+from services.database_service import BancoNaoConfigurado, PostgresSettings, abrir_pool
 from services.drive_push_service import PROVEDOR as PROVEDOR_DRIVE
 from services.drive_push_service import TIPOS_PROCESSAVEIS as TIPOS_DRIVE
 from services.drive_push_service import (
@@ -45,12 +56,12 @@ from services.graph_push_service import (
     VerificadorClientState,
     VerificadorEmCadeia,
 )
+from services.portfolio_repository import PortfolioRepository
 from services.speech_service import GenerateSpeech
-from services.storage_service import S3AudioStorage, S3StorageSettings
+from services.storage_service import S3ObjectStorage, S3StorageSettings
 from services.transcription_service import TranscribeAudio
 from services.usuario_service import ResolveOrCreateUsuario
 from services.webhook_registry_service import (
-    PostgresSettings,
     ProcessadorVarreduraPendente,
     RegistroConexoesPostgres,
     RegistroEventosPostgres,
@@ -81,7 +92,7 @@ class AuthAPIError(Exception):
 @lru_cache
 def get_audio_receiver() -> ReceiveAudio:
     settings = S3StorageSettings.from_environment()
-    return ReceiveAudio(storage=S3AudioStorage.from_settings(settings))
+    return ReceiveAudio(storage=S3ObjectStorage.from_settings(settings))
 
 
 @lru_cache
@@ -89,13 +100,17 @@ def get_transcriber() -> TranscribeAudio:
     settings = S3StorageSettings.from_environment()
     api_key = os.environ["DEEPGRAM_API_KEY"]
     return TranscribeAudio(
-        fetcher=S3AudioStorage.from_settings(settings),
+        fetcher=S3ObjectStorage.from_settings(settings),
         api_key=api_key,
     )
 
 
+# O `.joblib` é carregado uma vez e compartilhado. Estava embutido em
+# `get_analyzer`; com o classificador passando a ser observado também no chat,
+# deixá-lo lá faria o modelo ser desserializado duas vezes — e o shim de
+# `sys.modules` viveria duplicado em dois lugares que teriam de concordar.
 @lru_cache
-def get_analyzer() -> AnalyzeAudio:
+def carregar_modelo_padrao():
     import sys
 
     import pln.classificador as _pln_mod
@@ -110,7 +125,7 @@ def get_analyzer() -> AnalyzeAudio:
     for k in _aliases:
         sys.modules[k] = _pln_mod
     try:
-        modelo = carregar_modelo(MODELO_PADRAO)
+        return carregar_modelo(MODELO_PADRAO)
     finally:
         for k, v in _saved.items():
             if v is None:
@@ -118,13 +133,68 @@ def get_analyzer() -> AnalyzeAudio:
             else:
                 sys.modules[k] = v
 
-    return AnalyzeAudio(transcriber=get_transcriber(), modelo=modelo)
+
+@lru_cache
+def get_analyzer() -> AnalyzeAudio:
+    return AnalyzeAudio(transcriber=get_transcriber(), modelo=carregar_modelo_padrao())
+
+
+# O classificador entra no chat como OBSERVADOR, e nada mais: o rótulo vai para
+# `auditoria.mensagem.intencao` e não decide nem a busca, nem a recusa, nem a
+# resposta.
+#
+# A distinção é o ponto. O modelo mede F1-macro 0,6736 contra os 0,85 do RNF03 —
+# colocá-lo para decidir algo erraria em cerca de um terço das interações. Como
+# observador, ele torna o RNF03 mensurável sobre tráfego real (hoje `intencao` é
+# NULL em 100% das linhas) sem colocar a qualidade da resposta em suas mãos.
+#
+# Devolve None quando o modelo não pôde ser carregado: uma instalação sem o
+# `.joblib` treinado continua conversando, apenas sem registrar a intenção.
+@lru_cache
+def get_classificador_de_intencao() -> Callable[[str], tuple[str, float]] | None:
+    try:
+        modelo = carregar_modelo_padrao()
+    except Exception:
+        logger.exception("Classificador indisponível; a intenção não será registrada.")
+        return None
+
+    from pln.classificador import prever_intencao
+
+    return lambda texto: prever_intencao(modelo, texto)
+
+
+def _historico_do_banco(conversa_id: str) -> list[tuple[str, str]]:
+    """Turnos anteriores, lidos de `auditoria.mensagem`.
+
+    Sem o `usuario_id` no filtro porque quem chama é o próprio modelo, já dentro
+    de uma requisição autenticada cujo `conversation_id` veio do cliente. A rota
+    de LEITURA da trilha (`routes/conversas.py`) filtra por usuário; aqui o que
+    se busca é o contexto da conversa em andamento.
+    """
+    repositorio = get_conversa_repository()
+    if isinstance(repositorio, PersistenciaDesligada):
+        return []
+    identificador = conversa_uuid(conversa_id)
+    if identificador is None:
+        return []
+    with get_connection_pool().connection() as conexao, conexao.cursor() as cursor:
+        cursor.execute(
+            "SELECT papel, conteudo FROM auditoria.mensagem "
+            "WHERE conversa_id = %s ORDER BY ordem",
+            (identificador,),
+        )
+        return [(papel, conteudo) for papel, conteudo in cursor.fetchall()]
 
 
 @lru_cache
 def get_chat_answerer() -> AnswerChatMessage:
     settings = GeminiSettings.from_environment()
-    return AnswerChatMessage(model=GeminiChatModel.from_settings(settings))
+    model = GeminiChatModel.from_settings(
+        settings,
+        buscar_contexto=buscar_contexto_rag,
+        carregar_historico=_historico_do_banco,
+    )
+    return AnswerChatMessage(model=model)
 
 
 @lru_cache
@@ -134,6 +204,72 @@ def get_speech_generator() -> GenerateSpeech:
         raise RuntimeError("GEMINI_API_KEY não configurada para geração de áudio.")
     model = os.environ.get("GEMINI_TTS_MODEL", DEFAULT_TTS_MODEL)
     return GenerateSpeech(model=GeminiSpeechModel.from_api_key(api_key, model))
+
+
+# O pool é compartilhado pelo processo inteiro e aberto sob demanda, e não na
+# subida da aplicação: uma instalação sem `SUPABASE_DB_URL` continua servindo
+# as rotas que não dependem de banco, em vez de não subir.
+#
+# `lru_cache` aqui é o que garante um pool só. Dois pools dobrariam as conexões
+# contra o Supabase, que as cobra.
+@lru_cache
+def get_connection_pool() -> ConnectionPool:
+    return abrir_pool(PostgresSettings.from_environment())
+
+
+# A busca semântica passa por aqui, e não por import direto em `routes/rag.py`,
+# para poder ser substituída em teste com `app.dependency_overrides`. É o mesmo
+# motivo dos cinco provedores acima.
+def get_document_searcher():
+    from rag.retriever import buscar
+
+    return buscar
+
+
+# O repositório junta as duas pontas do RNF04: o objeto no S3 e a linha em
+# `auditoria`. Depende do pool, então herda o comportamento dele — sem
+# `SUPABASE_DB_URL` levanta `BancoNaoConfigurado`, que o manipulador de
+# `main.py` traduz em 503.
+#
+# A identidade vem de `AuthenticatedUser.domain_user_id`, preenchido por
+# `ResolveOrCreateUsuario`. Substituiu o `GravarConsulta`, que gravava as mesmas
+# linhas com `usuario_id = 0` — um id que, sendo a coluna GENERATED ALWAYS AS
+# IDENTITY, não existe em banco algum criado pelo DDL. Ele só existia neste
+# Supabase, inserido à mão, e foi aposentado por `05_migracao_usuario_zero.sql`.
+#
+# Degrada em vez de levantar porque gravar a trilha é EFEITO COLATERAL de
+# `POST /chat`: sem `SUPABASE_DB_URL`, levantar aqui derrubaria a conversa
+# inteira com 500. Mesma escolha de `get_alerta_dispatcher`, logo abaixo.
+@lru_cache
+def get_conversa_repository() -> ConversaRepository | PersistenciaDesligada:
+    try:
+        return ConversaRepository(
+            pool=get_connection_pool(),
+            armazenamento=S3ObjectStorage.from_settings(S3StorageSettings.from_environment()),
+        )
+    except BancoNaoConfigurado as erro:
+        return PersistenciaDesligada(str(erro))
+
+
+# Diferente de `get_conversa_repository`, este NÃO degrada: aqui o banco não é
+# acessório, é a razão de o endpoint existir. Um `/tasks` que responde 200 com
+# lista vazia sem banco seria a mesma mentira que os dados de exemplo do
+# frontend. `BancoNaoConfigurado` vira 503 no manipulador de `main.py`.
+@lru_cache
+def get_portfolio_repository() -> PortfolioRepository:
+    return PortfolioRepository(pool=get_connection_pool())
+
+
+# Mesmo raciocínio de `get_alerta_dispatcher`, logo abaixo: o Agente é EFEITO
+# de `POST /chat` existir, não a razão do endpoint. Sem `SUPABASE_DB_URL`,
+# degrada para `AgenteDesligado` em vez de estourar a resolução das
+# dependências e derrubar a rota inteira com 500.
+@lru_cache
+def get_agente() -> ExecutarIntencao | AgenteDesligado:
+    try:
+        return ExecutarIntencao(portfolio=get_portfolio_repository())
+    except BancoNaoConfigurado as erro:
+        return AgenteDesligado(str(erro))
 
 
 @lru_cache
@@ -169,14 +305,6 @@ def get_alerta_dispatcher() -> DispatcherAlerta | DespachoDesligado:
         )
     except BancoNaoConfigurado as erro:
         return DespachoDesligado(str(erro))
-
-
-@lru_cache
-def get_gravador_auditoria() -> GravarConsulta | GravacaoDesligada:
-    try:
-        return GravarConsulta(engine=obter_engine())
-    except BancoNaoConfigurado as erro:
-        return GravacaoDesligada(str(erro))
 
 
 @lru_cache
@@ -240,18 +368,16 @@ def require_authenticated_user(
 
 
 @lru_cache
-def get_connection_pool() -> ConnectionPool:
-    """Pool compartilhado pelos dois receptores de webhook.
+def get_webhook_connection_pool() -> ConnectionPool:
+    """Mesmo banco do domínio por padrão, em sessão restrita aos webhooks.
 
-    É `lru_cache` e não uma variável de módulo para que o pool só seja aberto
-    quando alguém precisar dele. Uma instalação que ainda não subiu o Postgres
-    continua servindo as demais rotas, e o handshake de validação do Graph
-    responde mesmo assim — que é o que permite criar a assinatura antes de o
-    banco existir.
+    DATABASE_URL seleciona uma base explícita; sem ela, usa SUPABASE_DB_URL.
+    O papel az1_webhook é obrigatório e não compartilha sessões com az1_app.
     """
-    pool = ConnectionPool(PostgresSettings.from_environment().dsn, min_size=1, max_size=4, open=False)
-    pool.open()
-    return pool
+    dsn = os.environ.get("DATABASE_URL", "").strip()
+    if not dsn:
+        dsn = PostgresSettings.from_environment().dsn
+    return abrir_pool(PostgresSettings(dsn=dsn, papel="az1_webhook"))
 
 
 def _segredo(variavel: str, provedor: str) -> str:
@@ -280,7 +406,7 @@ def get_webhook_receiver() -> ReceberEventoWebhook:
     Os testes de API substituem esta função por `app.dependency_overrides`, como
     as demais dependências deste módulo.
     """
-    pool = get_connection_pool()
+    pool = get_webhook_connection_pool()
     conexoes = RegistroConexoesPostgres(pool, PROVEDOR_GRAPH)
 
     return ReceberEventoWebhook(
@@ -306,7 +432,7 @@ def get_drive_webhook_receiver() -> ReceberEventoWebhook:
     provedor. É essa simetria que a Seção 5.1 apresenta como evidência de que o
     núcleo é desacoplado da plataforma.
     """
-    pool = get_connection_pool()
+    pool = get_webhook_connection_pool()
     conexoes = RegistroConexoesPostgres(pool, PROVEDOR_DRIVE)
 
     return ReceberEventoWebhook(

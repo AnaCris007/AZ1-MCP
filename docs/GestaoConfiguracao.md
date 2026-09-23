@@ -84,6 +84,7 @@
 - [7.1 O que foi inspecionado, e com que alcance](#71-o-que-foi-inspecionado-e-com-que-alcance)
 - [7.2 Quadro de aderência](#72-quadro-de-aderência)
 - [7.3 Leitura do quadro](#73-leitura-do-quadro)
+- [7.4 Atualização de aderência na Sprint 3](#74-atualização-de-aderência-na-sprint-3)
 
 </details>
 
@@ -101,7 +102,7 @@
 
 ## 1.2 Princípios da gestão de configuração
 
- A gestão de configuração do projeto AZ1 é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches permanentes**: `main` e `develop` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
+ A gestão de configuração do projeto AZ1 é orientada por quatro princípios fundamentais. O primeiro é a **rastreabilidade**: toda mudança autoral no repositório deve estar associada a uma issue do GitLab, de modo que seja possível identificar por que a alteração foi feita, quem a fez e em qual sprint. Commits de merge gerados pelo GitLab são exceção ao formato autoral, pois sua rastreabilidade decorre do próprio Merge Request. O segundo princípio é a **revisão por pares**: nenhuma alteração é integrada às branches estáveis sem aprovação de um integrante diferente do autor, garantindo qualidade e distribuição do conhecimento. O terceiro é a **proteção das branches permanentes**: `main`, `develop` e `hmg` não recebem commits diretos; toda integração ocorre por Merge Request aprovado. O quarto é a **cadência distribuída**: o trabalho deve ser realizado ao longo da sprint, com commits frequentes e progressivos, evitando a concentração de entregas no último dia.
 
 ---
 
@@ -111,7 +112,7 @@
 
  O projeto AZ1 adota um fluxo baseado no Gitflow, com as branches permanentes `main`, `develop` e `hmg` e as branches temporárias `feature/*`, `release/*` e `hotfix/*` exigidas pelo enunciado oficial. As branches `docs/*` e `fix/*` são especializações adotadas pela equipe para documentação e correções comuns.
 
- A branch `hmg` é a etapa de homologação entre `develop` e `main`: ela recebe o conteúdo integrado da sprint, serve de ambiente de verificação final e só então é promovida para `main`. Nenhuma promoção para `main` ocorre sem passar por ela.
+ A branch `hmg` é a etapa de homologação entre `develop` e `main`: ela recebe o conteúdo integrado da sprint, serve de ambiente de verificação final e só então é promovida para `main`. Toda promoção regular para `main` passa por ela; hotfix é a exceção urgente documentada, com retorno a develop e sincronização posterior de hmg.
 
 - fluxo regular: `feature/*`, `docs/*` e `fix/*` → `develop` → `hmg` → `main`;
 - correção urgente: `hotfix/*` parte de `main` e retorna por MRs separados para `main` e `develop`.
@@ -130,11 +131,11 @@
 | `docs/<descricao>` | Documentação, sem alteração de comportamento | `develop` | `develop`, por MR | Ao iniciar uma task de documentação com o DoR atendido | Um revisor diferente do autor | Imediatamente após o merge | `docs/modelo-logico-relacional` |
 | `fix/<descricao>` | Correção de defeito já integrado à `develop` | `develop` | `develop`, por MR | Ao identificar o defeito e refinar a issue correspondente | Um revisor diferente do autor | Imediatamente após o merge | `fix/diagramas` |
 | `hotfix/<descricao>` | Correção urgente sobre versão já promovida | `main` | `main` e `develop`, por MRs separados | Somente quando a falha estiver em `main` e não puder aguardar o ciclo regular | Um revisor diferente do autor, em cada um dos dois MRs | Após os dois merges concluídos | `hotfix/corrigir-falha-classificador` |
-| `release/<versao>` | Estabilização e etiquetagem da versão candidata | `develop` | `main` e, havendo ajustes, `develop`, por MRs separados | Quando a versão exigir ajustes de estabilização que não devam voltar diretamente para `develop` | Um revisor diferente do autor, em cada MR | Após a criação da tag em `main` | `release/v1.0.0` |
+| `release/<versao>` | Estabilização e etiquetagem da versão candidata | `develop` | `hmg` e, havendo ajustes, `develop`, por MRs separados | Quando a versão exigir ajustes de estabilização que não devam voltar diretamente para `develop` | Um revisor diferente do autor, em cada MR | Após a criação da tag em `main` | `release/v1.0.0` |
 
-**Estado observado no repositório.** Das oito branches acima, seis têm uso comprovado no histórico: `main`, `develop`, `hmg` e as temporárias `feature/`, `feat/`, `docs/` e `fix/`. **Não há registro de uso de `release/*` nem de `hotfix/*`** — os exemplos dessas duas linhas descrevem a política e não constituem evidência de execução, conforme a Seção 5.3. Registra-se também que **o repositório não possui nenhuma tag**, de modo que a etiquetagem de versão prevista nas Seções 4.4 e 6.4 ainda não foi executada em nenhuma das duas sprints.
+**Estado observado no repositório.** Os tipos com uso registrado no histórico são: `main`, `develop`, `hmg` e as temporárias `feature/`, `feat/`, `docs/` e `fix/`. **Não há registro de uso de `release/*` nem de `hotfix/*`**: os exemplos dessas duas linhas descrevem a política e não constituem evidência de execução, conforme a Seção 5.3. Registra-se também que **o repositório não possui nenhuma tag**, portanto a etiquetagem prevista nas Seções 4.4 e 6.4 não está demonstrada no corte. Ausência de tag atual não prova que uma tag nunca tenha existido.
 
- A `hmg` e a `release/*` cumprem papéis distintos e não se substituem. A `hmg` é permanente e concentra a homologação de cada ciclo: é por ela que todo conteúdo passa antes de chegar à `main`. A `release/*` é temporária e existe para estabilizar e etiquetar uma versão específica quando houver ajustes que não devam voltar diretamente para `develop`. Até o momento, a equipe promoveu para `main` exclusivamente pela `hmg`; a `release/*` permanece definida conforme o enunciado do módulo, sem uso registrado no histórico do repositório.
+ A `hmg` e a `release/*` cumprem papéis distintos e não se substituem. A `hmg` é permanente e concentra a homologação de cada ciclo: é por ela que o conteúdo de promoção regular passa antes de chegar à `main`, com a exceção urgente de hotfix descrita acima. A `release/*` é temporária e existe para estabilizar e etiquetar uma versão específica quando houver ajustes que não devam voltar diretamente para `develop`. Até o momento, a equipe promoveu para `main` exclusivamente pela `hmg`; a `release/*` permanece definida conforme o enunciado do módulo, sem uso registrado no histórico do repositório.
 
 ## 2.3 Fluxo entre branches
 
@@ -143,7 +144,7 @@ feature/* ─┐
 docs/* ────┼──> develop ──> hmg ──> main
 fix/* ─────┘
 
-              develop ──> release/* ──> main          (estabilização de versão)
+              develop ──> release/* ──> hmg ──> main          (estabilização de versão)
                               └────────> develop      (ajustes da release)
 
 main ──> hotfix/* ──> main
@@ -190,7 +191,7 @@ A branch `release/*` é criada a partir de `develop` para estabilizar e etiqueta
 - Descrição curta e objetiva, que identifique a issue sem precisar abri-la;
 - Nunca usar nome de pessoa, número de sprint isolado ou termos genéricos como `desenvolvimento`, `tarefa` ou `atualização`.
 
-**Sobre o número da issue no nome da branch.** Uma convenção difundida inclui o número da issue no próprio nome, no formato `tipo/numero-descricao`, como em `feat/123-recebimento-audio`. **A equipe não adota esse formato**, e a escolha é deliberada: o vínculo com a issue já é estabelecido em dois pontos obrigatórios — a referência `#N` em cada commit autoral e o `Closes #N` na descrição do Merge Request —, de modo que acrescentá-lo ao nome da branch seria uma terceira repetição do mesmo dado. O que se perde é a legibilidade do vínculo na listagem de branches; o que se ganha é um nome que descreve o trabalho, e não um número que exige consulta para significar algo. A convenção adotada é a única válida no projeto, e a aferição da Seção 7 mostra que ela foi seguida em 100% das branches da Sprint 2.
+**Sobre o número da issue no nome da branch.** Uma convenção difundida inclui o número da issue no próprio nome, no formato `tipo/numero-descricao`, como em `feat/123-recebimento-audio`. **A equipe não adota esse formato**, e a escolha é deliberada: o vínculo com a issue já é estabelecido em dois pontos obrigatórios (a referência `#N` em cada commit autoral e o `Closes #N` na descrição do Merge Request), de modo que acrescentá-lo ao nome da branch seria uma terceira repetição do mesmo dado. O que se perde é a legibilidade do vínculo na listagem de branches; o que se ganha é um nome que descreve o trabalho, e não um número que exige consulta para significar algo. A convenção adotada é a única válida no projeto, e a aferição da Seção 7 mostra conformidade do prefixo, mas também uma exceção de maiúscula na descrição na Sprint 2.
 
 **Exemplos válidos:**
 
@@ -213,7 +214,7 @@ A branch `release/*` é criada a partir de `develop` para estabilizar e etiqueta
 
 ```bash
 git checkout develop
-git pull origin develop
+git pull --ff-only origin develop
 git checkout -b docs/brainstorming-features
 git push -u origin docs/brainstorming-features
 ```
@@ -241,31 +242,15 @@ git merge develop
 
 | Critério | Regra da equipe |
 |---|---|
-| Branch de destino correta | Branches de trabalho apontam para `develop`; releases promovem para `main`; hotfixes retornam para `main` e `develop` |
+| Branch de destino correta | Branches de trabalho apontam para `develop`; releases seguem para `hmg` e depois `main`; hotfixes retornam para `main` e `develop` |
 | Quantidade mínima de revisores | Um revisor, diferente do autor |
-| Critérios de aprovação | Pelo menos um comentário de revisão real, já que aprovação sem comentário não conta |
+| Critérios de aprovação | Aprovação por par e comentário técnico, conforme política do grupo. Na auditoria de participação, aprovação registrada também é revisão efetiva; a conformidade com a exigência local de comentário é verificada separadamente |
 | Tratamento de conflitos | O autor resolve os conflitos antes de solicitar a revisão |
 | Evidências obrigatórias | `Closes #N` na descrição, seções `## O que foi feito` e `## Como testar`, labels e milestone preenchidos |
 
-**Template mínimo de MR:**
+**Conteúdo mínimo da descrição:** a seção “O que foi feito” explica o problema, o resultado e os arquivos afetados. “Como testar” informa comandos, ambiente, SHA e resultado esperado, com links para a evidência obtida. O vínculo de fechamento usa o número real da issue, após conferir que o MR entrega todo o seu escopo; uma contribuição parcial deve referenciar a issue sem declarar sua conclusão.
 
-```markdown
-Closes #<número da issue>
-
-## O que foi feito
-- <ponto principal>
-- <ponto secundário>
-
-## Como testar
-1. <passo>
-2. <passo>
-3. <resultado esperado>
-
-## Checklist
-- [ ] Sem warnings de lint
-- [ ] Documentação atualizada (se aplicável)
-- [ ] MR aprovado por 1 revisor
-```
+O checklist do MR deve conferir revisão independente, aprovação, resolução das discussões, testes aplicáveis, documentação, labels e milestone. Esses itens são critérios para aceite, não evidência de que este artefato já foi aprovado.
 
 ## 4.2 Procedimento de merge
 
@@ -283,10 +268,13 @@ As promoções para `main` seguem o mesmo controle e ocorrem em duas etapas. Pri
  Branches de trabalho devem ser excluídas imediatamente após o merge, para manter o repositório organizado. A exclusão pode ser feita pelo GitLab no momento do merge (opção "Delete source branch") ou manualmente:
 
 ```bash
-git push origin --delete docs/brainstorming-features
+git status --short
+git switch develop
+git pull --ff-only origin develop
+git branch --merged origin/develop
+# Somente após conferir merge, trabalho adicional e autorização:
 git branch -d docs/brainstorming-features
-git checkout develop
-git pull origin develop
+git push origin --delete docs/brainstorming-features
 ```
 
 ## 4.4 Releases e hotfixes
@@ -294,7 +282,7 @@ git pull origin develop
 **Release:**
 
 ```bash
-git checkout develop && git pull origin develop
+git checkout develop && git pull --ff-only origin develop
 git checkout -b release/v1.0.0
 # realizar e validar os ajustes de estabilização
 git add <arquivos-alterados>
@@ -302,10 +290,10 @@ git commit -m "chore: preparar release v1.0.0 (#N)"
 git push -u origin release/v1.0.0
 ```
 
- Após a estabilização, abrir um Merge Request de `release/*` para `main`. Se a release contiver ajustes que ainda não estejam em `develop`, abrir também um Merge Request de retorno para `develop`. Depois da integração em `main`, criar a tag e excluir a branch de release:
+ Após a estabilização, abrir um Merge Request de `release/*` para `hmg`, seguido de `hmg` para `main`. Se a release contiver ajustes que ainda não estejam em `develop`, abrir também um Merge Request de retorno para `develop`. Depois da integração em `main`, criar a tag e excluir a branch de release:
 
 ```bash
-git checkout main && git pull origin main
+git checkout main && git pull --ff-only origin main
 git tag -a v1.0.0 -m "Release v1.0.0 da Sprint 1"
 git push origin v1.0.0
 git push origin --delete release/v1.0.0
@@ -314,7 +302,7 @@ git push origin --delete release/v1.0.0
 **Hotfix:**
 
 ```bash
-git checkout main && git pull origin main
+git checkout main && git pull --ff-only origin main
 git checkout -b hotfix/corrigir-falha-classificador
 # realizar e validar a correção urgente
 git add <arquivos-alterados>
@@ -330,7 +318,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 
  Commits e pushes diretos para `main`, `hmg` e `develop` são proibidos. A integração deve ocorrer por Merge Request, com **no mínimo uma aprovação** de revisor diferente do autor e com os critérios da Seção 4.1 atendidos. Somente integrantes autorizados pelo grupo podem concluir o merge; o autor pode realizá-lo apenas depois da aprovação registrada pelo revisor. A rotação de responsáveis pelas promoções para `main` está definida no Contrato de Convivência.
 
- As três branches permanentes são configuradas como protegidas no GitLab, o que impede o push direto e condiciona toda alteração à abertura de Merge Request. Nenhum commit direto em branch protegida foi observado no histórico do repositório ao longo das Sprints 1 e 2, conforme registrado na Seção 4.6 do `GestaoProjeto.md`.
+ A política exige proteção das três branches permanentes. A proteção deve ser conferida nas configurações do projeto; a topologia do Git não substitui essa configuração. Nenhum commit direto em branch protegida foi observado no histórico do repositório ao longo das Sprints 1 e 2, conforme registrado na Seção 4.6 do `GestaoProjeto.md`.
 
 ### Tratamento de conflitos
 
@@ -350,7 +338,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 
 ## 5.1 Vínculo com tasks
 
- Toda branch de trabalho, todo commit autoral e todo Merge Request do projeto AZ1 devem estar associados a uma issue do GitLab. O vínculo é estabelecido de três formas: o nome da branch descreve a issue desenvolvida; cada commit autoral referencia a issue com `#N`; e o MR contém `Closes #N` na descrição, encerrando a issue automaticamente quando o merge é realizado. Commits de merge gerados pela plataforma são rastreados pelo MR correspondente e não precisam repetir o padrão de mensagem autoral.
+ Toda branch de trabalho, todo commit autoral e todo Merge Request do projeto AZ1 devem estar associados a uma issue do GitLab. O vínculo é estabelecido de três formas: o nome da branch descreve a issue desenvolvida; cada commit autoral referencia a issue com `#N`; e o MR contém `Closes #N` na descrição, permitindo fechamento automático conforme destino e configuração; o estado deve ser conferido após o merge. Commits de merge gerados pela plataforma são rastreados pelo MR correspondente e não precisam repetir o padrão de mensagem autoral.
 
 ## 5.2 Convenção de commits
 
@@ -400,10 +388,10 @@ git push -u origin hotfix/corrigir-falha-classificador
 | Evidência | Link | O que demonstra |
 |---|---|---|
 | Issue | [Issue #16](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/issues/16) | Task refinada com DoR, DoD, labels, milestone e assignee |
-| Branch | [docs/brainstorming-features](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/tree/docs/brainstorming-features) | Nomenclatura padronizada e origem em `develop` |
+| Branch | [docs/brainstorming-features](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/tree/8affbbeb2767dba6eb0f52d11fa21d961802a231) | Nomenclatura padronizada e origem em `develop` |
 | Merge Request | [MR !11](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/merge_requests/11) | Vínculo com a issue, reviewer designado e revisão real |
 | Aderência da política à prática | [Seção 7.2 deste documento](#72-quadro-de-aderência) | Confronto item a item entre o que a política define e o que o repositório registra |
-| Histórico de commits | [Commits da branch](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/commits/docs/brainstorming-features) | Commits semânticos em português com `#N` distribuídos ao longo da sprint |
+| Histórico de commits | [Commits da branch](https://git.inteli.edu.br/graduacao/2026-2a/t17/g01/-/commits/8affbbeb2767dba6eb0f52d11fa21d961802a231) | Commits semânticos em português com `#N` distribuídos ao longo da sprint |
 
  Os links acima são evidências declaradas pela equipe. O histórico local confirma a existência de branches de trabalho com prefixos padronizados, commits autorais vinculados a issues e merges em `develop`. O conteúdo completo da issue e do Merge Request depende de acesso ao GitLab e, portanto, não pôde ser validado apenas com os arquivos locais. Não foram encontradas evidências locais de uso de `release/*` ou `hotfix/*`; as Seções 6.2 e 6.3 são exemplos de aplicação futura, não registros de execução.
 
@@ -426,7 +414,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 
  A equipe optou por manter as regras como estão e registrar o desvio, em vez de flexibilizar a convenção para acomodar a prática. O histórico já integrado não é reescrito, e a correção vale para os commits das próximas sprints, apoiada no hook da Seção 6.5, que recusa a mensagem antes de o commit ser criado. A ação correspondente está registrada na Seção 4.2.4 do `GestaoProjeto.md`, e a criação do hook é a task T37 do planejamento da Sprint 3.
 
-**Distribuição ao longo da sprint.** A quinta regra da Seção 5.2 — commits distribuídos ao longo do ciclo — é a única que não se afere por mensagem, e sim por data. Sobre os mesmos 94 commits:
+**Distribuição ao longo da sprint.** A quinta regra da Seção 5.2 (commits distribuídos ao longo do ciclo) é a única que não se afere por mensagem, e sim por data. Sobre os mesmos 94 commits:
 
 | Dia | Commits | Participação |
 |---|---:|---:|
@@ -454,7 +442,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 | Ana Cristina Jardim | 13 | 13,8% |
 | Tobias Viana | 9 | 9,6% |
 
- A diferença entre o integrante com mais e o com menos commits é de sete registros, e todos os sete contribuíram em volume comparável. Commits são uma medida grosseira de esforço — uma seção longa de documentação pode caber em um commit, e um ajuste pequeno de código pode render três —, de modo que a leitura correta desta tabela é a ausência de concentração, e não a equivalência de carga.
+ A diferença entre o integrante com mais e o com menos commits é de sete registros, e todos os sete contribuíram em volume comparável. Commits são uma medida grosseira de esforço (uma seção longa de documentação pode caber em um commit, e um ajuste pequeno de código pode render três), de modo que a leitura correta desta tabela é a ausência de concentração, e não a equivalência de carga.
 
 ---
 
@@ -465,7 +453,7 @@ git push -u origin hotfix/corrigir-falha-classificador
 **Contexto:** implementar a seção de brainstorming de features no `Projeto.md` (issue #16, Sprint 1).
 
 ```bash
-git checkout develop && git pull origin develop
+git checkout develop && git pull --ff-only origin develop
 git checkout -b docs/brainstorming-features
 git push -u origin docs/brainstorming-features
 
@@ -482,7 +470,7 @@ git push -u origin docs/brainstorming-features
 **Contexto ilustrativo:** estabilizar as entregas de uma sprint antes de promover a versão para `main`. Este exemplo descreve a política; não constitui evidência de que uma branch de release já tenha sido utilizada.
 
 ```bash
-git checkout develop && git pull origin develop
+git checkout develop && git pull --ff-only origin develop
 git checkout -b release/v1.0.0
 # realizar e validar os ajustes de estabilização
 git add <arquivos-alterados>
@@ -490,10 +478,10 @@ git commit -m "chore: preparar release v1.0.0 (#N)"
 git push -u origin release/v1.0.0
 ```
 
- Abrir um Merge Request da release para `main` e, se houver ajustes de estabilização ainda ausentes de `develop`, outro Merge Request de retorno para `develop`. Por fim, criar a tag em `main`:
+ Abrir um Merge Request da release para `hmg`, seguido de `hmg` para `main` e, se houver ajustes de estabilização ainda ausentes de `develop`, outro Merge Request de retorno para `develop`. Por fim, criar a tag em `main`:
 
 ```bash
-git checkout main && git pull origin main
+git checkout main && git pull --ff-only origin main
 git tag -a v1.0.0 -m "Release v1.0.0 da Sprint 1"
 git push origin v1.0.0
 git push origin --delete release/v1.0.0
@@ -504,7 +492,7 @@ git push origin --delete release/v1.0.0
 **Contexto ilustrativo:** corrigir uma falha crítica no classificador de intenções após integração em `main`. A issue `#34` é usada apenas para demonstrar a convenção e não é apresentada como evidência de hotfix executado.
 
 ```bash
-git checkout main && git pull origin main
+git checkout main && git pull --ff-only origin main
 git checkout -b hotfix/corrigir-falha-classificador
 git push -u origin hotfix/corrigir-falha-classificador
 
@@ -517,21 +505,21 @@ git push -u origin hotfix/corrigir-falha-classificador
 
 ## 6.4 Promoção da entrega da sprint por `hmg`
 
-**Contexto real:** este é o único exemplo desta seção que registra execução, e não aplicação futura. A entrega da Sprint 1 foi promovida para `main` por este caminho, no MR !24, mergeado em 14/08/2026.
+**Contexto real:** a integração abaixo está registrada no Git; os comandos de tag são ilustrativos, não evidência de execução. A entrega da Sprint 1 foi promovida para `main` por este caminho, no MR !24, mergeado em 14/08/2026.
 
  A promoção ocorre em duas etapas, cada uma com Merge Request e aprovação próprias. Primeiro, o conteúdo consolidado em `develop` é levado para homologação:
 
 ```bash
-git checkout develop && git pull origin develop
-git checkout hmg && git pull origin hmg
-git merge develop
-git push origin hmg
+git fetch origin
+git log --oneline origin/hmg..origin/develop
+# No GitLab: abrir MR develop -> hmg, revisar e aprovar.
+# Após homologação: abrir MR hmg -> main, revisar e aprovar.
 ```
 
  Na prática, esse merge é realizado pela interface do GitLab, por um Merge Request de `develop` para `hmg`, de modo que a revisão fique registrada. Com a entrega homologada em `hmg`, abre-se o segundo Merge Request, de `hmg` para `main`, cuja abertura é revezada entre os integrantes conforme o Contrato de Convivência. Depois da integração em `main`, cria-se a tag da versão:
 
 ```bash
-git checkout main && git pull origin main
+git checkout main && git pull --ff-only origin main
 git tag -a v0.2.0 -m "Release v0.2.0 da Sprint 2"
 git push origin v0.2.0
 ```
@@ -540,7 +528,7 @@ git push origin v0.2.0
 
 ## 6.5 Verificação automática da mensagem de commit
 
-**Contexto:** a aferição registrada na Seção 5.3 mostrou que a referência à issue atingiu 100% de conformidade na Sprint 2, enquanto a descrição no infinitivo ficou em 36,2%. A diferença é que a primeira regra passou a ser lembrada e a segunda continuou dependendo de atenção manual a cada mensagem. O hook abaixo transfere essa verificação para o próprio `git commit`.
+**Contexto:** a aferição registrada na Seção 5.3 mostrou que a referência à issue atingiu 100% de conformidade na Sprint 2, enquanto a descrição no infinitivo ficou em 36,2%. A causa dessa diferença não foi medida. O hook abaixo faz uma verificação heurística no `git commit`; o sufixo ar/er/ir não certifica que a palavra é verbo no infinitivo, nem comprova instalação coletiva.
 
  O arquivo é criado em `.git/hooks/commit-msg`, que é local a cada cópia do repositório e não é versionado, de modo que cada integrante o instala em sua máquina:
 
@@ -572,7 +560,7 @@ chmod +x .git/hooks/commit-msg
 
 ## 7.1 O que foi inspecionado, e com que alcance
 
- Esta seção confronta cada política deste documento com o que o repositório e o GitLab efetivamente registram. O histórico Git foi usado como fonte primária para branches, commits e merges; a consulta à plataforma complementou a inspeção com aprovações, revisores e estado dos Merge Requests. Uma tentativa intermediária de consulta à API devolveu `HTTP 401`, mas essa limitação foi superada na conferência final da Sprint 2, cujos dados de revisão estão registrados na Seção 4.2.4 do `GestaoProjeto.md`.
+ Esta seção confronta cada política deste documento com o que o repositório e o GitLab efetivamente registram. O histórico Git foi usado como fonte primária para branches, commits e merges; a consulta à plataforma complementou a inspeção com aprovações, revisores e estado dos Merge Requests. A conferência final da Sprint 2, validada no feedback do artefato, está registrada na Seção 4.2.4 do `GestaoProjeto.md`.
 
  A distinção importa e é aplicada rigorosamente na tabela abaixo: **ausência de informação local não é descumprimento comprovado**. Onde a prática não pôde ser observada, a linha diz exatamente isso.
 
@@ -592,7 +580,7 @@ chmod +x .git/hooks/commit-msg
 | Limite de 72 caracteres | Primeira linha com até 72 caracteres | 78 de 94, ou 83,0% | **Desvio comprovado** | Mesmo hook, que também verifica o comprimento |
 | Cadência dos commits | Commits distribuídos ao longo da sprint | Um único dia concentra 41,5% dos commits | **Desvio comprovado** | Primeira ação da Seção 4.2.4 do `GestaoProjeto.md`, com critério de 40% por dia |
 | Vínculo entre MR e issue | `Closes #N` na descrição do MR | Os 26 MRs têm ao menos uma issue referenciada nos commits da branch. A presença específica de `Closes #N` no corpo de cada MR não foi incluída na aferição final | **Não verificável integralmente** | Incluir a verificação do campo `Closes` na conferência final de cada sprint |
-| Revisão por par com comentário real | Ao menos um comentário de revisão, por integrante diferente do autor | A consulta final ao GitLab confirmou revisor designado e diferente do autor em todos os MRs examinados, com participação dos sete integrantes | Nenhum | Manter a distribuição e registrar a aferição na retrospectiva |
+| Revisão por par com comentário real | Ao menos um comentário técnico independente | A participação dos sete integrantes em revisões na Sprint 2 foi confirmada no feedback do artefato; a Seção 4.2.4 registra a distribuição | Participação confirmada no retorno da avaliação | Manter o vínculo de cada revisão à aprovação e ao comentário no MR; designação isolada não substitui revisão |
 | Autor não conclui o próprio merge sem aprovação | O autor só realiza o merge depois da aprovação registrada | A consulta final ao GitLab confirmou a existência de revisão registrada por integrante diferente do autor antes das integrações examinadas | Nenhum | Manter |
 | Estratégia de merge | Merge commit, para preservar o histórico | Os 26 MRs geraram commit de merge, sem indício de *squash* ou *rebase* | Nenhum | Manter |
 | Exclusão da branch após o merge | Branch temporária excluída imediatamente após o merge | Os 26 MRs partiram de 25 branches distintas, das quais **7 foram excluídas e 18 continuam existindo** nas referências remotas conhecidas localmente | **Desvio comprovado** | Excluir as branches já mescladas e marcar a opção de exclusão da branch de origem na abertura de cada MR |
@@ -602,17 +590,39 @@ chmod +x .git/hooks/commit-msg
 | Etiquetagem da versão | Tag anotada criada em `main` após a promoção | **Nenhuma tag existe no repositório** | **Desvio comprovado** | Criar a tag da Sprint 2 junto da promoção, e incluir a etapa no checklist da Seção 8 |
 | Uso de `release/*` | Branch de estabilização quando houver ajustes que não devam voltar a `develop` | Sem uso registrado | Nenhum: a política prevê o uso condicionado, e a condição não ocorreu | Manter a política; os exemplos permanecem ilustrativos |
 | Uso de `hotfix/*` | Correção urgente a partir de `main` | Sem uso registrado | Nenhum, pela mesma razão | Manter a política |
-| Esteira de verificação | Etapas de lint, testes, build, registro, deploy e verificação, conforme a Seção 3.7.6 do `Projeto.md` | **Não existe arquivo de configuração de CI no repositório** | **Desvio comprovado**: a política descreve um processo que não executa | Criar a configuração na Sprint 4, conforme a task T36 |
+| Esteira de verificação | Etapas de lint, testes, build, registro, deploy e verificação, conforme a Seção 3.7.6 do `Projeto.md` | No retrato de S2, CI ainda era planejamento; em S3, os arquivos de configuração foram versionados | Desvio registrado no retrato histórico, não estado atual | Ação histórica T36; em S3, conferir execução da configuração já versionada |
 
 ## 7.3 Leitura do quadro
 
- Dos vinte e um itens inspecionados, **treze estão em conformidade comprovada**, **seis apresentam desvio comprovado**, **um apresenta desvio pontual** e **um não pôde ser verificado integralmente** com as fontes disponíveis.
+ O quadro registra a avaliação da Sprint 2 e suas ações para o ciclo seguinte. A promoção por hmg e a participação dos revisores, confirmadas no feedback, permanecem registradas. Os avanços posteriores de configuração são descritos abaixo, sem substituir o histórico.
 
- Os seis desvios comprovados se organizam em quatro grupos, e o agrupamento sugere tratamentos distintos. O primeiro é **forma da mensagem de commit**, com dois itens que têm a mesma causa e a mesma solução: são conhecidos, dependem de atenção manual e o hook da Seção 6.5 os elimina de uma vez. O segundo é **cadência**, um item que não se resolve por ferramenta e depende de mudança de comportamento, razão pela qual está tratado como ação verificável, com critério numérico. O terceiro é **encerramento de ciclo**, com dois itens — branches não excluídas e tag ausente — que compartilham a característica de serem etapas finais que podem ser esquecidas quando a entrega já parece pronta. A promoção por `hmg`, anteriormente classificada de forma incorreta como não executada, foi confirmada no histórico e não integra esse grupo. Para os desvios restantes, a providência mais eficaz é o checklist da Seção 8.
+ Os seis desvios comprovados se organizam em quatro grupos, e o agrupamento sugere tratamentos distintos. O primeiro é **forma da mensagem de commit**, com dois itens que têm a mesma causa e a mesma solução: são conhecidos, dependem de atenção manual e o hook da Seção 6.5 pode reduzir parte dos desvios formais. O segundo é **cadência**, um item que não se resolve por ferramenta e depende de mudança de comportamento, razão pela qual está tratado como ação verificável, com critério numérico. O terceiro é **encerramento de ciclo**, com dois itens (branches não excluídas e tag ausente) que compartilham a característica de serem etapas finais que podem ser esquecidas quando a entrega já parece pronta. A promoção por `hmg`, anteriormente classificada de forma incorreta como não executada, foi confirmada no histórico e não integra esse grupo. Para os desvios restantes, a providência mais eficaz é o checklist da Seção 8.
 
- O item da esteira de verificação merece registro à parte porque é de natureza diferente dos demais: não é uma regra descumprida, e sim **um processo documentado que ainda não existe**. Enquanto o arquivo de configuração não for criado, as quatro rotas de gatilho descritas na Seção 3.7.6 do `Projeto.md` são especificação, e nenhuma verificação automática impede um MR de ser aceito.
+ A avaliação histórica da Sprint 2 registrava uma esteira ainda não implementada. Na Sprint 3, os arquivos de CI passaram a existir; os arquivos `.gitlab-ci.yml` e `gitlab-issue-kit/.gitlab-ci.yml` registram build, testes e qualidade. A execução de cada pipeline deve ser conferida no MR.
 
- O único item não verificado integralmente é a presença de `Closes #N` no corpo de cada MR. A cobertura de revisão deixou de ser uma lacuna de instrumentação: a consulta final ao GitLab confirmou revisores distintos dos autores e participação dos sete integrantes. A correção desta seção preserva a diferença entre uma limitação temporária de acesso e o estado efetivamente comprovado no encerramento da sprint.
+ Além do vínculo `Closes #N`, a cobertura de revisão exige registros primários de aprovações e comentários. A participação dos sete integrantes na Sprint 2 foi confirmada no feedback; no acompanhamento das próximas sprints, cada revisão deve continuar vinculada à aprovação ou ao comentário correspondente.
+
+## 7.4 Atualização de aderência na Sprint 3
+
+Esta atualização foi reconferida em **11/09/2026, às 23h21 (BRT)**. A análise local está fixada em `develop@2993257`; o GitLab foi consultado para estado dos MRs, reviewers, pipelines, branches e milestone. O quadro da Seção 7.2 permanece como histórico da Sprint 2 e não é sobrescrito.
+
+| Item | Prática observada na Sprint 3 | Situação | Encaminhamento para a Sprint 4 |
+|---|---|---|---|
+| Origem e destino das branches | As 24 branches de trabalho foram integradas por MR em `develop`, mantendo o fluxo informado pela equipe de partir de `develop` e retornar a ela | **Conforme** | Manter o fluxo e a atualização com a base antes do MR |
+| Nomenclatura das branches | Os 24 MRs usam prefixos válidos (`feat`, `feature`, `fix` ou `docs`) e descrição legível; `docs/autenticacao-SSO-login` contém maiúsculas | **23 de 24 em conformidade integral** | Validar lowercase antes do primeiro push |
+| Rastreabilidade dos commits | 92 de 92 commits autorais possuem referência `#N` e tipo Conventional Commits válido | **100% conforme** | Manter |
+| Descrição no infinitivo | 74 de 92 mensagens começam com palavra terminada em `ar`, `er` ou `ir`, segundo a heurística da Seção 6.5 | **80,4%; desvio em 18** | Versionar validação compartilhada, sem reescrever o histórico |
+| Limite de 72 caracteres | 70 de 92 primeiras linhas respeitam o limite | **76,1%; desvio em 22** | Aplicar a mesma validação antes do commit |
+| Cadência | O pico foi 10/09, com 33 de 92 commits (35,9%), mas 68 commits (73,9%) ocorreram de 09 a 11/09 e não houve atividade autoral entre 05 e 07/09 | **Parcial** | Acompanhar idade dos cards e antecipar o primeiro MR, além do teto diário |
+| Revisão por pares | Os 24 MRs possuem reviewer diferente do autor e os sete integrantes revisaram, conforme a atribuição e os registros de revisão | **Conforme** | Manter reviewer diferente do autor e registrar comentários quando houver ajuste técnico |
+| Estratégia de merge | Os 24 MRs geraram commits de merge em `develop` | **Conforme** | Manter |
+| Exclusão de branches | A página de branches ainda exibe fontes já mescladas, entre elas `feat/modelo-openrouter`, `feat/autenticacao-login`, `feat/receber-webhook-microsoft-graph` e `feature/implementar-text-to-speech` | **Desvio comprovado** | Excluir somente após conferir que o MR foi mesclado e não há trabalho adicional |
+| Esteira de verificação | `.gitlab-ci.yml` na raiz executa build, testes e lint; o pipeline associado a `develop@2993257` passou | **Evolução concluída na Sprint 3** | Manter a execução obrigatória e tratar falhas antes do merge |
+| Promoção `develop → hmg → main` | No corte, `develop` estava 138 commits à frente de `main`; a promoção está programada para depois da integração desta revisão final do artefato | **Etapa final programada** | Após integrar a correção final do artefato, abrir os dois MRs de promoção e realizar a revisão em cada etapa |
+| Tag da versão | A tag da Sprint 3 depende da promoção do conteúdo para `main` | **Etapa posterior à promoção** | Criar a tag anotada em `main` depois da conclusão do fluxo `develop → hmg → main` |
+| `release/*` e `hotfix/*` | Não houve condição nem uso registrado dessas branches | **Não aplicável nesta sprint** | Manter os procedimentos como política condicional |
+
+O resultado confirma evolução em rastreabilidade, revisão distribuída e CI. Permanecem como desvios observados a nomenclatura de uma branch, a forma de parte das mensagens de commit, a cadência concentrada e a manutenção de branches temporárias já mescladas. A promoção por `hmg` e a tag não são classificadas como falhas neste corte, pois constituem as etapas finais programadas para depois da integração desta revisão.
 
 ---
 

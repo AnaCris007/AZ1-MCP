@@ -17,6 +17,9 @@ class RagResultado(BaseModel):
     tipo_documento: str
     secao: str
     arquivo_origem: str
+    # Referência estável ao trecho citado, exigida pelo RNF12. É a mesma chave
+    # gravada em `auditoria.mensagem_fonte.chunk_id`.
+    chunk_id: str = ""
 
 
 class RagSearchResponse(BaseModel):

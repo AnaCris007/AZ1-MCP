@@ -1,0 +1,107 @@
+BEGIN
+DO
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+DO
+DO
+CREATE FUNCTION
+COMMENT
+REVOKE
+GRANT
+DO
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+COMMIT
+BEGIN
+DO
+GRANT ROLE
+REVOKE
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+ALTER TABLE
+ALTER TABLE
+DROP POLICY
+psql:/tmp/az1-database/06_webhook_permissions.sql:34: NOTICE:  policy "webhook_leitura" for relation "auditoria.evento_webhook" does not exist, skipping
+DROP POLICY
+psql:/tmp/az1-database/06_webhook_permissions.sql:35: NOTICE:  policy "webhook_registro" for relation "auditoria.evento_webhook" does not exist, skipping
+psql:/tmp/az1-database/06_webhook_permissions.sql:36: NOTICE:  policy "webhook_conclusao" for relation "auditoria.evento_webhook" does not exist, skipping
+DROP POLICY
+DROP POLICY
+psql:/tmp/az1-database/06_webhook_permissions.sql:37: NOTICE:  policy "webhook_origem_leitura" for relation "integracao.conexao" does not exist, skipping
+DROP POLICY
+psql:/tmp/az1-database/06_webhook_permissions.sql:38: NOTICE:  policy "webhook_origem_varredura" for relation "integracao.conexao" does not exist, skipping
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+DO
+COMMENT
+COMMIT
+
+== RLS por tabela (todas devem estar ativas) ==
+  schema   |       tabela        | rls | politicas 
+-----------+---------------------+-----+-----------
+ auditoria | avaliacao           | t   |         3
+ auditoria | conversa            | t   |         3
+ auditoria | evento_plataforma   | t   |         0
+ auditoria | evento_webhook      | t   |         3
+ auditoria | mensagem            | t   |         2
+ auditoria | mensagem_fonte      | t   |         1
+ auditoria | notificacao         | t   |         0
+ portfolio | artefato            | t   |         1
+ portfolio | campo_artefato      | t   |         1
+ portfolio | pendencia           | t   |         1
+ portfolio | portfolio           | t   |         1
+ portfolio | projeto             | t   |         1
+ portfolio | projeto_relacionado | t   |         1
+ portfolio | usuario             | t   |         1
+ portfolio | usuario_projeto     | t   |         1
+(15 rows)
+
+
+== Sem identidade, portfolio.usuario_atual() devolve NULL ==
+ usuario_atual 
+---------------
+              
+(1 row)
+

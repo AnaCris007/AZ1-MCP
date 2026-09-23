@@ -1,0 +1,227 @@
+BEGIN
+CREATE SCHEMA
+CREATE SCHEMA
+COMMENT
+COMMENT
+CREATE EXTENSION
+CREATE TABLE
+CREATE TABLE
+COMMENT
+COMMENT
+CREATE TABLE
+COMMENT
+COMMENT
+CREATE TABLE
+CREATE TABLE
+COMMENT
+COMMENT
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+COMMENT
+COMMENT
+CREATE TABLE
+COMMENT
+CREATE TABLE
+COMMENT
+COMMENT
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE TABLE
+COMMENT
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE VIEW
+COMMENT
+CREATE VIEW
+REVOKE
+REVOKE
+CREATE SCHEMA
+COMMENT
+CREATE TABLE
+CREATE TABLE
+COMMENT
+REVOKE
+CREATE INDEX
+COMMIT
+BEGIN
+TRUNCATE TABLE
+psql:/sql/02_initial_data.sql:29: NOTICE:  truncate cascades to table "conversa"
+psql:/sql/02_initial_data.sql:29: NOTICE:  truncate cascades to table "mensagem_fonte"
+psql:/sql/02_initial_data.sql:29: NOTICE:  truncate cascades to table "avaliacao"
+psql:/sql/02_initial_data.sql:29: NOTICE:  truncate cascades to table "evento_plataforma"
+psql:/sql/02_initial_data.sql:29: NOTICE:  truncate cascades to table "notificacao"
+psql:/sql/02_initial_data.sql:29: NOTICE:  truncate cascades to table "mensagem"
+TRUNCATE TABLE
+INSERT 0 4
+INSERT 0 10
+INSERT 0 8
+INSERT 0 6
+INSERT 0 37
+INSERT 0 18
+INSERT 0 24
+COMMIT
+
+== Contagem por tabela ==
+       tabela        | count 
+---------------------+-------
+ portfolio           |     4
+ usuario             |    10
+ projeto             |     8
+ projeto_relacionado |     6
+ artefato            |    37
+ pendencia           |    18
+ usuario_projeto     |    24
+(7 rows)
+
+
+== Situação do portfólio (a pergunta do Diretor) ==
+ codigo |        status         |  prev  |  real  | desvio_pp | pendencias_abertas | artefatos |      lider       
+--------+-----------------------+--------+--------+-----------+--------------------+-----------+------------------
+ SYN-01 | Atrasado              |  82.00 |  64.00 |    -18.00 |                  4 |         5 | Rafael Antunes
+ SYN-07 | Crítico               |  61.00 |  47.00 |    -14.00 |                  2 |         5 | Marcos Ribeiro
+ SYN-04 | Parcialmente atrasado |  79.00 |  70.00 |     -9.00 |                  3 |         5 | Patrícia Moraes
+ SYN-06 | Em estruturação       |  18.00 |  15.00 |     -3.00 |                  1 |         4 | Juliana Prado
+ SYN-03 | Em risco              |  43.00 |  41.00 |     -2.00 |                  1 |         4 | Eduardo Tanaka
+ SYN-08 | Concluído             | 100.00 | 100.00 |      0.00 |                  0 |         6 | Ana Beatriz Lima
+ SYN-02 | Dentro do previsto    |  68.00 |  71.00 |      3.00 |                  3 |         4 | Camila Nogueira
+ SYN-05 | Acima do previsto     |  70.00 |  78.00 |      8.00 |                  2 |         4 | Sérgio Vilela
+(8 rows)
+
+
+== Cobertura: artefatos no banco x documentos indexados no RAG ==
+Carga relacional concluída. A comparação com o RAG se aplica após a indexação.
+BEGIN
+DO
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+DO
+DO
+CREATE FUNCTION
+COMMENT
+REVOKE
+GRANT
+DO
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+COMMIT
+BEGIN
+DO
+GRANT ROLE
+REVOKE
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+ALTER TABLE
+ALTER TABLE
+psql:/sql/06_webhook_permissions.sql:34: NOTICE:  policy "webhook_leitura" for relation "auditoria.evento_webhook" does not exist, skipping
+DROP POLICY
+psql:/sql/06_webhook_permissions.sql:35: NOTICE:  policy "webhook_registro" for relation "auditoria.evento_webhook" does not exist, skipping
+DROP POLICY
+DROP POLICY
+psql:/sql/06_webhook_permissions.sql:36: NOTICE:  policy "webhook_conclusao" for relation "auditoria.evento_webhook" does not exist, skipping
+psql:/sql/06_webhook_permissions.sql:37: NOTICE:  policy "webhook_origem_leitura" for relation "integracao.conexao" does not exist, skipping
+DROP POLICY
+DROP POLICY
+psql:/sql/06_webhook_permissions.sql:38: NOTICE:  policy "webhook_origem_varredura" for relation "integracao.conexao" does not exist, skipping
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+DO
+COMMENT
+COMMIT
+
+== RLS por tabela (todas devem estar ativas) ==
+  schema   |       tabela        | rls | politicas 
+-----------+---------------------+-----+-----------
+ auditoria | avaliacao           | t   |         3
+ auditoria | conversa            | t   |         3
+ auditoria | evento_plataforma   | t   |         0
+ auditoria | evento_webhook      | t   |         3
+ auditoria | mensagem            | t   |         2
+ auditoria | mensagem_fonte      | t   |         1
+ auditoria | notificacao         | t   |         0
+ portfolio | artefato            | t   |         1
+ portfolio | campo_artefato      | t   |         1
+ portfolio | pendencia           | t   |         1
+ portfolio | portfolio           | t   |         1
+ portfolio | projeto             | t   |         1
+ portfolio | projeto_relacionado | t   |         1
+ portfolio | usuario             | t   |         1
+ portfolio | usuario_projeto     | t   |         1
+(15 rows)
+
+
+== Sem identidade, portfolio.usuario_atual() devolve NULL ==
+ usuario_atual 
+---------------
+              
+(1 row)
+
+CREATE SCHEMA
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+BEGIN
+psql:/sql/05_migracao_usuario_zero.sql:69: NOTICE:  Sem usuário 0: nada a migrar.
+DO
+COMMIT

@@ -103,6 +103,7 @@ class AmbienteHTTP(AmbienteWebhook):
             "subscriptionId": assinatura,
             "changeType": change_type,
             "resource": "drives/b!fake/root",
+            "id": item_id,
             "resourceData": {"id": item_id, "@odata.type": "#microsoft.graph.driveItem"},
             "tenantId": "tenant-1",
             "subscriptionExpirationDateTime": expira_em or _daqui(29),
@@ -254,7 +255,7 @@ class TestTradutorGraph(unittest.TestCase):
         corpo = json.dumps(
             {
                 "value": [
-                    {"subscriptionId": "s1", "changeType": "updated", "resource": "r", "resourceData": {"id": "i1"}}
+                    {"subscriptionId": "s1", "changeType": "updated", "resource": "r", "resourceData": {"id": "i1", "@odata.etag": "v1"}}
                 ]
             }
         ).encode()
@@ -264,16 +265,64 @@ class TestTradutorGraph(unittest.TestCase):
         # O identificador precisa distinguir o mesmo item vindo de assinaturas
         # diferentes, senão trocar de conexão faria o evento novo parecer duplicata.
         self.assertEqual(len(eventos), 1)
-        self.assertEqual(eventos[0].identificador, "s1:i1")
+        self.assertEqual(eventos[0].identificador, "s1:i1:v1")
         self.assertEqual(eventos[0].tipo, "graph.updated")
         self.assertEqual(eventos[0].correlacao, "s1")
 
     def test_entrega_com_varias_mudancas_e_desdobrada(self) -> None:
         notificacao = {"subscriptionId": "s1", "changeType": "updated", "resource": "r"}
         corpo = json.dumps(
-            {"value": [{**notificacao, "resourceData": {"id": "i1"}}, {**notificacao, "resourceData": {"id": "i2"}}]}
+            {"value": [{**notificacao, "resourceData": {"id": "i1", "@odata.etag": "v1"}}, {**notificacao, "resourceData": {"id": "i2", "@odata.etag": "v1"}}]}
         ).encode()
 
         eventos = self.tradutor.traduzir(cabecalhos={}, corpo=corpo)
 
-        self.assertEqual([e.identificador for e in eventos], ["s1:i1", "s1:i2"])
+        self.assertEqual([e.identificador for e in eventos], ["s1:i1:v1", "s1:i2:v1"])
+
+
+class TestAvisosOneDrive(unittest.TestCase):
+    def setUp(self):
+        self.ambiente = AmbienteHTTP()
+        self.addCleanup(app.dependency_overrides.clear)
+
+    def aviso(self, **campos):
+        return {"subscriptionId": ASSINATURA, "expirationDateTime": _daqui(1),
+                "resource": "/me/drive/root", "clientState": CLIENT_STATE, **campos}
+
+    def enviar(self, aviso):
+        return self.ambiente.cliente.post("/api/v1/webhooks/microsoft", json={"value": [aviso]})
+
+    def test_payload_minimo_oficial_aceito_e_nova_mudanca_nao_e_descartada(self):
+        for _ in range(2):
+            self.assertEqual(self.enviar(self.aviso()).status_code, 202)
+        self.assertEqual(self.ambiente.eventos_registrados(), 2)
+        self.assertEqual(self.ambiente.efeitos_aplicados(), 2)
+
+    def test_expiracao_do_onedrive_e_respeitada(self):
+        self.assertEqual(self.enviar(self.aviso(expirationDateTime=_daqui(-1))).status_code, 401)
+        self.assertEqual(self.ambiente.eventos_registrados(), 0)
+
+    def test_tipos_invalidos_nao_produzem_erro_interno(self):
+        for campo, valor in [("resource", []), ("resourceData", []), ("id", []),
+                             ("changeType", None), ("subscriptionId", []),
+                             ("expirationDateTime", "2026-09-11")]:
+            with self.subTest(campo=campo):
+                self.assertEqual(self.enviar(self.aviso(**{campo: valor})).status_code, 400)
+        for valor in [1, {}, "segredo-incorreto", "ç"]:
+            with self.subTest(clientState=valor):
+                self.assertEqual(self.enviar(self.aviso(clientState=valor)).status_code, 401)
+        self.assertEqual(self.enviar(None).status_code, 400)
+        self.assertEqual(self.ambiente.cliente.post(ROTA, content=b"\xff").status_code, 400)
+
+    def test_item_sem_versao_nao_e_chave_de_deduplicacao(self):
+        corpo = json.dumps({"value": [self.aviso(resourceData={"id": "mesmo-item"})]}).encode()
+        a = TradutorGraph().traduzir(cabecalhos={}, corpo=corpo)[0]
+        b = TradutorGraph().traduzir(cabecalhos={}, corpo=corpo)[0]
+        self.assertNotEqual(a.identificador, b.identificador)
+
+    def test_versoes_diferentes_do_item_produzem_chaves_diferentes(self):
+        def traduzir(etag):
+            corpo = json.dumps({"value": [self.aviso(resourceData={"id": "item", "@odata.etag": etag})]}).encode()
+            return TradutorGraph().traduzir(cabecalhos={}, corpo=corpo)[0].identificador
+        self.assertEqual(traduzir("v1"), traduzir("v1"))
+        self.assertNotEqual(traduzir("v1"), traduzir("v2"))

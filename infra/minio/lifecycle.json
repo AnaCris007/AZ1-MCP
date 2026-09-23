@@ -9,6 +9,16 @@
       },
       "ID": "expire-incoming-after-7-days",
       "Status": "Enabled"
+    },
+    {
+      "Expiration": {
+        "Days": 365
+      },
+      "Filter": {
+        "Prefix": "conversas/"
+      },
+      "ID": "expire-conversas-after-365-days",
+      "Status": "Enabled"
     }
   ]
 }

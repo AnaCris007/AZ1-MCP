@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hmac
 import json
+import uuid
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -39,10 +40,14 @@ def _carregar_notificacoes(corpo: bytes) -> list[Any]:
     try:
         bruto: Any = json.loads(corpo)
         notificacoes = bruto["value"]
-    except (json.JSONDecodeError, KeyError, TypeError) as exc:
+    except (json.JSONDecodeError, UnicodeDecodeError, KeyError, TypeError) as exc:
         raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO) from exc
 
-    if not isinstance(notificacoes, list) or not notificacoes:
+    if (
+        not isinstance(notificacoes, list)
+        or not notificacoes
+        or any(not isinstance(n, dict) for n in notificacoes)
+    ):
         raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO)
 
     return notificacoes
@@ -67,17 +72,25 @@ class TradutorGraph:
     def _converter(self, notificacao: Any) -> EventoWebhook:
         try:
             subscription_id = notificacao["subscriptionId"]
-            change_type = notificacao["changeType"]
+            change_type = notificacao.get("changeType", "updated")
             recurso = notificacao["resource"]
         except (KeyError, TypeError) as exc:
             raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO) from exc
 
-        dados = notificacao.get("resourceData") or {}
-        identificador = notificacao.get("id") or self._identificador_de_fallback(dados)
-        if not identificador:
-            # Sem identificador não há como garantir efeito único (TI-37), e
-            # processar mesmo assim arriscaria aplicar o efeito duas vezes.
+        if any(not isinstance(v, str) or not v.strip() for v in (subscription_id, change_type, recurso)):
             raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO)
+        dados = notificacao.get("resourceData", {})
+        if not isinstance(dados, dict):
+            raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO)
+        identificador = notificacao.get("id")
+        if identificador is not None and (not isinstance(identificador, str) or not identificador.strip()):
+            raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO)
+        identificador = identificador or self._identificador_de_fallback(dados)
+        # OneDrive envia também avisos sem ID, changeType ou resourceData.
+        # Cada recebimento ganha UUID: hash do corpo descartaria mudanças futuras
+        # com o mesmo aviso. O efeito repetível é marcar delta_pendente = TRUE.
+        estrategia = "provedor" if identificador else "recebimento"
+        identificador = identificador or str(uuid.uuid4())
 
         return EventoWebhook(
             identificador=f"{subscription_id}:{identificador}",
@@ -92,27 +105,17 @@ class TradutorGraph:
                 "resource": recurso,
                 "resource_data": dados,
                 "tenant_id": notificacao.get("tenantId"),
+                "identificacao": estrategia,
             },
         )
 
     def _identificador_de_fallback(self, dados: Mapping[str, Any]) -> str | None:
-        """Usado quando a notificação não traz `id` — campo documentado como
-        opcional pelo Graph (`changeNotification.id`).
-
-        `resourceData.id` sozinho identifica o *item*, não a *entrega*: duas
-        edições sucessivas do mesmo arquivo compartilham o mesmo `resourceData.id`,
-        e usá-lo isolado como chave de idempotência faria a segunda edição parecer
-        reentrega da primeira e ser descartada sem processar — perda silenciosa,
-        não falha visível. O `@odata.etag` muda a cada edição do item, então
-        compô-lo à chave distingue as duas. Se também faltar, ainda não há como
-        diferenciar — limitação do que o provedor envia, não deste código.
-        """
+        """Só item e versão juntos identificam uma alteração sem ID de evento."""
         item_id = dados.get("id")
-        if not item_id:
-            return None
-
         etag = dados.get("@odata.etag")
-        return f"{item_id}:{etag}" if etag else item_id
+        if isinstance(item_id, str) and item_id and isinstance(etag, str) and etag:
+            return f"{item_id}:{etag}"
+        return None
 
 
 @dataclass(frozen=True)
@@ -139,7 +142,7 @@ class VerificadorClientState:
             raise WebhookError(WebhookErrorCode.ASSINATURA_AUSENTE)
 
         for valor in recebidos:
-            if not hmac.compare_digest(valor, self.esperado):
+            if not isinstance(valor, str) or not hmac.compare_digest(valor.encode(), self.esperado.encode()):
                 raise WebhookError(WebhookErrorCode.ASSINATURA_INVALIDA)
 
 
@@ -159,7 +162,7 @@ class VerificadorAssinaturaAtiva:
     1. o `subscriptionId`, que confrontamos com as origens ativas em
        `integracao.conexao`: uma assinatura removida ou desativada deixa de ser
        aceita imediatamente;
-    2. o `subscriptionExpirationDateTime` do próprio corpo, que recusa a entrega
+    2. `subscriptionExpirationDateTime` ou `expirationDateTime` do corpo, que recusa a entrega
        cuja assinatura já venceu.
 
     Não é frescor por entrega, e o texto da documentação diz isso com todas as
@@ -175,7 +178,7 @@ class VerificadorAssinaturaAtiva:
 
         for notificacao in _carregar_notificacoes(corpo):
             subscription_id = notificacao.get("subscriptionId") if isinstance(notificacao, dict) else None
-            if not subscription_id:
+            if not isinstance(subscription_id, str) or not subscription_id.strip():
                 # Sem `subscriptionId` não há o que confrontar. Deixamos passar de
                 # propósito para o tradutor recusar com 400 (TI-39): a entrega é
                 # inválida por estrutura, não por autenticidade, e responder 401
@@ -185,13 +188,13 @@ class VerificadorAssinaturaAtiva:
             if not self.conexoes.assinatura_ativa(subscription_id):
                 raise WebhookError(WebhookErrorCode.ASSINATURA_EXPIRADA)
 
-            expira_em = notificacao.get("subscriptionExpirationDateTime")
-            if expira_em and self._vencida(expira_em, instante):
-                raise WebhookError(WebhookErrorCode.ASSINATURA_EXPIRADA)
+            for campo in ("subscriptionExpirationDateTime", "expirationDateTime"):
+                if campo in notificacao and self._vencida(notificacao[campo], instante):
+                    raise WebhookError(WebhookErrorCode.ASSINATURA_EXPIRADA)
 
     def _vencida(self, expira_em: str, instante: datetime) -> bool:
         try:
-            return datetime.fromisoformat(expira_em) < instante
+            return datetime.fromisoformat(expira_em) <= instante
         except (TypeError, ValueError) as exc:
             raise WebhookError(WebhookErrorCode.CONTEUDO_MALFORMADO) from exc
 

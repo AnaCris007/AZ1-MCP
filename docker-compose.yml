@@ -84,6 +84,7 @@ services:
     # (localhost:9000), e dentro da rede do compose o MinIO atende por "minio".
     # Sem esta sobreposição, a API tentaria falar consigo mesma na 9000.
     environment:
+      DATABASE_URL: ${DATABASE_URL:-${SUPABASE_DB_URL:-postgresql://az1:az1@postgres:5432/az1}}
       AUDIO_STORAGE_ENDPOINT_URL: http://minio:9000
       AUDIO_STORAGE_BUCKET: ${AUDIO_STORAGE_BUCKET:-az1-audio}
       AUDIO_STORAGE_REGION: ${AUDIO_STORAGE_REGION:-us-east-1}
@@ -97,6 +98,8 @@ services:
       TZ: ${TZ:-America/Sao_Paulo}
 
     depends_on:
+      postgres:
+        condition: service_healthy
       minio:
         # Espera o MinIO responder ao healthcheck, não apenas o processo existir.
         condition: service_healthy
@@ -275,22 +278,17 @@ services:
       POSTGRES_DB: az1
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Monta só o DDL, e não a pasta src/database inteira: 02_initial_data.sql
-      # ainda é o molde genérico do template inicial do repositório (commit
-      # 805d797), nunca preenchido com dados de verdade, e o Postgres o
-      # executaria como SQL se a pasta inteira fosse montada aqui.
-      # Recriar o banco do zero é `docker compose down -v`.
+      # Inicialização de uma base local nova. Volumes existentes recebem a
+      # migração 06 manualmente, sem apagar dados.
       - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create_database.sql:ro
+      - ./src/database/06_webhook_permissions.sql:/docker-entrypoint-initdb.d/06_webhook_permissions.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U az1 -d az1"]
       interval: 5s
       timeout: 5s
       retries: 5
-    # Sem "ports" aqui, seguindo o padrão do minio: publicado só no override de
-    # desenvolvimento (docker-compose.override.yml). A API containerizada
-    # alcança em "postgres:5432" pela rede interna; o webhook, que hoje roda
-    # fora do contêiner (uvicorn no host), depende desse mapeamento de porta
-    # para falar com "localhost:5432", conforme DATABASE_URL no .env.example.
+    # A API alcança postgres:5432 na rede interna; o override publica a porta
+    # para ferramentas operacionais executadas no host.
     networks:
       - backend
 
@@ -343,6 +341,25 @@ services:
       args:
         PYTHON_VERSION: "3.12"
     image: az1/api-dev:${AZ1_VERSION:-dev}
+
+    # Três caminhos do repositório que a imagem não carrega, montados apenas
+    # para leitura. A imagem copia o que a aplicação executa — `src`, `tests` e
+    # `pyproject.toml` —, e três suítes verificam coerência entre o código e
+    # arquivos que ficam fora dele: `test_reprodutibilidade` compara as versões
+    # fixadas em `requirements.txt` e declaradas na Seção 3.3.7 do `Projeto.md`
+    # com as instaladas, e `TesteRegraDeCicloDeVida` confere a retenção de
+    # `lifecycle.json` contra o mínimo do RNF09.
+    #
+    # Montar é melhor do que copiar para a imagem por dois motivos: a
+    # documentação muda a cada sprint e invalidaria a camada a cada commit, e
+    # uma imagem de aplicação não tem por que carregar `docs/`. Sem estes três
+    # mounts, `make test` termina com oito erros de arquivo ausente — que não
+    # são defeito do código, e escondem os que seriam.
+    volumes:
+      - ./requirements.txt:/app/requirements.txt:ro
+      - ./docs:/app/docs:ro
+      - ./infra:/app/infra:ro
+
     environment:
       # Os testes de API sobem o app com dependências substituídas por dublês,
       # mas a construção das dependências reais lê estas variáveis. Valores

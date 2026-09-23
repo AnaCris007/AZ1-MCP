@@ -11,6 +11,29 @@ export class ChatRequestError extends Error {
   }
 }
 
+// `/api/v1/audio` e `/api/v1/audio/{id}/transcribe` já respondem com
+// `{ error, message }` em português (arquivo grande demais, formato
+// recusado, áudio não encontrado etc.). Sem essa classe, a UI descartava o
+// corpo da resposta e mostrava sempre a mesma mensagem genérica, não importa
+// a causa real da falha.
+export class AudioRequestError extends Error {
+  constructor(status, error, message) {
+    super(message)
+    this.name = 'AudioRequestError'
+    this.status = status
+    this.error = error
+  }
+}
+
+async function lancarErroDeAudio(response, mensagemPadrao) {
+  const body = await response.json().catch(() => null)
+  throw new AudioRequestError(
+    response.status,
+    body?.error ?? 'unknown_error',
+    body?.message ?? mensagemPadrao,
+  )
+}
+
 async function authHeaders() {
   const { data } = await supabase.auth.getSession()
   const token = data.session?.access_token
@@ -61,7 +84,7 @@ export async function sendAudio(audioBlob) {
   })
 
   if (!response.ok) {
-    throw new Error(`Falha ao enviar áudio: ${response.status}`)
+    await lancarErroDeAudio(response, `Falha ao enviar áudio: ${response.status}`)
   }
 
   return response.json()
@@ -74,7 +97,7 @@ export async function transcribeAudio(audioId, language = 'pt-BR') {
   )
 
   if (!response.ok) {
-    throw new Error(`Falha ao transcrever áudio: ${response.status}`)
+    await lancarErroDeAudio(response, `Falha ao transcrever áudio: ${response.status}`)
   }
 
   return response.json()
@@ -151,6 +174,40 @@ export async function fetchCalendarEvents() {
 
   if (!response.ok) {
     throw new Error(`Falha ao buscar agenda: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function fetchConversas() {
+  const response = await apiFetch('/api/v1/conversas')
+
+  if (!response.ok) {
+    throw new Error(`Falha ao buscar conversas: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function fetchMensagens(conversaId) {
+  const response = await apiFetch(`/api/v1/conversas/${conversaId}/mensagens`)
+
+  if (!response.ok) {
+    throw new Error(`Falha ao buscar mensagens: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function avaliarResposta({ conversaId, ordem, polaridade }) {
+  const response = await apiFetch('/api/v1/conversas/avaliacoes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ conversa_id: conversaId, ordem, polaridade }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Falha ao registrar avaliação: ${response.status}`)
   }
 
   return response.json()

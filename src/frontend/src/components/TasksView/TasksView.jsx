@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Calendar, Check, ListChecks, Pencil, Sparkles } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import AgentOrb from '../AgentOrb/AgentOrb'
 import { fetchTasks, updateTask } from '../../lib/api'
 import TaskEditModal from './TaskEditModal'
@@ -19,54 +19,6 @@ const PRIORITY_LABELS = {
   baixa: 'Baixa',
 }
 
-const FALLBACK_TASKS = [
-  {
-    id: 't1',
-    title: 'Atualizar status de risco pendente na Linha 6',
-    project: 'Linha 6 — Laranja',
-    priority: 'alta',
-    dueDate: '2026-08-27',
-    description:
-      'O relatório de riscos está desatualizado desde a última vistoria. O agente identificou 2 riscos sem responsável definido.',
-    done: false,
-  },
-  {
-    id: 't2',
-    title: 'Revisar marco de licenciamento antes do prazo',
-    project: 'Linha 6 — Laranja',
-    priority: 'alta',
-    dueDate: '2026-08-28',
-    description: '',
-    done: false,
-  },
-  {
-    id: 't3',
-    title: 'Confirmar presença na reunião com equipe de obras',
-    project: 'Linha 2 — Verde',
-    priority: 'media',
-    dueDate: '',
-    description: '',
-    done: false,
-  },
-  {
-    id: 't4',
-    title: 'Preencher formulário de acompanhamento mensal',
-    project: 'Linha 15 — Prata',
-    priority: 'media',
-    dueDate: '2026-09-02',
-    description: '',
-    done: false,
-  },
-  {
-    id: 't5',
-    title: 'Arquivar documentos de escopo já validados',
-    project: 'Linha 15 — Prata',
-    priority: 'baixa',
-    dueDate: '',
-    description: '',
-    done: true,
-  },
-]
 
 function formatDueDate(dueDate) {
   if (!dueDate) return null
@@ -75,7 +27,11 @@ function formatDueDate(dueDate) {
 }
 
 export default function TasksView() {
-  const [tasks, setTasks] = useState(FALLBACK_TASKS)
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [savingIds, setSavingIds] = useState(new Set())
+  const pendingUpdates = useRef(new Set())
+  const [error, setError] = useState('')
   const [editingTaskId, setEditingTaskId] = useState(null)
 
   useEffect(() => {
@@ -83,10 +39,13 @@ export default function TasksView() {
 
     fetchTasks()
       .then((data) => {
-        if (!cancelled) setTasks(data)
+        if (!cancelled) { setTasks(data); setLoading(false) }
       })
       .catch(() => {
-        console.info('[tasks] backend indisponível, usando dados de exemplo')
+        // Antes isto caía numa lista fixa e mostrava tarefa inventada como se
+        // fosse real. Numa ferramenta de PMO, lista vazia é mais honesta.
+        console.error('[tasks] não foi possível carregar as pendências do portfólio')
+        if (!cancelled) { setLoading(false); setError('Não foi possível carregar as tarefas. Tente novamente ao abrir esta tela.') }
       })
 
     return () => {
@@ -105,13 +64,23 @@ export default function TasksView() {
 
   const editingTask = tasks.find((task) => task.id === editingTaskId) ?? null
 
-  const applyTaskUpdate = (id, updates) => {
-    setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, ...updates } : task)),
-    )
-    updateTask(id, updates).catch(() => {
-      console.info('[tasks] backend indisponível, atualização mantida só localmente')
-    })
+  const applyTaskUpdate = async (id, updates) => {
+    const previous = tasks.find((task) => task.id === id)
+    if (!previous || pendingUpdates.current.has(id)) return
+    pendingUpdates.current.add(id)
+    setSavingIds(new Set(pendingUpdates.current))
+    setError('')
+    setTasks((prev) => prev.map((task) => (task.id === id ? { ...task, ...updates } : task)))
+    try {
+      const atualizada = await updateTask(id, updates)
+      setTasks((prev) => prev.map((task) => (task.id === id ? atualizada : task)))
+    } catch {
+      setTasks((prev) => prev.map((task) => (task.id === id ? previous : task)))
+      setError('Não foi possível salvar a alteração. A tarefa mantém o estado anterior. Tente novamente.')
+    } finally {
+      pendingUpdates.current.delete(id)
+      setSavingIds(new Set(pendingUpdates.current))
+    }
   }
 
   const toggleTask = (id) => {
@@ -139,6 +108,9 @@ export default function TasksView() {
           </span>
         </div>
 
+        {loading && <p role="status">Carregando tarefas...</p>}
+        {savingIds.size > 0 && <p role="status">Salvando alterações...</p>}
+        {error && <p role="alert">{error}</p>}
         <div className="flex flex-col gap-2">
           {sortedTasks.map((task, index) => (
             <motion.div
@@ -153,6 +125,7 @@ export default function TasksView() {
               <button
                 type="button"
                 onClick={() => toggleTask(task.id)}
+                disabled={savingIds.has(task.id)}
                 aria-label={task.done ? 'Marcar como pendente' : 'Marcar como concluída'}
                 aria-pressed={task.done}
                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
@@ -197,6 +170,7 @@ export default function TasksView() {
                 <button
                   type="button"
                   onClick={() => setEditingTaskId(task.id)}
+                  disabled={savingIds.has(task.id)}
                   aria-label="Editar tarefa"
                   className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-black/5 hover:text-text-primary dark:hover:bg-white/10"
                 >
@@ -206,7 +180,7 @@ export default function TasksView() {
             </motion.div>
           ))}
 
-          {sortedTasks.length === 0 && (
+          {!loading && !error && sortedTasks.length === 0 && (
             <div className="flex flex-col items-center gap-3 py-16">
               <AgentOrb state="idle" size={40} />
               <p className="text-[13px] text-text-muted">

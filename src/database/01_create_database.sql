@@ -612,9 +612,11 @@ CREATE TABLE integracao.conexao (
     UNIQUE (provedor, conta, recurso)
 );
 
--- Registro imutável de cada entrega recebida. A unicidade composta é o critério
--- de idempotência exigido pelo caso TI-37: a mesma notificação reentregue pelo
--- provedor encontra a linha já gravada e não repete o efeito.
+-- Registro de recebimentos. O UNIQUE atende ao TI-37 somente quando o provedor
+-- oferece identidade estável de evento ou versão. Avisos mínimos OneDrive
+-- recebem UUID por recebimento, portanto não são deduplicados por esta chave.
+-- Neles, repetir delta_pendente = TRUE preserva o estado, mas registra e
+-- processa cada recebimento; não há garantia de execução única.
 --
 -- `concluido_em` nulo significa entrega registrada mas ainda não processada —
 -- o estado em que fica um evento que devolveu 5xx. É por isso que a reentrega
@@ -651,7 +653,7 @@ CREATE TABLE auditoria.evento_webhook (
 );
 
 COMMENT ON TABLE auditoria.evento_webhook IS
-    'Trilha de entregas de webhook (Microsoft Graph, Google Drive). Idempotência do TI-37 via UNIQUE composto.';
+    'Trilha de recebimentos de webhook. UNIQUE deduplica somente identidade estável de evento ou versão (TI-37). Avisos mínimos OneDrive geram uma linha por recebimento; repetir delta_pendente = TRUE preserva o estado.';
 
 -- Imutabilidade da trilha de webhook (RNF09), no mesmo regime da Seção 6.
 REVOKE UPDATE, DELETE ON auditoria.evento_webhook FROM PUBLIC;
@@ -659,7 +661,8 @@ REVOKE UPDATE, DELETE ON auditoria.evento_webhook FROM PUBLIC;
 -- Exceção pontual, análoga às da Seção 6: a conclusão do processamento só é
 -- conhecida depois da gravação, portanto o papel da aplicação recebe permissão
 -- de atualização restrita a estas duas colunas:
--- GRANT UPDATE (concluido_em, situacao) ON auditoria.evento_webhook TO <papel_da_aplicacao>;
+-- O GRANT executável e as políticas estão em 06_webhook_permissions.sql,
+-- também chamado por 03_rls_policies.sql. O receptor assume az1_webhook.
 
 -- Índice parcial para a varredura de pendentes: só as entregas não concluídas
 -- interessam, e elas são a minoria.

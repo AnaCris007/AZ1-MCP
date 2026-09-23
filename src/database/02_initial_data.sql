@@ -250,6 +250,8 @@ SELECT codigo, status, percentual_previsto AS prev, percentual_avanco AS real,
 \echo '== Cobertura: artefatos no banco x documentos indexados no RAG =='
 -- As duas contagens devem bater, projeto a projeto. Divergência significa que
 -- alguém indexou um documento sem cadastrá-lo, ou o contrário.
+SELECT to_regclass('vecs.documentos_metro') IS NOT NULL AS tem_indice_rag \gset
+\if :tem_indice_rag
 SELECT p.codigo,
        count(a.id)                                  AS artefatos_no_banco,
        (SELECT count(DISTINCT v.metadata->>'arquivo_origem')
@@ -259,3 +261,6 @@ SELECT p.codigo,
   LEFT JOIN portfolio.artefato a ON a.projeto_id = p.id
  GROUP BY p.codigo ORDER BY p.codigo;
 
+\else
+\echo 'Carga relacional concluída. A comparação com o RAG se aplica após a indexação.'
+\endif

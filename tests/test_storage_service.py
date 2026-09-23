@@ -4,13 +4,13 @@ import io
 import unittest
 from unittest.mock import Mock
 
-from services.storage_service import S3AudioStorage
+from services.storage_service import S3ObjectStorage
 
 
-class TestS3AudioStorage(unittest.TestCase):
+class TestS3ObjectStorage(unittest.TestCase):
     def test_envia_objeto_com_contrato_esperado(self) -> None:
         client = Mock()
-        storage = S3AudioStorage(client=client, bucket_name="az1-audio")
+        storage = S3ObjectStorage(client=client, bucket_name="az1-audio")
         content = io.BytesIO(b"audio")
         content.seek(2)
 
