@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Menu } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import AgentOrb from '../components/AgentOrb/AgentOrb'
 import CalendarView from '../components/CalendarView/CalendarView'
 import ChatMessage from '../components/ChatMessage/ChatMessage'
@@ -16,7 +16,6 @@ import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
 import {
   ChatRequestError,
-  generateSpeech,
   sendAudio,
   sendMessage,
   transcribeAudio,
@@ -59,10 +58,10 @@ export default function AgentPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [voiceState, setVoiceState] = useState('idle')
   const [voiceError, setVoiceError] = useState('')
+  const [voiceCallActive, setVoiceCallActive] = useState(false)
+  const [voiceConversationId, setVoiceConversationId] = useState(null)
   const [shareCopied, setShareCopied] = useState(false)
   const scrollRef = useRef(null)
-  const voiceAudioRef = useRef(null)
-  const voiceRunRef = useRef(0)
 
   const hasStarted = messages.length > 0
 
@@ -172,14 +171,21 @@ export default function AgentPage() {
   }
 
   const handleSelectTab = (tab) => {
-    if (activeTab === 'voice' && tab !== 'voice') {
-      voiceRunRef.current += 1
-      const currentAudio = voiceAudioRef.current
-      if (currentAudio) {
-        currentAudio.audio.pause()
-        URL.revokeObjectURL(currentAudio.url)
-        voiceAudioRef.current = null
+    if (tab === 'voice') {
+      const previousVoiceConversation = conversations.find(
+        (conversation) => conversation.title === 'Chamada por voz',
+      )
+      if (previousVoiceConversation?.id === activeId) {
+        setActiveId(null)
+        setMessages([])
       }
+      setVoiceConversationId((current) => current ?? crypto.randomUUID())
+      setConversations((prev) =>
+        prev.filter((conversation) => conversation.title !== 'Chamada por voz'),
+      )
+    }
+    if (activeTab === 'voice' && tab !== 'voice') {
+      setVoiceCallActive(false)
       setVoiceState('idle')
       setVoiceError('')
     }
@@ -187,95 +193,11 @@ export default function AgentPage() {
     setIsListening(false)
   }
 
-  const ensureConversation = (firstMessage) => {
-    const conversationId = activeId ?? crypto.randomUUID()
-    if (!activeId) {
-      setActiveId(conversationId)
-      setConversations((prev) => [
-        { id: conversationId, title: titleFromMessage(firstMessage) },
-        ...prev,
-      ])
-    }
-    return conversationId
-  }
-
-  const handleVoiceRecordingComplete = async (blob) => {
-    const runId = ++voiceRunRef.current
-    setVoiceError('')
-
-    if (!blob || blob.size === 0) {
-      setVoiceError('Não consegui acessar o microfone. Verifique a permissão do navegador.')
-      setVoiceState('error')
-      return
-    }
-
-    try {
-      setVoiceState('transcribing')
-      const upload = await sendAudio(blob)
-      const transcription = await transcribeAudio(upload.id)
-      if (runId !== voiceRunRef.current) return
-
-      const text = transcription.text.trim()
-      if (!text) {
-        setVoiceError(EMPTY_TRANSCRIPTION_MESSAGE)
-        setVoiceState('error')
-        return
-      }
-
-      const conversationId = ensureConversation(text)
-      setMessages((prev) => [...prev, { role: 'user', content: text }])
-      setVoiceState('processing')
-
-      const data = await sendMessage(text, conversationId)
-      if (runId !== voiceRunRef.current) return
-      setMessages((prev) => [...prev, { role: 'agent', content: data.reply }])
-
-      setVoiceState('speaking')
-      const speech = await generateSpeech(data.reply)
-      if (runId !== voiceRunRef.current) return
-
-      const url = URL.createObjectURL(speech)
-      const audio = new Audio(url)
-      voiceAudioRef.current = { audio, url }
-      await audio.play()
-      await new Promise((resolve) => {
-        audio.onended = resolve
-        audio.onerror = resolve
-      })
-      URL.revokeObjectURL(url)
-      voiceAudioRef.current = null
-      if (runId === voiceRunRef.current) setVoiceState('idle')
-    } catch (err) {
-      if (runId !== voiceRunRef.current) return
-      const currentAudio = voiceAudioRef.current
-      if (currentAudio) {
-        currentAudio.audio.pause()
-        URL.revokeObjectURL(currentAudio.url)
-        voiceAudioRef.current = null
-      }
-      let message = 'Não foi possível concluir essa interação. Tente novamente.'
-      if (err instanceof ChatRequestError && err.error === 'service_unavailable') {
-        message = err.message || SERVICE_UNAVAILABLE_FALLBACK
-      } else if (err instanceof ChatRequestError && err.error === 'network_error') {
-        message = NETWORK_ERROR_FALLBACK
-      }
-      setVoiceError(message)
-      setVoiceState('error')
-    }
-  }
-
-  const handleEndVoiceCall = () => {
-    voiceRunRef.current += 1
-    const currentAudio = voiceAudioRef.current
-    if (currentAudio) {
-      currentAudio.audio.pause()
-      URL.revokeObjectURL(currentAudio.url)
-      voiceAudioRef.current = null
-    }
-    setVoiceState('idle')
-    setVoiceError('')
-    setActiveTab('chat')
-  }
+  const handleVoiceStart = useCallback(() => {
+    setVoiceConversationId((current) => current ?? crypto.randomUUID())
+    setActiveTab('voice')
+    setVoiceCallActive(true)
+  }, [])
 
   const handleShare = async () => {
     const shareData = {
@@ -380,16 +302,14 @@ export default function AgentPage() {
             backgroundSize: '340px 340px',
           }}
         >
-          {activeTab === 'voice' ? (
+          {activeTab === 'voice' || voiceCallActive ? (
             <VoiceCall
+              conversationId={voiceConversationId}
               state={voiceState}
               error={voiceError}
-              onStateChange={(nextState) => {
-                setVoiceError('')
-                setVoiceState(nextState)
-              }}
-              onRecordingComplete={handleVoiceRecordingComplete}
-              onEnd={handleEndVoiceCall}
+              onStateChange={setVoiceState}
+              onError={setVoiceError}
+              onStart={handleVoiceStart}
             />
           ) : activeTab === 'calendar' ? (
             <CalendarView />

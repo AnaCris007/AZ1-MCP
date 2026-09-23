@@ -17,6 +17,31 @@ async function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
+export async function openVoiceCall(conversationId, { onMessage, onClose } = {}) {
+  const { data } = await supabase.auth.getSession()
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const apiUrl = API_BASE_URL
+    ? new URL(API_BASE_URL, window.location.origin)
+    : new URL(window.location.origin)
+  const url = `${protocol}//${apiUrl.host}/api/v1/voice/call`
+  const socket = new WebSocket(url)
+  socket.onmessage = onMessage
+  socket.onclose = onClose
+
+  await new Promise((resolve, reject) => {
+    socket.onopen = resolve
+    socket.onerror = () => reject(new Error('Não foi possível conectar à chamada.'))
+  })
+  socket.send(
+    JSON.stringify({
+      type: 'start_call',
+      conversation_id: conversationId,
+      access_token: data.session?.access_token ?? '',
+    }),
+  )
+  return socket
+}
+
 // Injeta o token da sessão atual em toda chamada à API. Buscar a sessão a
 // cada requisição (em vez de guardar o token numa variável) é o que garante
 // que o token renovado pelo Supabase seja usado automaticamente.

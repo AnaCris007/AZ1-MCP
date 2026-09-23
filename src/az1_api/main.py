@@ -17,6 +17,7 @@ from routes import (
     rag_router,
     speech_router,
     transcription_router,
+    voice_router,
     webhooks_router,
 )
 from routes.alerta import AlertaAPIError
@@ -52,6 +53,7 @@ app.include_router(rag_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(speech_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(alerta_router, prefix="/api/v1", dependencies=_auth_dependency)
 app.include_router(auditoria_router, prefix="/api/v1", dependencies=_auth_dependency)
+app.include_router(voice_router, prefix="/api/v1")
 
 # Webhooks ficam fora do RNF02: quem chama é o provedor (Google Drive /
 # Microsoft Graph), que não tem token do SSO. A autenticidade dessas entregas
