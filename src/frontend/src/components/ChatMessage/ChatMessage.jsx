@@ -156,10 +156,11 @@ export default function ChatMessage({ role, content, fontes = [], conversaId, or
         </div>
       )}
       <div
+        data-testid={isUser ? 'user-message-bubble' : 'agent-message-bubble'}
         className={`max-w-[640px] text-[15px] leading-relaxed ${
           isUser
-            ? 'rounded-2xl bg-surface px-4 py-3 text-text-primary'
-            : 'text-text-primary'
+            ? 'rounded-2xl rounded-tr-md border border-border-soft bg-surface px-4 py-3 text-text-primary shadow-sm'
+            : 'rounded-2xl rounded-tl-md border border-border bg-surface/95 px-4 py-3 text-text-primary shadow-sm backdrop-blur-sm'
         }`}
       >
         <div>{content}</div>

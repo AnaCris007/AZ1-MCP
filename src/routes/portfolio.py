@@ -157,6 +157,9 @@ def montar_agenda(
                 title=f"Término previsto — {projeto.nome}",
                 type="marco",
                 project=projeto.codigo,
+                description=f"Fase: {projeto.fase} · Portfólio: {projeto.portfolio}",
+                responsible=projeto.lider,
+                status=projeto.status,
             )
         )
 
@@ -168,7 +171,17 @@ def montar_agenda(
                 id=f"prazo-{pendencia.id}",
                 title=pendencia.titulo,
                 type="prazo",
-                project=pendencia.projeto_codigo,
+                project=f"{pendencia.projeto_codigo} — {pendencia.projeto_nome}",
+                description=pendencia.descricao or "",
+                responsible=pendencia.responsavel or "",
+                status=" · ".join(
+                    parte
+                    for parte in (
+                        pendencia.situacao.replace("_", " ").capitalize(),
+                        f"Criticidade {pendencia.criticidade}" if pendencia.criticidade else "",
+                    )
+                    if parte
+                ),
             )
         )
 
@@ -179,6 +192,7 @@ def montar_agenda(
                 title=evento.titulo,
                 type="evento",
                 time="" if evento.hora is None else evento.hora.strftime("%H:%M"),
+                description=evento.descricao,
             )
         )
 

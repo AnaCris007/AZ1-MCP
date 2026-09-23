@@ -81,6 +81,10 @@ describe('AgentPage — confirmação de transcrição', () => {
 
     await user.click(screen.getByRole('button', { name: 'Enviar mensagem' }))
 
+    const conversation = screen.getByTestId('conversation-scroll')
+    expect(conversation).toHaveClass('bg-background/30')
+    expect(conversation).not.toHaveClass('bg-background/75')
+
     await waitFor(() =>
       expect(sendMessage).toHaveBeenCalledWith(
         'Qual o status do projeto Linha 6?',

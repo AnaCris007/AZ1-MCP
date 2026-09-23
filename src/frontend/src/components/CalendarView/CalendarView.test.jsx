@@ -41,6 +41,35 @@ it('renderiza um evento local com pílula própria', async () => {
   expect(screen.getByText('Evento')).toBeInTheDocument()
 })
 
+it('abre os detalhes de um marco ao clicar no item', async () => {
+  fetchCalendarEvents.mockResolvedValue({
+    days: [
+      {
+        date: '5 de dezembro',
+        weekday: 'sábado',
+        iso: '2026-12-05',
+        events: [{
+          id: 'marco-SYN-01',
+          title: 'Término previsto — Implantação',
+          type: 'marco',
+          project: 'SYN-01',
+          time: '',
+          description: 'Fase: Execução · Portfólio: Expansão',
+          responsible: 'Ana Silva',
+          status: 'Em andamento',
+        }],
+      },
+    ],
+  })
+
+  render(<CalendarView />)
+  await userEvent.click(await screen.findByRole('button', { name: /Término previsto/ }))
+
+  expect(screen.getByRole('dialog', { name: 'Término previsto — Implantação' })).toBeInTheDocument()
+  expect(screen.getByText('Ana Silva')).toBeInTheDocument()
+  expect(screen.getByText('Fase: Execução · Portfólio: Expansão')).toBeInTheDocument()
+})
+
 it('mostra o botão de excluir só em eventos próprios', async () => {
   fetchCalendarEvents.mockResolvedValue({
     days: [

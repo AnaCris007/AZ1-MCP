@@ -65,6 +65,9 @@ class CalendarEventResponse(BaseModel):
     # inventar uma seria fabricar dado. Só type="evento" (criado pelo próprio
     # usuário) preenche este campo, quando uma hora é informada.
     time: str = ""
+    description: str = ""
+    responsible: str = ""
+    status: str = ""
 
 
 class CalendarDayResponse(BaseModel):

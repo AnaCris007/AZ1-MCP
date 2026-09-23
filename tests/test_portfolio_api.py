@@ -235,7 +235,10 @@ class TesteCalendario(_BaseDePortfolio):
         corpo = self.client.get("/api/v1/calendar/events").json()
         dia = corpo["days"][0]
         self.assertEqual(set(dia), {"date", "weekday", "events", "iso"})
-        self.assertEqual(set(dia["events"][0]), {"id", "title", "type", "project", "time"})
+        self.assertEqual(
+            set(dia["events"][0]),
+            {"id", "title", "type", "project", "time", "description", "responsible", "status"},
+        )
         self.assertEqual(dia["iso"], "2026-11-30")
 
     def test_marco_e_prazo_continuam_sem_hora_fabricada(self):
