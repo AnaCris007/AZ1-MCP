@@ -1,0 +1,15 @@
+test_assinatura_invalida_e_rejeitada (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_assinatura_invalida_e_rejeitada) ... ok
+test_confirmacao_so_ocorre_apos_persistencia (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_confirmacao_so_ocorre_apos_persistencia) ... ok
+test_conteudo_malformado_e_rejeitado (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_conteudo_malformado_e_rejeitado) ... ok
+test_entrega_com_assinatura_valida_e_processada (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_entrega_com_assinatura_valida_e_processada) ... ok
+test_entrega_duplicada_produz_efeito_unico (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_entrega_duplicada_produz_efeito_unico) ... ok
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... ok
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... ok
+test_reentrega_apos_falha_parcial_completa_sem_repetir (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK

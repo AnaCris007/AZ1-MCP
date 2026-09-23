@@ -1,0 +1,25 @@
+test_abrir_campanha_nao_devolve_orcamento_ja_gasto (tests.test_integracao_vhs.TestManifestoVhs.test_abrir_campanha_nao_devolve_orcamento_ja_gasto)
+Abrir zera o contador, e por isso não pode acontecer sem querer. ... ok
+test_encerramento_remove_temporarios_e_barra_nova_gravacao (tests.test_integracao_vhs.TestManifestoVhs.test_encerramento_remove_temporarios_e_barra_nova_gravacao)
+O que não foi selecionado para regressão sai ao fechar a campanha. ... ok
+test_manifesto_sobrevive_a_recarga (tests.test_integracao_vhs.TestManifestoVhs.test_manifesto_sobrevive_a_recarga)
+O estado é o arquivo, não a memória: outra instância lê o mesmo. ... ok
+test_teto_de_chamadas_reais_interrompe_a_campanha (tests.test_integracao_vhs.TestManifestoVhs.test_teto_de_chamadas_reais_interrompe_a_campanha)
+Atingido o limite do manifesto, a próxima gravação não sai. ... ok
+test_ausencia_ou_expiracao_aciona_o_adaptador_real (tests.test_integracao_vhs.TestVhsIntegracao.test_ausencia_ou_expiracao_aciona_o_adaptador_real)
+Chave nova, ou registro vencido: grava chamando; reproduz falhando. ... ok
+test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao (tests.test_integracao_vhs.TestVhsIntegracao.test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao)
+Mudou idioma, modelo ou instrução: chave nova, registro não reusado. ... ok
+test_modo_reproduzir_sem_registro_valido_falha_sem_acessar_a_rede (tests.test_integracao_vhs.TestVhsIntegracao.test_modo_reproduzir_sem_registro_valido_falha_sem_acessar_a_rede)
+Ausência e corrupção falham, com mensagens distintas e sem rede. ... ok
+test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado (tests.test_integracao_vhs.TestVhsIntegracao.test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado)
+Sem contexto não há fita; `atualizar` grava candidato, não sobrescreve. ... ok
+test_nenhum_segredo_e_gravado_no_registro (tests.test_integracao_vhs.TestVhsIntegracao.test_nenhum_segredo_e_gravado_no_registro)
+Varredura das gravações de sucesso e de falha: nada de credencial. ... ok
+test_registro_existente_nao_aciona_o_adaptador (tests.test_integracao_vhs.TestVhsIntegracao.test_registro_existente_nao_aciona_o_adaptador)
+Segunda chamada com a mesma entrada é servida pela fita. ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 5.700s
+
+OK

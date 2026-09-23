@@ -1,0 +1,30 @@
+/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+test_assinatura_invalida_e_rejeitada (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_assinatura_invalida_e_rejeitada) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_confirmacao_so_ocorre_apos_persistencia (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_confirmacao_so_ocorre_apos_persistencia) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_conteudo_malformado_e_rejeitado (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_conteudo_malformado_e_rejeitado) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_entrega_com_assinatura_valida_e_processada (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_entrega_com_assinatura_valida_e_processada) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_entrega_duplicada_produz_efeito_unico (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_entrega_duplicada_produz_efeito_unico) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_reentrega_apos_falha_parcial_completa_sem_repetir (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_abrir_preserva_canal_ativo_no_postgres (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_abrir_preserva_canal_ativo_no_postgres) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_aviso_minimo_onedrive_marca_novamente_apos_varredura (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_aviso_minimo_onedrive_marca_novamente_apos_varredura) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_papel_nao_pode_apagar_reescrever_corpo_ou_ler_segredos (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_papel_nao_pode_apagar_reescrever_corpo_ou_ler_segredos) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_receptor_restrito_persiste_conclui_e_marca_varredura (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_receptor_restrito_persiste_conclui_e_marca_varredura) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_usuario_da_aplicacao_nao_le_webhooks (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_usuario_da_aplicacao_nao_le_webhooks) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_processador_marca_varredura_pendente (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_processador_marca_varredura_pendente) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_recusa_grava_o_corpo_bruto_sem_envelope (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_recusa_grava_o_corpo_bruto_sem_envelope) ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_reivindicacao_concorrente_espera_e_ve_a_conclusao (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_concorrente_espera_e_ve_a_conclusao)
+Prova com duas threads de verdade que a segunda espera a primeira — ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_reivindicacao_concorrente_retoma_apos_a_primeira_liberar (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_concorrente_retoma_apos_a_primeira_liberar)
+A reentrega de verdade do TI-38 — a primeira tentativa falhou. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+test_reivindicacao_e_duplicata_apos_concluida (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_e_duplicata_apos_concluida)
+TI-37, sem concorrência: uma vez concluída, mais ninguém reivindica. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.'
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.000s
+
+OK (skipped=18)
