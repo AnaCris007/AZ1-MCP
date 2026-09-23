@@ -46,6 +46,7 @@ from services.drive_push_service import (
     VerificadorCanalAtivo,
     VerificadorChannelToken,
 )
+from services.evento_local_repository import EventoLocalRepository
 from services.gemini_service import GeminiChatModel, GeminiSettings
 from services.gemini_speech_service import DEFAULT_TTS_MODEL, GeminiSpeechModel
 from services.graph_push_service import PROVEDOR as PROVEDOR_GRAPH
@@ -258,6 +259,17 @@ def get_conversa_repository() -> ConversaRepository | PersistenciaDesligada:
 @lru_cache
 def get_portfolio_repository() -> PortfolioRepository:
     return PortfolioRepository(pool=get_connection_pool())
+
+
+# Mesmo pool de domínio de get_portfolio_repository. Esta fábrica em si não
+# degrada — constrói o repositório de qualquer forma. Quem degrada é a rota
+# (`listar_eventos`, em routes/portfolio.py): sem identidade do usuário, ou
+# com falha na leitura (por exemplo `07_evento_local.sql` ainda não aplicada),
+# a Agenda responde só sem a seção de eventos próprios, nunca com 500 —
+# migração de banco e deploy de código são passos separados neste projeto.
+@lru_cache
+def get_evento_local_repository() -> EventoLocalRepository:
+    return EventoLocalRepository(pool=get_connection_pool())
 
 
 # Mesmo raciocínio de `get_alerta_dispatcher`, logo abaixo: o Agente é EFEITO

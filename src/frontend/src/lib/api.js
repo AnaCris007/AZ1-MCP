@@ -153,6 +153,29 @@ export async function fetchCalendarEvents() {
   return response.json()
 }
 
+export async function createCalendarEvent({ title, date, time, description }) {
+  const response = await apiFetch('/api/v1/calendar/events', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ titulo: title, data: date, hora: time ?? '', descricao: description ?? '' }),
+  })
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.message ?? `Falha ao criar evento: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function deleteCalendarEvent(id) {
+  const response = await apiFetch(`/api/v1/calendar/events/${id}`, { method: 'DELETE' })
+
+  if (!response.ok) {
+    throw new Error(`Falha ao remover evento: ${response.status}`)
+  }
+}
+
 export async function fetchConversas() {
   const response = await apiFetch('/api/v1/conversas')
 
