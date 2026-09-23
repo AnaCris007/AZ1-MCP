@@ -50,6 +50,27 @@ O `04_verificacao.sql` roda **sem** `-v ON_ERROR_STOP=1` de propósito: a segund
 metade provoca erros para verificar que as restrições reagem. Cada bloco deve
 imprimir `RECUSADO (ok)`; um `ACEITOU` significa que uma restrição se perdeu.
 
+### Inventariar o índice vetorial
+
+`inventario_rag.sql` consulta a coleção `vecs.documentos_metro` sem modificar
+seu conteúdo. O executor abre uma transação `READ ONLY`, aplica timeout e produz
+um JSON com totais, cobertura dos metadados, dimensão vetorial, índices e sinais
+de duplicação ou caminhos sensíveis:
+
+```bash
+.venv/bin/python scripts/inventariar_indice_rag.py
+
+# Evidência local para anexar à task ou ao MR:
+.venv/bin/python scripts/inventariar_indice_rag.py \
+  --saida /tmp/inventario-rag.json
+```
+
+Projetos e arquivos aparecem somente como hashes, suficientes para distinguir
+grupos no relatório sem publicar os identificadores originais. Esses hashes são
+pseudônimos técnicos, não uma anonimização criptográfica dos valores de origem.
+Não salve o relatório dentro do repositório e não versione texto de chunks,
+nomes de arquivos, caminhos pessoais ou outros metadados identificáveis.
+
 ## Estrutura
 
 ### Schema `portfolio` — dados operacionais
