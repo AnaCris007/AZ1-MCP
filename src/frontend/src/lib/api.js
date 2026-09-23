@@ -25,6 +25,7 @@ export async function openVoiceCall(conversationId, { onMessage, onClose } = {})
     : new URL(window.location.origin)
   const url = `${protocol}//${apiUrl.host}/api/v1/voice/call`
   const socket = new WebSocket(url)
+  socket.binaryType = 'arraybuffer'
   socket.onmessage = onMessage
   socket.onclose = onClose
 

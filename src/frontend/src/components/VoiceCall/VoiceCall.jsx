@@ -27,6 +27,7 @@ export default function VoiceCall({
   const analyserRef = useRef(null)
   const audioContextRef = useRef(null)
   const responseAudioRef = useRef(null)
+  const speechUtteranceRef = useRef(null)
   const transcriptRef = useRef(null)
   const rafRef = useRef(null)
   const speechStartedAtRef = useRef(null)
@@ -60,10 +61,13 @@ export default function VoiceCall({
       const recorder = new MediaRecorder(streamRef.current)
       recorderRef.current = recorder
       socket.send(JSON.stringify({ type: 'utterance_start' }))
-      recorder.ondataavailable = (event) => { if (event.data.size > 0) chunks.push(event.data) }
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunks.push(event.data)
+      }
       recorder.onstop = async () => {
         if (!cancelled && socket.readyState === WebSocket.OPEN) {
-          for (const chunk of chunks) socket.send(await chunk.arrayBuffer())
+          const completeRecording = new Blob(chunks, { type: recorder.mimeType })
+          socket.send(await completeRecording.arrayBuffer())
           socket.send(JSON.stringify({ type: 'utterance_end' }))
         }
         recorderRef.current = null
@@ -86,25 +90,31 @@ export default function VoiceCall({
 
       if (stateRef.current === 'listening') {
         const now = performance.now()
-        if (currentVolume > 0.08) {
+        if (currentVolume > 0.05) {
           silenceStartedAtRef.current = null
           speechStartedAtRef.current ??= now
-          if (!recorderRef.current && now - speechStartedAtRef.current > 120) startUtterance()
+          if (!recorderRef.current && now - speechStartedAtRef.current > 120) {
+            startUtterance()
+          }
         } else {
           speechStartedAtRef.current = null
           if (recorderRef.current) {
             silenceStartedAtRef.current ??= now
-            if (now - silenceStartedAtRef.current > 900) stopUtterance()
+            if (now - silenceStartedAtRef.current > 850) stopUtterance()
           }
         }
       }
       rafRef.current = requestAnimationFrame(monitorVolume)
     }
 
-    const playAgentAudio = async (event) => {
-      const binary = atob(event.data)
-      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0))
-      const url = URL.createObjectURL(new Blob([bytes], { type: event.media_type }))
+    let pendingAudioType = 'audio/wav'
+    let lastAgentResponse = ''
+    let speechFallbackTimer = null
+    let browserFallbackActive = false
+    let acceptNextServerAudio = true
+
+    const playAgentAudio = async (content, mediaType) => {
+      const url = URL.createObjectURL(new Blob([content], { type: mediaType }))
       const audio = new Audio(url)
       responseAudioRef.current = { audio, url }
       onStateChange('speaking')
@@ -118,7 +128,27 @@ export default function VoiceCall({
       }
     }
 
+    const playBrowserSpeech = (text) => {
+      if (!('speechSynthesis' in window) || !text) return false
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = 'pt-BR'
+      utterance.rate = 1.05
+      speechUtteranceRef.current = utterance
+      onStateChange('speaking')
+      utterance.onend = () => {
+        speechUtteranceRef.current = null
+        if (!cancelled) onStateChange('listening')
+      }
+      utterance.onerror = utterance.onend
+      window.speechSynthesis.speak(utterance)
+      return true
+    }
+
     const handleMessage = ({ data }) => {
+      if (data instanceof ArrayBuffer) {
+        if (acceptNextServerAudio) void playAgentAudio(data, pendingAudioType)
+        return
+      }
       const event = JSON.parse(data)
       if (event.type === 'call_ready') onStateChange('listening')
       else if (event.type === 'transcribing') onStateChange('transcribing')
@@ -127,9 +157,27 @@ export default function VoiceCall({
         onError('')
         onTranscript(event.text)
       }
-      else if (event.type === 'agent_response') onAgentResponse(event.text)
-      else if (event.type === 'agent_audio') void playAgentAudio(event)
+      else if (event.type === 'agent_response') {
+        lastAgentResponse = event.text
+        onAgentResponse(event.text)
+        clearTimeout(speechFallbackTimer)
+        browserFallbackActive = false
+        acceptNextServerAudio = true
+        speechFallbackTimer = setTimeout(() => {
+          browserFallbackActive = playBrowserSpeech(lastAgentResponse)
+          acceptNextServerAudio = !browserFallbackActive
+        }, 2500)
+      }
+      else if (event.type === 'agent_audio') {
+        clearTimeout(speechFallbackTimer)
+        pendingAudioType = event.media_type
+        acceptNextServerAudio = !browserFallbackActive
+      }
       else if (event.type === 'error') {
+        if (event.error === 'speech_failed') {
+          clearTimeout(speechFallbackTimer)
+          if (browserFallbackActive || playBrowserSpeech(lastAgentResponse)) return
+        }
         onError(event.message)
         onStateChange('error')
         setTimeout(() => !cancelled && onStateChange('listening'), 1800)
@@ -170,11 +218,14 @@ export default function VoiceCall({
     void startCall()
     return () => {
       cancelled = true
+      clearTimeout(speechFallbackTimer)
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
       if (recorderRef.current?.state === 'recording') recorderRef.current.stop()
       streamRef.current?.getTracks().forEach((track) => track.stop())
       audioContextRef.current?.close()
       responseAudioRef.current?.audio.pause()
+      window.speechSynthesis?.cancel()
+      speechUtteranceRef.current = null
       if (responseAudioRef.current) URL.revokeObjectURL(responseAudioRef.current.url)
       if (socketRef.current?.readyState === WebSocket.OPEN) {
         socketRef.current.send(JSON.stringify({ type: 'end_call' }))

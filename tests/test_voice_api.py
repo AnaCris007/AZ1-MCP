@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import base64
 import unittest
 from types import SimpleNamespace
 
@@ -78,7 +77,8 @@ class TestVoiceCallAPI(unittest.TestCase):
             )
             audio = websocket.receive_json()
             self.assertEqual(audio["type"], "agent_audio")
-            self.assertEqual(base64.b64decode(audio["data"]), b"wav-audio")
+            self.assertEqual(audio["media_type"], "audio/wav")
+            self.assertEqual(websocket.receive_bytes(), b"wav-audio")
 
 
 if __name__ == "__main__":

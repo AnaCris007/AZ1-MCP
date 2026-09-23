@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import base64
 import json
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
@@ -90,9 +89,9 @@ async def voice_call(
                         {
                             "type": "agent_audio",
                             "media_type": generated.media_type,
-                            "data": base64.b64encode(generated.content).decode("ascii"),
                         }
                     )
+                    await websocket.send_bytes(generated.content)
                 except TranscriptionError:
                     await _send_error(websocket, "transcription_failed", "Não consegui transcrever sua fala.")
                 except ChatReceptionError:
