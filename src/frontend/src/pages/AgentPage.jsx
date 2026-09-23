@@ -60,10 +60,17 @@ export default function AgentPage() {
   const [voiceError, setVoiceError] = useState('')
   const [voiceCallActive, setVoiceCallActive] = useState(false)
   const [voiceConversationId, setVoiceConversationId] = useState(null)
+  const [voiceMessages, setVoiceMessages] = useState([])
   const [shareCopied, setShareCopied] = useState(false)
   const scrollRef = useRef(null)
 
   const hasStarted = messages.length > 0
+  const visibleConversations = conversations.filter((conversation) =>
+    activeTab === 'voice'
+      ? conversation.type === 'voice'
+      : conversation.type !== 'voice',
+  )
+  const visibleActiveId = activeTab === 'voice' ? voiceConversationId : activeId
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -156,14 +163,33 @@ export default function AgentPage() {
   }
 
   const handleNewConversation = () => {
+    if (activeTab === 'voice') {
+      setVoiceConversationId(crypto.randomUUID())
+      setVoiceMessages([])
+      setVoiceCallActive(false)
+      setVoiceState('idle')
+      setVoiceError('')
+      return
+    }
     setMessages([])
     setActiveId(null)
     setInputValue('')
   }
 
   const handleSelectConversation = (id) => {
+    const conversation = conversations.find((item) => item.id === id)
+    if (conversation?.type === 'voice') {
+      setVoiceConversationId(id)
+      setVoiceMessages(conversationHistory[id] ?? [])
+      setVoiceCallActive(false)
+      setVoiceState('idle')
+      setVoiceError('')
+      setActiveTab('voice')
+      return
+    }
     setActiveId(id)
     setMessages(conversationHistory[id] ?? [])
+    setActiveTab('chat')
   }
 
   const handleToggleListening = () => {
@@ -198,6 +224,32 @@ export default function AgentPage() {
     setActiveTab('voice')
     setVoiceCallActive(true)
   }, [])
+
+  const handleVoiceTranscript = useCallback((text) => {
+    setVoiceMessages((prev) => [...prev, { role: 'user', content: text }])
+  }, [])
+
+  const handleVoiceAgentResponse = useCallback((text) => {
+    setVoiceMessages((prev) => [...prev, { role: 'agent', content: text }])
+  }, [])
+
+  const handleVoiceEnd = useCallback(() => {
+    if (voiceConversationId && voiceMessages.length > 0) {
+      const firstUserMessage = voiceMessages.find((message) => message.role === 'user')
+      const title = firstUserMessage
+        ? titleFromMessage(firstUserMessage.content)
+        : 'Conversa por voz'
+      setConversations((prev) => [
+        { id: voiceConversationId, title, type: 'voice' },
+        ...prev.filter((conversation) => conversation.id !== voiceConversationId),
+      ])
+      setConversationHistory((prev) => ({
+        ...prev,
+        [voiceConversationId]: voiceMessages,
+      }))
+    }
+    setVoiceCallActive(false)
+  }, [voiceConversationId, voiceMessages])
 
   const handleShare = async () => {
     const shareData = {
@@ -239,8 +291,8 @@ export default function AgentPage() {
         <Sidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(true)}
-          conversations={conversations}
-          activeId={activeId}
+          conversations={visibleConversations}
+          activeId={visibleActiveId}
           onSelectConversation={handleSelectConversation}
           onNewConversation={handleNewConversation}
         />
@@ -251,8 +303,8 @@ export default function AgentPage() {
           <Sidebar
             collapsed={false}
             onToggle={() => setMobileSidebarOpen(false)}
-            conversations={conversations}
-            activeId={activeId}
+            conversations={visibleConversations}
+            activeId={visibleActiveId}
             onSelectConversation={(id) => {
               handleSelectConversation(id)
               setMobileSidebarOpen(false)
@@ -304,12 +356,17 @@ export default function AgentPage() {
         >
           {activeTab === 'voice' || voiceCallActive ? (
             <VoiceCall
+              key={voiceConversationId ?? 'new-voice-call'}
               conversationId={voiceConversationId}
+              messages={voiceMessages}
               state={voiceState}
               error={voiceError}
               onStateChange={setVoiceState}
               onError={setVoiceError}
               onStart={handleVoiceStart}
+              onTranscript={handleVoiceTranscript}
+              onAgentResponse={handleVoiceAgentResponse}
+              onEnd={handleVoiceEnd}
             />
           ) : activeTab === 'calendar' ? (
             <CalendarView />

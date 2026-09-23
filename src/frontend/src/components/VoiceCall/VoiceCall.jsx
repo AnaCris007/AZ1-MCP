@@ -2,6 +2,7 @@ import { Mic, PhoneOff } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { openVoiceCall } from '../../lib/api'
 import AgentOrb from '../AgentOrb/AgentOrb'
+import ChatMessage from '../ChatMessage/ChatMessage'
 import Waveform from '../Waveform/Waveform'
 
 const STATUS_TEXT = {
@@ -15,7 +16,8 @@ const STATUS_TEXT = {
 }
 
 export default function VoiceCall({
-  conversationId, state, error, onStateChange, onError, onStart,
+  conversationId, messages = [], state, error, onStateChange, onError, onStart,
+  onTranscript, onAgentResponse, onEnd,
 }) {
   const [started, setStarted] = useState(false)
   const [volume, setVolume] = useState(0)
@@ -25,6 +27,7 @@ export default function VoiceCall({
   const analyserRef = useRef(null)
   const audioContextRef = useRef(null)
   const responseAudioRef = useRef(null)
+  const transcriptRef = useRef(null)
   const rafRef = useRef(null)
   const speechStartedAtRef = useRef(null)
   const silenceStartedAtRef = useRef(null)
@@ -32,6 +35,12 @@ export default function VoiceCall({
   const [title, description] = STATUS_TEXT[state] ?? STATUS_TEXT.idle
 
   useEffect(() => { stateRef.current = state }, [state])
+
+  useEffect(() => {
+    if (transcriptRef.current) {
+      transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight
+    }
+  }, [messages])
 
   useEffect(() => {
     if (!started) return undefined
@@ -114,7 +123,11 @@ export default function VoiceCall({
       if (event.type === 'call_ready') onStateChange('listening')
       else if (event.type === 'transcribing') onStateChange('transcribing')
       else if (event.type === 'processing') onStateChange('processing')
-      else if (event.type === 'transcription_final') onError('')
+      else if (event.type === 'transcription_final') {
+        onError('')
+        onTranscript(event.text)
+      }
+      else if (event.type === 'agent_response') onAgentResponse(event.text)
       else if (event.type === 'agent_audio') void playAgentAudio(event)
       else if (event.type === 'error') {
         onError(event.message)
@@ -168,25 +181,49 @@ export default function VoiceCall({
       }
       socketRef.current?.close()
     }
-  }, [conversationId, onError, onStateChange, started])
+  }, [conversationId, onAgentResponse, onError, onStateChange, onTranscript, started])
 
   const orbState = state === 'listening' ? 'listening' :
     ['transcribing', 'processing', 'speaking'].includes(state) ? 'processing' : 'idle'
+  const showTranscript = !started && messages.length > 0
 
   const endCall = () => {
     setStarted(false)
     onError('')
     onStateChange('idle')
+    onEnd()
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 pb-10">
-      <div className="mb-8"><AgentOrb state={orbState} size={128} /></div>
-      <p className="text-[16px] font-medium text-text-primary">{title}</p>
-      <p className="mt-2 max-w-xs text-center text-[13px] text-text-secondary">{error || description}</p>
-      {(state === 'listening' || state === 'speaking') && (
-        <div className="mt-5 flex h-10 w-full max-w-xs items-center rounded-xl border border-border bg-surface px-4">
-          <Waveform volume={volume} />
+    <div className={`flex min-h-0 flex-1 flex-col items-center px-4 ${
+      showTranscript ? 'py-6' : 'justify-center pb-10'
+    }`}>
+      {!showTranscript && (
+        <>
+          <div className="mb-8"><AgentOrb state={orbState} size={128} /></div>
+          <p className="text-[16px] font-medium text-text-primary">{title}</p>
+          <p className="mt-2 max-w-xs text-center text-[13px] text-text-secondary">{error || description}</p>
+          {(state === 'listening' || state === 'speaking') && (
+            <div className="mt-5 flex h-10 w-full max-w-xs items-center rounded-xl border border-border bg-surface px-4">
+              <Waveform volume={volume} />
+            </div>
+          )}
+        </>
+      )}
+      {showTranscript && (
+        <div
+          ref={transcriptRef}
+          className="flex min-h-0 w-full flex-1 overflow-y-auto px-4"
+        >
+          <div className="mx-auto flex w-full max-w-[720px] flex-col">
+            {messages.map((message, index) => (
+              <ChatMessage
+                key={`${message.role}-${index}`}
+                role={message.role}
+                content={message.content}
+              />
+            ))}
+          </div>
         </div>
       )}
       {!started && (
@@ -200,7 +237,7 @@ export default function VoiceCall({
           className="mt-8 inline-flex items-center gap-2 rounded-full bg-button-primary px-5 py-3 text-[14px] font-medium text-button-primary-text transition-opacity hover:opacity-90"
         >
           <Mic size={18} />
-          Clique para começar
+          {messages.length > 0 ? 'Continuar chamada' : 'Clique para começar'}
         </button>
       )}
       {started && (
