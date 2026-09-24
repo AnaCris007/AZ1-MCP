@@ -7995,15 +7995,137 @@ Ferramentas e bibliotecas, com justificativa.
 
 `boto3`: cliente independente do usado pela aplicação, para conferir de fora o estado do bucket após cada operação.
 
-`ContratoWebhookInbound` e `ContratoBarramentoMensagens`: classes que descrevem o comportamento exigido de webhooks e do barramento de mensagens independentemente do provedor selecionado, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste. `ContratoWebhookInbound` foi implementada em [`tests/test_integracao_contrato_webhook.py`](../tests/test_integracao_contrato_webhook.py) e é reexecutada, sem reescrever caso algum, contra o dublê em memória, o Microsoft Graph, o Google Drive e o PostgreSQL. `ContratoBarramentoMensagens` continua proposta, à espera da escolha do barramento.
+`ContratoWebhookInbound` e `ContratoBarramentoMensagens`: classes que descrevem o comportamento exigido de webhooks e do barramento de mensagens independentemente do provedor selecionado, com um único ponto de extensão: o método de fábrica que constrói o objeto sob teste. `ContratoWebhookInbound` foi implementada em [`tests/test_integracao_contrato_webhook.py`](../tests/test_integracao_contrato_webhook.py) e é reexecutada, sem reescrever caso algum, contra o dublê em memória, o Microsoft Graph, o Google Drive e o PostgreSQL. `ContratoBarramentoMensagens` foi implementada em [`tests/test_integracao_contrato_mensageria.py`](../tests/test_integracao_contrato_mensageria.py) e é exercitada contra um intermediário em memória; o ponto de extensão para o barramento real continua aberto, à espera da escolha da tecnologia.
 
 Padrão de validação. Cada caso verifica o código de status HTTP ou o efeito observável da operação, a integridade do payload desserializado para o schema Pydantic correspondente e, quando aplicável, o estado persistido (releitura do objeto no bucket, ou da linha na tabela) e o comportamento do módulo VHS, comparando o número de chamadas ao adaptador real entre a primeira e a segunda execução com a mesma chave.
 
-Ambiente e comandos. A execução unitária é `python -m unittest discover -s tests -v`. A execução de integração usa `python -m unittest discover -s tests -p "test_integracao_*.py" -v`, e o padrão hoje corresponde a 65 testes: as quatro suítes de webhook (TI-35 a TI-42) e a suíte do módulo VHS. Dezoito deles são pulados quando não há PostgreSQL de teste alcançável, o que é registro de execução parcial, não aprovação — a advertência original continua valendo, e zero testes não é sucesso do artefato. O módulo VHS usa configuração VCR explícita, e não uma variável `VHS_MODO`, que segue não existindo.
+Ambiente e comandos. A execução unitária é `python -m unittest discover -s tests -v`. A execução de integração usa `python -m unittest discover -s tests -p "test_integracao_*.py" -v`. Na Sprint 4 esse padrão correspondia a 65 testes — as quatro suítes de webhook (TI-35 a TI-40, mais os TI-41 e TI-42 locais de lote, que colidem com os IDs de mensageria e estão registrados na Seção 5.2) e a suíte do módulo VHS. Com a implementação registrada na Seção 6.4.6, são **155**, dos quais 40 são pulados quando não há MinIO nem PostgreSQL de teste alcançáveis. Pular continua sendo registro de execução parcial, não aprovação — a advertência original vale integralmente, e zero testes não é sucesso do artefato. O módulo VHS usa configuração VCR explícita, e não uma variável `VHS_MODO`, que segue não existindo.
+
+Duas premissas do texto acima mudaram desde a Sprint 4, e a Seção 6.4.6 opera sobre a versão corrigida. A primeira: **as rotas de negócio passaram a exigir sessão**, o que torna obsoleta a frase "nenhuma das rotas de negócio atuais possui dependência de SSO" do inventário de interfaces da Seção 6.4.4 — a autenticação foi implementada (Seção 3.10) e TI-64 deixou de ser condicional. A segunda: **a composição passou a ter serviço de banco**, de modo que "não há serviço de banco nessa composição" também não vale mais; `docker compose up -d postgres` provisiona o PostgreSQL, ainda que a base de teste precise ser criada e migrada à parte.
 
 Para a preparação local do MinIO, usar a composição existente em ambiente dedicado; não iniciar indiscriminadamente toda a pilha para testar uma única dependência. A base PostgreSQL de testes deve ser provisionada separadamente, com os scripts da pasta `src/database` revisados para aquele destino. `python scripts/verificar_modelo_documentado.py --sem-banco` compara documento e DDL sem acesso remoto. Executar a verificação real de SQL e retenção somente na base dedicada, registrando consultas, identidades e estado antes/depois.
 
 Para o frontend, executar `npm test` em `src/frontend` após instalação das dependências. Isso executa Vitest/jsdom com mocks; a integração pelo proxy e microfone exige navegador real. Para rodar API no host: `python -m uvicorn az1_api.main:app --host 127.0.0.1 --port 8010 --workers 1`, após preparar as dependências. Não se afirma que esse servidor foi iniciado na auditoria.
+
+
+### 6.4.6 Execução dos Testes de Integração
+
+Esta seção registra a execução do que a Seção 6.4.4 planejou. O planejamento não foi reescrito: ele continua acima, e o que muda aqui é o estado de cada caso, a evidência produzida e os pontos em que a realidade divergiu da previsão. Onde houve divergência, ela está nomeada — apagar a previsão para fazê-la coincidir com o resultado destruiria justamente a continuidade que a entrega pede.
+
+#### Scripts de teste: onde cada caso mora
+
+Os arquivos seguem a convenção já adotada em `tests/`: um módulo por fronteira, `test_integracao_<fronteira>.py`, com uma classe por suíte do catálogo e um método por caso. O apoio comum — massa sintética das fitas, cliente HTTP autenticado, leitor do módulo VHS — vive em [`tests/apoio_integracao.py`](../tests/apoio_integracao.py), que não é descoberto como suíte por não casar com o padrão `test_integracao_*.py`.
+
+| Arquivo | Casos | Fronteira efetivamente atravessada |
+|---|---|---|
+| [`test_integracao_audio_minio.py`](../tests/test_integracao_audio_minio.py) | TI-01 a TI-05, TI-62 | MinIO real por `boto3`, com releitura por cliente independente |
+| [`test_integracao_transcricao.py`](../tests/test_integracao_transcricao.py) | TI-06 a TI-10 | Deepgram, por fita real; mocks de transporte nas falhas sem HTTP |
+| [`test_integracao_sintese_fala.py`](../tests/test_integracao_sintese_fala.py) | TI-11 a TI-15 | Gemini TTS, por fita real |
+| [`test_integracao_analise_pln.py`](../tests/test_integracao_analise_pln.py) | TI-16 a TI-19 | Deepgram por fita, mais o `.joblib` carregado do disco |
+| [`test_integracao_chat.py`](../tests/test_integracao_chat.py) | TI-20 a TI-23 | Gemini chat, por fita real |
+| [`test_integracao_persistencia.py`](../tests/test_integracao_persistencia.py) | TI-24 a TI-29, TI-53, TI-54, TI-65 | PostgreSQL real, com os CHECKs do DDL |
+| [`test_integracao_frontend_backend.py`](../tests/test_integracao_frontend_backend.py) | TI-30 a TI-34 | contrato HTTP e concordância entre arquivos de configuração |
+| [`test_integracao_rag.py`](../tests/test_integracao_rag.py) | TI-55 a TI-58 | parsers e chunker reais; `vecs` sob opt-in explícito |
+| [`test_integracao_seguranca.py`](../tests/test_integracao_seguranca.py) | TI-63, TI-64 | pilha de autenticação real, sem substituir `require_authenticated_user` |
+| [`test_integracao_vhs_provedores.py`](../tests/test_integracao_vhs_provedores.py) | TI-59 a TI-61 | fitas reais dos dois SDKs, reproduzidas com a rede bloqueada |
+| [`test_integracao_vhs.py`](../tests/test_integracao_vhs.py) | TI-47 a TI-52 | harness do VHS contra servidor sintético (Sprint 4) |
+| [`test_integracao_contrato_webhook.py`](../tests/test_integracao_contrato_webhook.py) e as três subclasses | TI-35 a TI-40, mais TI-41 e TI-42 de lote | dublê em memória, Graph, Drive e PostgreSQL (Sprint 4) |
+| [`test_integracao_contrato_mensageria.py`](../tests/test_integracao_contrato_mensageria.py) | TI-41 a TI-46 | intermediário em memória; ponto de extensão aberto para o barramento real |
+
+Uma decisão de organização merece registro porque evita uma classe inteira de falha silenciosa: **a massa sintética das fitas passou a ter dono único**. Ela morava duplicada em `scripts/gravar_fitas_vhs.py` e seria naturalmente reescrita nas suítes novas; como é a massa que compõe a chave da gravação (Seção 6.4.3, item 2), um acento diferente entre os dois arquivos faria o replay procurar uma fita que ninguém gravou, e o erro apareceria como `RegistroAusente` — mensagem que não diz nada sobre a causa real. Agora o roteiro de gravação importa a massa de `tests/apoio_integracao.py`, e as duas pontas não podem divergir.
+
+#### Registros, evidências e logs
+
+A execução ficou em [`resultados/testes/6a757e2/`](../resultados/testes/6a757e2), com um log verboso por suíte, o log consolidado da descoberta e a saída do replay offline das fitas. O `README.md` daquela pasta traz o comando, o ambiente e a tabela por suíte.
+
+**Resultado consolidado, execução de 21/09/2026:**
+
+| Métrica | Valor |
+|---|---|
+| Testes de integração executados | 155 |
+| Aprovados | 115 |
+| Pulados por infraestrutura ausente | 40 |
+| Falhas e erros | 0 |
+| Tempo total | ~11,5 s |
+| Suíte completa do projeto (`discover -s tests`) | 622 testes, 0 falhas |
+
+Os 40 pulados são os das suítes de MinIO (7), de persistência (14), de webhook sobre PostgreSQL (18) e o caso de RAG ponta a ponta (1). Eles não foram executados porque o ambiente desta rodada não tinha o *daemon* do Docker ativo. Cada um declara no próprio motivo o que falta e como subir; o `README.md` da pasta de evidências traz a sequência completa. **Pular não é aprovar**, e a contagem de 115 aprovados vale apenas para as fronteiras efetivamente atravessadas.
+
+**A evidência mais forte desta entrega é o replay das gravações reais.** As seis fitas de `tests/fixtures/vhs/` foram capturadas em sessão controlada, com teto de chamadas fixado antes da primeira chamada, e são interações genuínas de Deepgram e Google — não *fixtures* escritas à mão. O arquivo `vhs-replay-offline.log` mostra as seis reproduzidas em processo separado, com a rede bloqueada, cada uma com `play_count=1` e `origem=real`:
+
+```
+  tts            223290 bytes de WAV                play_count=1, origem=real
+  stt            'Qual é a aderência do projeto '... play_count=1, origem=real
+  stt_sem_fala   texto ''                           play_count=1, origem=real
+  stt_credencial recusado, 2                        play_count=1, origem=real
+  chat           'Aderência de um projeto ao por'... play_count=1, origem=real
+  embedding      1536 dimensões                     play_count=1, origem=real
+```
+
+Isso fecha o item 9 do contrato da Seção 6.4.3, que a Sprint 4 havia deixado como "Parcial": a integração das suítes de STT, TTS, chat e embedding ao replay era o conteúdo de TI-59, e está feita. O item 10 permanece parcial pelo mesmo motivo de antes — o *smoke* real contra os provedores exige sessão com credencial e não roda em CI, e aprovar replay antigo não aprova o provedor atual.
+
+#### Problemas encontrados e o que foi feito
+
+Quatro achados desta campanha, em ordem de gravidade. Os três primeiros são defeitos dos próprios testes, corrigidos; o quarto é uma característica do sistema, registrada.
+
+**1. Um caso de teste abria conexão contra o banco de produção.** O caso que varre as doze rotas protegidas (TI-64) passava, mas com efeito colateral grave: o FastAPI resolve a árvore de dependências inteira antes de entrar no *handler*, e `require_authenticated_user` é apenas um nó dela. Os provedores de `/alertas` e `/auditoria` chegavam a ser construídos — e `obter_engine()` a abrir conexão — antes de o 401 interromper a requisição. Pior, `get_webhook_receiver` abre o *pool* **antes** de conferir o segredo compartilhado, de modo que uma entrega a `/webhooks/microsoft` numa instalação sem `MS_WEBHOOK_CLIENT_STATE` primeiro tentava conectar ao banco de `.env`. Numa das execuções isso bastou para o Supabase abrir o disjuntor por excesso de tentativas de autenticação. Corrigido com dublês na construção dessas dependências, e verificado: três descobertas completas consecutivas, zero tentativas de conexão externa. O fenômeno já estava antecipado no protocolo reproduzível da Seção 6.4.4 — *"em entrada rejeitada, zero chamada de negócio não significa necessariamente zero construção de dependência"* —, e aqui foi observado na prática.
+
+**2. Um caso de chat media o `except` do teste, não o do código.** A primeira versão de TI-21 substituía o `GeminiChatModel` inteiro por um dublê que levantava `ServerError`. O caso falhou com 500 em vez de 503, e a falha estava certa: é *dentro* do `GeminiChatModel` que `ServerError` e `ClientError` 429 viram `ChatModelUnavailableError`. Um dublê no lugar do modelo pula exatamente a tradução que o caso existe para verificar. A falha foi injetada no cliente do SDK, um nível abaixo, e o caminho percorrido passou a ser o de produção inteiro.
+
+**3. Duas asserções eram vacuamente verdadeiras.** Em TI-63, um espião era criado e a asserção `espiao.mensagens == []` passava porque o espião nunca fora ligado a nada. Em TI-64, o caminho do webhook estava escrito como `/api/v1/webhooks/drive`, que não existe — a resposta era 404, que também não é 401, e o `assertNotEqual` passava por acidente. As duas foram reescritas: a primeira prova a ausência por construção (o cliente injetado estoura se for acionado), e a segunda confere os caminhos contra o esquema OpenAPI antes de usá-los, além de distinguir a recusa de sessão da recusa de assinatura pelo cabeçalho `WWW-Authenticate`.
+
+**4. `app.routes` não é uma lista plana nesta versão do FastAPI.** Roteadores incluídos são embrulhados em `_IncludedRouter`, e `getattr(rota, "path")` devolve vazio para toda rota de negócio. Um caso escrito sobre essa premissa teria passado sem conferir nada. As suítes leem os caminhos de `app.openapi()["paths"]`.
+
+#### Conformidade nominal com o catálogo
+
+O planejamento fixa, para cada caso, a classe e o método (`TestNomeDoCaso.test_descricao_do_cenario`). Dos **54 casos nomeados** no catálogo da Seção 6.4.4, **os 54 têm classe e método idênticos aos planejados**. A conferência é mecânica: extrai os pares do documento, lê as classes e métodos reais por análise sintática dos arquivos de `tests/` e compara.
+
+Um caso quase se perdeu nessa conferência, e o registro da correção importa mais do que o número. TI-33 foi implementado primeiro sob um nome novo, com a justificativa de que as três rotas da ficha haviam sido implementadas e o nome planejado passaria a mentir. A justificativa estava errada: a ficha nomeia **rotas não implementadas**, e as três eram a massa disponível quando o plano foi escrito, não o objeto do teste. A invariante — *rota que o backend não serve responde `404` limpo* — não envelheceu com a implementação daquelas três; ela continua sendo o que protege a interface de confundir "não existe" com "quebrou". O caso voltou ao nome e ao resultado esperado originais, com massa nova.
+
+Os casos TI-55 a TI-65 não têm nome prescrito: aparecem numa tabela de formato diferente, sem a coluna de classe e método, e por isso a nomeação deles foi livre.
+
+#### Divergências entre o planejamento e a implementação
+
+| Caso | O que o planejamento previa | O que se verificou | Como ficou |
+|---|---|---|---|
+| TI-33 | `404 Not Found` em `GET /api/v1/tasks`, `PATCH /api/v1/tasks/{id}` e `GET /api/v1/calendar/events` | as três rotas foram implementadas em `src/routes/portfolio.py` | **trocou a massa, não a invariante**: o caso mantém nome e resultado esperado (`404` para rota não implementada) e passa a exercitá-los contra rotas que de fato não existem; um caso irmão registra que as três da massa original hoje existem, e distingue o `404` de recurso do `404` de rota inexistente |
+| TI-64 | condicional: "com SSO implementado" | a autenticação foi implementada na Sprint 4 | executável; o caso cobre o recorte de integração (todas as rotas, e as duas exceções deliberadas), sem repetir o que `tests/test_auth_api.py` já cobre caso a caso |
+| TI-17 | mesma intenção por texto e por áudio | `/chat` classifica, mas como **observador**: o rótulo vai para a trilha e não aparece na resposta | caracterização — verifica que o pipeline é o mesmo nos dois caminhos e que `/chat` não expõe `intencao`; a igualdade pedida não é observável pela API |
+| TI-27 | "o turno é reencaminhado, não descartado" | não há fila, reenvio nem marca de pendência: a falha é registrada em log e o turno se perde | caracterização, com a lacuna nomeada abaixo |
+| TI-29 | criação do esquema em base vazia | implementado como descrito: cria a base, aplica `01`, `02` e `03` por `psql` e a destrói ao final. O `psql` é necessário porque o DDL usa metacomandos do cliente (`\set`, `\echo`, `\if`) que um driver não interpreta | sem divergência de comportamento; pula com motivo explícito quando falta `psql` ou privilégio de `CREATEDB`, e um caso irmão confere a base já migrada |
+| TI-18 | áudio fora do catálogo, por fita | não há gravação de áudio fora do catálogo | transcrição simulada e declarada; a fronteira sob teste é a do classificador, que não depende da fita |
+| TI-31 | "Blob sem nome de arquivo" | `FormData.append` envia `filename="blob"`; parte sem `filename` algum não é tratada como arquivo | o caso cobre o que o navegador de fato envia e caracteriza a fronteira literal à parte |
+
+#### Lacunas do sistema confirmadas pelos testes
+
+Três, e nenhuma delas é defeito de teste. Estão registradas como caracterização, com o caso que as vigia:
+
+1. **Turno perdido quando o banco cai (TI-27).** `registrar_turno_em_segundo_plano` captura qualquer exceção e apenas registra. A escolha tem razão documentada — gravar a trilha é efeito colateral de `POST /chat`, e derrubar a conversa por causa do banco seria pior —, mas o RNF04 pede durabilidade, e durabilidade sem reenvio não se sustenta. Falta uma fila ou uma marca de pendência.
+2. **Tabelas de DOCX não são indexadas (TI-58).** `parsers.extrair_docx` percorre apenas `doc.paragraphs`. Num TAP, a tabela costuma ser exatamente onde estão marcos e datas — o agente não tem como citá-los porque eles nunca chegaram ao índice.
+3. **Reindexar não remove o trecho antigo (TI-58).** O `chunk_id` é função do conteúdo, então editar um documento gera identificador novo; nada apaga o anterior, e a busca pode devolver a versão velha.
+
+Some-se a elas duas caracterizações de contrato que os casos fixam sem aprovar: `/chat` devolve `200` com `reply=""` quando o provedor retorna texto vazio (TI-21), e `POST /api/v1/rag/search` aceita `query` vazia e gasta uma chamada de embedding com ela (TI-56).
+
+#### Discussão sobre abrangência
+
+**O que ficou coberto.** Todas as fronteiras do fluxo principal têm caso executando contra a dependência real ou contra uma gravação real dela: recebimento e armazenamento de áudio, transcrição, síntese de fala, classificação de intenção, chat, busca semântica, persistência da trilha, contrato com a interface, autenticação e os dois webhooks. Em requisitos: RF01, RF02, RF03, RF05, RF06, RNF01, RNF02, RNF03, RNF04, RNF05, RNF06, RNF07, RNF08, RNF09, RNF11 e RNF12 têm ao menos um caso de integração associado.
+
+**O que a cobertura não significa.** Três limites precisam ficar explícitos, porque contá-los como cobertura seria inflar o número:
+
+- *Replay não é contrato atual.* As fitas provam que o código lê corretamente uma resposta que o provedor deu em 20/09/2026. Se a Deepgram ou o Google mudarem o formato amanhã, as suítes continuam verdes. O item 10 do contrato — *smoke* real antes de cada entrega — é o que fecharia essa brecha, e ele depende de sessão com credencial.
+- *40 casos não rodaram nesta execução.* MinIO e PostgreSQL de teste não estavam no ar. As suítes existem, pulam com motivo explícito e foram escritas para rodar; mas enquanto não rodarem, nada se pode afirmar sobre as fronteiras que elas cobrem — inclusive sobre os CHECKs do DDL, que são o único lugar onde `mensagem_papel_coerente` e companhia são impostos.
+- *`TestClient` não executa React.* Tudo o que se afirma sobre a interface é sobre o contrato HTTP que ela consome. A renderização, o tratamento visual do erro e o microfone são evidência de componente (Vitest) ou exigem navegador real.
+
+**Onde a cobertura é mais rala.** Quatro pontos, em ordem de risco:
+
+1. **Mensageria (TI-41 a TI-46).** O contrato foi escrito e roda contra um intermediário em memória, como a abertura da Seção 6.4 prescreve. O que não existe é adaptador real: nenhum barramento foi escolhido, e entrega em ordem parcial, particionamento e semântica de confirmação variam por produto. O contrato é satisfazível; que um produto o satisfaça continua por verificar.
+2. **Concorrência.** Só os webhooks sobre PostgreSQL exercitam reivindicação concorrente. O caminho de chat não tem caso de dois turnos simultâneos na mesma conversa, embora o `FOR UPDATE` de `registrar_turno` exista exatamente para isso.
+3. **Tempo limite e política de *retry*.** A Seção 6.4.4 já registrava que os adaptadores não têm política uniforme. Os casos caracterizam a falha; nenhum mede o tempo efetivo, que é assunto do RNF01 na Seção 6.3.
+4. **Volume.** Toda a massa é sintética e pequena. Nada nesta seção diz como o RAG se comporta com o portfólio inteiro indexado.
+
+**Qualidade alcançada antes da liberação.** A campanha encontrou quatro defeitos, e a distribuição deles é informativa: os quatro estavam nos *testes*, não no código sob teste. Dois teriam produzido aprovação falsa (asserções vacuamente verdadeiras), um media a camada errada e um tocava o banco de produção. Nenhum defeito funcional novo do AZ1 apareceu — o que é coerente com o fato de as fronteiras já terem suítes de unidade, e reforça que o valor desta camada está em outro lugar: as três lacunas listadas acima (turno perdido, tabela de DOCX, reindexação) são exatamente o tipo de coisa que teste de unidade com dublê não alcança, porque em dublê a gravação sempre funciona, o parser sempre devolve o que se mandou ele devolver e o índice nunca tem duas versões do mesmo trecho.
+
+O critério de liberação desta camada, portanto, não está cumprido por inteiro. Está cumprido para as fronteiras que rodaram; falta executar os 40 casos de infraestrutura e decidir o que fazer com o turno perdido do TI-27, que é a única das lacunas com impacto direto sobre um requisito não funcional declarado.
 
 ---
 

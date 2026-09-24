@@ -1,0 +1,19 @@
+test_arquivo_rejeitado_nao_grava_objeto (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_arquivo_rejeitado_nao_grava_objeto)
+Extensão não é formato: um `.txt` renomeado é recusado pela assinatura. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_audio_id_inexistente_retorna_404 (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_audio_id_inexistente_retorna_404)
+A ausência do objeto vira `404 audio_not_found`, sem tocar no provedor. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_falha_de_infraestrutura_retorna_500 (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_falha_de_infraestrutura_retorna_500)
+As três causas dão `500 internal_error`, sem detalhe de infraestrutura. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_leitura_devolve_bytes_identicos_ao_upload (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_leitura_devolve_bytes_identicos_ao_upload)
+O que `TranscribeAudio` lê é byte a byte o que foi enviado. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_objeto_ausente_apos_expurgo_leva_a_404 (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_objeto_ausente_apos_expurgo_leva_a_404)
+O efeito do expurgo, ensaiado por remoção direta. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_politica_de_ciclo_de_vida_corresponde_ao_arquivo_versionado (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_politica_de_ciclo_de_vida_corresponde_ao_arquivo_versionado)
+A regra aplicada no bucket é a que está no repositório. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+test_upload_valido_grava_objeto_no_bucket (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_upload_valido_grava_objeto_no_bucket)
+O `201` corresponde a um objeto que existe, com os metadados certos. ... skipped 'TEST_AUDIO_STORAGE_ENDPOINT_URL não definido. Suba o MinIO com `docker compose up -d minio minio-init` e aponte a variável para ele.'
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.000s
+
+OK (skipped=7)
