@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Menu, Mic } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { Menu } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import AgentOrb from '../components/AgentOrb/AgentOrb'
 import CalendarView from '../components/CalendarView/CalendarView'
 import ChatMessage from '../components/ChatMessage/ChatMessage'
@@ -10,6 +10,7 @@ import SettingsModal from '../components/SettingsModal/SettingsModal'
 import Sidebar, { SidebarOpenButton } from '../components/Sidebar/Sidebar'
 import TasksView from '../components/TasksView/TasksView'
 import TopBar from '../components/TopBar/TopBar'
+import VoiceCall from '../components/VoiceCall/VoiceCall'
 import metroMapPattern from '../assets/metro-map-pattern.svg'
 import { useSettings } from '../hooks/useSettings'
 import { useTheme } from '../hooks/useTheme'
@@ -81,10 +82,21 @@ export default function AgentPage() {
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [hasPendingTranscription, setHasPendingTranscription] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [voiceState, setVoiceState] = useState('idle')
+  const [voiceError, setVoiceError] = useState('')
+  const [voiceCallActive, setVoiceCallActive] = useState(false)
+  const [voiceConversationId, setVoiceConversationId] = useState(null)
+  const [voiceMessages, setVoiceMessages] = useState([])
   const [shareCopied, setShareCopied] = useState(false)
   const scrollRef = useRef(null)
 
   const hasStarted = messages.length > 0
+  const visibleConversations = conversations.filter((conversation) =>
+    activeTab === 'voice'
+      ? conversation.type === 'voice'
+      : conversation.type !== 'voice',
+  )
+  const visibleActiveId = activeTab === 'voice' ? voiceConversationId : activeId
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -181,13 +193,32 @@ export default function AgentPage() {
   }
 
   const handleNewConversation = () => {
+    if (activeTab === 'voice') {
+      setVoiceConversationId(crypto.randomUUID())
+      setVoiceMessages([])
+      setVoiceCallActive(false)
+      setVoiceState('idle')
+      setVoiceError('')
+      return
+    }
     setMessages([])
     setActiveId(null)
     setInputValue('')
   }
 
   const handleSelectConversation = (id) => {
+    const conversation = conversations.find((item) => item.id === id)
+    if (conversation?.type === 'voice') {
+      setVoiceConversationId(id)
+      setVoiceMessages(conversationHistory[id] ?? [])
+      setVoiceCallActive(false)
+      setVoiceState('idle')
+      setVoiceError('')
+      setActiveTab('voice')
+      return
+    }
     setActiveId(id)
+    setActiveTab('chat')
     // O que está em memória cobre a conversa em andamento; para as
     // anteriores, a fonte é o banco.
     const emMemoria = conversationHistory[id]
@@ -216,9 +247,59 @@ export default function AgentPage() {
   }
 
   const handleSelectTab = (tab) => {
+    if (tab === 'voice') {
+      const previousVoiceConversation = conversations.find(
+        (conversation) => conversation.title === 'Chamada por voz',
+      )
+      if (previousVoiceConversation?.id === activeId) {
+        setActiveId(null)
+        setMessages([])
+      }
+      setVoiceConversationId((current) => current ?? crypto.randomUUID())
+      setConversations((prev) =>
+        prev.filter((conversation) => conversation.title !== 'Chamada por voz'),
+      )
+    }
+    if (activeTab === 'voice' && tab !== 'voice') {
+      setVoiceCallActive(false)
+      setVoiceState('idle')
+      setVoiceError('')
+    }
     setActiveTab(tab)
-    setIsListening(tab === 'voice')
+    setIsListening(false)
   }
+
+  const handleVoiceStart = useCallback(() => {
+    setVoiceConversationId((current) => current ?? crypto.randomUUID())
+    setActiveTab('voice')
+    setVoiceCallActive(true)
+  }, [])
+
+  const handleVoiceTranscript = useCallback((text) => {
+    setVoiceMessages((prev) => [...prev, { role: 'user', content: text }])
+  }, [])
+
+  const handleVoiceAgentResponse = useCallback((text) => {
+    setVoiceMessages((prev) => [...prev, { role: 'agent', content: text }])
+  }, [])
+
+  const handleVoiceEnd = useCallback(() => {
+    if (voiceConversationId && voiceMessages.length > 0) {
+      const firstUserMessage = voiceMessages.find((message) => message.role === 'user')
+      const title = firstUserMessage
+        ? titleFromMessage(firstUserMessage.content)
+        : 'Conversa por voz'
+      setConversations((prev) => [
+        { id: voiceConversationId, title, type: 'voice' },
+        ...prev.filter((conversation) => conversation.id !== voiceConversationId),
+      ])
+      setConversationHistory((prev) => ({
+        ...prev,
+        [voiceConversationId]: voiceMessages,
+      }))
+    }
+    setVoiceCallActive(false)
+  }, [voiceConversationId, voiceMessages])
 
   const handleShare = async () => {
     const shareData = {
@@ -260,8 +341,8 @@ export default function AgentPage() {
         <Sidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(true)}
-          conversations={conversations}
-          activeId={activeId}
+          conversations={visibleConversations}
+          activeId={visibleActiveId}
           onSelectConversation={handleSelectConversation}
           onNewConversation={handleNewConversation}
           onConfig={() => setSettingsOpen(true)}
@@ -273,8 +354,8 @@ export default function AgentPage() {
           <Sidebar
             collapsed={false}
             onToggle={() => setMobileSidebarOpen(false)}
-            conversations={conversations}
-            activeId={activeId}
+            conversations={visibleConversations}
+            activeId={visibleActiveId}
             onSelectConversation={(id) => {
               handleSelectConversation(id)
               setMobileSidebarOpen(false)
@@ -327,32 +408,20 @@ export default function AgentPage() {
             backgroundSize: '340px 340px',
           }}
         >
-          {activeTab === 'voice' ? (
-            <div className="flex flex-1 flex-col items-center justify-center px-4 pb-10">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="mb-8"
-              >
-                <AgentOrb state="listening" size={128} />
-              </motion.div>
-              <p className="flex items-center gap-2 text-[16px] font-medium text-text-primary">
-                <Mic size={16} strokeWidth={1.75} />
-                Ouvindo...
-              </p>
-              <p className="mt-2 max-w-xs text-center text-[13px] text-text-secondary">
-                Fale naturalmente. O AZ1 vai transcrever e responder assim
-                que você terminar.
-              </p>
-              <button
-                type="button"
-                onClick={() => handleSelectTab('chat')}
-                className="mt-8 rounded-xl border border-border bg-surface px-4 py-2 text-[13px] font-medium text-text-primary transition-colors hover:bg-surface-hover"
-              >
-                Voltar para o chat
-              </button>
-            </div>
+          {activeTab === 'voice' || voiceCallActive ? (
+            <VoiceCall
+              key={voiceConversationId ?? 'new-voice-call'}
+              conversationId={voiceConversationId}
+              messages={voiceMessages}
+              state={voiceState}
+              error={voiceError}
+              onStateChange={setVoiceState}
+              onError={setVoiceError}
+              onStart={handleVoiceStart}
+              onTranscript={handleVoiceTranscript}
+              onAgentResponse={handleVoiceAgentResponse}
+              onEnd={handleVoiceEnd}
+            />
           ) : activeTab === 'calendar' ? (
             <CalendarView />
           ) : activeTab === 'tasks' ? (
