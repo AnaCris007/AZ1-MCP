@@ -6254,305 +6254,106 @@ Não foram identificados testes automatizados que percorram conjuntamente login 
 
 ## 5.3 Chamada de Voz Contínua
 
-Este documento descreve a experiência de uso, o comportamento funcional e a
-integração técnica da chamada de voz do AZ1. A funcionalidade permite que o
-usuário converse com o agente em turnos sucessivos sem precisar gravar,
-confirmar e enviar manualmente cada mensagem.
+A chamada de voz permite conversar com o AZ1 em vários turnos sem enviar cada
+gravação manualmente. O navegador detecta o início e o fim da fala, envia o
+áudio ao backend, reproduz a resposta e volta a ouvir. A funcionalidade usa o
+mesmo agente do chat textual, mas mantém sua interface e seu histórico
+separados.
 
+### 5.3.1 Uso e estados da chamada
 
-### 5.3.1 Objetivo e escopo
+Para iniciar, o usuário seleciona **Voz**, pressiona **Clique para começar** e
+autoriza o microfone. A interface considera uma fala válida após 120 ms acima
+do limiar de volume e encerra o turno depois de 850 ms de silêncio.
 
-A chamada de voz oferece uma camada de interação sobre o mesmo agente usado no
-chat textual. Em cada turno, a aplicação:
+O fluxo de um turno é:
 
-1. detecta automaticamente que o usuário começou a falar;
-2. identifica o fim da fala por um intervalo de silêncio;
-3. envia o áudio ao backend pela conexão WebSocket aberta para a chamada;
-4. transcreve o áudio e solicita uma resposta ao agente;
-5. reproduz a resposta em voz;
-6. volta ao estado de escuta para receber o turno seguinte.
+1. capturar a fala com `MediaRecorder`;
+2. enviar o áudio pela conexão WebSocket;
+3. transcrever com Deepgram;
+4. gerar a resposta com Gemini;
+5. reproduzir o áudio da resposta;
+6. voltar automaticamente à escuta.
 
-O escopo atual inclui múltiplos turnos na mesma chamada, indicação visual do
-estado, encerramento explícito, consulta do diálogo após o encerramento e
-continuação da conversa. A chamada não transmite áudio continuamente para um
-provedor em tempo real: cada fala é delimitada no navegador e processada como
-um turno completo.
+| Estado | Significado |
+|---|---|
+| `idle` | A chamada ainda não começou ou já foi encerrada. |
+| `connecting` | O WebSocket e o microfone estão sendo preparados. |
+| `listening` | A aplicação está aguardando a fala do usuário. |
+| `transcribing` | O Deepgram está convertendo o áudio em texto. |
+| `processing` | O agente está gerando a resposta. |
+| `speaking` | A resposta está sendo reproduzida. |
+| `error` | Uma etapa falhou e a interface apresenta uma orientação. |
 
-### 5.3.2 Como usar
+Durante a ligação, as mensagens ficam ocultas. Ao pressionar **Encerrar
+conversa**, o frontend desativa o microfone, interrompe reproduções, fecha os
+recursos de áudio e encerra o WebSocket. Depois disso, a transcrição e as
+respostas ficam disponíveis na área de voz. O usuário também pode continuar a
+mesma conversa, preservando o `conversation_id` e o contexto do agente.
 
-#### Iniciar uma chamada
+### 5.3.2 Arquitetura
 
-1. Acesse a aplicação e faça a autenticação.
-2. Selecione **Voz** na barra de navegação.
-3. Pressione **Clique para começar**.
-4. Autorize o acesso ao microfone quando o navegador solicitar.
-5. Aguarde a indicação **Ouvindo...** antes de falar.
-
-O botão inicia uma sessão de voz vinculada a um `conversation_id`. Esse
-identificador é mantido nos turnos seguintes para que o agente preserve o
-contexto da conversa.
-
-#### Conversar com o agente
-
-O usuário pode falar naturalmente e não precisa pressionar outro botão para
-enviar a pergunta. A interface detecta voz acima do limiar por pelo menos 120
-ms e encerra o turno após 850 ms de silêncio. Esses valores reduzem ativações
-por ruídos curtos e evitam o corte imediato em pequenas pausas da frase.
-
-Enquanto a chamada está ativa, a transcrição fica oculta e a tela permanece
-dedicada à ligação. Depois que o agente termina de falar, a aplicação retorna
-automaticamente ao estado de escuta.
-
-####  Encerrar e consultar
-
-O botão **Encerrar conversa** finaliza a sessão ativa. O frontend interrompe a
-captura do microfone, cancela reproduções pendentes, fecha os recursos de áudio
-e encerra o WebSocket. Somente após esse encerramento o diálogo é apresentado
-na tela, com o mesmo componente visual usado pelo chat textual.
-
-As chamadas são separadas das conversas de texto na barra lateral. Ao selecionar
-uma chamada encerrada, o usuário pode consultar suas falas e as respostas do
-AZ1 ou pressionar **Continuar chamada** para reutilizar o mesmo contexto.
-
-No estado atual, esse histórico de voz é mantido no estado do frontend durante
-a sessão da página. A persistência definitiva das chamadas no banco de dados
-não integra esta entrega.
-
-### 5.3.3 Estados apresentados na interface
-
-| Estado | Texto principal | O que está acontecendo | Próxima transição esperada |
-|---|---|---|---|
-| `idle` | Converse com o AZ1 | A chamada ainda não começou ou já foi encerrada. | `connecting` após o clique para iniciar ou continuar. |
-| `connecting` | Conectando... | O frontend abre o WebSocket, autentica a sessão e solicita o microfone. | `listening` após receber `call_ready`. |
-| `listening` | Ouvindo... | O analisador acompanha o volume e aguarda uma fala válida. | `transcribing` depois do silêncio que encerra o turno. |
-| `transcribing` | Transcrevendo... | O áudio completo do turno foi enviado para transcrição. | `processing` quando há texto reconhecido. |
-| `processing` | Pensando... | O agente está produzindo a resposta textual. | `speaking` quando a reprodução começa. |
-| `speaking` | Respondendo... | O áudio do agente ou a voz alternativa do navegador está sendo reproduzida. | `listening` quando a reprodução termina. |
-| `error` | Não consegui continuar | Uma etapa falhou e a mensagem correspondente é exibida. | `listening` após a recuperação automática, quando aplicável. |
-
-O estado visual não é apenas decorativo: ele impede que o detector inicie um
-novo turno enquanto a aplicação transcreve, processa ou reproduz uma resposta.
-Isso evita o envio simultâneo de falas e reduz a possibilidade de o microfone
-capturar a própria voz do agente.
-
-
-### 5.3.4 Critérios funcionais atendidos
-
-- a chamada começa por uma ação explícita do usuário;
-- a interface informa conexão, escuta, transcrição, processamento, reprodução
-  e erro;
-- o envio da fala ocorre automaticamente após a pausa configurada;
-- uma única conexão suporta vários turnos de conversa;
-- o contexto é preservado pelo `conversation_id`;
-- o usuário pode encerrar a chamada a qualquer momento;
-- microfone, contexto de áudio, reprodução e conexão são liberados ao sair;
-- o diálogo só fica visível depois do encerramento;
-- chamadas e conversas textuais aparecem em históricos separados;
-- uma chamada encerrada pode ser consultada e continuada.
-
-### 5.3.5 Ciclo de um turno e continuidade da sessão
-
-A sessão começa somente depois da ação do usuário. O componente abre o
-WebSocket, envia os dados de início e, após a confirmação do backend, solicita
-o microfone. A conexão permanece aberta entre os turnos; portanto, autenticação
-e negociação da conexão não são repetidas a cada pergunta.
-
-Cada turno segue esta sequência funcional:
-
-1. O analisador da Web Audio API mede continuamente a amplitude do sinal do
-   microfone enquanto a interface está em `listening`.
-2. Depois de 120 ms de sinal acima do limiar, uma nova instância de
-   `MediaRecorder` começa a registrar a fala.
-3. O gravador reúne fragmentos a cada 250 ms. Após 850 ms de silêncio, os
-   fragmentos formam um único `Blob` e são enviados como frame binário.
-4. O frontend envia `utterance_end`, e o backend processa o turno na ordem:
-   Deepgram, agente conversacional e síntese de fala.
-5. A transcrição e a resposta textual são guardadas no estado temporário da
-   chamada. Elas permanecem ocultas durante a ligação.
-6. O áudio do agente é reproduzido. Quando a reprodução termina, a interface
-   retorna a `listening` e aceita uma nova fala pela mesma conexão.
-
-O backend associa todos os turnos ao mesmo `conversation_id`. Esse valor é
-repassado ao serviço do agente, que o utiliza como chave do contexto
-conversacional. Ao continuar uma chamada encerrada, o frontend reutiliza o
-identificador e acrescenta as novas falas ao histórico já exibido.
-
-O processamento é sequencial por conexão: o backend conclui transcrição,
-resposta e síntese antes de receber o próximo turno da mesma chamada. A
-interface também limita a detecção de voz ao estado `listening`. A versão atual
-não implementa interrupção da resposta pelo usuário, transcrição parcial ou
-duas falas simultâneas.
-
-#### Encerramento e liberação de recursos
-
-O encerramento explícito e a desmontagem do componente executam a mesma rotina
-de limpeza no navegador:
-
-- cancelam o ciclo de análise iniciado por `requestAnimationFrame`;
-- interrompem uma gravação que ainda esteja ativa;
-- param todas as faixas do `MediaStream`, desativando o microfone;
-- fecham o `AudioContext`;
-- pausam e liberam a URL temporária do áudio recebido;
-- cancelam uma fala iniciada por `SpeechSynthesis`;
-- enviam `end_call` quando o WebSocket ainda está aberto;
-- fecham a conexão WebSocket.
-
-O backend encerra normalmente a conexão ao receber `end_call`. Fechar a tela
-durante uma chamada impede novas atualizações no frontend, mas não cancela uma
-requisição externa que já tenha sido iniciada no Deepgram ou no Gemini. Esse
-cancelamento distribuído não faz parte da implementação atual.
-
-### 5.3.6 Tratamento de falhas e recuperação
-
-Os erros controlados do WebSocket possuem `type: "error"`, um código estável no
-campo `error` e uma mensagem voltada ao usuário. Na maioria das falhas de um
-turno, a interface apresenta a mensagem por 1,8 segundo e retorna ao estado de
-escuta, mantendo a conexão para uma nova tentativa.
-
-| Código ou situação | Origem | Comportamento observado |
-|---|---|---|
-| `invalid_start` | Evento inicial ausente, tipo incorreto ou sem `conversation_id`. | O backend informa o erro e fecha a conexão com código `1008`. |
-| `unauthorized` | Token ausente ou inválido quando a autenticação está habilitada. | O backend rejeita a sessão e fecha a conexão com código `1008`. |
-| `audio_too_large` | O turno ultrapassa 10 MiB. | Os bytes acumulados são descartados, a mensagem é exibida e a chamada pode voltar a ouvir. |
-| `empty_transcription` | O Deepgram não reconhece texto no áudio recebido. | O usuário recebe a orientação de repetir a fala; a conexão é preservada. |
-| `transcription_failed` | O serviço de transcrição falha. | A interface informa que não conseguiu transcrever e permite nova tentativa. |
-| `agent_unavailable` | O agente não consegue produzir a resposta. | A falha é apresentada e o turno pode ser repetido. |
-| `speech_failed` | O texto foi gerado, mas o Gemini TTS não produziu áudio. | O navegador tenta falar a resposta com `SpeechSynthesis`; se o recurso existir, a conversa continua sem perder o texto. |
-| Áudio do Gemini demora mais de 2,5 s após a resposta textual. | Latência ou indisponibilidade do TTS. | O frontend inicia `SpeechSynthesis` e ignora um áudio do servidor que chegue depois, evitando reprodução duplicada. |
-| Microfone negado ou indisponível. | Permissão ou dispositivo no navegador. | A inicialização entra em `error` e orienta o usuário; é necessário iniciar novamente após corrigir a permissão. |
-| WebSocket encerrado inesperadamente. | Rede, proxy ou backend. | A interface informa o encerramento. Não há reconexão automática nesta versão. |
-
-A voz alternativa usa `SpeechSynthesisUtterance` com idioma `pt-BR` e velocidade
-`1.05`. Ela depende das vozes disponíveis no sistema operacional e pode soar
-diferente entre navegadores. O fallback preserva a continuidade funcional
-quando a cota ou a disponibilidade do TTS externo impede a reprodução, mas não
-garante a mesma identidade vocal do Gemini.
-
-Falhas de um turno não removem as mensagens anteriores. A transcrição só entra
-no histórico quando o backend devolve `transcription_final`, e a resposta só é
-adicionada quando chega `agent_response`; dessa forma, tentativas vazias ou
-falhas anteriores a esses eventos não criam mensagens incompletas na conversa.
-
-### 5.3.7 Validação e evidências
-
-A validação prévia ao Merge Request foi executada após integrar a `develop` na
-branch da funcionalidade. Os comandos e resultados observados foram:
-
-| Verificação | Comando | Resultado |
-|---|---|---|
-| Compilação do frontend | `npm run build` em `src/frontend` | Build concluído sem erro. O aviso de tamanho do bundle permaneceu informativo. |
-| Análise estática do frontend | `npm run lint` em `src/frontend` | Nenhum erro; permaneceram avisos já identificados em componentes e hooks. |
-| Testes do frontend | `npm test` em `src/frontend` | 5 arquivos e 25 testes aprovados após a integração com a `develop`. |
-| Testes focados do backend | `python -m unittest tests.test_voice_api tests.test_transcription_service` no contêiner da API | 6 testes aprovados. |
-| Análise estática Python | `ruff check src tests --ignore EXE002` no contêiner da API | Verificação aprovada. `EXE002` é ignorado porque a montagem do Windows apresenta arquivos como executáveis. |
-
-O teste automatizado do WebSocket confirma um turno bem-sucedido com serviços
-substituídos. Ele não mede latência real, qualidade de transcrição, permissão do
-microfone, comportamento do `SpeechSynthesis`, múltiplos turnos nem falhas dos
-provedores. Esses pontos exigem execução no navegador e, quando envolverem os
-serviços externos, consomem suas respectivas cotas.
-
-#### Roteiro de validação manual
-
-1. Atualizar a aplicação e autenticar com uma conta permitida.
-2. Abrir **Voz**, iniciar a chamada e conceder acesso ao microfone.
-3. Fazer uma pergunta e observar, na ordem, `listening`, `transcribing`,
-   `processing`, `speaking` e o retorno a `listening`.
-4. Fazer uma segunda pergunta relacionada à primeira e conferir se a resposta
-   considera o contexto anterior.
-5. Encerrar a conversa durante o estado de escuta e verificar se o indicador de
-   uso do microfone é desativado.
-6. Abrir o registro na área de voz, conferir transcrição e respostas e usar
-   **Continuar chamada**.
-7. Indisponibilizar ou esgotar a cota do Gemini TTS e confirmar a reprodução
-   pela voz nativa do navegador sem áudio duplicado.
-8. Negar a permissão do microfone e interromper a conexão para verificar as
-   mensagens de falha correspondentes.
-
-Para cada execução manual, o MR deve registrar navegador e versão, sistema
-operacional, commit testado, horário, resultado por passo e captura ou gravação
-da evidência. Tokens, chaves, conteúdo do `.env` e dados pessoais não devem
-aparecer nas evidências.
-
-#### Conferência dos critérios de conclusão
-
-| Critério | Evidência disponível | Situação documental |
-|---|---|---|
-| Mais de um turno na mesma chamada | Conexão persistente e reutilização do `conversation_id`; roteiro manual acima. | Implementado; registrar execução manual no MR. |
-| Estado atual visível | Mapeamento da Seção 5.3.3 e componente `VoiceCall`. | Implementado. |
-| Encerramento sem captura ou reprodução pendente | Rotina de limpeza descrita na Seção 5.3.5. | Implementado; inspecionar microfone no navegador. |
-| Erros principais tratados | Códigos e respostas da Seção 5.3.6. | Implementado com limitações declaradas. |
-| Testes pertinentes aprovados | Build, lint, 25 testes de frontend e 6 testes focados de backend. | Aprovado no ambiente local usado na revisão pré-MR. |
-| Documentação atualizada | Seções 5.2 e 5.3 deste documento. | Atendido nesta branch de documentação. |
-| Revisão por pares | Aprovação formal do Merge Request. | Pendente até a revisão do MR. |
-
-### 5.3.8 Arquitetura da chamada
-
-A chamada mantém uma conexão WebSocket entre o componente `VoiceCall` do
-frontend e o endpoint `/api/v1/voice/call` do FastAPI. Essa conexão permanece
-aberta durante toda a conversa e permite processar vários turnos sem criar uma
-nova requisição para cada evento.
+A chamada mantém uma conexão WebSocket entre o componente `VoiceCall` e o
+endpoint `/api/v1/voice/call` do FastAPI. A conexão permanece aberta durante a
+conversa e processa vários turnos.
 
 | Componente | Responsabilidade |
 |---|---|
-| `VoiceCall.jsx` | Capturar o microfone, detectar fala e silêncio, mostrar o estado e reproduzir a resposta. |
-| `api.js` | Abrir o WebSocket com a sessão atual do usuário. |
-| `voice.py` | Autenticar a chamada e coordenar transcrição, resposta e geração de áudio. |
-| Deepgram | Converter a fala do usuário em texto. |
-| Gemini | Gerar a resposta textual e, quando disponível, o áudio. |
-| `SpeechSynthesis` | Reproduzir a resposta pelo navegador quando o Gemini TTS falhar ou demorar. |
+| `VoiceCall.jsx` | Capturar o microfone, controlar estados e reproduzir a resposta. |
+| `api.js` | Abrir o WebSocket com a sessão atual. |
+| `voice.py` | Autenticar e coordenar transcrição, resposta e síntese. |
+| Deepgram | Converter a fala em texto. |
+| Gemini | Gerar a resposta textual e o áudio. |
+| `SpeechSynthesis` | Reproduzir a resposta quando o Gemini TTS falhar ou demorar. |
 
-O fluxo ocorre nesta ordem:
+O áudio de entrada é reunido em um arquivo por turno para preservar um formato
+válido para transcrição. Eventos de controle e textos usam JSON; os áudios usam
+frames binários, evitando o aumento de tamanho causado pelo Base64. O Vite e o
+nginx estão configurados para encaminhar o upgrade WebSocket.
 
-1. o navegador detecta a fala e grava um turno;
-2. o áudio é enviado ao FastAPI como dado binário;
-3. o Deepgram devolve a transcrição;
-4. o agente gera a resposta usando o mesmo `conversation_id`;
-5. o backend devolve o texto e o áudio;
-6. o navegador reproduz a resposta e volta a ouvir.
+### 5.3.3 Protocolo WebSocket
 
-Os eventos de controle e os textos usam JSON. Os áudios de entrada e saída usam
-frames binários, evitando o aumento de tamanho causado pela conversão para
-Base64. O proxy do Vite e o nginx preservam o upgrade necessário para a conexão
-WebSocket.
-
-### 5.3.9 Protocolo, configuração e limites
-
-O endpoint da chamada é `WS /api/v1/voice/call`. Depois de abrir a conexão, o
-frontend e o backend trocam os seguintes eventos:
+Após abrir `WS /api/v1/voice/call`, o frontend envia `start_call` com o
+`conversation_id` e o token da sessão. Em produção, a conexão usa `wss`.
 
 | Direção | Eventos principais |
 |---|---|
 | Frontend → backend | `start_call`, `utterance_start`, áudio binário, `utterance_end` e `end_call`. |
 | Backend → frontend | `call_ready`, `transcribing`, `transcription_final`, `processing`, `agent_response`, `agent_audio`, áudio binário e `error`. |
 
-`start_call` contém `conversation_id` e o token da sessão. O token é enviado no
-primeiro evento, e não na URL. Em produção, a página HTTPS utiliza `wss`; no
-desenvolvimento local utiliza `ws`. Cada fala pode ter até 10 MiB.
+O backend aceita até 10 MiB por fala. A autenticação inválida encerra a conexão;
+erros de um turno, como transcrição vazia, preservam a chamada para uma nova
+tentativa.
 
-As configurações necessárias são `DEEPGRAM_API_KEY`, `GEMINI_API_KEY`, dados do
-Supabase e, opcionalmente, `GEMINI_TTS_MODEL`. O Vite e o nginx já possuem a
-configuração de proxy e upgrade WebSocket. Os valores devem ficar no `.env`,
-que não é versionado; `.env.example` registra apenas os nomes esperados.
+### 5.3.4 Erros, configuração e limitações
+
+| Situação | Comportamento |
+|---|---|
+| Fala não identificada | A interface pede que o usuário tente novamente. |
+| Falha no Deepgram ou no agente | O erro é apresentado e a chamada volta à escuta quando possível. |
+| Gemini TTS indisponível ou lento | Após 2,5 segundos, o navegador usa `SpeechSynthesis` em `pt-BR`. |
+| Microfone negado | A interface informa que não conseguiu iniciar a chamada. |
+| WebSocket desconectado | A chamada apresenta o erro; não há reconexão automática. |
+
+A execução depende de `DEEPGRAM_API_KEY`, `GEMINI_API_KEY` e da configuração do
+Supabase. `GEMINI_TTS_MODEL` é opcional. Os valores ficam no `.env`, que não é
+versionado; `.env.example` registra apenas os nomes esperados.
 
 Limitações atuais:
 
-- não há transcrição parcial, interrupção da fala do agente ou reconexão
-  automática;
-- a detecção do fim da fala depende de 850 ms de silêncio;
-- o histórico da chamada permanece em memória e é perdido ao recarregar a
-  página;
+- não há transcrição parcial nem interrupção da fala do agente;
 - o áudio original não é armazenado;
-- a latência depende de Deepgram, Gemini e da rede;
-- o Gemini TTS possui cotas, e a voz alternativa varia conforme o navegador e
-  o sistema operacional.
+- o histórico de voz fica em memória e é perdido ao recarregar a página;
+- a latência depende dos provedores externos e da rede;
+- a voz alternativa varia conforme o navegador e o sistema operacional.
 
-Se a chamada não conectar, devem ser verificados a API na porta configurada, o
-proxy WebSocket e a sessão do usuário. Se não houver transcrição, devem ser
-verificados a permissão do microfone, o volume captado e a chave do Deepgram.
-Quando o Gemini TTS estiver indisponível, o navegador deve reproduzir a resposta
-por `SpeechSynthesis`.
+### 5.3.5 Validação
 
+A revisão pré-MR aprovou o build e o lint do frontend, 25 testes de frontend e
+6 testes focados no WebSocket e na transcrição. O teste do endpoint cobre um
+turno completo com serviços substituídos. Permissão real do microfone, múltiplos
+turnos, latência e fallback de voz devem ser verificados manualmente no
+navegador e registrados como evidência no MR.
 ---
 
 # 6. Planejamento de Testes Sistêmicos
