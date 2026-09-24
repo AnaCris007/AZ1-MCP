@@ -12,6 +12,8 @@ import unittest
 from datetime import date, time
 
 from fastapi.testclient import TestClient
+from psycopg import OperationalError
+from psycopg.errors import UndefinedTable
 
 from az1_api.dependencies import (
     get_evento_local_repository,
@@ -257,13 +259,35 @@ class TesteCalendario(_BaseDePortfolio):
         self.repositorio = _RepositorioFalso(projetos=[_projeto()])
         app.dependency_overrides[get_portfolio_repository] = lambda: self.repositorio
         self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(
-            erro_ao_listar=RuntimeError('relation "portfolio.evento_local" does not exist')
+            erro_ao_listar=UndefinedTable('relation "portfolio.evento_local" does not exist')
         )
         app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
 
         resposta = self.client.get("/api/v1/calendar/events")
         self.assertEqual(resposta.status_code, 200)
         self.assertEqual(resposta.json()["days"][0]["events"][0]["type"], "marco")
+
+    def test_falha_de_banco_ao_listar_eventos_locais_devolve_503(self):
+        self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(
+            erro_ao_listar=OperationalError("conexão indisponível")
+        )
+        app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
+
+        resposta = self.client.get("/api/v1/calendar/events")
+
+        self.assertEqual(resposta.status_code, 503)
+        self.assertEqual(resposta.json()["error"], "agenda_indisponivel")
+
+    def test_erro_de_programacao_ao_listar_eventos_locais_nao_e_mascarado(self):
+        self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(
+            erro_ao_listar=RuntimeError("erro inesperado")
+        )
+        app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
+
+        resposta = self.client.get("/api/v1/calendar/events")
+
+        self.assertEqual(resposta.status_code, 500)
+        self.assertEqual(resposta.json()["error"], "internal_error")
 
     def test_evento_local_aparece_na_agenda_com_hora_real(self):
         self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(

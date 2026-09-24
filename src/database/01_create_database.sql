@@ -182,6 +182,21 @@ CREATE TABLE portfolio.usuario_projeto (
     PRIMARY KEY (usuario_id, projeto_id)
 );
 
+-- Compromissos próprios do usuário na Agenda, sem sincronização externa.
+-- DATE + TIME opcional preservam exatamente a data e a hora local informadas.
+CREATE TABLE portfolio.evento_local (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id INTEGER     NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
+    titulo     TEXT        NOT NULL,
+    data       DATE        NOT NULL,
+    hora       TIME,
+    descricao  TEXT,
+    criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+COMMENT ON TABLE portfolio.evento_local IS
+    'Compromissos próprios do usuário na Agenda. Nunca sincronizados com Outlook/Microsoft Graph.';
+
 
 -- =============================================================================
 -- 2. CONVERSAS E TRILHA DE AUDITORIA
@@ -428,6 +443,8 @@ CREATE INDEX idx_campo_artefato_artefato ON portfolio.campo_artefato (artefato_i
 -- Consulta do Agendador do cenário 3: pendências abertas por prazo.
 CREATE INDEX idx_pendencia_verificacao   ON portfolio.pendencia (situacao, prazo);
 CREATE INDEX idx_pendencia_projeto       ON portfolio.pendencia (projeto_id);
+CREATE INDEX idx_evento_local_usuario_data
+    ON portfolio.evento_local (usuario_id, data);
 
 -- Barra lateral: conversas não arquivadas do usuário, mais recentes primeiro.
 CREATE INDEX idx_conversa_usuario_recente

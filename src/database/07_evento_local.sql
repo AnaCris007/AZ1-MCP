@@ -1,5 +1,8 @@
 -- Eventos próprios do usuário na Agenda, nunca escritos no Outlook.
--- Execute como administrador após 03_rls_policies.sql.
+-- Em ambientes completos, execute como administrador após
+-- 03_rls_policies.sql. O PostgreSQL local do Compose não instala esse baseline
+-- de RLS: nesse caso os blocos de privilégios/policies são ignorados com NOTICE
+-- e a API, que conecta como dona do schema, continua funcional.
 -- PostgreSQL 16 ou superior.
 \set ON_ERROR_STOP on
 BEGIN;
@@ -20,33 +23,37 @@ CREATE TABLE IF NOT EXISTS portfolio.evento_local (
 
 CREATE INDEX IF NOT EXISTS idx_evento_local_usuario_data ON portfolio.evento_local (usuario_id, data);
 
--- Aditivo, de propósito: uma migração nova não deveria exigir editar
--- 03_rls_policies.sql, então os grants desta tabela ficam autocontidos aqui.
-GRANT SELECT, INSERT, UPDATE, DELETE ON portfolio.evento_local TO az1_app;
-GRANT USAGE, SELECT ON SEQUENCE portfolio.evento_local_id_seq TO az1_app;
-
 ALTER TABLE portfolio.evento_local ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS evento_local_propria_leitura ON portfolio.evento_local;
-DROP POLICY IF EXISTS evento_local_propria_criacao ON portfolio.evento_local;
-DROP POLICY IF EXISTS evento_local_propria_exclusao ON portfolio.evento_local;
 
-CREATE POLICY evento_local_propria_leitura ON portfolio.evento_local
-    FOR SELECT USING (usuario_id = portfolio.usuario_atual());
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'az1_app') THEN
+        EXECUTE 'GRANT SELECT, INSERT, DELETE ON portfolio.evento_local TO az1_app';
+        EXECUTE 'GRANT USAGE, SELECT ON SEQUENCE portfolio.evento_local_id_seq TO az1_app';
+    ELSE
+        RAISE NOTICE 'papel az1_app ausente; privilégios de evento_local não aplicados';
+    END IF;
 
-CREATE POLICY evento_local_propria_criacao ON portfolio.evento_local
-    FOR INSERT WITH CHECK (usuario_id = portfolio.usuario_atual());
-
--- Primeira política FOR DELETE do projeto: toda tabela existente até aqui usa
--- exclusão lógica (situacao/ativa), não DELETE físico. Não há política de
--- UPDATE: não existe rota de edição neste escopo, e uma política sem rota que
--- a use é manutenção morta.
-CREATE POLICY evento_local_propria_exclusao ON portfolio.evento_local
-    FOR DELETE USING (usuario_id = portfolio.usuario_atual());
+    IF to_regprocedure('portfolio.usuario_atual()') IS NOT NULL THEN
+        EXECUTE 'DROP POLICY IF EXISTS evento_local_propria_leitura ON portfolio.evento_local';
+        EXECUTE 'DROP POLICY IF EXISTS evento_local_propria_criacao ON portfolio.evento_local';
+        EXECUTE 'DROP POLICY IF EXISTS evento_local_propria_exclusao ON portfolio.evento_local';
+        EXECUTE 'CREATE POLICY evento_local_propria_leitura ON portfolio.evento_local
+                     FOR SELECT USING (usuario_id = portfolio.usuario_atual())';
+        EXECUTE 'CREATE POLICY evento_local_propria_criacao ON portfolio.evento_local
+                     FOR INSERT WITH CHECK (usuario_id = portfolio.usuario_atual())';
+        EXECUTE 'CREATE POLICY evento_local_propria_exclusao ON portfolio.evento_local
+                     FOR DELETE USING (usuario_id = portfolio.usuario_atual())';
+    ELSE
+        RAISE NOTICE 'função portfolio.usuario_atual ausente; policies de evento_local não aplicadas';
+    END IF;
+END
+$$;
 
 -- A aplicação conecta hoje como dono do schema (AZ1_DB_ROLE opcional, ver
 -- database_service.py): estas políticas não são aplicadas ainda. O filtro por
 -- usuario_id em EventoLocalRepository não é opcional por causa disso, mesma
 -- ressalva já documentada em PortfolioRepository.alterar_situacao.
 COMMENT ON TABLE portfolio.evento_local IS
-    'Compromissos próprios do usuário na Agenda. Nunca sincronizados com Outlook/Microsoft Graph — ver services/evento_local_repository.py.';
+    'Compromissos próprios do usuário na Agenda. Nunca sincronizados com Outlook/Microsoft Graph.';
 COMMIT;

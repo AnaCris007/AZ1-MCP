@@ -3052,7 +3052,7 @@ O modelo lógico é mais amplo que o recorte conceitual da seção 3.6.1, e essa
 
 <div align="center">
 <sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
-  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, projeto_relacionado, artefato, campo_artefato, pendencia, usuario_projeto, conversa, mensagem, mensagem_fonte, avaliacao, evento_plataforma e notificacao"><br>
+  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, projeto_relacionado, artefato, campo_artefato, pendencia, usuario_projeto, evento_local, conversa, mensagem, mensagem_fonte, avaliacao, evento_plataforma e notificacao"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -3082,6 +3082,7 @@ A tabela a seguir registra a correspondência entre cada elemento das modelagens
 | **Projeto origina Pendência** `(0,n)`-`(1,1)` | `pendencia.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
 | **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
 | **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
+| Compromisso próprio na Agenda | Tabela `evento_local` | Estrutura operacional privada por usuário, sem sincronização externa e fora da trilha imutável de auditoria |
 | **Pendência notifica Usuário** (2.2.1) | Tabela `notificacao` | Muitos-para-muitos materializado como registro de envio, com atributo próprio `data_envio` (decisão 3 da seção 3.6.7) |
 | Atributo de avaliação da Interação | Tabela `avaliacao` | Atributo promovido a entidade por possuir autor, instante e alvo próprios (decisão 10 da seção 3.6.7) |
 | Uso da plataforma fora do agente | Tabela `evento_plataforma` | Estrutura nova, exigida pelo RNF09 e sem correspondência no recorte conceitual (decisão 11 da seção 3.6.7) |
@@ -3185,6 +3186,18 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 |---|---|---|---|
 | `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
 | `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`portfolio.evento_local`**: compromisso próprio criado pelo usuário na Agenda.
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `ON DELETE CASCADE` | Dono do compromisso |
+| `titulo` | `TEXT` | `NOT NULL` | Título exibido na Agenda |
+| `data` | `DATE` | `NOT NULL` | Data local do compromisso |
+| `hora` | `TIME` | Não se aplica | Hora local opcional, sem conversão de fuso |
+| `descricao` | `TEXT` | Não se aplica | Detalhes opcionais |
+| `criado_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento de criação para operação e suporte |
 
 **`auditoria.conversa`**: sequência de turnos entre um usuário e o agente.
 
@@ -3381,6 +3394,16 @@ CREATE TABLE portfolio.usuario_projeto (
     usuario_id INTEGER NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
     projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
     PRIMARY KEY (usuario_id, projeto_id)
+);
+
+CREATE TABLE portfolio.evento_local (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id INTEGER     NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
+    titulo     TEXT        NOT NULL,
+    data       DATE        NOT NULL,
+    hora       TIME,
+    descricao  TEXT,
+    criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE auditoria.conversa (
@@ -3908,12 +3931,13 @@ O `.gitlab-ci.yml` executa compilação Python, testes `unittest` e Ruff, além 
 
 ### 3.7.7 Reprodutibilidade e Verificação
 
-Em uma base nova, execute `01_create_database.sql`, `02_initial_data.sql`, `03_rls_policies.sql` e `03_webhooks_auditoria.sql`, nessa ordem. O script de políticas inclui `06_webhook_permissions.sql`. A carga relacional funciona antes da indexação vetorial; a comparação com `vecs.documentos_metro` é executada quando essa tabela existe. `05_migracao_usuario_zero.sql` trata bases que tenham o usuário legado.
+Em uma base nova, execute `01_create_database.sql`, `02_initial_data.sql`, `03_rls_policies.sql`, `07_evento_local.sql` e `03_webhooks_auditoria.sql`, nessa ordem. O script de políticas inclui `06_webhook_permissions.sql`; a migração 07 é idempotente e mantém bancos existentes alinhados ao baseline. A carga relacional funciona antes da indexação vetorial; a comparação com `vecs.documentos_metro` é executada quando essa tabela existe. `05_migracao_usuario_zero.sql` trata bases que tenham o usuário legado.
 
 O Compose inicializa uma base local vazia com o DDL e as permissões de webhook. Para uma base existente, confirme PostgreSQL 16 ou superior com `SHOW server_version` e aplique a migração de permissões antes de iniciar o receptor, sem remover volumes:
 
 ```bash
 docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -v webhook_login=az1 < src/database/06_webhook_permissions.sql
+docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -f /docker-entrypoint-initdb.d/07_evento_local.sql
 ```
 
 Para a base Supabase, conferir a versão por conexão PostgreSQL antes de executar. A migração exige as opções de associação de papéis introduzidas no PostgreSQL 16 e interrompe versões anteriores com erro explícito. O administrador deve informar `-v webhook_login` com o nome real do usuário do DSN do receptor; se a variável for omitida, o script concede o papel ao usuário conectado. A versão mínima e as opções estão no [contrato oficial de GRANT do PostgreSQL 16](https://www.postgresql.org/docs/16/sql-grant.html). O receptor sempre assume `az1_webhook`; erro ao assumir o papel impede a conexão. As CLIs de abertura e encerramento são operações administrativas e usam a mesma seleção de base do receptor.
@@ -7882,7 +7906,7 @@ Casos planejados contra PostgreSQL de teste provisionado pelos scripts de `src/d
 | TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.mensagem_fonte` por trecho citado, com `chunk_id`, posição e cópia dos metadados | RF02, RF03, RNF11, RNF12 |
 | TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_o_turno` | Turno processado com o banco inacessível | Código de indisponibilidade definido; o turno é reencaminhado, não descartado | RNF07, RNF04 |
 | TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.mensagem` com as credenciais da aplicação | Alteração/exclusão de mensagem rejeitada; feedback autorizado permitido. Caracterizar título/arquivamento separadamente e aplicar o oráculo RNF09 de 6.1.2 | RNF04, RNF09 |
-| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução de `src/database/01_create_database.sql` em base vazia, seguida de `02_initial_data.sql` e `03_rls_policies.sql` | Os três schemas relacionais e as dezesseis tabelas são criados; carga inicial populada; `scripts/verificar_modelo_documentado.py` não aponta divergência com a seção 3.6.6 | Seção 3.6 |
+| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução de `src/database/01_create_database.sql` em base vazia, seguida de `02_initial_data.sql`, `03_rls_policies.sql` e duas aplicações de `07_evento_local.sql` | Os três schemas relacionais e as dezessete tabelas são criados; a migração 07 é idempotente; carga inicial populada; `scripts/verificar_modelo_documentado.py` não aponta divergência com a seção 3.6.6 | Seção 3.6 |
 | TI-53 | Positivo e negativo | `TestPersistenciaIntegracao.test_papel_da_mensagem_delimita_as_colunas` | Resposta do agente com intenção classificada e solicitação do usuário com tempo de processamento | Ambas rejeitadas por `mensagem_papel_coerente` | RNF04 |
 | TI-54 | Positivo e negativo | `TestPersistenciaIntegracao.test_avaliacao_exige_alvo_e_juizo_unicos` | Avaliação apontando para conversa e mensagem ao mesmo tempo; avaliação apenas com comentário | Ambas rejeitadas por `avaliacao_alvo_unico` e `avaliacao_tem_juizo`; reavaliar o mesmo alvo atualiza a linha existente | RNF08, RNF09 |
 

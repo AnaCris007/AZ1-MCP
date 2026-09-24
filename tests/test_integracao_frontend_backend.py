@@ -284,7 +284,9 @@ class TestFrontendBackendIntegracao(unittest.TestCase):
         for caminho in (
             "/api/v1/tasks/1/comentarios",
             "/api/v1/projetos/SYN-04/relatorio",
-            "/api/v1/calendar/events/proxima-semana",
+            # Evita o padrão DELETE /calendar/events/{evento_id}: nesse
+            # endereço o caminho existe e um GET deve responder 405.
+            "/api/v1/calendar/sem-rota",
         ):
             with self.subTest(rota=caminho):
                 # Confirmado contra o roteador: se algum destes passar a

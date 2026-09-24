@@ -279,9 +279,10 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Inicialização de uma base local nova. Volumes existentes recebem a
-      # migração 06 manualmente, sem apagar dados.
+      # migração 06/07 manualmente, sem apagar dados.
       - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create_database.sql:ro
       - ./src/database/06_webhook_permissions.sql:/docker-entrypoint-initdb.d/06_webhook_permissions.sql:ro
+      - ./src/database/07_evento_local.sql:/docker-entrypoint-initdb.d/07_evento_local.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U az1 -d az1"]
       interval: 5s

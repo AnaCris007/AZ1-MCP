@@ -8,10 +8,13 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Sequence
 from datetime import date, time
 
 from fastapi import APIRouter, Depends, Response
+from psycopg import Error as PsycopgError
+from psycopg.errors import UndefinedTable
 
 from az1_api.dependencies import (
     get_evento_local_repository,
@@ -40,6 +43,7 @@ from services.portfolio_repository import (
 )
 
 router = APIRouter(tags=["portfolio"])
+logger = logging.getLogger(__name__)
 
 Repositorio = PortfolioRepository
 
@@ -285,8 +289,18 @@ def listar_eventos(
             if usuario.domain_user_id is not None
             else []
         )
-    except Exception:
+    except UndefinedTable:
+        logger.warning(
+            "Tabela portfolio.evento_local ainda não existe; Agenda seguirá sem eventos próprios."
+        )
         eventos_locais = []
+    except PsycopgError as erro:
+        logger.exception("Falha ao consultar eventos próprios da Agenda", exc_info=erro)
+        raise PortfolioAPIError(
+            503,
+            "agenda_indisponivel",
+            "Não foi possível consultar os eventos próprios da Agenda.",
+        ) from erro
 
     return CalendarResponse(
         days=montar_agenda(
