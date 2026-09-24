@@ -41,8 +41,13 @@ export default function EventDetailsModal({ selection, onClose }) {
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            data-testid="event-details-modal-layer"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={onClose}
+          >
             <motion.section
+              onClick={(event) => event.stopPropagation()}
               role="dialog"
               aria-modal="true"
               aria-labelledby="event-details-title"

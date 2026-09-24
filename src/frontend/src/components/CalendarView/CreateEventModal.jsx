@@ -53,8 +53,13 @@ export default function CreateEventModal({ open, onClose, onCreate }) {
             className="fixed inset-0 z-40 bg-black/30"
             onClick={handleClose}
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            data-testid="create-event-modal-layer"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={handleClose}
+          >
             <motion.form
+              onClick={(event) => event.stopPropagation()}
               onSubmit={handleSubmit}
               initial={{ opacity: 0, y: 12, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}

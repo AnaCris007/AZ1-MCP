@@ -15,17 +15,27 @@ function idNumerico(idComposto) {
   return idComposto.replace(/^evento-/, '')
 }
 
+function chaveDoDia(day) {
+  return day.iso || day.date
+}
+
+function rotuloDoDia(day) {
+  const ano = day.iso?.slice(0, 4)
+  return ano ? `${day.date} de ${ano}` : day.date
+}
+
 export default function CalendarView() {
   const [days, setDays] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [loadError, setLoadError] = useState('')
+  const [actionError, setActionError] = useState('')
   const [view, setView] = useState('list')
   const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(new Date()))
   const [creating, setCreating] = useState(false)
   const [selection, setSelection] = useState(null)
 
   const loadAgenda = () => {
-    setError('')
+    setLoadError('')
     return fetchCalendarEvents()
       .then((data) => {
         // A resposta vem como {days: [...]}; o componente lista os dias.
@@ -35,7 +45,7 @@ export default function CalendarView() {
       .catch(() => {
         console.error('[calendar] não foi possível carregar a agenda do portfólio')
         setLoading(false)
-        setError('Não foi possível carregar a agenda. Tente novamente ao abrir esta tela.')
+        setLoadError('Não foi possível carregar a agenda. Tente novamente ao abrir esta tela.')
       })
   }
 
@@ -44,19 +54,32 @@ export default function CalendarView() {
   }, [])
 
   const handleCreate = async (payload) => {
+    setActionError('')
     await createCalendarEvent(payload)
     setCreating(false)
     await loadAgenda()
   }
 
   const handleDelete = async (eventId) => {
-    const anterior = days
+    const diaOriginal = days.find((day) => day.events.some((event) => event.id === eventId))
+    const indiceOriginal = diaOriginal?.events.findIndex((event) => event.id === eventId) ?? -1
+    const eventoOriginal = indiceOriginal >= 0 ? diaOriginal.events[indiceOriginal] : null
+    setActionError('')
     setDays((prev) => prev.map((day) => ({ ...day, events: day.events.filter((event) => event.id !== eventId) })))
     try {
       await deleteCalendarEvent(idNumerico(eventId))
     } catch {
-      setDays(anterior)
-      setError('Não foi possível excluir o evento. Tente novamente.')
+      if (diaOriginal && eventoOriginal) {
+        setDays((prev) => prev.map((day) => {
+          if (chaveDoDia(day) !== chaveDoDia(diaOriginal) || day.events.some((event) => event.id === eventId)) {
+            return day
+          }
+          const events = [...day.events]
+          events.splice(indiceOriginal, 0, eventoOriginal)
+          return { ...day, events }
+        }))
+      }
+      setActionError('Não foi possível excluir o evento. Tente novamente.')
     }
   }
 
@@ -108,8 +131,9 @@ export default function CalendarView() {
             <p className="text-[13px] font-medium">Carregando agenda...</p>
           </div>
         )}
-        {error && <div role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-[13px] text-rose-700 dark:border-rose-500/25 dark:bg-rose-500/10 dark:text-rose-300">{error}</div>}
-        {!loading && !error && days.length === 0 && (
+        {loadError && <div role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-[13px] text-rose-700 dark:border-rose-500/25 dark:bg-rose-500/10 dark:text-rose-300">{loadError}</div>}
+        {!loadError && actionError && <div role="alert" className="mb-3 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-[13px] text-rose-700 dark:border-rose-500/25 dark:bg-rose-500/10 dark:text-rose-300">{actionError}</div>}
+        {!loading && !loadError && days.length === 0 && (
           <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white/65 px-6 text-center dark:border-white/15 dark:bg-slate-950/35">
             <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300"><CalendarDays size={22} /></span>
             <p className="text-[14px] font-semibold text-slate-800 dark:text-slate-100">Sua agenda está livre</p>
@@ -117,7 +141,7 @@ export default function CalendarView() {
           </div>
         )}
 
-        {!loading && !error && view === 'grid' && (
+        {!loading && !loadError && view === 'grid' && (
           <CalendarGridView
             visibleMonth={visibleMonth}
             onPrevMonth={() => setVisibleMonth((mes) => new Date(mes.getFullYear(), mes.getMonth() - 1, 1))}
@@ -128,11 +152,11 @@ export default function CalendarView() {
           />
         )}
 
-        {!loading && !error && view === 'list' && (
+        {!loading && !loadError && view === 'list' && (
           <div className="flex flex-col gap-4">
             {days.map((day, dayIndex) => (
               <motion.div
-                key={day.date}
+                key={chaveDoDia(day)}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: dayIndex * 0.04, ease: 'easeOut' }}
@@ -140,7 +164,7 @@ export default function CalendarView() {
                 <div className="mb-2 flex items-center gap-2">
                   <div className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
                   <div className="flex items-baseline gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm dark:border-white/10 dark:bg-slate-900">
-                    <p className="text-[12px] font-semibold capitalize text-slate-900 dark:text-white">{day.date}</p>
+                    <p className="text-[12px] font-semibold capitalize text-slate-900 dark:text-white">{rotuloDoDia(day)}</p>
                     <p className="text-[10px] capitalize text-slate-400 dark:text-slate-500">{day.weekday}</p>
                   </div>
                   <div className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
