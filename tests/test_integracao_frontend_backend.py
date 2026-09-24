@@ -92,7 +92,7 @@ class _ModeloFixo:
         self._texto = texto
         self.mensagens: list[str] = []
 
-    def generate_reply(self, message: str, *, conversation_id: str | None = None):
+    def generate_reply(self, message: str, *, conversation_id: str | None = None, **_):
         self.mensagens.append(message)
         return SimpleNamespace(texto=self._texto, fontes=(), resultado="sucesso", modelo="duble")
 

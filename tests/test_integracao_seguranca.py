@@ -93,7 +93,7 @@ class _ModeloEspiao:
         self.mensagens: list[str] = []
         self._texto = texto
 
-    def generate_reply(self, message: str, *, conversation_id: str | None = None):
+    def generate_reply(self, message: str, *, conversation_id: str | None = None, **_):
         from types import SimpleNamespace
 
         self.mensagens.append(message)
@@ -170,7 +170,7 @@ class TestEntradaHostilIntegracao(unittest.TestCase):
         modelo = GeminiChatModel(
             client=_ClienteQueNaoDeveSerUsado(),
             model="modelo-irrelevante",
-            buscar_contexto=lambda _pergunta: abaixo_do_piso,
+            buscar_contexto=lambda _p, **_: (abaixo_do_piso, False),
         )
 
         http = cliente(
@@ -205,7 +205,7 @@ class TestEntradaHostilIntegracao(unittest.TestCase):
         modelo = GeminiChatModel(
             client=_ClienteQueResponde("Segundo o documento, o avanço é parcial [1]."),
             model="modelo-irrelevante",
-            buscar_contexto=lambda _pergunta: [acima],
+            buscar_contexto=lambda _p, **_: ([acima], False),
         )
 
         http = cliente(
@@ -240,7 +240,7 @@ class TestEntradaHostilIntegracao(unittest.TestCase):
         """
 
         class _ModeloQueVazaNoErro:
-            def generate_reply(self, message: str, *, conversation_id: str | None = None):
+            def generate_reply(self, message: str, *, conversation_id: str | None = None, **_):
                 raise RuntimeError(f"falha ao autenticar com {MARCA_SEGREDO}")
 
         http = cliente(
