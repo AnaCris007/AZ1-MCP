@@ -91,6 +91,7 @@
 - [6.6 Matriz de Cobertura Planejada](#66-matriz-de-cobertura-planejada)
 - [6.7 Execução dos testes sistêmicos — campanha funcional da Sprint 4](#67-execução-dos-testes-sistêmicos--campanha-funcional-da-sprint-4)
 - [6.8 Ferramentas e Bibliotecas Utilizadas](#68-ferramentas-e-bibliotecas-utilizadas)
+- [6.9 Execução dos Testes de Usabilidade](#69-execução-dos-testes-de-usabilidade)
 
 </details>
 
@@ -8811,6 +8812,44 @@ Os comandos abaixo reproduzem, em ordem, o ambiente usado nesta verificação.
 O passo 8 exige uma base exclusiva de teste. Apontar `TEST_DATABASE_URL` para a base de desenvolvimento apaga dados, e é por isso que a variável é separada e o pulo é explícito quando ela não existe.
 
 ---
+
+## 6.9 Execução dos Testes de Usabilidade
+
+Esta seção registra a execução dos testes de usabilidade planejados na Seção 6.5. Os resultados serão preenchidos somente após cada sessão com participantes externos, mantendo a separação entre o que foi planejado e o que foi efetivamente observado.
+
+### 6.9.1 Escopo, preparação e ferramentas
+
+A campanha avaliará se usuários externos conseguem utilizar os principais fluxos do AZ1 e compreender as respostas, fontes e limitações apresentadas pelo agente. Serão executadas as tarefas obrigatórias T1, T2, T3, T5 e T10 definidas na Seção 6.5, com pelo menos cinco participantes adultos que não pertençam à equipe nem à turma.
+
+| Item da execução | Registro |
+|---|---|
+| Versão ou commit avaliado | A preencher antes da primeira sessão |
+| Período das sessões | A preencher após o agendamento |
+| Ambiente | Aplicação executada em navegador, com a mesma versão e massa de dados para todos os participantes |
+| Equipe da sessão | Um moderador e um observador |
+| Participantes | Identificados apenas como P1 a P5, sem dados pessoais no repositório |
+| Situação atual | Preparação da campanha |
+
+As ferramentas foram escolhidas por permitirem uma execução uniforme, mensuração objetiva e registro rastreável sem expor os participantes.
+
+| Ferramenta ou instrumento | Uso durante o teste | Justificativa |
+|---|---|---|
+| Navegador web | Executar os fluxos do AZ1 | Representa o ambiente real de uso da interface |
+| Cronômetro | Medir o tempo de conclusão de cada tarefa | Permite comparar eficiência e identificar esperas excessivas |
+| Roteiro de observação | Registrar erros, caminhos, pedidos de ajuda e comentários | Padroniza a coleta entre todas as sessões |
+| Questionário SUS | Medir a percepção geral de usabilidade ao final da sessão | Utiliza uma escala consolidada e comparável |
+| Capturas de tela | Evidenciar etapas e problemas relevantes | Complementa os registros escritos sem substituir os resultados mensuráveis |
+| Tabelas desta seção | Consolidar resultados, feedback e ações corretivas | Mantém todo o artefato no arquivo `docs/Projeto.md` |
+
+Antes de iniciar cada sessão, a equipe deve confirmar os seguintes itens:
+
+- aplicação disponível e na versão registrada nesta seção;
+- microfone e reprodução de áudio funcionando para as tarefas de voz;
+- massa de dados igual para todos os participantes;
+- roteiro, cronômetro e tabela de observação preparados;
+- consentimento obtido, sem versionar nome, voz, imagem ou outro dado pessoal;
+- moderador orientado a não ensinar o caminho durante a execução;
+- observador responsável por registrar tempo, erros, ajuda solicitada e comentários.
 
 ---
 
