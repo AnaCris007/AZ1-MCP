@@ -38,9 +38,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import io
 import sys
-import wave
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -48,6 +46,16 @@ from dotenv import load_dotenv
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
+from tests.apoio_integracao import (  # noqa: E402 - depende do sys.path acima
+    FRASE,
+    IDIOMA,
+    MODELO_STT,
+    PERGUNTA_CHAT,
+    TERMOS,
+    TEXTO_EMBEDDING,
+    VOZ,
+    silencio,
+)
 from tests.vhs import (  # noqa: E402 - depende do sys.path acima
     ChaveVhs,
     Modo,
@@ -63,30 +71,10 @@ from tests.vhs.erros import ErroVhs  # noqa: E402
 FITAS = RAIZ / "tests" / "fixtures" / "vhs"
 TETO_DE_CHAMADAS_REAIS = 8
 
-# Massa sintética. Frase do domínio do AZ1, sem nada do parceiro.
-FRASE = "Qual é a aderência do projeto de expansão da linha quatro ao portfólio?"
-PERGUNTA_CHAT = "Em uma frase, o que é aderência de um projeto ao portfólio?"
-TEXTO_EMBEDDING = "relatório de aderência do portfólio de projetos"
-
-VOZ = "Kore"
-MODELO_STT = "nova-3"
-IDIOMA = "pt-BR"
-TERMOS = ("portfólio", "aderência", "PMO")
-
-SAMPLE_RATE_HZ = 24_000
-SAMPLE_WIDTH_BYTES = 2
-CHANNELS = 1
-
-
-def _silencio(segundos: float = 2.0) -> bytes:
-    """WAV de silêncio, para o caso de áudio sem fala reconhecível."""
-    buffer = io.BytesIO()
-    with wave.open(buffer, "wb") as saida:
-        saida.setnchannels(CHANNELS)
-        saida.setsampwidth(SAMPLE_WIDTH_BYTES)
-        saida.setframerate(SAMPLE_RATE_HZ)
-        saida.writeframes(b"\x00" * int(SAMPLE_RATE_HZ * SAMPLE_WIDTH_BYTES * segundos))
-    return buffer.getvalue()
+# A massa sintética vive em `tests/apoio_integracao.py`, e é importada acima.
+# Ela é a mesma que as suítes TI-06 em diante usam para montar a chave da fita:
+# redeclarada aqui, bastaria um acento diferente entre os dois arquivos para o
+# replay procurar uma gravação que esta sessão nunca fez.
 
 
 class FetcherDeMemoria:
@@ -115,7 +103,7 @@ def _chaves(audio: bytes, *, modelo_chat: str) -> dict[str, ChaveVhs]:
         "tts": chave_tts(texto=FRASE, voz=VOZ, modelo="gemini-2.5-flash-preview-tts", formato="wav", cenario="sucesso"),
         "stt": chave_stt(audio=audio, idioma=IDIOMA, modelo=MODELO_STT, termos=TERMOS, cenario="sucesso"),
         "stt_sem_fala": chave_stt(
-            audio=_silencio(), idioma=IDIOMA, modelo=MODELO_STT, termos=TERMOS, cenario="sem-fala"
+            audio=silencio(), idioma=IDIOMA, modelo=MODELO_STT, termos=TERMOS, cenario="sem-fala"
         ),
         "stt_credencial": chave_stt(
             audio=audio, idioma=IDIOMA, modelo=MODELO_STT, termos=TERMOS, cenario="credencial-invalida"
@@ -164,7 +152,7 @@ def gravar(vhs: Vhs) -> None:
     # 3. STT sem fala.
     with vhs.fita(chaves["stt_sem_fala"], origem="real"):
         vazio = asyncio.run(
-            TranscribeAudio(FetcherDeMemoria(_silencio()), deepgram).transcribe(audio_id="silencio", language=IDIOMA)
+            TranscribeAudio(FetcherDeMemoria(silencio()), deepgram).transcribe(audio_id="silencio", language=IDIOMA)
         )
     print(f"  3. STT sem fala ......... texto {vazio.text!r}")
 
@@ -216,6 +204,18 @@ def conferir() -> int:
     leitor = Vhs(raiz=FITAS, modo=Modo.REPRODUZIR)
     gemini = os.environ.get("GEMINI_API_KEY", "irrelevante-no-replay")
     deepgram = os.environ.get("DEEPGRAM_API_KEY", "irrelevante-no-replay")
+
+    # O embedding é o único passo que NÃO recebe a credencial por parâmetro:
+    # `rag.embedder._cliente` a lê do ambiente por dentro e recusa subir sem
+    # ela, mesmo quando nada vai à rede. Sem este `setdefault`, `--conferir`
+    # quebra em qualquer lugar sem `.env` — foi assim que o pipeline do GitLab
+    # falhou, e não localmente, onde o `.env` existe no disco e é carregado.
+    #
+    # `setdefault`, e não atribuição: numa sessão de gravação a chave real já
+    # está no ambiente e é ela que deve valer. Aqui a de fachada só preenche o
+    # vazio, e não chega ao provedor — quem responde é a fita.
+    os.environ.setdefault("GEMINI_API_KEY", gemini)
+
     # Montado à mão, e não por `from_environment`, para que conferir o replay
     # não dependa de credencial: o modelo é o que importa aqui, porque é ele
     # que compõe a chave da fita, e a chave da API não chega ao provedor.
@@ -247,7 +247,7 @@ def conferir() -> int:
 
         with leitor.fita(chaves["stt_sem_fala"]) as fita:
             vazio = _asyncio.run(
-                TranscribeAudio(FetcherDeMemoria(_silencio()), deepgram).transcribe(
+                TranscribeAudio(FetcherDeMemoria(silencio()), deepgram).transcribe(
                     audio_id="silencio", language=IDIOMA
                 )
             ).text

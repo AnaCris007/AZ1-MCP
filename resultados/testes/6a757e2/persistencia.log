@@ -1,0 +1,34 @@
+test_verificador_nao_aponta_divergencia (tests.test_integracao_persistencia.TestModeloDocumentado.test_verificador_nao_aponta_divergencia) ... ok
+test_feedback_autorizado_continua_permitido (tests.test_integracao_persistencia.TestPermissoesDaAuditoria.test_feedback_autorizado_continua_permitido)
+O contraste que dá sentido ao caso acima. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_historico_de_um_usuario_nao_vaza_para_o_outro (tests.test_integracao_persistencia.TestPermissoesDaAuditoria.test_historico_de_um_usuario_nao_vaza_para_o_outro)
+Duas identidades, cada uma enxergando a própria conversa. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_mensagens_de_conversa_alheia_nao_sao_devolvidas (tests.test_integracao_persistencia.TestPermissoesDaAuditoria.test_mensagens_de_conversa_alheia_nao_sao_devolvidas)
+O mesmo isolamento, um nível abaixo: as mensagens da conversa. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_carga_inicial_esta_populada (tests.test_integracao_persistencia.TestPersistenciaEsquema.test_carga_inicial_esta_populada)
+`02_initial_data.sql` deixou o portfólio com conteúdo. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_schemas_e_tabelas_do_ddl_estao_presentes (tests.test_integracao_persistencia.TestPersistenciaEsquema.test_schemas_e_tabelas_do_ddl_estao_presentes)
+O mesmo resultado, conferido na base de teste já migrada. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_avaliacao_exige_alvo_e_juizo_unicos (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_avaliacao_exige_alvo_e_juizo_unicos)
+Alvo único, juízo obrigatório, e reavaliar atualiza em vez de empilhar. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_banco_indisponivel_nao_perde_o_turno (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_o_turno)
+CARACTERIZAÇÃO: hoje o turno É perdido, e só sobra o registro no log. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_consulta_de_projeto_retorna_dados_e_fontes_registradas (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas)
+Uma linha em `mensagem_fonte` por trecho citado, com os metadados copiados. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_papel_da_mensagem_delimita_as_colunas (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_papel_da_mensagem_delimita_as_colunas)
+`mensagem_papel_coerente` recusa as duas combinações cruzadas. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_papel_de_aplicacao_nao_altera_auditoria (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria)
+A aplicação insere e lê a trilha, e não a reescreve nem a apaga. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_schema_e_criado_em_base_vazia (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia)
+Os três arquivos de `src/database` aplicados a uma base recém-criada. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_segundo_turno_continua_a_numeracao_da_conversa (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_segundo_turno_continua_a_numeracao_da_conversa)
+Ordens seguem crescendo na mesma conversa. Complementa TI-24. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_turno_por_texto_e_gravado_com_atributos_minimos (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_turno_por_texto_e_gravado_com_atributos_minimos)
+Um turno vira duas linhas irmãs, com ordens consecutivas. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+test_turno_por_voz_vincula_o_audio_de_origem (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_turno_por_voz_vincula_o_audio_de_origem)
+Formato `audio` aceita `audio_referencia`; formato `texto` não. ... skipped 'TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado — nunca para DATABASE_URL.'
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.021s
+
+OK (skipped=14)
