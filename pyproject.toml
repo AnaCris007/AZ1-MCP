@@ -69,6 +69,14 @@ dependencies = [
 # Ferramentas de desenvolvimento, não necessárias para executar o agente.
 dev = [
     "ruff==0.16.2",
+    # Gravação e reprodução das interações externas na suíte de integração
+    # (módulo VHS, `tests/vhs/`). Versão resolvida e fixada conforme o item 1
+    # do contrato da Seção 6.4.3: o replay é comparação byte a byte com o que
+    # ficou no arquivo, e um piso deixaria o serializador mudar de formato em
+    # um rebuild, invalidando as gravações sem que ninguém tivesse tocado nelas.
+    #
+    # Não entra em requirements.txt: a imagem de produção não reproduz fita.
+    "vcrpy==8.3.0",
 ]
 
 # Os pacotes de topo do projeto. Precisam ser listados explicitamente

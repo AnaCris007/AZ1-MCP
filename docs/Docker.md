@@ -25,7 +25,7 @@ E dois contêineres sob demanda, controlados por `profiles`:
 | Contêiner | Perfil | Papel |
 |---|---|---|
 | `trainer` | `ml` | Retreina o classificador e roda as varreduras de experimento. |
-| `tests` | `ci` | Executa a suíte de testes dentro da imagem. |
+| `tests` | `ci` | Executa a suíte de testes dentro da imagem, com `requirements.txt`, `docs/` e `infra/` montados só para leitura. |
 
 ### Topologia
 
@@ -184,9 +184,11 @@ docker compose --profile ml run --rm trainer python -m pln.experimento
 # varredura de hiperparâmetros
 docker compose --profile ml run --rm trainer python -m pln.ajuste_fino
 
-# suíte completa (145 testes)
+# suíte completa (mais de 500 testes)
 docker compose --profile ci run --rm tests
 ```
+
+O serviço `tests` monta três caminhos do repositório em modo somente leitura: `requirements.txt`, `docs/` e `infra/`. A imagem carrega apenas o que a aplicação executa, e três suítes comparam o código com arquivos que ficam fora dele — as versões fixadas contra as instaladas, e a retenção declarada em `infra/minio/lifecycle.json` contra o mínimo do RNF09. Montar em vez de copiar mantém `docs/` fora da imagem e evita invalidar a camada a cada alteração de documentação.
 
 O valor de treinar em contêiner é a correspondência de ambiente: o modelo que
 vai a produção é gerado com as mesmas versões de `scikit-learn`, `nltk` e

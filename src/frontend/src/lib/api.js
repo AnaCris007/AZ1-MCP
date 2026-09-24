@@ -11,10 +11,59 @@ export class ChatRequestError extends Error {
   }
 }
 
+// `/api/v1/audio` e `/api/v1/audio/{id}/transcribe` já respondem com
+// `{ error, message }` em português (arquivo grande demais, formato
+// recusado, áudio não encontrado etc.). Sem essa classe, a UI descartava o
+// corpo da resposta e mostrava sempre a mesma mensagem genérica, não importa
+// a causa real da falha.
+export class AudioRequestError extends Error {
+  constructor(status, error, message) {
+    super(message)
+    this.name = 'AudioRequestError'
+    this.status = status
+    this.error = error
+  }
+}
+
+async function lancarErroDeAudio(response, mensagemPadrao) {
+  const body = await response.json().catch(() => null)
+  throw new AudioRequestError(
+    response.status,
+    body?.error ?? 'unknown_error',
+    body?.message ?? mensagemPadrao,
+  )
+}
+
 async function authHeaders() {
   const { data } = await supabase.auth.getSession()
   const token = data.session?.access_token
   return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+export async function openVoiceCall(conversationId, { onMessage, onClose } = {}) {
+  const { data } = await supabase.auth.getSession()
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const apiUrl = API_BASE_URL
+    ? new URL(API_BASE_URL, window.location.origin)
+    : new URL(window.location.origin)
+  const url = `${protocol}//${apiUrl.host}/api/v1/voice/call`
+  const socket = new WebSocket(url)
+  socket.binaryType = 'arraybuffer'
+  socket.onmessage = onMessage
+  socket.onclose = onClose
+
+  await new Promise((resolve, reject) => {
+    socket.onopen = resolve
+    socket.onerror = () => reject(new Error('Não foi possível conectar à chamada.'))
+  })
+  socket.send(
+    JSON.stringify({
+      type: 'start_call',
+      conversation_id: conversationId,
+      access_token: data.session?.access_token ?? '',
+    }),
+  )
+  return socket
 }
 
 // Injeta o token da sessão atual em toda chamada à API. Buscar a sessão a
@@ -35,7 +84,7 @@ export async function sendAudio(audioBlob) {
   })
 
   if (!response.ok) {
-    throw new Error(`Falha ao enviar áudio: ${response.status}`)
+    await lancarErroDeAudio(response, `Falha ao enviar áudio: ${response.status}`)
   }
 
   return response.json()
@@ -48,7 +97,7 @@ export async function transcribeAudio(audioId, language = 'pt-BR') {
   )
 
   if (!response.ok) {
-    throw new Error(`Falha ao transcrever áudio: ${response.status}`)
+    await lancarErroDeAudio(response, `Falha ao transcrever áudio: ${response.status}`)
   }
 
   return response.json()

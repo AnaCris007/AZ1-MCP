@@ -1,0 +1,993 @@
+{
+  "started_at_utc": "2026-09-18T12:48:36.454940+00:00",
+  "python": "3.12.14 (main, Aug 31 2026, 23:48:05) [GCC 12.2.0]",
+  "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.36",
+  "commit": "f1b3591123f2488791012dfeebaa0b6b04c601bb",
+  "records": [
+    {
+      "case": "CT-RF01-01",
+      "variant": "WAV real (parcial: demais formatos pendentes)",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 16044,
+        "sha256": "56d4af65701c26df20bd4021eda95b6e830348ce3a746086079fe89285548dc9",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 201,
+        "error": null
+      },
+      "observed": {
+        "status": 201,
+        "body": {
+          "id": "aud_096db7ba23184c709b505d469fb1a996",
+          "status": "received",
+          "message": "Áudio recebido com sucesso."
+        },
+        "effects": {
+          "new_objects": 1,
+          "provider_calls": 0,
+          "stored_sha256": "56d4af65701c26df20bd4021eda95b6e830348ce3a746086079fe89285548dc9"
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-06",
+      "variant": "assinatura Ogg",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 104,
+        "sha256": "936015638147de1758f949fef2988324ad698693452d6feadfb0fc51ace7fc1d",
+        "mime": "audio/ogg"
+      },
+      "expected": {
+        "status": 415,
+        "error": "unsupported_format"
+      },
+      "observed": {
+        "status": 415,
+        "body": {
+          "error": "unsupported_format",
+          "message": "Formato de áudio não suportado. Formatos aceitos: wav, mp3, m4a, webm."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-07",
+      "variant": "12 MiB",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 12582912,
+        "sha256": "cfadd44a103cbd6d5726fa07b27d7aad2f67ed3930ff96901c486a5beaf7e723",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 413,
+        "error": "file_too_large"
+      },
+      "observed": {
+        "status": 413,
+        "body": {
+          "error": "file_too_large",
+          "message": "O arquivo excede o tamanho máximo permitido de 10 MB."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-08",
+      "variant": "WAV 360 segundos",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 5760044,
+        "sha256": "50ae04109237fb497280368ae1e719ea07878fc1ca1afe564082ac0c8bb047a7",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 422,
+        "error": "audio_too_long"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "audio_too_long",
+          "message": "O áudio excede a duração máxima permitida de 5 minutos."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-09",
+      "variant": "zero byte",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 422,
+        "error": "invalid_audio"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "invalid_audio",
+          "message": "Arquivo de áudio ausente, vazio ou corrompido."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-09",
+      "variant": "WAV truncado",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 12,
+        "sha256": "56ddf20bae94693a26732a7629d110957d63d8afd31c95f098b32b0d9ec5b387",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 422,
+        "error": "invalid_audio"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "invalid_audio",
+          "message": "Arquivo de áudio ausente, vazio ou corrompido."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-10",
+      "variant": "JSON sem multipart",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "json": {
+          "text": null
+        }
+      },
+      "expected": {
+        "status": 422,
+        "error": null
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "audio"
+              ],
+              "msg": "Field required",
+              "input": null
+            }
+          ]
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-11",
+      "variant": "objeto inexistente",
+      "method": "POST",
+      "path": "/api/v1/audio/aud_inexistente/transcribe",
+      "input": {
+        "json": {
+          "text": null
+        }
+      },
+      "expected": {
+        "status": 404,
+        "error": "audio_not_found"
+      },
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": "audio_not_found",
+          "message": "Áudio não encontrado. O id informado não existe ou já expirou."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-12",
+      "variant": "falha injetada no STT; sem cassette VHS",
+      "method": "POST",
+      "path": "/api/v1/audio/aud_9c0af3ca5e2341ecb9ced299b03295d5/transcribe",
+      "input": {
+        "json": {
+          "text": null
+        }
+      },
+      "expected": {
+        "status": 502,
+        "error": "transcription_failed"
+      },
+      "observed": {
+        "status": 502,
+        "body": {
+          "error": "transcription_failed",
+          "message": "Falha ao transcrever o áudio. Tente novamente em instantes."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-04",
+      "variant": "texto-1",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "json": {
+          "message": "Status do SYN-01?",
+          "conversation_id": "functional-test"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "reply": "Resposta controlada para validar o transporte textual.",
+          "fontes": []
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-04",
+      "variant": "texto-2",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "json": {
+          "message": "Avanço do SYN-02?",
+          "conversation_id": "functional-test"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "reply": "Resposta controlada para validar o transporte textual.",
+          "fontes": []
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-04",
+      "variant": "texto-3",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "json": {
+          "message": "Prazo do SYN-03?",
+          "conversation_id": "functional-test"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "reply": "Resposta controlada para validar o transporte textual.",
+          "fontes": []
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-04",
+      "variant": "texto-4",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "json": {
+          "message": "Riscos do SYN-04?",
+          "conversation_id": "functional-test"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "reply": "Resposta controlada para validar o transporte textual.",
+          "fontes": []
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-04",
+      "variant": "texto-5",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "json": {
+          "message": "Responsável pelo SYN-05?",
+          "conversation_id": "functional-test"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "reply": "Resposta controlada para validar o transporte textual.",
+          "fontes": []
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-13",
+      "variant": "''",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "json": {
+          "message": "",
+          "conversation_id": "functional-test"
+        }
+      },
+      "expected": {
+        "status": 422,
+        "error": "empty_message"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "empty_message",
+          "message": "A mensagem não pode estar vazia."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-13",
+      "variant": "'   '",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "json": {
+          "message": "   ",
+          "conversation_id": "functional-test"
+        }
+      },
+      "expected": {
+        "status": 422,
+        "error": "empty_message"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "empty_message",
+          "message": "A mensagem não pode estar vazia."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-14",
+      "variant": "4001 caracteres",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "field": "message",
+        "characters": 4001,
+        "sha256": "ba07fa666a8a8206d9f000ae3da00c6572e9116bc3ce8b840b5d415ff94113a7"
+      },
+      "expected": {
+        "status": 422,
+        "error": "message_too_long"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "message_too_long",
+          "message": "A mensagem excede o limite de 4000 caracteres."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-16",
+      "variant": "10 MiB",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 10485760,
+        "sha256": "ff92eb5073001dd1116bd3142d95d6ac577d18b64db6f365408bd5356e3ac7fa",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 201,
+        "error": null
+      },
+      "observed": {
+        "status": 201,
+        "body": {
+          "id": "aud_f05689bdb91548ba9ef126df3350943e",
+          "status": "received",
+          "message": "Áudio recebido com sucesso."
+        },
+        "effects": {
+          "new_objects": 1,
+          "provider_calls": 0,
+          "stored_sha256": "ff92eb5073001dd1116bd3142d95d6ac577d18b64db6f365408bd5356e3ac7fa"
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-16",
+      "variant": "10 MiB + 1 byte",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 10485761,
+        "sha256": "22f6ef5adaba2510021748b77a7307a7ae9d43293b3893a20899d0d918250e0a",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 413,
+        "error": "file_too_large"
+      },
+      "observed": {
+        "status": 413,
+        "body": {
+          "error": "file_too_large",
+          "message": "O arquivo excede o tamanho máximo permitido de 10 MB."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-16",
+      "variant": "300 segundos",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 4800044,
+        "sha256": "4166147ac6263fbbb0d20a1b18a0e63e55ef6c2ec8eb63af016311e028df0af0",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 201,
+        "error": null
+      },
+      "observed": {
+        "status": 201,
+        "body": {
+          "id": "aud_d20f6224f4694de29de8bd45c81882f1",
+          "status": "received",
+          "message": "Áudio recebido com sucesso."
+        },
+        "effects": {
+          "new_objects": 1,
+          "provider_calls": 0,
+          "stored_sha256": "4166147ac6263fbbb0d20a1b18a0e63e55ef6c2ec8eb63af016311e028df0af0"
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-16",
+      "variant": "300.001 segundos",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 4800060,
+        "sha256": "3cb2b5b241a135e5083fb670814cd367f2b9e47a426e27ee3b9f180eae95fe2e",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 422,
+        "error": "audio_too_long"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "audio_too_long",
+          "message": "O áudio excede a duração máxima permitida de 5 minutos."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-17",
+      "variant": "WAV com MIME genérico",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 16044,
+        "sha256": "56d4af65701c26df20bd4021eda95b6e830348ce3a746086079fe89285548dc9",
+        "mime": "application/octet-stream"
+      },
+      "expected": {
+        "status": 201,
+        "error": null
+      },
+      "observed": {
+        "status": 201,
+        "body": {
+          "id": "aud_7f190695e69a4674b735a658a2f45b0c",
+          "status": "received",
+          "message": "Áudio recebido com sucesso."
+        },
+        "effects": {
+          "new_objects": 1,
+          "provider_calls": 0,
+          "stored_sha256": "56d4af65701c26df20bd4021eda95b6e830348ce3a746086079fe89285548dc9"
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-17",
+      "variant": "texto com MIME WAV",
+      "method": "POST",
+      "path": "/api/v1/audio",
+      "input": {
+        "bytes": 16,
+        "sha256": "894fa791a9141b4adea97c83e628b660ab0dd46f3a8e6cf161aa716058ec1476",
+        "mime": "audio/wav"
+      },
+      "expected": {
+        "status": 415,
+        "error": "unsupported_format"
+      },
+      "observed": {
+        "status": 415,
+        "body": {
+          "error": "unsupported_format",
+          "message": "Formato de áudio não suportado. Formatos aceitos: wav, mp3, m4a, webm."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/chat: bruto=3999, trim=3999",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "field": "message",
+        "characters": 3999,
+        "sha256": "8dda4b6eb34ee3947a745cc6d5b9b254e6651b2f266d81b9d8be9e1e41d047e8"
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "reply": "Resposta controlada para validar o transporte textual.",
+          "fontes": []
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/text-to-speech: bruto=3999, trim=3999",
+      "method": "POST",
+      "path": "/api/v1/text-to-speech",
+      "input": {
+        "field": "text",
+        "characters": 3999,
+        "sha256": "8dda4b6eb34ee3947a745cc6d5b9b254e6651b2f266d81b9d8be9e1e41d047e8"
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "media_type": "audio/wav",
+          "bytes": 524
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/chat: bruto=4000, trim=4000",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "field": "message",
+        "characters": 4000,
+        "sha256": "91c9568c40c8d8d1f7a1bd029d124994b3c2a8750c4e4b328ee9b1cf81151d85"
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "reply": "Resposta controlada para validar o transporte textual.",
+          "fontes": []
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/text-to-speech: bruto=4000, trim=4000",
+      "method": "POST",
+      "path": "/api/v1/text-to-speech",
+      "input": {
+        "field": "text",
+        "characters": 4000,
+        "sha256": "91c9568c40c8d8d1f7a1bd029d124994b3c2a8750c4e4b328ee9b1cf81151d85"
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "media_type": "audio/wav",
+          "bytes": 524
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/chat: bruto=4001, trim=4001",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "field": "message",
+        "characters": 4001,
+        "sha256": "ba07fa666a8a8206d9f000ae3da00c6572e9116bc3ce8b840b5d415ff94113a7"
+      },
+      "expected": {
+        "status": 422,
+        "error": "message_too_long"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "message_too_long",
+          "message": "A mensagem excede o limite de 4000 caracteres."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/text-to-speech: bruto=4001, trim=4001",
+      "method": "POST",
+      "path": "/api/v1/text-to-speech",
+      "input": {
+        "field": "text",
+        "characters": 4001,
+        "sha256": "ba07fa666a8a8206d9f000ae3da00c6572e9116bc3ce8b840b5d415ff94113a7"
+      },
+      "expected": {
+        "status": 422,
+        "error": "text_too_long"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "text_too_long",
+          "message": "O texto excede o limite de 4000 caracteres."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/chat: bruto=4004, trim=4000",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "field": "message",
+        "characters": 4004,
+        "sha256": "7088fb70da9a32d9c31921ec340505b20fbbc261179c5e77c0a4246816ecf982"
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "reply": "Resposta controlada para validar o transporte textual.",
+          "fontes": []
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/text-to-speech: bruto=4004, trim=4000",
+      "method": "POST",
+      "path": "/api/v1/text-to-speech",
+      "input": {
+        "field": "text",
+        "characters": 4004,
+        "sha256": "7088fb70da9a32d9c31921ec340505b20fbbc261179c5e77c0a4246816ecf982"
+      },
+      "expected": {
+        "status": 200,
+        "error": null
+      },
+      "observed": {
+        "status": 200,
+        "body": {
+          "media_type": "audio/wav",
+          "bytes": 524
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 1
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/chat: bruto=0, trim=0",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "input": {
+        "json": {
+          "message": "",
+          "conversation_id": "functional-test"
+        }
+      },
+      "expected": {
+        "status": 422,
+        "error": "empty_message"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "empty_message",
+          "message": "A mensagem não pode estar vazia."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF01-18",
+      "variant": "/api/v1/text-to-speech: bruto=0, trim=0",
+      "method": "POST",
+      "path": "/api/v1/text-to-speech",
+      "input": {
+        "json": {
+          "text": ""
+        }
+      },
+      "expected": {
+        "status": 422,
+        "error": "empty_text"
+      },
+      "observed": {
+        "status": 422,
+        "body": {
+          "error": "empty_text",
+          "message": "O texto não pode estar vazio."
+        },
+        "effects": {
+          "new_objects": 0,
+          "provider_calls": 0
+        }
+      },
+      "status": "Aprovado",
+      "scope": "API + serviço; MinIO real; autenticação/modelos controlados"
+    },
+    {
+      "case": "CT-RF02-07",
+      "variant": "proibição de busca antes da recusa/esclarecimento",
+      "input": "Qual a previsão do tempo em Marte?",
+      "expected": {
+        "search_calls": 0
+      },
+      "observed": {
+        "search_calls": 1,
+        "status": 200,
+        "body": {
+          "reply": "Não encontrei essa informação nos documentos do portfólio que tenho indexados. Posso ajudar com outra pergunta sobre os projetos, os cronogramas, os riscos ou os termos de abertura.",
+          "fontes": []
+        }
+      },
+      "status": "Reprovado",
+      "scope": "orquestrador Gemini real; recuperação instrumentada; sem modelo externo"
+    },
+    {
+      "case": "CT-RF02-08",
+      "variant": "proibição de busca antes da recusa/esclarecimento",
+      "input": "Qual é o avanço do projeto?",
+      "expected": {
+        "search_calls": 0
+      },
+      "observed": {
+        "search_calls": 1,
+        "status": 200,
+        "body": {
+          "reply": "Não encontrei essa informação nos documentos do portfólio que tenho indexados. Posso ajudar com outra pergunta sobre os projetos, os cronogramas, os riscos ou os termos de abertura.",
+          "fontes": []
+        }
+      },
+      "status": "Reprovado",
+      "scope": "orquestrador Gemini real; recuperação instrumentada; sem modelo externo"
+    }
+  ]
+}

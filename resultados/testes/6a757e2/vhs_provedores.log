@@ -1,0 +1,30 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+test_erro_http_gravado_reproduz_e_vira_o_status_da_rota (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_erro_http_gravado_reproduz_e_vira_o_status_da_rota)
+A recusa real do provedor é reproduzida e traduzida pelo contrato. ... /home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/deepgram/core/websocket_compat.py:4: DeprecationWarning: websockets.exceptions.InvalidStatusCode is deprecated
+  from websockets.exceptions import InvalidStatusCode as InvalidWebSocketStatus  # type: ignore[attr-defined]
+/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  warnings.warn(  # deprecated in 14.0 - 2024-11-09
+ok
+test_gravacoes_dos_dois_sdks_reproduzem_sem_rede (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_gravacoes_dos_dois_sdks_reproduzem_sem_rede)
+Cada SDK reproduz sua gravação real, e o `play_count` incrementa. ... ok
+test_manifesto_declara_origem_real_para_cada_gravacao (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_manifesto_declara_origem_real_para_cada_gravacao)
+Toda fita versionada é interação genuína, e está dentro do prazo. ... ok
+test_mudanca_de_modelo_idioma_ou_termos_invalida_a_gravacao (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_mudanca_de_modelo_idioma_ou_termos_invalida_a_gravacao)
+Alterado o que é semanticamente relevante, a fita antiga não serve. ... ok
+test_nenhum_segredo_ou_marcador_sobrevive_nas_gravacoes (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_nenhum_segredo_ou_marcador_sobrevive_nas_gravacoes)
+Varredura das fitas versionadas, por nome e por valor. ... ok
+test_registro_vencido_ou_corrompido_falha_sem_rede (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_registro_vencido_ou_corrompido_falha_sem_rede)
+Validade e integridade barram o replay antes de a fita abrir. ... ok
+test_replay_com_chave_ausente_nao_alcanca_a_rede (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_replay_com_chave_ausente_nao_alcanca_a_rede)
+A falha por ausência acontece ANTES de qualquer tentativa de conexão. ... ok
+test_reproducao_funciona_em_processo_novo (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_reproducao_funciona_em_processo_novo)
+Item 4 do contrato: o replay não depende da memória da gravação. ... ok
+test_timeout_sem_resposta_nao_tem_fita_e_e_declarado_simulado (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_timeout_sem_resposta_nao_tem_fita_e_e_declarado_simulado)
+Ausência de resposta não é gravável, e o registro não finge que é. ... ok
+test_varredura_de_segredos_acha_o_que_deve_achar (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_varredura_de_segredos_acha_o_que_deve_achar)
+Controle do próprio instrumento: a varredura não é vacuamente vazia. ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.875s
+
+OK

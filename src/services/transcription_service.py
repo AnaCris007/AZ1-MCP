@@ -58,6 +58,11 @@ class TranscribeAudio:
         except KeyError as exc:
             raise TranscriptionError(TranscriptionErrorCode.AUDIO_NOT_FOUND) from exc
 
+        return await self.transcribe_content(content=content, language=language)
+
+    async def transcribe_content(
+        self, *, content: bytes, language: str = "pt-BR"
+    ) -> TranscriptionResult:
         try:
             response = await self._client.listen.v1.media.transcribe_file(
                 request=content,

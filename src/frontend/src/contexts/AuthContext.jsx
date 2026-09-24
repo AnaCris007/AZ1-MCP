@@ -1,13 +1,21 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { isSupabaseConfigured, supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
+const authDisabled = import.meta.env.VITE_AUTH_DISABLED === 'true'
+const developmentUser = {
+  id: 'development-user',
+  email: 'desenvolvimento@local',
+  user_metadata: { name: 'Usuário de desenvolvimento' },
+}
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(authDisabled ? developmentUser : null)
+  const [loading, setLoading] = useState(!authDisabled)
 
   useEffect(() => {
+    if (authDisabled) return undefined
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -19,6 +27,11 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function signInWithMicrosoft() {
+    if (authDisabled) return
+    if (!isSupabaseConfigured) {
+      throw new Error('Autenticação Microsoft não configurada neste ambiente.')
+    }
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'azure',
       options: {
@@ -34,6 +47,8 @@ export function AuthProvider({ children }) {
   }
 
   async function signOut() {
+    if (authDisabled) return
+
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }

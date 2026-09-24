@@ -32,6 +32,16 @@ Makefile text eol=lf
 # este projeto usa em 01 a 08.
 *.sql text eol=lf
 
+# Gravações do VHS (tests/fixtures/vhs). O manifesto guarda o SHA-256 dos BYTES
+# de cada fita — `hashlib.sha256(arquivo.read_bytes())` em tests/vhs/manifesto.py
+# — e compara antes de tocar a gravação. Um CRLF introduzido no checkout muda os
+# bytes sem mudar o conteúdo, e a fita é recusada com `RegistroCorrompido`, como
+# se alguém a tivesse adulterado. O erro acusa corrupção; a causa é o fim de
+# linha.
+tests/fixtures/vhs/** text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+
 # =============================================================================
 # Arquivos binários — nunca normalizar
 # =============================================================================
