@@ -6516,6 +6516,43 @@ frames binários, evitando o aumento de tamanho causado pela conversão para
 Base64. O proxy do Vite e o nginx preservam o upgrade necessário para a conexão
 WebSocket.
 
+### 5.3.9 Protocolo, configuração e limites
+
+O endpoint da chamada é `WS /api/v1/voice/call`. Depois de abrir a conexão, o
+frontend e o backend trocam os seguintes eventos:
+
+| Direção | Eventos principais |
+|---|---|
+| Frontend → backend | `start_call`, `utterance_start`, áudio binário, `utterance_end` e `end_call`. |
+| Backend → frontend | `call_ready`, `transcribing`, `transcription_final`, `processing`, `agent_response`, `agent_audio`, áudio binário e `error`. |
+
+`start_call` contém `conversation_id` e o token da sessão. O token é enviado no
+primeiro evento, e não na URL. Em produção, a página HTTPS utiliza `wss`; no
+desenvolvimento local utiliza `ws`. Cada fala pode ter até 10 MiB.
+
+As configurações necessárias são `DEEPGRAM_API_KEY`, `GEMINI_API_KEY`, dados do
+Supabase e, opcionalmente, `GEMINI_TTS_MODEL`. O Vite e o nginx já possuem a
+configuração de proxy e upgrade WebSocket. Os valores devem ficar no `.env`,
+que não é versionado; `.env.example` registra apenas os nomes esperados.
+
+Limitações atuais:
+
+- não há transcrição parcial, interrupção da fala do agente ou reconexão
+  automática;
+- a detecção do fim da fala depende de 850 ms de silêncio;
+- o histórico da chamada permanece em memória e é perdido ao recarregar a
+  página;
+- o áudio original não é armazenado;
+- a latência depende de Deepgram, Gemini e da rede;
+- o Gemini TTS possui cotas, e a voz alternativa varia conforme o navegador e
+  o sistema operacional.
+
+Se a chamada não conectar, devem ser verificados a API na porta configurada, o
+proxy WebSocket e a sessão do usuário. Se não houver transcrição, devem ser
+verificados a permissão do microfone, o volume captado e a chave do Deepgram.
+Quando o Gemini TTS estiver indisponível, o navegador deve reproduzir a resposta
+por `SpeechSynthesis`.
+
 ---
 
 # 6. Planejamento de Testes Sistêmicos
