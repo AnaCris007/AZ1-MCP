@@ -6486,6 +6486,35 @@ aparecer nas evidências.
 | Documentação atualizada | Seções 5.2 e 5.3 deste documento. | Atendido nesta branch de documentação. |
 | Revisão por pares | Aprovação formal do Merge Request. | Pendente até a revisão do MR. |
 
+### 5.3.8 Arquitetura da chamada
+
+A chamada mantém uma conexão WebSocket entre o componente `VoiceCall` do
+frontend e o endpoint `/api/v1/voice/call` do FastAPI. Essa conexão permanece
+aberta durante toda a conversa e permite processar vários turnos sem criar uma
+nova requisição para cada evento.
+
+| Componente | Responsabilidade |
+|---|---|
+| `VoiceCall.jsx` | Capturar o microfone, detectar fala e silêncio, mostrar o estado e reproduzir a resposta. |
+| `api.js` | Abrir o WebSocket com a sessão atual do usuário. |
+| `voice.py` | Autenticar a chamada e coordenar transcrição, resposta e geração de áudio. |
+| Deepgram | Converter a fala do usuário em texto. |
+| Gemini | Gerar a resposta textual e, quando disponível, o áudio. |
+| `SpeechSynthesis` | Reproduzir a resposta pelo navegador quando o Gemini TTS falhar ou demorar. |
+
+O fluxo ocorre nesta ordem:
+
+1. o navegador detecta a fala e grava um turno;
+2. o áudio é enviado ao FastAPI como dado binário;
+3. o Deepgram devolve a transcrição;
+4. o agente gera a resposta usando o mesmo `conversation_id`;
+5. o backend devolve o texto e o áudio;
+6. o navegador reproduz a resposta e volta a ouvir.
+
+Os eventos de controle e os textos usam JSON. Os áudios de entrada e saída usam
+frames binários, evitando o aumento de tamanho causado pela conversão para
+Base64. O proxy do Vite e o nginx preservam o upgrade necessário para a conexão
+WebSocket.
 
 ---
 
