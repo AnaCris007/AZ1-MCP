@@ -76,6 +76,14 @@ def _executar(dsn: str, consulta: str) -> dict:
                 f"A coleção {COLECAO} não existe no banco configurado."
             )
 
+        # Perguntado ao servidor, e nao afirmado por nos. Este relatorio existe
+        # para ser evidencia anexada a um MR, e um campo que so pode sair `true`
+        # nao prova nada a quem revisa: prova que a linha foi escrita. Aqui,
+        # `false` e um valor alcancavel, e e isso que da sentido a conferencia.
+        somente_leitura = conexao.execute(
+            "SELECT current_setting('transaction_read_only')"
+        ).fetchone()[0] == "on"
+
         secoes: defaultdict[str, list[dict]] = defaultdict(list)
         for nome, item in conexao.execute(consulta).fetchall():
             secoes[nome].append(item)
@@ -84,7 +92,7 @@ def _executar(dsn: str, consulta: str) -> dict:
             "colecao": COLECAO,
             "colecao_existe": True,
             "gerado_em_utc": datetime.now(UTC).isoformat(),
-            "transacao_somente_leitura": True,
+            "transacao_somente_leitura": somente_leitura,
             "resultados": dict(secoes),
         }
     except psycopg.Error as erro:

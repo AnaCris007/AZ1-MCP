@@ -76,6 +76,14 @@ resultado AS (
     SELECT
         40,
         'sinais_em_arquivo_origem',
+        -- Os dois padroes que contem barra invertida usam prefixo E de
+        -- proposito; o de caminho unix nao precisa, porque nao tem nenhuma.
+        --
+        -- Com standard_conforming_strings ligado (padrao desde o 9.1), a
+        -- barra NAO e escape num literal comum: '\\.' entrega ao regex
+        -- \\ (barra literal) seguido de . (qualquer caractere), e o
+        -- padrao passa a exigir uma barra invertida antes do TLD. Nenhum
+        -- e-mail real casa, e o contador so pode devolver zero.
         jsonb_build_object(
             'caminhos_absolutos_unix',
                 count(*) FILTER (WHERE arquivo_origem ~ '^/'),
@@ -83,7 +91,7 @@ resultado AS (
                 count(*) FILTER (WHERE arquivo_origem ~ E'^[A-Za-z]:[\\\\/]'),
             'possiveis_emails',
                 count(*) FILTER (
-                    WHERE arquivo_origem ~* '[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}'
+                    WHERE arquivo_origem ~* E'[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}'
                 )
         )
     FROM base
