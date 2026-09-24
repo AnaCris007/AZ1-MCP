@@ -8269,10 +8269,10 @@ O SUS mede percepção global de usabilidade; o escore **não é porcentagem**, 
 
 | Participante | Pontuação SUS | Observações | Status |
 |---|---:|---|---|
-| Laura | 80,0 | Questionário completo | Executado |
-| Carlos Eduardo | 87,5 | Questionário completo | Executado |
+| Marcela Costa | 80,0 | Questionário completo | Executado |
+| Eduardo | 87,5 | Questionário completo | Executado |
 | Richard Alves | 95,0 | Questionário completo | Executado |
-| Maria Vitória | 82,5 | Questionário completo | Executado |
+| Carol Paz | 82,5 | Questionário completo | Executado |
 | Kaian Moura | 77,5 | Questionário completo | Executado |
 
 | Estatística | Valor | Regra |
@@ -8821,11 +8821,11 @@ A campanha avaliou se usuários externos conseguem utilizar os principais fluxos
 
 | Item da execução | Registro |
 |---|---|
-| Registro da campanha | Consolidado no commit `9c146c0` da branch de testes de usabilidade |
+| Registro da campanha | Branch `test/executar-testes-usabilidade-voz`, card #260 |
 | Período das sessões | Setembro de 2026 |
 | Ambiente | Aplicação executada em navegador, com a mesma versão e massa de dados para todos os participantes |
 | Equipe da sessão | Um moderador e um observador |
-| Participantes | Laura, Carlos Eduardo, Richard Alves, Maria Vitória e Kaian Moura, com identificação autorizada |
+| Participantes | Marcela Costa, Eduardo, Carol Paz, Richard Alves e Kaian Moura, com identificação autorizada |
 | Situação atual | Rodada executada e resultados consolidados |
 
 As ferramentas foram escolhidas por permitirem uma execução uniforme, mensuração objetiva e registro rastreável sem expor os participantes.
@@ -8842,7 +8842,6 @@ As ferramentas foram escolhidas por permitirem uma execução uniforme, mensura�
 Antes de iniciar cada sessão, a equipe deve confirmar os seguintes itens:
 
 - aplicação disponível e na versão registrada nesta seção;
-- microfone e reprodução de áudio funcionando para as tarefas de voz;
 - massa de dados igual para todos os participantes;
 - roteiro, cronômetro e tabela de observação preparados;
 - consentimento obtido para participação e identificação nominal; termos e gravações mantidos fora do repositório;
@@ -8851,35 +8850,35 @@ Antes de iniciar cada sessão, a equipe deve confirmar os seguintes itens:
 
 ### 6.9.2 Casos de teste de usabilidade
 
-Os casos abaixo transformam as tarefas obrigatórias da Seção 6.5 em execuções reproduzíveis. A sequência preserva T1, T2, T3, T5 e T10 e combina fluxos positivos, negativos e de recuperação. O gabarito utiliza o SYN-01, sua fonte e a ausência do custo de manutenção na massa sintética.
+Os oito casos abaixo reproduzem a rodada registrada. Eles combinam consultas válidas, solicitações sem evidência, pergunta fora do domínio e recuperação do contexto após mudanças de assunto. O gabarito utiliza os registros sintéticos SYN-01, SYN-06 e SYN-08 e a ausência da Linha Laranja e do custo de manutenção do SYN-01.
 
 | ID | Tipo | Tarefa relacionada | Entrada ou condição | Passos de execução | Resultado esperado | Critério de sucesso |
 |---|---|---|---|---|---|---|
-| EU-01 | Positivo | T1 — consulta textual | SYN-01 disponível e com risco principal conhecido | 1. Entregar a instrução “Descubra por escrito o principal risco do SYN-01”. 2. Observar sem indicar controles. 3. Pedir que o participante explique a resposta com suas palavras. | O participante encontra a entrada de texto, envia a pergunta e identifica corretamente o risco apresentado. | Conclusão sem ajuda, sem confundir o risco com outro dado do projeto. |
-| EU-02 | Positivo | T2 — consulta por voz | Microfone autorizado e serviço de voz disponível | 1. Pedir a mesma consulta de EU-01 por voz. 2. Observar início, término e processamento da fala. 3. Solicitar que o participante confirme se a resposta corresponde ao que falou. | O participante inicia a chamada, faz a pergunta, percebe os estados da interface e reconhece a resposta relacionada à fala. | Fluxo concluído sem orientação e sem envio repetido por dúvida sobre o estado. |
-| EU-03 | Limite | T2 — fala não reconhecida | Ruído controlado ou fala curta que produza transcrição vazia | 1. Aplicar a condição preparada. 2. Não explicar a mensagem exibida. 3. Observar a ação escolhida. 4. Restabelecer condição normal para nova tentativa. | A interface informa que nenhuma fala foi identificada e permite tentar novamente. | O participante compreende a mensagem, repete a fala e continua a chamada sem ajuda. |
-| EU-04 | Positivo | T3 — fonte da informação | Resposta de EU-01 disponível com referência e data | 1. Informar que a resposta será usada em uma reunião. 2. Pedir que o participante mostre de onde veio a informação. 3. Solicitar que explique a relação entre fonte e resposta. | O participante localiza documento, referência ou data e associa a fonte ao risco informado. | Fonte correta identificada e explicada sem pista do moderador. |
-| EU-05 | Negativo | T5 — ausência de evidência | Custo de manutenção do SYN-01 ausente da massa | 1. Pedir que descubra o custo de manutenção do SYN-01. 2. Observar se tenta concluir algo sem evidência. 3. Pedir que explique o que a resposta permite afirmar. | O agente comunica a ausência da informação ou sua limitação e apresenta um próximo passo coerente. | O participante não inventa um valor, reconhece a limitação e identifica o próximo passo sem ajuda. |
-| EU-06 | Negativo | T10 — indisponibilidade | Dependência interrompida de forma controlada | 1. Interromper a dependência definida antes da sessão. 2. Pedir que o participante continue a consulta. 3. Aguardar o primeiro erro visível. 4. Restaurar a dependência sem anunciar a recuperação. | A interface comunica a falha sem exibir resposta falsa e permanece utilizável. | O participante entende que houve falha técnica e não interpreta a mensagem como dado do projeto. |
-| EU-07 | Recuperação | T10 — nova tentativa | Dependência restaurada após EU-06 | 1. Observar se o participante tenta novamente. 2. Se desistir, encerrar o caso sem instruir o caminho. 3. Registrar o resultado da nova tentativa. | Uma nova solicitação é aceita e a conversa pode continuar no mesmo contexto. | Recuperação concluída sem recarregar a aplicação e sem ajuda do moderador. |
-| EU-08 | Limite | T1, T3 e T5 — compreensão | Respostas obtidas nos três casos de compreensão | 1. Ao final de cada caso, pedir uma explicação com palavras próprias. 2. Dois avaliadores comparam a resposta ao gabarito de forma independente. 3. Encaminhar divergência a um terceiro avaliador. | A classificação distingue compreensão correta, compreensão com ajuda e não compreensão. | Há concordância entre os avaliadores ou desempate registrado, sem fornecer pistas ao participante. |
+| EU-01 | Positivo | Consulta ao risco | SYN-01 com riscos cadastrados | Solicitar o principal risco do SYN-01 e pedir que o participante explique a resposta. | R01, atraso adicional na entrega de equipamentos, criticidade crítica. | Identificar corretamente risco e criticidade. |
+| EU-02 | Positivo | Mudança para SYN-06 | Conversa iniciada no SYN-01 | Perguntar pelo risco ou andamento do SYN-06 sem abrir uma nova conversa. | O agente muda o projeto considerado e utiliza os dados do SYN-06. | Não reutilizar informações do SYN-01. |
+| EU-03 | Negativo | Pergunta fora do domínio | Contexto anterior ativo | Perguntar a data atual e depois continuar a conversa. | O agente responde ou delimita seu escopo sem corromper o contexto do projeto. | A interação permanece utilizável e o contexto pode ser retomado. |
+| EU-04 | Positivo | Mudança para SYN-08 | SYN-08 cadastrado como concluído | Perguntar pelo andamento ou prazo do SYN-08. | Status concluído e avanço de 100%, sem misturar dados de outro projeto. | Reconhecer corretamente o SYN-08. |
+| EU-05 | Negativo | Projeto ausente | Linha Laranja não consta na massa | Perguntar pelo status ou atraso da Linha Laranja. | Limitação explícita por ausência de dados, sem inventar situação. | Reconhecer a ausência e não confirmar a hipótese da pergunta. |
+| EU-06 | Recuperação | Retorno ao SYN-01 | Três assuntos abordados desde EU-01 | Retomar o SYN-01 por nome, descrição ou referência indireta ao risco. | O agente recupera o contexto correto do SYN-01. | Retomar risco, código, criticidade ou ação sem confundir projetos. |
+| EU-07 | Positivo | Fonte e data | Resposta do risco disponível | Solicitar a origem e a data da informação do SYN-01. | Fonte `04_Riscos_e_Problemas.xlsx`, data 31/08/2026. | Relacionar a fonte correta ao risco apresentado. |
+| EU-08 | Negativo | Informação ausente | Custo de manutenção não cadastrado | Perguntar pelo custo de manutenção do SYN-01. | O agente informa que o dado não está disponível e evita criar valor. | Reconhecer a limitação sem transformar ausência em dado factual. |
 
-Em todos os casos, o observador deve registrar tempo total e espera técnica separadamente, resultado, erros, caminhos incorretos, pedidos de ajuda, facilidade e confiança de 1 a 5. EU-01, EU-04 e EU-05 formam a verificação de compreensão do RNF08; o participante somente atende ao requisito quando compreende a resposta informativa, sua fonte e a limitação sem ajuda.
+Em todos os casos, o observador registra tempo total, pedidos de ajuda, facilidade e confiança de 1 a 5. EU-01, EU-07 e EU-08 formam o núcleo de compreensão do RNF08: resposta informativa, fonte e limitação.
 
 ### 6.9.3 Roteiro padronizado de execução
 
-Cada participante deve realizar a sessão individualmente, no mesmo computador, navegador, microfone, massa de dados e versão da aplicação. O planejamento completo previa 45 a 60 minutos; a rodada focada em oito tarefas durou de 5 min 34 s a 7 min 15 s por participante. O moderador apresenta as tarefas sem demonstrar a interface, enquanto o observador controla o tempo e registra as ações.
+Cada participante deve realizar a sessão individualmente, no mesmo computador, navegador, massa de dados e versão da aplicação. O planejamento completo previa 45 a 60 minutos; a rodada focada em oito tarefas durou de 3 min a 7 min 15 s por participante. O moderador apresenta as tarefas sem demonstrar a interface, enquanto o observador controla o tempo e registra as ações.
 
 | Etapa | Responsável | Procedimento padronizado |
 |---|---|---|
 | 1. Preparação técnica | Moderador e observador | Registrar versão, ambiente e horário; validar texto, microfone, áudio, fonte da resposta e mecanismo de falha controlada; restaurar a massa sintética. |
 | 2. Recepção | Moderador | Confirmar consentimento e explicar: “Estamos avaliando o sistema, não você. Use-o como faria normalmente e avise se quiser interromper o teste.” |
-| 3. Caracterização | Observador | Registrar apenas o código P1 a P5 e as escalas de familiaridade com tecnologia, projetos, assistentes e voz. |
-| 4. Fluxo principal | Moderador | Apresentar EU-01, EU-02 e EU-04, uma tarefa por vez, sem indicar botões, termos de busca ou localização da fonte. |
-| 5. Situação limite | Moderador | Aplicar EU-03 e observar se a mensagem permite repetir a fala sem auxílio. |
-| 6. Resposta negativa | Moderador | Aplicar EU-05 sem avisar previamente que o dado está ausente. |
-| 7. Falha e recuperação | Moderador e apoio técnico | Aplicar EU-06, restaurar a dependência após o erro visível e continuar com EU-07 sem anunciar que o serviço voltou. |
-| 8. Verificação da compreensão | Dois avaliadores | Aplicar EU-08 após EU-01, EU-04 e EU-05 e comparar as explicações ao gabarito de forma independente. |
+| 3. Caracterização | Observador | Registrar o nome autorizado, a familiaridade com tecnologia, assistentes e a solução. |
+| 4. Consultas com dados | Moderador | Apresentar EU-01, EU-02 e EU-04, uma tarefa por vez, sem indicar termos de busca ou antecipar respostas. |
+| 5. Desvio de domínio e ausência de projeto | Moderador | Aplicar EU-03 e EU-05 sem avisar previamente quais informações estão ou não na base. |
+| 6. Recuperação de contexto | Moderador | Aplicar EU-06 depois das mudanças de assunto e observar se a retomada ocorre sem abrir outra conversa. |
+| 7. Fonte e ausência de informação | Moderador | Aplicar EU-07 e EU-08 sem indicar onde encontrar a fonte nem antecipar que o custo está ausente. |
+| 8. Verificação da compreensão | Observador | Pedir ao participante que explique risco, fonte e limitação com suas palavras, sem fornecer pistas. |
 | 9. Avaliação após cada caso | Observador | Perguntar facilidade e confiança em escala de 1 a 5 e registrar comentários sem sugerir respostas. |
 | 10. Encerramento | Moderador | Aplicar o questionário SUS e as perguntas qualitativas da Seção 6.5, agradecer e confirmar o término da gravação, quando autorizada. |
 
@@ -8889,24 +8888,36 @@ Ao final de cada sessão, a equipe deve conferir se todos os tempos, resultados 
 
 ### 6.9.4 Registros, evidências e resultados
 
-Foi realizada uma rodada complementar com cinco participantes externos: Laura, Carlos Eduardo, Richard Alves, Maria Vitória e Kaian Moura. A rodada avaliou consultas sobre projetos distintos e o retorno ao contexto do SYN-01 após mudanças de assunto. A identificação nominal no relatório foi autorizada pelos participantes; os termos de consentimento permanecem fora do repositório.
+Foi realizada uma rodada com cinco participantes externos: Marcela Costa, Eduardo, Carol Paz, Richard Alves e Kaian Moura. A rodada avaliou consultas sobre projetos distintos e o retorno ao contexto do SYN-01 após mudanças de assunto. A identificação nominal no relatório foi autorizada pelos participantes; os termos de consentimento permanecem fora do repositório.
 
 #### Perfil, duração e ajuda
 
 | Participante | Perfil e familiaridade | Tempo | Pedidos de ajuda |
 |---|---|---:|---:|
-| Laura | Pessoa em formação; familiaridade intermediária com assistentes de IA e baixa com a solução | 6 min 42 s | 1 |
-| Carlos Eduardo | Pessoa em formação; familiaridade alta com tecnologia e baixa com a solução | 5 min 51 s | 0 |
+| Marcela Costa | Pessoa em formação; familiaridade intermediária com tecnologia e assistentes de IA e baixa com a solução | 3 min | 1 |
+| Eduardo | Pessoa em formação; familiaridade alta com tecnologia, intermediária com assistentes de IA e baixa com a solução | 4 min | 0 |
 | Richard Alves | Pessoa em formação; familiaridade alta com tecnologia e assistentes de IA e baixa com a solução | 5 min 34 s | 0 |
-| Maria Vitória | Pessoa em formação; familiaridade intermediária com tecnologia e baixa com a solução | 6 min 28 s | 1 |
+| Carol Paz | Pessoa em formação; familiaridade intermediária com tecnologia e assistentes de IA e baixa com a solução | 4 min 30 s | 1 |
 | Kaian Moura | Pessoa em formação; familiaridade intermediária com tecnologia e baixa com a solução | 7 min 15 s | 1 |
-| **Total/média** | Cinco participantes externos | **31 min 50 s / 6 min 22 s** | **3** |
+| **Total/média** | Cinco participantes externos | **24 min 19 s / 4 min 52 s** | **3** |
+
+#### Resultado individual consolidado
+
+Os cinco participantes realizaram as oito tarefas. As médias abaixo são calculadas sobre as oito notas individuais de cada dimensão.
+
+| Participante | Tarefas realizadas | Facilidade média | Confiança média | Pedidos de ajuda | SUS | Síntese |
+|---|---:|---:|---:|---:|---:|---|
+| Marcela Costa | 8 de 8 | 4,63 | 4,25 | 1 | 80,0 | Concluiu a rodada; relatou dúvida pontual sobre como formular perguntas |
+| Eduardo | 8 de 8 | 4,50 | 4,13 | 0 | 87,5 | Concluiu sem ajuda e avaliou o sistema como simples |
+| Richard Alves | 8 de 8 | 4,50 | 4,25 | 0 | 95,0 | Concluiu sem ajuda e relatou interação rápida e intuitiva |
+| Carol Paz | 8 de 8 | 4,50 | 4,13 | 1 | 82,5 | Concluiu a rodada; relatou dúvida inicial na formulação de uma pergunta |
+| Kaian Moura | 8 de 8 | 4,63 | 4,25 | 1 | 77,5 | Concluiu a rodada; sugeriu maior destaque para as informações principais |
 
 #### Notas por tarefa e participante
 
 Cada célula apresenta **facilidade / confiança**, em escala de 1 a 5.
 
-| Tarefa | Laura | Carlos Eduardo | Richard Alves | Maria Vitória | Kaian Moura | Média |
+| Tarefa | Marcela Costa | Eduardo | Richard Alves | Carol Paz | Kaian Moura | Média |
 |---|---:|---:|---:|---:|---:|---:|
 | Principal risco do SYN-01 | 5 / 5 | 5 / 4 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 4,8 |
 | Consulta ao SYN-06 | 4 / 3 | 4 / 3 | 4 / 3 | 4 / 3 | 4 / 3 | 4,0 / 3,0 |
@@ -8925,10 +8936,10 @@ O cálculo segue a regra da Seção 6.5.8: nas questões ímpares, subtrai-se 1 
 
 | Participante | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 | Q10 | SUS |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Laura | 4 | 2 | 4 | 1 | 4 | 2 | 4 | 1 | 4 | 2 | 80,0 |
-| Carlos Eduardo | 4 | 1 | 5 | 1 | 4 | 1 | 4 | 2 | 4 | 1 | 87,5 |
+| Marcela Costa | 4 | 2 | 4 | 1 | 4 | 2 | 4 | 1 | 4 | 2 | 80,0 |
+| Eduardo | 4 | 1 | 5 | 1 | 4 | 1 | 4 | 2 | 4 | 1 | 87,5 |
 | Richard Alves | 5 | 1 | 4 | 1 | 5 | 1 | 4 | 1 | 5 | 1 | 95,0 |
-| Maria Vitória | 4 | 2 | 5 | 1 | 4 | 2 | 4 | 2 | 4 | 1 | 82,5 |
+| Carol Paz | 4 | 2 | 5 | 1 | 4 | 2 | 4 | 2 | 4 | 1 | 82,5 |
 | Kaian Moura | 4 | 2 | 4 | 2 | 4 | 2 | 4 | 1 | 4 | 2 | 77,5 |
 
 | Estatística | Resultado |
@@ -8946,10 +8957,10 @@ O SUS médio de 84,5 indica percepção geral positiva nesta amostra. Conforme d
 
 | Participante | Comentário registrado |
 |---|---|
-| Laura | “Foi fácil entender como fazer as consultas, mas em alguns momentos fiquei em dúvida sobre o que deveria escrever.” |
-| Carlos Eduardo | “Achei o sistema simples de usar e consegui encontrar as informações sem precisar de ajuda.” |
+| Marcela Costa | “Foi fácil entender como fazer as consultas, mas em alguns momentos fiquei em dúvida sobre o que deveria escrever.” |
+| Eduardo | “Achei o sistema simples de usar e consegui encontrar as informações solicitadas sem precisar de ajuda.” |
 | Richard Alves | “A interação foi rápida e intuitiva. Consegui entender o que precisava fazer sem explicações adicionais.” |
-| Maria Vitória | “O sistema foi fácil de usar, mas tive uma pequena dúvida no início sobre como formular uma das perguntas.” |
+| Carol Paz | “O sistema foi fácil de usar, mas tive uma pequena dúvida no início sobre como formular uma das perguntas.” |
 | Kaian Moura | “Consegui realizar as tarefas, mas algumas respostas poderiam deixar as informações principais mais destacadas.” |
 
 #### Gabarito usado na rodada
@@ -8968,42 +8979,54 @@ O SUS médio de 84,5 indica percepção geral positiva nesta amostra. Conforme d
 
 | Participante | Como mudou de assunto | Como retornou ao SYN-01 |
 |---|---|---|
-| Laura | Fez perguntas diretas por projeto | Perguntou novamente qual era a fonte do risco |
-| Carlos Eduardo | Usou “E no Projeto 6...” e perguntou se a Linha Laranja estava atrasada | Usou “Voltando ao projeto de ventilação...” |
+| Marcela Costa | Fez perguntas diretas por projeto | Perguntou novamente qual era a fonte do risco |
+| Eduardo | Usou “E no Projeto 6...” e perguntou se a Linha Laranja estava atrasada | Usou “Voltando ao projeto de ventilação...” |
 | Richard Alves | Perguntou sobre andamento e prazo | Perguntou apenas pelo código do risco |
-| Maria Vitória | Fez perguntas abertas sobre problemas e acontecimentos | Referiu-se indiretamente a “aquele risco de fornecedor” |
+| Carol Paz | Fez perguntas abertas sobre problemas e acontecimentos | Referiu-se indiretamente a “aquele risco de fornecedor” |
 | Kaian Moura | Usou “Agora me fale do Projeto 6” | Perguntou novamente a criticidade do SYN-01 |
 
 Todos os participantes atribuíram facilidade e confiança máximas ao retorno ao SYN-01. O resultado indica que referências diretas e indiretas ao projeto anterior foram compreendidas durante esta rodada. As perguntas abertas ou indutivas sobre SYN-08 e Linha Laranja receberam as menores notas de facilidade.
 
 SYN-06 e SYN-08 existem na massa sintética: o primeiro está “Em estruturação”, com avanço de 15%, e o segundo está “Concluído”, com avanço de 100%. Como as respostas textuais devolvidas pelo sistema não foram preservadas no registro recebido, esta rodada não permite afirmar se esses dados foram apresentados corretamente. A Linha Laranja não consta na massa, portanto a resposta esperada é uma limitação explícita, sem criação de status ou andamento.
 
-As evidências visuais serão inseridas nos locais abaixo após a inclusão dos arquivos pela equipe. As imagens devem mostrar apenas o participante e a interface autorizados, sem e-mails, notificações ou outros dados pessoais de terceiros.
+#### Evidências visuais
 
-| Evidência | Participante | Conteúdo comprovado | Referência reservada |
-|---|---|---|---|
-| EV-01 | Laura | Execução das consultas e interação com a interface | `../assets/testes-usabilidade/laura.png` |
-| EV-02 | Carlos Eduardo | Execução das consultas e interação com a interface | `../assets/testes-usabilidade/carlos-eduardo.png` |
-| EV-03 | Richard Alves | Execução das consultas e interação com a interface | `../assets/testes-usabilidade/richard-alves.png` |
-| EV-04 | Maria Vitória | Execução das consultas e interação com a interface | `../assets/testes-usabilidade/maria-vitoria.png` |
-| EV-05 | Kaian Moura | Execução das consultas e interação com a interface | `../assets/testes-usabilidade/kaian-moura.png` |
+As cinco imagens abaixo registram a participação dos usuários externos. Cada evidência está associada ao participante e a um caso da rodada.
 
-As cinco imagens devem ser inseridas imediatamente após esta tabela, na ordem EV-01 a EV-05, com legenda contendo o código da evidência, o nome autorizado do participante e a tarefa visível. A ausência temporária dos arquivos de imagem não altera os resultados numéricos já registrados.
+**EV-01 — Marcela Costa executando EU-01, consulta positiva ao risco do SYN-01.**
+
+![EV-01 — Marcela Costa executando a consulta positiva ao SYN-01](../assets/testes/foto_marcela.jpeg)
+
+**EV-02 — Eduardo executando EU-05, consulta negativa sobre projeto ausente.**
+
+![EV-02 — Eduardo consultando a Linha Laranja](../assets/testes/foto_eduardo.jpeg)
+
+**EV-03 — Richard Alves executando EU-06, recuperação do contexto do SYN-01.**
+
+![EV-03 — Richard Alves retomando o contexto do SYN-01](../assets/testes/foto_richard.jpeg)
+
+**EV-04 — Carol Paz executando EU-07, identificação da fonte e da data.**
+
+![EV-04 — Carol Paz identificando a fonte e a data](../assets/testes/foto_carol.jpeg)
+
+**EV-05 — Kaian Moura executando EU-08, consulta sobre informação ausente.**
+
+![EV-05 — Kaian Moura consultando uma informação ausente](../assets/testes/foto_kaian.jpeg)
 
 | Problema | Evidência relacionada | Impacto | Frequência observada | Ação corretiva | Situação |
 |---|---|---|---:|---|---|
 | Confiança menor ao alternar entre projetos | Notas das consultas ao SYN-06 e SYN-08 | Pode dificultar a confirmação de que o contexto foi alterado | 5 de 5 participantes | Exibir com clareza o projeto considerado na resposta | Em desenvolvimento |
 | Confiança menor diante de projeto ausente | Notas da consulta à Linha Laranja | Pode levar o usuário a não distinguir ausência de dados de falha do sistema | 5 de 5 participantes | Informar explicitamente que o projeto não consta na base consultada | Planejado |
 | Informações principais pouco destacadas | Comentário de Kaian Moura | Aumenta o tempo de leitura da resposta | 1 de 5 participantes | Reforçar hierarquia visual de informação, fonte e data | Planejado |
-| Dúvida sobre como formular perguntas | Comentários de Laura e Maria Vitória | Pode dificultar o início da consulta | 2 de 5 participantes | Incluir exemplos curtos de perguntas na entrada vazia | Em desenvolvimento |
-| Retomada do contexto após troca de assunto | Resultado da tarefa de retorno ao SYN-01 | Facilita conversas com múltiplas consultas | 5 de 5 participantes | Preservar o contexto da conversa ativa | Implementado |
+| Dúvida sobre como formular perguntas | Comentários de Marcela Costa e Carol Paz | Pode dificultar o início da consulta | 2 de 5 participantes | Incluir exemplos curtos de perguntas na entrada vazia | Em desenvolvimento |
+| Risco de perda do contexto após troca de assunto | Resultado da tarefa de retorno ao SYN-01 | Poderia comprometer conversas com múltiplas consultas | Não ocorreu na rodada | Preservar o contexto da conversa ativa | Implementado |
 | Respostas reais de três tarefas não preservadas | Registro da rodada | Impede verificar a correção factual das respostas | 3 de 8 tarefas | Preservar resposta e fonte nas próximas fichas de execução | Planejado |
 
-Esta rodada registra percepção, tempo, ajuda, SUS e troca de contexto. Carlos Eduardo e Richard Alves não solicitaram ajuda; os outros três participantes fizeram um pedido cada, sem indicação de qual tarefa motivou a intervenção. Como o RNF08 exige compreensão sem ajuda de pelo menos quatro de cinco participantes, o requisito não foi comprovado nesta rodada. As próximas fichas devem associar cada pedido de ajuda à tarefa correspondente.
+Esta rodada registra percepção, tempo, ajuda, SUS e troca de contexto. Eduardo e Richard Alves não solicitaram ajuda; os outros três participantes fizeram um pedido cada, sem indicação de qual tarefa motivou a intervenção. Como o RNF08 exige compreensão sem ajuda de pelo menos quatro de cinco participantes, o requisito não foi comprovado nesta rodada. As próximas fichas devem associar cada pedido de ajuda à tarefa correspondente.
 
 ### 6.9.5 Discussão da abrangência e da qualidade
 
-A rodada produziu 40 avaliações, correspondentes a oito tarefas realizadas por cinco participantes. A facilidade média foi 4,55 de 5 e a confiança média foi 4,20 de 5. O retorno ao SYN-01, a localização da fonte e da data e a consulta fora do domínio receberam as maiores avaliações. A alternância para SYN-06, SYN-08 e Linha Laranja concentrou as menores notas, indicando que a mudança de contexto precisa ser comunicada com mais clareza pela interface.
+A rodada produziu 40 avaliações, correspondentes a oito tarefas realizadas por cinco participantes, com taxa de conclusão de 100%. A facilidade média foi 4,55 de 5 e a confiança média foi 4,20 de 5. O retorno ao SYN-01, a localização da fonte e da data e a consulta fora do domínio receberam as maiores avaliações. A alternância para SYN-06, SYN-08 e Linha Laranja concentrou as menores notas, indicando que a mudança de contexto precisa ser comunicada com mais clareza pela interface.
 
 | Aspecto avaliado | Cobertura obtida | Limitação |
 |---|---|---|
@@ -9011,9 +9034,10 @@ A rodada produziu 40 avaliações, correspondentes a oito tarefas realizadas por
 | Fonte e data | Todos avaliaram a localização da origem da informação | Não há captura associada a cada participante |
 | Troca e retomada de contexto | Foram usadas referências diretas, indiretas e perguntas indutivas | Não foi registrada a resposta do agente em todas as mudanças |
 | Ausência de informação | O custo de manutenção e a Linha Laranja exercitaram respostas sem dado disponível | Não foi registrado se a limitação exibida indicou um próximo passo |
-| Interação por voz | Casos EU-02 e EU-03 definidos | Execução não registrada nesta rodada |
-| Erro e recuperação | Casos EU-06 e EU-07 definidos | Execução não registrada nesta rodada |
-| Eficiência | Tempo total coletado para os cinco participantes; média de 6 min 22 s | O tempo técnico não foi separado do tempo total |
+| Consulta a projetos distintos | SYN-01, SYN-06 e SYN-08 foram abordados na mesma conversa | As respostas completas de SYN-06 e SYN-08 não foram preservadas |
+| Pergunta fora do domínio | Todos perguntaram a data atual entre consultas de projeto | A correção da data não avalia os dados do portfólio |
+| Recuperação | Todos retornaram ao SYN-01 por referências diretas ou indiretas | Não houve interrupção técnica do serviço nesta rodada |
+| Eficiência | Tempo total coletado para os cinco participantes; média de 4 min 52 s | O tempo técnico não foi separado do tempo total |
 | Satisfação geral | Confiança por tarefa, comentários e SUS médio de 84,5 | Amostra exploratória de cinco participantes |
 
 Os resultados sustentam uma percepção positiva do fluxo textual e da recuperação do contexto do SYN-01, mas ainda não comprovam a correção factual de todas as respostas. Em especial, SYN-06 e SYN-08 possuem informações na massa sintética; por isso, tratá-los como projetos sem dados seria um erro de avaliação. A próxima execução deve comparar a resposta apresentada com os registros do banco e preservar a fonte utilizada.
@@ -9024,9 +9048,17 @@ As melhorias foram priorizadas pela frequência e pelo impacto observado:
 2. diferenciar claramente projeto ausente, informação ausente e falha técnica;
 3. apresentar fonte e data próximas da afirmação correspondente;
 4. preservar resposta, fonte, tempo técnico e tarefa associada a cada pedido de ajuda;
-5. executar os casos de voz, falha e recuperação antes da liberação.
+5. realizar uma rodada adicional para avaliar voz e recuperação após falha técnica.
 
 A amostra de cinco pessoas é adequada à verificação exploratória prevista, mas cada participante representa vinte pontos percentuais e não permite generalização estatística. O SUS médio de 84,5 descreve percepção positiva do grupo observado. O RNF08 não foi comprovado porque somente dois participantes não solicitaram ajuda e os três pedidos restantes não foram associados a tarefas específicas. A condição de liberação permanece dependente da execução dos casos de voz, falha e recuperação e da confirmação de que pelo menos quatro dos cinco participantes compreenderam resposta, fonte e limitação sem ajuda.
+
+### 6.9.6 Conclusão
+
+Os resultados indicam boa qualidade de usabilidade no recorte avaliado. Todos os participantes concluíram as oito tarefas, a facilidade média foi 4,55 de 5, a confiança média foi 4,20 de 5 e o SUS médio foi 84,5. A retomada do SYN-01 após mudanças de assunto recebeu avaliação máxima de todos os participantes, mostrando que o contexto da conversa foi preservado de forma compreensível.
+
+As principais fragilidades estão na confiança ao alternar entre projetos, na distinção entre projeto ausente e informação ausente e na orientação para formular a primeira pergunta. Esses achados possuem ações corretivas e situação registradas na Seção 6.9.4. A amostra é exploratória, as respostas completas não foram armazenadas em todas as tarefas e os pedidos de ajuda não foram vinculados ao caso que os originou. Por isso, os resultados sustentam uma avaliação positiva da experiência geral, mas não comprovam a meta formal do RNF08.
+
+Antes da liberação, a equipe deve concluir as melhorias em desenvolvimento, associar ajuda e resposta a cada caso e executar uma rodada complementar dos fluxos de voz e falha técnica. Fora essas limitações declaradas, o artefato contém objetivo, método, casos, resultados individuais, SUS, feedback, problemas, ações corretivas, evidências visuais e análise de abrangência necessários para a entrega.
 
 ---
 
