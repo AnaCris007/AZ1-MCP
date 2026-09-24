@@ -6093,7 +6093,7 @@ Esta seção descreve as integrações implementadas até a Sprint 3 entre a int
 
 ### 5.2.1 Arquitetura da Integração
 
-A interface em React utiliza o cliente HTTP centralizado em [api.js](../src/frontend/src/lib/api.js), que chama a API FastAPI com `fetch`. O ponto de entrada [main.py](../src/az1_api/main.py) registra as rotas sob `/api/v1`; os schemas Pydantic definem as entradas e saídas, enquanto os serviços executam as operações e acessam os provedores externos. A comunicação do chat usa requisição e resposta HTTP, sem streaming, WebSocket ou fila de mensagens entre navegador e API.
+A interface em React utiliza o cliente centralizado em [api.js](../src/frontend/src/lib/api.js). O chat textual e as demais operações usam `fetch`, enquanto a chamada de voz abre um WebSocket dedicado. O ponto de entrada [main.py](../src/az1_api/main.py) registra as rotas sob `/api/v1`; os schemas Pydantic definem as entradas e saídas HTTP, enquanto os serviços executam as operações e acessam os provedores externos. O chat textual continua baseado em requisição e resposta, sem streaming de tokens ou fila de mensagens entre navegador e API.
 
 ```mermaid
 flowchart LR
@@ -6101,6 +6101,7 @@ flowchart LR
     F <-->|"SSO Microsoft via Supabase Auth"| S["Supabase Auth"]
     F -->|"HTTP /api/v1 + Bearer token"| P["Proxy Vite ou nginx"]
     P --> A["FastAPI"]
+    F <-->|"WebSocket /api/v1/voice/call"| P
     A -->|"Upload e leitura de áudio"| M["S3 / MinIO"]
     A -->|"Transcrição"| D["Deepgram"]
     A -->|"Busca de contexto"| R["RAG: src/rag, pgvector"]
@@ -6184,7 +6185,7 @@ O histórico guarda a mensagem original do usuário, não a versão com os trech
 5. O texto retornado preenche o campo de entrada. O usuário pode revisar, editar, enviar ou descartar. A transcrição não é enviada automaticamente ao chat.
 6. Se confirmada, a entrada segue o mesmo fluxo de mensagem textual.
 
-A aba separada de voz exibe uma apresentação de escuta, mas não monta o `PromptBar` responsável pela gravação. Assim, o fluxo de captura integrado descrito acima é o botão de microfone dentro do chat; a aba de voz não constitui uma conversa contínua implementada.
+A aba separada de voz implementa uma conversa contínua e não utiliza o `PromptBar`. O componente `VoiceCall` captura cada turno com `MediaRecorder`, detecta automaticamente fala e silêncio e troca eventos de controle, áudio e respostas pela mesma conexão WebSocket. O histórico de chamadas permanece separado do chat textual e só é exibido após o encerramento. A Seção 5.3 descreve esse fluxo, seus estados e limites. O botão de microfone dentro do chat continua oferecendo o fluxo com confirmação descrito acima; são duas formas de entrada distintas.
 
 #### Reprodução da resposta
 
@@ -6234,6 +6235,7 @@ Os testes automatizados verificam os contratos HTTP e o comportamento dos compon
 | [test_chat_api.py](../tests/test_chat_api.py) e [test_speech_api.py](../tests/test_speech_api.py) | Contratos de mensagem e geração de voz, respostas de sucesso e erros controlados. Não executam chamadas reais ao Gemini. |
 | [test_auth_api.py](../tests/test_auth_api.py) e [test_auth_service.py](../tests/test_auth_service.py) | Aceitação e rejeição de tokens, verificadas com chaves de teste; não equivalem a executar o redirecionamento OAuth no navegador. |
 | [test_dependencias_sem_banco.py](../tests/test_dependencias_sem_banco.py) | Degradação dos efeitos laterais quando o banco não está configurado. |
+| `tests/test_voice_api.py` | Handshake da chamada e processamento de um turno completo na mesma conexão: início, blocos binários, transcrição, resposta textual, metadados do áudio e frame WAV. Usa transcritor, agente e sintetizador substituídos. O arquivo entra na `develop` pelo MR da funcionalidade. |
 
 Os comandos para execução dos testes, após preparar as dependências, são:
 
@@ -6430,6 +6432,59 @@ Falhas de um turno não removem as mensagens anteriores. A transcrição só ent
 no histórico quando o backend devolve `transcription_final`, e a resposta só é
 adicionada quando chega `agent_response`; dessa forma, tentativas vazias ou
 falhas anteriores a esses eventos não criam mensagens incompletas na conversa.
+
+### 5.3.7 Validação e evidências
+
+A validação prévia ao Merge Request foi executada após integrar a `develop` na
+branch da funcionalidade. Os comandos e resultados observados foram:
+
+| Verificação | Comando | Resultado |
+|---|---|---|
+| Compilação do frontend | `npm run build` em `src/frontend` | Build concluído sem erro. O aviso de tamanho do bundle permaneceu informativo. |
+| Análise estática do frontend | `npm run lint` em `src/frontend` | Nenhum erro; permaneceram avisos já identificados em componentes e hooks. |
+| Testes do frontend | `npm test` em `src/frontend` | 5 arquivos e 25 testes aprovados após a integração com a `develop`. |
+| Testes focados do backend | `python -m unittest tests.test_voice_api tests.test_transcription_service` no contêiner da API | 6 testes aprovados. |
+| Análise estática Python | `ruff check src tests --ignore EXE002` no contêiner da API | Verificação aprovada. `EXE002` é ignorado porque a montagem do Windows apresenta arquivos como executáveis. |
+
+O teste automatizado do WebSocket confirma um turno bem-sucedido com serviços
+substituídos. Ele não mede latência real, qualidade de transcrição, permissão do
+microfone, comportamento do `SpeechSynthesis`, múltiplos turnos nem falhas dos
+provedores. Esses pontos exigem execução no navegador e, quando envolverem os
+serviços externos, consomem suas respectivas cotas.
+
+#### Roteiro de validação manual
+
+1. Atualizar a aplicação e autenticar com uma conta permitida.
+2. Abrir **Voz**, iniciar a chamada e conceder acesso ao microfone.
+3. Fazer uma pergunta e observar, na ordem, `listening`, `transcribing`,
+   `processing`, `speaking` e o retorno a `listening`.
+4. Fazer uma segunda pergunta relacionada à primeira e conferir se a resposta
+   considera o contexto anterior.
+5. Encerrar a conversa durante o estado de escuta e verificar se o indicador de
+   uso do microfone é desativado.
+6. Abrir o registro na área de voz, conferir transcrição e respostas e usar
+   **Continuar chamada**.
+7. Indisponibilizar ou esgotar a cota do Gemini TTS e confirmar a reprodução
+   pela voz nativa do navegador sem áudio duplicado.
+8. Negar a permissão do microfone e interromper a conexão para verificar as
+   mensagens de falha correspondentes.
+
+Para cada execução manual, o MR deve registrar navegador e versão, sistema
+operacional, commit testado, horário, resultado por passo e captura ou gravação
+da evidência. Tokens, chaves, conteúdo do `.env` e dados pessoais não devem
+aparecer nas evidências.
+
+#### Conferência dos critérios de conclusão
+
+| Critério | Evidência disponível | Situação documental |
+|---|---|---|
+| Mais de um turno na mesma chamada | Conexão persistente e reutilização do `conversation_id`; roteiro manual acima. | Implementado; registrar execução manual no MR. |
+| Estado atual visível | Mapeamento da Seção 5.3.3 e componente `VoiceCall`. | Implementado. |
+| Encerramento sem captura ou reprodução pendente | Rotina de limpeza descrita na Seção 5.3.5. | Implementado; inspecionar microfone no navegador. |
+| Erros principais tratados | Códigos e respostas da Seção 5.3.6. | Implementado com limitações declaradas. |
+| Testes pertinentes aprovados | Build, lint, 25 testes de frontend e 6 testes focados de backend. | Aprovado no ambiente local usado na revisão pré-MR. |
+| Documentação atualizada | Seções 5.2 e 5.3 deste documento. | Atendido nesta branch de documentação. |
+| Revisão por pares | Aprovação formal do Merge Request. | Pendente até a revisão do MR. |
 
 
 ---
