@@ -8868,6 +8868,27 @@ Os casos abaixo transformam as tarefas obrigatórias da Seção 6.5 em execuçõ
 
 Em todos os casos, o observador deve registrar tempo total e espera técnica separadamente, resultado, erros, caminhos incorretos, pedidos de ajuda, facilidade e confiança de 1 a 5. EU-01, EU-04 e EU-05 formam a verificação de compreensão do RNF08; o participante somente atende ao requisito quando compreende a resposta informativa, sua fonte e a limitação sem ajuda.
 
+### 6.9.3 Roteiro padronizado de execução
+
+Cada participante deve realizar a sessão individualmente, no mesmo computador, navegador, microfone, massa de dados e versão da aplicação. A duração prevista é de 45 a 60 minutos. O moderador apresenta as tarefas sem demonstrar a interface, enquanto o observador controla o tempo e registra as ações.
+
+| Etapa | Responsável | Procedimento padronizado |
+|---|---|---|
+| 1. Preparação técnica | Moderador e observador | Registrar versão, ambiente e horário; validar texto, microfone, áudio, fonte da resposta e mecanismo de falha controlada; restaurar a massa sintética. |
+| 2. Recepção | Moderador | Confirmar consentimento e explicar: “Estamos avaliando o sistema, não você. Use-o como faria normalmente e avise se quiser interromper o teste.” |
+| 3. Caracterização | Observador | Registrar apenas o código P1 a P5 e as escalas de familiaridade com tecnologia, projetos, assistentes e voz. |
+| 4. Fluxo principal | Moderador | Apresentar EU-01, EU-02 e EU-04, uma tarefa por vez, sem indicar botões, termos de busca ou localização da fonte. |
+| 5. Situação limite | Moderador | Aplicar EU-03 e observar se a mensagem permite repetir a fala sem auxílio. |
+| 6. Resposta negativa | Moderador | Aplicar EU-05 sem avisar previamente que o dado está ausente. |
+| 7. Falha e recuperação | Moderador e apoio técnico | Aplicar EU-06, restaurar a dependência após o erro visível e continuar com EU-07 sem anunciar que o serviço voltou. |
+| 8. Verificação da compreensão | Dois avaliadores | Aplicar EU-08 após EU-01, EU-04 e EU-05 e comparar as explicações ao gabarito de forma independente. |
+| 9. Avaliação após cada caso | Observador | Perguntar facilidade e confiança em escala de 1 a 5 e registrar comentários sem sugerir respostas. |
+| 10. Encerramento | Moderador | Aplicar o questionário SUS e as perguntas qualitativas da Seção 6.5, agradecer e confirmar o término da gravação, quando autorizada. |
+
+Durante toda a sessão, pedidos de ajuda devem ser registrados antes de qualquer intervenção. Se a pessoa não concluir uma tarefa, o moderador pode encerrá-la para preservar a duração da sessão, marcando o resultado como “não concluída” ou “desistência”. Falhas do ambiente que impeçam a observação devem ser registradas como “não aplicada”, com o motivo, e não como erro do participante.
+
+Ao final de cada sessão, a equipe deve conferir se todos os tempos, resultados e avaliações foram registrados, separar consentimentos das observações e armazenar mídias identificáveis em local restrito. Apenas dados anonimizados e evidências autorizadas poderão aparecer neste relatório.
+
 ---
 
 # 7. Registro de Decisões
