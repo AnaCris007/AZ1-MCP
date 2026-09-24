@@ -8950,6 +8950,33 @@ As evidências devem permitir relacionar o registro ao participante anonimizado,
 
 Esta rodada registra percepção e troca de contexto, mas não encerra o RNF08. A aprovação depende da comprovação individual de EU-01, EU-04 e EU-05 sem ajuda para pelo menos quatro de cinco participantes. Tempos, pedidos de ajuda, respostas SUS e respostas textuais do sistema também precisam ser preservados na execução principal.
 
+### 6.9.5 Discussão da abrangência e da qualidade
+
+A rodada produziu 40 avaliações, correspondentes a oito tarefas realizadas por cinco participantes. A facilidade média foi 4,55 de 5 e a confiança média foi 4,20 de 5. O retorno ao SYN-01, a localização da fonte e da data e a consulta fora do domínio receberam as maiores avaliações. A alternância para SYN-06, SYN-08 e Linha Laranja concentrou as menores notas, indicando que a mudança de contexto precisa ser comunicada com mais clareza pela interface.
+
+| Aspecto avaliado | Cobertura obtida | Limitação |
+|---|---|---|
+| Consulta textual e compreensão da resposta | Cinco participantes consultaram o risco do SYN-01 | A resposta textual completa não foi preservada |
+| Fonte e data | Todos avaliaram a localização da origem da informação | Não há captura associada a cada participante |
+| Troca e retomada de contexto | Foram usadas referências diretas, indiretas e perguntas indutivas | Não foi registrada a resposta do agente em todas as mudanças |
+| Ausência de informação | O custo de manutenção e a Linha Laranja exercitaram respostas sem dado disponível | Não foi registrado se a limitação exibida indicou um próximo passo |
+| Interação por voz | Casos EU-02 e EU-03 definidos | Execução não registrada nesta rodada |
+| Erro e recuperação | Casos EU-06 e EU-07 definidos | Execução não registrada nesta rodada |
+| Eficiência | Facilidade percebida coletada | Tempos total e técnico não foram coletados |
+| Satisfação geral | Confiança por tarefa coletada | Questionário SUS não foi preservado |
+
+Os resultados sustentam uma percepção positiva do fluxo textual e da recuperação do contexto do SYN-01, mas ainda não comprovam a correção factual de todas as respostas. Em especial, SYN-06 e SYN-08 possuem informações na massa sintética; por isso, tratá-los como projetos sem dados seria um erro de avaliação. A próxima execução deve comparar a resposta apresentada com os registros do banco e preservar a fonte utilizada.
+
+As melhorias foram priorizadas pela frequência e pelo impacto observado:
+
+1. exibir na resposta qual projeto está sendo considerado após cada mudança de contexto;
+2. diferenciar claramente projeto ausente, informação ausente e falha técnica;
+3. apresentar fonte e data próximas da afirmação correspondente;
+4. preservar resposta, fonte, tempo e necessidade de ajuda em cada ficha;
+5. executar os casos de voz, falha e recuperação antes da liberação.
+
+A amostra de cinco pessoas é adequada à verificação exploratória prevista, mas cada participante representa vinte pontos percentuais e não permite generalização estatística. Com os registros disponíveis, não é possível declarar aprovação do RNF08 nem calcular o SUS. A condição de liberação permanece dependente da execução integral dos casos obrigatórios e da confirmação de que pelo menos quatro dos cinco participantes compreenderam resposta, fonte e limitação sem ajuda.
+
 ---
 
 # 7. Registro de Decisões
