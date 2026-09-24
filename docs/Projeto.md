@@ -6348,6 +6348,89 @@ capturar a própria voz do agente.
 - chamadas e conversas textuais aparecem em históricos separados;
 - uma chamada encerrada pode ser consultada e continuada.
 
+### 5.3.5 Ciclo de um turno e continuidade da sessão
+
+A sessão começa somente depois da ação do usuário. O componente abre o
+WebSocket, envia os dados de início e, após a confirmação do backend, solicita
+o microfone. A conexão permanece aberta entre os turnos; portanto, autenticação
+e negociação da conexão não são repetidas a cada pergunta.
+
+Cada turno segue esta sequência funcional:
+
+1. O analisador da Web Audio API mede continuamente a amplitude do sinal do
+   microfone enquanto a interface está em `listening`.
+2. Depois de 120 ms de sinal acima do limiar, uma nova instância de
+   `MediaRecorder` começa a registrar a fala.
+3. O gravador reúne fragmentos a cada 250 ms. Após 850 ms de silêncio, os
+   fragmentos formam um único `Blob` e são enviados como frame binário.
+4. O frontend envia `utterance_end`, e o backend processa o turno na ordem:
+   Deepgram, agente conversacional e síntese de fala.
+5. A transcrição e a resposta textual são guardadas no estado temporário da
+   chamada. Elas permanecem ocultas durante a ligação.
+6. O áudio do agente é reproduzido. Quando a reprodução termina, a interface
+   retorna a `listening` e aceita uma nova fala pela mesma conexão.
+
+O backend associa todos os turnos ao mesmo `conversation_id`. Esse valor é
+repassado ao serviço do agente, que o utiliza como chave do contexto
+conversacional. Ao continuar uma chamada encerrada, o frontend reutiliza o
+identificador e acrescenta as novas falas ao histórico já exibido.
+
+O processamento é sequencial por conexão: o backend conclui transcrição,
+resposta e síntese antes de receber o próximo turno da mesma chamada. A
+interface também limita a detecção de voz ao estado `listening`. A versão atual
+não implementa interrupção da resposta pelo usuário, transcrição parcial ou
+duas falas simultâneas.
+
+#### Encerramento e liberação de recursos
+
+O encerramento explícito e a desmontagem do componente executam a mesma rotina
+de limpeza no navegador:
+
+- cancelam o ciclo de análise iniciado por `requestAnimationFrame`;
+- interrompem uma gravação que ainda esteja ativa;
+- param todas as faixas do `MediaStream`, desativando o microfone;
+- fecham o `AudioContext`;
+- pausam e liberam a URL temporária do áudio recebido;
+- cancelam uma fala iniciada por `SpeechSynthesis`;
+- enviam `end_call` quando o WebSocket ainda está aberto;
+- fecham a conexão WebSocket.
+
+O backend encerra normalmente a conexão ao receber `end_call`. Fechar a tela
+durante uma chamada impede novas atualizações no frontend, mas não cancela uma
+requisição externa que já tenha sido iniciada no Deepgram ou no Gemini. Esse
+cancelamento distribuído não faz parte da implementação atual.
+
+### 5.3.6 Tratamento de falhas e recuperação
+
+Os erros controlados do WebSocket possuem `type: "error"`, um código estável no
+campo `error` e uma mensagem voltada ao usuário. Na maioria das falhas de um
+turno, a interface apresenta a mensagem por 1,8 segundo e retorna ao estado de
+escuta, mantendo a conexão para uma nova tentativa.
+
+| Código ou situação | Origem | Comportamento observado |
+|---|---|---|
+| `invalid_start` | Evento inicial ausente, tipo incorreto ou sem `conversation_id`. | O backend informa o erro e fecha a conexão com código `1008`. |
+| `unauthorized` | Token ausente ou inválido quando a autenticação está habilitada. | O backend rejeita a sessão e fecha a conexão com código `1008`. |
+| `audio_too_large` | O turno ultrapassa 10 MiB. | Os bytes acumulados são descartados, a mensagem é exibida e a chamada pode voltar a ouvir. |
+| `empty_transcription` | O Deepgram não reconhece texto no áudio recebido. | O usuário recebe a orientação de repetir a fala; a conexão é preservada. |
+| `transcription_failed` | O serviço de transcrição falha. | A interface informa que não conseguiu transcrever e permite nova tentativa. |
+| `agent_unavailable` | O agente não consegue produzir a resposta. | A falha é apresentada e o turno pode ser repetido. |
+| `speech_failed` | O texto foi gerado, mas o Gemini TTS não produziu áudio. | O navegador tenta falar a resposta com `SpeechSynthesis`; se o recurso existir, a conversa continua sem perder o texto. |
+| Áudio do Gemini demora mais de 2,5 s após a resposta textual. | Latência ou indisponibilidade do TTS. | O frontend inicia `SpeechSynthesis` e ignora um áudio do servidor que chegue depois, evitando reprodução duplicada. |
+| Microfone negado ou indisponível. | Permissão ou dispositivo no navegador. | A inicialização entra em `error` e orienta o usuário; é necessário iniciar novamente após corrigir a permissão. |
+| WebSocket encerrado inesperadamente. | Rede, proxy ou backend. | A interface informa o encerramento. Não há reconexão automática nesta versão. |
+
+A voz alternativa usa `SpeechSynthesisUtterance` com idioma `pt-BR` e velocidade
+`1.05`. Ela depende das vozes disponíveis no sistema operacional e pode soar
+diferente entre navegadores. O fallback preserva a continuidade funcional
+quando a cota ou a disponibilidade do TTS externo impede a reprodução, mas não
+garante a mesma identidade vocal do Gemini.
+
+Falhas de um turno não removem as mensagens anteriores. A transcrição só entra
+no histórico quando o backend devolve `transcription_final`, e a resposta só é
+adicionada quando chega `agent_response`; dessa forma, tentativas vazias ou
+falhas anteriores a esses eventos não criam mensagens incompletas na conversa.
+
 
 ---
 
