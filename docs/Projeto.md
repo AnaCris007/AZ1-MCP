@@ -8889,6 +8889,67 @@ Durante toda a sessão, pedidos de ajuda devem ser registrados antes de qualquer
 
 Ao final de cada sessão, a equipe deve conferir se todos os tempos, resultados e avaliações foram registrados, separar consentimentos das observações e armazenar mídias identificáveis em local restrito. Apenas dados anonimizados e evidências autorizadas poderão aparecer neste relatório.
 
+### 6.9.4 Registros, evidências e resultados
+
+Foi realizada uma rodada complementar com cinco participantes externos: Laura, Carlos Eduardo, Richard Alves, Maria Vitória e Kaian Moura. A rodada avaliou consultas sobre projetos distintos e o retorno ao contexto do SYN-01 após mudanças de assunto. A identificação nominal no relatório foi autorizada pelos participantes; os termos de consentimento permanecem fora do repositório.
+
+#### Notas por tarefa e participante
+
+Cada célula apresenta **facilidade / confiança**, em escala de 1 a 5.
+
+| Tarefa | Laura | Carlos Eduardo | Richard Alves | Maria Vitória | Kaian Moura | Média |
+|---|---:|---:|---:|---:|---:|---:|
+| Principal risco do SYN-01 | 5 / 5 | 5 / 4 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 4,8 |
+| Consulta ao SYN-06 | 4 / 3 | 4 / 3 | 4 / 3 | 4 / 3 | 4 / 3 | 4,0 / 3,0 |
+| Pergunta fora do domínio: data atual | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 5,0 |
+| Consulta ao SYN-08 | 4 / 3 | 4 / 3 | 3 / 3 | 4 / 3 | 4 / 3 | 3,8 / 3,0 |
+| Consulta à Linha Laranja | 4 / 3 | 3 / 3 | 4 / 3 | 3 / 3 | 4 / 3 | 3,6 / 3,0 |
+| Retorno ao SYN-01 | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 5,0 |
+| Identificação da fonte e da data | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 5,0 |
+| Consulta ao custo de manutenção | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 4 | 5 / 5 | 5,0 / 4,8 |
+
+A média geral das oito tarefas foi 4,55 para facilidade e 4,20 para confiança. As menores médias de confiança, 3,0, ocorreram nas consultas ao SYN-06, SYN-08 e Linha Laranja.
+
+#### Gabarito usado na rodada
+
+| Informação | Resposta esperada |
+|---|---|
+| Projeto | SYN-01 — Modernização da Ventilação Operacional |
+| Risco principal | R01 — Atraso adicional na entrega de equipamentos |
+| Criticidade | Crítica |
+| Ação prevista | Diligenciar o fornecedor e priorizar os itens críticos |
+| Fonte | `04_Riscos_e_Problemas.xlsx` |
+| Data de referência | 31/08/2026 |
+| Custo de manutenção | Não disponível na massa de dados |
+
+#### Estratégias observadas na troca de contexto
+
+| Participante | Como mudou de assunto | Como retornou ao SYN-01 |
+|---|---|---|
+| Laura | Fez perguntas diretas por projeto | Perguntou novamente qual era a fonte do risco |
+| Carlos Eduardo | Usou “E no Projeto 6...” e perguntou se a Linha Laranja estava atrasada | Usou “Voltando ao projeto de ventilação...” |
+| Richard Alves | Perguntou sobre andamento e prazo | Perguntou apenas pelo código do risco |
+| Maria Vitória | Fez perguntas abertas sobre problemas e acontecimentos | Referiu-se indiretamente a “aquele risco de fornecedor” |
+| Kaian Moura | Usou “Agora me fale do Projeto 6” | Perguntou novamente a criticidade do SYN-01 |
+
+Todos os participantes atribuíram facilidade e confiança máximas ao retorno ao SYN-01. O resultado indica que referências diretas e indiretas ao projeto anterior foram compreendidas durante esta rodada. As perguntas abertas ou indutivas sobre SYN-08 e Linha Laranja receberam as menores notas de facilidade.
+
+SYN-06 e SYN-08 existem na massa sintética: o primeiro está “Em estruturação”, com avanço de 15%, e o segundo está “Concluído”, com avanço de 100%. Como as respostas textuais devolvidas pelo sistema não foram preservadas no registro recebido, esta rodada não permite afirmar se esses dados foram apresentados corretamente. A Linha Laranja não consta na massa, portanto a resposta esperada é uma limitação explícita, sem criação de status ou andamento.
+
+As evidências devem permitir relacionar o registro ao participante anonimizado, à tarefa e à versão avaliada. Capturas inseridas no relatório devem ocultar nomes, e-mails e outros dados pessoais. Gravações identificáveis permanecem fora do Git e são apenas referenciadas pelo código da sessão.
+
+| Evidência | Participante e caso | Conteúdo comprovado | Local ou referência | Situação |
+|---|---|---|---|---|
+| EV-01 | Pendente | Pendente | Pendente | Não coletada |
+
+| Problema | Evidência relacionada | Impacto | Frequência observada | Ação corretiva | Situação |
+|---|---|---|---:|---|---|
+| Confiança menor ao alternar entre projetos | Notas das consultas ao SYN-06 e SYN-08 | Pode dificultar a confirmação de que o contexto foi alterado | 5 de 5 participantes | Exibir com clareza o projeto considerado na resposta | A avaliar |
+| Confiança menor diante de projeto ausente | Notas da consulta à Linha Laranja | Pode levar o usuário a não distinguir ausência de dados de falha do sistema | 5 de 5 participantes | Informar explicitamente que o projeto não consta na base consultada | A avaliar |
+| Respostas reais de três tarefas não preservadas | Registro da rodada | Impede verificar a correção factual das respostas | 3 de 8 tarefas | Preservar resposta e fonte nas próximas fichas de execução | Aberta |
+
+Esta rodada registra percepção e troca de contexto, mas não encerra o RNF08. A aprovação depende da comprovação individual de EU-01, EU-04 e EU-05 sem ajuda para pelo menos quatro de cinco participantes. Tempos, pedidos de ajuda, respostas SUS e respostas textuais do sistema também precisam ser preservados na execução principal.
+
 ---
 
 # 7. Registro de Decisões
