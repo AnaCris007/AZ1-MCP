@@ -12,14 +12,21 @@ from __future__ import annotations
 
 import unittest
 
-from pln.metricas import (
+# A regra de rejeição mudou de casa para `pln.intencao`, porque o serviço
+# precisa aplicá-la em produção e não pode depender do módulo de medição. Os
+# testes dela continuam aqui: a rejeição é uma das DEFINIÇÕES que este arquivo
+# existe para travar, e é sobre ela que cobertura e aceitação indevida são
+# construídas. `test_intencao.py` trava o outro lado — que é a MESMA função.
+from pln.intencao import (
     INTENCAO_FORA_DO_CATALOGO,
+    aplicar_limiar,
+    aplicar_limiar_em_lote,
+)
+from pln.metricas import (
     LIMIARES_PADRAO,
     META_ACEITACAO_INDEVIDA,
     META_COBERTURA,
     META_F1_MACRO,
-    aplicar_limiar,
-    aplicar_limiar_em_lote,
     avaliar_rnf03,
     curva_do_limiar,
     escolher_limiar,
