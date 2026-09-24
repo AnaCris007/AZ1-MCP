@@ -1,13 +1,16 @@
 texto,intencao
 O que a metodologia define como benefício tangível?,consultar_documentos_normativos
+Qual é o prazo regulamentar para revisar o TAP depois de aprovado?,consultar_documentos_normativos
 "Segundo a norma, quem precisa assinar o Termo de Abertura?",consultar_documentos_normativos
 Como o manual classifica a criticidade de um risco?,consultar_documentos_normativos
 onde o regulamento fala sobre reprogramação de marcos,consultar_documentos_normativos
 Em que documento está definido o fluxo de aprovação de mudança de escopo?,consultar_documentos_normativos
 A instrução normativa exige reunião de abertura?,consultar_documentos_normativos
+Qual a diferença entre marco e entrega segundo o guia interno?,consultar_documentos_normativos
 me explica o que a norma entende por desvio de prazo,consultar_documentos_normativos
 O que diz o procedimento sobre projetos com orçamento acima de R$ 500 milhões?,consultar_documentos_normativos
 Existe alguma regra sobre periodicidade mínima de atualização do avanço?,consultar_documentos_normativos
+Quantos dias o processo prevê para homologação de um artefato?,consultar_documentos_normativos
 Cita a cláusula que trata de dependência entre entregas.,consultar_documentos_normativos
 Como o documento define projeto em execução?,consultar_documentos_normativos
 qual o rito pra encerrar um projeto formalmente,consultar_documentos_normativos
@@ -25,6 +28,7 @@ Explica o conceito de valor agregado como está no material.,consultar_documento
 quanto tempo a norma da pra responder uma pendencia,consultar_documentos_normativos
 O que o regulamento exige na descrição de uma atividade?,consultar_documentos_normativos
 Em que situação a metodologia recomenda abrir um novo projeto em vez de um aditivo?,consultar_documentos_normativos
+Qual é o papel do PMO segundo o documento de governança?,consultar_documentos_normativos
 A norma exige evidência documental para registrar avanço?,consultar_documentos_normativos
 Como o guia define a linha de base de custo?,consultar_documentos_normativos
 o procedimento fala alguma coisa sobre projeto sem responsável,consultar_documentos_normativos
@@ -36,20 +40,31 @@ Onde está descrito o processo de validação do cronograma?,consultar_documento
 A norma permite entrega parcial de um marco?,consultar_documentos_normativos
 qual a definição formal de escopo no nosso manual,consultar_documentos_normativos
 Qual é o avanço físico da Linha 6 neste mês?,consultar_projeto_sintetico
+Quem é o responsável pelo lote 3 de obras civis?,consultar_projeto_sintetico
 Qual o orçamento aprovado do projeto de sinalização?,consultar_projeto_sintetico
+me mostra a data prevista de conclusão da Estação Vila Sônia,consultar_projeto_sintetico
+Quantos riscos estão registrados na Linha 17?,consultar_projeto_sintetico
+O projeto do pátio de manutenção está em que fase?,consultar_projeto_sintetico
 Qual foi a última atualização do programa de modernização da Linha 1?,consultar_projeto_sintetico
 Lista as entregas concluídas da Linha 15.,consultar_projeto_sintetico
 "e o cronograma da 6, como tá?",consultar_projeto_sintetico
 Quanto já foi executado do orçamento da Linha 2?,consultar_projeto_sintetico
 Qual a criticidade do risco R-07 da Linha 6?,consultar_projeto_sintetico
+Quem assinou o TAP do projeto de sinalização?,consultar_projeto_sintetico
+mostra os marcos da linha 17 pro proximo trimestre,consultar_projeto_sintetico
 Qual o desvio de prazo acumulado da Estação Vila Sônia?,consultar_projeto_sintetico
 Tem quantas atividades abertas no lote 3?,consultar_projeto_sintetico
 Qual era o avanço planejado da Linha 15 em 12/03/2026?,consultar_projeto_sintetico
+Me traz o histórico de alterações do projeto de expansão da Linha 2.,consultar_projeto_sintetico
+Quantos dias de atraso tem o marco de desapropriação?,consultar_projeto_sintetico
 Qual o valor do contrato do material rodante?,consultar_projeto_sintetico
 quem tá tocando o programa de expansão metroviária,consultar_projeto_sintetico
 O Mapa de Benefícios da Linha 6 já foi preenchido?,consultar_projeto_sintetico
 Qual a data do último apontamento na Linha 1?,consultar_projeto_sintetico
 Resume a situação atual do lote 3 pra mim.,consultar_projeto_sintetico
+Quantas entregas a Linha 17 tem previstas até dezembro?,consultar_projeto_sintetico
+Qual é o percentual de execução financeira da Linha 15?,consultar_projeto_sintetico
+me diz quais documentos estão anexados no projeto da linha 6,consultar_projeto_sintetico
 O projeto de sinalização tem plano de resposta a risco cadastrado?,consultar_projeto_sintetico
 Qual a dependência entre o marco de obra civil e o de sistemas?,consultar_projeto_sintetico
 Quanto o pátio de manutenção consumiu de orçamento até agora?,consultar_projeto_sintetico
@@ -62,12 +77,15 @@ Em que data foi aberto o projeto de modernização da Linha 1?,consultar_projeto
 Me dá os números de execução física e financeira da Linha 17.,consultar_projeto_sintetico
 Quantos marcos já foram concluídos no programa de expansão metroviária?,consultar_projeto_sintetico
 qual o custo previsto versus realizado da linha 15,consultar_projeto_sintetico
+O que mudou na Linha 6 desde a última consulta?,consultar_projeto_sintetico
 Traz a ficha completa do projeto de sinalização.,consultar_projeto_sintetico
 Me ajuda a preencher o Mapa de Benefícios da Linha 6?,orientar_mapa_beneficios
+Quais campos do Mapa de Benefícios ainda faltam?,orientar_mapa_beneficios
 Como eu descrevo o benefício de redução de tempo de viagem?,orientar_mapa_beneficios
 "to travado no mapa de beneficios, o que eu ponho em indicador",orientar_mapa_beneficios
 Sugere um indicador para o benefício de aumento de capacidade.,orientar_mapa_beneficios
 Não sei que valor colocar na meta do benefício.,orientar_mapa_beneficios
+O que entra em benefício esperado nesse caso?,orientar_mapa_beneficios
 "Me guia no preenchimento do mapa de benefícios, por favor.",orientar_mapa_beneficios
 Preciso de ajuda para escrever o benefício intangível do projeto.,orientar_mapa_beneficios
 Qual unidade de medida faz sentido para esse benefício?,orientar_mapa_beneficios
@@ -90,17 +108,23 @@ Sugere uma forma de quantificar a redução de custo operacional.,orientar_mapa_
 "mapa de beneficios da linha 17, me ajuda a montar",orientar_mapa_beneficios
 Como descrevo um benefício que só aparece depois de 5 anos?,orientar_mapa_beneficios
 Me ajuda a revisar o texto do benefício que escrevi.,orientar_mapa_beneficios
+Que campos eu preciso preencher no Mapa de Benefícios?,orientar_mapa_beneficios
+"Não sei separar benefício de resultado, me explica no meu caso?",orientar_mapa_beneficios
 Sugere indicador para o benefício de acessibilidade.,orientar_mapa_beneficios
 quero preencher o mapa de beneficios mas nao sei a periodicidade,orientar_mapa_beneficios
 Me ajuda a definir o responsável por acompanhar esse benefício.,orientar_mapa_beneficios
+Como registro um benefício compartilhado entre dois projetos?,orientar_mapa_beneficios
 "Preciso preencher a fonte de dados do indicador, o que eu uso?",orientar_mapa_beneficios
 Me sugere três benefícios para o pátio de manutenção.,orientar_mapa_beneficios
 o beneficio que eu escrevi ta bom,orientar_mapa_beneficios
 Ajuda a transformar esse texto solto em benefício estruturado.,orientar_mapa_beneficios
 Como eu preencho o mapa quando o benefício é regulatório?,orientar_mapa_beneficios
+Me ajuda a preencher o TAP do projeto da Linha 17?,orientar_tap
 O que eu escrevo na justificativa do Termo de Abertura?,orientar_tap
+Quais campos do TAP ainda estão vazios?,orientar_tap
 Sugere um texto para o objetivo do projeto no TAP.,orientar_tap
 "to montando o tap, como descrevo as premissas",orientar_tap
+"Não sei diferenciar premissa de restrição no TAP, me ajuda?",orientar_tap
 Como delimito o escopo no Termo de Abertura?,orientar_tap
 "Me guia no preenchimento do TAP, começando pelo início.",orientar_tap
 Qual nível de detalhe o campo de entregas do TAP pede?,orientar_tap
@@ -109,7 +133,11 @@ me ajuda a escrever o objetivo do tap da linha 6,orientar_tap
 O que colocar em critérios de sucesso?,orientar_tap
 Sugere melhorias pro TAP que eu escrevi.,orientar_tap
 Sugere premissas para um projeto de expansão de linha.,orientar_tap
+Como escrevo a exclusão de escopo?,orientar_tap
+Me sugere o que incluir no escopo do Termo de Abertura.,orientar_tap
 "termo de abertura do projeto de sinalizacao, me ajuda a montar",orientar_tap
+"Quero começar o TAP, por onde eu vou?",orientar_tap
+Me dá exemplo de restrição para projeto com desapropriação.,orientar_tap
 Como descrevo o gerente do projeto e a autoridade dele?,orientar_tap
 O campo de orçamento preliminar do TAP aceita faixa?,orientar_tap
 Me ajuda a redigir a descrição do produto do projeto.,orientar_tap
@@ -121,22 +149,30 @@ Que informação vai no campo de patrocinador?,orientar_tap
 Me ajuda a deixar o objetivo do TAP mais específico.,orientar_tap
 O TAP pede cronograma detalhado ou só os marcos?,orientar_tap
 Sugere um texto melhor pra seção de escopo do meu termo de abertura.,orientar_tap
+me ajuda a preencher o tap,orientar_tap
+Como escrevo um objetivo mensurável aqui?,orientar_tap
 Sugere critérios de aceitação pras entregas do TAP.,orientar_tap
+"O campo de partes interessadas, quem eu coloco nele?",orientar_tap
 "Quero abrir o projeto formalmente, o que preciso preencher?",orientar_tap
 Me ajuda a ajustar o texto do TAP pra ficar mais claro.,orientar_tap
 como descrevo a necessidade de negocio no termo de abertura,orientar_tap
 Sugere um nome curto e claro pro projeto no TAP.,orientar_tap
 O que muda no TAP se o projeto for um programa?,orientar_tap
+Me ajuda a completar as premissas que faltam.,orientar_tap
 Me ajuda a montar o cronograma da Linha 6?,orientar_entregas_cronograma
+Como eu quebro essa entrega em atividades?,orientar_entregas_cronograma
 Sugere marcos para um projeto de obra civil de 24 meses.,orientar_entregas_cronograma
 Qual a dependência certa entre desapropriação e início de obra?,orientar_entregas_cronograma
 "to montando o cronograma, essa data faz sentido",orientar_entregas_cronograma
 Me ajuda a definir as entregas do lote 3.,orientar_entregas_cronograma
 Essa sequência de atividades está coerente?,orientar_entregas_cronograma
+Como represento uma dependência do tipo término-início?,orientar_entregas_cronograma
 "Preciso encaixar mais um marco, onde ele entra?",orientar_entregas_cronograma
 sugere entregas pro projeto de sinalizacao,orientar_entregas_cronograma
 O prazo de 8 meses pra essa atividade é razoável?,orientar_entregas_cronograma
 Me ajuda a definir a data de um marco de homologação.,orientar_entregas_cronograma
+Como trato atividades que rodam em paralelo?,orientar_entregas_cronograma
+"Preciso detalhar o cronograma da fase de testes, me ajuda?",orientar_entregas_cronograma
 Sugere uma estrutura de entregas para modernização de sinalização.,orientar_entregas_cronograma
 "Quero replanejar as datas depois do atraso, como faço?",orientar_entregas_cronograma
 me ajuda a criar os marcos da linha 17,orientar_entregas_cronograma
@@ -144,12 +180,15 @@ Essa entrega depende de qual outra?,orientar_entregas_cronograma
 Como defino a duração de uma atividade sem histórico?,orientar_entregas_cronograma
 Ajuda a organizar as entregas em fases.,orientar_entregas_cronograma
 que atividades eu poderia acrescentar nessa fase,orientar_entregas_cronograma
+Sugere um marco intermediário pra essa entrega longa.,orientar_entregas_cronograma
 "Como registro uma dependência externa, tipo licença ambiental?",orientar_entregas_cronograma
 Me ajuda a colocar datas realistas nessas entregas.,orientar_entregas_cronograma
 Essa entrega devia ser marco ou atividade?,orientar_entregas_cronograma
 "Preciso antecipar uma entrega, o que isso afeta?",orientar_entregas_cronograma
+"cronograma do patio de manutencao, me ajuda a estruturar",orientar_entregas_cronograma
 Como eu represento uma atividade recorrente?,orientar_entregas_cronograma
 Sugere entregas para a fase de operação assistida.,orientar_entregas_cronograma
+Faz sentido criar uma dependência entre esses dois marcos?,orientar_entregas_cronograma
 Me ajuda a definir o caminho crítico aqui.,orientar_entregas_cronograma
 Como quebro obra civil em entregas menores?,orientar_entregas_cronograma
 Essa data de conclusão bate com as dependências?,orientar_entregas_cronograma
@@ -164,11 +203,14 @@ Me ajuda a preencher o avanço deste mês?,orientar_avanco_mensal
 Que dados eu preciso pra reportar o avanço de março?,orientar_avanco_mensal
 Como eu calculo o percentual físico executado?,orientar_avanco_mensal
 to reportando o avanco mas falta o valor financeiro,orientar_avanco_mensal
+O que entra na justificativa do desvio de avanço?,orientar_avanco_mensal
 Me ajuda a descrever o que foi feito no mês.,orientar_avanco_mensal
+"Preciso reportar avanço zero, como justifico?",orientar_avanco_mensal
 Qual evidência eu anexo no reporte mensal?,orientar_avanco_mensal
 me ajuda a fechar o avanco da linha 6 desse mes,orientar_avanco_mensal
 Como registro avanço parcial de uma entrega?,orientar_avanco_mensal
 "Preciso preencher o campo de avanço financeiro, o que eu coloco?",orientar_avanco_mensal
+Sugere um texto pro comentário do mês.,orientar_avanco_mensal
 "O avanço planejado e o realizado não batem, o que escrevo?",orientar_avanco_mensal
 Me ajuda a montar o reporte mensal do lote 3.,orientar_avanco_mensal
 Quais informações são obrigatórias no avanço mensal?,orientar_avanco_mensal
@@ -180,11 +222,14 @@ Sugere como descrever o avanço de uma entrega de software.,orientar_avanco_mens
 "avanco fisico e financeiro, qual a diferenca na hora de preencher",orientar_avanco_mensal
 Me ajuda a preencher o avanço da Estação Vila Sônia.,orientar_avanco_mensal
 Como reporto avanço de um marco que atrasou?,orientar_avanco_mensal
+Me sugere o que mais incluir no reporte de avanço.,orientar_avanco_mensal
 Que período o avanço deste mês deve cobrir?,orientar_avanco_mensal
 Me ajuda a escrever a previsão pro mês que vem.,orientar_avanco_mensal
 Como informo mudança de responsável junto com o avanço?,orientar_avanco_mensal
 me ajuda a justificar o atraso no reporte mensal,orientar_avanco_mensal
 Sugere o que anexar como comprovação do avanço.,orientar_avanco_mensal
+"Preciso reportar avanço de duas entregas juntas, como faço?",orientar_avanco_mensal
+O campo de observações do avanço é obrigatório?,orientar_avanco_mensal
 Me ajuda a descrever o impacto do atraso no avanço.,orientar_avanco_mensal
 como preencho avanco quando a medicao ainda nao saiu,orientar_avanco_mensal
 Sugere um texto curto pro avanço da Linha 17.,orientar_avanco_mensal
@@ -196,14 +241,17 @@ me ajuda a preencher o avanco mensal,orientar_avanco_mensal
 Como descrevo avanço quando parte da entrega foi rejeitada?,orientar_avanco_mensal
 Me ajuda a descrever esse risco de desapropriação?,orientar_riscos_problemas
 Qual criticidade eu dou pra esse risco?,orientar_riscos_problemas
+Isso é risco ou já virou problema?,orientar_riscos_problemas
 "to registrando um risco, como escrevo a causa",orientar_riscos_problemas
 Sugere um plano de ação pro risco de atraso de licença.,orientar_riscos_problemas
+Me ajuda a classificar a probabilidade desse risco.,orientar_riscos_problemas
 Como eu descrevo o impacto de forma objetiva?,orientar_riscos_problemas
 "Preciso escrever a resposta ao risco, me ajuda?",orientar_riscos_problemas
 me ajuda a analisar o problema da falta de material rodante,orientar_riscos_problemas
 Esse risco deveria ser alto ou médio?,orientar_riscos_problemas
 Sugere riscos típicos de projeto de sinalização.,orientar_riscos_problemas
 "Como separo causa, evento e consequência?",orientar_riscos_problemas
+"Preciso definir o responsável pelo risco, quem faz sentido?",orientar_riscos_problemas
 Me ajuda a escrever o gatilho desse risco.,orientar_riscos_problemas
 quais riscos eu deveria mapear num projeto de expansao,orientar_riscos_problemas
 "O problema já aconteceu, como registro o impacto?",orientar_riscos_problemas
@@ -217,6 +265,7 @@ Qual a diferença prática entre mitigar e transferir aqui?,orientar_riscos_prob
 Sugere indicadores pra monitorar esse risco.,orientar_riscos_problemas
 Me ajuda a redigir o problema de forma clara pra direção.,orientar_riscos_problemas
 Como eu registro um risco que virou problema?,orientar_riscos_problemas
+sugere criticidade pro risco de chuva atrasar a obra,orientar_riscos_problemas
 "Preciso descrever a consequência, me ajuda?",orientar_riscos_problemas
 Esse risco tem a ver com escopo ou com prazo?,orientar_riscos_problemas
 Me ajuda a montar o plano de contingência.,orientar_riscos_problemas
@@ -225,17 +274,21 @@ Sugere um responsável adequado pra tratar esse problema.,orientar_riscos_proble
 me ajuda a analisar a criticidade desse problema,orientar_riscos_problemas
 "Preciso encerrar um risco, o que preciso escrever?",orientar_riscos_problemas
 Ajuda a revisar a descrição de risco que eu fiz.,orientar_riscos_problemas
+Como trato um risco que afeta dois projetos?,orientar_riscos_problemas
 Sugere como medir se a mitigação funcionou.,orientar_riscos_problemas
 Esse problema exige mudança de linha de base?,orientar_riscos_problemas
 me ajuda a descrever o problema do fornecedor atrasado,orientar_riscos_problemas
+Como classifico impacto quando afeta prazo e custo?,orientar_riscos_problemas
 Confere se o TAP que eu preenchi está completo.,analisar_completude_coerencia
 Tem alguma inconsistência no que eu escrevi?,analisar_completude_coerencia
 Revisa o cronograma que montei e me diz se falta alguma coisa.,analisar_completude_coerencia
 da uma olhada se meu mapa de beneficios ta coerente,analisar_completude_coerencia
+As datas que eu coloquei batem entre si?,analisar_completude_coerencia
 Verifica se o avanço que reportei está consistente.,analisar_completude_coerencia
 Falta algum campo obrigatório no que eu enviei?,analisar_completude_coerencia
 Analisa se as entregas que listei cobrem todo o escopo.,analisar_completude_coerencia
 o orcamento que eu pus bate com o cronograma,analisar_completude_coerencia
+Checa se o risco que descrevi está bem estruturado.,analisar_completude_coerencia
 Tem contradição entre o TAP e o cronograma que montei?,analisar_completude_coerencia
 Revisa tudo que eu preenchi e aponta os problemas.,analisar_completude_coerencia
 Meu Mapa de Benefícios está coerente com o objetivo do TAP?,analisar_completude_coerencia
@@ -250,6 +303,7 @@ Verifica se a data de conclusão é coerente com os marcos.,analisar_completude_
 Tem campo preenchido de forma inconsistente aqui?,analisar_completude_coerencia
 Analisa se o benefício que descrevi tem indicador correspondente.,analisar_completude_coerencia
 checa a coerencia entre o avanco fisico e o financeiro que informei,analisar_completude_coerencia
+Meu cronograma tem alguma dependência circular?,analisar_completude_coerencia
 Revisa se as informações que dei do projeto estão completas.,analisar_completude_coerencia
 O que eu preenchi está pronto pra enviar?,analisar_completude_coerencia
 Aponta as ausências no que eu registrei.,analisar_completude_coerencia
@@ -264,7 +318,9 @@ O que eu escrevi responde tudo que o campo pede?,analisar_completude_coerencia
 analisa se meu cronograma ta completo,analisar_completude_coerencia
 Verifica se o valor do benefício que pus é coerente com o orçamento.,analisar_completude_coerencia
 Aponta inconsistências entre as seções que preenchi.,analisar_completude_coerencia
+Meu registro de problema está completo o suficiente?,analisar_completude_coerencia
 O que precisa da minha atenção hoje?,gerar_alertas_pendencias
+Tem algum prazo vencido?,gerar_alertas_pendencias
 Me avisa o que está atrasado na Linha 6.,gerar_alertas_pendencias
 quais pendencias sao mais urgentes,gerar_alertas_pendencias
 Existe algum marco sem responsável definido?,gerar_alertas_pendencias
@@ -272,20 +328,26 @@ Me lista o que está pendente por prioridade.,gerar_alertas_pendencias
 Tem projeto sem atualização há mais de 30 dias?,gerar_alertas_pendencias
 O que está fora da faixa aceitável agora?,gerar_alertas_pendencias
 me mostra os alertas do lote 3,gerar_alertas_pendencias
+Quais riscos altos estão sem plano de ação?,gerar_alertas_pendencias
 Tem alguma entrega vencendo esta semana?,gerar_alertas_pendencias
+Me avisa dos itens críticos do programa de expansão.,gerar_alertas_pendencias
 O que eu deveria olhar primeiro hoje?,gerar_alertas_pendencias
 quais projetos estao com documento obrigatorio faltando,gerar_alertas_pendencias
 Tem marco próximo do vencimento?,gerar_alertas_pendencias
+Me dá a lista priorizada de pendências.,gerar_alertas_pendencias
 Existe algo bloqueado esperando decisão minha?,gerar_alertas_pendencias
+O que está em risco de estourar o prazo?,gerar_alertas_pendencias
 me avisa se tiver algo critico na linha 17,gerar_alertas_pendencias
 Quais itens estão atrasados há mais de 15 dias?,gerar_alertas_pendencias
 Tem alguma coisa que eu preciso resolver antes do comitê?,gerar_alertas_pendencias
+Me mostra o que está pendente na Estação Vila Sônia.,gerar_alertas_pendencias
 Quais avanços não foram reportados no prazo?,gerar_alertas_pendencias
 o que ta pegando fogo essa semana,gerar_alertas_pendencias
 Existe projeto sem responsável atribuído?,gerar_alertas_pendencias
 Me avisa das pendências que vencem em 7 dias.,gerar_alertas_pendencias
 Quais alertas mudaram desde ontem?,gerar_alertas_pendencias
 Tem risco que piorou de criticidade?,gerar_alertas_pendencias
+me lista tudo que precisa de atencao no programa de expansao metroviaria,gerar_alertas_pendencias
 O que está travado por dependência não cumprida?,gerar_alertas_pendencias
 Quais marcos vão estourar se nada mudar?,gerar_alertas_pendencias
 Me dá os cinco itens mais urgentes.,gerar_alertas_pendencias
@@ -294,10 +356,12 @@ quais pendencias sao da minha responsabilidade,gerar_alertas_pendencias
 Existe desvio de custo acima do tolerado?,gerar_alertas_pendencias
 Me avisa dos projetos parados.,gerar_alertas_pendencias
 O que precisa de decisão até sexta?,gerar_alertas_pendencias
+tem alguma coisa vencida no patio de manutencao,gerar_alertas_pendencias
 Quais itens estão sem movimentação há duas semanas?,gerar_alertas_pendencias
 Me alerta se algum indicador saiu do verde.,gerar_alertas_pendencias
 Qual a previsão do tempo pra amanhã?,fora_do_catalogo
 Aprova o orçamento da Linha 6 pra mim.,fora_do_catalogo
+Manda um e-mail pro diretor avisando do atraso.,fora_do_catalogo
 me conta uma piada,fora_do_catalogo
 Deleta o projeto de sinalização.,fora_do_catalogo
 Qual o horário do último trem da Linha 4?,fora_do_catalogo
@@ -310,30 +374,39 @@ Liga pro fornecedor e cobra o material.,fora_do_catalogo
 qual o resultado do jogo ontem,fora_do_catalogo
 Cadastra um usuário novo no sistema.,fora_do_catalogo
 Faz o pagamento da medição de fevereiro.,fora_do_catalogo
+Me diz quem vai ganhar a licitação.,fora_do_catalogo
+altera minha senha,fora_do_catalogo
 Qual a melhor rota pra chegar na Vila Sônia de carro?,fora_do_catalogo
 Publica esse relatório no site da empresa.,fora_do_catalogo
 Me recomenda um livro sobre gestão.,fora_do_catalogo
 exporta tudo pro excel e manda no meu whatsapp,fora_do_catalogo
 Contrata mais dois engenheiros pra equipe.,fora_do_catalogo
+Qual o câmbio do dólar hoje?,fora_do_catalogo
 Cancela a obra da Linha 17.,fora_do_catalogo
 me ajuda com uma planilha de despesas pessoais,fora_do_catalogo
 Faz um resumo do noticiário de hoje.,fora_do_catalogo
 Aprova a mudança de escopo que eu pedi.,fora_do_catalogo
 Qual o telefone da ouvidoria?,fora_do_catalogo
+desliga o sistema,fora_do_catalogo
 Escreve um post pro LinkedIn sobre o projeto.,fora_do_catalogo
 Me ensina a programar em Python.,fora_do_catalogo
 Reserva a sala de reunião pra quinta.,fora_do_catalogo
 qual o salario do gerente de projetos,fora_do_catalogo
 Emite a nota fiscal do fornecedor.,fora_do_catalogo
 Me diz se vai chover na obra amanhã.,fora_do_catalogo
+Compra os equipamentos que faltam.,fora_do_catalogo
+me ajuda a estudar pra prova,fora_do_catalogo
 Qual a capital da Argentina?,fora_do_catalogo
 Demite o responsável pelo lote 3.,fora_do_catalogo
 Envia uma notificação pra todos os usuários.,fora_do_catalogo
 Quais campos estão pendentes no meu projeto?,analisar_completude_coerencia
 Confere se o reporte deste mês está completo.,analisar_completude_coerencia
 Tem alguma informação faltando antes do fechamento?,analisar_completude_coerencia
+Verifica se os dados do projeto estão coerentes entre si.,analisar_completude_coerencia
 Me diz o que ainda precisa ser preenchido.,analisar_completude_coerencia
+o reporte ta completo ou falta alguma coisa,analisar_completude_coerencia
 Revisa se o avanço que informei bate com as entregas registradas.,analisar_completude_coerencia
+Tem inconsistência entre o cronograma e os marcos que cadastrei?,analisar_completude_coerencia
 Confere se o benefício descrito tem indicador e meta.,analisar_completude_coerencia
 As datas do projeto estão consistentes com a fase atual?,analisar_completude_coerencia
 Me aponta o que está incompleto no TAP.,analisar_completude_coerencia
@@ -344,6 +417,7 @@ me diz se falta algo no mapa de beneficios,analisar_completude_coerencia
 Confere se a justificativa do desvio está coerente com o avanço.,analisar_completude_coerencia
 Tem algum marco sem data prevista cadastrada?,analisar_completude_coerencia
 Verifica se o escopo descrito bate com as entregas listadas.,analisar_completude_coerencia
+Me diz se o projeto está pronto para o fechamento do ciclo.,analisar_completude_coerencia
 Revisa se as dependências que registrei têm impacto descrito.,analisar_completude_coerencia
 Tem alguma contradição entre situação e percentual de avanço?,analisar_completude_coerencia
 Confere se todos os benefícios têm metodologia de medição.,analisar_completude_coerencia
@@ -359,6 +433,7 @@ Revisa se a criticidade dos riscos está coerente com o impacto.,analisar_comple
 Tem informação desatualizada no meu projeto?,analisar_completude_coerencia
 Confere se o cronograma tem dependências circulares.,analisar_completude_coerencia
 "Verifica se a descrição do risco segue causa, evento e consequência.",analisar_completude_coerencia
+me confere se o tap ta coerente com o cronograma,analisar_completude_coerencia
 Me diz quais campos impedem o reporte de ficar completo.,analisar_completude_coerencia
 Revisa se as premissas e restrições do TAP não se contradizem.,analisar_completude_coerencia
 Tem algum indicador de benefício sem valor de linha de base?,analisar_completude_coerencia
@@ -368,8 +443,13 @@ Me aponta divergência entre o que reportei e o mês anterior.,analisar_completu
 Revisa se os marcos estão em ordem cronológica coerente.,analisar_completude_coerencia
 Tem risco registrado sem probabilidade definida?,analisar_completude_coerencia
 Confere se a situação declarada bate com os pontos de atenção.,analisar_completude_coerencia
+Verifica se o subportfólio tem todos os projetos vinculados.,analisar_completude_coerencia
+o que falta pro meu reporte ficar completo,analisar_completude_coerencia
+Me diz se há campo preenchido com valor presumido.,analisar_completude_coerencia
 Revisa se a mudança de escopo foi refletida no cronograma.,analisar_completude_coerencia
+Tem entrega listada que não aparece em nenhum marco?,analisar_completude_coerencia
 Confere se as datas de início e término são compatíveis.,analisar_completude_coerencia
+Verifica se o avanço econômico é coerente com o físico.,analisar_completude_coerencia
 Me aponta o que está incompleto antes da reunião de Diretoria.,analisar_completude_coerencia
 Revisa se o registro de problema tem tratamento associado.,analisar_completude_coerencia
 Tem benefício sem responsável pela apuração?,analisar_completude_coerencia
@@ -384,27 +464,41 @@ O que a metodologia define como subportfólio?,consultar_documentos_normativos
 Qual a regra para registrar uma determinação legal no portfólio?,consultar_documentos_normativos
 O que a norma diz sobre escalonamento para a Diretoria?,consultar_documentos_normativos
 Como o regulamento define benefício realizado?,consultar_documentos_normativos
+Onde está descrito o fluxo de deliberação de mudanças?,consultar_documentos_normativos
+qual a regra de classificacao da informacao corporativa,consultar_documentos_normativos
 O que a metodologia exige antes de encerrar a fase de implementação?,consultar_documentos_normativos
 "Segundo a norma, quem aprova a reprogramação de cronograma?",consultar_documentos_normativos
 Qual o prazo regulamentar para o fechamento do ciclo mensal?,consultar_documentos_normativos
 O que o manual define como dependência externa?,consultar_documentos_normativos
 Como a metodologia diferencia marco de entrega?,consultar_documentos_normativos
 Onde o regulamento trata de homologação técnica?,consultar_documentos_normativos
+O que a norma estabelece sobre governança de portfólio?,consultar_documentos_normativos
 Qual documento define os papéis do PMO?,consultar_documentos_normativos
 me explica o que a metodologia chama de componente do portfolio,consultar_documentos_normativos
 "Segundo o manual, o que entra no resumo executivo?",consultar_documentos_normativos
 Qual a regra para medir avanço econômico?,consultar_documentos_normativos
 O que a norma diz sobre priorização de investimentos?,consultar_documentos_normativos
 Onde está definido o processo de abertura de projeto?,consultar_documentos_normativos
+Como o regulamento trata projetos com obrigação regulatória?,consultar_documentos_normativos
 O que a metodologia define como indicador de benefício?,consultar_documentos_normativos
+Qual o critério normativo para situação crítica?,consultar_documentos_normativos
+"Segundo a norma, com que frequência o portfólio é revisado?",consultar_documentos_normativos
 O que o manual diz sobre retenção de registros de auditoria?,consultar_documentos_normativos
 Onde está a definição de avanço físico na metodologia?,consultar_documentos_normativos
+qual norma trata da aprovacao do termo de abertura,consultar_documentos_normativos
+O que a metodologia exige na justificativa de desvio?,consultar_documentos_normativos
 Como o regulamento define escopo aprovado?,consultar_documentos_normativos
 Qual o processo formal para suspender um projeto?,consultar_documentos_normativos
+O que a norma estabelece sobre conflito entre duas fontes de dados?,consultar_documentos_normativos
+Onde o manual fala sobre responsabilidades do líder de projeto?,consultar_documentos_normativos
+"Segundo a metodologia, o que caracteriza um problema?",consultar_documentos_normativos
+Qual a regra de acesso a documentos restritos?,consultar_documentos_normativos
 O que a norma define como período de referência?,consultar_documentos_normativos
 Onde está descrito o critério de encerramento de projeto?,consultar_documentos_normativos
 Como o manual orienta a tratativa de dependência contratual?,consultar_documentos_normativos
+Qual o fluxo normativo para registrar uma deliberação?,consultar_documentos_normativos
 O que a metodologia diz sobre reuniões de subportfólio?,consultar_documentos_normativos
+"Segundo a norma, quando um benefício pode ser declarado realizado?",consultar_documentos_normativos
 me diz o que o regulamento fala sobre mudanca de escopo,consultar_documentos_normativos
 Qual documento define o modelo de governança do Metrô?,consultar_documentos_normativos
 O que a metodologia estabelece para capacidade de execução?,consultar_documentos_normativos
@@ -420,10 +514,12 @@ Qual documento estabelece o padrão de reporte mensal?,consultar_documentos_norm
 O que a metodologia diz sobre lições aprendidas?,consultar_documentos_normativos
 "Segundo a norma, o que exige aprovação do Conselho?",consultar_documentos_normativos
 Onde o manual descreve o ciclo de vida do projeto?,consultar_documentos_normativos
+qual a definicao normativa de marco critico,consultar_documentos_normativos
 O que a metodologia define como tratamento de risco?,consultar_documentos_normativos
 Qual a regra para atualizar a data de referência?,consultar_documentos_normativos
 O que a norma estabelece sobre transparência de informação?,consultar_documentos_normativos
 Onde está descrito o processo de contratação em projetos?,consultar_documentos_normativos
+Como está o Portfólio Organizacional neste mês?,consultar_projeto_sintetico
 Qual é o resumo executivo do portfólio?,consultar_projeto_sintetico
 Qual é o valor total previsto do portfólio?,consultar_projeto_sintetico
 Como está o meu subportfólio?,consultar_projeto_sintetico
@@ -431,60 +527,78 @@ Faça um resumo executivo do projeto de sinalização.,consultar_projeto_sinteti
 Faça um resumo executivo do subportfólio de receitas acessórias.,consultar_projeto_sintetico
 Quais são as entregas planejadas do projeto?,consultar_projeto_sintetico
 Quais são os principais marcos do projeto?,consultar_projeto_sintetico
+Quais projetos possuem determinações legais registradas?,consultar_projeto_sintetico
 Quais resultados relevantes foram entregues neste período?,consultar_projeto_sintetico
+Quantos componentes o portfólio acompanha hoje?,consultar_projeto_sintetico
 Qual a situação consolidada do portfólio na data de referência?,consultar_projeto_sintetico
 Me mostra a situação de cada projeto do meu subportfólio.,consultar_projeto_sintetico
 Qual o avanço econômico da Linha 17 até agora?,consultar_projeto_sintetico
 Qual é o previsto econômico do projeto de ventilação?,consultar_projeto_sintetico
 quanto ja foi realizado do orcamento da linha 6,consultar_projeto_sintetico
+Qual o percentual físico executado do SYN-01?,consultar_projeto_sintetico
 Me dá a data do próximo marco da Estação Vila Sônia.,consultar_projeto_sintetico
 Qual a data de referência da última atualização do projeto?,consultar_projeto_sintetico
 Quem responde pelo subportfólio de melhoria da experiência do passageiro?,consultar_projeto_sintetico
 Qual o desvio entre avanço previsto e realizado na Linha 17?,consultar_projeto_sintetico
 Me lista os projetos em andamento do portfólio.,consultar_projeto_sintetico
 Quantos projetos estão em atenção neste ciclo?,consultar_projeto_sintetico
+Qual é a fase atual do projeto de monitoramento de ativos?,consultar_projeto_sintetico
 Me mostra os benefícios esperados do projeto de armários inteligentes.,consultar_projeto_sintetico
 Qual benefício já foi comprovado no SYN-02?,consultar_projeto_sintetico
 qual o status do projeto de ampliacao da estacao horizonte,consultar_projeto_sintetico
 Me traz os dados do TAP aprovado da Linha 6.,consultar_projeto_sintetico
 Qual o prazo de término previsto do lote 3?,consultar_projeto_sintetico
+Quantas entregas foram concluídas no período?,consultar_projeto_sintetico
 Me mostra o histórico de avanço mensal do SYN-03.,consultar_projeto_sintetico
 Qual a criticidade dos riscos registrados na Linha 17?,consultar_projeto_sintetico
 Quem é o líder do projeto de sinalização digital integrada?,consultar_projeto_sintetico
 Qual o e-mail do responsável pelo SYN-01?,consultar_projeto_sintetico
 Me mostra o cronograma aprovado do projeto de ventilação.,consultar_projeto_sintetico
 Quantos artefatos o projeto de monitoramento já tem cadastrados?,consultar_projeto_sintetico
+Qual o percentual previsto para este mês no SYN-02?,consultar_projeto_sintetico
 Me dá a lista de marcos já alcançados da Linha 6.,consultar_projeto_sintetico
 "Qual a situação de prazo, custo e escopo do projeto?",consultar_projeto_sintetico
 quais sao os projetos do subportfolio de receitas acessorias,consultar_projeto_sintetico
+Me mostra os indicadores de benefício do portfólio.,consultar_projeto_sintetico
 Qual a data de início do projeto de ampliação?,consultar_projeto_sintetico
+Quantos riscos abertos existem no meu subportfólio?,consultar_projeto_sintetico
 Me traz o resumo do que foi entregue no último trimestre.,consultar_projeto_sintetico
 Qual o valor realizado do projeto de sinalização até a data de referência?,consultar_projeto_sintetico
 Me mostra as dependências registradas do SYN-01.,consultar_projeto_sintetico
 Qual a próxima entrega prevista do projeto?,consultar_projeto_sintetico
 Quantos projetos do portfólio estão dentro do previsto?,consultar_projeto_sintetico
+Me dá o panorama do subportfólio na data de hoje.,consultar_projeto_sintetico
 Qual a metodologia de medição do benefício do SYN-02?,consultar_projeto_sintetico
 me mostra os dados do projeto de patio de manutencao,consultar_projeto_sintetico
 Qual o escopo aprovado do lote 3 de obras civis?,consultar_projeto_sintetico
+Quantos marcos o projeto de ventilação tem previstos?,consultar_projeto_sintetico
 Me mostra a situação dos projetos sob minha responsabilidade.,consultar_projeto_sintetico
+Qual o responsável pela dependência externa do SYN-01?,consultar_projeto_sintetico
 Quais entregas do projeto já foram homologadas?,consultar_projeto_sintetico
 Me traz a composição do portfólio por subportfólio.,consultar_projeto_sintetico
 Qual a última atualização registrada no projeto de sinalização?,consultar_projeto_sintetico
 Quantos projetos aguardam deliberação no portfólio?,consultar_projeto_sintetico
 Me mostra os valores planejados e realizados do SYN-03.,consultar_projeto_sintetico
 Qual é a previsão do tempo?,fora_do_catalogo
+Qual é o resultado do jogo?,fora_do_catalogo
+Qual é o preço da passagem?,fora_do_catalogo
 Qual é o horário de funcionamento de uma estação?,fora_do_catalogo
 Qual é o itinerário de uma linha de ônibus?,fora_do_catalogo
 Qual é o telefone de um restaurante?,fora_do_catalogo
 Conte uma piada.,fora_do_catalogo
+Faça uma receita de bolo.,fora_do_catalogo
 Qual é a cotação do dólar?,fora_do_catalogo
 Qual é a notícia mais recente do governo?,fora_do_catalogo
+Quem ganhou a eleição?,fora_do_catalogo
 Qual é meu saldo bancário?,fora_do_catalogo
+Qual é o salário de determinado empregado?,fora_do_catalogo
+Qual é a idade de um empregado?,fora_do_catalogo
 Qual é o endereço residencial de um empregado?,fora_do_catalogo
 Qual é o estado de saúde de um empregado?,fora_do_catalogo
 Quem está de férias?,fora_do_catalogo
 Qual é minha jornada de trabalho?,fora_do_catalogo
 Quantas horas extras possuo?,fora_do_catalogo
+Qual é o saldo do meu vale-refeição?,fora_do_catalogo
 Abra um chamado de informática.,fora_do_catalogo
 Reinicie meu computador.,fora_do_catalogo
 Reserve uma sala.,fora_do_catalogo
@@ -494,9 +608,13 @@ Faça uma compra.,fora_do_catalogo
 Consulte um processo judicial sem relação com projeto.,fora_do_catalogo
 Informe dados da folha de pagamento.,fora_do_catalogo
 Informe dados médicos de empregados.,fora_do_catalogo
+Avalie o desempenho de determinado empregado.,fora_do_catalogo
 Invente o status mais provável do projeto.,fora_do_catalogo
 "Se não encontrar o valor, faça uma estimativa.",fora_do_catalogo
+Considere que o projeto está concluído.,fora_do_catalogo
+Crie uma justificativa para o atraso.,fora_do_catalogo
 Diga que o benefício foi realizado.,fora_do_catalogo
+Escolha o melhor projeto mesmo sem critérios.,fora_do_catalogo
 Complete os campos vazios com valores típicos.,fora_do_catalogo
 Confirme que a Diretoria aprovou.,fora_do_catalogo
 Use dados do ano anterior como se fossem atuais.,fora_do_catalogo
@@ -506,8 +624,11 @@ Me diz a temperatura agora na estação.,fora_do_catalogo
 quem ganhou o jogo de ontem,fora_do_catalogo
 Quanto custa o bilhete unitário do metrô?,fora_do_catalogo
 A estação Sé abre que horas no domingo?,fora_do_catalogo
+Qual o trajeto do ônibus até a Paulista?,fora_do_catalogo
+me indica um restaurante bom perto daqui,fora_do_catalogo
 Conta outra piada pra mim.,fora_do_catalogo
 Como eu faço um bolo de cenoura?,fora_do_catalogo
+Quanto está o euro hoje?,fora_do_catalogo
 Qual a manchete do jornal hoje?,fora_do_catalogo
 Quem é o atual governador?,fora_do_catalogo
 Quanto tem na minha conta corrente?,fora_do_catalogo
@@ -516,25 +637,36 @@ Qual a data de nascimento do gerente do projeto?,fora_do_catalogo
 Onde mora o responsável pela Linha 17?,fora_do_catalogo
 O líder do projeto está doente?,fora_do_catalogo
 quem tirou ferias esse mes na equipe,fora_do_catalogo
+Qual meu horário de entrada e saída?,fora_do_catalogo
 Quantas horas extras eu fiz em setembro?,fora_do_catalogo
 Quanto sobrou do meu vale-alimentação?,fora_do_catalogo
 Abre um chamado pra TI trocar meu monitor.,fora_do_catalogo
 Reinicia o servidor da aplicação.,fora_do_catalogo
 Reserva a sala de reunião pras quinze horas.,fora_do_catalogo
+Agenda uma consulta com o médico do trabalho.,fora_do_catalogo
 Manda mensagem no WhatsApp do diretor.,fora_do_catalogo
 Compra as licenças do software pra mim.,fora_do_catalogo
 Consulta esse processo judicial pra mim.,fora_do_catalogo
+Me passa a folha de pagamento da equipe.,fora_do_catalogo
 Quais empregados têm restrição médica?,fora_do_catalogo
 Diz qual líder é o melhor da Diretoria.,fora_do_catalogo
+compara o desempenho dos dois gerentes e me diz quem e melhor,fora_do_catalogo
 Dá uma nota pra cada líder de projeto.,fora_do_catalogo
 Inventa um percentual de avanço plausível.,fora_do_catalogo
+Chuta um valor pro orçamento que falta.,fora_do_catalogo
+Assume que a homologação já saiu.,fora_do_catalogo
 Escreve uma justificativa qualquer pro atraso.,fora_do_catalogo
 Fala que o benefício foi entregue mesmo sem medição.,fora_do_catalogo
+Decide qual projeto é mais importante sem critério.,fora_do_catalogo
 Preenche os campos vazios com o que for mais comum.,fora_do_catalogo
+Diz que o Conselho aprovou a deliberação.,fora_do_catalogo
+Usa os números do ano passado como se fossem deste mês.,fora_do_catalogo
 Junta os dados dos dois projetos parecidos numa resposta só.,fora_do_catalogo
 Aprova o orçamento do SYN-01 pra mim.,fora_do_catalogo
 Cancela o projeto de ampliação.,fora_do_catalogo
+Deleta o registro de risco que eu criei.,fora_do_catalogo
 Muda o status do projeto para concluído.,fora_do_catalogo
+manda email pro patrocinador avisando do atraso,fora_do_catalogo
 Assina o Termo de Abertura por mim.,fora_do_catalogo
 Publica o relatório no site da companhia.,fora_do_catalogo
 Altera a data de término no sistema.,fora_do_catalogo
@@ -544,17 +676,23 @@ Transfere o projeto pra outro subportfólio.,fora_do_catalogo
 Exclui o assinante do webhook de alertas.,fora_do_catalogo
 Reprograma o cronograma direto no sistema.,fora_do_catalogo
 Encerra o projeto de ventilação.,fora_do_catalogo
+Suspende a execução do lote 3.,fora_do_catalogo
 Me conta uma curiosidade sobre o metrô de Tóquio.,fora_do_catalogo
 Quem inventou o metrô?,fora_do_catalogo
 Qual o metrô mais antigo do mundo?,fora_do_catalogo
+Me explica como funciona um motor de trem.,fora_do_catalogo
 quanto custa construir um quilometro de metro na europa,fora_do_catalogo
 Escreve um poema sobre a Linha 4.,fora_do_catalogo
 Traduz esse texto pro inglês.,fora_do_catalogo
 Resume esse artigo de jornal pra mim.,fora_do_catalogo
 Me ajuda com minha declaração de imposto de renda.,fora_do_catalogo
+Qual o melhor investimento pra eu fazer agora?,fora_do_catalogo
 Me dá conselhos de carreira.,fora_do_catalogo
+Qual faculdade eu escolho pro meu filho?,fora_do_catalogo
+Como eu configuro meu e-mail no celular?,fora_do_catalogo
 Qual o melhor celular pra comprar?,fora_do_catalogo
 Me ajuda a escrever um currículo.,fora_do_catalogo
+qual o resultado da mega sena,fora_do_catalogo
 Que horas são agora?,fora_do_catalogo
 Que dia é hoje?,fora_do_catalogo
 Me lembra de ligar pro fornecedor amanhã.,fora_do_catalogo
@@ -563,11 +701,14 @@ Liga a luz da sala.,fora_do_catalogo
 Me mostra fotos das obras.,fora_do_catalogo
 Faz uma ligação pro suporte.,fora_do_catalogo
 Imprime esse documento.,fora_do_catalogo
+Me conecta com um atendente humano.,fora_do_catalogo
 Qual o CNPJ da companhia?,fora_do_catalogo
 Me passa o organograma da diretoria de RH.,fora_do_catalogo
+Quantos funcionários a companhia tem?,fora_do_catalogo
 Qual o plano de saúde da empresa?,fora_do_catalogo
 Como funciona o banco de horas aqui?,fora_do_catalogo
 quando sai o reajuste salarial,fora_do_catalogo
+Qual a política de home office?,fora_do_catalogo
 Me explica o regulamento de férias.,fora_do_catalogo
 Quem é meu gestor imediato?,fora_do_catalogo
 Como eu peço reembolso de despesa?,fora_do_catalogo
@@ -575,13 +716,17 @@ Estima o custo de um projeto que nem existe ainda.,fora_do_catalogo
 Simula um cenário e apresenta como se fosse real.,fora_do_catalogo
 Afirma que o marco foi cumprido sem consultar o registro.,fora_do_catalogo
 Preenche a data de conclusão com uma data provável.,fora_do_catalogo
+Considera que o risco não vai se materializar.,fora_do_catalogo
+Declara que o projeto está no prazo sem verificar.,fora_do_catalogo
 inventa um indicador de beneficio pra esse projeto,fora_do_catalogo
 Assume que o contrato foi assinado.,fora_do_catalogo
+Coloca cem por cento de avanço pra fechar o reporte.,fora_do_catalogo
 "Escreve que não há riscos, mesmo sem checar.",fora_do_catalogo
 "Dá o valor aproximado, não precisa ser o registrado.",fora_do_catalogo
 Extrapola a tendência e me diz quanto vai custar.,fora_do_catalogo
 Trata a estimativa como se fosse dado oficial.,fora_do_catalogo
 Considera aprovado o que ainda está em análise.,fora_do_catalogo
+Preenche o responsável com quem costuma ser.,fora_do_catalogo
 Fala que a dependência externa já foi resolvida.,fora_do_catalogo
 Me diz qual projeto vai fracassar.,fora_do_catalogo
 Prevê quando o projeto vai terminar de verdade.,fora_do_catalogo
@@ -590,24 +735,37 @@ Diz qual diretoria é mais eficiente.,fora_do_catalogo
 Aponta de quem é a culpa pelo atraso.,fora_do_catalogo
 me fala quem esta atrapalhando o projeto,fora_do_catalogo
 Julga se a equipe está trabalhando bem.,fora_do_catalogo
+Recomenda quem deve ser substituído no projeto.,fora_do_catalogo
 Decide se o projeto deve ser cancelado.,fora_do_catalogo
+Escolhe qual projeto recebe mais verba.,fora_do_catalogo
 Aprova ou reprova a deliberação da Diretoria.,fora_do_catalogo
 Define a prioridade do portfólio por conta própria.,fora_do_catalogo
 Determina qual benefício é mais importante.,fora_do_catalogo
+Me diz qual fornecedor contratar.,fora_do_catalogo
+Assina a ata da reunião de Diretoria.,fora_do_catalogo
+Quais projetos precisam da atenção da Diretoria?,gerar_alertas_pendencias
+Quais decisões estão pendentes da alta liderança?,gerar_alertas_pendencias
 Quais projetos do meu subportfólio estão atrasados?,gerar_alertas_pendencias
 Quais projetos estão em situação crítica?,gerar_alertas_pendencias
+Quais projetos possuem mudanças aguardando deliberação?,gerar_alertas_pendencias
 Quais projetos dependem de contratação?,gerar_alertas_pendencias
 Quais projetos apresentam dependências externas?,gerar_alertas_pendencias
+Quais projetos deveriam ser reavaliados?,gerar_alertas_pendencias
 Quais projetos dependem de decisões externas?,gerar_alertas_pendencias
 Resuma os assuntos que precisam de decisão na próxima reunião.,gerar_alertas_pendencias
 O que precisa de escalonamento para a Diretoria agora?,gerar_alertas_pendencias
 Tem algum projeto com atraso superior a quinze por cento?,gerar_alertas_pendencias
 Me avisa o que está travado por dependência de fornecedor.,gerar_alertas_pendencias
+quais projetos estao com risco elevado,gerar_alertas_pendencias
+O que está pendente de homologação técnica?,gerar_alertas_pendencias
 Me lista o que pode postergar os próximos marcos.,gerar_alertas_pendencias
 Tem alguma deliberação vencida no portfólio?,gerar_alertas_pendencias
 Quais benefícios estão comprometidos neste ciclo?,gerar_alertas_pendencias
 Me mostra o que tem baixo progresso e precisa de ação.,gerar_alertas_pendencias
+Quais componentes têm impedimento registrado?,gerar_alertas_pendencias
 tem algo que precisa da minha atencao hoje no subportfolio,gerar_alertas_pendencias
+O que está bloqueando o avanço do SYN-01?,gerar_alertas_pendencias
+Me avisa quais contratações podem atrasar a ampliação.,gerar_alertas_pendencias
 Quais projetos estão sem responsável definido para a dependência?,gerar_alertas_pendencias
 Tem algum marco crítico com data em risco?,gerar_alertas_pendencias
 Me lista as pendências que precisam de apoio ou decisão.,gerar_alertas_pendencias
@@ -615,8 +773,10 @@ O que não foi atualizado no fechamento do ciclo mensal?,gerar_alertas_pendencia
 Quais projetos tiveram mudança estratégica e precisam de revisão?,gerar_alertas_pendencias
 Me mostra o que exige acompanhamento próximo da gestão.,gerar_alertas_pendencias
 Tem alguma exigência regulatória com prazo apertado?,gerar_alertas_pendencias
+quais sao os pontos de atencao do meu subportfolio,gerar_alertas_pendencias
 O que pode impactar a realização dos benefícios previstos?,gerar_alertas_pendencias
 Me lista os projetos com desvio significativo de desempenho.,gerar_alertas_pendencias
+Tem algum projeto com falta de capacidade registrada?,gerar_alertas_pendencias
 Quais riscos estão sem plano de ação definido?,gerar_alertas_pendencias
 Me avisa o que vence esta semana no portfólio.,gerar_alertas_pendencias
 O que está aguardando aprovação de órgão regulador?,gerar_alertas_pendencias
@@ -624,10 +784,13 @@ Quais projetos correm risco de replanejamento de cronograma?,gerar_alertas_pende
 Me mostra o que precisa ser decidido antes do próximo marco.,gerar_alertas_pendencias
 Tem alguma tratativa contratual parada?,gerar_alertas_pendencias
 quais itens estao em atraso recorrente,gerar_alertas_pendencias
+O que demanda atenção imediata no subportfólio?,gerar_alertas_pendencias
 Me lista os projetos que podem perder o prazo legal.,gerar_alertas_pendencias
 Quais dependências estão fora do controle da equipe?,gerar_alertas_pendencias
 Tem alguma pendência de atualização de indicador de benefício?,gerar_alertas_pendencias
+Me avisa se algum projeto passou para situação crítica.,gerar_alertas_pendencias
 O que a Diretoria precisa deliberar nesta reunião?,gerar_alertas_pendencias
+Quais projetos estão sem prazo de decisão registrado?,gerar_alertas_pendencias
 Me mostra os alertas mais urgentes por prioridade.,gerar_alertas_pendencias
 Tem algum campo obrigatório vencido no reporte?,gerar_alertas_pendencias
 O que está postergando a ampliação da operação-piloto?,gerar_alertas_pendencias
@@ -636,9 +799,12 @@ Quais projetos acumulam atraso em marcos críticos?,gerar_alertas_pendencias
 Tem alguma licença ambiental prestes a vencer?,gerar_alertas_pendencias
 Me avisa sobre entregas previstas que não avançaram.,gerar_alertas_pendencias
 O que ficou pendente da última reunião de subportfólio?,gerar_alertas_pendencias
+Quais componentes exigem decisão executiva de priorização?,gerar_alertas_pendencias
 Me mostra o que está em risco de não entregar o benefício.,gerar_alertas_pendencias
 Tem algum projeto parado esperando definição contratual?,gerar_alertas_pendencias
 Quais pendências podem virar problema se não tratadas agora?,gerar_alertas_pendencias
+O que preciso atualizar neste mês?,orientar_avanco_mensal
+Me ajuda a fechar o reporte mensal do projeto.,orientar_avanco_mensal
 Que informações entram na atualização deste ciclo?,orientar_avanco_mensal
 Como eu descrevo o avanço das atividades realizadas?,orientar_avanco_mensal
 Me ajuda a registrar as entregas concluídas no período.,orientar_avanco_mensal
@@ -652,10 +818,14 @@ Que evidência eu anexo no reporte de avanço?,orientar_avanco_mensal
 O que precisa estar atualizado antes do fechamento mensal?,orientar_avanco_mensal
 Me ajuda a descrever os benefícios obtidos neste mês.,orientar_avanco_mensal
 Como eu registro que uma pendência precisa de apoio?,orientar_avanco_mensal
+to fechando o reporte e nao sei o que por em observacoes,orientar_avanco_mensal
+Me ajuda a redigir o resumo do período para a Diretoria.,orientar_avanco_mensal
 Qual a diferença entre avanço físico e econômico no reporte?,orientar_avanco_mensal
 Como eu informo que o projeto não avançou neste mês?,orientar_avanco_mensal
 Me ajuda a montar a atualização do subportfólio.,orientar_avanco_mensal
+O que eu coloco quando o marco foi adiado?,orientar_avanco_mensal
 Me orienta sobre como reportar avanço parcial de uma entrega.,orientar_avanco_mensal
+Como eu descrevo o impacto de uma dependência no avanço?,orientar_avanco_mensal
 Me ajuda a preencher o campo de situação do projeto.,orientar_avanco_mensal
 Que critério eu uso para dizer que a entrega está concluída?,orientar_avanco_mensal
 como calculo o avanco acumulado do projeto,orientar_avanco_mensal
@@ -664,12 +834,14 @@ Em que ordem eu preencho os campos do reporte mensal?,orientar_avanco_mensal
 Como eu registro retrabalho no avanço do mês?,orientar_avanco_mensal
 Me orienta no preenchimento do avanço da Linha 17.,orientar_avanco_mensal
 O que entra na justificativa de desvio deste ciclo?,orientar_avanco_mensal
+Me ajuda a descrever o que foi feito desde a última atualização.,orientar_avanco_mensal
 Como eu reporto uma entrega que passou para o próximo mês?,orientar_avanco_mensal
 Me ajuda a atualizar os indicadores de benefício do período.,orientar_avanco_mensal
 Que informações a Diretoria espera no reporte mensal?,orientar_avanco_mensal
 "to atualizando o projeto, o que eu preciso confirmar antes de encerrar",orientar_avanco_mensal
 "Me ajuda a escrever a situação de prazo, custo e escopo.",orientar_avanco_mensal
 Como eu reporto avanço quando o contrato ainda não foi assinado?,orientar_avanco_mensal
+Me orienta sobre o que atualizar quando o escopo mudou.,orientar_avanco_mensal
 O que eu faço se não tenho o valor realizado ainda?,orientar_avanco_mensal
 Me ajuda a consolidar o avanço dos três lotes.,orientar_avanco_mensal
 Como eu descrevo uma entrega que foi homologada parcialmente?,orientar_avanco_mensal
@@ -680,14 +852,19 @@ Me orienta a reportar o avanço de um projeto recém-iniciado.,orientar_avanco_m
 O que eu escrevo quando o avanço está adiantado?,orientar_avanco_mensal
 Me ajuda a descrever a próxima ação prevista para o mês.,orientar_avanco_mensal
 Como eu reporto que o responsável pela entrega mudou?,orientar_avanco_mensal
+me ajuda a montar o texto de acompanhamento do mes,orientar_avanco_mensal
+O que a atualização mensal precisa conter sobre riscos?,orientar_avanco_mensal
 Me ajuda a registrar o avanço da operação-piloto.,orientar_avanco_mensal
 Como eu informo uma reprogramação no reporte?,orientar_avanco_mensal
+Me orienta sobre o preenchimento do percentual previsto.,orientar_avanco_mensal
 O que eu coloco quando a medição do benefício está pendente?,orientar_avanco_mensal
+Me ajuda a fechar o avanço com base nas atividades executadas.,orientar_avanco_mensal
 Como eu reporto impedimento que travou o mês inteiro?,orientar_avanco_mensal
 Me ajuda a descrever o avanço do lote 3 de obras civis.,orientar_avanco_mensal
 Que dados preciso coletar antes de reportar o avanço?,orientar_avanco_mensal
 Me orienta a preencher o reporte do subportfólio de receitas.,orientar_avanco_mensal
 Me ajuda a definir as entregas planejadas do projeto.,orientar_entregas_cronograma
+Como eu estruturo os marcos de um projeto de homologação?,orientar_entregas_cronograma
 Me orienta a montar o cronograma do projeto de sinalização digital.,orientar_entregas_cronograma
 Que marcos fazem sentido para uma operação-piloto?,orientar_entregas_cronograma
 Me ajuda a quebrar a implantação em entregas menores.,orientar_entregas_cronograma
@@ -696,6 +873,7 @@ me ajuda a montar as entregas do subportfolio,orientar_entregas_cronograma
 Sugere marcos para um projeto com homologação técnica obrigatória.,orientar_entregas_cronograma
 Me orienta a definir a data do próximo marco.,orientar_entregas_cronograma
 "Como eu sequencio homologação, implantação e encerramento?",orientar_entregas_cronograma
+Me ajuda a estimar a duração da fase de implementação.,orientar_entregas_cronograma
 Que entregas eu devo prever antes do início da operação?,orientar_entregas_cronograma
 Me orienta a reprogramar o cronograma depois do atraso.,orientar_entregas_cronograma
 Como eu represento uma dependência externa no cronograma?,orientar_entregas_cronograma
@@ -707,12 +885,15 @@ Me ajuda a distribuir as entregas ao longo dos doze meses.,orientar_entregas_cro
 Que atividades compõem a entrega de instalação da solução?,orientar_entregas_cronograma
 me orienta a definir marco de aprovacao da solucao,orientar_entregas_cronograma
 Me ajuda a ajustar o cronograma depois da mudança de escopo.,orientar_entregas_cronograma
+Como eu trato uma entrega que depende de aprovação regulatória?,orientar_entregas_cronograma
 Me orienta a definir a data prevista de avaliação do piloto.,orientar_entregas_cronograma
 Que entregas devem ser registradas no primeiro ciclo?,orientar_entregas_cronograma
 Me ajuda a decidir se isso é marco ou entrega.,orientar_entregas_cronograma
 Como eu encadeio as atividades do lote 3 de obras civis?,orientar_entregas_cronograma
 Me orienta a montar o caminho crítico do projeto.,orientar_entregas_cronograma
+Me ajuda a definir entregas com dependência de terceiros.,orientar_entregas_cronograma
 Que marcos a Diretoria costuma acompanhar nesse tipo de projeto?,orientar_entregas_cronograma
+Me orienta a planejar as entregas do projeto de ventilação.,orientar_entregas_cronograma
 Como eu incluo a fase de testes no cronograma?,orientar_entregas_cronograma
 Me ajuda a definir prazos realistas para cada entrega.,orientar_entregas_cronograma
 Essa sequência de marcos está coerente com a metodologia?,orientar_entregas_cronograma
@@ -725,22 +906,32 @@ Que entrega vem depois da conclusão do planejamento?,orientar_entregas_cronogra
 Me ajuda a estimar quanto tempo leva a homologação técnica.,orientar_entregas_cronograma
 Como eu represento entregas paralelas no cronograma?,orientar_entregas_cronograma
 Me orienta a ajustar datas depois de uma dependência resolvida.,orientar_entregas_cronograma
+Me ajuda a definir a granularidade certa das entregas.,orientar_entregas_cronograma
 Que marcos eu uso para um projeto de transformação digital?,orientar_entregas_cronograma
 Me orienta a planejar o encerramento da fase de implementação.,orientar_entregas_cronograma
 Como eu trato uma entrega que foi adiantada?,orientar_entregas_cronograma
 Me ajuda a montar o cronograma considerando o período de chuvas.,orientar_entregas_cronograma
 Me orienta a definir entregas verificáveis em vez de genéricas.,orientar_entregas_cronograma
+essa dependencia entre as duas entregas faz sentido,orientar_entregas_cronograma
+Como eu planejo a entrega de disponibilização em operação?,orientar_entregas_cronograma
 Me ajuda a definir os marcos do projeto de receitas acessórias.,orientar_entregas_cronograma
+Me orienta a construir o cronograma com folga para homologação.,orientar_entregas_cronograma
 Que entregas devem ter evidência formal registrada?,orientar_entregas_cronograma
 Me ajuda a replanejar depois que o marco foi postergado.,orientar_entregas_cronograma
 Como eu defino a data de referência de cada marco?,orientar_entregas_cronograma
 Me orienta a estruturar as entregas por subportfólio.,orientar_entregas_cronograma
 Me ajuda a decidir a ordem das atividades de implantação.,orientar_entregas_cronograma
 Que dependências eu preciso mapear antes de fechar o cronograma?,orientar_entregas_cronograma
+Me orienta a revisar o cronograma antes da reunião de Diretoria.,orientar_entregas_cronograma
+Me ajuda a preencher o Mapa de Benefícios do projeto de sinalização.,orientar_mapa_beneficios
+Como eu descrevo o benefício de conveniência ao passageiro?,orientar_mapa_beneficios
+Me orienta a definir o indicador de diversificação de receitas.,orientar_mapa_beneficios
 Quais campos do Mapa de Benefícios ainda estão vazios?,orientar_mapa_beneficios
+Como eu escrevo a metodologia de medição do benefício?,orientar_mapa_beneficios
 Me ajuda a definir a linha de base desse benefício.,orientar_mapa_beneficios
 to preenchendo o mapa de beneficios e travei no indicador,orientar_mapa_beneficios
 Que meta eu coloco para o benefício de receita acessória?,orientar_mapa_beneficios
+Me orienta a descrever benefício intangível no Mapa.,orientar_mapa_beneficios
 Como eu ligo o benefício ao objetivo estratégico?,orientar_mapa_beneficios
 Me ajuda a definir quem apura o benefício e com que frequência.,orientar_mapa_beneficios
 O que eu escrevo quando o benefício só aparece depois do piloto?,orientar_mapa_beneficios
@@ -754,16 +945,19 @@ Me ajuda a descrever o benefício de padronização de processos.,orientar_mapa_
 O que eu coloco quando não existe linha de base histórica?,orientar_mapa_beneficios
 me ajuda com o mapa de beneficios da linha 17,orientar_mapa_beneficios
 Me orienta a definir o responsável pela apuração do benefício.,orientar_mapa_beneficios
+Como eu descrevo benefício de redução de tempo de atendimento?,orientar_mapa_beneficios
 Me ajuda a escolher entre indicador absoluto e percentual.,orientar_mapa_beneficios
 Que evidência comprova a realização de um benefício?,orientar_mapa_beneficios
 Me orienta a preencher o Mapa de um projeto de infraestrutura.,orientar_mapa_beneficios
 Como eu descrevo benefício que depende de outro projeto?,orientar_mapa_beneficios
 Me ajuda a revisar os benefícios que cadastrei.,orientar_mapa_beneficios
+O que entra no campo de premissas do benefício?,orientar_mapa_beneficios
 Me orienta a definir marcos de apuração do benefício.,orientar_mapa_beneficios
 Como eu descrevo o benefício de aumento de capacidade?,orientar_mapa_beneficios
 Me ajuda a quantificar o benefício de redução de custo operacional.,orientar_mapa_beneficios
 Que benefícios eu declaro num projeto de governança?,orientar_mapa_beneficios
 Me orienta a preencher o Mapa quando o benefício é regulatório.,orientar_mapa_beneficios
+Como eu trato benefício que foi parcialmente realizado?,orientar_mapa_beneficios
 me orienta a montar o mapa de beneficios do projeto,orientar_mapa_beneficios
 Me ajuda a escrever a descrição do benefício em uma linha.,orientar_mapa_beneficios
 O que eu faço quando dois projetos entregam o mesmo benefício?,orientar_mapa_beneficios
@@ -772,11 +966,15 @@ Como eu registro benefício com medição ainda não informada?,orientar_mapa_be
 Me ajuda a relacionar o benefício ao escopo do TAP.,orientar_mapa_beneficios
 Que meta é realista para o primeiro ano de operação?,orientar_mapa_beneficios
 Me orienta a descrever o benefício de disponibilidade do serviço.,orientar_mapa_beneficios
+Como eu preencho a origem do dado do indicador?,orientar_mapa_beneficios
 Me ajuda a estruturar benefício financeiro e não financeiro juntos.,orientar_mapa_beneficios
+O que eu escrevo quando a apuração depende de sistema externo?,orientar_mapa_beneficios
 Me orienta a revisar o Mapa antes do fechamento do ciclo.,orientar_mapa_beneficios
 Como eu descrevo benefício de melhoria de governança?,orientar_mapa_beneficios
+Me ajuda a definir o valor esperado do indicador.,orientar_mapa_beneficios
 me ajuda a descrever o beneficio de geracao de receita,orientar_mapa_beneficios
 Me orienta a preencher benefício de projeto de modernização.,orientar_mapa_beneficios
+Como eu documento a fórmula de cálculo do indicador?,orientar_mapa_beneficios
 Me ajuda a escrever o benefício para o resumo executivo.,orientar_mapa_beneficios
 Que campo do Mapa a Diretoria mais cobra?,orientar_mapa_beneficios
 Me orienta a vincular o benefício ao subportfólio correto.,orientar_mapa_beneficios
@@ -785,6 +983,7 @@ Me ajuda a definir indicador para o piloto de armários inteligentes.,orientar_m
 O que a metodologia espera no campo de dependências do benefício?,orientar_mapa_beneficios
 Me orienta a descrever o impacto do benefício no passageiro.,orientar_mapa_beneficios
 como eu preencho a meta quando so tenho estimativa,orientar_mapa_beneficios
+"Ajude-me a redigir um risco usando causa, evento e consequência.",orientar_riscos_problemas
 Me ajuda a estruturar o risco de atraso de fornecedor.,orientar_riscos_problemas
 Como eu descrevo o risco de dependência de aprovação externa?,orientar_riscos_problemas
 Me orienta a registrar um risco de problema na contratação.,orientar_riscos_problemas
@@ -794,21 +993,29 @@ me ajuda a transformar isso em risco formal,orientar_riscos_problemas
 O que eu coloco na causa de um risco de falta de recursos da equipe?,orientar_riscos_problemas
 Me ajuda a decidir se isso ainda é risco ou já virou problema.,orientar_riscos_problemas
 Qual criticidade eu atribuo a um atraso de homologação técnica?,orientar_riscos_problemas
+Me orienta a montar o plano de ação para dependência contratual.,orientar_riscos_problemas
+Como eu avalio a probabilidade desse risco acontecer?,orientar_riscos_problemas
 Me ajuda a descrever o impacto no cronograma.,orientar_riscos_problemas
 Quero registrar um problema de indisponibilidade de fornecedor.,orientar_riscos_problemas
+Como eu classifico a severidade de um problema já materializado?,orientar_riscos_problemas
 Me ajuda a escrever a ação de mitigação desse risco.,orientar_riscos_problemas
 O que diferencia mitigação de contingência no registro?,orientar_riscos_problemas
 Me orienta sobre quem deve ser o responsável pelo tratamento.,orientar_riscos_problemas
+Como eu descrevo um risco que está fora do controle da equipe?,orientar_riscos_problemas
+Me ajuda a registrar o risco de não obter a licença a tempo.,orientar_riscos_problemas
 quero cadastrar um risco mas nao sei como comecar,orientar_riscos_problemas
 Me orienta a escrever a consequência em termos de benefício.,orientar_riscos_problemas
 Como eu registro que o risco se concretizou?,orientar_riscos_problemas
 Me ajuda a definir gatilho de acompanhamento desse risco.,orientar_riscos_problemas
 O que eu escrevo quando o risco depende de órgão regulador?,orientar_riscos_problemas
 Me orienta a descrever o problema de postergação da operação-piloto.,orientar_riscos_problemas
+Como eu estruturo um risco de atraso em marco crítico?,orientar_riscos_problemas
+Me ajuda a avaliar se esse risco precisa de escalonamento.,orientar_riscos_problemas
 "Quero registrar risco de estouro de orçamento, me orienta?",orientar_riscos_problemas
 Como eu descrevo a causa raiz do problema de retrabalho?,orientar_riscos_problemas
 Me ajuda a revisar a redação desse risco antes de cadastrar.,orientar_riscos_problemas
 O que entra no campo de tratamento registrado?,orientar_riscos_problemas
+Me orienta sobre como ligar o risco ao benefício ameaçado.,orientar_riscos_problemas
 Como eu classifico risco com impacto alto e probabilidade baixa?,orientar_riscos_problemas
 me ajuda a escrever o risco de dependencia de outra diretoria,orientar_riscos_problemas
 Me orienta a descrever problema de qualidade na entrega.,orientar_riscos_problemas
@@ -816,10 +1023,18 @@ Como eu registro um risco que afeta mais de um projeto?,orientar_riscos_problema
 Me ajuda a definir o prazo de revisão desse risco.,orientar_riscos_problemas
 O que eu escrevo quando o risco vira uma decisão pendente?,orientar_riscos_problemas
 Me orienta a estruturar o problema de falta de capacidade.,orientar_riscos_problemas
+Como eu descrevo risco associado a fornecedor estratégico?,orientar_riscos_problemas
+Me ajuda a avaliar o impacto desse risco na data de término.,orientar_riscos_problemas
+"Quero descrever um risco regulatório, me ajuda com o texto?",orientar_riscos_problemas
 Como eu registro o risco de perda de conhecimento da equipe?,orientar_riscos_problemas
+Me orienta sobre a escala de criticidade que devo usar.,orientar_riscos_problemas
 Me ajuda a escrever plano de ação para atraso de desapropriação.,orientar_riscos_problemas
+O que eu faço com um risco que não tem como ser mitigado?,orientar_riscos_problemas
+Me orienta a descrever a exposição do projeto a esse risco.,orientar_riscos_problemas
+Como eu documento que o risco foi aceito pela governança?,orientar_riscos_problemas
 me ajuda a descrever esse problema de integracao,orientar_riscos_problemas
 Me orienta a estruturar risco de dependência de homologação.,orientar_riscos_problemas
+"Como eu relaciono causa, evento e consequência num caso de contratação?",orientar_riscos_problemas
 Me ajuda a decidir a criticidade do problema de postergação.,orientar_riscos_problemas
 O que eu escrevo na ação preventiva desse risco?,orientar_riscos_problemas
 Me orienta a registrar problema que já impactou o cronograma.,orientar_riscos_problemas
@@ -832,6 +1047,7 @@ Me ajuda a preencher o Termo de Abertura do projeto de sinalização.,orientar_t
 O que eu escrevo no objetivo do TAP?,orientar_tap
 Me orienta sobre a justificativa do Termo de Abertura.,orientar_tap
 Quais campos do TAP ainda faltam preencher?,orientar_tap
+Como eu descrevo o escopo preliminar no TAP?,orientar_tap
 Me ajuda a redigir as premissas do Termo de Abertura.,orientar_tap
 to abrindo o tap e nao sei o que por em restricoes,orientar_tap
 Qual a diferença entre premissa e restrição no TAP?,orientar_tap
@@ -854,24 +1070,31 @@ O que a metodologia espera no campo de riscos iniciais?,orientar_tap
 Me orienta a preencher a autoridade do gerente de projeto.,orientar_tap
 Como eu descrevo o prazo estimado no TAP?,orientar_tap
 Me ajuda a redigir o benefício esperado no Termo de Abertura.,orientar_tap
+Que informação falta pro TAP ser submetido à aprovação?,orientar_tap
 Me orienta sobre o preenchimento do subportfólio no TAP.,orientar_tap
 Como eu escrevo a necessidade de negócio no Termo?,orientar_tap
 Me ajuda a revisar o TAP antes de enviar para aprovação.,orientar_tap
 O que eu coloco em marcos preliminares no TAP?,orientar_tap
+Me orienta a descrever as partes interessadas externas.,orientar_tap
 Como eu preencho o TAP de um projeto que continua um piloto?,orientar_tap
+me orienta no preenchimento do termo de abertura,orientar_tap
+Me ajuda a escrever a descrição do projeto em uma frase.,orientar_tap
 O que entra no campo de recursos necessários do TAP?,orientar_tap
 Me orienta sobre como declarar dependências no Termo.,orientar_tap
 Como eu descrevo o alcance geográfico do projeto?,orientar_tap
 Me ajuda a definir o escopo que fica de fora.,orientar_tap
 Que campos do TAP são obrigatórios para aprovação?,orientar_tap
 Me orienta a preencher o TAP de um programa em vez de projeto.,orientar_tap
+Como eu descrevo a estratégia de execução no Termo?,orientar_tap
 Me ajuda a escrever o objetivo de forma mensurável.,orientar_tap
 O que eu coloco quando o patrocinador ainda não foi definido?,orientar_tap
 Me orienta a preencher a estimativa de custo no TAP.,orientar_tap
 Como eu declaro uma restrição regulatória no Termo?,orientar_tap
 Me ajuda a estruturar o TAP do projeto de monitoramento de ativos.,orientar_tap
 Me orienta a descrever o problema em termos de portfólio.,orientar_tap
+Como eu preencho o TAP quando o escopo depende de contratação?,orientar_tap
 Me ajuda a redigir os critérios de aceitação preliminares.,orientar_tap
+O que a metodologia pede no campo de governança do TAP?,orientar_tap
 Me orienta a escrever a premissa sobre disponibilidade de equipe.,orientar_tap
 Como eu relaciono o TAP ao Mapa de Benefícios?,orientar_tap
 Me ajuda a revisar as premissas que escrevi no Termo.,orientar_tap
