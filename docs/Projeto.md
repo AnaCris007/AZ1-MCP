@@ -77,6 +77,7 @@
 
 - [5.1 Webhooks](#51-webhooks)
 - [5.2 Integração entre Frontend e Backend](#52-integração-entre-frontend-e-backend)
+- [5.3 Chamada de Voz Contínua](#53-chamada-de-voz-contínua)
 
 </details>
 
@@ -6247,6 +6248,106 @@ npm test
 O [.gitlab-ci.yml](../.gitlab-ci.yml) configura compilação Python, execução da suíte por `unittest` e lint da aplicação. Não há job do frontend executando `npm test` nesse arquivo. A configuração de CI e a existência dos testes não demonstram, por si, uma execução aprovada.
 
 Não foram identificados testes automatizados que percorram conjuntamente login Microsoft real, navegador, proxy, API, armazenamento, transcrição e resposta de voz. A validação desse percurso, das condições de falha e da continuidade de conversa entre workers permanece necessária para afirmar integração sistêmica completa.
+
+
+## 5.3 Chamada de Voz Contínua
+
+Este documento descreve a experiência de uso, o comportamento funcional e a
+integração técnica da chamada de voz do AZ1. A funcionalidade permite que o
+usuário converse com o agente em turnos sucessivos sem precisar gravar,
+confirmar e enviar manualmente cada mensagem.
+
+
+### 5.3.1 Objetivo e escopo
+
+A chamada de voz oferece uma camada de interação sobre o mesmo agente usado no
+chat textual. Em cada turno, a aplicação:
+
+1. detecta automaticamente que o usuário começou a falar;
+2. identifica o fim da fala por um intervalo de silêncio;
+3. envia o áudio ao backend pela conexão WebSocket aberta para a chamada;
+4. transcreve o áudio e solicita uma resposta ao agente;
+5. reproduz a resposta em voz;
+6. volta ao estado de escuta para receber o turno seguinte.
+
+O escopo atual inclui múltiplos turnos na mesma chamada, indicação visual do
+estado, encerramento explícito, consulta do diálogo após o encerramento e
+continuação da conversa. A chamada não transmite áudio continuamente para um
+provedor em tempo real: cada fala é delimitada no navegador e processada como
+um turno completo.
+
+### 5.3.2 Como usar
+
+#### Iniciar uma chamada
+
+1. Acesse a aplicação e faça a autenticação.
+2. Selecione **Voz** na barra de navegação.
+3. Pressione **Clique para começar**.
+4. Autorize o acesso ao microfone quando o navegador solicitar.
+5. Aguarde a indicação **Ouvindo...** antes de falar.
+
+O botão inicia uma sessão de voz vinculada a um `conversation_id`. Esse
+identificador é mantido nos turnos seguintes para que o agente preserve o
+contexto da conversa.
+
+#### Conversar com o agente
+
+O usuário pode falar naturalmente e não precisa pressionar outro botão para
+enviar a pergunta. A interface detecta voz acima do limiar por pelo menos 120
+ms e encerra o turno após 850 ms de silêncio. Esses valores reduzem ativações
+por ruídos curtos e evitam o corte imediato em pequenas pausas da frase.
+
+Enquanto a chamada está ativa, a transcrição fica oculta e a tela permanece
+dedicada à ligação. Depois que o agente termina de falar, a aplicação retorna
+automaticamente ao estado de escuta.
+
+####  Encerrar e consultar
+
+O botão **Encerrar conversa** finaliza a sessão ativa. O frontend interrompe a
+captura do microfone, cancela reproduções pendentes, fecha os recursos de áudio
+e encerra o WebSocket. Somente após esse encerramento o diálogo é apresentado
+na tela, com o mesmo componente visual usado pelo chat textual.
+
+As chamadas são separadas das conversas de texto na barra lateral. Ao selecionar
+uma chamada encerrada, o usuário pode consultar suas falas e as respostas do
+AZ1 ou pressionar **Continuar chamada** para reutilizar o mesmo contexto.
+
+No estado atual, esse histórico de voz é mantido no estado do frontend durante
+a sessão da página. A persistência definitiva das chamadas no banco de dados
+não integra esta entrega.
+
+### 5.3.3 Estados apresentados na interface
+
+| Estado | Texto principal | O que está acontecendo | Próxima transição esperada |
+|---|---|---|---|
+| `idle` | Converse com o AZ1 | A chamada ainda não começou ou já foi encerrada. | `connecting` após o clique para iniciar ou continuar. |
+| `connecting` | Conectando... | O frontend abre o WebSocket, autentica a sessão e solicita o microfone. | `listening` após receber `call_ready`. |
+| `listening` | Ouvindo... | O analisador acompanha o volume e aguarda uma fala válida. | `transcribing` depois do silêncio que encerra o turno. |
+| `transcribing` | Transcrevendo... | O áudio completo do turno foi enviado para transcrição. | `processing` quando há texto reconhecido. |
+| `processing` | Pensando... | O agente está produzindo a resposta textual. | `speaking` quando a reprodução começa. |
+| `speaking` | Respondendo... | O áudio do agente ou a voz alternativa do navegador está sendo reproduzida. | `listening` quando a reprodução termina. |
+| `error` | Não consegui continuar | Uma etapa falhou e a mensagem correspondente é exibida. | `listening` após a recuperação automática, quando aplicável. |
+
+O estado visual não é apenas decorativo: ele impede que o detector inicie um
+novo turno enquanto a aplicação transcreve, processa ou reproduz uma resposta.
+Isso evita o envio simultâneo de falas e reduz a possibilidade de o microfone
+capturar a própria voz do agente.
+
+
+### 5.3.4 Critérios funcionais atendidos
+
+- a chamada começa por uma ação explícita do usuário;
+- a interface informa conexão, escuta, transcrição, processamento, reprodução
+  e erro;
+- o envio da fala ocorre automaticamente após a pausa configurada;
+- uma única conexão suporta vários turnos de conversa;
+- o contexto é preservado pelo `conversation_id`;
+- o usuário pode encerrar a chamada a qualquer momento;
+- microfone, contexto de áudio, reprodução e conexão são liberados ao sair;
+- o diálogo só fica visível depois do encerramento;
+- chamadas e conversas textuais aparecem em históricos separados;
+- uma chamada encerrada pode ser consultada e continuada.
+
 
 ---
 
