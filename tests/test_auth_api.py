@@ -8,7 +8,11 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from fastapi.testclient import TestClient
 
-from az1_api.dependencies import get_chat_answerer, get_token_verifier
+from az1_api.dependencies import (
+    get_chat_answerer,
+    get_classificador_de_intencao,
+    get_token_verifier,
+)
 from az1_api.main import app
 from services.auth_service import (
     REQUIRED_AUDIENCE,
@@ -61,7 +65,7 @@ class FakeAnswerer:
     def __init__(self) -> None:
         self.foi_chamado = False
 
-    def answer(self, message: str, conversation_id: str | None = None) -> ChatReply:
+    def answer(self, message: str, conversation_id: str | None = None, **_) -> ChatReply:
         self.foi_chamado = True
         return ChatReply(text="resposta")
 
@@ -80,6 +84,8 @@ class TestAuthAPI(unittest.TestCase):
     def setUp(self) -> None:
         self.answerer = FakeAnswerer()
         app.dependency_overrides[get_chat_answerer] = lambda: self.answerer
+        # Testes de autenticação: o Agente não deve interferir na asserção.
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: None
         app.dependency_overrides[get_token_verifier] = lambda: SupabaseTokenVerifier(
             _SETTINGS, key_resolver=lambda _token: _PUBLIC_KEY
         )
@@ -202,6 +208,8 @@ class TestAuthModeDisabled(unittest.TestCase):
     def setUp(self) -> None:
         self.answerer = FakeAnswerer()
         app.dependency_overrides[get_chat_answerer] = lambda: self.answerer
+        # Testes de autenticação: o Agente não deve interferir na asserção.
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: None
         app.dependency_overrides[get_token_verifier] = lambda: SupabaseTokenVerifier(
             SupabaseAuthSettings(project_url="", mode=AuthMode.DISABLED)
         )

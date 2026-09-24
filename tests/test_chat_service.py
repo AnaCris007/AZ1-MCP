@@ -22,14 +22,14 @@ class FakeChatModel:
         self.received_messages: list[str] = []
         self.received_conversation_ids: list[str | None] = []
 
-    def generate_reply(self, message: str, *, conversation_id: str | None = None):
+    def generate_reply(self, message: str, *, conversation_id: str | None = None, **_):
         self.received_messages.append(message)
         self.received_conversation_ids.append(conversation_id)
         return RespostaGerada(texto=self.reply, fontes=self.fontes)
 
 
 class UnavailableChatModel:
-    def generate_reply(self, message: str, *, conversation_id: str | None = None):
+    def generate_reply(self, message: str, *, conversation_id: str | None = None, **_):
         raise ChatModelUnavailableError
 
 
