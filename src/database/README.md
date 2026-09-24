@@ -50,6 +50,33 @@ O `04_verificacao.sql` roda **sem** `-v ON_ERROR_STOP=1` de propósito: a segund
 metade provoca erros para verificar que as restrições reagem. Cada bloco deve
 imprimir `RECUSADO (ok)`; um `ACEITOU` significa que uma restrição se perdeu.
 
+### Inventariar o índice vetorial
+
+`inventario_rag.sql` consulta a coleção `vecs.documentos_metro` sem modificar
+seu conteúdo. O executor abre uma transação `READ ONLY`, aplica timeout e produz
+um JSON com totais, cobertura dos metadados, dimensão vetorial, índices e sinais
+de duplicação ou caminhos sensíveis:
+
+```bash
+python scripts/inventariar_indice_rag.py
+
+# Evidência local para anexar à task ou ao MR. O caminho precisa ficar FORA
+# do repositório: o executor recusa qualquer destino interno, e é o que
+# impede a evidência de entrar no histórico do Git por acidente.
+python scripts/inventariar_indice_rag.py --saida /tmp/inventario-rag.json
+```
+
+Projetos e arquivos aparecem somente como hashes, suficientes para distinguir
+grupos no relatório sem publicar os identificadores originais. Esses hashes são
+pseudônimos técnicos, não uma anonimização criptográfica dos valores de origem.
+Não salve o relatório dentro do repositório e não versione texto de chunks,
+nomes de arquivos, caminhos pessoais ou outros metadados identificáveis.
+
+O que NÃO é mascarado é o `tipo_documento`, que sai em claro por ser
+vocabulário fechado do próprio modelo (`riscos_problemas`, `cronograma`,
+...) e não identificar projeto nem arquivo. Se algum dia esse campo passar
+a carregar valor livre, ele precisa entrar na lista dos que viram hash.
+
 ## Estrutura
 
 ### Schema `portfolio` — dados operacionais
