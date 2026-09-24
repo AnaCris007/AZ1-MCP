@@ -160,6 +160,10 @@
   - [6.3.6 Quadro consolidado e representação visual](#636-quadro-consolidado-e-representação-visual)
   - [6.3.7 Análise dos três itens mais críticos](#637-análise-dos-três-itens-mais-críticos)
   - [6.3.8 Histórico de acompanhamento](#638-histórico-de-acompanhamento)
+- [6.4 Matriz de Papéis e Responsabilidades da Sprint 4](#64-matriz-de-papéis-e-responsabilidades-da-sprint-4)
+  - [6.4.1 Papéis, responsabilidades e rotação](#641-papéis-responsabilidades-e-rotação)
+  - [6.4.2 Evidência versionada e colaborações efetivas](#642-evidência-versionada-e-colaborações-efetivas)
+  - [6.4.3 Avaliação da distribuição](#643-avaliação-da-distribuição)
 - [6.5 Revisão do Contrato de Convivência, SLA e Rituais](#65-revisão-do-contrato-de-convivência-sla-e-rituais)
 - [6.6 Revisão da Gestão do Processo de Desenvolvimento](#66-revisão-da-gestão-do-processo-de-desenvolvimento)
   - [6.6.1 Aderência das políticas na Sprint 4](#661-aderência-das-políticas-na-sprint-4)
@@ -1727,6 +1731,54 @@ Como nas Seções 4.3.8 e 5.3.8, só constam aqui os itens cujos valores ou stat
 | AM12, AM13, AM14, OP5 | 4 | 25/09/2026 (revisão) | — | — | — | Sem alteração numérica | — | Responsável "Scrum Master da Sprint 3" substituído por nome, conforme a Seção 4.3 | Seção 6.3 |
 
 Três leituras se destacam. **Primeiro**, as ameaças técnicas estão estáveis ou em queda (AM2, AM8), enquanto as de organização do trabalho sobem ou entram (AM5, AM15, AM16): o projeto está mais exposto pelo modo como distribui e sequencia o trabalho do que pela tecnologia. **Segundo**, AM6 e OP3 chegam à quarta sprint sem execução, e por isso a resposta foi reformulada com prazo e saída alternativa. **Terceiro**, AM14 caiu sem a resposta planejada, e isso é registrado como está, sem atribuir a melhora a uma ação que não ocorreu.
+
+---
+
+## 6.4 Matriz de Papéis e Responsabilidades da Sprint 4
+
+### 6.4.1 Papéis, responsabilidades e rotação
+
+A tabela traz o papel das quatro sprints lado a lado. A coluna de **atuação fora da frente** fica dentro da matriz principal, e não em nota separada, como pedido no retorno da Sprint 2. Conforme o retorno da Sprint 3, não é mantida a reconciliação entre o par da Planning e o par efetivo: responsável e revisor são definidos quando o card é puxado para execução.
+
+<!-- CONFERIR-SEXTA: MRs e revisões finais de Matheus e Tobias -->
+| Integrante | Sprint 1 | Sprint 2 | Sprint 3 | Papel principal na Sprint 4 | Principais responsabilidades e entregas na Sprint 4 | Atuação fora da frente | Revisões na Sprint 4 | Natureza da rotação |
+|---|---|---|---|---|---|---|---|---|
+| Ana Cristina Jardim | Gestão de riscos e requisitos funcionais | Algoritmo de PLN e artefatos de gestão | Planejamento dos testes de integração; webhooks e SSO | **Infraestrutura de testes e testes de integração** | Construir o módulo VHS de gravação e reprodução de respostas externas (`!87`); implementar e executar os testes de integração no pipeline (`!89`); documentar ferramentas e bibliotecas de teste (`!86`); integrar a classificação de intenção à recuperação do chat (`#290`) | Correção do serviço de testes no Docker (`f5b0b19`); apresentação da Sprint Review | `!85` | Da escrita do plano para a construção da infraestrutura que o executa: primeira vez com código de teste automatizado |
+| Felipe Simão | Contexto da indústria e perfil do líder | Prototipação exploratória e modelagem de dados | Banco relacional e planejamento dos testes funcionais | **Scrum Master e gestão evolutiva** | Conduzir rituais, Planning e cadastro das 45 issues; produzir a retrospectiva (`#221`), a matriz de risco e a matriz de papéis (`#234`); conferir e atualizar os dois artefatos de gestão | Execução da campanha de testes funcionais com evidências (`!85`, `#261`, `#262`); correção do VHS na branch de Ana (`f3de419`) | `!87` | Primeira vez na gestão do projeto e na matriz de risco |
+| Karol Barbosa Rocha | Perfil do diretor e requisitos não funcionais | Prototipação exploratória e organização documental | TTS, desempenho e validação técnica | **Chamada de voz em tempo real** | Integrar captura e reprodução de voz à conversa com o agente (`#227`, `#253`); implementar WebSocket e reduzir a latência (`#254`); documentar arquitetura, protocolo, falhas e validação da chamada (`#237`, `#263`) | Testes de usabilidade previstos na Planning, que não foram iniciados (`#269`) | `!89` | Do componente isolado de síntese (S3) para a arquitetura de comunicação contínua cliente-servidor |
+| Matheus Ferreira da Silva | Perfil do PMO e estratégia técnica inicial | APIs de STT e TTS | Pipeline RAG e webhooks | **Viabilidade financeira e consolidação do Projeto.md** | Produzir a análise de viabilidade financeira (`#243`, `#244`, `#249`, Seção 6.8); consolidar evidências e publicação do `Projeto.md` | — | `!88`, `!91` | Primeira vez em análise de negócio e custos, após três sprints técnicas |
+| Paulo Henrique Bueno Fernandes | Entendimento do problema e visão do produto | API de recebimento de áudios | Frontend integrado e usabilidade | **Integração da intenção às ações do agente** | Criar o componente Agente, extrair entidades e ligar o agente ao chat (`!88`, `#250`); integrar a agenda ao calendário (`!92`, `#257`) | Correções de áudio e documentação do feedback da Sprint 3 (`#255`); correção da subida do Docker para toda a equipe (`#297`); melhorias de interface (`#293`); apresentação da Sprint Review | `!86` | Do frontend para a lógica de decisão do backend |
+| Rui Facó | Definição do MVP e tecnologias | Pilha de tecnologias e contratos de entrada | Testes não funcionais e gestão evolutiva | **Dados do parceiro e base vetorial** | Inventariar a base vetorial antes da nova carga (`!91`, `#242`); popular banco e Drive com os dados de portfólio do parceiro (`#275`, `#295`) | Testes de desempenho previstos na Planning, que não foram iniciados (`#264`) | `!92` | Da gestão e qualidade para a camada de dados e recuperação |
+| Tobias Viana | Modelagem do fluxo de negócio | Processo de deploy em nuvem | PLN e integração do banco relacional | **Planejamento da Sprint 5** | Planejar a Sprint 5 com objetivo, estimativas, DoR e DoD (`#241`, Seção 6.7) | Evolução das integrações e das tabelas do banco (`#300`, `#301`) | `!90` | Primeira vez no planejamento de sprint; o banco é continuidade secundária, declarada como tal |
+
+**Como a rotação foi verificada.** O papel principal da Sprint 4 foi comparado com os três anteriores de cada integrante. Nenhum repete uma responsabilidade principal já exercida. Três casos exigem leitura cuidadosa e estão declarados na própria tabela:
+
+- **Ana e Felipe** planejaram testes na Sprint 3 e os executaram na Sprint 4. A frente é a mesma, mas a responsabilidade é outra: planejar é escrever casos, e executar é construir infraestrutura (Ana) ou produzir e analisar evidências (Felipe). No caso de Felipe, a execução é atuação fora da frente; o papel principal é a gestão.
+- **Karol** trabalhou com voz nas Sprints 3 e 4. Na Sprint 3 foi um componente de síntese isolado; na Sprint 4, uma chamada contínua com WebSocket, controle de estado e tratamento de falha de rede. É outra competência.
+- **Tobias** manteve atuação no banco como continuidade secundária do MR `!80`. Ela não é o seu papel principal e não é apresentada como rotação.
+
+### 6.4.2 Evidência versionada e colaborações efetivas
+
+<!-- CONFERIR-SEXTA: toda a tabela -->
+| Integrante | Commits autorais | MRs de autoria | MRs revisados | Resultado final |
+|---|---:|---|---|---|
+| Ana Cristina Jardim | 7 | `!86`, `!87`, `!89` | `!85` | VHS, testes de integração e documentação de ferramentas integrados |
+| Felipe Simão | 5 | `!85` | `!87` | Testes funcionais integrados; artefatos de gestão |
+| Karol Barbosa Rocha | 10 | `!90` | `!89` | Chamada de voz em revisão |
+| Matheus Ferreira da Silva | 0 | — | `!88`, `!91` | Análise financeira produzida fora do repositório até a consolidação |
+| Paulo Henrique Bueno Fernandes | 11 | `!88`, `!92` | `!86` | Agente integrado; calendário em revisão |
+| Rui Facó | 2 | `!91` | `!92` | Inventário da base vetorial em revisão |
+| Tobias Viana | 0 | — | `!90` | Planejamento da Sprint 5 produzido fora do repositório até a consolidação |
+
+**Colaborações cruzadas.** No VHS, Ana construiu o módulo e Felipe corrigiu a chave do chat e o teto de chamadas reais na mesma branch (`f3de419`) antes de revisar o `!87`. O ambiente Docker corrigido por Paulo (`#297`) é usado por toda a equipe para rodar a suíte, e o serviço de testes corrigido por Ana (`f5b0b19`) é o que permite rodar os testes de integração no contêiner.
+
+### 6.4.3 Avaliação da distribuição
+
+A **revisão** está bem distribuída: os sete integrantes revisaram, cada um de um a dois MRs, e nenhum revisou o próprio trabalho. É a melhor distribuição de revisão do módulo até aqui.
+
+A **autoria versionada** não está distribuída da mesma forma. Ana, Paulo e Karol concentram 28 dos 35 commits e 6 dos 8 MRs de autoria, e Matheus e Tobias não têm commit autoral no período, porque produziram a análise financeira e o planejamento da Sprint 5 fora do repositório até a consolidação.<!-- CONFERIR-SEXTA: atualizar se os MRs deles entrarem --> O problema não é falta de trabalho, e sim a falta de visibilidade dele durante a sprint: o quadro e o Git não mostravam o que estava em andamento, e a revisão desses artefatos só pôde começar no fim. A ação da Seção 6.2.5 que exige trabalho versionado desde o início, com MR em rascunho e commit de todos os integrantes em cada semana, e o risco AM16 tratam esse ponto.
+
+Contagem de commits não é medida de esforço: a análise financeira e o planejamento da Sprint 5 são documentos longos que podem entrar em poucos commits. A tabela 6.4.2 serve para mostrar **quando** o trabalho ficou visível, não **quanto** trabalho houve.
 
 ---
 
