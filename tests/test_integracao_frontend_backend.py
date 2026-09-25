@@ -37,6 +37,7 @@ from az1_api.dependencies import (
     get_chat_answerer,
     get_classificador_de_intencao,
     get_conversa_repository,
+    get_evento_local_repository,
     get_portfolio_repository,
 )
 from az1_api.main import app
@@ -117,6 +118,13 @@ class _PortfolioVazio:
 
     def alterar_situacao(self, *, pendencia_id: int, situacao: str):
         return None
+
+
+class _EventosLocaisVazios:
+    """Repositório sem banco para a parcela local da Agenda."""
+
+    def listar(self, usuario_id: int) -> tuple:
+        return ()
 
 
 class TestFrontendBackendIntegracao(unittest.TestCase):
@@ -284,7 +292,9 @@ class TestFrontendBackendIntegracao(unittest.TestCase):
         for caminho in (
             "/api/v1/tasks/1/comentarios",
             "/api/v1/projetos/SYN-04/relatorio",
-            "/api/v1/calendar/events/proxima-semana",
+            # Evita o padrão DELETE /calendar/events/{evento_id}: nesse
+            # endereço o caminho existe e um GET deve responder 405.
+            "/api/v1/calendar/sem-rota",
         ):
             with self.subTest(rota=caminho):
                 # Confirmado contra o roteador: se algum destes passar a
@@ -312,7 +322,12 @@ class TestFrontendBackendIntegracao(unittest.TestCase):
         o `404` de rota inexistente do caso acima. Confundir os dois é o erro
         que o par de casos existe para tornar impossível.
         """
-        http = cliente({get_portfolio_repository: _PortfolioVazio})
+        http = cliente(
+            {
+                get_portfolio_repository: _PortfolioVazio,
+                get_evento_local_repository: _EventosLocaisVazios,
+            }
+        )
         caminhos = set(app.openapi()["paths"])
 
         for metodo, caminho, modelo in ROTAS_DE_PORTFOLIO:

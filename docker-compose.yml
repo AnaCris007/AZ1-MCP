@@ -195,7 +195,7 @@ services:
     # Tag de release fixa, não "latest". Com "latest", a mesma composição sobe
     # versões diferentes em máquinas diferentes conforme a data do pull — o tipo
     # de divergência que só aparece em produção.
-    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
     command: server /data --console-address ":9001"
 
     # O usuário root do MinIO É a chave de acesso S3 que a API usa: nesta pilha
@@ -240,7 +240,7 @@ services:
   # clássico "na minha máquina funciona" — aqui ela é parte da composição,
   # versionada e idempotente (--ignore-existing), então rodar de novo não quebra.
   minio-init:
-    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z
     depends_on:
       minio:
         condition: service_healthy
@@ -279,9 +279,10 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Inicialização de uma base local nova. Volumes existentes recebem a
-      # migração 06 manualmente, sem apagar dados.
+      # migração 06/07 manualmente, sem apagar dados.
       - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create_database.sql:ro
       - ./src/database/06_webhook_permissions.sql:/docker-entrypoint-initdb.d/06_webhook_permissions.sql:ro
+      - ./src/database/07_evento_local.sql:/docker-entrypoint-initdb.d/07_evento_local.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U az1 -d az1"]
       interval: 5s
