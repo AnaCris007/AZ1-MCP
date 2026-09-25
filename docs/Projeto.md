@@ -77,6 +77,7 @@
 
 - [5.1 Webhooks](#51-webhooks)
 - [5.2 Integração entre Frontend e Backend](#52-integração-entre-frontend-e-backend)
+- [5.3 Chamada de Voz Contínua](#53-chamada-de-voz-contínua)
 
 </details>
 
@@ -91,6 +92,7 @@
 - [6.6 Matriz de Cobertura Planejada](#66-matriz-de-cobertura-planejada)
 - [6.7 Execução dos testes sistêmicos — campanha funcional da Sprint 4](#67-execução-dos-testes-sistêmicos--campanha-funcional-da-sprint-4)
 - [6.8 Ferramentas e Bibliotecas Utilizadas](#68-ferramentas-e-bibliotecas-utilizadas)
+- [6.9 Execução dos Testes de Usabilidade](#69-execução-dos-testes-de-usabilidade)
 
 </details>
 
@@ -2206,13 +2208,38 @@ O código está em `src/pln/`.
 
 O pipeline recebe **texto**, digitado pelo usuário ou transcrito pela API de Speech-to-Text descrita em 3.2, e devolve **uma das dez intenções do catálogo** definido em 3.1, acompanhada de um grau de confiança.
 
-Ele não interpreta a intenção nem executa a ação correspondente. Essa responsabilidade é do agente, conforme a separação registrada no diagrama de componentes: o pipeline transforma texto e classifica, e o que fazer com a intenção identificada é decisão de quem o consome.
+Ele não interpreta a intenção nem executa a ação correspondente. Essa responsabilidade é do agente, conforme a separação registrada no diagrama de componentes: o pipeline transforma texto, classifica e aplica a regra de rejeição calibrada, e o que fazer com a intenção identificada é decisão de quem o consome.
 
-O conjunto de treino em `src/pln/dados/intencoes_exemplos.csv` tem **400 frases, 40 por intenção**, cobrindo as dez intenções do catálogo da Seção 3.1.
+A fronteira do pipeline é o módulo `src/pln/intencao.py`, que devolve um objeto com **duas leituras da mesma classificação**: `prevista`, o argmax cru do modelo, e `intencao`, o que sobra depois de comparar a confiança contra o limiar. A distinção não é conveniência de implementação. "O modelo disse `fora_do_catalogo` com confiança" leva à recusa prevista no RF02; "o modelo não teve confiança em nada" leva a deixar a resposta fundamentada seguir. Colapsar as duas transformaria toda dúvida do classificador numa recusa.
 
-### 3.3.2 Algoritmo escolhido: Naive Bayes multinomial
+O limiar vive nesse módulo, e é o mesmo objeto que `pln/metricas.py` usa para medir o RNF03. Até a Sprint 3 ele existia em quatro versões independentes — uma em `metricas.py`, aplicada somente offline; um `0.70` fixo em `agente_service.py`; outro em `config/alertas.yaml`; e nenhuma no caminho de áudio, que devolvia o argmax cru. Nenhuma das quatro estava errada isoladamente, e é por isso que nenhum teste as acusava: o defeito era a relação entre elas, e o efeito era o relatório do RNF03 descrever uma regra que o serviço não aplicava.
 
-**Decisão:** utilizar `MultinomialNB` sobre representação esparsa de termos, tanto na medição quanto no produto.
+#### Corpus e partição
+
+O corpus autoral vive em `src/pln/dados/intencoes_pool.csv` e tem **1.104 frases**: 100 para cada uma das nove intenções conhecidas e 204 para `fora_do_catalogo`. O dobro na classe aberta é decisão, e não desequilíbrio acidental — ela não tem vocabulário próprio, compartilha termos com todas as demais e só aprende a própria fronteira vendo variedade. Era ela que respondia pela maior parte da distância até o RNF03, com recall de 0,200 sobre as 400 frases anteriores.
+
+Parte das frases vem do material de perguntas e respostas entregue pelo Metrô, o que muda a natureza do corpus: o vocabulário de `subportfólio`, `deliberação`, `dependência externa`, `homologação técnica` e `data de referência` passa a ser o do parceiro, e não o que a equipe supôs que ele usaria. As trinta perguntas fora do escopo e as dez de indução a alucinação daquele material alimentam diretamente a classe `fora_do_catalogo`.
+
+As perguntas de teste de permissão do mesmo material ficaram **deliberadamente fora**. Elas são pedidos legítimos de portfólio — "mostre o orçamento detalhado de todos os projetos" é, semanticamente, `consultar_projeto_sintetico` — que devem falhar por autorização, e não por classificação. Rotulá-las `fora_do_catalogo` ensinaria o modelo a rejeitar o vocabulário legítimo do domínio, e o próprio material do parceiro registra a regra: não confundir ausência de dados com falta de permissão.
+
+O pool é separado por `python -m pln.particao` em dois arquivos gerados:
+
+| Arquivo | Exemplos | Papel |
+| --- | ---: | --- |
+| `intencoes_exemplos.csv` | 881 | Desenvolvimento: treino, varredura de pré-processamento, ajuste de hiperparâmetros e calibração do limiar |
+| `intencoes_teste.csv` | 223 | Teste retido, lido uma única vez por `python -m pln.metricas --teste` |
+
+São dois arquivos, e não uma coluna `particao` num CSV único, de propósito: assim `experimento.py`, `ajuste_fino.py` e `bancada.py` ficam **incapazes** de enxergar o teste, em vez de apenas instruídos a não enxergá-lo. Nenhum dos três precisou mudar uma linha.
+
+A atribuição de cada frase é feita por hash do próprio texto, e não por embaralhamento com semente. Um `shuffle` semeado é reprodutível, mas não sobrevive ao crescimento do corpus: acrescentar frases recalcula o sorteio inteiro, e exemplos migram do teste para o desenvolvimento — onde o modelo da rodada anterior já foi ajustado sobre eles. O conjunto retido vaza sem que ninguém tenha feito nada errado, e nenhuma execução isolada parece incorreta. Com hash, acrescentar nunca move quem já está. O custo é que a proporção por classe passa a ser aproximada em vez de exata, e por isso o relatório da partição imprime as contagens reais e avisa quando alguma classe fica rasa demais para sustentar um F1.
+
+> **O teste retido não é o conjunto cego da Seção 6.3.** Aquele exige duzentas frases novas, escritas depois e custodiadas por um integrante que não participe do ajuste. Este é uma separação interna do corpus, feita antes de qualquer treino ou calibração: mede generalização com honestidade e **não** substitui a medição cega.
+
+### 3.3.2 Algoritmo escolhido: `LinearSVC` calibrado no produto, Naive Bayes na régua do estágio 1
+
+> **Esta seção foi reescrita na Sprint 3.** Até então ela sustentava uma decisão única — `MultinomialNB` na medição e no produto — apresentada como condição de validade. A busca de três estágios da Seção 3.3.7 mediu cada família sobre o seu próprio melhor texto e desfez o argumento: o `MultinomialNB` ficou em sexto de sete e falhava nos **três** limites do RNF03 no conjunto retido. Manter a condição custaria o requisito. O texto abaixo preserva o raciocínio original porque ele continua válido para a RÉGUA, e registra onde ele deixou de valer.
+
+**Decisão, em duas partes:** utilizar **cada família como sua própria régua** na varredura de pré-processamento, e **`LinearSVC` calibrado** (`C=1.0`) como **modelo do produto**.
 
 O critério determinante foi **velocidade**, e ele não é conveniência de desenvolvimento: é o que viabiliza o método de escolha descrito em 3.3.3. O pipeline só pode ser configurado por medição exaustiva se cada medição for barata, porque são 11.644 delas. Medindo o custo de uma validação cruzada de 5 dobras sobre a vetorização mais cara do espaço (`bow n=1-2`, com 2.540 colunas):
 
@@ -2234,11 +2261,19 @@ Os demais critérios acompanham a escolha:
 | RNF04 e RNF09, rastreabilidade e auditabilidade | A intenção identificada e as palavras que a determinaram podem ser registradas no log de cada interação |
 | RNF01 e RNF10, desempenho e escalabilidade | Classificação em microssegundos, e a matriz esparsa não cresce em memória proporcionalmente ao corpus |
 
-**Decisão:** o classificador do produto é o mesmo que serve de instrumento de medida no experimento.
+**A condição de validade que foi abandonada, e por quê.** Até a Sprint 3 o produto era o mesmo modelo da régua, e isso era apresentado como condição de validade: o pré-processamento é escolhido medindo com um classificador fixo, então um produto diferente herdaria uma escolha de texto feita para outro modelo. O argumento é correto, e o custo de ignorá-lo já havia sido medido — o melhor pré-processamento sob `BernoulliNB` estava na posição 43 do ranking construído sob multinomial.
 
-Isso não é redundância, é uma condição de validade. O pré-processamento é escolhido medindo com um classificador fixo; se o produto usasse outro, a escolha do texto teria sido feita para um modelo que não é o que roda. Chegamos a avaliar `BernoulliNB` como modelo do produto, e a medição mostrou o custo dessa separação: o melhor pré-processamento sob Bernoulli estava na posição 43 do ranking construído sob multinomial, fora da janela de candidatos que o ajuste fino recebe. Fixar o mesmo classificador nos dois lugares elimina o problema por construção.
+O que mudou não foi o argumento, foi o preço dele. Medido no conjunto retido com o melhor texto dele próprio, o `MultinomialNB` entrega F1-macro 0,8084 e cobertura 89,1% — **falha em dois dos três limites do RNF03**. O `LinearSVC` calibrado entrega 0,8735, 96,0% e 8,2%, e **atende aos três**. Preservar a simetria entre régua e produto significaria escolher um requisito não atendido por elegância metodológica.
 
-**Limitação declarada:** a confiança devolvida pelo modelo ordena bem e calibra mal. Ela serve para comparar duas frases entre si, mas não deve ser lida como "probabilidade de estar certo". Um limiar de recusa construído sobre ela, necessário para o comportamento previsto no RF02 e na intenção `fora_do_catalogo`, precisa ser calibrado empiricamente sobre dados rotulados, e não escolhido por intuição.
+A separação é mitigada, e não ignorada: `comparativo_modelos.py` mede cada família sobre o seu próprio melhor texto, entre os melhores do ranking do estágio 1. O resíduo — o ranking em si continuar sendo produzido sob `MultinomialNB` — está declarado na Seção 3.3.7.
+
+**Por que `LinearSVC`, e por que a resposta mudou.** Uma rodada anterior adotou a regressão logística por desempate de engenharia, sobre o que então parecia um empate estatístico. Não era empate: o teste pareado tinha sido feito com 10 medições e devolveu t = 1,502, que é *não consegui detectar*, e não *são iguais*. Refeito com validação cruzada de 10 dobras repetida 5 vezes — 50 medições pareadas —, o mesmo par dá **t = +4,871**, com intervalo de 95% da diferença em **[+0,0124, +0,0292]**, que não inclui zero.
+
+Com a diferença estabelecida como real, o desempate por engenharia deixa de ser legítimo: ele decide entre modelos equivalentes, e aplicá-lo sobre uma diferença medida seria escolher o pior de propósito.
+
+**O custo da escolha, declarado.** O `LinearSVC` não expõe `predict_proba` — a perda de dobradiça produz distância com sinal, não probabilidade — e por isso vive embrulhado em `CalibratedClassifierCV`, que ajusta uma sigmoide sobre escores validados cruzadamente. Isso cobra três preços: a latência de inferência sobe de 0,351 ms para **2,107 ms**; os pesos por termo deixam de estar em `coef_` e passam a ser a média dos três modelos internos, o que serve para listar termos característicos mas não para auditar uma decisão específica; e o modelo passa a exigir **pelo menos três exemplos de cada classe em cada dobra de treino**, de modo que uma classe rara demais impede o treino.
+
+**Limitação declarada:** a confiança devolvida pelo modelo ordena melhor do que calibra. Ela serve para comparar duas frases entre si, mas não deve ser lida como "probabilidade de estar certo". Um limiar de recusa construído sobre ela, necessário para o comportamento previsto no RF02 e na intenção `fora_do_catalogo`, precisa ser calibrado empiricamente sobre dados rotulados, e não escolhido por intuição.
 
 ### 3.3.3 Por que um pipeline que combina opções, e não uma sequência fixa
 
@@ -2425,20 +2460,104 @@ As probabilidades a priori não fazem diferença nenhuma (0,6271 nos dois valore
 
 ```python
 CONFIG_PRE_PADRAO = ConfigPreprocessamento(
+    minusculas=True,
+    remover_acentos=True,
     remover_numeros=True,
-    morfologia=ModoMorfologia.STEMMING,
     tokenizacao=Tokenizacao.REGEX,
 )
-CONFIG_VET_PADRAO = ConfigVetorizacao(ModoVetorizacao.BOW, n_max=1)
-ALPHA_PADRAO      = 1.0
-FIT_PRIOR_PADRAO  = True
+CONFIG_VET_PADRAO = ConfigVetorizacao(ModoVetorizacao.BOW, n_max=2)
+C_PADRAO          = 1.0     # LinearSVC; a grade de 0,1 a 10 não superou o padrão
 ```
 
-F1-macro de **0,6736** em validação cruzada de 5 dobras. Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
+F1-macro de **0,8244** no ponto de operação, em validação cruzada de 5 dobras sobre as 881 frases de desenvolvimento, e **0,8735** no conjunto de teste retido — onde **os três limites do RNF03 são atendidos**. Esses valores estão aplicados em `classificador.py` e são verificados por teste automatizado, que falha se alguém os editar sem passar pelas duas buscas.
 
-**Ressalvas declaradas.** A primeira é que 1.439 das 11.644 execuções ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada. A segunda é que o F1-macro de 0,6736 está **17,6 pontos percentuais abaixo do 0,85 exigido pelo RNF03**. A classe `fora_do_catalogo` responde pela maior parte da distância, porque é uma categoria aberta, sem vocabulário próprio e que compartilha termos com todas as demais. Fechar essa distância é trabalho previsto para a Sprint 3, conforme a Seção 3.8, e as duas frentes são ampliar o dataset e calibrar, somente em dados de desenvolvimento, um limiar de confiança sobre as nove intenções conhecidas. A validação final também deverá atender à cobertura e à aceitação indevida definidas no RNF03.
+A latência subiu de 0,200 ms para **0,351 ms** de mediana com a troca de família, e continua irrelevante diante do RNF01, que mede a consulta completa — transcrição e geração incluídas.
 
-### 3.3.7 Bibliotecas utilizadas
+**Uma ressalva que a régua de distância não captura.** A régua soma violações normalizadas dos três limites, então uma diferença entre dois pontos que já respeitam um limite não pesa nela. O `SGD` ilustra o risco: tem o **maior F1 do conjunto retido** (0,8774) e ainda assim reprova, com 16,3% de aceitação indevida. Ordenar só por F1 teria escolhido justamente o modelo que mais aceita pedidos fora do catálogo — e é por isso que os três critérios são medidos juntos, e não resumidos num número.
+
+**O que a ampliação do corpus mudou.** O F1-macro subiu de **0,6736 para 0,7797** (+0,1061), e o ganho veio quase todo de onde se esperava: `fora_do_catalogo` saiu de recall 0,200 e F1 0,314 para recall **0,703** e F1 **0,784**. A classe que respondia pela maior parte da distância até o RNF03 deixou de responder.
+
+**Ressalvas declaradas.** A primeira é que 492 das 11.884 execuções distintas ficam dentro de um desvio padrão da melhor. O topo do ranking é um empate largo, e a leitura confiável está nas tabelas agregadas, cada uma resumindo centenas de comparações pareadas, e não na primeira colocada.
+
+A segunda mudou de natureza duas vezes. Sob o `MultinomialNB`, o F1-macro de 0,7797 ficava 7,0 pontos abaixo do exigido e **a curva de aprendizado achatou**: o último degrau, de 706 para 881 exemplos, rendeu apenas **+0,0089**, contra os +0,0338 medidos sobre o corpus de 400. Mais frases do mesmo tipo tinham deixado de render, e foi essa leitura que motivou a comparação entre famílias da Seção 3.3.7.
+
+Ela mostrou que o limite era da **família**, e não do corpus: o `LinearSVC` calibrado, sobre o melhor texto dele próprio, marca 0,8244 no desenvolvimento e **0,8735 no conjunto retido**, onde atende aos três limites. A distância até o requisito não foi fechada por mais dados, e sim por trocar o classificador — o que só ficou visível quando cada família passou a varrer o espaço com ela própria como régua.
+
+### 3.3.7 Comparação entre famílias de classificador
+
+Esta seção foi refeita na Sprint 3 para atender ao parecer, que apontava: *"existe uma busca extensa pela melhor configuração de um único algoritmo, mas ainda não uma busca efetiva pela melhor abordagem para o problema"*.
+
+#### O que tornava a comparação injusta
+
+Medir várias famílias sobre **um** espaço de texto — o ranking produzido com `MultinomialNB` como régua — favorece quem produziu esse ranking. Uma família cujo texto ideal estivesse na posição 800 dele nunca o veria.
+
+A correção é literal: **cada família varre as 11.884 configurações com ela própria como instrumento de medida**, e não herda o ranking de ninguém. `python -m pln.experimento --regua <familia>` grava um ranking por família.
+
+O custo não é simétrico, e é o que a §3.3.2 previa ao escolher o Naive Bayes por velocidade. Uma validação cruzada de 5 dobras custa 0,05 s no `MultinomialNB`, 0,11 s no `SGDClassifier`, 0,77 s no `LinearSVC` calibrado e até 21,69 s na regressão logística. O gargalo dela não é falta de convergência — converge em 30 iterações, com teto de 2000 — e sim a dimensionalidade: com `n=1-2` são 4.524 colunas × 10 classes = 45.240 parâmetros sob um solver quase-Newton, contra a solução fechada do Naive Bayes.
+
+#### As quatro famílias, cada uma no seu melhor texto
+
+| Família | Melhor texto (do ranking próprio) | Hiperparâmetro | F1 | Cobertura | Aceit. indevida |
+| --- | --- | --- | ---: | ---: | ---: |
+| **`LinearSVC` calibrado** | `bow n=1-2` · regex · minúsc > acentos > números | padrão | **0,8244** | **95,9%** | **9,7%** |
+| `SGD modified_huber` | `tfidf n=1-2` · linguístico · acentos > números | padrão | 0,8120 | 93,7% | 11,6% |
+| `LogisticRegression` | `bow n=1-2` · regex · números > stemming > acentos | `C=5.0` | 0,8090 | 92,4% | 8,4% |
+| `MultinomialNB` | `bow n=1-2` · linguístico · números > stemming | `alpha=2.0` | 0,7680 | 89,4% | 14,8% |
+
+**As quatro preferiram quatro textos diferentes.** Nenhuma escolheu o texto de outra, o que mede o tamanho do viés que a metodologia anterior introduzia.
+
+#### Ordenar não é separar
+
+A tabela ordena; separar exige teste. Validação cruzada de 10 dobras **repetida 5 vezes** — 50 medições pareadas, mesmas partições para todos:
+
+| Par | Diferença média | t | IC 95% | Separáveis |
+| --- | ---: | ---: | --- | :---: |
+| `LinearSVC` − `MultinomialNB` | +0,0453 | +8,861 | [+0,0353, +0,0553] | **sim** |
+| `LinearSVC` − `LogisticRegression` | +0,0208 | +4,871 | [+0,0124, +0,0292] | **sim** |
+| `LinearSVC` − `SGD` | +0,0151 | +3,429 | [+0,0065, +0,0238] | **sim** |
+| `SGD` − `MultinomialNB` | +0,0301 | +5,942 | [+0,0202, +0,0401] | **sim** |
+| `LogisticRegression` − `MultinomialNB` | +0,0245 | +4,181 | [+0,0130, +0,0359] | **sim** |
+| `SGD` − `LogisticRegression` | +0,0057 | +1,385 | [−0,0024, +0,0137] | não |
+
+O `LinearSVC` **separa-se das três outras**. O único par que não se separa é `SGD` contra `LogisticRegression` — e isso não autoriza dizer que uma é melhor, só que esta amostra não as distinguiu.
+
+**A repetição não é zelo.** Com 10 medições em vez de 50, o par `LinearSVC` × `LogisticRegression` dava t = 1,502 e foi lido como empate — leitura que motivou adotar a regressão logística por critério de engenharia numa rodada anterior. Poucas medições produzem *não detectei*, que não é *são iguais*, e as duas leituras levam a decisões opostas.
+
+#### Confirmação no conjunto retido
+
+Cada família treinada no desenvolvimento inteiro e medida **uma única vez** no retido, com o limiar congelado do desenvolvimento:
+
+| Família | Limiar | F1 (≥0,85) | Cobertura (≥90%) | Aceit. indevida (≤15%) | Atende |
+| --- | ---: | ---: | ---: | ---: | :---: |
+| **`LinearSVC` calibrado** | 0,00 | **0,8735** | **96,0%** | **8,2%** | **sim** |
+| `LogisticRegression` | 0,30 | 0,8710 | 94,3% | 10,2% | **sim** |
+| `SGD modified_huber` | 0,40 | 0,8774 | 96,0% | 16,3% | — |
+| `MultinomialNB` | 0,50 | 0,8084 | 89,1% | 8,2% | — |
+
+O `SGD` tem o **maior F1 do retido e ainda assim reprova**: 16,3% de aceitação indevida, acima do limite de 15%. É o caso que justifica medir os três critérios em vez de ranquear por F1 — uma leitura que ordenasse só por F1 escolheria o modelo que mais aceita pedidos fora do catálogo.
+
+**Duas famílias atendem aos três limites; o `LinearSVC` é a que se separa das demais em desenvolvimento.** Por isso é ele que está em produção.
+
+#### Com quanta confiança, exatamente
+
+A estimativa pontual passa nos três. A pergunta seguinte é quão firme ela é, e isso se responde reamostrando o próprio conjunto retido (4.000 bootstraps):
+
+| Critério | Limite | Pontual | IC 95% | Atende em |
+| --- | ---: | ---: | --- | ---: |
+| F1-macro | ≥ 0,85 | 0,8735 | [0,8208, 0,9152] | **79,5%** |
+| Cobertura | ≥ 90% | 96,0% | [92,9%, 98,8%] | **100,0%** |
+| Aceitação indevida | ≤ 15% | 8,2% | [1,9%, 16,9%] | **94,4%** |
+| **os três juntos** | | | | **76,0%** |
+
+A leitura honesta é **"atende, com cerca de 76% de confiança neste tamanho de amostra"** — e não "cumprido" nem "não cumprido". Sortear outro conjunto de 223 exemplos da mesma distribuição passaria nos três em cerca de três de cada quatro vezes.
+
+As três pernas não são igualmente firmes: a **cobertura está ganha** (100% das reamostragens), a aceitação indevida quase (94,4%), e o **F1 é a perna fraca** (79,5%) — o limite de 0,85 cai dentro do intervalo.
+
+**O que ainda separa isto de uma declaração de conformidade.** Primeiro, o tamanho: 223 exemplos, com classes de 14 a 49, produzem intervalo largo por construção. Segundo, o corpus é **sintético dos dois lados** — desenvolvimento e retido saíram das mesmas frases autorais, então o que se mede é generalização para frases inéditas *da mesma distribuição*, e não para a linguagem real do PMO. Terceiro, o retido foi lido mais de uma vez ao longo da Sprint 3, e ao menos uma decisão de modelo foi informada por ele antes de o protocolo de confirmação única ser instituído.
+
+Por isso a §6.3 reserva o nome *conjunto cego* para 200 frases **novas**, custodiadas por quem não participa do ajuste, e é ela que decide a conformidade. O caminho para estreitar o intervalo é ampliar o pool: a partição por hash faz desenvolvimento e retido crescerem juntos sem mover exemplos existentes.
+
+### 3.3.8 Bibliotecas utilizadas
 
 | Biblioteca | Versão | Papel no pipeline |
 | --- | --- | --- |
@@ -2452,7 +2571,48 @@ As cinco versões acima estão fixadas com `==` em `requirements.txt` e em `pypr
 
 O tokenizador linguístico usa `spacy.blank("pt")`, que carrega apenas as regras do idioma e não exige o download de modelo. O `pt_core_news_sm` é necessário somente para a lematização.
 
-### 3.3.8 Execução
+### 3.3.9 A classificação chegando à recuperação
+
+Até a Sprint 3 o rótulo era calculado e descartado. Quando o Agente não agia — o caso da maioria das perguntas — a pergunta seguia para o RAG exatamente como se nenhuma classificação existisse. O pipeline de PLN estava integrado ao **roteamento** e não à **resposta**.
+
+#### Por que filtrar a busca, e não instruir o modelo
+
+Havia duas formas de a intenção alcançar o provedor de linguagem.
+
+A literal é escrever no prompt *"a intenção classificada é X"*. É também a pior. Com F1-macro de 0,87, cerca de uma em oito classificações está errada, e uma afirmação errada dentro do prompt **compete com a pergunta do usuário** pela atenção do modelo, que não tem como saber em qual das duas confiar. O erro do classificador passaria a contaminar o raciocínio.
+
+A escolhida é usar a intenção para decidir **em que documentos procurar**. Ela é verificável — ou o documento certo foi recuperado, ou não — e degrada bem, porque o erro se manifesta como recuperação pobre, que o mecanismo abaixo corrige.
+
+A correspondência entre os dois catálogos é direta, o que torna o mapa pequeno e conferível:
+
+| Intenção (§3.1) | `tipo_documento` (`rag/parsers.py`) |
+| --- | --- |
+| `orientar_tap` | `termo_abertura` |
+| `orientar_entregas_cronograma` | `cronograma` |
+| `orientar_mapa_beneficios` | `mapa_beneficios` |
+| `orientar_riscos_problemas` | `riscos_problemas` |
+
+**O mapa é parcial de propósito.** Quatro das dez intenções nomeiam um documento; as demais não, e forçá-las a um tipo inventaria correspondência — `consultar_projeto_sintetico` atravessa todos os documentos de um projeto, `consultar_documentos_normativos` busca fora dele. Sem entrada no mapa, a busca é a de sempre: nenhuma pergunta piora por não haver regra para ela.
+
+#### O recuo é o que torna a sugestão segura
+
+`rag.retriever.buscar_com_recuo` busca com o filtro e, se nada passar do corte de relevância, **repete sem filtro e o resultado amplo prevalece**. O custo de uma classificação errada deixa de ser uma resposta pior e passa a ser uma consulta vetorial a mais.
+
+E é consulta barata: `vetorizar_consulta` é cacheada por texto, de modo que as duas buscas da mesma pergunta pagam **uma única chamada de embedding**. O que se repete é a consulta ao índice, local.
+
+Três decisões limitam o alcance do erro:
+
+- **Detecção rejeitada não foca nada.** Abaixo do limiar o rótulo é palpite, e estreitar a busca com base num palpite é a forma mais direta de o classificador piorar uma resposta que funcionaria sem ele.
+- **O código do projeto entra independente do F1.** `extrair_entidades` reconhece `SYN-\d{2}` por expressão regular: casa ou não casa. Por isso o filtro de projeto vale mesmo quando a intenção foi rejeitada, e `"Qual o risco do SYN-04?"` passa a buscar nos documentos daquele projeto.
+- **O desacoplamento é preservado.** `gemini_service` não importa `pln`: recebe dois filtros opcionais como dado simples. A tradução de `IntencaoDetectada` para filtros vive em `services/foco_da_busca.py`, e a de `projeto_codigo` para `projeto_id` — nomes diferentes para a mesma coisa em camadas diferentes — acontece na borda, em `dependencies.py`.
+
+#### O que ainda não é
+
+A intenção **não** entra no prompt nem seleciona instrução de resposta. As respostas-padrão do material do parceiro, que variam por tipo de pergunta, continuam fora: aplicá-las exigiria confiar no rótulo para escolher o formato, e é exatamente a confiança que o F1 atual não sustenta.
+
+A verificação desta integração está em `tests/test_foco_da_busca.py` e `tests/test_retriever_recuo.py`. Ela é de **contrato**, e não contra o índice vetorial real — os casos TI-24 a TI-26, que exigem o Postgres com `vecs`, continuam não implementados.
+
+### 3.3.10 Execução
 
 Instalação, uma vez:
 
@@ -2507,7 +2667,7 @@ listar_palavras_de_maior_peso_por_intencao(modelo, quantas=4)
 #  ...}
 ```
 
-### 3.3.9 Testes
+### 3.3.11 Testes
 
 O pipeline tem mais de **150 testes automatizados**, organizados por módulo. Eles são a evidência de que o
 comportamento descrito nesta seção é o que o código faz, e não apenas o que se pretendia.
@@ -2574,6 +2734,33 @@ um teste de etapa isolada quebrar quando outra etapa mudar, houve acoplamento in
 | --- | ---: | --- |
 | `TesteEspacoDeBusca` | 4 | As 432 configurações cobrem o produto cartesiano, toda etapa ativa é permutada, toda ordem gerada é válida e a primeira permutação é a ordem padrão |
 | `TesteRecomendacao` | 5 | O empate é de um desvio padrão, e o desempate segue a ordem de critérios adotada |
+
+`tests/test_intencao.py`, 11 testes:
+
+| Classe | Testes | Garante |
+| --- | ---: | --- |
+| `TesteAplicarLimiar` | 3 | A comparação é `<` e não `<=`, e o lote recusa listas de tamanhos diferentes |
+| `TesteIntencaoDetectada` | 3 | `prevista` e `intencao` permanecem leituras distintas da mesma classificação |
+| `TesteDetectarIntencao` | 2 | O argmax e a confiança do modelo chegam à detecção, e o limiar do detector é respeitado |
+| `TesteRegraUnica` | 3 | `metricas.py` usa o mesmo objeto do serviço, e nem `agente_service` nem `alerta_service` declaram limiar próprio |
+
+`tests/test_particao.py`, 13 testes:
+
+| Classe | Testes | Garante |
+| --- | ---: | --- |
+| `TesteNormalizar` | 2 | Acento, caixa, pontuação e espaço repetido não fazem a mesma frase passar por duas |
+| `TesteSeparar` | 6 | Sobreposição zero, nada se perde, determinismo, e crescer o pool não move quem já estava |
+| `TesteDuplicatas` | 2 | Repetição que só difere em acento é detectada antes de inflar a contagem da classe |
+| `TesteArquivosGerados` | 3 | Os dois CSVs no disco não se sobrepõem e correspondem à regra que diz tê-los produzido |
+
+`tests/test_comparativo_modelos.py`, 11 testes:
+
+| Classe | Testes | Garante |
+| --- | ---: | --- |
+| `TesteCandidatos` | 3 | Todo candidato expõe `predict_proba`, a referência vem primeiro e os nomes não colidem |
+| `TesteTrocaSomenteOEstimador` | 2 | Trocar a família não troca o pré-processamento nem a vetorização |
+| `TesteDistanciaDoRequisito` | 2 | Os três limites são cumulativos: folga num não compensa violação noutro |
+| `TesteLeitura` | 4 | O veredito ranqueia pelo ponto de operação, e a ressalva da régua nunca some do relatório |
 
 #### Os quatro testes que impedem defeito silencioso
 
@@ -2963,7 +3150,7 @@ O quadro reúne, em uma única leitura, cada camada da solução com a tecnologi
 | Apresentação | Tailwind CSS, Framer Motion, Lucide React | Estilo, animação e iconografia | Reduz o esforço de padronização visual sem introduzir uma biblioteca de componentes que imponha identidade própria | Biblioteca de componentes pronta | Consistência visual a baixo custo | Marcação verbosa; a acessibilidade continua sendo responsabilidade da equipe | Implementado |
 | Backend e API | Python 3.12+, FastAPI, Uvicorn, Pydantic, `python-multipart` | Expor as APIs REST, validar entradas e orquestrar os serviços | Mesma linguagem do pipeline de PLN, o que elimina uma fronteira de processo entre API e modelo; validação por tipo já embutida | Flask, considerado no exemplo original da Seção 3.7.5 | Validação declarativa, documentação OpenAPI automática e suporte nativo a rotas assíncronas | Ecossistema assíncrono exige atenção com bibliotecas bloqueantes | Implementado |
 | Processamento de áudio | PyAV | Inspecionar o conteúdo do arquivo e apurar formato e duração reais | Único modo de validar o arquivo pelo conteúdo, e não pelos metadados declarados pelo cliente | Confiar no MIME type e na extensão informados | Fecha a principal brecha de validação do canal de voz | Depende de bibliotecas nativas do FFmpeg no ambiente de execução | Implementado |
-| PLN | scikit-learn com `MultinomialNB`, NLTK, spaCy, NumPy | Pré-processar, vetorizar e classificar a intenção | Velocidade que viabiliza a varredura exaustiva de 8.070 execuções distintas registrada na Seção 3.3.7, além de determinismo e explicabilidade | Regressão logística, `BernoulliNB`, `ComplementNB` e a vetorização densa por embeddings, todas medidas e registradas na Seção 3.3.7 | Treino e inferência em microssegundos, modelo auditável termo a termo | Medição saturada, com F1-macro de 1,0000 sobre três classes genéricas: não comprova o atendimento do RNF03, conforme a ressalva da Seção 3.3.7 | Implementado |
+| PLN | scikit-learn com `LinearSVC` calibrado, NLTK, spaCy, NumPy | Pré-processar, vetorizar e classificar a intenção | Velocidade que viabiliza a varredura exaustiva de 11.884 execuções distintas registrada na Seção 3.3.6, além de determinismo e explicabilidade | `MultinomialNB`, regressão logística e `SGDClassifier`, cada um medido sobre o SEU melhor pré-processamento (varredura exaustiva por família) e registrados na Seção 3.3.7 | Inferência em 2,107 ms; pesos por termo recuperáveis pela média dos três modelos internos do calibrador | Atende aos três limites do RNF03 no teste retido, mas o intervalo de confiança inclui valores abaixo de 0,85; a calibração cobra 6x em latência e exige 3 exemplos por classe por dobra; medição cega pendente | Implementado |
 | Persistência do modelo | Joblib | Serializar e carregar o classificador treinado | Formato nativo do ecossistema scikit-learn para matrizes esparsas | Reconstruir o modelo a cada inicialização | Carga rápida, sem retreinar | Arquivo acoplado à versão da biblioteca que o gerou | Implementado |
 | Armazenamento de objetos | MinIO com API S3 e Boto3 | Guardar os áudios recebidos | Contrato S3 permite trocar o provedor sem alterar o código da aplicação | Gravação em sistema de arquivos local | Mesmo cliente serve ao ambiente local e ao Amazon S3 na nuvem | Exige contêiner adicional em desenvolvimento | Implementado |
 | Speech to Text | Deepgram SDK 5+, modelo Nova-3 | Converter o áudio em texto | Suporte a termos de domínio via `keyterm`, latência baixa e créditos gratuitos, conforme a comparação da Seção 3.2.1 | OpenAI Whisper API, Google Cloud STT, Azure AI Speech | Vocabulário do PMO reconhecido com mais precisão | Dependência de serviço externo pago, com custo por minuto de áudio | Implementado |
@@ -3052,7 +3239,7 @@ O modelo lógico é mais amplo que o recorte conceitual da seção 3.6.1, e essa
 
 <div align="center">
 <sub>Imagem 3.6.2 - Modelo lógico-relacional de dados</sub><br>
-  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, projeto_relacionado, artefato, campo_artefato, pendencia, usuario_projeto, conversa, mensagem, mensagem_fonte, avaliacao, evento_plataforma e notificacao"><br>
+  <img src="../assets/logico.svg" width="100%" alt="Modelo lógico-relacional, com as tabelas portfolio, usuario, projeto, projeto_relacionado, artefato, campo_artefato, pendencia, usuario_projeto, evento_local, conversa, mensagem, mensagem_fonte, avaliacao, evento_plataforma e notificacao"><br>
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
 
@@ -3082,6 +3269,7 @@ A tabela a seguir registra a correspondência entre cada elemento das modelagens
 | **Projeto origina Pendência** `(0,n)`-`(1,1)` | `pendencia.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
 | **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
 | **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
+| Compromisso próprio na Agenda | Tabela `evento_local` | Estrutura operacional privada por usuário, sem sincronização externa e fora da trilha imutável de auditoria |
 | **Pendência notifica Usuário** (2.2.1) | Tabela `notificacao` | Muitos-para-muitos materializado como registro de envio, com atributo próprio `data_envio` (decisão 3 da seção 3.6.7) |
 | Atributo de avaliação da Interação | Tabela `avaliacao` | Atributo promovido a entidade por possuir autor, instante e alvo próprios (decisão 10 da seção 3.6.7) |
 | Uso da plataforma fora do agente | Tabela `evento_plataforma` | Estrutura nova, exigida pelo RNF09 e sem correspondência no recorte conceitual (decisão 11 da seção 3.6.7) |
@@ -3185,6 +3373,18 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 |---|---|---|---|
 | `usuario_id` | `INTEGER` | `PK` composta, `FK → usuario`, `ON DELETE CASCADE` | Usuário interessado |
 | `projeto_id` | `INTEGER` | `PK` composta, `FK → projeto`, `ON DELETE CASCADE` | Projeto acompanhado, base do RF05 |
+
+**`portfolio.evento_local`**: compromisso próprio criado pelo usuário na Agenda.
+
+| Coluna | Tipo | Restrições | Finalidade |
+|---|---|---|---|
+| `id` | `INTEGER` | `PK`, identity | Identificador do evento |
+| `usuario_id` | `INTEGER` | `FK → usuario`, `NOT NULL`, `ON DELETE CASCADE` | Dono do compromisso |
+| `titulo` | `TEXT` | `NOT NULL` | Título exibido na Agenda |
+| `data` | `DATE` | `NOT NULL` | Data local do compromisso |
+| `hora` | `TIME` | Não se aplica | Hora local opcional, sem conversão de fuso |
+| `descricao` | `TEXT` | Não se aplica | Detalhes opcionais |
+| `criado_em` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Momento de criação para operação e suporte |
 
 **`auditoria.conversa`**: sequência de turnos entre um usuário e o agente.
 
@@ -3381,6 +3581,16 @@ CREATE TABLE portfolio.usuario_projeto (
     usuario_id INTEGER NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
     projeto_id INTEGER NOT NULL REFERENCES portfolio.projeto (id) ON DELETE CASCADE,
     PRIMARY KEY (usuario_id, projeto_id)
+);
+
+CREATE TABLE portfolio.evento_local (
+    id         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id INTEGER     NOT NULL REFERENCES portfolio.usuario (id) ON DELETE CASCADE,
+    titulo     TEXT        NOT NULL,
+    data       DATE        NOT NULL,
+    hora       TIME,
+    descricao  TEXT,
+    criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE auditoria.conversa (
@@ -3908,12 +4118,13 @@ O `.gitlab-ci.yml` executa compilação Python, testes `unittest` e Ruff, além 
 
 ### 3.7.7 Reprodutibilidade e Verificação
 
-Em uma base nova, execute `01_create_database.sql`, `02_initial_data.sql`, `03_rls_policies.sql` e `03_webhooks_auditoria.sql`, nessa ordem. O script de políticas inclui `06_webhook_permissions.sql`. A carga relacional funciona antes da indexação vetorial; a comparação com `vecs.documentos_metro` é executada quando essa tabela existe. `05_migracao_usuario_zero.sql` trata bases que tenham o usuário legado.
+Em uma base nova, execute `01_create_database.sql`, `02_initial_data.sql`, `03_rls_policies.sql`, `07_evento_local.sql` e `03_webhooks_auditoria.sql`, nessa ordem. O script de políticas inclui `06_webhook_permissions.sql`; a migração 07 é idempotente e mantém bancos existentes alinhados ao baseline. A carga relacional funciona antes da indexação vetorial; a comparação com `vecs.documentos_metro` é executada quando essa tabela existe. `05_migracao_usuario_zero.sql` trata bases que tenham o usuário legado.
 
 O Compose inicializa uma base local vazia com o DDL e as permissões de webhook. Para uma base existente, confirme PostgreSQL 16 ou superior com `SHOW server_version` e aplique a migração de permissões antes de iniciar o receptor, sem remover volumes:
 
 ```bash
 docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -v webhook_login=az1 < src/database/06_webhook_permissions.sql
+docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -f /docker-entrypoint-initdb.d/07_evento_local.sql
 ```
 
 Para a base Supabase, conferir a versão por conexão PostgreSQL antes de executar. A migração exige as opções de associação de papéis introduzidas no PostgreSQL 16 e interrompe versões anteriores com erro explícito. O administrador deve informar `-v webhook_login` com o nome real do usuário do DSN do receptor; se a variável for omitida, o script concede o papel ao usuário conectado. A versão mínima e as opções estão no [contrato oficial de GRANT do PostgreSQL 16](https://www.postgresql.org/docs/16/sql-grant.html). O receptor sempre assume `az1_webhook`; erro ao assumir o papel impede a conexão. As CLIs de abertura e encerramento são operações administrativas e usam a mesma seleção de base do receptor.
@@ -4583,7 +4794,7 @@ A matriz fecha o artefato ligando cada requisito ao mecanismo que o realiza. Ela
 | RF06: atualizar cadastro por instrução | Fluxo conversacional de escrita previsto para a Sprint 4 | Extração de campos e valores da instrução | `Projeto`, `LiderProjeto`, `projeto.lider_id` | PLN: Transações e Ações | 2.2.2 cenário 2 (variação) | Plano de testes funcionais, task T30 | 5 |
 | RNF01: desempenho | Tempo de resposta de todas as rotas | Classificação em microssegundos; o custo dominante é a chamada externa | `Interacao.tempoProcessamentoMs` | API Gateway, Conversão de Áudio em Texto | 3.9.4 cenário A | Teste de desempenho, task T31 | 4 |
 | RNF02: autenticação | Cabeçalho `Authorization` e resposta `401` | Não se aplica | Identidade técnica associada ao usuário; sem autorização por cargo | Autenticação SSO, API Gateway | 3.9.4 cenário E | `CT-RNF02-P` e `CT-RNF02-N` | 3 e 4 |
-| RNF03: qualidade da classificação de intenções | Campo `confianca_pln` da resposta de análise e decisão do limiar | `MultinomialNB` sobre vetorização esparsa; F1-macro atual de 0,6736, abaixo da meta | `Interacao.intencao` | PLN: Compreensão | 3.9.4 cenários A e D | `CT-RNF03-P` e `CT-RNF03-N`; testes automatizados existentes apoiam a regressão | Instrumento construído na 2; medição cega pendente para a 3 |
+| RNF03: qualidade da classificação de intenções | Campos `confianca_pln` e `rejeitada` da resposta de análise, e a mesma regra aplicada no chat | `LinearSVC` calibrado sobre vetorização esparsa; no teste retido atende aos **três** limites (F1 0,8735; cobertura 96,0%; aceitação indevida 8,2%) e separa-se das outras três famílias em teste pareado de 50 medições | `Interacao.intencao` | PLN: Compreensão | 3.9.4 cenários A e D | `CT-RNF03-P` e `CT-RNF03-N`; testes automatizados existentes apoiam a regressão | Instrumento na 2; partição retida, varredura exaustiva por família e troca de modelo na 3; **medição cega ainda pendente** |
 | RNF04: rastreabilidade | Identificador de cada interação e registro de toda requisição | Intenção e termos de maior peso registráveis | `auditoria.mensagem`, `auditoria.mensagem_fonte` | Auditoria e Feedback, Logs de Auditoria | 2.2.2 cenário 1, automensagem `log()` | `CT-RNF04-P` e `CT-RNF04-N` | 3 |
 | RNF05: interoperabilidade | Contrato REST versionado em `/api/v1` | Núcleo de PLN sem dependência da camada de API | Não se aplica | API Gateway | 3.9.4 cenário A | `CT-RNF05-P` e `CT-RNF05-N` entre React e Python | 4 e 5 |
 | RNF06: qualidade da transcrição | `POST .../transcribe`, campo `confidence` | Entrada do pipeline; `keyterm` cobre o vocabulário do domínio | `Interacao.audioReferencia` | Conversão de Áudio em Texto, Deepgram | 3.9.4 cenários A e C | Medição de WER, prevista para a 3 | 3 |
@@ -5854,6 +6065,34 @@ O canal expira em até 7 dias, sem possibilidade de extensão; encerrar e abrir 
 
 > **A pegadinha do túnel.** A URL do `cloudflared` gratuito muda a cada reinício, e o Google não permite alterar o endereço de um canal já criado. Num servidor com endereço fixo isso deixa de existir, e aí só o `renovar` semanal importa.
 
+###### Via GitLab CI, em vez de cron
+
+O job `renovar-canal-drive` (`.gitlab-ci.yml`) faz o mesmo que a linha de cron acima, sem depender de uma máquina ligada e com cron configurado. Ele só roda dentro de um **pipeline agendado**, nunca num push ou merge request comum — a condição dupla na regra do job (`$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE_TASK == "renovar-drive"`) existe justamente para isso.
+
+**1. Publicar o app**, como descrito acima — sem isso o `refresh token` expira em 7 dias e o runner não tem navegador para reautorizar.
+
+**2. Obter um `refresh_token` de vida longa.** Rode `abrir` uma vez, localmente, **depois** de publicar o app, e leia o valor gravado em `.google_token.json`:
+
+```bash
+python -m services.drive_channel_service abrir
+python -c "import json; print(json.load(open('.google_token.json'))['refresh_token'])"
+```
+
+**3. Cadastrar as variáveis de CI/CD.** *Settings* → *CI/CD* → *Variables*, todas marcadas **Protected** e **Masked**:
+
+| Variável | Valor |
+|---|---|
+| `GOOGLE_CLIENT_ID` | o mesmo do `.env` |
+| `GOOGLE_CLIENT_SECRET` | o mesmo do `.env` |
+| `GOOGLE_WEBHOOK_CHANNEL_TOKEN` | o mesmo do `.env` |
+| `WEBHOOK_PUBLIC_URL` | o domínio fixo de produção — **não** a URL de um túnel `cloudflared` |
+| `DATABASE_URL` (ou `SUPABASE_DB_URL`) | precisa ser alcançável a partir do runner; num shared runner do GitLab.com isso significa Postgres exposto publicamente, ainda que com IP allowlist — num runner privado, dentro da mesma rede, não |
+| `GOOGLE_REFRESH_TOKEN` | o valor obtido no passo 2 |
+
+**4. Criar o agendamento.** *Build* → *Pipeline schedules* → *New schedule*: `0 6 * * 1`, branch alvo `main` (ou a que estiver em produção), e uma variável custom `SCHEDULE_TASK` = `renovar-drive` — é essa variável, e não a branch nem o horário, que distingue este agendamento de qualquer outro que o projeto venha a ter.
+
+O job escreve `.google_token.json` a partir de `GOOGLE_REFRESH_TOKEN` a cada execução; como a resposta do refresh não repete o refresh token (`obter_token`, em `drive_channel_service.py`, preserva o valor gravado), o mesmo segredo cadastrado no passo 3 continua válido indefinidamente — refazer o passo 2 só é necessário se o consent for revogado.
+
 ##### Quando algo dá errado (Google Drive)
 
 | Sintoma | Causa | O que fazer |
@@ -6092,7 +6331,7 @@ Esta seção descreve as integrações implementadas até a Sprint 3 entre a int
 
 ### 5.2.1 Arquitetura da Integração
 
-A interface em React utiliza o cliente HTTP centralizado em [api.js](../src/frontend/src/lib/api.js), que chama a API FastAPI com `fetch`. O ponto de entrada [main.py](../src/az1_api/main.py) registra as rotas sob `/api/v1`; os schemas Pydantic definem as entradas e saídas, enquanto os serviços executam as operações e acessam os provedores externos. A comunicação do chat usa requisição e resposta HTTP, sem streaming, WebSocket ou fila de mensagens entre navegador e API.
+A interface em React utiliza o cliente centralizado em [api.js](../src/frontend/src/lib/api.js). O chat textual e as demais operações usam `fetch`, enquanto a chamada de voz abre um WebSocket dedicado. O ponto de entrada [main.py](../src/az1_api/main.py) registra as rotas sob `/api/v1`; os schemas Pydantic definem as entradas e saídas HTTP, enquanto os serviços executam as operações e acessam os provedores externos. O chat textual continua baseado em requisição e resposta, sem streaming de tokens ou fila de mensagens entre navegador e API.
 
 ```mermaid
 flowchart LR
@@ -6100,6 +6339,7 @@ flowchart LR
     F <-->|"SSO Microsoft via Supabase Auth"| S["Supabase Auth"]
     F -->|"HTTP /api/v1 + Bearer token"| P["Proxy Vite ou nginx"]
     P --> A["FastAPI"]
+    F <-->|"WebSocket /api/v1/voice/call"| P
     A -->|"Upload e leitura de áudio"| M["S3 / MinIO"]
     A -->|"Transcrição"| D["Deepgram"]
     A -->|"Busca de contexto"| R["RAG: src/rag, pgvector"]
@@ -6183,7 +6423,7 @@ O histórico guarda a mensagem original do usuário, não a versão com os trech
 5. O texto retornado preenche o campo de entrada. O usuário pode revisar, editar, enviar ou descartar. A transcrição não é enviada automaticamente ao chat.
 6. Se confirmada, a entrada segue o mesmo fluxo de mensagem textual.
 
-A aba separada de voz exibe uma apresentação de escuta, mas não monta o `PromptBar` responsável pela gravação. Assim, o fluxo de captura integrado descrito acima é o botão de microfone dentro do chat; a aba de voz não constitui uma conversa contínua implementada.
+A aba separada de voz implementa uma conversa contínua e não utiliza o `PromptBar`. O componente `VoiceCall` captura cada turno com `MediaRecorder`, detecta automaticamente fala e silêncio e troca eventos de controle, áudio e respostas pela mesma conexão WebSocket. O histórico de chamadas permanece separado do chat textual e só é exibido após o encerramento. A Seção 5.3 descreve esse fluxo, seus estados e limites. O botão de microfone dentro do chat continua oferecendo o fluxo com confirmação descrito acima; são duas formas de entrada distintas.
 
 #### Reprodução da resposta
 
@@ -6233,6 +6473,7 @@ Os testes automatizados verificam os contratos HTTP e o comportamento dos compon
 | [test_chat_api.py](../tests/test_chat_api.py) e [test_speech_api.py](../tests/test_speech_api.py) | Contratos de mensagem e geração de voz, respostas de sucesso e erros controlados. Não executam chamadas reais ao Gemini. |
 | [test_auth_api.py](../tests/test_auth_api.py) e [test_auth_service.py](../tests/test_auth_service.py) | Aceitação e rejeição de tokens, verificadas com chaves de teste; não equivalem a executar o redirecionamento OAuth no navegador. |
 | [test_dependencias_sem_banco.py](../tests/test_dependencias_sem_banco.py) | Degradação dos efeitos laterais quando o banco não está configurado. |
+| `tests/test_voice_api.py` | Handshake da chamada e processamento de um turno completo na mesma conexão: início, blocos binários, transcrição, resposta textual, metadados do áudio e frame WAV. Usa transcritor, agente e sintetizador substituídos. O arquivo entra na `develop` pelo MR da funcionalidade. |
 
 Os comandos para execução dos testes, após preparar as dependências, são:
 
@@ -6248,6 +6489,109 @@ O [.gitlab-ci.yml](../.gitlab-ci.yml) configura compilação Python, execução 
 
 Não foram identificados testes automatizados que percorram conjuntamente login Microsoft real, navegador, proxy, API, armazenamento, transcrição e resposta de voz. A validação desse percurso, das condições de falha e da continuidade de conversa entre workers permanece necessária para afirmar integração sistêmica completa.
 
+
+## 5.3 Chamada de Voz Contínua
+
+A chamada de voz permite conversar com o AZ1 em vários turnos sem enviar cada
+gravação manualmente. O navegador detecta o início e o fim da fala, envia o
+áudio ao backend, reproduz a resposta e volta a ouvir. A funcionalidade usa o
+mesmo agente do chat textual, mas mantém sua interface e seu histórico
+separados.
+
+### 5.3.1 Uso e estados da chamada
+
+Para iniciar, o usuário seleciona **Voz**, pressiona **Clique para começar** e
+autoriza o microfone. A interface considera uma fala válida após 120 ms acima
+do limiar de volume e encerra o turno depois de 850 ms de silêncio.
+
+O fluxo de um turno é:
+
+1. capturar a fala com `MediaRecorder`;
+2. enviar o áudio pela conexão WebSocket;
+3. transcrever com Deepgram;
+4. gerar a resposta com Gemini;
+5. reproduzir o áudio da resposta;
+6. voltar automaticamente à escuta.
+
+| Estado | Significado |
+|---|---|
+| `idle` | A chamada ainda não começou ou já foi encerrada. |
+| `connecting` | O WebSocket e o microfone estão sendo preparados. |
+| `listening` | A aplicação está aguardando a fala do usuário. |
+| `transcribing` | O Deepgram está convertendo o áudio em texto. |
+| `processing` | O agente está gerando a resposta. |
+| `speaking` | A resposta está sendo reproduzida. |
+| `error` | Uma etapa falhou e a interface apresenta uma orientação. |
+
+Durante a ligação, as mensagens ficam ocultas. Ao pressionar **Encerrar
+conversa**, o frontend desativa o microfone, interrompe reproduções, fecha os
+recursos de áudio e encerra o WebSocket. Depois disso, a transcrição e as
+respostas ficam disponíveis na área de voz. O usuário também pode continuar a
+mesma conversa, preservando o `conversation_id` e o contexto do agente.
+
+### 5.3.2 Arquitetura
+
+A chamada mantém uma conexão WebSocket entre o componente `VoiceCall` e o
+endpoint `/api/v1/voice/call` do FastAPI. A conexão permanece aberta durante a
+conversa e processa vários turnos.
+
+| Componente | Responsabilidade |
+|---|---|
+| `VoiceCall.jsx` | Capturar o microfone, controlar estados e reproduzir a resposta. |
+| `api.js` | Abrir o WebSocket com a sessão atual. |
+| `voice.py` | Autenticar e coordenar transcrição, resposta e síntese. |
+| Deepgram | Converter a fala em texto. |
+| Gemini | Gerar a resposta textual e o áudio. |
+| `SpeechSynthesis` | Reproduzir a resposta quando o Gemini TTS falhar ou demorar. |
+
+O áudio de entrada é reunido em um arquivo por turno para preservar um formato
+válido para transcrição. Eventos de controle e textos usam JSON; os áudios usam
+frames binários, evitando o aumento de tamanho causado pelo Base64. O Vite e o
+nginx estão configurados para encaminhar o upgrade WebSocket.
+
+### 5.3.3 Protocolo WebSocket
+
+Após abrir `WS /api/v1/voice/call`, o frontend envia `start_call` com o
+`conversation_id` e o token da sessão. Em produção, a conexão usa `wss`.
+
+| Direção | Eventos principais |
+|---|---|
+| Frontend → backend | `start_call`, `utterance_start`, áudio binário, `utterance_end` e `end_call`. |
+| Backend → frontend | `call_ready`, `transcribing`, `transcription_final`, `processing`, `agent_response`, `agent_audio`, áudio binário e `error`. |
+
+O backend aceita até 10 MiB por fala. A autenticação inválida encerra a conexão;
+erros de um turno, como transcrição vazia, preservam a chamada para uma nova
+tentativa.
+
+### 5.3.4 Erros, configuração e limitações
+
+| Situação | Comportamento |
+|---|---|
+| Fala não identificada | A interface pede que o usuário tente novamente. |
+| Falha no Deepgram ou no agente | O erro é apresentado e a chamada volta à escuta quando possível. |
+| Gemini TTS indisponível ou lento | Após 2,5 segundos, o navegador usa `SpeechSynthesis` em `pt-BR`. |
+| Microfone negado | A interface informa que não conseguiu iniciar a chamada. |
+| WebSocket desconectado | A chamada apresenta o erro; não há reconexão automática. |
+
+A execução depende de `DEEPGRAM_API_KEY`, `GEMINI_API_KEY` e da configuração do
+Supabase. `GEMINI_TTS_MODEL` é opcional. Os valores ficam no `.env`, que não é
+versionado; `.env.example` registra apenas os nomes esperados.
+
+Limitações atuais:
+
+- não há transcrição parcial nem interrupção da fala do agente;
+- o áudio original não é armazenado;
+- o histórico de voz fica em memória e é perdido ao recarregar a página;
+- a latência depende dos provedores externos e da rede;
+- a voz alternativa varia conforme o navegador e o sistema operacional.
+
+### 5.3.5 Validação
+
+A revisão pré-MR aprovou o build e o lint do frontend, 25 testes de frontend e
+6 testes focados no WebSocket e na transcrição. O teste do endpoint cobre um
+turno completo com serviços substituídos. Permissão real do microfone, múltiplos
+turnos, latência e fallback de voz devem ser verificados manualmente no
+navegador e registrados como evidência no MR.
 ---
 
 # 6. Planejamento de Testes Sistêmicos
@@ -6388,7 +6732,7 @@ A tabela confronta cada requisito funcional com o que existe no repositório na 
 | RF | Estado | O que existe | O que falta para o critério de aceitação |
 |---|---|---|---|
 | **RF01** | **Parcialmente implementado** | `POST /api/v1/audio` com validação de formato, tamanho e duração (`src/routes/audio.py`); `POST /api/v1/audio/{audio_id}/transcribe` integrado ao Deepgram (`src/routes/transcription.py`); `POST /api/v1/chat` devolvendo resposta textual (`src/routes/chat.py`) | `AgentPage.jsx` já envia áudio, apresenta transcrição editável e aguarda confirmação; há testes de componente de confirmação, descarte e silêncio. Falta evidência sistêmica com navegador, armazenamento e provedor integrados |
-| **RF02** | **Parcialmente implementado** | Classificação de intenção sobre as dez classes do catálogo da Seção 3.1, incluindo `fora_do_catalogo`, exposta por `POST /api/v1/audio/{audio_id}/analyze` (`src/routes/analysis.py`) e apoiada em 400 exemplos rotulados | Busca separada `/api/v1/rag/search` já existe com Gemini e PostgreSQL/vecs. Faltam integração ao chat, extração de entidades, correspondência e esclarecimento; `/chat` ainda não recupera fontes |
+| **RF02** | **Parcialmente implementado** | Classificação de intenção sobre as dez classes do catálogo da Seção 3.1, incluindo `fora_do_catalogo`, apoiada em 1.104 exemplos rotulados e aplicada nas DUAS entradas: `POST /api/v1/chat` (`src/routes/chat.py`) e `POST /api/v1/audio/{audio_id}/analyze` (`src/routes/analysis.py`), pela mesma regra de rejeição de `src/pln/intencao.py`. A classificação ocorre ANTES da consulta às fontes, e a recusa de `fora_do_catalogo` usa a resposta-padrão 1.1 do material do parceiro | `/chat` recupera fontes e cita posição. Falta correspondência de parâmetros e o ciclo de esclarecimento; a extração de entidades cobre apenas o código do projeto (`src/pln/entidades.py`) |
 | **RF03** | **Parcial** | `RagResultado` contém `arquivo_origem`, `secao`, projeto e texto | `ChatResponse` contém somente `reply`; faltam fonte/data no chat e referência acionável na interface |
 | **RF04** | **Não implementado** | As intenções INT-03 a INT-07 estão no catálogo e na base de treinamento | A execução da intenção: leitura dos campos pendentes de um artefato e geração de sugestão por campo |
 | **RF05** | **Não implementado** | Não se aplica | DDL de pendência/notificação já existe; faltam agendador, serviço, entrega e persistência integrada |
@@ -6562,7 +6906,7 @@ A massa é construída pela equipe e versionada junto dos testes. Nenhum item ut
 | **H. Pendências** | Pendências com prazo futuro, prazo vencido, uma já notificada e uma sem prazo, distribuídas entre projetos acompanhados e não acompanhados | CT-RF05-* | Depende do modelo de `Pendência`, Sprint 4 |
 | **I. Identidades sintéticas** | Usuário comum e administrativo; personas não concedem autorização por cargo na D07 | CT-RNF02/09; casos históricos CT-RF02-10 e CT-RF06-04 suspensos | Preparar o adaptador SSO; avaliar separadamente histórico pessoal e acesso administrativo à auditoria |
 
-O conjunto C merece registro à parte. A base atual foi gerada por gabarito e a Seção 3.3.7 já declara que a medição sobre ela está saturada; o risco AM6 acompanha exatamente essa fragilidade. Os casos CT-RF02-01 a CT-RF02-03 executados sobre a base atual produziriam aprovação sem significado. Por isso o plano condiciona esses três casos à partição reformulada da task T14, e não à base existente.
+O conjunto C merece registro à parte, e a situação dele mudou na Sprint 3. A partição isolada prevista na task T14 **passou a existir**: `python -m pln.particao` separa o pool de 1.104 frases em 881 de desenvolvimento e 223 de teste retido, e a separação acontece antes de qualquer treino, escolha de pré-processamento, ajuste de hiperparâmetro ou calibração de limiar. Os casos CT-RF02-01 a CT-RF02-03 deixam de depender da base que os tornava vazios. O que **não** mudou é que o teste retido não substitui o conjunto cego da Seção 6.3, que exige frases novas e custodiadas por quem não participa do ajuste — o risco AM6 continua endereçado apenas em parte.
 
 #### RF01: Receber solicitações por áudio e texto e responder em texto
 
@@ -7113,7 +7457,9 @@ A cobertura é maior onde a especificação é mais precisa. Isso não é aciden
 
 Três limites afetam a força das conclusões que a execução deste plano poderá sustentar, e o registro deles faz parte do plano.
 
-**A base de avaliação do classificador.** Os casos CT-RF02-01 a CT-RF02-03 dependem da partição de teste isolada prevista na task T14. A base atual, de 400 exemplos igualmente distribuídos entre as dez intenções, foi gerada por gabarito, e a Seção 3.3.7 já registra que a medição sobre ela está saturada. Executar esses casos sobre a base atual produziria aprovação sem informação, porque o conjunto não contém casos que o classificador erre. Esse limite é a materialização do risco AM6 e é a dependência mais crítica de todo o plano: sem a base reformulada, o RF02 fica sem verificação significativa da sua condição C2.1.
+**A base de avaliação do classificador.** Esta era a dependência mais crítica de todo o plano, e foi resolvida na Sprint 3. A partição isolada da task T14 existe: o corpus passou de 400 para **1.104 frases** e é separado por `python -m pln.particao` em 881 de desenvolvimento e 223 de teste retido, com a separação feita antes de qualquer etapa de ajuste. A medição deixou de ser saturada — o classificador erra sobre o conjunto, e o relatório em `resultados/metricas_teste_retido.md` registra F1-macro de 0,7549, cobertura de 81,6% e aceitação indevida de 18,4% no limiar congelado do desenvolvimento. Os casos CT-RF02-01 a CT-RF02-03 passam a produzir informação.
+
+O risco AM6 permanece **parcialmente** endereçado. O teste retido é uma separação interna do corpus, feita pela mesma equipe que o escreveu; o conjunto cego da Seção 6.3 exige frases novas e um integrante custodiando-as fora do ajuste. Um não substitui o outro.
 
 **Dependências atuais.** Voz na interface, RAG e DDL já existem. Faltam composição RAG/chat, entidades, diálogo, SSO, auditoria de serviço, notificações e sugestões por campo. Não se mantém a inferência antiga de somente 17 casos executáveis nem a de interface inteiramente futura. Validar prontidão por caso no commit candidato.
 
@@ -7471,7 +7817,7 @@ Os procedimentos dos casos de desempenho `CT-RNF01-*` e `CT-RNF10-*` estão deta
 
 **Propósito.** Verificar se o classificador interpreta corretamente solicitações relacionadas aos RF02, RF04 e RF06, mantendo equilíbrio entre qualidade por classe, atendimento das intenções conhecidas e rejeição de entradas fora do catálogo.
 
-**Massa de teste.** Será construído um conjunto cego novo com 200 exemplos, vinte para cada uma das dez intenções do catálogo. Os 180 exemplos das nove intenções conhecidas compõem o `CT-RNF03-P`; os vinte exemplos de `fora_do_catalogo`, incluindo formulações ambíguas e limítrofes, compõem o `CT-RNF03-N`. Um integrante que não participe do ajuste custodiará os textos e rótulos. Nenhum exemplo poderá integrar o corpus atual de 400 frases nem participar do treinamento, da comparação de pré-processamento, da ampliação do dataset, da calibração do limiar ou do ajuste de hiperparâmetros. Embora maior que a massa anterior, o conjunto sintético continua sendo evidência acadêmica controlada e não estima sozinho o desempenho sobre a linguagem real de toda a organização.
+**Massa de teste.** Será construído um conjunto cego novo com 200 exemplos, vinte para cada uma das dez intenções do catálogo. Os 180 exemplos das nove intenções conhecidas compõem o `CT-RNF03-P`; os vinte exemplos de `fora_do_catalogo`, incluindo formulações ambíguas e limítrofes, compõem o `CT-RNF03-N`. Um integrante que não participe do ajuste custodiará os textos e rótulos. Nenhum exemplo poderá integrar o pool atual de 1.104 frases — nem a partição de desenvolvimento, nem a de teste retido — e nenhum poderá participar do treinamento, da comparação de pré-processamento, da comparação entre famílias de classificador, da ampliação do dataset, da calibração do limiar ou do ajuste de hiperparâmetros. Embora maior que a massa anterior, o conjunto sintético continua sendo evidência acadêmica controlada e não estima sozinho o desempenho sobre a linguagem real de toda a organização.
 
 **Instruções de execução:**
 
@@ -7807,7 +8153,7 @@ A tabela relaciona cada suíte à dependência que ela isola e ao mecanismo usad
 | Recebimento de áudio e armazenamento de objetos | MinIO | Contêiner real, provisionado por `docker compose` |
 | Transcrição e provedor de fala em texto | Deepgram | Replay proposto para TI-06/TI-08; TI-07 combina erro HTTP gravável e mocks de timeout/rede; spy em TI-10 |
 | Síntese de fala e provedor de voz | Google Gemini (`gemini-2.5-flash-preview-tts`) | VHS, registro de sucesso (TI-11) e registro de falha (TI-15); TI-12 a TI-14 não acionam nenhuma dependência |
-| Análise e pipeline de PLN | Deepgram, por meio de `TranscribeAudio`; modelo classificador local | VHS no trecho de transcrição (TI-16 a TI-18); modelo carregado diretamente do disco, sem dublê; TI-19 não aciona nenhuma dependência externa |
+| Análise e pipeline de PLN | Deepgram, por meio de `TranscribeAudio`; modelo classificador local | VHS no trecho de transcrição (TI-16 a TI-18); modelo carregado diretamente do disco, sem dublê; TI-19 não aciona nenhuma dependência externa. TI-17 exercita o pipeline comum entre chat e áudio sem serviço externo algum: modelo do disco, sem dublê |
 | Chat e provedor de modelo de linguagem | Google Gemini (`gemini-3.5-flash-lite`) | VHS, registro de sucesso (TI-20) e registro de falha (TI-21) |
 | Persistência em banco de dados | PostgreSQL | Contêiner real, provisionado por `docker compose` a partir da Sprint 4 |
 | Frontend e backend | Nenhuma; verificação de contrato entre interface e aplicação | Navegador com frontend/API reais; TestClient não executa React. Vitest com mocks é evidência de componente |
@@ -7882,7 +8228,7 @@ Casos planejados contra PostgreSQL de teste provisionado pelos scripts de `src/d
 | TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.mensagem_fonte` por trecho citado, com `chunk_id`, posição e cópia dos metadados | RF02, RF03, RNF11, RNF12 |
 | TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_o_turno` | Turno processado com o banco inacessível | Código de indisponibilidade definido; o turno é reencaminhado, não descartado | RNF07, RNF04 |
 | TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.mensagem` com as credenciais da aplicação | Alteração/exclusão de mensagem rejeitada; feedback autorizado permitido. Caracterizar título/arquivamento separadamente e aplicar o oráculo RNF09 de 6.1.2 | RNF04, RNF09 |
-| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução de `src/database/01_create_database.sql` em base vazia, seguida de `02_initial_data.sql` e `03_rls_policies.sql` | Os três schemas relacionais e as dezesseis tabelas são criados; carga inicial populada; `scripts/verificar_modelo_documentado.py` não aponta divergência com a seção 3.6.6 | Seção 3.6 |
+| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução de `src/database/01_create_database.sql` em base vazia, seguida de `02_initial_data.sql`, `03_rls_policies.sql` e duas aplicações de `07_evento_local.sql` | Os três schemas relacionais e as dezessete tabelas são criados; a migração 07 é idempotente; carga inicial populada; `scripts/verificar_modelo_documentado.py` não aponta divergência com a seção 3.6.6 | Seção 3.6 |
 | TI-53 | Positivo e negativo | `TestPersistenciaIntegracao.test_papel_da_mensagem_delimita_as_colunas` | Resposta do agente com intenção classificada e solicitação do usuário com tempo de processamento | Ambas rejeitadas por `mensagem_papel_coerente` | RNF04 |
 | TI-54 | Positivo e negativo | `TestPersistenciaIntegracao.test_avaliacao_exige_alvo_e_juizo_unicos` | Avaliação apontando para conversa e mensagem ao mesmo tempo; avaliação apenas com comentário | Ambas rejeitadas por `avaliacao_alvo_unico` e `avaliacao_tem_juizo`; reavaliar o mesmo alvo atualiza a linha existente | RNF08, RNF09 |
 
@@ -8131,7 +8477,7 @@ O critério de liberação desta camada, portanto, não está cumprido por intei
 
 ## 6.5 Planejamento dos Testes de Usabilidade
 
-Os testes das seções 6.2 a 6.4 verificam se o sistema faz o que foi especificado. Esta seção planeja um tipo diferente de verificação: se uma pessoa que nunca viu o agente consegue usá-lo sem instrução prévia. Nenhuma das evidências desta seção existe ainda: o que segue é o instrumento e o roteiro a serem aplicados, não os resultados da aplicação.
+Os testes das seções 6.2 a 6.4 verificam se o sistema faz o que foi especificado. Esta seção preserva o planejamento usado para verificar se uma pessoa que nunca viu o agente consegue utilizá-lo sem instrução prévia. A execução e as evidências resultantes estão consolidadas na Seção 6.9.
 
 ### 6.5.1 Objetivo do Teste
 
@@ -8151,11 +8497,11 @@ Recrutar pelo menos cinco adultos externos à equipe **e à turma**, sem contato
 
 | Participante | Perfil desejado | Relação com gestão de projetos | Familiaridade tecnológica desejada | Diversidade representada | Status |
 |---|---|---|---|---|---|
-| P1 | Pessoa em formação, externa à turma | Iniciante | Intermediária | Experiência inicial em projetos; voz a registrar | Perfil previsto para recrutamento |
-| P2 | Profissional técnico | Experiência operacional | Alta | Uso frequente de tecnologia; experiência com IA a registrar | Perfil previsto para recrutamento |
-| P3 | Profissional administrativo | Acompanhamento de prazos/documentos | Intermediária | Aproximação à jornada de Maria Eduarda; voz pouco frequente desejada | Perfil previsto para recrutamento |
-| P4 | Pessoa com experiência em coordenação | Comparação e acompanhamento | Variada | Aproximação à jornada de Robson/Rafael; faixa etária distinta a buscar | Perfil previsto para recrutamento |
-| P5 | Pessoa com pouca experiência em assistentes | Iniciante ou ocasional | Baixa | Pouco uso de IA/voz; faixa etária distinta a buscar | Perfil previsto para recrutamento |
+| P1 | Pessoa em formação, externa à turma | Iniciante | Intermediária | Experiência inicial em projetos | Referência original do recrutamento |
+| P2 | Profissional técnico | Experiência operacional | Alta | Uso frequente de tecnologia | Referência original do recrutamento |
+| P3 | Profissional administrativo | Acompanhamento de prazos/documentos | Intermediária | Aproximação à jornada de Maria Eduarda | Referência original do recrutamento |
+| P4 | Pessoa com experiência em coordenação | Comparação e acompanhamento | Variada | Aproximação à jornada de Robson/Rafael | Referência original do recrutamento |
+| P5 | Pessoa com pouca experiência em assistentes | Iniciante ou ocasional | Baixa | Pouco uso de IA/voz | Referência original do recrutamento |
 
 Na triagem, registrar familiaridade com tecnologia, projetos, IA e voz em escala 1-5 e faixa etária opcional (18-29, 30-49, 50+). Buscar mais de uma faixa etária e níveis diferentes nos quatro eixos, sem afirmar diversidade já alcançada. Se não for possível preencher uma vaga, registrar desvio de recrutamento e seu efeito. Os perfis aproximam tarefas das personas, mas não representam estatisticamente os funcionários do Metrô.
 
@@ -8221,9 +8567,7 @@ Tempo: da apresentação da tarefa ao encerramento, em segundos; registrar esper
 
 Após cada tarefa, pedir facilidade percebida e confiança na resposta em escala 1-5, de muito baixa a muito alta; essas perguntas não compõem o SUS. Registrar comentários literais autorizados, compreensão da fonte, clareza da voz e relevância/interrupção de alertas quando aplicáveis. Taxa de sucesso por tarefa = conclusões sem ajuda / tentativas aplicadas; excluir tarefas não aplicadas do denominador, mas expor sua quantidade e motivo. Um participante com tarefa obrigatória de compreensão não aplicada não pode contar como aprovado no RNF08.
 
-| Participante | Caso | Versão | Resultado | Tempo total/técnico | Erros/caminhos incorretos | Pedidos/intervenções de ajuda | Desistência | Facilidade/confiança | Comentário/evidência |
-|---|---|---|---|---|---|---|---|---|---|
-| A preencher | A preencher | A preencher | Não realizado | Não se aplica | Não se aplica | Não se aplica | Não se aplica | Não se aplica | Registro da execução |
+Os registros preenchidos de participante, duração, ajuda, facilidade, confiança, comentários e evidências estão na Seção 6.9.4. A separação entre o instrumento desta seção e os resultados evita substituir o planejamento original por dados posteriores.
 
 ### 6.5.7 Preparação e roteiro reproduzível da sessão
 
@@ -8269,22 +8613,22 @@ O escore final reportado é a média dos escores individuais dos 5 participantes
 O SUS mede percepção global de usabilidade; o escore **não é porcentagem**, acurácia, taxa de sucesso nem prova de RNF08. Os dez itens acima usam tradução consistente neste roteiro; validação psicométrica específica da tradução não é presumida. Resposta ausente torna o escore individual incompleto; não imputar valor. Estatísticas serão calculadas somente com questionários completos, informando perdas. Interpretação contextual e limitações de pequenas amostras devem acompanhar o relatório; não atribuir aceite automático a um ponto de corte genérico. [Estudo sobre incerteza do SUS em pequenas amostras](https://arxiv.org/abs/2101.00455).
 
 | Participante | Pontuação SUS | Observações | Status |
-|---|---|---|---|
-| P1 | Não se aplica | A preencher após teste | Não realizado |
-| P2 | Não se aplica | A preencher após teste | Não realizado |
-| P3 | Não se aplica | A preencher após teste | Não realizado |
-| P4 | Não se aplica | A preencher após teste | Não realizado |
-| P5 | Não se aplica | A preencher após teste | Não realizado |
+|---|---:|---|---|
+| Marcela Costa | 80,0 | Questionário completo | Executado |
+| Eduardo | 87,5 | Questionário completo | Executado |
+| Richard Alves | 95,0 | Questionário completo | Executado |
+| Carol Paz | 82,5 | Questionário completo | Executado |
+| Kaian Moura | 77,5 | Questionário completo | Executado |
 
 | Estatística | Valor | Regra |
 |---|---|---|
-| Média | Não se aplica | Soma dos escores / questionários completos |
-| Mediana | Não se aplica | Valor central dos escores ordenados |
-| Mínimo / máximo | Não se aplica | Extremos observados |
-| Dispersão | Não se aplica | Desvio padrão amostral, quando n ≥ 2, e amplitude |
-| Comentários qualitativos | Não se aplica | Temas, dificuldades e evidências anonimizadas |
+| Média | 84,5 | Soma dos escores / cinco questionários completos |
+| Mediana | 82,5 | Valor central dos escores ordenados |
+| Mínimo / máximo | 77,5 / 95,0 | Extremos observados |
+| Dispersão | Desvio padrão amostral de 6,94; amplitude de 17,5 | Variação observada entre os cinco escores |
+| Comentários qualitativos | Consolidados na Seção 6.9.4 | Temas, dificuldades e evidências autorizadas |
 
-**Registro da execução:** recrutamento efetivo, sessões, respostas originais, cálculos e comentários. Não preencher os campos acima com exemplos numéricos.
+**Registro da execução:** respostas originais, cálculos e comentários estão detalhados na Seção 6.9.4.
 
 ### 6.5.9 Perguntas Qualitativas Finais
 
@@ -8784,7 +9128,7 @@ O artefato cobra "uso eficiente de frameworks de automação para a verificaçã
 
 **Pulo declarado com motivo, em vez de teste silenciosamente ausente.** A suíte relacional usa `unittest.skipIf` com a mensagem `TEST_DATABASE_URL não definido. Aponte para um banco de teste dedicado -- nunca para DATABASE_URL.` Quem executa sem banco vê 18 pulos e o motivo, e não um "OK" que esconde a ausência de verificação. A exigência de uma variável separada de `DATABASE_URL` é proteção: a carga desses testes limpa tabelas.
 
-**Teste que guarda a reprodutibilidade da medição.** `tests/test_reprodutibilidade.py` compara três fontes — `requirements.txt`, `pyproject.toml` e a tabela da Seção 3.3.7 — e o ambiente instalado, para as cinco bibliotecas que determinam o F1-macro publicado em `resultados/`. É o mecanismo que transforma "as métricas são reproduzíveis" em afirmação verificada a cada execução, em vez de promessa escrita na documentação. Na execução de 19/09 ele acusou spaCy 3.8.15 no ambiente contra 3.8.16 fixado, o que basta para invalidar comparação com os números de `resultados/`: rodar `pip install -r requirements.txt` até o caso passar é critério de pronto do ambiente antes de qualquer ensaio de métrica.
+**Teste que guarda a reprodutibilidade da medição.** `tests/test_reprodutibilidade.py` compara três fontes — `requirements.txt`, `pyproject.toml` e a tabela da Seção 3.3.8 — e o ambiente instalado, para as cinco bibliotecas que determinam o F1-macro publicado em `resultados/`. É o mecanismo que transforma "as métricas são reproduzíveis" em afirmação verificada a cada execução, em vez de promessa escrita na documentação. Na execução de 19/09 ele acusou spaCy 3.8.15 no ambiente contra 3.8.16 fixado, o que basta para invalidar comparação com os números de `resultados/`: rodar `pip install -r requirements.txt` até o caso passar é critério de pronto do ambiente antes de qualquer ensaio de métrica.
 
 **Consulta por papel acessível no frontend.** As suítes de componente localizam elementos por papel e texto visível, não por classe ou identificador interno. O efeito prático é que a mudança de estilo não quebra o teste e a remoção de um rótulo acessível quebra — que é a direção desejada para um sistema cujo RNF08 trata de compreensão das respostas.
 
@@ -8811,6 +9155,329 @@ Os comandos abaixo reproduzem, em ordem, o ambiente usado nesta verificação.
 O passo 8 exige uma base exclusiva de teste. Apontar `TEST_DATABASE_URL` para a base de desenvolvimento apaga dados, e é por isso que a variável é separada e o pulo é explícito quando ela não existe.
 
 ---
+
+## 6.9 Execução dos Testes de Usabilidade
+
+Esta seção registra a execução dos testes de usabilidade planejados na Seção 6.5, mantendo a separação entre o roteiro previsto e os resultados efetivamente observados.
+
+### 6.9.1 Objetivo, metodologia, participantes e ferramentas
+
+A campanha avaliou se usuários externos conseguem realizar consultas no AZ1, alternar entre projetos, recuperar o contexto anterior e compreender respostas, fontes e limitações. Participaram cinco adultos que não pertencem à equipe nem à turma e que declararam baixa familiaridade prévia com a solução.
+
+Foi adotado um teste moderado, individual e orientado por tarefas. Todos receberam os mesmos oito casos, na mesma ordem, sem demonstração prévia da interface. O moderador apresentou uma tarefa por vez e evitou indicar o caminho; o observador registrou duração total, pedidos de ajuda, facilidade, confiança e comentários. Ao final, cada participante respondeu aos dez itens do SUS. A ordem fixa favorece a comparação direta, mas pode produzir efeito de aprendizagem nos casos finais.
+
+| Item da execução | Registro |
+|---|---|
+| Período das sessões | Setembro de 2026 |
+| Ambiente | Aplicação executada em navegador, com a mesma versão e massa sintética; os participantes utilizaram estações de trabalho distintas |
+| Equipe da sessão | Um moderador e um observador |
+| Participantes | Marcela Costa, Eduardo, Carol Paz, Richard Alves e Kaian Moura, com identificação autorizada |
+| Situação atual | Rodada executada e resultados consolidados |
+
+As ferramentas foram escolhidas por permitirem uma execução uniforme, mensuração objetiva e registro rastreável sem expor os participantes.
+
+| Ferramenta ou instrumento | Uso durante o teste | Justificativa |
+|---|---|---|
+| Navegador web | Executar os fluxos do AZ1 | Representa o ambiente real de uso da interface |
+| Cronômetro | Medir a duração total de cada sessão | Permite comparar a eficiência global entre os participantes |
+| Roteiro de observação | Registrar erros, caminhos, pedidos de ajuda e comentários | Padroniza a coleta entre todas as sessões |
+| Questionário SUS | Medir a percepção geral de usabilidade ao final da sessão | Utiliza uma escala consolidada e comparável |
+| Registros fotográficos | Comprovar a participação e o uso da interface | Evidenciam a execução das sessões, mas não permitem validar o conteúdo textual das respostas |
+| Tabelas desta seção | Consolidar resultados, feedback e ações corretivas | Mantém todo o artefato no arquivo `docs/Projeto.md` |
+
+Antes de iniciar cada sessão, a equipe deve confirmar os seguintes itens:
+
+- aplicação disponível na mesma versão funcional para todos;
+- massa de dados igual para todos os participantes;
+- roteiro, cronômetro e tabela de observação preparados;
+- consentimento obtido para participação e identificação nominal; termos e gravações mantidos fora do repositório;
+- moderador orientado a não ensinar o caminho durante a execução;
+- observador responsável por registrar tempo, erros, ajuda solicitada e comentários.
+
+### 6.9.2 Casos de teste de usabilidade
+
+Os oito casos abaixo reproduzem a rodada registrada. Eles combinam consultas válidas, solicitações sem evidência, pergunta fora do domínio e recuperação do contexto após mudanças de assunto. O gabarito utiliza os registros sintéticos SYN-01, SYN-06 e SYN-08 e a ausência da Linha Laranja e do custo de manutenção do SYN-01.
+
+| ID | Tipo | Tarefa relacionada | Entrada ou condição | Passos de execução | Resultado esperado | Critério de sucesso |
+|---|---|---|---|---|---|---|
+| EU-01 | Positivo | Consulta ao risco | SYN-01 com riscos cadastrados | Solicitar o principal risco do SYN-01 e pedir que o participante explique a resposta. | R01, atraso adicional na entrega de equipamentos, criticidade crítica. | Identificar corretamente risco e criticidade. |
+| EU-02 | Positivo | Mudança para SYN-06 | Conversa iniciada no SYN-01 | Perguntar pelo risco ou andamento do SYN-06 sem abrir uma nova conversa. | O agente muda o projeto considerado e utiliza os dados do SYN-06. | Não reutilizar informações do SYN-01. |
+| EU-03 | Negativo | Pergunta fora do domínio | Contexto anterior ativo | Perguntar a data atual e depois continuar a conversa. | O agente responde ou delimita seu escopo sem corromper o contexto do projeto. | A interação permanece utilizável e o contexto pode ser retomado. |
+| EU-04 | Positivo | Mudança para SYN-08 | SYN-08 cadastrado como concluído | Perguntar pelo andamento ou prazo do SYN-08. | Status concluído e avanço de 100%, sem misturar dados de outro projeto. | Reconhecer corretamente o SYN-08. |
+| EU-05 | Negativo | Projeto ausente | Linha Laranja não consta na massa | Perguntar pelo status ou atraso da Linha Laranja. | Limitação explícita por ausência de dados, sem inventar situação. | Reconhecer a ausência e não confirmar a hipótese da pergunta. |
+| EU-06 | Recuperação | Retorno ao SYN-01 | Três assuntos abordados desde EU-01 | Retomar o SYN-01 por nome, descrição ou referência indireta ao risco. | O agente recupera o contexto correto do SYN-01. | Retomar risco, código, criticidade ou ação sem confundir projetos. |
+| EU-07 | Positivo | Fonte e data | Resposta do risco disponível | Solicitar a origem e a data da informação do SYN-01. | Fonte `04_Riscos_e_Problemas.xlsx`, data 31/08/2026. | Relacionar a fonte correta ao risco apresentado. |
+| EU-08 | Negativo | Informação ausente | Custo de manutenção não cadastrado | Perguntar pelo custo de manutenção do SYN-01. | O agente informa que o dado não está disponível e evita criar valor. | Reconhecer a limitação sem transformar ausência em dado factual. |
+
+Em todos os casos, o observador registra tempo total, pedidos de ajuda, facilidade e confiança de 1 a 5. EU-01, EU-07 e EU-08 formam o núcleo de compreensão do RNF08: resposta informativa, fonte e limitação.
+
+### 6.9.3 Roteiro padronizado de execução
+
+Cada participante realizou a sessão individualmente, usando navegador, mesma massa de dados e mesma versão funcional da aplicação. O planejamento completo previa 45 a 60 minutos; a rodada foi reduzida aos oito casos desta seção e durou de 3 min a 7 min 15 s por participante. O moderador apresentou as tarefas sem demonstrar a interface, enquanto o observador controlou o tempo e registrou as ações.
+
+| Etapa | Responsável | Procedimento padronizado |
+|---|---|---|
+| 1. Preparação técnica | Moderador e observador | Registrar ambiente; validar o acesso ao chat e à massa sintética; restaurar o contexto inicial antes de cada sessão. |
+| 2. Recepção | Moderador | Confirmar consentimento e explicar: “Estamos avaliando o sistema, não você. Use-o como faria normalmente e avise se quiser interromper o teste.” |
+| 3. Caracterização | Observador | Registrar o nome autorizado, a familiaridade com tecnologia, assistentes e a solução. |
+| 4. Consultas com dados | Moderador | Apresentar EU-01, EU-02 e EU-04, uma tarefa por vez, sem indicar termos de busca ou antecipar respostas. |
+| 5. Desvio de domínio e ausência de projeto | Moderador | Aplicar EU-03 e EU-05 sem avisar previamente quais informações estão ou não na base. |
+| 6. Recuperação de contexto | Moderador | Aplicar EU-06 depois das mudanças de assunto e observar se a retomada ocorre sem abrir outra conversa. |
+| 7. Fonte e ausência de informação | Moderador | Aplicar EU-07 e EU-08 sem indicar onde encontrar a fonte nem antecipar que o custo está ausente. |
+| 8. Verificação da compreensão | Observador | Pedir ao participante que explique risco, fonte e limitação com suas palavras, sem fornecer pistas. |
+| 9. Avaliação após cada caso | Observador | Perguntar facilidade e confiança em escala de 1 a 5 e registrar comentários sem sugerir respostas. |
+| 10. Encerramento | Moderador | Aplicar o questionário SUS e as perguntas qualitativas da Seção 6.5, agradecer e confirmar o término da gravação, quando autorizada. |
+
+Durante toda a sessão, pedidos de ajuda devem ser registrados antes de qualquer intervenção. Se a pessoa não concluir uma tarefa, o moderador pode encerrá-la para preservar a duração da sessão, marcando o resultado como “não concluída” ou “desistência”. Falhas do ambiente que impeçam a observação devem ser registradas como “não aplicada”, com o motivo, e não como erro do participante.
+
+Ao final de cada sessão, a equipe deve conferir se todos os tempos, resultados e avaliações foram registrados, separar consentimentos das observações e armazenar mídias identificáveis em local restrito. Apenas dados autorizados pelos participantes poderão aparecer neste relatório.
+
+### 6.9.4 Registros, evidências e resultados
+
+Foi realizada uma rodada com cinco participantes externos: Marcela Costa, Eduardo, Carol Paz, Richard Alves e Kaian Moura. A rodada avaliou consultas sobre projetos distintos, o retorno ao contexto do SYN-01 após mudanças de assunto e, como tarefa complementar padronizada, o início e a condução de uma chamada de voz. A identificação nominal no relatório foi autorizada pelos participantes; os termos de consentimento permanecem fora do repositório.
+
+#### Perfil, duração e ajuda
+
+| Participante | Perfil e familiaridade | Tempo | Pedidos de ajuda | Caso e dificuldade relacionados |
+|---|---|---:|---:|---|
+| Marcela Costa | Pessoa em formação; familiaridade intermediária com tecnologia e assistentes de IA e baixa com a solução | 3 min | 1 | EU-01; dúvida sobre o que escrever na primeira consulta |
+| Eduardo | Pessoa em formação; familiaridade alta com tecnologia, intermediária com assistentes de IA e baixa com a solução | 4 min | 0 | Nenhuma ajuda solicitada |
+| Richard Alves | Estudante de Ciência da Computação; familiaridade alta com tecnologia e assistentes de IA e baixa com a solução | 5 min 34 s | 0 | Nenhuma ajuda solicitada |
+| Carol Paz | Estudante de Ciência da Computação; familiaridade intermediária com tecnologia e assistentes de IA e baixa com a solução | 4 min 30 s | 1 | EU-01; dúvida inicial sobre como formular a pergunta |
+| Kaian Moura | Estudante de Engenharia da Computação e profissional da área de hardware; familiaridade intermediária com tecnologia e baixa com a solução | 7 min 15 s | 1 | Tarefa complementar de voz, fora dos oito casos textuais; não sabia o que perguntar e procurou um botão para enviar o áudio, embora o envio fosse automático |
+| **Total/média** | Cinco participantes externos | **24 min 19 s / 4 min 52 s** | **3** | Dois pedidos ligados a EU-01 e um ligado à exploração da chamada de voz |
+
+#### Resultado individual consolidado
+
+Os cinco participantes realizaram as oito tarefas. As médias abaixo são calculadas sobre as oito notas individuais de cada dimensão.
+
+| Participante | Tarefas realizadas | Facilidade média | Confiança média | Pedidos de ajuda | SUS | Síntese |
+|---|---:|---:|---:|---:|---:|---|
+| Marcela Costa | 8 de 8 | 4,63 | 4,25 | 1 | 80,0 | Concluiu a rodada; relatou dúvida pontual sobre como formular perguntas |
+| Eduardo | 8 de 8 | 4,50 | 4,13 | 0 | 87,5 | Concluiu sem ajuda e avaliou o sistema como simples |
+| Richard Alves | 8 de 8 | 4,50 | 4,25 | 0 | 95,0 | Concluiu sem ajuda e relatou interação rápida e intuitiva |
+| Carol Paz | 8 de 8 | 4,50 | 4,13 | 1 | 82,5 | Concluiu a rodada; relatou dúvida inicial na formulação de uma pergunta |
+| Kaian Moura | 8 de 8 | 4,63 | 4,25 | 1 | 77,5 | Concluiu a rodada; sugeriu maior destaque para as informações e precisou de orientação no envio automático da fala |
+
+#### Notas por tarefa e participante
+
+Cada célula apresenta **facilidade / confiança**, em escala de 1 a 5.
+
+| Tarefa | Marcela Costa | Eduardo | Richard Alves | Carol Paz | Kaian Moura | Média |
+|---|---:|---:|---:|---:|---:|---:|
+| Principal risco do SYN-01 | 5 / 5 | 5 / 4 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 4,8 |
+| Consulta ao SYN-06 | 4 / 3 | 4 / 3 | 4 / 3 | 4 / 3 | 4 / 3 | 4,0 / 3,0 |
+| Pergunta fora do domínio: data atual | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 5,0 |
+| Consulta ao SYN-08 | 4 / 3 | 4 / 3 | 3 / 3 | 4 / 3 | 4 / 3 | 3,8 / 3,0 |
+| Consulta à Linha Laranja | 4 / 3 | 3 / 3 | 4 / 3 | 3 / 3 | 4 / 3 | 3,6 / 3,0 |
+| Retorno ao SYN-01 | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 5,0 |
+| Identificação da fonte e da data | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 5 | 5,0 / 5,0 |
+| Consulta ao custo de manutenção | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 4 | 5 / 5 | 5,0 / 4,8 |
+
+A média geral das oito tarefas foi 4,55 para facilidade e 4,20 para confiança. As menores médias de confiança, 3,0, ocorreram nas consultas ao SYN-06, SYN-08 e Linha Laranja.
+
+#### Resultado observado por caso
+
+Conclusão da tarefa e aprovação do caso são medidas diferentes. As 40 execuções foram concluídas, mas um caso somente é classificado como aprovado quando o registro preservado permite comparar o comportamento observado com o critério de sucesso.
+
+| Caso | Tipo | Resultado observado | Facilidade / confiança médias | Avaliação |
+|---|---|---|---:|---|
+| EU-01 | Positivo | Os cinco participantes localizaram o risco do SYN-01; o registro identifica corretamente R01 e sua criticidade | 5,0 / 4,8 | Aprovado |
+| EU-02 | Positivo | Na primeira rodada, os cinco mudaram a consulta para o SYN-06, mas o texto devolvido pelo agente não foi preservado | 4,0 / 3,0 | Não comprovado na primeira rodada; aprovado na rodada complementar |
+| EU-03 | Negativo | Os cinco fizeram a pergunta fora do domínio e continuaram a conversa; o retorno posterior ao SYN-01 confirma que o contexto permaneceu recuperável | 5,0 / 5,0 | Aprovado |
+| EU-04 | Positivo | Na primeira rodada, os cinco consultaram o SYN-08, mas o texto devolvido pelo agente não foi preservado | 3,8 / 3,0 | Não comprovado na primeira rodada; aprovado na rodada complementar |
+| EU-05 | Negativo | Na primeira rodada, os cinco consultaram a Linha Laranja, porém a mensagem de limitação não foi preservada para confronto com o critério | 3,6 / 3,0 | Não comprovado na primeira rodada; aprovado na rodada complementar |
+| EU-06 | Recuperação | Os cinco retomaram o SYN-01 por referências diretas ou indiretas sem abrir nova conversa | 5,0 / 5,0 | Aprovado |
+| EU-07 | Positivo | Os cinco localizaram a fonte e a data registradas no gabarito | 5,0 / 5,0 | Aprovado |
+| EU-08 | Negativo | Os cinco reconheceram que o custo de manutenção não está disponível, sem registrar valor inexistente | 5,0 / 4,8 | Aprovado |
+
+Na primeira rodada, houve conclusão de 40 em 40 execuções de tarefa. Cinco dos oito casos possuíam evidência suficiente para aprovação; os outros três foram executados sem registro bastante para aprovação naquele momento. A rodada complementar da Seção 6.9.6 repetiu EU-02, EU-04 e EU-05 com os cinco participantes e aprovou os três casos, preservando a distinção entre o resultado original e a nova evidência.
+
+A revisão confirmou os valores esperados de EU-02 e EU-04 no [registro da massa funcional](evidencias/testes-funcionais/database-massa.log) e na [carga inicial do banco](../src/database/02_initial_data.sql), além da ausência da Linha Laranja usada em EU-05. Esses arquivos definem o gabarito, mas não substituem as respostas da primeira rodada. Por isso, a aprovação dos três casos utiliza exclusivamente a nova execução documentada na Seção 6.9.6.
+
+#### Questionário SUS
+
+O cálculo segue a regra da Seção 6.5.8: nas questões ímpares, subtrai-se 1 da resposta; nas pares, subtrai-se a resposta de 5; a soma é multiplicada por 2,5.
+
+| Participante | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 | Q10 | SUS |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Marcela Costa | 4 | 2 | 4 | 1 | 4 | 2 | 4 | 1 | 4 | 2 | 80,0 |
+| Eduardo | 4 | 1 | 5 | 1 | 4 | 1 | 4 | 2 | 4 | 1 | 87,5 |
+| Richard Alves | 5 | 1 | 4 | 1 | 5 | 1 | 4 | 1 | 5 | 1 | 95,0 |
+| Carol Paz | 4 | 2 | 5 | 1 | 4 | 2 | 4 | 2 | 4 | 1 | 82,5 |
+| Kaian Moura | 4 | 2 | 4 | 2 | 4 | 2 | 4 | 1 | 4 | 2 | 77,5 |
+
+| Estatística | Resultado |
+|---|---:|
+| Média | 84,5 |
+| Mediana | 82,5 |
+| Mínimo | 77,5 |
+| Máximo | 95,0 |
+| Desvio padrão amostral | 6,94 |
+| Amplitude | 17,5 |
+
+O SUS médio de 84,5 indica percepção geral positiva nesta amostra. Conforme definido no planejamento, o valor é diagnóstico e não substitui a verificação de compreensão do RNF08.
+
+#### Comentários dos participantes
+
+| Participante | Comentário registrado |
+|---|---|
+| Marcela Costa | “Foi fácil entender como fazer as consultas, mas em alguns momentos fiquei em dúvida sobre o que deveria escrever.” |
+| Eduardo | “Achei o sistema simples de usar e consegui encontrar as informações solicitadas sem precisar de ajuda.” |
+| Richard Alves | “A interação foi rápida e intuitiva. Consegui entender o que precisava fazer sem explicações adicionais.” |
+| Carol Paz | “O sistema foi fácil de usar, mas tive uma pequena dúvida no início sobre como formular uma das perguntas.” |
+| Kaian Moura | “Consegui realizar as tarefas, mas algumas respostas poderiam deixar as informações principais mais destacadas.” |
+
+#### Voz na primeira rodada
+
+Na primeira rodada, os cinco participantes concluíram a chamada. A facilidade e a confiança específicas da voz foram medidas posteriormente na rodada complementar.
+#### Gabarito usado na rodada
+
+| Informação | Resposta esperada |
+|---|---|
+| Projeto | SYN-01 — Modernização da Ventilação Operacional |
+| Risco principal | R01 — Atraso adicional na entrega de equipamentos |
+| Criticidade | Crítica |
+| Ação prevista | Diligenciar o fornecedor e priorizar os itens críticos |
+| Fonte | `04_Riscos_e_Problemas.xlsx` |
+| Data de referência | 31/08/2026 |
+| Custo de manutenção | Não disponível na massa de dados |
+
+#### Estratégias observadas na troca de contexto
+
+| Participante | Como mudou de assunto | Como retornou ao SYN-01 |
+|---|---|---|
+| Marcela Costa | Fez perguntas diretas por projeto | Perguntou novamente qual era a fonte do risco |
+| Eduardo | Usou “E no Projeto 6...” e perguntou se a Linha Laranja estava atrasada | Usou “Voltando ao projeto de ventilação...” |
+| Richard Alves | Perguntou sobre andamento e prazo | Perguntou apenas pelo código do risco |
+| Carol Paz | Fez perguntas abertas sobre problemas e acontecimentos | Referiu-se indiretamente a “aquele risco de fornecedor” |
+| Kaian Moura | Usou “Agora me fale do Projeto 6” | Perguntou novamente a criticidade do SYN-01 |
+
+Todos os participantes atribuíram facilidade e confiança máximas ao retorno ao SYN-01. O resultado indica que referências diretas e indiretas ao projeto anterior foram compreendidas durante esta rodada. As perguntas abertas ou indutivas sobre SYN-08 e Linha Laranja receberam as menores notas de facilidade.
+
+SYN-06 e SYN-08 existem na massa sintética: o primeiro está “Em estruturação”, com avanço de 15%, e o segundo está “Concluído”, com avanço de 100%. Como as respostas textuais devolvidas pelo sistema não foram preservadas no registro recebido, esta rodada não permite afirmar se esses dados foram apresentados corretamente. A Linha Laranja não consta na massa, portanto a resposta esperada é uma limitação explícita, sem criação de status ou andamento.
+
+#### Evidências visuais
+
+As cinco fotografias comprovam a presença dos participantes diante da interface do AZ1 durante as sessões que aplicaram EU-01 a EU-08 e a tarefa complementar de voz. Como os textos nas telas não são legíveis nas imagens, elas evidenciam a execução presencial, mas não comprovam isoladamente qual prompt foi enviado, qual etapa estava aberta nem a correção da resposta. Essa verificação depende das fichas e tabelas desta seção.
+
+**EV-01 — Sessão de Marcela Costa, roteiro EU-01 a EU-08 e tarefa de voz.**
+
+![EV-01 — Marcela Costa utilizando a interface do AZ1 durante o teste](../assets/testes/foto_marcela.jpeg)
+
+**EV-02 — Sessão de Eduardo, roteiro EU-01 a EU-08 e tarefa de voz.**
+
+![EV-02 — Eduardo utilizando a interface do AZ1 durante o teste](../assets/testes/foto_eduardo.jpeg)
+
+**EV-03 — Sessão de Richard Alves, roteiro EU-01 a EU-08 e tarefa de voz.**
+
+![EV-03 — Richard Alves utilizando a interface do AZ1 durante o teste](../assets/testes/foto_richard.jpeg)
+
+**EV-04 — Sessão de Carol Paz, roteiro EU-01 a EU-08 e tarefa de voz.**
+
+![EV-04 — Carol Paz utilizando a interface do AZ1 durante o teste](../assets/testes/foto_carol.jpeg)
+
+**EV-05 — Sessão de Kaian Moura, roteiro EU-01 a EU-08 e tarefa de voz.**
+
+![EV-05 — Kaian Moura utilizando a interface do AZ1 durante o teste](../assets/testes/foto_kaian.jpeg)
+
+As imagens são mantidas para comprovar a execução presencial exigida na entrega. A validação dos resultados depende das fichas e tabelas, pois as telas não estão legíveis nas fotografias.
+
+#### Problemas, ações corretivas e situação
+
+| Evidência observada | Problema identificado | Impacto na experiência | Ação corretiva | Situação |
+|---|---|---|---|---|
+| EU-02 e EU-04 receberam confiança média 3,0 de todos os participantes | A mudança do projeto considerado não fica suficientemente explícita | O usuário pode não saber se a resposta ainda se refere ao projeto anterior | Exibir o código e o nome do projeto no início da resposta após mudança de contexto | Em desenvolvimento |
+| EU-05 teve a menor facilidade média, 3,6, e confiança média 3,0 | A ausência de um projeto na base não é comunicada com segurança percebida | O usuário pode confundir falta de dados, falha técnica e confirmação de uma hipótese | Informar que o projeto não foi localizado, indicar a base consultada e sugerir reformulação | Planejado |
+| Kaian Moura pediu maior destaque para as informações principais | A hierarquia visual da resposta não destaca suficientemente informação, fonte e data | A leitura exige mais esforço e pode atrasar a localização do dado principal | Separar resposta, fonte e data por rótulos e hierarquia visual | Planejado |
+| Marcela Costa e Carol Paz relataram dúvida ao formular perguntas; ambas solicitaram ajuda uma vez | A entrada inicial oferece pouca orientação sobre como começar | Usuários novos podem depender de ajuda para formular a primeira consulta | Apresentar exemplos curtos e contextualizados no estado vazio do chat | Em desenvolvimento |
+| Kaian Moura procurou um botão para enviar a fala durante a chamada de voz e precisou de orientação | O envio automático após o fim da fala não está suficientemente indicado | O usuário pode esperar uma ação inexistente, repetir a fala ou acreditar que o áudio não foi enviado | Exibir estados claros de escuta e envio automático e uma instrução breve antes da primeira fala | Planejado |
+| Richard Alves procurou o recurso de voz no chat textual antes de localizar a tela de chamada | O acesso e a separação entre chat textual e chamada não são suficientemente evidentes | O usuário pode não descobrir a chamada ou interpretar o recurso como envio de mensagem de áudio | Destacar o acesso à chamada e explicar brevemente que ela ocorre em uma interface própria | Planejado |
+| Eduardo tentou falar enquanto o agente ainda reproduzia a resposta | A interface não comunica de forma suficiente quando uma nova fala pode começar | O usuário pode falar sem ser capturado ou entender que a chamada deixou de responder | Indicar visualmente os estados “agente falando” e “pode falar”; avaliar suporte futuro à interrupção da resposta | Planejado |
+| As respostas de EU-02, EU-04 e EU-05 não foram preservadas na primeira rodada | A captura manual não garantiu o registro bruto de todos os casos | Três casos precisaram de nova execução para produzir evidência verificável | Capturar automaticamente pergunta, resposta, horário e caso em todas as sessões futuras | Planejado |
+| EU-06 obteve facilidade e confiança 5,0 para os cinco participantes | O risco de perda de contexto foi tratado adequadamente no fluxo observado | A preservação evita repetição de informações e abandono da conversa | Manter o histórico ativo e proteger esse comportamento com teste de regressão | Implementado |
+
+#### Verificação do RNF08
+
+O RNF08 exige que pelo menos 80% dos participantes compreendam, sem ajuda, a resposta informativa, sua fonte e a limitação. Nesta rodada, isso corresponde à compreensão das respostas de EU-01, EU-07 e EU-08 por pelo menos quatro dos cinco participantes. Uma orientação para formular a pergunta é registrada como problema de interação, mas não reprova este requisito quando o participante interpreta a resposta sem auxílio.
+
+| Participante | EU-01: resposta | EU-07: fonte | EU-08: limitação | Classificação no RNF08 |
+|---|---|---|---|---|
+| Marcela Costa | Compreendeu sem ajuda; a orientação ocorreu na formulação da pergunta | Compreendeu sem ajuda | Compreendeu sem ajuda | Atende |
+| Eduardo | Concluído sem ajuda | Concluído sem ajuda | Concluído sem ajuda | Atende |
+| Richard Alves | Concluído sem ajuda | Concluído sem ajuda | Concluído sem ajuda | Atende |
+| Carol Paz | Compreendeu sem ajuda; a orientação ocorreu na formulação da pergunta | Compreendeu sem ajuda | Compreendeu sem ajuda | Atende |
+| Kaian Moura | Apresentou dificuldade para compreender a resposta | Concluído | Concluído | Não atende, pois precisou de apoio para compreender a interação |
+
+Foram comprovados **4 sucessos em 5 participantes (80%)**, exatamente a quantidade mínima exigida. Portanto, o RNF08 foi atingido, mas com margem zero: cada participante representa 20 pontos percentuais e uma única mudança de resultado faria a taxa cair para 60%. O registro de Kaian confirma dificuldade de compreensão, mas não isola uma causa única; por isso, ela não é atribuída ao texto, à voz ou à formulação da pergunta sem nova observação controlada.
+
+### 6.9.5 Análise crítica da primeira rodada
+
+A primeira rodada concluiu 40 de 40 tarefas, com facilidade média de 4,55, confiança média de 4,20 e SUS médio de 84,5. EU-02, EU-04 e EU-05 concentraram as menores notas e foram repetidos na rodada complementar. O RNF08 atingiu a meta de 80%, sujeito à ressalva de margem apresentada na Seção 6.9.4.
+
+O registro caracteriza a amostra como de conveniência, pequena e concentrada em pessoas com familiaridade intermediária ou alta com tecnologia, mas não detalha o recrutamento nem apresenta estratificação pelas personas. Esse perfil pode facilitar a descoberta dos controles e a interpretação das mensagens. Assim, os resultados são exploratórios e não podem ser generalizados estatisticamente para pessoas com menor familiaridade digital nem para todas as personas profissionais do Metrô. Antes da liberação para um público mais amplo, recomenda-se repetir a avaliação com uma amostra maior e mais próxima dos usuários profissionais.
+
+| Requisito ou aspecto | Cobertura nesta seção | Risco residual |
+|---|---|---|
+| RF01 — receber solicitações por áudio e texto e responder em texto | Cinco participantes concluíram a chamada; as consultas textuais também foram executadas | Médio: descoberta e alternância de turnos da chamada ainda geraram hesitação |
+| RF02 — consultar dados de projetos | Casos positivos, negativos e troca de contexto executados | Baixo no recorte sintético; dados reais não foram avaliados |
+| RF03 — apresentar a fonte da informação | Fonte e data avaliadas em EU-07 | Baixo no recorte observado |
+| RNF08 — compreensão | 4/5, exatamente 80% | Médio: resultado sensível ao tamanho da amostra, conforme a Seção 6.9.4 |
+| RF04, RF05 e RF06 | Fora do escopo da usabilidade desta rodada; cobertura sistêmica rastreada nas Seções 6.2, 6.6 e 6.7 | Não inferir aprovação a partir da Seção 6.9 |
+
+### 6.9.6 Rodada Complementar de Testes de Usabilidade
+
+#### Objetivo e participantes
+
+Esta rodada complementou a execução da Seção 6.9.4 sem substituir seus resultados. Seu objetivo foi repetir EU-02, EU-04 e EU-05, coletar métricas próprias do canal de voz e observar a recuperação após uma indisponibilidade controlada. Participaram novamente Marcela Costa, Richard Alves, Kaian Moura, Eduardo e Carol Paz.
+
+A rodada utilizou a mesma massa sintética para os cinco participantes, em ambiente local isolado de dados reais. As tabelas apresentam somente as medidas previstas no registro consolidado.
+
+#### Protocolo e resultados observados
+
+| Teste | Entrada | Resultado observado | Consolidado |
+|---|---|---|---:|
+| EU-02 | `E qual é o andamento do projeto SYN-06?` | Mudança correta para SYN-06; “Em estruturação”, 15%, sem misturar SYN-01 | 5/5 — 100% |
+| EU-04 | `Agora, qual é o andamento do projeto SYN-08?` | Mudança correta para SYN-08; “Concluído”, 100%, sem misturar projetos | 5/5 — 100% |
+| EU-05 | `A Linha Laranja está atrasada?` | Projeto ausente; nenhum status, percentual ou prazo inventado | 5/5 — 100% |
+| Voz | Falar `Qual é o principal risco do projeto SYN-01?` | Intenção corretamente reconhecida e interação concluída | 5/5 — 100% |
+| Recuperação | Consultar SYN-01 com a API 8010 indisponível; restaurar e repetir | Erro sem resposta inventada; consulta concluída após restauração | 5/5 — 100% |
+
+#### Resultados por participante
+
+| Participante | EU-02 | EU-04 | EU-05 | Voz: facilidade/confiança | Recuperação |
+|---|---|---|---|---|---|
+| Marcela Costa | Sucesso sem ajuda | Sucesso sem ajuda | Sucesso | 5/4 | Primeira nova tentativa, sem ajuda |
+| Richard Alves | Sucesso sem ajuda | Sucesso sem ajuda | Sucesso | 5/5 | Primeira nova tentativa, sem ajuda |
+| Kaian Moura | Sucesso sem ajuda | Sucesso sem ajuda | Sucesso | 4/4 | Duas tentativas, sem ajuda |
+| Eduardo | Sucesso sem ajuda | Sucesso sem ajuda | Sucesso | 5/5 | Primeira nova tentativa, sem ajuda |
+| Carol Paz | Sucesso sem ajuda | Sucesso sem ajuda | Sucesso | 4/4 | Sucesso com uma orientação |
+
+#### Evidências
+
+As fotografias da Seção 6.9.4 comprovam a participação e a interação nas duas rodadas. Como o texto das telas não está legível, os resultados são sustentados pelas fichas consolidadas.
+
+#### Indicadores consolidados
+
+| Indicador | Resultado |
+|---|---:|
+| EU-02 | 5/5 — 100% |
+| EU-04 | 5/5 — 100% |
+| EU-05 | 5/5 — 100% |
+| Voz | 5/5 — 100% |
+| Facilidade média da voz | 4,6/5 |
+| Confiança média da voz | 4,4/5 |
+| Recuperação concluída | 5/5 — 100% |
+| Recuperação sem ajuda | 4/5 — 80% |
+| Recuperação com ajuda | 1/5 — 20% |
+
+#### RNF08 e conclusão
+
+O RNF08 permanece baseado em EU-01, EU-07 e EU-08 da primeira rodada: 4 de 5 participantes atenderam ao critério, totalizando 80%. A rodada complementar fortalece a evidência de compreensibilidade sem substituir essa medição; a interpretação da margem está registrada na Seção 6.9.4.
+
+Considerando as duas rodadas, os oito casos textuais possuem resultado aprovado. EU-02, EU-04 e EU-05 foram aprovados com base na nova execução complementar, e não por reconstrução dos dados perdidos da primeira rodada. A rodada complementar também obteve 100% de sucesso na voz e comprovou 100% de conclusão da recuperação após falha, sendo 80% sem ajuda. As ações corretivas continuam relevantes para tornar a chamada mais evidente e orientar melhor o primeiro uso.
+
+A principal limitação permanece sendo a amostra pequena e concentrada em participantes familiarizados com tecnologia. Uma nova rodada deve incluir mais participantes, pessoas com menor familiaridade digital e perfis próximos das personas profissionais do Metrô.
 
 ---
 

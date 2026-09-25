@@ -3,13 +3,16 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from services.agente_service import (
-    LIMIAR_CONFIANCA_ACAO,
-    AgenteDesligado,
-    ExecutarIntencao,
-    ResultadoAcao,
-)
+from pln.intencao import LIMIAR_PADRAO, IntencaoDetectada
+from services.agente_service import AgenteDesligado, ExecutarIntencao, ResultadoAcao
 from services.portfolio_repository import Pendencia, SituacaoProjeto
+
+
+# O Agente não tem mais limiar próprio: ele recebe a detecção já submetida à
+# regra de `pln.intencao`. A fábrica constrói detecções reais, e não dublês,
+# porque `rejeitada`/`intencao` são justamente o que se quer exercitar.
+def _detectada(prevista: str, confianca: float) -> IntencaoDetectada:
+    return IntencaoDetectada(prevista=prevista, confianca=confianca)
 
 
 def _pendencia(projeto_codigo: str, titulo: str = "Pendência") -> Pendencia:
@@ -65,8 +68,7 @@ class TestExecutarIntencao(unittest.TestCase):
         agente = ExecutarIntencao(portfolio=_PortfolioFalso())
 
         resposta = agente.executar(
-            intencao="gerar_alertas_pendencias",
-            confianca=LIMIAR_CONFIANCA_ACAO - 0.01,
+            deteccao=_detectada("gerar_alertas_pendencias", LIMIAR_PADRAO - 0.01),
             texto="tem algo pendente?",
         )
 
@@ -76,7 +78,7 @@ class TestExecutarIntencao(unittest.TestCase):
         agente = ExecutarIntencao(portfolio=_PortfolioFalso())
 
         resposta = agente.executar(
-            intencao="orientar_tap", confianca=0.95, texto="me ajuda com o TAP"
+            deteccao=_detectada("orientar_tap", 0.95), texto="me ajuda com o TAP"
         )
 
         self.assertEqual(resposta.resultado, ResultadoAcao.SEM_ACAO)
@@ -85,7 +87,7 @@ class TestExecutarIntencao(unittest.TestCase):
         agente = ExecutarIntencao(portfolio=_PortfolioFalso())
 
         resposta = agente.executar(
-            intencao="fora_do_catalogo", confianca=0.9, texto="qual a previsão do tempo?"
+            deteccao=_detectada("fora_do_catalogo", 0.9), texto="qual a previsão do tempo?"
         )
 
         self.assertEqual(resposta.resultado, ResultadoAcao.RECUSADA_FORA_DO_CATALOGO)
@@ -95,8 +97,7 @@ class TestExecutarIntencao(unittest.TestCase):
         agente = ExecutarIntencao(portfolio=_PortfolioFalso(pendencias=pendencias))
 
         resposta = agente.executar(
-            intencao="gerar_alertas_pendencias",
-            confianca=0.9,
+            deteccao=_detectada("gerar_alertas_pendencias", 0.9),
             texto="o que precisa da minha atenção hoje?",
         )
 
@@ -109,8 +110,7 @@ class TestExecutarIntencao(unittest.TestCase):
         agente = ExecutarIntencao(portfolio=_PortfolioFalso(pendencias=(alvo, outro)))
 
         resposta = agente.executar(
-            intencao="gerar_alertas_pendencias",
-            confianca=0.9,
+            deteccao=_detectada("gerar_alertas_pendencias", 0.9),
             texto="tem pendência no SYN-01?",
         )
 
@@ -122,8 +122,7 @@ class TestExecutarIntencao(unittest.TestCase):
         agente = ExecutarIntencao(portfolio=_PortfolioFalso(projetos=(alvo, outro)))
 
         resposta = agente.executar(
-            intencao="consultar_projeto_sintetico",
-            confianca=0.9,
+            deteccao=_detectada("consultar_projeto_sintetico", 0.9),
             texto="qual a situação do SYN-01?",
         )
 
@@ -136,7 +135,7 @@ class TestAgenteDesligado(unittest.TestCase):
         agente = AgenteDesligado("SUPABASE_DB_URL não configurada")
 
         resposta = agente.executar(
-            intencao="fora_do_catalogo", confianca=0.9, texto="qual a previsão do tempo?"
+            deteccao=_detectada("fora_do_catalogo", 0.9), texto="qual a previsão do tempo?"
         )
 
         self.assertEqual(resposta.resultado, ResultadoAcao.RECUSADA_FORA_DO_CATALOGO)
@@ -145,7 +144,7 @@ class TestAgenteDesligado(unittest.TestCase):
         agente = AgenteDesligado("SUPABASE_DB_URL não configurada")
 
         resposta = agente.executar(
-            intencao="gerar_alertas_pendencias", confianca=0.9, texto="o que está pendente?"
+            deteccao=_detectada("gerar_alertas_pendencias", 0.9), texto="o que está pendente?"
         )
 
         self.assertEqual(resposta.resultado, ResultadoAcao.SEM_ACAO)

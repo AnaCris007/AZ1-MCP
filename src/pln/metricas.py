@@ -39,14 +39,18 @@ import numpy as np
 from sklearn.metrics import classification_report, f1_score
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
-from pln.caminhos import DATASET_PADRAO, garantir_dir_de_resultados
+from pln.caminhos import DATASET_PADRAO, DATASET_TESTE, garantir_dir_de_resultados
 from pln.classificador import (
     SEMENTE,
     carregar_dataset,
     construir_classificador,
 )
 
-INTENCAO_FORA_DO_CATALOGO = "fora_do_catalogo"
+# A regra de rejeição e o rótulo de recusa vêm de `pln.intencao`, e não são
+# redefinidos aqui. É a mesma função que o serviço aplica em produção: medir
+# uma regra e executar outra faria este relatório descrever um sistema que não
+# existe.
+from pln.intencao import INTENCAO_FORA_DO_CATALOGO, aplicar_limiar_em_lote
 
 META_F1_MACRO = 0.85
 META_COBERTURA = 0.90
@@ -84,23 +88,6 @@ class ResultadoRNF03:
             f"limiar={self.limiar:.2f}  F1={self.f1_macro:.4f}  "
             f"cobertura={self.cobertura:.1%}  aceitação indevida={self.aceitacao_indevida:.1%}"
         )
-
-
-# A regra de rejeição, isolada numa função porque é a decisão que o serviço
-# precisa aplicar em produção e que hoje ele não aplica.
-def aplicar_limiar(rotulo: str, confianca: float, limiar: float) -> str:
-    if confianca < limiar:
-        return INTENCAO_FORA_DO_CATALOGO
-    return rotulo
-
-
-def aplicar_limiar_em_lote(
-    rotulos: list[str], confiancas: list[float], limiar: float
-) -> list[str]:
-    return [
-        aplicar_limiar(rotulo, confianca, limiar)
-        for rotulo, confianca in zip(rotulos, confiancas, strict=True)
-    ]
 
 
 # Recebe as previsões cruas (argmax e confiança) e devolve as três métricas já
@@ -157,17 +144,25 @@ def escolher_limiar(curva: list[ResultadoRNF03]) -> ResultadoRNF03 | None:
     return max(aprovados, key=lambda r: r.f1_macro)
 
 
-# Mesmo não havendo ponto aprovado, é útil saber qual limiar chega mais perto.
-# A distância soma as três violações normalizadas pelos respectivos limites.
-def limiar_menos_distante(curva: list[ResultadoRNF03]) -> ResultadoRNF03:
-    def distancia(r: ResultadoRNF03) -> float:
-        return (
-            max(0.0, META_F1_MACRO - r.f1_macro) / META_F1_MACRO
-            + max(0.0, META_COBERTURA - r.cobertura) / META_COBERTURA
-            + max(0.0, r.aceitacao_indevida - META_ACEITACAO_INDEVIDA) / META_ACEITACAO_INDEVIDA
-        )
+# Quanto falta para atender ao RNF03, somando as três violações normalizadas
+# pelos respectivos limites. Zero significa aprovado.
+#
+# Função de módulo, e não closure, porque comparar MODELOS precisa da mesma
+# régua que comparar limiares. Sem ela, "qual é melhor" vira uma discussão
+# sobre qual das três métricas olhar — e como cobertura e aceitação indevida
+# trocam entre si, sempre existe uma escolha de métrica que faz qualquer
+# candidato vencer.
+def distancia_do_requisito(r: ResultadoRNF03) -> float:
+    return (
+        max(0.0, META_F1_MACRO - r.f1_macro) / META_F1_MACRO
+        + max(0.0, META_COBERTURA - r.cobertura) / META_COBERTURA
+        + max(0.0, r.aceitacao_indevida - META_ACEITACAO_INDEVIDA) / META_ACEITACAO_INDEVIDA
+    )
 
-    return min(curva, key=distancia)
+
+# Mesmo não havendo ponto aprovado, é útil saber qual limiar chega mais perto.
+def limiar_menos_distante(curva: list[ResultadoRNF03]) -> ResultadoRNF03:
+    return min(curva, key=distancia_do_requisito)
 
 
 # Previsões fora da amostra para todo o dataset: cada exemplo é previsto por um
@@ -191,6 +186,69 @@ def prever_por_validacao_cruzada(
     previstos = [str(classes[i]) for i in indices]
     confiancas = [float(probabilidades[linha, i]) for linha, i in enumerate(indices)]
     return previstos, confiancas
+
+
+# Previsões de um modelo JÁ TREINADO sobre textos que ele nunca viu.
+#
+# Não confundir com `prever_por_validacao_cruzada`, logo acima: lá cada exemplo
+# é previsto por um modelo diferente, treinado nas outras dobras do MESMO
+# corpus. Aqui existe um modelo só, e os textos vêm de outro arquivo. É a
+# diferença entre estimar o desempenho e medi-lo.
+def prever_com_modelo(modelo, textos: list[str]) -> tuple[list[str], list[float]]:
+    probabilidades = modelo.predict_proba(textos)
+    classes = modelo.named_steps["classificador"].classes_
+    indices = probabilidades.argmax(axis=1)
+
+    previstos = [str(classes[i]) for i in indices]
+    confiancas = [float(probabilidades[linha, i]) for linha, i in enumerate(indices)]
+    return previstos, confiancas
+
+
+@dataclass(frozen=True)
+class MedicaoNoRetido:
+    limiar: float
+    escolhido_no_desenvolvimento: ResultadoRNF03
+    no_retido: ResultadoRNF03
+    reais: list[str]
+    previstos: list[str]
+    confiancas: list[float]
+
+    # O relatório por classe precisa ver o que o sistema FARIA, e não o argmax
+    # cru: é a rejeição que produz `fora_do_catalogo` nas linhas de baixa
+    # confiança, e é dela que saem cobertura e aceitação indevida.
+    def previstos_com_rejeicao(self) -> list[str]:
+        return aplicar_limiar_em_lote(self.previstos, self.confiancas, self.limiar)
+
+
+# A ORDEM DESTES TRÊS PASSOS É A MEDIÇÃO.
+#
+# O limiar sai do desenvolvimento e entra congelado no retido. Escolhê-lo
+# olhando o retido — mesmo "só para ver" — transformaria a medição num ajuste,
+# e o número publicado voltaria a ser otimista por construção, que é
+# exatamente o que separar o conjunto pretendia resolver.
+def avaliar_no_teste_retido(
+    dev_textos: list[str],
+    dev_rotulos: list[str],
+    teste_textos: list[str],
+    teste_rotulos: list[str],
+    k: int = 5,
+) -> MedicaoNoRetido:
+    previstos_dev, confiancas_dev = prever_por_validacao_cruzada(dev_textos, dev_rotulos, k=k)
+    curva = curva_do_limiar(dev_rotulos, previstos_dev, confiancas_dev)
+    escolhido = escolher_limiar(curva) or limiar_menos_distante(curva)
+
+    modelo = construir_classificador()
+    modelo.fit(dev_textos, dev_rotulos)
+
+    previstos, confiancas = prever_com_modelo(modelo, teste_textos)
+    return MedicaoNoRetido(
+        limiar=escolhido.limiar,
+        escolhido_no_desenvolvimento=escolhido,
+        no_retido=avaliar_rnf03(teste_rotulos, previstos, confiancas, escolhido.limiar),
+        reais=teste_rotulos,
+        previstos=previstos,
+        confiancas=confiancas,
+    )
 
 
 # Subamostra estratificada: mantém a proporção entre classes para que a curva
@@ -334,6 +392,85 @@ def _secao_curva_de_aprendizado(curva: list[tuple[float, int, float]]) -> list[s
     return linhas + [""]
 
 
+def _relatorio_do_retido(medicao: MedicaoNoRetido, dev: int, retido: int) -> list[str]:
+    r = medicao.no_retido
+    escolhido = medicao.escolhido_no_desenvolvimento
+    return [
+        "# RNF03 no conjunto de teste retido",
+        "",
+        "Arquivo gerado por `python -m pln.metricas --teste`. Não editar à mão.",
+        "",
+        "> **Isto não é o conjunto cego da Seção 6.3.** Aquele exige frases novas,",
+        "> escritas depois e custodiadas por quem não participou do ajuste. Este é um",
+        "> teste retido: separado do pool por `python -m pln.particao` ANTES de",
+        "> qualquer treino, escolha de pré-processamento, ajuste de hiperparâmetro ou",
+        "> calibração de limiar, e lido uma única vez, aqui. Ele mede generalização",
+        "> com honestidade e não substitui a medição cega.",
+        "",
+        f"- Desenvolvimento: {dev} exemplos (treino, busca, ajuste e calibração)",
+        f"- Teste retido: {retido} exemplos, nunca vistos",
+        f"- Exemplos de intenções conhecidas no retido: {r.conhecidos}",
+        f"- Exemplos `fora_do_catalogo` no retido: {r.fora_do_catalogo}",
+        "",
+        "## Limiar congelado",
+        "",
+        f"**{medicao.limiar:.2f}**, escolhido SOMENTE sobre o desenvolvimento, onde media:",
+        "",
+        f"- F1-macro {escolhido.f1_macro:.4f}, cobertura {escolhido.cobertura:.1%}, "
+        f"aceitação indevida {escolhido.aceitacao_indevida:.1%}",
+        "",
+        "A diferença entre esses números e os de baixo é o custo de generalizar. Se ela",
+        "for grande, o modelo decorou o corpus de desenvolvimento.",
+        "",
+        "## Resultado no retido",
+        "",
+        f"- F1-macro: **{r.f1_macro:.4f}** (mínimo {META_F1_MACRO:.2f})",
+        f"- Cobertura: **{r.cobertura:.1%}** (mínimo {META_COBERTURA:.0%})",
+        f"- Aceitação indevida: **{r.aceitacao_indevida:.1%}** "
+        f"(máximo {META_ACEITACAO_INDEVIDA:.0%})",
+        "",
+        f"**{'Atende' if r.aprovado else 'NÃO atende'} aos três limites simultaneamente.**",
+        "",
+        "## Relatório por classe (com a rejeição aplicada)",
+        "",
+        "```",
+        classification_report(
+            medicao.reais, medicao.previstos_com_rejeicao(), digits=3, zero_division=0
+        ),
+        "```",
+        "",
+    ]
+
+
+def _medir_no_retido(args: argparse.Namespace) -> int:
+    if not args.teste_retido.exists():
+        print(
+            f"❌ Teste retido não encontrado em {args.teste_retido}.\n"
+            f"   Gere as duas partições primeiro:  python -m pln.particao"
+        )
+        return 1
+
+    dev_textos, dev_rotulos = carregar_dataset(args.dataset)
+    teste_textos, teste_rotulos = carregar_dataset(args.teste_retido)
+
+    print(f"Desenvolvimento: {args.dataset}  ({len(dev_textos)} exemplos)")
+    print(f"Teste retido   : {args.teste_retido}  ({len(teste_textos)} exemplos)")
+    print(f"Calibrando o limiar no desenvolvimento ({args.k} dobras)...")
+
+    medicao = avaliar_no_teste_retido(
+        dev_textos, dev_rotulos, teste_textos, teste_rotulos, k=args.k
+    )
+
+    destino = args.salvar or (garantir_dir_de_resultados() / "metricas_teste_retido.md")
+    linhas = _relatorio_do_retido(medicao, len(dev_textos), len(teste_textos))
+    destino.write_text("\n".join(linhas) + "\n", encoding="utf-8")
+
+    print(f"\nLimiar congelado do desenvolvimento: {medicao.limiar:.2f}")
+    print(f"No retido: {medicao.no_retido.descrever()}")
+    print(f"\nRelatório salvo em {destino}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Mede as três métricas do RNF03.")
     parser.add_argument("--dataset", type=Path, default=DATASET_PADRAO)
@@ -342,7 +479,15 @@ def main(argv: list[str] | None = None) -> int:
                         help="pula a curva de aprendizado, que é a parte demorada")
     parser.add_argument("--salvar", type=Path, default=None,
                         help="destino do relatório (padrão: resultados/metricas_rnf03.md)")
+    parser.add_argument("--teste", action="store_true",
+                        help="mede uma vez no conjunto retido, com o limiar calibrado "
+                             "no desenvolvimento")
+    parser.add_argument("--teste-retido", type=Path, default=DATASET_TESTE,
+                        help="arquivo do conjunto retido")
     args = parser.parse_args(argv)
+
+    if args.teste:
+        return _medir_no_retido(args)
 
     textos, rotulos = carregar_dataset(args.dataset)
     print(f"Dataset: {args.dataset}  ({len(textos)} exemplos, {len(set(rotulos))} classes)")

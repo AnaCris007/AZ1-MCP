@@ -5,6 +5,7 @@ import os
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import Protocol
 
 from google import genai
 from google.genai import errors, types
@@ -112,6 +113,22 @@ def _formatar_trecho(numero: int, resultado: ResultadoBusca) -> str:
     return " — ".join(partes) + f"\n{resultado.texto}"
 
 
+# O contrato do buscador, agora que ele aceita foco.
+#
+# Devolve (trechos, focou). O segundo elemento existe para que "a sugestão da
+# classificação valeu" seja observável — sem ele a decisão sumiria do log e da
+# auditoria, e ninguém saberia se o filtro ajudou ou foi ignorado.
+class BuscadorDeContexto(Protocol):
+    def __call__(
+        self,
+        query: str,
+        *,
+        tipo_documento: str | None = None,
+        projeto_codigo: str | None = None,
+        score_minimo: float = 0.0,
+    ) -> tuple[Sequence[ResultadoBusca], bool]: ...
+
+
 class _Situacao(Enum):
     """Em que pé a recuperação ficou, antes de decidir se chama o modelo."""
 
@@ -168,7 +185,7 @@ class GeminiChatModel:
         client: genai.Client,
         model: str,
         *,
-        buscar_contexto: Callable[[str], Sequence[ResultadoBusca]] | None = None,
+        buscar_contexto: BuscadorDeContexto | None = None,
         carregar_historico: Callable[[str], Sequence[tuple[str, str]]] | None = None,
     ) -> None:
         self._client = client
@@ -186,7 +203,7 @@ class GeminiChatModel:
         cls,
         settings: GeminiSettings,
         *,
-        buscar_contexto: Callable[[str], Sequence[ResultadoBusca]] | None = None,
+        buscar_contexto: BuscadorDeContexto | None = None,
         carregar_historico: Callable[[str], Sequence[tuple[str, str]]] | None = None,
     ) -> GeminiChatModel:
         return cls(
@@ -197,11 +214,18 @@ class GeminiChatModel:
         )
 
     def generate_reply(
-        self, message: str, *, conversation_id: str | None = None
+        self,
+        message: str,
+        *,
+        conversation_id: str | None = None,
+        tipo_documento: str | None = None,
+        projeto_codigo: str | None = None,
     ) -> RespostaGerada:
         historico = self._historico_de(conversation_id)
 
-        texto_enviado, fontes, situacao = self._preparar(message)
+        texto_enviado, fontes, situacao = self._preparar(
+            message, tipo_documento=tipo_documento, projeto_codigo=projeto_codigo
+        )
 
         # As duas situações abaixo devolvem resposta canônica SEM chamar o
         # modelo. Mandar a pergunta crua nesses casos é o que produzia respostas
@@ -270,7 +294,13 @@ class GeminiChatModel:
             for papel, texto in turnos
         ]
 
-    def _preparar(self, message: str) -> tuple[str, tuple[ResultadoBusca, ...], _Situacao]:
+    def _preparar(
+        self,
+        message: str,
+        *,
+        tipo_documento: str | None = None,
+        projeto_codigo: str | None = None,
+    ) -> tuple[str, tuple[ResultadoBusca, ...], _Situacao]:
         """Decide o que enviar ao modelo, e se vale enviar alguma coisa.
 
         Sem buscador injetado, o comportamento é o de antes: pergunta crua, sem
@@ -281,7 +311,22 @@ class GeminiChatModel:
             return message, (), _Situacao.SEM_BUSCA
 
         try:
-            resultados = list(self._buscar_contexto(message))
+            # A classificação SUGERE onde procurar; o buscador recua para a
+            # busca ampla se o filtro não sustentar nada acima do corte. Um
+            # rótulo errado custa uma consulta vetorial, e não uma resposta
+            # pior — ver `rag.retriever.buscar_com_recuo`.
+            resultados, focou = self._buscar_contexto(
+                message,
+                tipo_documento=tipo_documento,
+                projeto_codigo=projeto_codigo,
+                score_minimo=SCORE_MINIMO_CONTEXTO,
+            )
+            resultados = list(resultados)
+            if focou:
+                logger.info(
+                    "Busca focada valeu (tipo=%s, projeto=%s).",
+                    tipo_documento, projeto_codigo,
+                )
         except Exception:
             # Antes isto respondia sem contexto, o que deixava o modelo preencher
             # a lacuna. Indisponibilidade da base agora é dita, não disfarçada.

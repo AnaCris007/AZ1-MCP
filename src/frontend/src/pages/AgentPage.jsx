@@ -345,6 +345,7 @@ export default function AgentPage() {
           activeId={visibleActiveId}
           onSelectConversation={handleSelectConversation}
           onNewConversation={handleNewConversation}
+          onConfig={() => setSettingsOpen(true)}
         />
       </div>
 
@@ -363,6 +364,10 @@ export default function AgentPage() {
               handleNewConversation()
               setMobileSidebarOpen(false)
             }}
+            onConfig={() => {
+              setSettingsOpen(true)
+              setMobileSidebarOpen(false)
+            }}
           />
         </div>
       )}
@@ -371,7 +376,6 @@ export default function AgentPage() {
         <TopBar
           title="AZ1"
           onNewChat={handleNewConversation}
-          onConfig={() => setSettingsOpen(true)}
           onShare={handleShare}
           shareCopied={shareCopied}
           theme={theme}
@@ -455,7 +459,8 @@ export default function AgentPage() {
           ) : (
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto bg-background/90 px-4 pt-6"
+              data-testid="conversation-scroll"
+              className="flex-1 overflow-y-auto bg-background/30 px-4 pt-6"
             >
               <div className="mx-auto flex w-full max-w-[720px] flex-col">
                 <AnimatePresence initial={false}>
@@ -485,7 +490,7 @@ export default function AgentPage() {
 
           {activeTab === 'chat' && (
             <div
-              className={`shrink-0 px-4 pb-6 pt-3 ${hasStarted ? 'bg-background/90' : ''}`}
+                className={`shrink-0 px-4 pb-6 pt-3 ${hasStarted ? 'bg-background/30' : ''}`}
             >
               <PromptBar
                 value={inputValue}

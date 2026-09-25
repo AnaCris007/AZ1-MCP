@@ -34,6 +34,7 @@ set -a && source ../../.env && set +a
 psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 01_create_database.sql
 psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 02_initial_data.sql
 psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 03_rls_policies.sql
+psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 07_evento_local.sql
 psql "$SUPABASE_DB_URL" -X -f 04_verificacao.sql   # sem ON_ERROR_STOP: ver abaixo
 ```
 
@@ -43,6 +44,7 @@ psql "$SUPABASE_DB_URL" -X -f 04_verificacao.sql   # sem ON_ERROR_STOP: ver abai
 | `02_initial_data.sql` | Carga da base sintética. Reexecutável: limpa antes de inserir |
 | `03_rls_policies.sql` | Papel da aplicação, ponte com o SSO e Row Level Security |
 | `04_verificacao.sql` | Exercita o caminho de escrita e prova que o banco recusa dado incoerente. Termina em `ROLLBACK` |
+| `07_evento_local.sql` | Migração idempotente dos compromissos próprios da Agenda para bancos existentes |
 
 Fora desta pasta, `scripts/verificar_modelo_documentado.py` confere se a Seção 3.6.6 do `docs/Projeto.md`, o `01_create_database.sql` e o banco em execução descrevem o mesmo modelo.
 
@@ -87,8 +89,13 @@ portfolio ──< projeto ──< artefato ──< campo_artefato
                  │  └──< pendencia
                  │
      usuario ────┴──< usuario_projeto
+         └──────────< evento_local
                       projeto_relacionado (projeto ↔ projeto)
 ```
+
+Em bases novas, `evento_local` já nasce pelo `01_create_database.sql`. A
+migração 07 existe para volumes e ambientes persistentes anteriores a essa
+tabela e deve ser aplicada antes do deploy da API que permite criar eventos.
 
 `usuario` traz a coluna `auth_user_id`, hoje nula. É por ali que a frente de
 autenticação vai amarrar cada pessoa à sua conta de SSO — ver

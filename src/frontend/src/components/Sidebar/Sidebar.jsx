@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { PanelLeftClose, PanelLeftOpen, Plus, Search, X } from 'lucide-react'
+import { PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import Logo from '../Logo/Logo'
 
@@ -10,6 +10,7 @@ export default function Sidebar({
   activeId,
   onSelectConversation,
   onNewConversation,
+  onConfig,
 }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -130,6 +131,17 @@ export default function Sidebar({
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="mt-3 border-t border-border-soft pt-3">
+          <button
+            type="button"
+            onClick={onConfig}
+            className="flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-left text-[13px] font-medium text-text-secondary transition-colors hover:bg-black/[0.04] hover:text-text-primary dark:hover:bg-white/5"
+          >
+            <Settings size={15} strokeWidth={1.75} />
+            Configurações
+          </button>
         </div>
       </div>
     </motion.aside>
