@@ -32,6 +32,9 @@
   <path class="line" d="M230,450 L230,500"/>
   <text class="card" x="238" y="466">1</text>
   <text class="card" x="238" y="492">N</text>
+  <path class="line" d="M230,250 L230,60 L1280,60 L1280,584 L1260,584"/>
+  <text class="card" x="238" y="242">1</text>
+  <text class="card" x="1268" y="577">N</text>
   <path class="line" d="M490,430 L455,430 L455,545 L400,545"/>
   <text class="card" x="474" y="423">1</text>
   <text class="card" x="412" y="538">N</text>
@@ -200,6 +203,25 @@
   <text class="typ" x="1248" y="468">BOOLEAN</text>
   <text class="col" x="970" y="490">preenchido  (gerada)</text>
   <text class="typ" x="1248" y="490">BOOLEAN</text>
+  <rect class="ent" x="920" y="514" width="340" height="116"/>
+  <rect class="hdr" x="920" y="514" width="340" height="34"/>
+  <text class="tit" x="1090" y="537">evento_local</text>
+  <text class="tag" x="932" y="564">PK</text>
+  <text class="colpk" x="960" y="564">id</text>
+  <text class="typ" x="1075" y="564">INTEGER</text>
+  <text class="col" x="1095" y="564">hora</text>
+  <text class="typ" x="1248" y="564">TIME</text>
+  <text class="tag" x="932" y="584">FK</text>
+  <text class="colfk" x="960" y="584">usuario_id</text>
+  <text class="typ" x="1075" y="584">INTEGER</text>
+  <text class="col" x="1095" y="584">descricao</text>
+  <text class="typ" x="1248" y="584">TEXT</text>
+  <text class="col" x="960" y="604">titulo</text>
+  <text class="typ" x="1075" y="604">TEXT</text>
+  <text class="col" x="1095" y="604">criado_em</text>
+  <text class="typ" x="1248" y="604">TIMESTAMPTZ</text>
+  <text class="col" x="960" y="624">data</text>
+  <text class="typ" x="1075" y="624">DATE</text>
   <rect class="ent" x="1350" y="80" width="340" height="288"/>
   <rect class="hdr" x="1350" y="80" width="340" height="34"/>
   <text class="tit" x="1520" y="103">pendencia</text>

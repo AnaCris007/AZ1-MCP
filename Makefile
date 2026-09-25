@@ -33,6 +33,7 @@ export AZ1_BUILD_DATE := $(BUILD_DATE)
 .PHONY: help build up down restart logs logs-worker logs-rabbit rabbitmq-ui ps sh \
 	    drive-abrir restart-worker \
 	    test lint train experiment bancada metricas \
+	    particionar metricas-teste comparativo \
 	    prod-build prod-up prod-down prod-logs bake release clean nuke scan size
 
 help:  ## Lista os alvos disponíveis
@@ -100,14 +101,30 @@ lint:  ## Roda o ruff no código Python
 train:  ## Retreina o classificador e grava em ./resultados
 	$(COMPOSE) --profile ml run --rm trainer
 
-experiment:  ## Roda a varredura de pré-processamento e vetorização
-	$(COMPOSE) --profile ml run --rm trainer python -m pln.experimento
+# REGUA escolhe o instrumento de medida da varredura. Cada família precisa da
+# dela: herdar o ranking de outra favorece quem o produziu. Ver Seção 3.3.7.
+#   make experiment                      -> multinomialnb (padrão, ~20 min)
+#   make experiment REGUA=linearsvc      -> ~15 min
+#   make experiment REGUA=logisticregression -> ~2h30
+REGUA ?= multinomialnb
+
+experiment:  ## Varre pré-processamento e vetorização (use REGUA=<familia>)
+	$(COMPOSE) --profile ml run --rm trainer python -m pln.experimento --regua $(REGUA)
 
 bancada:  ## Mede latência, tempo de treino e pico de memória (RNF01 e RNF10)
 	$(COMPOSE) --profile ml run --rm trainer python -m pln.bancada
 
 metricas:  ## Mede F1, cobertura e aceitação indevida, e a curva do limiar (RNF03)
 	$(COMPOSE) --profile ml run --rm trainer python -m pln.metricas
+
+particionar:  ## Separa o pool em desenvolvimento e teste retido
+	$(COMPOSE) --profile ml run --rm trainer python -m pln.particao
+
+metricas-teste:  ## Mede o RNF03 UMA VEZ no teste retido, com o limiar do desenvolvimento
+	$(COMPOSE) --profile ml run --rm trainer python -m pln.metricas --teste
+
+comparativo:  ## Compara 4 famílias, cada uma no melhor texto dela, e confirma no retido
+	$(COMPOSE) --profile ml run --rm trainer python -m pln.comparativo_modelos --confirmar-no-retido
 
 # --- Produção ----------------------------------------------------------------
 

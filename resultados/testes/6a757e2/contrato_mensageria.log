@@ -1,0 +1,19 @@
+test_confirmacao_remove_e_recusa_devolve_a_mensagem (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_confirmacao_remove_e_recusa_devolve_a_mensagem)
+Confirmada não volta; recusada volta para a fila. ... ok
+test_consumidor_nao_depende_de_ordem_global (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_consumidor_nao_depende_de_ordem_global)
+Publicadas fora de ordem, todas são processadas corretamente. ... ok
+test_consumo_duplicado_produz_efeito_unico (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_consumo_duplicado_produz_efeito_unico)
+A mesma mensagem processada duas vezes aplica o efeito uma vez. ... ok
+test_falha_persistente_vai_para_dead_letter (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_falha_persistente_vai_para_dead_letter)
+Contador cresce a cada reentrega; no limite, a mensagem é isolada. ... ok
+test_indisponibilidade_na_publicacao_e_reportada (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_indisponibilidade_na_publicacao_e_reportada)
+Barramento fora do ar: erro explícito ao produtor, sem perda silenciosa. ... ok
+test_payload_indesserializavel_vai_direto_para_dead_letter (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_payload_indesserializavel_vai_direto_para_dead_letter)
+A segunda causa de TI-43: sem reentrega, porque não há o que tentar. ... ok
+test_publica_e_consome_o_envelope_integro (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_publica_e_consome_o_envelope_integro)
+Os seis campos do envelope chegam ao consumidor preservados. ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+OK

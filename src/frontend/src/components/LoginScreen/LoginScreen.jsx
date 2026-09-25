@@ -17,8 +17,12 @@ export default function LoginScreen() {
       await signInWithMicrosoft()
       // Em caso de sucesso o navegador é redirecionado para fora desta
       // página; não há um estado de "concluído" para exibir aqui.
-    } catch {
-      setError('Não foi possível iniciar o login. Tente novamente em instantes.')
+    } catch (loginError) {
+      setError(
+        loginError?.message === 'Autenticação Microsoft não configurada neste ambiente.'
+          ? 'O login Microsoft ainda não foi configurado. Adicione SUPABASE_URL e SUPABASE_ANON_KEY no arquivo .env.'
+          : 'Não foi possível iniciar o login. Tente novamente em instantes.',
+      )
       setLoading(false)
     }
   }

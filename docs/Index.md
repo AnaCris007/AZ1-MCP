@@ -24,6 +24,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | Os riscos do projeto, na identificação inicial | [Projeto.md, Matriz de Risco](./Projeto.md#19-matriz-de-risco-do-projeto) |
 | Os riscos atualizados e seu histórico por sprint | [GestaoProjeto.md, Matriz de Risco do Projeto](./GestaoProjeto.md#53-matriz-de-risco-do-projeto) |
 | As APIs de voz, com endpoints, limites e exemplos | [Projeto.md, API de Speech to Text e Text to Speech](./Projeto.md#32-api-de-speech-to-text-e-text-to-speech) |
+| Como funciona a chamada contínua por voz | [Projeto.md, Chamada de Voz Contínua](./Projeto.md#53-chamada-de-voz-contínua) |
 | O contrato da API de recebimento de áudios | [Projeto.md, API para Recebimento de Áudios](./Projeto.md#34-api-para-recebimento-de-áudios) |
 | A pilha de tecnologias e as razões de cada escolha | [Projeto.md, Pilha de Tecnologias](./Projeto.md#35-pilha-de-tecnologias) |
 | Os modelos conceitual, lógico e físico dos dados | [Projeto.md, Modelagem Conceitual e Lógica dos Dados](./Projeto.md#36-modelagem-conceitual-e-lógica-dos-dados) |
@@ -37,6 +38,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | Os diagramas de classes, de componentes e de sequência | [Projeto.md, Projeto Técnico e Arquitetural](./Projeto.md#39-projeto-técnico-e-arquitetural) |
 | O algoritmo de PLN, como ele foi escolhido e como rodá-lo | [Projeto.md, Algoritmo de NLP e Implementação](./Projeto.md#33-algoritmo-de-nlp-e-implementação) |
 | Como os protótipos foram construídos e executados | [Projeto.md, Prototipação Exploratória](./Projeto.md#4-prototipação-exploratória-design-e-ux) |
+| Os testes funcionais executados, resultados, defeitos e limites da liberação | [Projeto.md, Execução dos testes sistêmicos](./Projeto.md#67-execução-dos-testes-sistêmicos--campanha-funcional-da-sprint-4) |
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
 | Os papéis de cada integrante e a evidência da rotação | [GestaoProjeto.md, Matriz de Papéis da Sprint 2](./GestaoProjeto.md#44-matriz-de-papéis-e-responsabilidades-da-sprint-2) |
 | O planejamento da Sprint 3, com estimativas, DoR e DoD | [GestaoProjeto.md, Planejamento da Sprint 3](./GestaoProjeto.md#47-planejamento-da-sprint-3) |

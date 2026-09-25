@@ -53,6 +53,7 @@ dependencies = [
     "openpyxl>=3.1",
     "pika==1.4.4",
     "psycopg[binary,pool]>=3.2",
+    "psycopg2-binary>=2.9",
     "pydantic>=2",
     "pyjwt[crypto]>=2.10",
     "pyyaml>=6.0",
@@ -61,15 +62,23 @@ dependencies = [
     "python-multipart>=0.0.12",
     "scikit-learn==1.9.0",
     "spacy==3.8.16",
-    "sqlalchemy>=2.0",
+    "sqlalchemy>=2.0,<2.2",
     "uvicorn[standard]>=0.30",
-    "vecs>=0.4",
+    "vecs>=0.4,<0.5",
 ]
 
 [project.optional-dependencies]
 # Ferramentas de desenvolvimento, não necessárias para executar o agente.
 dev = [
     "ruff==0.16.2",
+    # Gravação e reprodução das interações externas na suíte de integração
+    # (módulo VHS, `tests/vhs/`). Versão resolvida e fixada conforme o item 1
+    # do contrato da Seção 6.4.3: o replay é comparação byte a byte com o que
+    # ficou no arquivo, e um piso deixaria o serializador mudar de formato em
+    # um rebuild, invalidando as gravações sem que ninguém tivesse tocado nelas.
+    #
+    # Não entra em requirements.txt: a imagem de produção não reproduz fita.
+    "vcrpy==8.3.0",
 ]
 
 # Os pacotes de topo do projeto. Precisam ser listados explicitamente

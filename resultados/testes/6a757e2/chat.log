@@ -1,0 +1,148 @@
+test_429_do_provedor_nao_vira_429_publico (tests.test_integracao_chat.TestChatIntegracao.test_429_do_provedor_nao_vira_429_publico)
+A tradução do limite excedido, separada por ser fácil de errar. ... /home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+ok
+test_mensagem_acima_do_limite_nao_aciona_o_provedor (tests.test_integracao_chat.TestChatIntegracao.test_mensagem_acima_do_limite_nao_aciona_o_provedor)
+Acima de 4000 caracteres, a recusa vem antes da chamada. ... ok
+test_mensagem_no_limite_exato_e_aceita (tests.test_integracao_chat.TestChatIntegracao.test_mensagem_no_limite_exato_e_aceita)
+A fronteira do limite: 4000 passam, 4001 não. Complementa TI-22. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_mensagem_vazia_nao_aciona_o_provedor (tests.test_integracao_chat.TestChatIntegracao.test_mensagem_vazia_nao_aciona_o_provedor)
+Vazia e só-espaços param no serviço, sem chamada externa. ... ok
+test_resposta_gerada_pelo_provedor (tests.test_integracao_chat.TestChatIntegracao.test_resposta_gerada_pelo_provedor)
+Mensagem típica atravessa até `reply`, com a resposta real gravada. ... Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_variantes_de_falha_e_resposta_vazia (tests.test_integracao_chat.TestChatIntegracao.test_variantes_de_falha_e_resposta_vazia)
+Cada variante isolada, com o status que o contrato de hoje produz. ... Erro não tratado ao processar POST /api/v1/chat
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/chat.py", line 276, in send_chat_message
+    reply = answerer.answer(payload.message, payload.conversation_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/services/chat_service.py", line 77, in answer
+    resposta = self._model.generate_reply(trimmed, conversation_id=conversation_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/services/gemini_service.py", line 217, in generate_reply
+    response = self._client.models.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/tests/test_integracao_chat.py", line 85, in generate_content
+    raise self._erro
+RuntimeError: falha inesperada (simulada)
+Erro não tratado ao processar POST /api/v1/chat
+Traceback (most recent call last):
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2641, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1033, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/chat.py", line 287, in send_chat_message
+    fontes = fontes_citadas(reply.text, reply.fontes)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/inteli/Documentos/g01/src/routes/chat.py", line 76, in fontes_citadas
+    for grupo in _CITACAO.findall(texto)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: expected string or bytes-like object, got 'NoneType'
+Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.257s
+
+OK
