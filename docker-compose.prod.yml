@@ -87,6 +87,55 @@ services:
         reservations:
           memory: 32M
 
+  rabbitmq:
+    restart: always
+
+    # Credenciais padrão (az1/az1) são aceitáveis em desenvolvimento e
+    # inaceitáveis aqui. Sem as variáveis definidas no ambiente, a subida FALHA
+    # — em vez de subir com um broker de credencial conhecida. Mesma trava
+    # ${VAR:?...} do MinIO abaixo.
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:?defina RABBITMQ_DEFAULT_USER no .env de produção}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?defina RABBITMQ_DEFAULT_PASS no .env de produção}
+
+    # A porta de management (15672) NÃO é publicada em produção — o override de
+    # desenvolvimento é quem a publica, e ele não é carregado aqui. A operação é
+    # por rabbitmqctl/rabbitmq-diagnostics dentro do contêiner.
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768M
+        reservations:
+          memory: 256M
+
+  worker:
+    restart: always
+
+    # INDEXAÇÃO REAL FICA DESLIGADA EM PRODUÇÃO, DE PROPÓSITO. A base monta o token
+    # por `${GOOGLE_TOKEN_FILE:-/dev/null}`; produção NÃO define GOOGLE_TOKEN_FILE,
+    # então o default `/dev/null` prevalece e `_indexacao_disponivel` cai no stub
+    # `VarreduraDeConexao` (fecha delta sem baixar). Isso é deliberado: o modelo de
+    # auth atual é OAuth de "Desktop app" com refresh_token montado do host —
+    # single-tenant, operado à mão, adequado para PoC/demo, NÃO para um serviço de
+    # produção multiusuário. Habilitar indexação real em produção exigiria uma
+    # Google Service Account (ou OAuth server-side com consentimento por usuário) e
+    # um cofre de segredos — fora do escopo desta entrega. Não aponte
+    # GOOGLE_TOKEN_FILE em produção sem antes trocar o modelo de auth.
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL:?defina RABBITMQ_URL no .env de produção}
+
+    deploy:
+      resources:
+        limits:
+          # O consumidor é leve — uma mensagem por vez, uma varredura por
+          # mensagem —, então o teto é modesto de propósito.
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          memory: 64M
+
   minio:
     restart: always
 
