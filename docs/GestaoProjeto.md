@@ -17,7 +17,6 @@
 - [Tobias Viana](https://www.linkedin.com/in/tobias-viana/)
 ---
 
-
 # Gestão do Projeto
 
 ## Sumário
@@ -347,7 +346,6 @@ O quadro reúne, em uma leitura só, as políticas descritas nas seções anteri
 
 ## 2.3 Acompanhamento Contínuo dos Riscos
 
-
  A matriz de riscos registrada no artefato de negócios é revisitada a cada sprint, de modo que o grupo mantenha uma visão atualizada das ameaças e oportunidades ao longo de todo o módulo. A revisão não ocorre apenas na entrega final: ela é um item fixo da retrospectiva de cada sprint, garantindo que riscos materializados sejam tratados e que novos riscos identificados ao longo do desenvolvimento sejam incorporados. A tabela a seguir define o mecanismo de acompanhamento adotado pela equipe:
 
 | Elemento | Definição da equipe |
@@ -376,7 +374,6 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 | Entregas planejadas | Artefato de entendimento de negócio (Projeto.md, parte de negócios), artefato de especificação técnica (Projeto.md, parte técnica) e artefato de gestão do projeto (GestaoProjeto.md) |
 | Entregas concluídas | Artefato de entendimento de negócio, artefato de especificação técnica e artefato de gestão do projeto |
 | Resultado geral | Sprint concluída com todas as entregas planejadas realizadas. A equipe demonstrou boa organização e comunicação ao longo do ciclo, com pontos de melhoria identificados para a Sprint 2 |
-
 
 ### 3.2.2 Pontos fortes
 
@@ -1329,7 +1326,6 @@ O registro original possuía campos de responsável e revisor ainda vazios. Esse
 | Rui Facó | Definição do MVP e tecnologias | Pilha de tecnologias e contratos de entrada | Testes não funcionais e Gestão de Projetos Evolutiva | Frontend integrado | Estruturou a documentação (`!59`), planejou RNFs (`!63`), produziu a análise e a matriz de papéis (`!72`) e corrigiu a integração e a documentação na auditoria final (`!81`) | `!64`, `!67` e `!80` | Rotação para gestão e qualidade; revisão planejada do frontend cumprida e apoios adicionais em webhooks e banco |
 | Tobias Viana | Modelagem do fluxo de negócio | Processo de deploy em nuvem | Implementação e integração do algoritmo de NLP | Webhooks | Implementou Docker/CI (`!65`), melhorou, mediu e documentou o PLN (`!69`), integrou o banco relacional (`!80`) e colaborou na integração final do algoritmo com o frontend no MR `!81` | `!73`, `!78` e `!81` | Responsabilidade principal de PLN cumprida; também ampliou a atuação para banco e revisou webhooks e a auditoria final |
 
-
 **Reconciliação das frentes definidas no início da sprint**
 
 | Frente da Planning | Responsável/revisor inicialmente registrados | Responsável/revisor efetivos | Resultado da comparação |
@@ -1881,7 +1877,7 @@ As premissas abaixo antecedem todas as tabelas e devem ser lidas junto com elas,
 
 | # | Premissa | Justificativa |
 |---|---|---|
-| P1 | Contratação por escopo e preço fechados, e não por alocação de equipe por tempo | O enunciado pede o preço de entrega da solução, o que caracteriza contrato de resultado |
+| P1 | Contratação por escopo e preço fechados, e não por alocação de equipe por tempo | Como fornecedor entrante e sem capital para manter equipe alocada por prazo indeterminado, o preço fechado por escopo dá previsibilidade de caixa e concentra o risco de prazo na própria gestão da empresa |
 | P2 | Os sete integrantes são sócios da empresa, remunerados por pró-labore, com recolhimento previdenciário declarado em eSocial e DCTFWeb | Coerente com a hipótese de que a própria equipe constitui a empresa fornecedora, e necessária para que essa remuneração componha a folha de salários utilizada no Fator R da Seção 6.8.5 |
 | P3 | Jornada integral equivalente a 160 horas mensais | Converte o salário mensal de referência em valor-hora |
 | P4 | Prazo comercial proposto de dez semanas, equivalentes a 2,5 meses | Dimensionado pela capacidade da equipe frente ao escopo da Seção 6.8.1 |
@@ -1933,7 +1929,7 @@ O critério de valor de referência é único para todas as funções, adotando 
 | UX e design conversacional | 224 | R$ 4.833 | R$ 30,21 | R$ 6.766,20 | Glassdoor, UX Designer Pleno, 25º percentil, 614 salários |
 | **Total** | **2.800** | | | **R$ 183.699,95** | |
 
-**Salário de mercado como referência para o pró-labore.** Embora a remuneração dos integrantes seja modelada como pró-labore de sócios, conforme a premissa P2, as faixas salariais são utilizadas como referência de mercado para estimar o valor econômico das competências empregadas, o que é a prática usual quando se precifica o trabalho de sócios que atuam tecnicamente na operação. O valor de R$ 183.699,95 representa o montante agregado de pró-labore atribuído aos sete sócios ao longo dos 2,5 meses, o que corresponde a uma média de R$ 10.497,14 mensais por integrante, e não a oito remunerações distintas.
+**Salário de mercado como referência para o pró-labore.** Embora a remuneração dos integrantes seja modelada como pró-labore de sócios, conforme a premissa P2, as faixas salariais são utilizadas como referência de mercado para estimar o valor econômico das competências empregadas, o que é a prática usual quando se precifica o trabalho de sócios que atuam tecnicamente na operação. O valor de R$ 183.699,95 representa o montante agregado de pró-labore atribuído aos sete sócios ao longo dos 2,5 meses, o que corresponde a uma média de R$ 10.497,14 mensais por integrante, e não a oito remunerações distintas. Como os integrantes rotacionam entre funções a cada sprint, o pró-labore é distribuído igualmente entre os sete sócios — a média mensal acima —, e não conforme a função exercida no momento: as faixas por função servem apenas para atribuir valor de mercado ao esforço total da equipe, não como salário individual por cargo.
 
 **Por que duas funções não entram em faixa júnior.** Arquiteto de soluções e analista de DevOps são orçados no percentil inferior da faixa plena porque o guia não publica faixa júnior para esses cargos, o que não é lacuna da fonte e sim característica da função. O que se precifica é a competência que a entrega exige, e não o tempo de carreira de quem a executa, de modo que cobrar arquitetura a preço de júnior significaria subprecificar justamente a decisão mais difícil da solução, que foi separar a classificação local do acionamento do modelo de linguagem externo.
 
@@ -1986,7 +1982,7 @@ O regime simulado é o Simples Nacional, com tributação pelo Anexo III, o que 
 
 O ponto sensível está na composição da FS12. Ela reúne as remunerações pagas a empregados e a trabalhadores avulsos, as remunerações pagas a contribuintes individuais, o que abrange o pró-labore dos sócios e os pagamentos a autônomos, o décimo terceiro salário, a contribuição patronal previdenciária efetivamente recolhida, inclusive a já embutida no DAS, e o FGTS recolhido. Pagamentos feitos a outras pessoas jurídicas, incluindo microempreendedores individuais, **não** compõem a folha de quem contrata, e apenas remunerações informadas em GFIP e no eSocial ou DCTFWeb são consideradas.
 
-É por essa razão que a premissa P2 modela os integrantes como sócios remunerados por pró-labore, e não como prestadores pessoa jurídica. Sob a premissa adotada, a remuneração de R$ 183.699,95 compõe integralmente a FS12, o que resulta em Fator R de 67,17% sobre o preço final, muito acima do limite de 28%, e o enquadramento no Anexo III deixa de ser escolha e passa a ser consequência verificável da estrutura da operação. A premissa também não altera o custo apurado na Seção 6.8.3.2, porque em empresa do Anexo III a contribuição patronal previdenciária já está incluída no DAS, e a contribuição previdenciária de 11% incidente sobre o pró-labore é retida do sócio, reduzindo o valor líquido que ele recebe, sem acrescentar encargo ao empregador.
+É por essa razão que a premissa P2 modela os integrantes como sócios remunerados por pró-labore, e não como prestadores pessoa jurídica. Sob a premissa adotada, a remuneração de R$ 183.699,95 compõe integralmente a FS12, o que resulta em Fator R de 67,17%, muito acima do limite de 28%. No início de atividade a proporcionalização incide igualmente sobre a FS12 e sobre a receita bruta, de modo que a razão entre elas não se altera e os 67,17% permanecem válidos qualquer que seja a base — a receita real ou a proporcionalizada usada para determinar a faixa. Assim, o enquadramento no Anexo III deixa de ser escolha e passa a ser consequência verificável da estrutura da operação. A premissa também não altera o custo apurado na Seção 6.8.3.2, porque em empresa do Anexo III a contribuição patronal previdenciária já está incluída no DAS, e a contribuição previdenciária de 11% incidente sobre o pró-labore é retida do sócio, reduzindo o valor líquido que ele recebe, sem acrescentar encargo ao empregador.
 
 **Cenário alternativo, caso a contratação fosse por pessoa jurídica.** Se os sete integrantes fossem contratados como prestadores pessoa jurídica, a FS12 seria praticamente nula, o Fator R não alcançaria os 28% e a empresa seria tributada pelo Anexo V, com alíquotas substancialmente superiores.
 
@@ -1997,7 +1993,7 @@ O ponto sensível está na composição da FS12. Ela reúne as remunerações pa
 
 Entre as variáveis explicitamente simuladas nesta análise, a forma de contratação apresenta o segundo maior impacto sobre o preço final, com 8,2%, atrás apenas do perfil de senioridade tratado na Seção 6.8.9.
 
-**Determinação da faixa e efeito do cronograma de faturamento.** A alíquota efetiva de cada faixa é calculada pela fórmula da Resolução CGSN nº 140/2018, subtraindo a parcela a deduzir do produto entre a receita bruta acumulada e a alíquota nominal, e dividindo o resultado pela mesma receita. Nos primeiros doze meses de atividade, o enquadramento não usa a receita acumulada real, e sim uma receita proporcionalizada, calculada no primeiro mês pela multiplicação da receita daquele mês por doze, e nos meses seguintes pela média aritmética dos meses anteriores multiplicada por doze. Sob o cronograma de pagamento da Seção 6.8.7 e o regime de competência da premissa P10, a receita proporcionalizada situa a empresa na terceira faixa do Anexo III, cuja alíquota nominal é de 13,5% com parcela a deduzir de R$ 17.640, resultando na alíquota efetiva média de 12,076% aplicada ao contrato.
+**Determinação da faixa e efeito do cronograma de faturamento.** A alíquota efetiva de cada faixa é calculada pela fórmula da Resolução CGSN nº 140/2018, subtraindo a parcela a deduzir do produto entre a receita bruta acumulada e a alíquota nominal, e dividindo o resultado pela mesma receita. Nos primeiros doze meses de atividade, o enquadramento não usa a receita acumulada real, e sim uma receita proporcionalizada, calculada no primeiro mês pela multiplicação da receita daquele mês por doze, e nos meses seguintes pela média aritmética dos meses anteriores multiplicada por doze. Sob o cronograma de pagamento da Seção 6.8.7 e o regime de competência da premissa P10, a receita proporcionalizada situa a empresa na quarta faixa do Anexo III, cuja alíquota nominal é de 16% com parcela a deduzir de R$ 35.640, resultando na alíquota efetiva média de 12,076% aplicada ao contrato.
 
 Cabe registrar que a FS12 é apurada pelo regime de caixa, contando o que foi efetivamente pago, enquanto a receita bruta acumulada é apurada por competência, de modo que os dois lados do Fator R seguem regimes distintos por determinação legal.
 
@@ -2157,19 +2153,14 @@ A sustentação é proposta em separado do preço do projeto, conforme a premiss
 | Sustentação técnica, 24 horas mensais | R$ 1.205,00 | R$ 1.205,00 |
 | Rateio administrativo | R$ 400,00 | R$ 400,00 |
 | Valor sem lucro | R$ 2.790,99 | R$ 2.841,92 |
-| Margem de 15% | R$ 3.209,64 | R$ 3.268,21 |
+| Margem (15%) | R$ 418,65 | R$ 426,29 |
+| Valor com lucro | R$ 3.209,64 | R$ 3.268,21 |
 | **Preço mensal** | **R$ 3.479,77** | **R$ 3.543,33** |
 | **Contrato de doze meses** | **R$ 41.757,23** | **R$ 42.519,96** |
 
 A alíquota aplicada à sustentação é de 7,76%, e não a mesma do projeto, porque o contrato é executado no exercício seguinte, quando a receita bruta acumulada da empresa já reflete o projeto entregue e a apuração deixa de usar a receita proporcionalizada do início de atividade. A diferença entre os dois provedores ao longo de um ano inteiro é de R$ 762,73, o que reforça a conclusão da Seção 6.8.10 de que a decisão de nuvem deve ser tomada por critérios técnicos e de conformidade.
 
-### 6.8.12 Limitações, pendências e fontes
-
-**Limitações declaradas.** Três elementos do orçamento são estimativas da equipe e não possuem fonte externa: a distribuição das 2.800 horas entre as oito funções, a conversão do impacto qualitativo das ameaças em horas de retrabalho, e as quatro linhas de despesa identificadas como arbitramento na Seção 6.8.4. Cada uma está sinalizada no ponto em que aparece. A distribuição de horas entre as funções é uma estimativa fundamentada no escopo comprometido na Seção 6.8.1, e a conversão do impacto das ameaças em horas será revisada pela equipe na Sprint 5.
-
-**Pendências de refinamento.** O dimensionamento dos ambientes deve ser conferido contra a arquitetura efetivamente implantada e validado na calculadora oficial do Azure. As horas de impacto atribuídas a cada ameaça devem ser revisadas pela equipe na Sprint 5.
-
-**Fontes consultadas.**
+### 6.8.12 Fontes consultadas
 
 | Informação | Fonte |
 |---|---|
