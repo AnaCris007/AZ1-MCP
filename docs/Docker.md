@@ -317,6 +317,39 @@ contêiner em produção sem depender da memória de ninguém:
 docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' az1/api:0.2.0
 ```
 
+### Borda HTTPS com Caddy
+
+O login com Microsoft (Supabase Auth com PKCE) e a captura de áudio do
+navegador só funcionam em contexto seguro, então a interface não pode ficar
+exposta em HTTP puro fora de `localhost`. O `docker-compose.https.yml`
+acrescenta um Caddy nas portas 80 e 443: ele emite e renova o certificado do
+Let's Encrypt, redireciona HTTP para HTTPS e encaminha tudo, inclusive o
+WebSocket da chamada de voz, para o nginx do frontend. O nginx deixa de publicar
+porta no host.
+
+Sem domínio próprio, o [sslip.io](https://sslip.io) resolve o nome a partir do
+IP: `54.12.34.56` vira `54-12-34-56.sslip.io`. Associe um Elastic IP à
+instância, se o laboratório permitir; sem ele, o IP muda a cada sessão e, com
+ele, o domínio e as URLs de redirecionamento.
+
+```bash
+# .env do servidor, além das variáveis da Seção 4
+AZ1_DOMAIN=54-12-34-56.sslip.io
+
+export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml:docker-compose.https.yml
+docker compose up -d --build
+docker compose logs -f caddy      # aguarde "certificate obtained successfully"
+```
+
+No painel do Supabase, em *Authentication → URL Configuration*, defina a
+**Site URL** como `https://<AZ1_DOMAIN>` e acrescente `https://<AZ1_DOMAIN>/**`
+às **Redirect URLs**. O aplicativo no Entra ID não muda: o redirecionamento dele
+aponta para o callback do Supabase (`https://<ref>.supabase.co/auth/v1/callback`),
+e não para a interface.
+
+O grupo de segurança precisa das portas 80 e 443 abertas: o Let's Encrypt valida
+o domínio pela 80 antes de emitir o certificado.
+
 ---
 
 ## 9. Banco de dados e permissões dos webhooks
