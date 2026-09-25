@@ -137,7 +137,7 @@
 
 **Estado observado no repositório.** Os tipos com uso registrado no histórico são: `main`, `develop`, `hmg` e as temporárias `feature/`, `feat/`, `docs/` e `fix/`. **Não há registro de uso de `release/*` nem de `hotfix/*`**: os exemplos dessas duas linhas descrevem a política e não constituem evidência de execução, conforme a Seção 5.3. Registra-se também que **o repositório não possui nenhuma tag**, portanto a etiquetagem prevista nas Seções 4.4 e 6.4 não está demonstrada no corte. Ausência de tag atual não prova que uma tag nunca tenha existido.
 
-**Atualização na Sprint 4.** A promoção da Sprint 3 seguiu o fluxo `develop → hmg → main` pelos MRs `!83` e `!84`, concluídos na virada de 11 para 12/09. A proteção das três branches permanentes foi conferida pela API do GitLab em 25/09: `main`, `develop` e `hmg` aceitam push de "No one", de modo que toda entrada ocorre por Merge Request. `release/*` e `hotfix/*` continuam sem uso, porque a condição que as justificaria não ocorreu. A situação da tag está registrada na Seção 7.5.<!-- CONFERIR-SEXTA: se a tag v0.4.0 for criada, atualizar esta frase -->
+**Atualização na Sprint 4.** A promoção da Sprint 3 seguiu o fluxo `develop → hmg → main` pelos MRs `!83` e `!84`, concluídos na virada de 11 para 12/09. A proteção das três branches permanentes foi conferida pela API do GitLab em 25/09: `main`, `develop` e `hmg` aceitam push de "No one", de modo que toda entrada ocorre por Merge Request. `release/*` e `hotfix/*` continuam sem uso, porque a condição que as justificaria não ocorreu. A promoção da Sprint 4 e a tag da versão ocorrem depois da integração do artefato de gestão e não entram no corte da Seção 7.5.
 
  A `hmg` e a `release/*` cumprem papéis distintos e não se substituem. A `hmg` é permanente e concentra a homologação de cada ciclo: é por ela que o conteúdo de promoção regular passa antes de chegar à `main`, com a exceção urgente de hotfix descrita acima. A `release/*` é temporária e existe para estabilizar e etiquetar uma versão específica quando houver ajustes que não devam voltar diretamente para `develop`. Até o momento, a equipe promoveu para `main` exclusivamente pela `hmg`; a `release/*` permanece definida conforme o enunciado do módulo, sem uso registrado no histórico do repositório.
 
@@ -450,48 +450,48 @@ git push -u origin hotfix/corrigir-falha-classificador
 
 ### Conformidade dos commits na Sprint 4
 
-<!-- CONFERIR-SEXTA: recalcular todas as tabelas desta subseção sobre o SHA final -->
-**Método da aferição.** Mesmo método das Sprints 2 e 3: os **35 commits autorais únicos** com data de autoria entre 14/09 e 25/09/2026, alcançáveis a partir de qualquer referência remota, sem commits de merge e sem contar duas vezes o mesmo SHA. A verificação de infinitivo usa a mesma heurística da Seção 6.5 (primeira palavra da descrição terminada em `ar`, `er` ou `ir`).
+**Método da aferição.** Mesmo método das Sprints 2 e 3: os **72 commits autorais únicos** com data de autoria entre 14/09 e 25/09/2026, alcançáveis a partir de qualquer referência remota, sem commits de merge e sem contar duas vezes o mesmo SHA. A verificação de infinitivo usa a mesma heurística da Seção 6.5 (primeira palavra da descrição terminada em `ar`, `er` ou `ir`). Conferência em 25/09/2026, às 17h55 (BRT).
 
 | Regra da Seção 5.2 | Sprint 2 | Sprint 3 | Sprint 4 | Situação na Sprint 4 |
 |---|---:|---:|---:|---|
-| Referência à issue com `#N` | 100,0% | 100,0% | **35 de 35, 100,0%** | Atendida pela terceira sprint seguida |
-| Tipo Conventional Commits válido | 100,0% | 100,0% | **35 de 35, 100,0%** | Atendida |
-| Descrição no infinitivo | 36,2% | 80,4% | **34 de 35, 97,1%** | Um desvio |
-| Primeira linha com até 72 caracteres | 83,0% | 76,1% | **31 de 35, 88,6%** | Quatro desvios |
+| Referência à issue com `#N` | 100,0% | 100,0% | **72 de 72, 100,0%** | Atendida pela terceira sprint seguida |
+| Tipo Conventional Commits válido | 100,0% | 100,0% | **72 de 72, 100,0%** | Atendida |
+| Descrição no infinitivo | 36,2% | 80,4% | **71 de 72, 98,6%** | Um desvio |
+| Primeira linha com até 72 caracteres | 83,0% | 76,1% | **61 de 72, 84,7%** | Onze desvios |
 
-Os desvios de comprimento estão concentrados em mensagens que descrevem mais de uma coisa, como `fix: corrigir subida do ambiente Docker (imagens do MinIO fora do Docker Hub e CRLF do entrypoint) #297`, com 103 caracteres. O desvio de infinitivo é `fix: testes de integração pra passar no pipeline #265`, sem verbo. Há ainda dois casos que a aferição automática não pega, mas a revisão deveria pegar: `feat: corrigir contradição sobre autenticação na Seção 3.4 (#255)` usa o tipo `feat` para uma correção de documentação (o tipo correto seria `docs`), e `docs(testes): consolidar resultados da campanha funcional#262` não tem espaço antes do `#`.
+Os desvios de comprimento estão em mensagens que descrevem mais de uma coisa, como `fix: ajustar scripts e schemas do banco de dados e atualizar documentacao de acordo com a implementacao #242`, com 108 caracteres, ou que citam várias issues, como `docs: corrigir citação de faixa, base do Fator R, margem da sustentação e enxugar 6.8.12 #243 #244   #249`. O desvio de infinitivo é `fix: testes de integração pra passar no pipeline #265`, sem verbo. Há ainda dois casos que a aferição automática não pega, mas a revisão deveria pegar: `feat: corrigir contradição sobre autenticação na Seção 3.4 (#255)` usa o tipo `feat` para uma correção de documentação, e `docs(testes): consolidar resultados da campanha funcional#262` não tem espaço antes do `#`.
 
-A melhora ocorreu **sem** o hook versionado previsto na ação da Seção 5.2.5 do `GestaoProjeto.md`, que não foi implementado. A leitura está na Seção 6.3.5 daquele documento: o hábito melhorou por atenção manual, e o mecanismo continua necessário para sustentar o resultado sob pressão de prazo.
+A melhora ocorreu **sem** o hook versionado previsto na ação da Seção 5.2.5 do `GestaoProjeto.md`: a issue criada para ele (`#253`) foi reaproveitada para outro trabalho em 18/09. O hábito melhorou por atenção manual, e o mecanismo continua necessário para sustentar o resultado sob pressão de prazo.
 
 **Distribuição ao longo da sprint.**
 
 | Dia | Commits | Participação |
 |---|---:|---:|
 | 14/09 a 17/09 | 0 | 0,0% |
-| 18/09 | 4 | 11,4% |
-| 19/09 | 1 | 2,9% |
-| 20/09 | 9 | 25,7% |
-| 21/09 | 4 | 11,4% |
-| 22/09 | 6 | 17,1% |
-| **23/09** | **10** | **28,6%** |
-| 24/09 | 1 | 2,9% |
+| 18/09 | 4 | 5,6% |
+| 19/09 | 1 | 1,4% |
+| 20/09 | 9 | 12,5% |
+| 21/09 | 4 | 5,6% |
+| 22/09 | 9 | 12,5% |
+| 23/09 | 10 | 13,9% |
+| **24/09** | **29** | **40,3%** |
+| 25/09 | 6 | 8,3% |
 
-O teto de 40% por dia foi respeitado, com pico de 28,6%, o menor do módulo (41,5% na Sprint 2 e 35,9% na Sprint 3). O problema mudou de lugar: a Sprint 4 não concentrou o trabalho no fim, mas começou tarde, com os quatro primeiros dias úteis sem commit autoral. É por isso que a ação da Sprint 5 mede o início, e não só o pico.
+A regra **não é atendida**. O pico de 40,3% em 24/09 passa, por pouco, do teto de 40% fixado na Sprint 2, e os quatro primeiros dias úteis ficaram sem nenhum commit autoral. Somados, 24 e 25/09 concentram 48,6% dos commits. Por isso a ação da Sprint 5 mede o início da sprint, e não apenas o pico.
 
 **Distribuição por integrante.**
 
 | Integrante | Commits autorais | Participação |
 |---|---:|---:|
-| Paulo Henrique Bueno Fernandes | 11 | 31,4% |
-| Karol Barbosa Rocha | 10 | 28,6% |
-| Ana Cristina Jardim | 7 | 20,0% |
-| Felipe Simão | 5 | 14,3% |
-| Rui Facó | 2 | 5,7% |
-| Matheus Ferreira da Silva | 0 | 0,0% |
-| Tobias Viana | 0 | 0,0% |
+| Karol Barbosa Rocha | 20 | 27,8% |
+| Felipe Simão | 13 | 18,1% |
+| Ana Cristina Jardim | 11 | 15,3% |
+| Paulo Henrique Bueno Fernandes | 11 | 15,3% |
+| Matheus Ferreira da Silva | 7 | 9,7% |
+| Rui Facó | 5 | 6,9% |
+| Tobias Viana | 5 | 6,9% |
 
-Diferente das Sprints 2 e 3, a autoria **não** está equilibrada: dois integrantes não têm commit autoral no período. A Seção 6.4 do `GestaoProjeto.md` explica que os dois produziram artefatos documentais fora do repositório (análise financeira e planejamento da Sprint 5), e o risco AM16 registra a perda de rastreabilidade durante a sprint.
+Os sete integrantes têm commits autorais, mas o **momento** varia: os 7 commits de Matheus estão em 24 e 25/09, o que a Seção 6.4 do `GestaoProjeto.md` e o risco AM16 tratam como problema de visibilidade do trabalho durante a sprint.
 
 ---
 
@@ -627,7 +627,7 @@ python scripts/setup_mr_template.py --apply-remote
 
 O `--dry-run` do `create_issues.py` valida o lote inteiro antes de criar qualquer issue: se uma linha tem tamanho inválido ou falta uma coluna obrigatória, nenhuma issue é criada. O arquivo gerado por `setup_mr_template.py` em `.gitlab/merge_request_templates/` entra no repositório por Merge Request, como qualquer outra alteração.
 
-**Estado em 25/09.** O cadastro das 45 issues da Planning da Sprint 4 foi feito em lote. O template de MR **não está instalado**: não há `.gitlab/` na raiz e o campo `merge_requests_template` do projeto está vazio. A instalação é ação da Sprint 5 (Seção 6.2.5 do `GestaoProjeto.md`). O kit só alerta quando o **título** se repete, então duplicidades de conteúdo com títulos diferentes, como `#275` e `#295`, continuam dependendo do refinamento.
+**Estado em 25/09.** O cadastro das 45 issues da Planning da Sprint 4 foi feito em lote. O template de MR **não está instalado**: não há `.gitlab/` na raiz e o campo `merge_requests_template` do projeto está vazio. A issue criada para instalá-lo (`#254`) foi reaproveitada para outro trabalho em 22/09. A instalação volta como ação da Sprint 5 (Seção 6.2.5 do `GestaoProjeto.md`). O kit só alerta quando o **título** se repete e não impede que um card publicado seja renomeado depois. Duplicidades de conteúdo, como `#275` e `#295`, e reaproveitamentos continuam dependendo do refinamento e da política de escopo fixo do card (Seção 2.2.2 do `GestaoProjeto.md`).
 
 ---
 
@@ -701,28 +701,28 @@ O resultado confirma evolução em rastreabilidade, revisão distribuída e CI. 
 
 ## 7.5 Atualização de aderência na Sprint 4
 
-Esta atualização foi reconferida em **25/09/2026, às 23h00 (BRT)**, com a análise local fixada em `develop@c28ef70` e o GitLab consultado pela API no mesmo horário (MRs, revisores, aprovações, pipelines, branches protegidas, branches remotas e configurações do projeto).<!-- CONFERIR-SEXTA: horário, SHA e todos os números --> Os quadros das Seções 7.2 e 7.4 permanecem como histórico e não são sobrescritos.
+Esta atualização foi conferida em **25/09/2026, às 17h55 (BRT)**, com a análise local fixada em `develop@f8012f4` e o GitLab consultado pela API no mesmo horário (MRs, revisores, aprovações, pipelines, branches protegidas, branches remotas e configurações do projeto). Os quadros das Seções 7.2 e 7.4 permanecem como histórico e não são sobrescritos.
 
 | Item | Prática observada na Sprint 4 | Situação | Encaminhamento para a Sprint 5 |
 |---|---|---|---|
-| Origem e destino das branches | Os 8 MRs da milestone partem de branches de trabalho e apontam para `develop` | **Conforme** | Manter |
-| Nomenclatura das branches | As 8 branches usam prefixo válido (`feat/` ou `docs/`) e descrição em minúsculas e kebab-case; o desvio de maiúscula da Sprint 3 não se repetiu | **8 de 8 conformes** | Manter |
-| Rastreabilidade dos commits | 35 de 35 commits autorais com `#N` e tipo válido | **100% conforme** | Manter |
-| Descrição no infinitivo | 34 de 35 | **97,1%; desvio em 1** | Versionar o hook |
-| Limite de 72 caracteres | 31 de 35 | **88,6%; desvio em 4** | Versionar o hook |
-| Cadência | Pico de 28,6% em 23/09, mas nenhum commit autoral de 14 a 17/09 | **Parcial** | Regra do primeiro incremento (Seção 2.1.4 do `GestaoProjeto.md`) |
-| Vínculo entre MR e issue | 7 dos 8 MRs trazem `Closes #N` na descrição; `!85` não traz, e as issues `#261` e `#262` foram encerradas manualmente em 21/09, um dia antes do merge | **Desvio pontual** | Conferir o `Closes #N` na revisão, antes de aprovar |
-| Revisão por pares | Os 8 MRs têm revisor diferente do autor; os 5 mesclados têm aprovação registrada e comentário do revisor; os sete integrantes revisaram | **Conforme** | Manter |
-| Estratégia de merge | O projeto está configurado com `merge_method: merge`; os 5 merges geraram commit de merge | **Conforme** | Manter |
+| Origem e destino das branches | 15 dos 16 MRs partem de branches de trabalho e apontam para `develop`. O `!97` apontou para `docs/gestao-projeto-sprint-4`, para consolidar a análise financeira no mesmo artefato antes do MR para `develop` | **Conforme, com um desvio pontual e justificado** | Manter; consolidação entre branches de trabalho só quando o artefato for o mesmo |
+| Nomenclatura das branches | As 16 branches usam prefixo válido (`feat/`, `fix/`, `docs/` ou `test/`) e descrição em minúsculas e kebab-case; o desvio de maiúscula da Sprint 3 não se repetiu. Dois nomes foram reutilizados de branches já mescladas: `fix/auditoria-desenvolvimento-solucao` e `feat/inventariar-base-vetorial` | **16 de 16 no formato; 2 nomes reutilizados** | Nome novo para cada task, mesmo quando o tema se repete |
+| Rastreabilidade dos commits | 72 de 72 commits autorais com `#N` e tipo válido | **100% conforme** | Manter |
+| Descrição no infinitivo | 71 de 72 | **98,6%; desvio em 1** | Versionar o hook |
+| Limite de 72 caracteres | 61 de 72 | **84,7%; desvio em 11** | Versionar o hook |
+| Cadência | Nenhum commit de 14 a 17/09; 40,3% em 24/09; 9 dos 16 merges em 25/09 | **Não conforme** | Regra do primeiro incremento (Seção 2.1.4 do `GestaoProjeto.md`) e meta de merges no último dia |
+| Vínculo entre MR e issue | 15 dos 16 MRs trazem `Closes #N` na descrição. O `!85` não traz, e as issues `#261` e `#262` foram encerradas manualmente em 21/09, um dia antes do merge | **Desvio pontual** | Conferir o `Closes #N` na revisão, antes de aprovar |
+| Milestone e labels do MR | 15 dos 16 MRs têm a milestone `Sprint 04`; o `!100` não tem milestone nem labels | **Desvio pontual** | Instalar o template de MR (Seção 6.6) e conferir milestone na revisão |
+| Revisão por pares | Os 16 MRs têm revisor diferente do autor, aprovação registrada e comentário do revisor; os sete integrantes revisaram, de dois a três MRs cada | **Conforme** | Manter |
+| Estratégia de merge | O projeto está configurado com `merge_method: merge`; os 16 merges geraram commit de merge | **Conforme** | Manter |
 | Proteção das branches permanentes | `main`, `develop` e `hmg` protegidas com push "No one", conferido pela API | **Conforme, agora verificado na configuração** | Manter |
-| Esteira de verificação | Os 8 MRs têm pipeline com status `success` | **Conforme** | Manter |
-| Exclusão de branches | 28 branches temporárias no remoto. Das 5 branches mescladas na sprint, 2 foram excluídas; `!86` e `!89` foram mesclados sem a opção de exclusão, e a branch de `!88` permaneceu apesar da opção marcada | **Desvio comprovado, pela quarta sprint** | Excluir as branches já mescladas no encerramento, conferindo cada MR antes |
-| Template de MR | Não instalado no repositório nem nas configurações do projeto | **Desvio comprovado** | Instalar com `setup_mr_template.py` (Seção 6.6) |
-| Promoção `develop → hmg → main` | A promoção da Sprint 4 ocorre depois da integração deste artefato, com abertura do MR de `hmg` para `main` por integrante diferente do que abriu na Sprint 3 | **Etapa final programada** | Abrir os dois MRs de promoção, com revisão em cada etapa |
-| Tag da versão | Nenhuma tag no repositório | **Desvio comprovado, pela quarta sprint** | Criar a tag anotada `v0.4.0` em `main` logo depois da promoção |
+| Esteira de verificação | Os 16 MRs têm pipeline com status `success` | **Conforme** | Manter |
+| Exclusão de branches | 33 branches no remoto; 5 dos 16 MRs (`!86`, `!89`, `!93`, `!96`, `!97`) foram mesclados sem a opção de excluir a branch de origem | **Desvio comprovado, pela quarta sprint** | Marcar a exclusão na abertura do MR e excluir as branches mescladas na promoção |
+| Template de MR | Não instalado no repositório nem nas configurações do projeto | **Desvio comprovado** | Instalar com `setup_mr_template.py` (Seção 6.6), em issue própria |
+| Promoção `develop → hmg → main` e tag | Ocorrem depois da integração do artefato de gestão e não fazem parte deste corte. Até a conferência, o repositório não tem nenhuma tag | **Fora do corte** | Criar a tag anotada da versão em `main` na promoção |
 | `release/*` e `hotfix/*` | Não houve condição nem uso | **Não aplicável** | Manter como política condicional |
 
-A Sprint 4 fecha os dois pontos de forma da Sprint 3 que dependiam de atenção (nomenclatura e infinitivo) e confirma pela configuração do projeto uma política que antes era verificada só pelo histórico (proteção de branches). Os desvios que restam são os mesmos das três sprints anteriores e têm a mesma natureza: **etapas de encerramento** (exclusão de branches e tag) e **mecanismos que ninguém instalou** (hook e template de MR). Por isso os dois grupos viraram itens do checklist da Seção 8, que é conferido antes da Sprint Review.
+A Sprint 4 confirma pela configuração do projeto uma política que antes só era verificada pelo histórico (proteção de branches) e melhora a forma das mensagens de commit. Os desvios que restam são de dois tipos: **etapas de encerramento** (exclusão de branches e tag) e **mecanismos que ninguém instalou** (hook e template de MR). Os dois mecanismos tinham issue na Planning, e as duas issues foram reaproveitadas para outro trabalho. A política de escopo fixo do card, incluída na Seção 2.2.2 do `GestaoProjeto.md`, fecha esse caminho.
 
 ---
 
