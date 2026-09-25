@@ -1,0 +1,7 @@
+# AZ1 — borda HTTPS. O Caddy obtém o certificado para {$AZ1_DOMAIN}, redireciona
+# HTTP para HTTPS e encaminha tudo (incluindo o WebSocket da chamada de voz)
+# para o nginx do frontend, que continua servindo o bundle e o proxy de /api.
+{$AZ1_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy frontend:8080
+}
