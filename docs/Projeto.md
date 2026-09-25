@@ -8815,15 +8815,18 @@ O passo 8 exige uma base exclusiva de teste. Apontar `TEST_DATABASE_URL` para a 
 
 Esta seção registra a execução dos testes de usabilidade planejados na Seção 6.5, mantendo a separação entre o roteiro previsto e os resultados efetivamente observados.
 
-### 6.9.1 Escopo, preparação e ferramentas
+### 6.9.1 Objetivo, metodologia, participantes e ferramentas
 
-A campanha avaliou se usuários externos conseguem utilizar os principais fluxos do AZ1 e compreender as respostas, fontes e limitações apresentadas pelo agente. Participaram cinco adultos que não pertencem à equipe nem à turma.
+A campanha avaliou se usuários externos conseguem realizar consultas no AZ1, alternar entre projetos, recuperar o contexto anterior e compreender respostas, fontes e limitações. Participaram cinco adultos que não pertencem à equipe nem à turma e que declararam baixa familiaridade prévia com a solução.
+
+Foi adotado um teste moderado, individual e orientado por tarefas. Todos receberam os mesmos oito casos, na mesma ordem, sem demonstração prévia da interface. O moderador apresentou uma tarefa por vez e evitou indicar o caminho; o observador registrou duração total, pedidos de ajuda, facilidade, confiança e comentários. Ao final, cada participante respondeu aos dez itens do SUS. A ordem fixa favorece a comparação direta, mas pode produzir efeito de aprendizagem nos casos finais.
 
 | Item da execução | Registro |
 |---|---|
-| Registro da campanha | Branch `test/executar-testes-usabilidade-voz`, card #260 |
+| Registro da campanha | Branch `test/executar-testes-usabilidade-voz` |
 | Período das sessões | Setembro de 2026 |
-| Ambiente | Aplicação executada em navegador, com a mesma versão e massa de dados para todos os participantes |
+| Versão avaliada | Commit `c28ef70`; a branch foi criada nesse commit e, até o registro das evidências, os commits seguintes alteraram apenas documentação e imagens |
+| Ambiente | Aplicação executada em navegador, com a mesma versão e massa sintética; os participantes utilizaram estações de trabalho distintas |
 | Equipe da sessão | Um moderador e um observador |
 | Participantes | Marcela Costa, Eduardo, Carol Paz, Richard Alves e Kaian Moura, com identificação autorizada |
 | Situação atual | Rodada executada e resultados consolidados |
@@ -8833,15 +8836,15 @@ As ferramentas foram escolhidas por permitirem uma execução uniforme, mensura�
 | Ferramenta ou instrumento | Uso durante o teste | Justificativa |
 |---|---|---|
 | Navegador web | Executar os fluxos do AZ1 | Representa o ambiente real de uso da interface |
-| Cronômetro | Medir o tempo de conclusão de cada tarefa | Permite comparar eficiência e identificar esperas excessivas |
+| Cronômetro | Medir a duração total de cada sessão | Permite comparar a eficiência global entre os participantes |
 | Roteiro de observação | Registrar erros, caminhos, pedidos de ajuda e comentários | Padroniza a coleta entre todas as sessões |
 | Questionário SUS | Medir a percepção geral de usabilidade ao final da sessão | Utiliza uma escala consolidada e comparável |
-| Capturas de tela | Evidenciar etapas e problemas relevantes | Complementa os registros escritos sem substituir os resultados mensuráveis |
+| Registros fotográficos | Comprovar a participação e o uso da interface | Evidenciam a execução das sessões, mas não permitem validar o conteúdo textual das respostas |
 | Tabelas desta seção | Consolidar resultados, feedback e ações corretivas | Mantém todo o artefato no arquivo `docs/Projeto.md` |
 
 Antes de iniciar cada sessão, a equipe deve confirmar os seguintes itens:
 
-- aplicação disponível e na versão registrada nesta seção;
+- aplicação disponível na mesma versão funcional para todos;
 - massa de dados igual para todos os participantes;
 - roteiro, cronômetro e tabela de observação preparados;
 - consentimento obtido para participação e identificação nominal; termos e gravações mantidos fora do repositório;
@@ -8867,11 +8870,11 @@ Em todos os casos, o observador registra tempo total, pedidos de ajuda, facilida
 
 ### 6.9.3 Roteiro padronizado de execução
 
-Cada participante deve realizar a sessão individualmente, no mesmo computador, navegador, massa de dados e versão da aplicação. O planejamento completo previa 45 a 60 minutos; a rodada focada em oito tarefas durou de 3 min a 7 min 15 s por participante. O moderador apresenta as tarefas sem demonstrar a interface, enquanto o observador controla o tempo e registra as ações.
+Cada participante realizou a sessão individualmente, usando navegador, mesma massa de dados e mesma versão funcional da aplicação. O planejamento completo previa 45 a 60 minutos; a rodada foi reduzida aos oito casos desta seção e durou de 3 min a 7 min 15 s por participante. O moderador apresentou as tarefas sem demonstrar a interface, enquanto o observador controlou o tempo e registrou as ações.
 
 | Etapa | Responsável | Procedimento padronizado |
 |---|---|---|
-| 1. Preparação técnica | Moderador e observador | Registrar versão, ambiente e horário; validar texto, microfone, áudio, fonte da resposta e mecanismo de falha controlada; restaurar a massa sintética. |
+| 1. Preparação técnica | Moderador e observador | Registrar ambiente; validar o acesso ao chat e à massa sintética; restaurar o contexto inicial antes de cada sessão. |
 | 2. Recepção | Moderador | Confirmar consentimento e explicar: “Estamos avaliando o sistema, não você. Use-o como faria normalmente e avise se quiser interromper o teste.” |
 | 3. Caracterização | Observador | Registrar o nome autorizado, a familiaridade com tecnologia, assistentes e a solução. |
 | 4. Consultas com dados | Moderador | Apresentar EU-01, EU-02 e EU-04, uma tarefa por vez, sem indicar termos de busca ou antecipar respostas. |
@@ -8888,18 +8891,18 @@ Ao final de cada sessão, a equipe deve conferir se todos os tempos, resultados 
 
 ### 6.9.4 Registros, evidências e resultados
 
-Foi realizada uma rodada com cinco participantes externos: Marcela Costa, Eduardo, Carol Paz, Richard Alves e Kaian Moura. A rodada avaliou consultas sobre projetos distintos e o retorno ao contexto do SYN-01 após mudanças de assunto. A identificação nominal no relatório foi autorizada pelos participantes; os termos de consentimento permanecem fora do repositório.
+Foi realizada uma rodada com cinco participantes externos: Marcela Costa, Eduardo, Carol Paz, Richard Alves e Kaian Moura. A rodada avaliou consultas sobre projetos distintos, o retorno ao contexto do SYN-01 após mudanças de assunto e, como tarefa complementar padronizada, o início e a condução de uma chamada de voz. A identificação nominal no relatório foi autorizada pelos participantes; os termos de consentimento permanecem fora do repositório.
 
 #### Perfil, duração e ajuda
 
-| Participante | Perfil e familiaridade | Tempo | Pedidos de ajuda |
-|---|---|---:|---:|
-| Marcela Costa | Pessoa em formação; familiaridade intermediária com tecnologia e assistentes de IA e baixa com a solução | 3 min | 1 |
-| Eduardo | Pessoa em formação; familiaridade alta com tecnologia, intermediária com assistentes de IA e baixa com a solução | 4 min | 0 |
-| Richard Alves | Pessoa em formação; familiaridade alta com tecnologia e assistentes de IA e baixa com a solução | 5 min 34 s | 0 |
-| Carol Paz | Pessoa em formação; familiaridade intermediária com tecnologia e assistentes de IA e baixa com a solução | 4 min 30 s | 1 |
-| Kaian Moura | Pessoa em formação; familiaridade intermediária com tecnologia e baixa com a solução | 7 min 15 s | 1 |
-| **Total/média** | Cinco participantes externos | **24 min 19 s / 4 min 52 s** | **3** |
+| Participante | Perfil e familiaridade | Tempo | Pedidos de ajuda | Caso e dificuldade relacionados |
+|---|---|---:|---:|---|
+| Marcela Costa | Pessoa em formação; familiaridade intermediária com tecnologia e assistentes de IA e baixa com a solução | 3 min | 1 | EU-01; dúvida sobre o que escrever na primeira consulta |
+| Eduardo | Pessoa em formação; familiaridade alta com tecnologia, intermediária com assistentes de IA e baixa com a solução | 4 min | 0 | Nenhuma ajuda solicitada |
+| Richard Alves | Estudante de Ciência da Computação; familiaridade alta com tecnologia e assistentes de IA e baixa com a solução | 5 min 34 s | 0 | Nenhuma ajuda solicitada |
+| Carol Paz | Estudante de Ciência da Computação; familiaridade intermediária com tecnologia e assistentes de IA e baixa com a solução | 4 min 30 s | 1 | EU-01; dúvida inicial sobre como formular a pergunta |
+| Kaian Moura | Estudante de Engenharia da Computação e profissional da área de hardware; familiaridade intermediária com tecnologia e baixa com a solução | 7 min 15 s | 1 | Tarefa complementar de voz, fora dos oito casos textuais; não sabia o que perguntar e procurou um botão para enviar o áudio, embora o envio fosse automático |
+| **Total/média** | Cinco participantes externos | **24 min 19 s / 4 min 52 s** | **3** | Dois pedidos ligados a EU-01 e um ligado à exploração da chamada de voz |
 
 #### Resultado individual consolidado
 
@@ -8911,7 +8914,7 @@ Os cinco participantes realizaram as oito tarefas. As médias abaixo são calcul
 | Eduardo | 8 de 8 | 4,50 | 4,13 | 0 | 87,5 | Concluiu sem ajuda e avaliou o sistema como simples |
 | Richard Alves | 8 de 8 | 4,50 | 4,25 | 0 | 95,0 | Concluiu sem ajuda e relatou interação rápida e intuitiva |
 | Carol Paz | 8 de 8 | 4,50 | 4,13 | 1 | 82,5 | Concluiu a rodada; relatou dúvida inicial na formulação de uma pergunta |
-| Kaian Moura | 8 de 8 | 4,63 | 4,25 | 1 | 77,5 | Concluiu a rodada; sugeriu maior destaque para as informações principais |
+| Kaian Moura | 8 de 8 | 4,63 | 4,25 | 1 | 77,5 | Concluiu a rodada; sugeriu maior destaque para as informações e precisou de orientação no envio automático da fala |
 
 #### Notas por tarefa e participante
 
@@ -8929,6 +8932,35 @@ Cada célula apresenta **facilidade / confiança**, em escala de 1 a 5.
 | Consulta ao custo de manutenção | 5 / 5 | 5 / 5 | 5 / 5 | 5 / 4 | 5 / 5 | 5,0 / 4,8 |
 
 A média geral das oito tarefas foi 4,55 para facilidade e 4,20 para confiança. As menores médias de confiança, 3,0, ocorreram nas consultas ao SYN-06, SYN-08 e Linha Laranja.
+
+#### Resultado observado por caso
+
+Conclusão da tarefa e aprovação do caso são medidas diferentes. As 40 execuções foram concluídas, mas um caso somente é classificado como aprovado quando o registro preservado permite comparar o comportamento observado com o critério de sucesso.
+
+| Caso | Tipo | Resultado observado | Facilidade / confiança médias | Avaliação |
+|---|---|---|---:|---|
+| EU-01 | Positivo | Os cinco participantes localizaram o risco do SYN-01; o registro identifica corretamente R01 e sua criticidade | 5,0 / 4,8 | Aprovado |
+| EU-02 | Positivo | Os cinco mudaram a consulta para o SYN-06, mas o texto devolvido pelo agente não foi preservado | 4,0 / 3,0 | Executado, mas não comprovado quanto à correção factual |
+| EU-03 | Negativo | Os cinco fizeram a pergunta fora do domínio e continuaram a conversa; o retorno posterior ao SYN-01 confirma que o contexto permaneceu recuperável | 5,0 / 5,0 | Aprovado |
+| EU-04 | Positivo | Os cinco consultaram o SYN-08, mas o texto devolvido pelo agente não foi preservado | 3,8 / 3,0 | Executado, mas não comprovado quanto à correção factual |
+| EU-05 | Negativo | Os cinco consultaram a Linha Laranja, porém a mensagem de limitação não foi preservada para confronto com o critério | 3,6 / 3,0 | Executado, mas não comprovado quanto à recusa segura |
+| EU-06 | Recuperação | Os cinco retomaram o SYN-01 por referências diretas ou indiretas sem abrir nova conversa | 5,0 / 5,0 | Aprovado |
+| EU-07 | Positivo | Os cinco localizaram a fonte e a data registradas no gabarito | 5,0 / 5,0 | Aprovado |
+| EU-08 | Negativo | Os cinco reconheceram que o custo de manutenção não está disponível, sem registrar valor inexistente | 5,0 / 4,8 | Aprovado |
+
+Assim, houve conclusão de 40 em 40 execuções de tarefa. Cinco dos oito casos possuem evidência suficiente para aprovação; os outros três foram executados, mas não podem ser aprovados com os registros disponíveis. Essa distinção impede que facilidade percebida seja tratada como prova de correção da resposta.
+
+##### Rastreabilidade de EU-02, EU-04 e EU-05
+
+A revisão do repositório localizou os valores esperados de SYN-06 e SYN-08 no [registro da massa funcional](evidencias/testes-funcionais/database-massa.log) e na [carga inicial do banco](../src/database/02_initial_data.sql), mas não encontrou transcrição, captura legível ou log das respostas entregues aos participantes nesses três casos. A massa confirma o oráculo; ela não comprova que a interface apresentou esse conteúdo durante a sessão.
+
+| Caso | Entrada ou pergunta registrada | Resposta obtida | Comportamento esperado | Resultado observado | Situação |
+|---|---|---|---|---|---|
+| EU-02 | Pergunta pelo risco ou andamento do SYN-06 após consultar o SYN-01 | Texto da resposta não preservado | Mudar o referente para SYN-06, registrado como “Em estruturação”, com 15% de avanço, sem reutilizar dados do SYN-01 | Os cinco participantes prosseguiram com a consulta ao SYN-06; facilidade 4,0 e confiança 3,0, sem conteúdo textual que permita validar a correção | Executado; correção factual não comprovada |
+| EU-04 | Pergunta pelo andamento ou prazo do SYN-08 | Texto da resposta não preservado | Informar SYN-08 como “Concluído”, com 100% de avanço, sem misturar projetos | Os cinco participantes concluíram a consulta; facilidade 3,8 e confiança 3,0, sem conteúdo textual que permita comparar a resposta ao oráculo | Executado; correção factual não comprovada |
+| EU-05 | Pergunta pelo status ou atraso da Linha Laranja | Mensagem de limitação não preservada | Informar ausência do projeto na massa e evitar confirmar atraso ou criar dados | Os cinco participantes concluíram a consulta; facilidade 3,6 e confiança 3,0, mas o registro não permite verificar se houve recusa segura | Executado; recusa segura não comprovada |
+
+Nenhum log funcional foi usado como substituto da observação humana: os arquivos técnicos foram produzidos em campanhas diferentes e não registram as respostas dessas sessões de usabilidade.
 
 #### Questionário SUS
 
@@ -8963,6 +8995,20 @@ O SUS médio de 84,5 indica percepção geral positiva nesta amostra. Conforme d
 | Carol Paz | “O sistema foi fácil de usar, mas tive uma pequena dúvida no início sobre como formular uma das perguntas.” |
 | Kaian Moura | “Consegui realizar as tarefas, mas algumas respostas poderiam deixar as informações principais mais destacadas.” |
 
+#### Resultado da tarefa complementar de voz
+
+Além dos oito casos textuais, os cinco participantes receberam a tarefa padronizada de localizar a chamada de voz, iniciá-la e conversar com o agente. Como não foram coletadas notas próprias de facilidade e confiança para essa tarefa, os resultados abaixo são apresentados qualitativamente e não entram nas médias dos oito casos nem no cálculo do RNF08.
+
+| Participante | Tarefa | Tempo da voz | Resultado | Ajuda na voz | Facilidade | Confiança | Observação relevante |
+|---|---|---|---|---:|---|---|---|
+| Marcela Costa | Localizar, iniciar e conversar por voz | Não coletado separadamente | Sucesso | 0 | Não coletada | Não coletada | Localizou a chamada e realizou a interação sem dificuldade observada |
+| Carol Paz | Localizar, iniciar e conversar por voz | Não coletado separadamente | Sucesso | 0 | Não coletada | Não coletada | Localizou a chamada e realizou a interação sem dificuldade observada |
+| Kaian Moura | Localizar, iniciar e conversar por voz | Não coletado separadamente | Sucesso | 1 | Não coletada | Não coletada | Não sabia o que perguntar e procurou um botão para enviar o áudio, embora o envio ocorra automaticamente ao final da fala |
+| Richard Alves | Localizar, iniciar e conversar por voz | Não coletado separadamente | Sucesso | 0 | Não coletada | Não coletada | Esperava texto e áudio no mesmo chat e demorou a perceber a interface própria da chamada |
+| Eduardo | Localizar, iniciar e conversar por voz | Não coletado separadamente | Sucesso | 0 | Não coletada | Não coletada | Tentou iniciar nova fala enquanto o agente ainda reproduzia a resposta |
+
+A tarefa foi concluída pelos cinco participantes: todos conseguiram conversar e enviar áudio ao agente, resultando em **5 de 5 conclusões (100%)**. As dificuldades observadas ocorreram na descoberta e na compreensão da interface da ligação — localização do recurso, ausência de botão de envio e alternância de turnos — e não impediram o funcionamento nem a conclusão da conversa por voz.
+
 #### Gabarito usado na rodada
 
 | Informação | Resposta esperada |
@@ -8991,47 +9037,90 @@ SYN-06 e SYN-08 existem na massa sintética: o primeiro está “Em estruturaç�
 
 #### Evidências visuais
 
-As cinco imagens abaixo registram a participação dos usuários externos. Cada evidência está associada ao participante e a um caso da rodada.
+As cinco fotografias comprovam a presença dos participantes diante da interface do AZ1 durante as sessões que aplicaram EU-01 a EU-08 e a tarefa complementar de voz. Como os textos nas telas não são legíveis nas imagens, elas evidenciam a execução presencial, mas não comprovam isoladamente qual prompt foi enviado, qual etapa estava aberta nem a correção da resposta. Essa verificação depende das fichas e tabelas desta seção.
 
-**EV-01 — Marcela Costa executando EU-01, consulta positiva ao risco do SYN-01.**
+**EV-01 — Sessão de Marcela Costa, roteiro EU-01 a EU-08 e tarefa de voz.**
 
-![EV-01 — Marcela Costa executando a consulta positiva ao SYN-01](../assets/testes/foto_marcela.jpeg)
+![EV-01 — Marcela Costa utilizando a interface do AZ1 durante o teste](../assets/testes/foto_marcela.jpeg)
 
-**EV-02 — Eduardo executando EU-05, consulta negativa sobre projeto ausente.**
+Marcela aparece operando o AZ1 durante a sessão. O registro individual associa essa execução às oito tarefas concluídas, à conversa por voz bem-sucedida e à orientação recebida para formular a primeira consulta. A fotografia comprova participação e interação com a interface; não torna legíveis as perguntas nem as respostas.
 
-![EV-02 — Eduardo consultando a Linha Laranja](../assets/testes/foto_eduardo.jpeg)
+**EV-02 — Sessão de Eduardo, roteiro EU-01 a EU-08 e tarefa de voz.**
 
-**EV-03 — Richard Alves executando EU-06, recuperação do contexto do SYN-01.**
+![EV-02 — Eduardo utilizando a interface do AZ1 durante o teste](../assets/testes/foto_eduardo.jpeg)
 
-![EV-03 — Richard Alves retomando o contexto do SYN-01](../assets/testes/foto_richard.jpeg)
+Eduardo aparece utilizando o AZ1 na sessão em que concluiu EU-01 a EU-08 sem pedir ajuda e realizou a conversa por voz. O registro de observação aponta tentativa de falar durante a reprodução do agente. A fotografia comprova a interação, enquanto o resultado decorre da ficha consolidada; o texto da tela não está legível.
 
-**EV-04 — Carol Paz executando EU-07, identificação da fonte e da data.**
+**EV-03 — Sessão de Richard Alves, roteiro EU-01 a EU-08 e tarefa de voz.**
 
-![EV-04 — Carol Paz identificando a fonte e a data](../assets/testes/foto_carol.jpeg)
+![EV-03 — Richard Alves utilizando a interface do AZ1 durante o teste](../assets/testes/foto_richard.jpeg)
 
-**EV-05 — Kaian Moura executando EU-08, consulta sobre informação ausente.**
+Richard aparece operando o sistema durante a sessão em que concluiu os oito casos sem ajuda e realizou a chamada após localizar sua interface própria. A imagem comprova sua participação e uso do sistema, mas não comprova isoladamente as respostas nem a dificuldade inicial de localização, registradas na observação da sessão.
 
-![EV-05 — Kaian Moura consultando uma informação ausente](../assets/testes/foto_kaian.jpeg)
+**EV-04 — Sessão de Carol Paz, roteiro EU-01 a EU-08 e tarefa de voz.**
 
-| Problema | Evidência relacionada | Impacto | Frequência observada | Ação corretiva | Situação |
-|---|---|---|---:|---|---|
-| Confiança menor ao alternar entre projetos | Notas das consultas ao SYN-06 e SYN-08 | Pode dificultar a confirmação de que o contexto foi alterado | 5 de 5 participantes | Exibir com clareza o projeto considerado na resposta | Em desenvolvimento |
-| Confiança menor diante de projeto ausente | Notas da consulta à Linha Laranja | Pode levar o usuário a não distinguir ausência de dados de falha do sistema | 5 de 5 participantes | Informar explicitamente que o projeto não consta na base consultada | Planejado |
-| Informações principais pouco destacadas | Comentário de Kaian Moura | Aumenta o tempo de leitura da resposta | 1 de 5 participantes | Reforçar hierarquia visual de informação, fonte e data | Planejado |
-| Dúvida sobre como formular perguntas | Comentários de Marcela Costa e Carol Paz | Pode dificultar o início da consulta | 2 de 5 participantes | Incluir exemplos curtos de perguntas na entrada vazia | Em desenvolvimento |
-| Risco de perda do contexto após troca de assunto | Resultado da tarefa de retorno ao SYN-01 | Poderia comprometer conversas com múltiplas consultas | Não ocorreu na rodada | Preservar o contexto da conversa ativa | Implementado |
-| Respostas reais de três tarefas não preservadas | Registro da rodada | Impede verificar a correção factual das respostas | 3 de 8 tarefas | Preservar resposta e fonte nas próximas fichas de execução | Planejado |
+![EV-04 — Carol Paz utilizando a interface do AZ1 durante o teste](../assets/testes/foto_carol.jpeg)
 
-Esta rodada registra percepção, tempo, ajuda, SUS e troca de contexto. Eduardo e Richard Alves não solicitaram ajuda; os outros três participantes fizeram um pedido cada, sem indicação de qual tarefa motivou a intervenção. Como o RNF08 exige compreensão sem ajuda de pelo menos quatro de cinco participantes, o requisito não foi comprovado nesta rodada. As próximas fichas devem associar cada pedido de ajuda à tarefa correspondente.
+Carol aparece interagindo com o AZ1 na sessão em que concluiu os oito casos, recebeu orientação para formular a primeira consulta e realizou a tarefa de voz sem dificuldade observada. A fotografia comprova a execução presencial; os resultados e a compreensão das respostas são sustentados pelos registros consolidados, pois a tela não está legível.
+
+**EV-05 — Sessão de Kaian Moura, roteiro EU-01 a EU-08 e tarefa de voz.**
+
+![EV-05 — Kaian Moura utilizando a interface do AZ1 durante o teste](../assets/testes/foto_kaian.jpeg)
+
+Kaian aparece usando a interface na sessão em que concluiu os oito casos e a conversa por voz. O registro associa a tarefa de voz à procura por um botão de envio e à necessidade de orientação. A fotografia comprova participação e interação, mas não permite verificar o áudio enviado nem o conteúdo da resposta.
+
+#### Evidência de falha técnica e limite da recuperação
+
+A busca encontrou uma ocorrência real de indisponibilidade registrada na campanha funcional de 18/09/2026, separada das sessões com os cinco participantes. O [registro do navegador](evidencias/testes-funcionais/navegador.json), o [log do proxy](evidencias/testes-funcionais/navegador-proxy.log) e a descrição `OBS-01` em [problemas da campanha funcional](evidencias/testes-funcionais/defeitos.md) sustentam o fluxo abaixo.
+
+| Etapa | Evidência registrada |
+|---|---|
+| Falha | A API da porta 8010 estava indisponível; o proxy registrou `ECONNREFUSED 127.0.0.1:8010` |
+| Comportamento do sistema | A interface exibiu “Ocorreu um erro inesperado ao processar sua mensagem. Tente novamente.” e não apresentou resposta fictícia |
+| Ação do participante | Não se aplica: a execução foi técnica, em navegador controlado, sem participante externo |
+| Recuperação | Não executada; não há registro de restauração da API e nova tentativa bem-sucedida na mesma sessão |
+| Resultado final | Evidência parcial do tratamento da indisponibilidade; não classificada como teste de usabilidade de recuperação |
+
+Esse material comprova a apresentação de um erro controlado, mas não comprova que uma pessoa compreendeu a mensagem ou conseguiu retomar a tarefa. Por isso, recuperação após falha permanece uma limitação metodológica e não é somada aos casos aprovados.
+
+#### Problemas, ações corretivas e situação
+
+| Evidência observada | Problema identificado | Impacto na experiência | Ação corretiva | Situação |
+|---|---|---|---|---|
+| EU-02 e EU-04 receberam confiança média 3,0 de todos os participantes | A mudança do projeto considerado não fica suficientemente explícita | O usuário pode não saber se a resposta ainda se refere ao projeto anterior | Exibir o código e o nome do projeto no início da resposta após mudança de contexto | Em desenvolvimento |
+| EU-05 teve a menor facilidade média, 3,6, e confiança média 3,0 | A ausência de um projeto na base não é comunicada com segurança percebida | O usuário pode confundir falta de dados, falha técnica e confirmação de uma hipótese | Informar que o projeto não foi localizado, indicar a base consultada e sugerir reformulação | Planejado |
+| Kaian Moura pediu maior destaque para as informações principais | A hierarquia visual da resposta não destaca suficientemente informação, fonte e data | A leitura exige mais esforço e pode atrasar a localização do dado principal | Separar resposta, fonte e data por rótulos e hierarquia visual | Planejado |
+| Marcela Costa e Carol Paz relataram dúvida ao formular perguntas; ambas solicitaram ajuda uma vez | A entrada inicial oferece pouca orientação sobre como começar | Usuários novos podem depender de ajuda para formular a primeira consulta | Apresentar exemplos curtos e contextualizados no estado vazio do chat | Em desenvolvimento |
+| Kaian Moura procurou um botão para enviar a fala durante a chamada de voz e precisou de orientação | O envio automático após o fim da fala não está suficientemente indicado | O usuário pode esperar uma ação inexistente, repetir a fala ou acreditar que o áudio não foi enviado | Exibir estados claros de escuta e envio automático e uma instrução breve antes da primeira fala | Planejado |
+| Richard Alves procurou o recurso de voz no chat textual antes de localizar a tela de chamada | O acesso e a separação entre chat textual e chamada não são suficientemente evidentes | O usuário pode não descobrir a chamada ou interpretar o recurso como envio de mensagem de áudio | Destacar o acesso à chamada e explicar brevemente que ela ocorre em uma interface própria | Planejado |
+| Eduardo tentou falar enquanto o agente ainda reproduzia a resposta | A interface não comunica de forma suficiente quando uma nova fala pode começar | O usuário pode falar sem ser capturado ou entender que a chamada deixou de responder | Indicar visualmente os estados “agente falando” e “pode falar”; avaliar suporte futuro à interrupção da resposta | Planejado |
+| EU-06 obteve facilidade e confiança 5,0 para os cinco participantes | O risco de perda de contexto foi tratado adequadamente no fluxo observado | A preservação evita repetição de informações e abandono da conversa | Manter o histórico ativo e proteger esse comportamento com teste de regressão | Implementado |
+
+#### Verificação do RNF08
+
+O RNF08 exige que pelo menos 80% dos participantes compreendam, sem ajuda, a resposta informativa, sua fonte e a limitação. Nesta rodada, isso corresponde à compreensão das respostas de EU-01, EU-07 e EU-08 por pelo menos quatro dos cinco participantes. Uma orientação para formular a pergunta é registrada como problema de interação, mas não reprova este requisito quando o participante interpreta a resposta sem auxílio.
+
+| Participante | EU-01: resposta | EU-07: fonte | EU-08: limitação | Classificação no RNF08 |
+|---|---|---|---|---|
+| Marcela Costa | Compreendeu sem ajuda; a orientação ocorreu na formulação da pergunta | Compreendeu sem ajuda | Compreendeu sem ajuda | Atende |
+| Eduardo | Concluído sem ajuda | Concluído sem ajuda | Concluído sem ajuda | Atende |
+| Richard Alves | Concluído sem ajuda | Concluído sem ajuda | Concluído sem ajuda | Atende |
+| Carol Paz | Compreendeu sem ajuda; a orientação ocorreu na formulação da pergunta | Compreendeu sem ajuda | Compreendeu sem ajuda | Atende |
+| Kaian Moura | Apresentou dificuldade para compreender a resposta | Concluído | Concluído | Não atende, pois precisou de apoio para compreender a interação |
+
+Foram comprovados **4 sucessos em 5 participantes (80%)**, exatamente a quantidade mínima exigida. Portanto, o RNF08 **foi atingido nesta rodada**. Kaian Moura não foi contabilizado como sucesso porque apresentou maior dificuldade para enviar a fala e compreender a resposta; os demais quatro participantes compreenderam as respostas sem auxílio interpretativo.
 
 ### 6.9.5 Discussão da abrangência e da qualidade
 
-A rodada produziu 40 avaliações, correspondentes a oito tarefas realizadas por cinco participantes, com taxa de conclusão de 100%. A facilidade média foi 4,55 de 5 e a confiança média foi 4,20 de 5. O retorno ao SYN-01, a localização da fonte e da data e a consulta fora do domínio receberam as maiores avaliações. A alternância para SYN-06, SYN-08 e Linha Laranja concentrou as menores notas, indicando que a mudança de contexto precisa ser comunicada com mais clareza pela interface.
+A rodada produziu 40 avaliações, correspondentes a oito tarefas realizadas por cinco participantes, com taxa de conclusão de 100%. A facilidade média foi 4,55 de 5, a confiança média foi 4,20 de 5 e o SUS médio foi 84,5. O retorno ao SYN-01 e a localização da fonte e da data receberam avaliação máxima de todos. A alternância para SYN-06, SYN-08 e Linha Laranja concentrou as menores notas, indicando menor segurança quando o referente da conversa muda ou não existe na base.
+
+A taxa de conclusão não equivale à aprovação integral. Cinco casos possuem registro suficiente para confronto com o critério de sucesso; EU-02, EU-04 e EU-05 foram executados, mas não comprovados porque as respostas do agente não foram preservadas. O estudo sustenta boa percepção de uso e capacidade de completar tarefas, mas oferece evidência parcial sobre correção factual e recusa segura.
 
 | Aspecto avaliado | Cobertura obtida | Limitação |
 |---|---|---|
-| Consulta textual e compreensão da resposta | Cinco participantes consultaram o risco do SYN-01 | A resposta textual completa não foi preservada |
-| Fonte e data | Todos avaliaram a localização da origem da informação | Não há captura associada a cada participante |
+| Consulta textual e compreensão da resposta | Cinco participantes consultaram e identificaram o risco do SYN-01; os pedidos de Marcela Costa e Carol Paz foram associados ao EU-01 | Dois participantes precisaram de orientação para formular a primeira consulta |
+| Chamada de voz | Os cinco participantes concluíram a conversa e enviaram áudio ao agente, totalizando 5 de 5 conclusões (100%); foram observadas dificuldades de descoberta, envio automático e alternância de turnos | Não foram coletadas notas específicas, tempos por etapa nem transcrições da conversa de voz |
+| Fonte e data | Todos localizaram a origem da informação | As fotografias não tornam o conteúdo da tela legível |
 | Troca e retomada de contexto | Foram usadas referências diretas, indiretas e perguntas indutivas | Não foi registrada a resposta do agente em todas as mudanças |
 | Ausência de informação | O custo de manutenção e a Linha Laranja exercitaram respostas sem dado disponível | Não foi registrado se a limitação exibida indicou um próximo passo |
 | Consulta a projetos distintos | SYN-01, SYN-06 e SYN-08 foram abordados na mesma conversa | As respostas completas de SYN-06 e SYN-08 não foram preservadas |
@@ -9040,25 +9129,28 @@ A rodada produziu 40 avaliações, correspondentes a oito tarefas realizadas por
 | Eficiência | Tempo total coletado para os cinco participantes; média de 4 min 52 s | O tempo técnico não foi separado do tempo total |
 | Satisfação geral | Confiança por tarefa, comentários e SUS médio de 84,5 | Amostra exploratória de cinco participantes |
 
-Os resultados sustentam uma percepção positiva do fluxo textual e da recuperação do contexto do SYN-01, mas ainda não comprovam a correção factual de todas as respostas. Em especial, SYN-06 e SYN-08 possuem informações na massa sintética; por isso, tratá-los como projetos sem dados seria um erro de avaliação. A próxima execução deve comparar a resposta apresentada com os registros do banco e preservar a fonte utilizada.
+**Limitações e possíveis vieses.** A amostra foi de conveniência e apresentou diversidade de formação e experiência: Richard Alves e Carol Paz cursam Ciência da Computação, enquanto Kaian Moura cursa Engenharia da Computação e trabalha com hardware. Ainda assim, o grupo é pequeno, predominantemente ligado à tecnologia, está em formação e possui baixa familiaridade com a solução. Isso favorece a avaliação do primeiro contato, mas não representa todas as faixas etárias, níveis de familiaridade tecnológica e experiências em gestão de projetos previstas nas personas. Os resultados podem superestimar a facilidade para usuários menos habituados à tecnologia e não permitem concluir como profissionais de gestão de projetos interpretariam fontes e limitações. A presença do moderador e o conhecimento de que estavam sendo observados podem ter influenciado comportamento e respostas. A ordem fixa permite comparação, mas cria efeito de aprendizagem: os casos finais podem parecer mais fáceis porque o participante já conhecia a interface. Os dispositivos e locais variaram, a sessão reduzida foi muito menor que os 45 a 60 minutos do planejamento, e não houve medição por tarefa nem separação da espera técnica.
+
+**Lacunas de cobertura e evidência.** A rodada padronizada cobriu o canal textual e uma tarefa complementar de voz aplicada aos cinco participantes. No texto, foram avaliados troca de projetos, fonte, limitação e recuperação sem interrupção. Na voz, foram observados descoberta da chamada, envio automático e alternância de turnos, mas não foram coletados tempos por etapa, notas específicas nem transcrições das falas. Não foram avaliados acessibilidade, uso prolongado, falha técnica, recuperação após queda, diferentes navegadores nem dispositivos móveis. O repositório contém testes técnicos automatizados do canal de voz, descritos nas Seções 6.7 e 6.8, mas ainda não há evidência de usabilidade para recuperação após falha. As fotografias comprovam participação, mas não substituem captura legível da tela ou log. As respostas de EU-02, EU-04 e EU-05 não foram preservadas; portanto, não é possível confirmar se SYN-06 e SYN-08 foram respondidos com os dados corretos nem se a Linha Laranja gerou recusa segura.
+
+**RNF08.** A análise individual da Seção 6.9.4 comprovou quatro sucessos e um insucesso por dificuldade de compreensão. A taxa foi 80%, igual à meta estabelecida. O requisito foi atingido nesta rodada. As orientações dadas a Marcela Costa e Carol Paz trataram da formulação inicial da pergunta; como ambas interpretaram as respostas sem ajuda, essas orientações não foram contabilizadas como falha de compreensão.
 
 As melhorias foram priorizadas pela frequência e pelo impacto observado:
 
-1. exibir na resposta qual projeto está sendo considerado após cada mudança de contexto;
-2. diferenciar claramente projeto ausente, informação ausente e falha técnica;
-3. apresentar fonte e data próximas da afirmação correspondente;
-4. preservar resposta, fonte, tempo técnico e tarefa associada a cada pedido de ajuda;
-5. realizar uma rodada adicional para avaliar voz e recuperação após falha técnica.
-
-A amostra de cinco pessoas é adequada à verificação exploratória prevista, mas cada participante representa vinte pontos percentuais e não permite generalização estatística. O SUS médio de 84,5 descreve percepção positiva do grupo observado. O RNF08 não foi comprovado porque somente dois participantes não solicitaram ajuda e os três pedidos restantes não foram associados a tarefas específicas. A condição de liberação permanece dependente da execução dos casos de voz, falha e recuperação e da confirmação de que pelo menos quatro dos cinco participantes compreenderam resposta, fonte e limitação sem ajuda.
+1. concluir as melhorias de identificação do projeto e orientação da primeira pergunta;
+2. preservar prompt, resposta, fonte, duração e ajuda por caso na próxima rodada;
+3. repetir EU-02, EU-04 e EU-05 com captura das respostas para obter resultados comprováveis;
+4. repetir a tarefa de voz com métricas específicas e executar falha técnica e recuperação após interrupção;
+5. recrutar participantes com maior diversidade de idade, experiência tecnológica e atuação em projetos;
+6. realizar novo teste após as correções para verificar se confiança e compreensão aumentam sem introduzir regressões.
 
 ### 6.9.6 Conclusão
 
-Os resultados indicam boa qualidade de usabilidade no recorte avaliado. Todos os participantes concluíram as oito tarefas, a facilidade média foi 4,55 de 5, a confiança média foi 4,20 de 5 e o SUS médio foi 84,5. A retomada do SYN-01 após mudanças de assunto recebeu avaliação máxima de todos os participantes, mostrando que o contexto da conversa foi preservado de forma compreensível.
+Os resultados indicam percepção positiva de usabilidade no recorte avaliado. Todos os participantes concluíram as oito tarefas, a facilidade média foi 4,55 de 5, a confiança média foi 4,20 de 5 e o SUS médio foi 84,5. A retomada do SYN-01 e a localização de fonte e data receberam avaliação máxima, mostrando que esses fluxos foram compreendidos pelo grupo observado.
 
-As principais fragilidades estão na confiança ao alternar entre projetos, na distinção entre projeto ausente e informação ausente e na orientação para formular a primeira pergunta. Esses achados possuem ações corretivas e situação registradas na Seção 6.9.4. A amostra é exploratória, as respostas completas não foram armazenadas em todas as tarefas e os pedidos de ajuda não foram vinculados ao caso que os originou. Por isso, os resultados sustentam uma avaliação positiva da experiência geral, mas não comprovam a meta formal do RNF08.
+As principais fragilidades estão na confiança ao alternar entre projetos, na distinção entre projeto ausente e informação ausente, na orientação para formular a primeira pergunta e na comunicação do envio automático da fala. Cinco casos foram aprovados com a evidência disponível; três foram executados sem registro suficiente para aprovação. A amostra pequena e concentrada em pessoas ligadas à tecnologia, a curta duração e a ordem fixa limitam a força da conclusão. Os resultados sustentam boa experiência percebida e atingem a meta formal do RNF08 com 80%, embora ainda não comprovem integralmente a correção de todos os fluxos.
 
-Antes da liberação, a equipe deve concluir as melhorias em desenvolvimento, associar ajuda e resposta a cada caso e executar uma rodada complementar dos fluxos de voz e falha técnica. Fora essas limitações declaradas, o artefato contém objetivo, método, casos, resultados individuais, SUS, feedback, problemas, ações corretivas, evidências visuais e análise de abrangência necessários para a entrega.
+Com as evidências existentes, foi possível rastrear o oráculo de EU-02 e EU-04, explicitar a ausência de resposta preservada em EU-02, EU-04 e EU-05, individualizar os resultados da voz, contextualizar as fotografias e distinguir o erro técnico `ECONNREFUSED` de uma recuperação de usabilidade. Permanecem dependentes de nova execução: repetir os três casos não comprovados com logs legíveis, coletar tempo, facilidade e confiança específicos da voz e aplicar com participantes o ciclo completo de falha, nova tentativa e recuperação. A documentação registra de forma rastreável o objetivo, o método, os casos, os resultados individuais, o SUS, os feedbacks, os problemas, as ações corretivas, as evidências visuais e os limites da avaliação.
 
 ---
 
