@@ -12,6 +12,13 @@ from psycopg_pool import ConnectionPool
 # classe de `services/database_service.py`, importada mais abaixo. Duas classes
 # homônimas fariam `@app.exception_handler` registrar só uma delas.
 from database.conexao import obter_engine
+from mensageria.config import MensageriaSettings
+from mensageria.processador_publicador import ProcessadorComPublicacao
+from mensageria.publicador import (
+    PublicacaoDesligada,
+    Publicador,
+    PublicadorRabbitMQ,
+)
 from rag.retriever import buscar as buscar_contexto_rag
 from services.agente_service import AgenteDesligado, ExecutarIntencao
 from services.alerta_service import (
@@ -380,6 +387,22 @@ def get_webhook_connection_pool() -> ConnectionPool:
     return abrir_pool(PostgresSettings(dsn=dsn, papel="az1_webhook"))
 
 
+# A publicação no barramento é ADITIVA e OPCIONAL. Sem `RABBITMQ_URL`, devolve o
+# publicador no-op (`PublicacaoDesligada`) e o comportamento da Sprint 4 fica
+# intacto — o composto `ProcessadorComPublicacao` passa a ser indistinguível do
+# processador anterior, e os testes de contrato de webhook seguem verdes. Com
+# `RABBITMQ_URL`, devolve o publicador real, que marca o delta E publica.
+#
+# `lru_cache` garante uma conexão só ao broker por processo, como nos demais
+# provedores deste módulo.
+@lru_cache
+def get_publicador() -> Publicador:
+    settings = MensageriaSettings.from_environment()
+    if settings is None:
+        return PublicacaoDesligada()
+    return PublicadorRabbitMQ(settings)
+
+
 def _segredo(variavel: str, provedor: str) -> str:
     valor = os.environ.get(variavel)
     if not valor:
@@ -418,7 +441,10 @@ def get_webhook_receiver() -> ReceberEventoWebhook:
         ),
         tradutor=TradutorGraph(),
         registro=RegistroEventosPostgres(pool, PROVEDOR_GRAPH),
-        processador=ProcessadorVarreduraPendente(pool, PROVEDOR_GRAPH, TIPOS_GRAPH),
+        processador=ProcessadorComPublicacao(
+            ProcessadorVarreduraPendente(pool, PROVEDOR_GRAPH, TIPOS_GRAPH),
+            get_publicador(),
+        ),
     )
 
 
@@ -444,7 +470,10 @@ def get_drive_webhook_receiver() -> ReceberEventoWebhook:
         ),
         tradutor=TradutorDrive(),
         registro=RegistroEventosPostgres(pool, PROVEDOR_DRIVE),
-        processador=ProcessadorVarreduraPendente(pool, PROVEDOR_DRIVE, TIPOS_DRIVE),
+        processador=ProcessadorComPublicacao(
+            ProcessadorVarreduraPendente(pool, PROVEDOR_DRIVE, TIPOS_DRIVE),
+            get_publicador(),
+        ),
     )
 
 
