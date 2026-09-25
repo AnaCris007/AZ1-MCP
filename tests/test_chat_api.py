@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from az1_api.dependencies import (
     get_agente,
+    get_alerta_dispatcher,
     get_chat_answerer,
     get_classificador_de_intencao,
     get_conversa_repository,
@@ -14,23 +15,52 @@ from az1_api.dependencies import (
 )
 from az1_api.main import app
 from pln.entidades import EntidadesExtraidas
+from pln.intencao import IntencaoDetectada
 from rag.retriever import ResultadoBusca
 from routes.chat import fontes_citadas, limpar_citacoes
 from services.agente_service import RespostaDoAgente, ResultadoAcao
 from services.auth_service import AuthenticatedUser
-from services.chat_service import ChatReceptionError, ChatReceptionErrorCode, ChatReply
+from services.chat_service import (
+    MAX_MESSAGE_LENGTH,
+    ChatReceptionError,
+    ChatReceptionErrorCode,
+    ChatReply,
+)
 from services.conversa_repository import TurnoDoChat
 from services.portfolio_repository import Pendencia
 
 
 class FakeAnswerer:
+    """Dublê do gerador de respostas, que CONTA quantas vezes foi chamado.
+
+    A contagem não é detalhe de instrumentação: desde que a classificação
+    passou a vir antes, "o modelo não foi consultado" virou comportamento
+    exigido, e comportamento exigido precisa de asserção.
+    """
+
     def __init__(self, result: ChatReply | Exception) -> None:
         self.result = result
+        self.chamadas = 0
 
-    def answer(self, message: str, conversation_id: str | None = None) -> ChatReply:
+    def answer(self, message: str, conversation_id: str | None = None, **_) -> ChatReply:
+        self.chamadas += 1
         if isinstance(self.result, Exception):
             raise self.result
         return self.result
+
+
+def _detectada(prevista: str, confianca: float) -> IntencaoDetectada:
+    return IntencaoDetectada(prevista=prevista, confianca=confianca)
+
+
+class _DispatcherEspiao:
+    def __init__(self) -> None:
+        self.despachos: list[dict] = []
+
+    def despachar(self, *, deteccao, origem, texto, projeto_id) -> None:
+        self.despachos.append(
+            {"deteccao": deteccao, "origem": origem, "texto": texto, "projeto_id": projeto_id}
+        )
 
 
 _TEST_USER = AuthenticatedUser(subject="test-user", email="teste@example.com", name="Usuário de Teste", provider="azure")
@@ -43,6 +73,14 @@ class TestChatAPI(unittest.TestCase):
     def _client_with(self, result: ChatReply | Exception) -> TestClient:
         app.dependency_overrides[get_chat_answerer] = lambda: FakeAnswerer(result)
         app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
+        # Sem classificador: estes testes verificam o contrato da resposta do
+        # RAG, e não a decisão do Agente. Com o classificador real, "Oi" é
+        # `fora_do_catalogo` com 83% de confiança e o Agente recusa antes de o
+        # modelo ser chamado — comportamento correto, e ruído aqui.
+        #
+        # `setdefault` e não atribuição: o teste que PRECISA de classificador o
+        # configura antes de pedir o cliente, e atribuir aqui o apagaria.
+        app.dependency_overrides.setdefault(get_classificador_de_intencao, lambda: None)
         return TestClient(app, raise_server_exceptions=False)
 
     def test_responde_mensagem_com_sucesso(self) -> None:
@@ -100,6 +138,10 @@ class TestChatAPI(unittest.TestCase):
 
 class TestChatAPIFontes(unittest.TestCase):
     """A citação só é verificável se a fonte chegar ao cliente."""
+
+    def setUp(self) -> None:
+        # O que se testa é a numeração da fonte citada, não a classificação.
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: None
 
     def tearDown(self) -> None:
         app.dependency_overrides.clear()
@@ -272,6 +314,10 @@ class TesteTrilhaDaConversa(unittest.TestCase):
         app.dependency_overrides[get_chat_answerer] = lambda: FakeAnswerer(reply)
         app.dependency_overrides[require_authenticated_user] = lambda: usuario or self.usuario
         app.dependency_overrides[get_conversa_repository] = lambda: self.espiao
+        # Sem classificador por padrão: o que se testa aqui é a TRILHA. Os casos
+        # que precisam de intenção o configuram ANTES de pedir o cliente, e o
+        # `setdefault` é o que preserva essa configuração.
+        app.dependency_overrides.setdefault(get_classificador_de_intencao, lambda: None)
         return TestClient(app, raise_server_exceptions=False)
 
     @staticmethod
@@ -409,11 +455,13 @@ class TesteTrilhaDaConversa(unittest.TestCase):
         self.assertEqual(gravadas[0].chunk_id, "abc123")
 
     def test_intencao_observada_vai_para_a_trilha(self) -> None:
-        # O classificador entrou no chat como OBSERVADOR: o rótulo é gravado e
-        # não decide nada. É o que torna o RNF03 mensurável sobre tráfego real —
-        # antes disso, `intencao` era NULL em 100% das linhas.
+        # A trilha grava a previsão CRUA, e não o que sobra da rejeição: 0,42
+        # está abaixo do limiar, o Agente não agiu, e ainda assim `orientar_tap`
+        # é o que fica registrado. A regra é reconstituível a partir da
+        # confiança; o argmax descartado não seria — e é dele que depende
+        # recalibrar o limiar sobre tráfego real.
         app.dependency_overrides[get_classificador_de_intencao] = lambda: (
-            lambda texto: ("orientar_tap", 0.42)
+            lambda texto: _detectada("orientar_tap", 0.42)
         )
         cliente = self._cliente(ChatReply(text="Resposta."))
 
@@ -454,7 +502,7 @@ class FakeAgente:
     def __init__(self, resposta: RespostaDoAgente | Exception) -> None:
         self._resposta = resposta
 
-    def executar(self, *, intencao: str, confianca: float, texto: str) -> RespostaDoAgente:
+    def executar(self, *, deteccao: IntencaoDetectada, texto: str) -> RespostaDoAgente:
         if isinstance(self._resposta, Exception):
             raise self._resposta
         return self._resposta
@@ -474,14 +522,23 @@ class TesteAgenteNoChat(unittest.TestCase):
         self.usuario = dataclasses.replace(_TEST_USER, domain_user_id=7)
         self.addCleanup(app.dependency_overrides.clear)
 
-    def _cliente(self, reply: ChatReply, resposta_do_agente: RespostaDoAgente | Exception) -> TestClient:
-        app.dependency_overrides[get_chat_answerer] = lambda: FakeAnswerer(reply)
+    def _cliente(
+        self,
+        reply: ChatReply,
+        resposta_do_agente: RespostaDoAgente | Exception,
+        *,
+        confianca: float = 0.9,
+    ) -> TestClient:
+        self.answerer = FakeAnswerer(reply)
+        self.dispatcher = _DispatcherEspiao()
+        app.dependency_overrides[get_chat_answerer] = lambda: self.answerer
         app.dependency_overrides[require_authenticated_user] = lambda: self.usuario
         app.dependency_overrides[get_conversa_repository] = lambda: self.espiao
         app.dependency_overrides[get_classificador_de_intencao] = lambda: (
-            lambda texto: ("gerar_alertas_pendencias", 0.9)
+            lambda texto: _detectada("gerar_alertas_pendencias", confianca)
         )
         app.dependency_overrides[get_agente] = lambda: FakeAgente(resposta_do_agente)
+        app.dependency_overrides[get_alerta_dispatcher] = lambda: self.dispatcher
         return TestClient(app, raise_server_exceptions=False)
 
     def test_acao_confiante_sobrepoe_a_resposta_do_rag(self) -> None:
@@ -533,6 +590,226 @@ class TesteAgenteNoChat(unittest.TestCase):
 
         self.assertEqual(resposta.status_code, 200)
         self.assertEqual(resposta.json()["reply"], "Resposta do RAG.")
+
+class TesteClassificaAntesDeConsultarAsFontes(unittest.TestCase):
+    """A ordem do handler, que por muito tempo foi o oposto do artefato.
+
+    O handler chamava `answerer.answer` PRIMEIRO e classificava depois. Todo
+    turno em que o Agente agia — pendências, situação de projeto ou recusa —
+    pagava uma geração no Gemini e uma busca vetorial cujo resultado era
+    descartado na linha seguinte.
+
+    No caso da recusa isso não era só desperdício. A Seção 2.1 do Projeto.md
+    especifica recusar pedidos fora do escopo "antes mesmo de consultar as
+    fontes de dados", e o caso crítico 1 da Seção 2.2.3 modela a classificação
+    antes do roteamento. Consultar as fontes para depois jogar a resposta fora
+    é o oposto do que o artefato descreve.
+
+    A contagem em `FakeAnswerer.chamadas` é o que impede a ordem de voltar a
+    inverter sem ninguém notar: invertê-la não muda nenhuma resposta, só o
+    custo e a semântica.
+    """
+
+    def setUp(self) -> None:
+        self.espiao = _RepositorioEspiao()
+        self.usuario = dataclasses.replace(_TEST_USER, domain_user_id=7)
+        self.addCleanup(app.dependency_overrides.clear)
+
+    def _cliente(self, resposta_do_agente: RespostaDoAgente | Exception) -> TestClient:
+        self.answerer = FakeAnswerer(ChatReply(text="Resposta do RAG."))
+        app.dependency_overrides[get_chat_answerer] = lambda: self.answerer
+        app.dependency_overrides[require_authenticated_user] = lambda: self.usuario
+        app.dependency_overrides[get_conversa_repository] = lambda: self.espiao
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: (
+            lambda texto: _detectada("gerar_alertas_pendencias", 0.9)
+        )
+        app.dependency_overrides[get_agente] = lambda: FakeAgente(resposta_do_agente)
+        app.dependency_overrides[get_alerta_dispatcher] = lambda: _DispatcherEspiao()
+        return TestClient(app, raise_server_exceptions=False)
+
+    def test_recusa_nao_consulta_o_modelo(self) -> None:
+        cliente = self._cliente(
+            RespostaDoAgente(ResultadoAcao.RECUSADA_FORA_DO_CATALOGO, EntidadesExtraidas())
+        )
+
+        cliente.post(
+            "/api/v1/chat",
+            json={"message": "qual a previsão do tempo?", "conversation_id": _UUID_VALIDO},
+        )
+
+        self.assertEqual(self.answerer.chamadas, 0)
+
+    def test_acao_de_portfolio_nao_consulta_o_modelo(self) -> None:
+        pendencia = Pendencia(
+            id=1, projeto_codigo="SYN-01", projeto_nome="Projeto", codigo=None,
+            tipo="risco", titulo="Licença ambiental vencendo", descricao=None,
+            criticidade=None, responsavel=None, prazo=None, situacao="aberta",
+        )
+        cliente = self._cliente(
+            RespostaDoAgente(ResultadoAcao.PENDENCIAS, EntidadesExtraidas(), pendencias=(pendencia,))
+        )
+
+        corpo = cliente.post(
+            "/api/v1/chat",
+            json={"message": "o que precisa da minha atenção?", "conversation_id": _UUID_VALIDO},
+        ).json()
+
+        self.assertEqual(self.answerer.chamadas, 0)
+        self.assertIn("Licença ambiental vencendo", corpo["reply"])
+
+    def test_sem_acao_consulta_o_modelo_uma_vez(self) -> None:
+        """O outro lado da asserção: sem ação, a conversa é a de sempre."""
+        cliente = self._cliente(RespostaDoAgente(ResultadoAcao.SEM_ACAO, EntidadesExtraidas()))
+
+        corpo = cliente.post(
+            "/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO}
+        ).json()
+
+        self.assertEqual(self.answerer.chamadas, 1)
+        self.assertEqual(corpo["reply"], "Resposta do RAG.")
+
+    def test_agente_quebrado_cai_no_modelo(self) -> None:
+        """Degradar é cair na conversa de sempre, e não devolver vazio.
+
+        Com a classificação antes da geração, `executar_acao_sem_interferir`
+        devolvendo None passou a ser o que DECIDE se o modelo é chamado. Um
+        Agente com defeito não pode custar a resposta.
+        """
+        cliente = self._cliente(RuntimeError("agente quebrado"))
+
+        with self.assertLogs("routes.chat", level="ERROR"):
+            resposta = cliente.post(
+                "/api/v1/chat", json={"message": "x", "conversation_id": _UUID_VALIDO}
+            )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(self.answerer.chamadas, 1)
+        self.assertEqual(resposta.json()["reply"], "Resposta do RAG.")
+
+
+class TesteValidacaoAntesDaClassificacao(unittest.TestCase):
+    """O 422 continua imediato, e não passa pelo classificador.
+
+    A validação morava dentro de `AnswerChatMessage.answer`. Com a
+    classificação subindo na ordem, deixá-la lá faria uma mensagem vazia chegar
+    ao modelo de PLN, e o 422 passaria a depender do que ele achasse de uma
+    string em branco.
+    """
+
+    def setUp(self) -> None:
+        self.classificacoes: list[str] = []
+        self.addCleanup(app.dependency_overrides.clear)
+
+        def _classificador(texto: str):
+            self.classificacoes.append(texto)
+            return _detectada("gerar_alertas_pendencias", 0.9)
+
+        self.answerer = FakeAnswerer(ChatReply(text="Resposta."))
+        app.dependency_overrides[get_chat_answerer] = lambda: self.answerer
+        app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: _classificador
+        # O Agente real consultaria o portfólio e pagaria o timeout do pool.
+        # Aqui o que se mede é a ORDEM das etapas, não o que o Agente faz.
+        app.dependency_overrides[get_agente] = lambda: FakeAgente(
+            RespostaDoAgente(ResultadoAcao.SEM_ACAO, EntidadesExtraidas())
+        )
+        self.cliente = TestClient(app, raise_server_exceptions=False)
+
+    def test_mensagem_vazia_nao_chega_ao_classificador(self) -> None:
+        resposta = self.cliente.post(
+            "/api/v1/chat", json={"message": "   ", "conversation_id": _UUID_VALIDO}
+        )
+
+        self.assertEqual(resposta.status_code, 422)
+        self.assertEqual(resposta.json()["error"], "empty_message")
+        self.assertEqual(self.classificacoes, [])
+        self.assertEqual(self.answerer.chamadas, 0)
+
+    def test_mensagem_longa_demais_nao_chega_ao_classificador(self) -> None:
+        resposta = self.cliente.post(
+            "/api/v1/chat",
+            json={"message": "x" * (MAX_MESSAGE_LENGTH + 1), "conversation_id": _UUID_VALIDO},
+        )
+
+        self.assertEqual(resposta.status_code, 422)
+        self.assertEqual(resposta.json()["error"], "message_too_long")
+        self.assertEqual(self.classificacoes, [])
+
+    def test_classificador_ve_a_mensagem_sem_espacos_nas_pontas(self) -> None:
+        """O mesmo texto para os dois.
+
+        O handler classificava `payload.message` cru enquanto o modelo recebia
+        a versão sem espaços. A intenção gravada na trilha não era, a rigor, a
+        intenção do texto respondido.
+        """
+        self.cliente.post(
+            "/api/v1/chat", json={"message": "  o que está pendente?  ", "conversation_id": _UUID_VALIDO}
+        )
+
+        self.assertEqual(self.classificacoes, ["o que está pendente?"])
+
+
+class TesteClassificacaoChegaABusca(unittest.TestCase):
+    """A ponta que faltava: a intenção influenciando o que a LLM enxerga.
+
+    Antes desta integração a classificação era calculada, usada para decidir se
+    o Agente agia, e descartada. Quando ele não agia, a pergunta ia ao RAG como
+    se nenhuma classificação existisse.
+    """
+
+    def setUp(self) -> None:
+        self.recebido: dict = {}
+
+    def tearDown(self) -> None:
+        app.dependency_overrides.clear()
+
+    def _cliente(self, intencao: str, confianca: float) -> TestClient:
+        espiao = self
+
+        class AnswererEspiao:
+            def answer(self, message, conversation_id=None, foco=None):
+                espiao.recebido["foco"] = foco
+                return ChatReply(text="Resposta.", modelo="gemini-3.5-flash-lite")
+
+        app.dependency_overrides[get_chat_answerer] = AnswererEspiao
+        app.dependency_overrides[require_authenticated_user] = lambda: _TEST_USER
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: (
+            lambda texto: _detectada(intencao, confianca)
+        )
+        return TestClient(app, raise_server_exceptions=False)
+
+    def test_intencao_confiante_estreita_a_busca_por_tipo_de_documento(self) -> None:
+        cliente = self._cliente("orientar_riscos_problemas", 0.95)
+
+        cliente.post("/api/v1/chat", json={"message": "Como descrevo um risco?", "conversation_id": "c1"})
+
+        self.assertEqual(self.recebido["foco"].tipo_documento, "riscos_problemas")
+
+    def test_intencao_rejeitada_nao_estreita_nada(self) -> None:
+        """O classificador inseguro não pode piorar o que funcionava sem ele."""
+        cliente = self._cliente("orientar_riscos_problemas", 0.01)
+
+        cliente.post("/api/v1/chat", json={"message": "Como descrevo um risco?", "conversation_id": "c1"})
+
+        self.assertIsNone(self.recebido["foco"].tipo_documento)
+
+    def test_codigo_do_projeto_chega_a_busca(self) -> None:
+        # Extração por regra: não depende do F1 do classificador.
+        cliente = self._cliente("consultar_documentos_normativos", 0.95)
+
+        cliente.post("/api/v1/chat", json={"message": "Qual o risco do SYN-04?", "conversation_id": "c1"})
+
+        self.assertEqual(self.recebido["foco"].projeto_codigo, "SYN-04")
+
+    def test_sem_classificador_a_busca_continua_ampla(self) -> None:
+        """Instalação sem o `.joblib` treinado segue conversando."""
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: None
+        cliente = self._cliente("orientar_tap", 0.99)
+        app.dependency_overrides[get_classificador_de_intencao] = lambda: None
+
+        cliente.post("/api/v1/chat", json={"message": "Como preencho o TAP?", "conversation_id": "c1"})
+
+        self.assertTrue(self.recebido["foco"].vazio)
 
 
 if __name__ == "__main__":

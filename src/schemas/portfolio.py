@@ -60,13 +60,56 @@ class CalendarEventResponse(BaseModel):
     title: str
     type: str
     project: str = ""
+    # Vazio para marco/prazo, de propósito: não há hora real para os dois, e
+    # inventar uma seria fabricar dado. Só type="evento" (criado pelo próprio
+    # usuário) preenche este campo, quando uma hora é informada.
+    time: str = ""
+    description: str = ""
+    responsible: str = ""
+    status: str = ""
 
 
 class CalendarDayResponse(BaseModel):
     date: str
     weekday: str
     events: list[CalendarEventResponse]
+    # Chave inequívoca para a visualização em grade casar um dia com sua
+    # célula. `date` sozinho não serve: é uma string em português sem ano
+    # ("5 de dezembro"), e reimplementar a tabela de meses em JavaScript para
+    # desfazer essa formatação seria frágil e duplicado.
+    iso: str = ""
 
 
 class CalendarResponse(BaseModel):
     days: list[CalendarDayResponse]
+
+
+class EventoLocalCreateRequest(BaseModel):
+    """O que o frontend envia para criar um evento próprio na Agenda.
+
+    `data`/`hora` chegam como texto, não como `date`/`time` do Pydantic: a
+    rota valida e devolve um 422 com mensagem própria em caso de formato
+    inválido, em vez do erro genérico de parse do Pydantic (mesma razão de
+    `TaskPatchRequest`).
+    """
+
+    titulo: str
+    data: str
+    hora: str = ""
+    descricao: str = ""
+
+
+class EventoLocalResponse(BaseModel):
+    """Resposta de `POST /calendar/events`.
+
+    Distinta de `CalendarEventResponse`: o frontend precisa do `id` inteiro
+    puro para depois chamar `DELETE /calendar/events/{id}`, enquanto
+    `CalendarEventResponse.id` é a string composta ("evento-7") usada só
+    dentro da Agenda mesclada.
+    """
+
+    id: int
+    title: str
+    date: str
+    time: str = ""
+    description: str = ""

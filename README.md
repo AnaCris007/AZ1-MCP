@@ -64,6 +64,7 @@ Além de responder a consultas, o AZ1 apoia o acompanhamento preventivo do portf
 ├── src/
 │   ├── database/    # scripts SQL
 │   ├── frontend/    # interface em React + Vite
+│   ├── mensageria/  # barramento assíncrono (RabbitMQ) e worker de varredura
 │   ├── pln/         # pipeline de linguagem natural
 │   ├── routes/      # endpoints da API (FastAPI)
 │   ├── schemas/     # contratos de entrada da API
@@ -111,6 +112,7 @@ python -m unittest discover tests  # a suite completa
 - `src/routes/`: endpoints da API (FastAPI).
 - `src/schemas/`: modelos Pydantic de request/response da API.
 - `src/services/`: casos de uso e integração com armazenamento S3-compatível.
+- `src/mensageria/`: barramento de mensagens assíncrono (RabbitMQ) da Sprint 5. O receptor de webhook publica o envelope; um worker autônomo (`python -m mensageria.consumidor`) consome e faz a varredura da origem marcada como pendente. A publicação é opcional: sem `RABBITMQ_URL`, a API degrada para no-op e o comportamento anterior permanece intacto. [Documentação técnica](docs/Projeto.md#6441-implementação-do-barramento-assíncrono).
 - `src/az1_api/main.py`: ponto de entrada da aplicação FastAPI.
 - `resultados/`: saída gerada. Nada ali é editado à mão. Os comparativos vêm de
   `python -m pln.experimento` e `python -m pln.ajuste_fino`, o modelo treinado de
@@ -131,6 +133,7 @@ docker compose up -d --build
 | http://localhost:5173 | interface, com recarga automática |
 | http://localhost:8010/docs | documentação interativa da API (Swagger) |
 | http://localhost:9001 | console do MinIO (as chaves `AUDIO_STORAGE_*` do seu `.env`) |
+| http://localhost:15672 | painel de management do RabbitMQ (`az1` / `az1`) |
 
 O código do repositório é montado dentro dos contêineres: editar um arquivo recarrega a API ou a interface, sem reconstruir imagem.
 

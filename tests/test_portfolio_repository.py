@@ -195,7 +195,7 @@ class TesteLeituraUsaAView(unittest.TestCase):
         self.assertEqual(projeto.artefatos, 11)
 
     def test_a_tabela_portfolio_nao_existe_mais(self):
-        """Removida em 08_remove_portfolio.sql: nada pode voltar a referenciá-la.
+        """Removida em 09_remove_portfolio.sql: nada pode voltar a referenciá-la.
 
         Compara o SQL sem os comentários, porque o DDL explica em texto por que
         a tabela saiu — e uma asserção que tropeça na própria justificativa

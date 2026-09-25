@@ -13,6 +13,7 @@ import unittest
 from pathlib import Path
 
 from sklearn.base import clone
+from sklearn.naive_bayes import MultinomialNB
 
 from pln.caminhos import DATASET_PADRAO
 from pln.classificador import (
@@ -36,12 +37,21 @@ from pln.vetorizacao import (
 
 RAIZ = Path(__file__).resolve().parent.parent
 
+# SEIS por classe, e não três. O modelo do produto é `LinearSVC` embrulhado em
+# `CalibratedClassifierCV(cv=3)`, que treina três modelos internos e por isso
+# exige pelo menos três exemplos de cada classe DENTRO de cada dobra de treino.
+# Com três por classe, uma validação cruzada de três dobras deixa dois no treino
+# e o calibrador recusa — não é limitação do teste, é do modelo, e vale
+# registrar: um dataset com classe rara demais não treina.
 TEXTOS = [
     "Qual o status do projeto?", "Qual o avanço da obra?", "Quantos documentos existem?",
+    "Qual o percentual concluído?", "Como está o cronograma?", "Qual a situação do lote?",
     "Registra o novo marco.", "Cria um projeto novo.", "Atualiza o percentual.",
+    "Grava a data de entrega.", "Inclui o responsável.", "Lança o avanço do mês.",
     "Tem pendência vencida?", "Algum prazo vence hoje?", "Quais riscos estão sem mitigação?",
+    "Há entrega atrasada?", "Algum marco furou o prazo?", "Quais problemas estão abertos?",
 ]
-ROTULOS = ["consulta"] * 3 + ["transacao"] * 3 + ["alerta"] * 3
+ROTULOS = ["consulta"] * 6 + ["transacao"] * 6 + ["alerta"] * 6
 
 
 class TestePreprocessadorDeTexto(unittest.TestCase):
@@ -89,14 +99,24 @@ class TesteConstrucao(unittest.TestCase):
         self.assertEqual(ALPHA_PADRAO, 1.0)
         self.assertIs(FIT_PRIOR_PADRAO, True)
 
-    def test_suavizacao_ligada(self):
-        # Substituiu o antigo teste de `max_iter`, que era da regressão
-        # logística e deixou de existir com a troca para Naive Bayes. O análogo
-        # é o `alpha`: com 0 a suavização desliga e volta o problema que ela
-        # existe para resolver — um termo nunca visto numa classe tem
-        # probabilidade zero, e um único zero zera o produto inteiro, então uma
-        # palavra desconhecida basta para eliminar uma intenção inteira.
-        self.assertGreater(construir_classificador().named_steps["classificador"].alpha, 0)
+    def test_regularizacao_e_convergencia_configuradas(self):
+        # Este teste já foi de `max_iter`, virou `alpha` quando o produto passou
+        # a Naive Bayes, e volta a ser dos dois com a regressão logística. O que
+        # ele guarda não muda: os parâmetros que impedem o modelo de falhar em
+        # silêncio.
+        #
+        # `C` finito mantém a regularização ligada; sem ela, 5.096 colunas sobre
+        # 881 exemplos decoram o corpus. `max_iter` alto evita o aviso de não
+        # convergência do `lbfgs`, que sobre contagem bruta é lento — e um
+        # modelo que não convergiu treina, prevê e erra sem levantar exceção.
+        final = construir_classificador().named_steps["classificador"]
+
+        # O `C` mora no `LinearSVC` que o calibrador embrulha, e não no
+        # calibrador. Ler `final.C` devolveria AttributeError — é o custo de
+        # explicabilidade e de introspecção que a calibração cobra.
+        self.assertGreater(final.estimator.C, 0)
+        self.assertEqual(final.method, "sigmoid")
+        self.assertGreaterEqual(final.cv, 2)
 
 
 class TestePrevisao(unittest.TestCase):
@@ -172,22 +192,23 @@ class TesteAvaliacao(unittest.TestCase):
 
 
 class TesteDatasetPadrao(unittest.TestCase):
-    def test_config_padrao_e_a_primeira_colocada_do_experimento(self):
-        # Trava contra alguém trocar o padrão sem passar pelo experimento. Os
-        # valores abaixo são o rank #1 de resultados/comparativo_preprocessamento.md
-        # — `bow n=1` com `[tok:split] (texto cru)`, nenhuma etapa ligada.
-        # Se este teste falhar, o comparativo e docs/PipelinePLN.md precisam ser
-        # atualizados junto.
+    def test_config_padrao_e_a_vencedora_da_busca_de_tres_estagios(self):
+        # Trava contra alguém trocar o padrão sem passar pela busca. Os valores
+        # abaixo saíram de `resultados/comparativo_modelos.md`, da linha da
+        # regressão logística: `bow n=1-2` com `[tok:regex] remover_numeros >
+        # stemming`. Se este teste falhar, o comparativo e a Seção 3.3 do
+        # Projeto.md precisam ser atualizados junto.
         #
-        # O que este teste NÃO garante: que essa seja a melhor forma de preparar
-        # o texto. Ela venceu um empate de 2261 configurações, todas em F1
-        # 1,0000, por ser a mais simples — ver a ressalva em classificador.py.
+        # Repare que este NÃO é o rank #1 do experimento: aquele ranking é
+        # produzido sob `MultinomialNB`, e cada família tem o seu melhor texto.
+        # É justamente o que a busca conjunta existe para mostrar.
         self.assertEqual(
-            CONFIG_PRE_PADRAO.etapas_ativas_na_ordem(), ("remover_numeros", "morfologia")
+            CONFIG_PRE_PADRAO.etapas_ativas_na_ordem(),
+            ("minusculas", "remover_acentos", "remover_numeros"),
         )
         self.assertIs(CONFIG_PRE_PADRAO.tokenizacao, Tokenizacao.REGEX)
         self.assertIs(CONFIG_VET_PADRAO.modo, ModoVetorizacao.BOW)
-        self.assertEqual(CONFIG_VET_PADRAO.n_max, 1)
+        self.assertEqual(CONFIG_VET_PADRAO.n_max, 2)
 
     def test_dataset_de_exemplo_carrega(self):
         textos, rotulos = carregar_dataset(DATASET_PADRAO)
@@ -196,14 +217,47 @@ class TesteDatasetPadrao(unittest.TestCase):
 
 
 class TesteClassificadorDoProdutoEAReguaDoExperimento(unittest.TestCase):
-    # O pré-processamento padrão foi escolhido medindo com a régua do
-    # experimento, então trocar o classificador aqui faria essa escolha valer
-    # para um modelo que não é o que roda.
+    """Produto e régua DEIXARAM de ser o mesmo modelo, e isso é decisão.
 
-    def test_produto_usa_a_mesma_classe_da_regua(self):
+    Até a Sprint 3 havia aqui um teste afirmando o contrário: produto e régua
+    tinham de ser da mesma classe, porque o pré-processamento é escolhido
+    medindo com a régua. O argumento era válido enquanto ninguém tinha medido
+    outras famílias sobre o texto delas próprias.
+
+    Medido, o `MultinomialNB` ficou em sexto de sete e falhava nos três limites
+    do RNF03 no conjunto retido. Manter a invariante custaria o requisito.
+
+    Estes testes travam o que sobrou: a divergência é INTENCIONAL e a régua
+    continua sendo o Naive Bayes, cuja velocidade é o que torna a varredura de
+    milhares de execuções praticável.
+    """
+
+    def test_produto_e_regua_sao_familias_diferentes(self):
         do_produto = construir_classificador().named_steps["classificador"]
         da_regua = construir_pipeline_de_medicao(CONFIG_VET_PADRAO).named_steps["classificador"]
-        self.assertIs(type(do_produto), type(da_regua))
+
+        self.assertIsNot(
+            type(do_produto), type(da_regua),
+            "produto e régua voltaram a ser a mesma família. Se a volta é "
+            "deliberada, o cabeçalho de classificador.py e a Seção 3.3.7 "
+            "precisam voltar junto.",
+        )
+
+    def test_a_regua_continua_sendo_naive_bayes(self):
+        # A varredura de `experimento.py` são milhares de execuções, e é a
+        # velocidade do Naive Bayes que as torna praticáveis. Trocar a régua por
+        # uma família com otimização iterativa mediria o mesmo espaço em horas.
+        da_regua = construir_pipeline_de_medicao(CONFIG_VET_PADRAO).named_steps["classificador"]
+
+        self.assertIsInstance(da_regua, MultinomialNB)
+
+    def test_o_produto_produz_probabilidade(self):
+        # A regra de rejeição de `pln.intencao` é um limiar sobre confiança.
+        # Uma família sem `predict_proba` quebraria cobertura e aceitação
+        # indevida — as duas métricas do RNF03 definidas sobre a rejeição.
+        self.assertTrue(
+            hasattr(construir_classificador().named_steps["classificador"], "predict_proba")
+        )
 
     def test_treina_com_toda_vetorizacao_do_espaco(self):
         for config_vet in todas_as_vetorizacoes():

@@ -13,6 +13,7 @@ Preparação:
     psql "$TEST_DATABASE_URL" -f src/database/01_create_database.sql
     psql "$TEST_DATABASE_URL" -f src/database/02_initial_data.sql
     psql "$TEST_DATABASE_URL" -f src/database/03_rls_policies.sql
+    psql "$TEST_DATABASE_URL" -f src/database/07_evento_local.sql
     python -m unittest tests.test_integracao_persistencia -v
 
 Sem `TEST_DATABASE_URL`, a suíte inteira é PULADA — e pular é registro de
@@ -47,7 +48,8 @@ from tests.apoio_integracao import RAIZ
 
 DSN = os.environ.get("TEST_DATABASE_URL")
 
-# Os três schemas e as dezesseis tabelas que a Seção 3.6.6 declara.
+# Os três schemas e as dezesseis tabelas que a Seção 3.6.6 declara —
+# dezessete até `09_remove_portfolio.sql` tirar `portfolio.portfolio`.
 SCHEMAS_ESPERADOS = {"portfolio", "auditoria", "integracao"}
 TOTAL_DE_TABELAS_ESPERADO = 16
 
@@ -503,10 +505,11 @@ class TestPersistenciaIntegracao(_BaseDePersistencia):
     # -- TI-29 ---------------------------------------------------------------
 
     def test_schema_e_criado_em_base_vazia(self) -> None:
-        """Os três arquivos de `src/database` aplicados a uma base recém-criada.
+        """Os scripts-base e as migrações 07 a 09 aplicados a uma base recém-criada.
 
         Este é o caso como o planejamento o descreve, e não uma leitura do banco
-        já migrado: cria uma base do zero, aplica `01`, `02` e `03` na ordem e
+        já migrado: cria uma base do zero, aplica `01`, `02`, `03`, `07`, `08`
+        e `09` na ordem, reaplica cada migração para provar idempotência e
         confere o que ficou de pé. A base é destruída ao final.
 
         A execução é por `psql`, e não por `psycopg`, porque o DDL usa
@@ -533,7 +536,17 @@ class TestPersistenciaIntegracao(_BaseDePersistencia):
 
         try:
             destino = _dsn_para(base)
-            for arquivo in ("01_create_database.sql", "02_initial_data.sql", "03_rls_policies.sql"):
+            for arquivo in (
+                "01_create_database.sql",
+                "02_initial_data.sql",
+                "03_rls_policies.sql",
+                "07_evento_local.sql",
+                "07_evento_local.sql",
+                "08_seguranca_acesso.sql",
+                "08_seguranca_acesso.sql",
+                "09_remove_portfolio.sql",
+                "09_remove_portfolio.sql",
+            ):
                 with self.subTest(script=arquivo):
                     resultado = subprocess.run(
                         [psql, destino, "-v", "ON_ERROR_STOP=1", "-f", f"src/database/{arquivo}"],
@@ -696,6 +709,20 @@ class TestPersistenciaEsquema(unittest.TestCase):
             projetos = cursor.fetchone()[0]
 
         self.assertGreater(projetos, 0, "a carga inicial não foi aplicada")
+
+    def test_evento_local_tem_colunas_do_contrato(self) -> None:
+        with psycopg.connect(DSN) as conexao, conexao.cursor() as cursor:
+            cursor.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = 'portfolio' AND table_name = 'evento_local' "
+                "ORDER BY ordinal_position"
+            )
+            colunas = [linha[0] for linha in cursor.fetchall()]
+
+        self.assertEqual(
+            colunas,
+            ["id", "usuario_id", "titulo", "data", "hora", "descricao", "criado_em"],
+        )
 
 
 class TestModeloDocumentado(unittest.TestCase):

@@ -9,19 +9,34 @@
 from __future__ import annotations
 
 import unittest
-from datetime import date
+from datetime import date, time
 
 from fastapi.testclient import TestClient
+from psycopg import OperationalError
+from psycopg.errors import UndefinedTable
 
-from az1_api.dependencies import get_portfolio_repository, require_authenticated_user
+from az1_api.dependencies import (
+    get_evento_local_repository,
+    get_portfolio_repository,
+    require_authenticated_user,
+)
 from az1_api.main import app
 from routes.portfolio import formatar_dia, formatar_dia_da_semana, montar_agenda
 from services.auth_service import AuthenticatedUser
 from services.database_service import BancoNaoConfigurado
+from services.evento_local_repository import EventoLocal
 from services.portfolio_repository import Pendencia, SituacaoInvalida, SituacaoProjeto
+
+
+def _evento_local(id=1, titulo="Dentista", data=date(2026, 11, 30), hora=None, descricao="") -> EventoLocal:
+    return EventoLocal(id=id, titulo=titulo, data=data, hora=hora, descricao=descricao)
+
 
 _USUARIO = AuthenticatedUser(
     subject="s", email="e@x", name="n", provider="azure", domain_user_id=1
+)
+_USUARIO_SEM_IDENTIDADE = AuthenticatedUser(
+    subject="s", email="e@x", name="n", provider="disabled", domain_user_id=None
 )
 
 
@@ -70,11 +85,39 @@ class _RepositorioFalso:
         return self._atualizada
 
 
+class _RepositorioDeEventosLocaisFalso:
+    def __init__(self, eventos=(), criado="nao-definido", erro_ao_listar=None):
+        self._eventos = tuple(eventos)
+        self._criado = criado
+        self._erro_ao_listar = erro_ao_listar
+        self.chamadas_listar: list[int] = []
+        self.criados: list[dict] = []
+        self.apagados: list[tuple[int, int]] = []
+
+    def listar(self, usuario_id):
+        self.chamadas_listar.append(usuario_id)
+        if self._erro_ao_listar is not None:
+            raise self._erro_ao_listar
+        return self._eventos
+
+    def criar(self, *, usuario_id, titulo, data, hora, descricao):
+        self.criados.append({"usuario_id": usuario_id, "titulo": titulo, "data": data, "hora": hora, "descricao": descricao})
+        if self._criado == "nao-definido":
+            return _evento_local(id=99, titulo=titulo, data=data, hora=hora, descricao=descricao)
+        return self._criado
+
+    def apagar(self, *, usuario_id, evento_id):
+        self.apagados.append((usuario_id, evento_id))
+        return usuario_id == 1 and evento_id == 7
+
+
 class _BaseDePortfolio(unittest.TestCase):
     def setUp(self):
         self.repositorio = _RepositorioFalso()
+        self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso()
         app.dependency_overrides[require_authenticated_user] = lambda: _USUARIO
         app.dependency_overrides[get_portfolio_repository] = lambda: self.repositorio
+        app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
         self.client = TestClient(app, raise_server_exceptions=False)
         self.addCleanup(app.dependency_overrides.clear)
 
@@ -193,16 +236,106 @@ class TesteCalendario(_BaseDePortfolio):
 
         corpo = self.client.get("/api/v1/calendar/events").json()
         dia = corpo["days"][0]
-        self.assertEqual(set(dia), {"date", "weekday", "events"})
-        self.assertEqual(set(dia["events"][0]), {"id", "title", "type", "project"})
+        self.assertEqual(set(dia), {"date", "weekday", "events", "iso"})
+        self.assertEqual(
+            set(dia["events"][0]),
+            {"id", "title", "type", "project", "time", "description", "responsible", "status"},
+        )
+        self.assertEqual(dia["iso"], "2026-11-30")
 
-    def test_nao_existe_campo_de_hora(self):
-        # Não há tabela de compromissos no modelo: inventar "09:00" para
-        # preencher a coluna seria fabricar dado.
+    def test_marco_e_prazo_continuam_sem_hora_fabricada(self):
+        # Não há tabela de compromissos para eles no modelo: inventar "09:00"
+        # para preencher a coluna seria fabricar dado. Só eventos próprios
+        # carregam hora real — ver test_evento_local_aparece_na_agenda_com_hora_real.
         self.repositorio = _RepositorioFalso(projetos=[_projeto()])
         app.dependency_overrides[get_portfolio_repository] = lambda: self.repositorio
         corpo = self.client.get("/api/v1/calendar/events").json()
-        self.assertNotIn("time", corpo["days"][0]["events"][0])
+        self.assertEqual(corpo["days"][0]["events"][0]["time"], "")
+
+    def test_rota_degrada_quando_tabela_de_eventos_locais_nao_existe(self):
+        # Migração de banco e deploy de código são passos separados neste
+        # projeto: uma instalação que ainda não rodou 07_evento_local.sql não
+        # pode derrubar a Agenda inteira com 500 por causa disso.
+        self.repositorio = _RepositorioFalso(projetos=[_projeto()])
+        app.dependency_overrides[get_portfolio_repository] = lambda: self.repositorio
+        self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(
+            erro_ao_listar=UndefinedTable('relation "portfolio.evento_local" does not exist')
+        )
+        app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
+
+        resposta = self.client.get("/api/v1/calendar/events")
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.json()["days"][0]["events"][0]["type"], "marco")
+
+    def test_falha_de_banco_ao_listar_eventos_locais_devolve_503(self):
+        self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(
+            erro_ao_listar=OperationalError("conexão indisponível")
+        )
+        app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
+
+        resposta = self.client.get("/api/v1/calendar/events")
+
+        self.assertEqual(resposta.status_code, 503)
+        self.assertEqual(resposta.json()["error"], "agenda_indisponivel")
+
+    def test_erro_de_programacao_ao_listar_eventos_locais_nao_e_mascarado(self):
+        self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(
+            erro_ao_listar=RuntimeError("erro inesperado")
+        )
+        app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
+
+        resposta = self.client.get("/api/v1/calendar/events")
+
+        self.assertEqual(resposta.status_code, 500)
+        self.assertEqual(resposta.json()["error"], "internal_error")
+
+    def test_evento_local_aparece_na_agenda_com_hora_real(self):
+        self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(
+            eventos=[_evento_local(data=date(2026, 12, 5), hora=time(9, 0))]
+        )
+        app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
+
+        corpo = self.client.get("/api/v1/calendar/events").json()
+        evento = corpo["days"][0]["events"][0]
+        self.assertEqual(evento["type"], "evento")
+        self.assertEqual(evento["time"], "09:00")
+        self.assertEqual(self.repositorio_eventos_locais.chamadas_listar, [1])
+
+    def test_evento_local_sem_hora_nao_fabrica_horario(self):
+        self.repositorio_eventos_locais = _RepositorioDeEventosLocaisFalso(
+            eventos=[_evento_local(data=date(2026, 12, 5), hora=None)]
+        )
+        app.dependency_overrides[get_evento_local_repository] = lambda: self.repositorio_eventos_locais
+
+        corpo = self.client.get("/api/v1/calendar/events").json()
+        self.assertEqual(corpo["days"][0]["events"][0]["time"], "")
+
+    def test_evento_local_e_marco_no_mesmo_dia_ficam_juntos(self):
+        dias = montar_agenda(
+            [_projeto("SYN-01", termino=date(2026, 11, 30))],
+            [],
+            [_evento_local(data=date(2026, 11, 30))],
+        )
+        self.assertEqual(len(dias), 1)
+        self.assertEqual(len(dias[0].events), 2)
+
+    def test_sem_identidade_agenda_responde_200_sem_eventos_proprios(self):
+        # AZ1_AUTH_MODE=disabled, ou ResolveOrCreateUsuario falhou: sem
+        # domain_user_id não há "meus eventos", mas a Agenda não pode quebrar
+        # por causa disso.
+        app.dependency_overrides[require_authenticated_user] = lambda: _USUARIO_SEM_IDENTIDADE
+        self.repositorio = _RepositorioFalso(projetos=[_projeto()])
+        app.dependency_overrides[get_portfolio_repository] = lambda: self.repositorio
+
+        resposta = self.client.get("/api/v1/calendar/events")
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.json()["days"][0]["events"][0]["type"], "marco")
+        self.assertEqual(self.repositorio_eventos_locais.chamadas_listar, [])
+
+    def test_montar_agenda_continua_aceitando_dois_argumentos(self):
+        # Compatibilidade posicional: eventos_locais é o terceiro parâmetro,
+        # opcional, e chamadas existentes não devem precisar mudar.
+        self.assertEqual(montar_agenda([], []), [])
 
     def test_data_e_unica_por_dia(self):
         # `key={day.date}` no React: data repetida duplica chave e o componente
@@ -224,6 +357,54 @@ class TesteCalendario(_BaseDePortfolio):
             [_projeto("SYN-A", date(2026, 12, 1)), _projeto("SYN-B", date(2026, 3, 1))], []
         )
         self.assertEqual([d.date for d in dias], ["1 de março", "1 de dezembro"])
+
+
+class TesteEventoLocal(_BaseDePortfolio):
+    def test_cria_evento_e_devolve_a_forma_esperada(self):
+        resposta = self.client.post(
+            "/api/v1/calendar/events",
+            json={"titulo": "Dentista", "data": "2026-12-05", "hora": "09:00", "descricao": "Checkup"},
+        )
+        self.assertEqual(resposta.status_code, 201)
+        self.assertEqual(
+            set(resposta.json()), {"id", "title", "date", "time", "description"}
+        )
+        self.assertEqual(self.repositorio_eventos_locais.criados[0]["usuario_id"], 1)
+
+    def test_sem_titulo_e_422(self):
+        resposta = self.client.post(
+            "/api/v1/calendar/events", json={"titulo": "  ", "data": "2026-12-05"}
+        )
+        self.assertEqual(resposta.status_code, 422)
+
+    def test_data_invalida_e_422(self):
+        resposta = self.client.post(
+            "/api/v1/calendar/events", json={"titulo": "Dentista", "data": "05/12/2026"}
+        )
+        self.assertEqual(resposta.status_code, 422)
+
+    def test_hora_invalida_e_422(self):
+        resposta = self.client.post(
+            "/api/v1/calendar/events",
+            json={"titulo": "Dentista", "data": "2026-12-05", "hora": "9h"},
+        )
+        self.assertEqual(resposta.status_code, 422)
+
+    def test_sem_identidade_e_422(self):
+        app.dependency_overrides[require_authenticated_user] = lambda: _USUARIO_SEM_IDENTIDADE
+        resposta = self.client.post(
+            "/api/v1/calendar/events", json={"titulo": "Dentista", "data": "2026-12-05"}
+        )
+        self.assertEqual(resposta.status_code, 422)
+
+    def test_apaga_evento_proprio_e_devolve_204(self):
+        resposta = self.client.delete("/api/v1/calendar/events/7")
+        self.assertEqual(resposta.status_code, 204)
+        self.assertEqual(self.repositorio_eventos_locais.apagados, [(1, 7)])
+
+    def test_apagar_evento_inexistente_ou_de_outra_pessoa_e_404(self):
+        resposta = self.client.delete("/api/v1/calendar/events/999")
+        self.assertEqual(resposta.status_code, 404)
 
 
 class TesteFormatacaoDeData(unittest.TestCase):

@@ -16,6 +16,17 @@ from services.gemini_service import (
 )
 
 
+# O buscador passou a receber filtros e a devolver (trechos, focou) — o
+# segundo elemento é o que torna "a sugestão da classificação valeu"
+# observável. Os dublês daqui não exercitam o foco; devolvem sempre o mesmo e
+# declaram `focou=False`, que é o que a busca ampla faz.
+def _busca_fixa(resultados):
+    def buscar(query, *, tipo_documento=None, projeto_codigo=None, score_minimo=0.0):
+        return resultados, False
+
+    return buscar
+
+
 class TestGeminiChatModel(unittest.TestCase):
     def test_gera_resposta_com_contrato_esperado(self) -> None:
         client = Mock()
@@ -83,7 +94,7 @@ class TestGeminiChatModel(unittest.TestCase):
         model = GeminiChatModel(
             client=client,
             model="gemini-3.5-flash-lite",
-            buscar_contexto=lambda query: [resultado],
+            buscar_contexto=_busca_fixa([resultado]),
         )
 
         model.generate_reply("Qual é o SLA de resposta?")
@@ -105,7 +116,7 @@ class TestGeminiChatModel(unittest.TestCase):
         model = GeminiChatModel(
             client=client,
             model="gemini-3.5-flash-lite",
-            buscar_contexto=lambda query: [],
+            buscar_contexto=_busca_fixa([]),
         )
 
         reply = model.generate_reply("Qual o avanco do SYN-04?")
@@ -130,7 +141,7 @@ class TestGeminiChatModel(unittest.TestCase):
         model = GeminiChatModel(
             client=client,
             model="gemini-3.5-flash-lite",
-            buscar_contexto=lambda query: [irrelevante],
+            buscar_contexto=_busca_fixa([irrelevante]),
         )
 
         reply = model.generate_reply("Pergunta fora do assunto")
@@ -142,7 +153,7 @@ class TestGeminiChatModel(unittest.TestCase):
         client = Mock()
         client.models.generate_content.return_value = Mock(text="resposta")
 
-        def busca_com_falha(query: str) -> list[ResultadoBusca]:
+        def busca_com_falha(query: str, **_) -> list[ResultadoBusca]:
             raise RuntimeError("SUPABASE_DB_URL não configurada.")
 
         model = GeminiChatModel(
@@ -174,7 +185,7 @@ class TestGeminiChatModel(unittest.TestCase):
         model = GeminiChatModel(
             client=client,
             model="gemini-3.5-flash-lite",
-            buscar_contexto=lambda query: [resultado],
+            buscar_contexto=_busca_fixa([resultado]),
         )
 
         model.generate_reply("Primeira pergunta", conversation_id="c1")

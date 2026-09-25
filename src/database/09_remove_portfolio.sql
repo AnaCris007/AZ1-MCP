@@ -44,7 +44,7 @@ DROP TABLE IF EXISTS portfolio.portfolio;
 -- 4. A view volta, sem o JOIN e com security_invoker
 -- ---------------------------------------------------------------------------
 -- `security_invoker` pela mesma razão de `auditoria.vw_turno` no
--- 07_seguranca_acesso.sql: sem ele a view roda com os privilégios do DONO e a
+-- 08_seguranca_acesso.sql: sem ele a view roda com os privilégios do DONO e a
 -- RLS das tabelas de base é avaliada contra ele, o que faz de toda view um
 -- contorno das policies. Aqui o efeito prático hoje é nenhum — as policies de
 -- `portfolio` liberam leitura a qualquer autenticado —, mas deixar o padrão
