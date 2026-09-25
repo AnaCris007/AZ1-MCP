@@ -72,6 +72,11 @@ class AuthenticatedUser:
     # (src/services/usuario_service.py). None quando a ligação falha ou o
     # banco está indisponível — a autenticação em si não depende disso.
     domain_user_id: int | None = None
+    # `portfolio.usuario.perfil`: 'diretor', 'pmo' ou 'lider_projeto'. Vem do
+    # mesmo `resolve()` que devolve o id — era descartado. None pelos mesmos
+    # motivos do campo acima, e quem decide acesso trata None como "não é
+    # administrador", nunca como "deixa passar".
+    perfil: str | None = None
 
 
 class AuthErrorCode(Enum):

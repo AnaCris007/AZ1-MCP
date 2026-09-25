@@ -120,7 +120,6 @@ def _para_projeto(projeto: SituacaoProjeto) -> ProjetoResponse:
     return ProjetoResponse(
         codigo=projeto.codigo,
         nome=projeto.nome,
-        portfolio=projeto.portfolio,
         fase=projeto.fase,
         status=projeto.status,
         percentual_previsto=projeto.percentual_previsto,
@@ -161,7 +160,7 @@ def montar_agenda(
                 title=f"Término previsto — {projeto.nome}",
                 type="marco",
                 project=projeto.codigo,
-                description=f"Fase: {projeto.fase} · Portfólio: {projeto.portfolio}",
+                description=f"Fase: {projeto.fase}",
                 responsible=projeto.lider,
                 status=projeto.status,
             )

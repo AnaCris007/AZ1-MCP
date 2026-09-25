@@ -51,7 +51,6 @@ class SituacaoProjeto:
     id: int
     codigo: str
     nome: str
-    portfolio: str
     fase: str
     status: str
     data_inicio: date | None
@@ -85,7 +84,7 @@ class Pendencia:
 
 
 _SQL_PROJETOS = """
-SELECT id, codigo, nome, portfolio, fase, status,
+SELECT id, codigo, nome, fase, status,
        data_inicio, data_termino_prevista,
        percentual_previsto, percentual_avanco, desvio_pp,
        lider, lider_email, pendencias_abertas, artefatos
@@ -119,22 +118,25 @@ UPDATE portfolio.pendencia SET situacao = %s WHERE id = %s RETURNING id
 
 
 def _para_projeto(linha: tuple) -> SituacaoProjeto:
+    # Mapeamento POSICIONAL: os índices seguem a ordem das colunas de
+    # `_SQL_PROJETOS`, que segue a de `portfolio.vw_projeto_situacao`. Mexer na
+    # ordem em qualquer um dos três exige renumerar aqui — e o erro não avisa:
+    # trocar `lider` com `lider_email` mantém os dois como texto e passa.
     return SituacaoProjeto(
         id=linha[0],
         codigo=linha[1],
         nome=linha[2],
-        portfolio=linha[3],
-        fase=linha[4],
-        status=linha[5],
-        data_inicio=linha[6],
-        data_termino_prevista=linha[7],
-        percentual_previsto=float(linha[8] or 0),
-        percentual_avanco=float(linha[9] or 0),
-        desvio_pp=float(linha[10] or 0),
-        lider=linha[11] or "",
-        lider_email=linha[12] or "",
-        pendencias_abertas=linha[13] or 0,
-        artefatos=linha[14] or 0,
+        fase=linha[3],
+        status=linha[4],
+        data_inicio=linha[5],
+        data_termino_prevista=linha[6],
+        percentual_previsto=float(linha[7] or 0),
+        percentual_avanco=float(linha[8] or 0),
+        desvio_pp=float(linha[9] or 0),
+        lider=linha[10] or "",
+        lider_email=linha[11] or "",
+        pendencias_abertas=linha[12] or 0,
+        artefatos=linha[13] or 0,
     )
 
 

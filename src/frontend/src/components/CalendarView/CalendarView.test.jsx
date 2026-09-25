@@ -54,7 +54,7 @@ it('abre os detalhes de um marco ao clicar no item', async () => {
           type: 'marco',
           project: 'SYN-01',
           time: '',
-          description: 'Fase: Execução · Portfólio: Expansão',
+          description: 'Fase: Execução',
           responsible: 'Ana Silva',
           status: 'Em andamento',
         }],
@@ -67,7 +67,7 @@ it('abre os detalhes de um marco ao clicar no item', async () => {
 
   expect(screen.getByRole('dialog', { name: 'Término previsto — Implantação' })).toBeInTheDocument()
   expect(screen.getByText('Ana Silva')).toBeInTheDocument()
-  expect(screen.getByText('Fase: Execução · Portfólio: Expansão')).toBeInTheDocument()
+  expect(screen.getByText('Fase: Execução')).toBeInTheDocument()
 })
 
 it('mostra o botão de excluir só em eventos próprios', async () => {

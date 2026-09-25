@@ -161,7 +161,6 @@ $$;
 -- Sem FORCE: o dono do schema (a API do backend) permanece fora do filtro. É
 -- ele quem aplica as regras de negócio e quem precisa gravar a auditoria de
 -- todos os usuários.
-ALTER TABLE portfolio.portfolio           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.usuario             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.projeto             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.projeto_relacionado ENABLE ROW LEVEL SECURITY;
@@ -186,8 +185,6 @@ ALTER TABLE auditoria.notificacao         ENABLE ROW LEVEL SECURITY;
 -- O RNF02 exige autenticação e diz explicitamente que o perfil não concede
 -- permissões distintas. A condição é, portanto, "existe um usuário ativo por
 -- trás desta sessão" — e não "este usuário acompanha este projeto".
-CREATE POLICY portfolio_leitura_autenticada ON portfolio.portfolio
-    FOR SELECT USING (portfolio.usuario_atual() IS NOT NULL);
 CREATE POLICY projeto_leitura_autenticada ON portfolio.projeto
     FOR SELECT USING (portfolio.usuario_atual() IS NOT NULL);
 CREATE POLICY projeto_relacionado_leitura_autenticada ON portfolio.projeto_relacionado

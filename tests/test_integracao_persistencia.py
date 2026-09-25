@@ -48,9 +48,10 @@ from tests.apoio_integracao import RAIZ
 
 DSN = os.environ.get("TEST_DATABASE_URL")
 
-# Os três schemas e as dezessete tabelas que a Seção 3.6.6 declara.
+# Os três schemas e as dezesseis tabelas que a Seção 3.6.6 declara —
+# dezessete até `09_remove_portfolio.sql` tirar `portfolio.portfolio`.
 SCHEMAS_ESPERADOS = {"portfolio", "auditoria", "integracao"}
-TOTAL_DE_TABELAS_ESPERADO = 17
+TOTAL_DE_TABELAS_ESPERADO = 16
 
 
 def _motivo_para_pular() -> str | None:
@@ -504,12 +505,12 @@ class TestPersistenciaIntegracao(_BaseDePersistencia):
     # -- TI-29 ---------------------------------------------------------------
 
     def test_schema_e_criado_em_base_vazia(self) -> None:
-        """Os scripts-base e a migração 07 aplicados a uma base recém-criada.
+        """Os scripts-base e as migrações 07 a 09 aplicados a uma base recém-criada.
 
         Este é o caso como o planejamento o descreve, e não uma leitura do banco
-        já migrado: cria uma base do zero, aplica `01`, `02`, `03` e `07` na
-        ordem, reaplica `07` para provar idempotência e confere o que ficou de
-        pé. A base é destruída ao final.
+        já migrado: cria uma base do zero, aplica `01`, `02`, `03`, `07`, `08`
+        e `09` na ordem, reaplica cada migração para provar idempotência e
+        confere o que ficou de pé. A base é destruída ao final.
 
         A execução é por `psql`, e não por `psycopg`, porque o DDL usa
         metacomandos do cliente — `\\set ON_ERROR_STOP`, `\\echo` e `\\if` — que
@@ -541,6 +542,10 @@ class TestPersistenciaIntegracao(_BaseDePersistencia):
                 "03_rls_policies.sql",
                 "07_evento_local.sql",
                 "07_evento_local.sql",
+                "08_seguranca_acesso.sql",
+                "08_seguranca_acesso.sql",
+                "09_remove_portfolio.sql",
+                "09_remove_portfolio.sql",
             ):
                 with self.subTest(script=arquivo):
                     resultado = subprocess.run(

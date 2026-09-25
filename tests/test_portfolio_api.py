@@ -43,7 +43,7 @@ _USUARIO_SEM_IDENTIDADE = AuthenticatedUser(
 def _projeto(codigo="SYN-01", termino=date(2026, 11, 30)) -> SituacaoProjeto:
     return SituacaoProjeto(
         id=1, codigo=codigo, nome="Modernização da Ventilação",
-        portfolio="Desempenho", fase="Execução", status="Atrasado",
+        fase="Execução", status="Atrasado",
         data_inicio=date(2026, 2, 15), data_termino_prevista=termino,
         percentual_previsto=82.0, percentual_avanco=64.0, desvio_pp=-18.0,
         lider="Rafael Antunes", lider_email="rafael@metro.example",

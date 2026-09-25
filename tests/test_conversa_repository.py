@@ -25,6 +25,7 @@ from services.conversa_repository import (
     INTENCOES_VALIDAS,
     PREFIXO_CONVERSAS,
     RESULTADOS_VALIDOS,
+    ConversaDeOutroUsuario,
     ConversaNaoGravada,
     ConversaRepository,
     FonteDaResposta,
@@ -104,10 +105,19 @@ class _PoolFalso:
     tornaria cada teste ilegível.
     """
 
-    def __init__(self, ultima_ordem: int = 0, ids=(10, 11)):
+    def __init__(self, ultima_ordem: int = 0, ids=(10, 11), dono: int | None = 2):
         self.execucoes: list[tuple[str, tuple]] = []
         self.commitou = False
-        self.respostas = [(ultima_ordem,), (ids[0],), (ids[1],)]
+        # A primeira resposta é a de `_SQL_TRAVAR_CONVERSA`, que devolve o
+        # `usuario_id` da conversa travada. O padrão 2 é o mesmo dono de
+        # `_turno()`, de modo que a conferência passe; `dono=None` simula a
+        # conversa que ainda não existe, e outro inteiro simula a alheia.
+        self.respostas = [
+            None if dono is None else (dono,),
+            (ultima_ordem,),
+            (ids[0],),
+            (ids[1],),
+        ]
 
     def connection(self):
         return _ConexaoFalsa(self)
@@ -322,6 +332,33 @@ class TesteGravacaoDoTurno(unittest.TestCase):
         trava = next(i for i, s in enumerate(sqls) if "FOR UPDATE" in s)
         ordem = next(i for i, s in enumerate(sqls) if "max(ordem)" in s)
         self.assertLess(trava, ordem)
+
+    def test_turno_em_conversa_alheia_e_recusado(self):
+        """Segunda barreira, com a linha já travada.
+
+        A rota tem um porteiro que recusa antes de gerar a resposta, mas entre
+        aquela leitura e esta gravação existe janela. Aqui não existe: o dono é
+        conferido sobre a linha que o `FOR UPDATE` acabou de travar.
+        """
+        self.pool = _PoolFalso(dono=99)
+        self.repo = ConversaRepository(self.pool, _ArmazenamentoFalso())
+
+        with self.assertRaises(ConversaDeOutroUsuario):
+            self.repo.registrar_turno(_turno())
+
+        # Nada foi commitado: nem as mensagens, nem o INSERT da conversa.
+        self.assertFalse(self.pool.commitou)
+        sqls = [s for s, _ in self.pool.execucoes]
+        self.assertFalse(any("INSERT INTO auditoria.mensagem" in s for s in sqls))
+
+    def test_conversa_nova_nao_tem_dono_a_contrariar(self):
+        """`dono=None` é a primeira mensagem: o UUID ainda não existe no banco."""
+        self.pool = _PoolFalso(dono=None)
+        self.repo = ConversaRepository(self.pool, _ArmazenamentoFalso())
+
+        self.repo.registrar_turno(_turno())
+
+        self.assertTrue(self.pool.commitou)
 
     def test_fontes_sao_ligadas_a_resposta_e_nao_ao_prompt(self):
         # As fontes fundamentam o que o agente respondeu. Ligá-las ao prompt

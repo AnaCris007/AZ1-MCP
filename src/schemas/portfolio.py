@@ -15,7 +15,6 @@ from pydantic import BaseModel
 class ProjetoResponse(BaseModel):
     codigo: str
     nome: str
-    portfolio: str
     fase: str
     status: str
     percentual_previsto: float

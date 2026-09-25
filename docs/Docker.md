@@ -330,11 +330,15 @@ Volumes existentes não reaplicam scripts de inicialização. Antes de iniciar o
 ```bash
 docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -v webhook_login=az1 < src/database/06_webhook_permissions.sql
 docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -f /docker-entrypoint-initdb.d/07_evento_local.sql
+docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 < src/database/08_seguranca_acesso.sql
+docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 < src/database/09_remove_portfolio.sql
 ```
+
+`08_seguranca_acesso.sql` e `09_remove_portfolio.sql` não são montados na inicialização porque uma base nova já nasce corrigida pelo `01_create_database.sql`; só volumes anteriores precisam deles. A 09 remove `portfolio.portfolio` e a coluna `projeto.portfolio_id`, e deve rodar junto com o deploy da API que deixou de ler essa coluna.
 
 Em outro ambiente, `webhook_login` deve ser o nome do usuário no DSN do receptor, mesmo que a migração seja executada por outro administrador. Se omitido, o script usa o usuário conectado. O receptor falha ao abrir o pool quando não consegue assumir `az1_webhook`; `/health` sozinho não verifica essas permissões.
 
-A base relacional completa pode receber `02_initial_data.sql` e `03_rls_policies.sql`, que inclui a migração 06; aplique a migração 07 depois das políticas. O RAG usa `SUPABASE_DB_URL` com extensão vetorial; a imagem PostgreSQL local não instala pgvector. Testes destrutivos usam base dedicada indicada por `TEST_DATABASE_URL`.
+A base relacional completa pode receber `02_initial_data.sql` e `03_rls_policies.sql`, que inclui a migração 06; aplique as migrações 07, 08 e 09 depois das políticas. O RAG usa `SUPABASE_DB_URL` com extensão vetorial; a imagem PostgreSQL local não instala pgvector. Testes destrutivos usam base dedicada indicada por `TEST_DATABASE_URL`.
 
 ---
 

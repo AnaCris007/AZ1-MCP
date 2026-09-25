@@ -36,7 +36,6 @@ def _projeto(codigo: str) -> SituacaoProjeto:
         id=1,
         codigo=codigo,
         nome="Projeto",
-        portfolio="Portfolio",
         fase="Execução",
         status="Em risco",
         data_inicio=None,

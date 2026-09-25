@@ -3265,7 +3265,7 @@ A tabela a seguir registra a correspondência entre cada elemento das modelagens
 | **Interação consulta Artefato** `(0,n)`-`(0,n)` | Tabela `mensagem_fonte` | Muitos-para-muitos materializado com atributos próprios de posição, score e cópia dos metadados (decisão 9 da seção 3.6.7) |
 | **Artefato documenta/pertence a Projeto** `(1,1)`-`(0,n)` | `artefato.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
 | **Artefato possui Campo Artefato** `(1,n)`-`(1,1)` | `campo_artefato.artefato_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata e unicidade de `nome` por artefato |
-| **Projeto pertence a Portfólio** `(1,1)`-`(1,n)` | `projeto.portfolio_id NOT NULL` | Um-para-muitos vira chave estrangeira |
+| **Projeto pertence a Portfólio** `(1,1)`-`(1,n)` | Não materializado | O agrupamento por subportfólio foi removido do modelo físico (`09_remove_portfolio.sql`): nenhuma consulta o usava, e a coluna atravessava a API até uma interface que não a exibe |
 | **Projeto origina Pendência** `(0,n)`-`(1,1)` | `pendencia.projeto_id NOT NULL` | Um-para-muitos vira chave estrangeira, com cascata por se tratar de composição |
 | **LiderProjeto lidera Projeto** (2.2.1) | `projeto.lider_id NOT NULL` | O "1" do lado do líder na cardinalidade de `lidera` torna a chave estrangeira única e obrigatória em cada projeto |
 | **Usuário acompanha Projeto** (2.2.1) | Tabela associativa `usuario_projeto` | Muitos-para-muitos vira tabela associativa |
@@ -3282,14 +3282,6 @@ As cardinalidades mínimas do lado "muitos" (um portfólio reúne ao menos um pr
 O dicionário a seguir descreve o modelo físico de cada tabela: colunas, tipos de dados do PostgreSQL e restrições de integridade. As chaves primárias substitutas usam `INTEGER` ou `BIGINT GENERATED ALWAYS AS IDENTITY`, forma recomendada pelo PostgreSQL para identificadores autoincrementais; a exceção é `conversa`, cuja chave é `UUID` pela razão registrada na decisão 8 da seção 3.6.7.
 
 As tabelas distribuem-se em dois schemas, seguindo a separação definida no diagrama de componentes da seção 2.4 e adotada no processo de deploy da seção 3.7: o schema **`portfolio`** reúne os dados operacionais consultados pelo agente, e o schema **`auditoria`** reúne os registros de conversa, mensagem, fonte, avaliação, evento e notificação, que possuem padrão de escrita e requisito de imutabilidade distintos dos dados operacionais (decisão 7 da seção 3.6.7).
-
-**`portfolio.portfolio`**: agrupamento de projetos de um exercício.
-
-| Coluna | Tipo | Restrições | Finalidade |
-|---|---|---|---|
-| `id` | `INTEGER` | `PK`, identity | Identificador único do portfólio |
-| `nome` | `TEXT` | `NOT NULL` | Denominação do portfólio |
-| `ano_exercicio` | `INTEGER` | `NOT NULL`, `UNIQUE (nome, ano_exercicio)` | Exercício de referência; a unicidade composta impede a duplicação do mesmo portfólio no mesmo ano |
 
 **`portfolio.usuario`**: profissional autorizado a utilizar o agente.
 
@@ -3317,7 +3309,6 @@ As tabelas distribuem-se em dois schemas, seguindo a separação definida no dia
 | `percentual_previsto` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Avanço planejado para a data de referência |
 | `percentual_avanco` | `NUMERIC(5,2)` | `NOT NULL`, `DEFAULT 0`, `CHECK (BETWEEN 0 AND 100)` | Grau de execução física realizado |
 | `desvio_pp` | `NUMERIC(6,2)` | Coluna gerada (`GENERATED ALWAYS AS ... STORED`) | Desvio em pontos percentuais entre realizado e previsto (decisão 2 da seção 3.6.7) |
-| `portfolio_id` | `INTEGER` | `FK → portfolio`, `NOT NULL` | Portfólio ao qual o projeto pertence |
 | `lider_id` | `INTEGER` | `FK → usuario`, `NOT NULL` | Líder responsável, materialização de `lidera` |
 
 **`portfolio.projeto_relacionado`**: dependências declaradas entre projetos.
@@ -3495,13 +3486,6 @@ CREATE SCHEMA auditoria;
 CREATE SCHEMA integracao;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE TABLE portfolio.portfolio (
-    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome          TEXT    NOT NULL,
-    ano_exercicio INTEGER NOT NULL,
-    UNIQUE (nome, ano_exercicio)
-);
-
 CREATE TABLE portfolio.usuario (
     id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     auth_user_id UUID UNIQUE,
@@ -3527,7 +3511,6 @@ CREATE TABLE portfolio.projeto (
                           CHECK (percentual_avanco BETWEEN 0 AND 100),
     desvio_pp             NUMERIC(6,2) GENERATED ALWAYS AS
                           (percentual_avanco - percentual_previsto) STORED,
-    portfolio_id          INTEGER NOT NULL REFERENCES portfolio.portfolio (id),
     lider_id              INTEGER NOT NULL REFERENCES portfolio.usuario (id)
 );
 
@@ -4118,7 +4101,7 @@ O `.gitlab-ci.yml` executa compilação Python, testes `unittest` e Ruff, além 
 
 ### 3.7.7 Reprodutibilidade e Verificação
 
-Em uma base nova, execute `01_create_database.sql`, `02_initial_data.sql`, `03_rls_policies.sql`, `07_evento_local.sql` e `03_webhooks_auditoria.sql`, nessa ordem. O script de políticas inclui `06_webhook_permissions.sql`; a migração 07 é idempotente e mantém bancos existentes alinhados ao baseline. A carga relacional funciona antes da indexação vetorial; a comparação com `vecs.documentos_metro` é executada quando essa tabela existe. `05_migracao_usuario_zero.sql` trata bases que tenham o usuário legado.
+Em uma base nova, execute `01_create_database.sql`, `02_initial_data.sql`, `03_rls_policies.sql`, `07_evento_local.sql` e `03_webhooks_auditoria.sql`, nessa ordem. O script de políticas inclui `06_webhook_permissions.sql`; as migrações 07, `08_seguranca_acesso.sql` e `09_remove_portfolio.sql` são idempotentes, no-op em base nova, e mantêm bancos existentes alinhados ao baseline. A carga relacional funciona antes da indexação vetorial; a comparação com `vecs.documentos_metro` é executada quando essa tabela existe. `05_migracao_usuario_zero.sql` trata bases que tenham o usuário legado.
 
 O Compose inicializa uma base local vazia com o DDL e as permissões de webhook. Para uma base existente, confirme PostgreSQL 16 ou superior com `SHOW server_version` e aplique a migração de permissões antes de iniciar o receptor, sem remover volumes:
 
@@ -8229,7 +8212,7 @@ Casos planejados contra PostgreSQL de teste provisionado pelos scripts de `src/d
 | TI-26 | Positivo | `TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas` | Consulta de dados de um projeto que cita artefatos de origem | Retorno inclui a referência e a data do artefato; uma linha em `auditoria.mensagem_fonte` por trecho citado, com `chunk_id`, posição e cópia dos metadados | RF02, RF03, RNF11, RNF12 |
 | TI-27 | Negativo | `TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_o_turno` | Turno processado com o banco inacessível | Código de indisponibilidade definido; o turno é reencaminhado, não descartado | RNF07, RNF04 |
 | TI-28 | Negativo | `TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria` | `UPDATE`/`DELETE` em `auditoria.mensagem` com as credenciais da aplicação | Alteração/exclusão de mensagem rejeitada; feedback autorizado permitido. Caracterizar título/arquivamento separadamente e aplicar o oráculo RNF09 de 6.1.2 | RNF04, RNF09 |
-| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução de `src/database/01_create_database.sql` em base vazia, seguida de `02_initial_data.sql`, `03_rls_policies.sql` e duas aplicações de `07_evento_local.sql` | Os três schemas relacionais e as dezessete tabelas são criados; a migração 07 é idempotente; carga inicial populada; `scripts/verificar_modelo_documentado.py` não aponta divergência com a seção 3.6.6 | Seção 3.6 |
+| TI-29 | Positivo | `TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia` | Execução de `src/database/01_create_database.sql` em base vazia, seguida de `02_initial_data.sql`, `03_rls_policies.sql` e duas aplicações de cada migração `07_evento_local.sql`, `08_seguranca_acesso.sql` e `09_remove_portfolio.sql` | Os três schemas relacionais e as dezesseis tabelas são criados; as migrações 07 a 09 são idempotentes; carga inicial populada; `scripts/verificar_modelo_documentado.py` não aponta divergência com a seção 3.6.6 | Seção 3.6 |
 | TI-53 | Positivo e negativo | `TestPersistenciaIntegracao.test_papel_da_mensagem_delimita_as_colunas` | Resposta do agente com intenção classificada e solicitação do usuário com tempo de processamento | Ambas rejeitadas por `mensagem_papel_coerente` | RNF04 |
 | TI-54 | Positivo e negativo | `TestPersistenciaIntegracao.test_avaliacao_exige_alvo_e_juizo_unicos` | Avaliação apontando para conversa e mensagem ao mesmo tempo; avaliação apenas com comentário | Ambas rejeitadas por `avaliacao_alvo_unico` e `avaliacao_tem_juizo`; reavaliar o mesmo alvo atualiza a linha existente | RNF08, RNF09 |
 
