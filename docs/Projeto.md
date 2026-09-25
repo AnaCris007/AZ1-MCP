@@ -5661,7 +5661,8 @@ O registro de 09/09/2026 descrito abaixo contabilizava 195 testes, incluindo onz
 | Demonstração ao vivo do Microsoft Graph | **Não realizada** | *Tenant* do Entra ID indisponível; ver Seção 5.1.1 |
 | Criação, renovação e remoção da assinatura do Graph | **Implementada, não exercitada** | `python -m services.graph_subscription_service`; sem *tenant* para executar ponta a ponta |
 | Verificação por `validationTokens` | **Inviável para este recurso** | Não suportado para `driveItem`; ver Seção 5.1.5 |
-| Varredura `delta` e vetorização do documento alterado | **Prevista para a Sprint 5** | Marca em `integracao.conexao.delta_pendente` |
+| Varredura `delta`, download e vetorização — **Google Drive** | **Implementada e demonstrada ao vivo** | `VarreduraComIndexacao` + `DriveClient`; `changes.list` → download → RAG → `delta_pendente = FALSE` |
+| Varredura `delta`, download e vetorização — **Microsoft Graph / SharePoint** | **Não implementada** | Falta o `GraphClient` (delta + download) e um *tenant* do Entra ID; ver 6.4.4.1 e Seção 5.1.1 |
 
 #### Evidência da demonstração ao vivo (Google Drive)
 
@@ -7789,7 +7790,7 @@ A tabela relaciona cada suíte à dependência que ela isola e ao mecanismo usad
 | Persistência em banco de dados | PostgreSQL | Contêiner real, provisionado por `docker compose` a partir da Sprint 4 |
 | Frontend e backend | Nenhuma; verificação de contrato entre interface e aplicação | Navegador com frontend/API reais; TestClient não executa React. Vitest com mocks é evidência de componente |
 | Webhooks | Adaptador de webhook previsto para a Sprint 4 | Suíte de contrato `ContratoWebhookInbound` contra um receptor em memória |
-| Mensageria | Adaptador de mensageria previsto para a Sprint 5 | Suíte de contrato `ContratoBarramentoMensagens` contra um intermediário em memória |
+| Mensageria | Barramento RabbitMQ (Sprint 5), implementado em `src/mensageria` | Suíte de contrato `ContratoBarramentoMensagens` contra um broker-fake em memória; subclasse opcional contra RabbitMQ real sob `TEST_RABBITMQ_URL` |
 | Módulo VHS | O adaptador real que o módulo decora | Dublê instrumentado que conta chamadas, decorado pelo módulo VHS sob teste |
 
 #### Recebimento de áudio e armazenamento de objetos
@@ -7888,7 +7889,9 @@ Suíte de contrato `ContratoWebhookInbound`, planejada para um receptor em memó
 
 #### Mensageria
 
-Suíte de contrato `ContratoBarramentoMensagens`, planejada para um intermediário em memória; classe ainda não implementada. O contrato é o envelope da mensagem, com os campos identificador, tipo, versão, marca de tempo, correlação e conteúdo, além do ciclo de publicação e consumo.
+Suíte de contrato `ContratoBarramentoMensagens`, **implementada** em `tests/test_integracao_contrato_barramento.py` contra um broker-fake em memória (fila com ack, nack, dead-letter e contador de tentativas), espelhando `ContratoWebhookInbound`. O contrato é o envelope da mensagem, com os campos identificador, tipo, versão, marca de tempo, correlação e conteúdo, além do ciclo de publicação e consumo. A subclasse opcional `TestContratoBarramentoRabbitMQ`, guardada por `TEST_RABBITMQ_URL` (no estilo do `TEST_DATABASE_URL` da suíte destrutiva), roda o mesmo contrato contra um RabbitMQ real quando a variável está presente; sem ela é pulada, e o contrato em memória é a garantia ativa.
+
+A implementação vive em `src/mensageria`: o envelope (`envelope.py`, round-trip JSON que preserva os seis campos, incluindo a marca de tempo com fuso e a versão), a configuração da topologia (`config.py`), a porta de publicação (`publicador.py`, com `PublicadorRabbitMQ` de publisher confirms e `PublicacaoDesligada` no-op), o composto que junta o efeito de domínio à publicação (`processador_publicador.py`), o efeito do consumidor (`varredura.py`) e o worker autônomo (`consumidor.py`, `python -m mensageria.consumidor`). Ver a Seção 6.4.4.1 para a topologia, o produtor, o consumidor e a política de reentrega/dead-letter.
 
 | ID | Tipo | Caso | Entrada | Resultado esperado | Requisito |
 |---|---|---|---|---|---|
@@ -7898,6 +7901,32 @@ Suíte de contrato `ContratoBarramentoMensagens`, planejada para um intermediár
 | TI-44 | Negativo | `ContratoBarramentoMensagens.test_consumo_duplicado_produz_efeito_unico` | Mesma mensagem processada duas vezes | Efeito único | RF05, RNF04 |
 | TI-45 | Positivo | `ContratoBarramentoMensagens.test_consumidor_nao_depende_de_ordem_global` | Mensagens publicadas fora de ordem | Consumidor processa corretamente sem pressupor ordem de chegada | RF05 |
 | TI-46 | Negativo | `ContratoBarramentoMensagens.test_indisponibilidade_na_publicacao_e_reportada` | Barramento inacessível no momento da publicação | Erro explícito ao produtor; nenhuma perda silenciosa | RNF07 |
+
+##### 6.4.4.1 Implementação do barramento assíncrono
+
+O barramento é um RabbitMQ (`pika` síncrono). A escolha de projeto que estrutura tudo é a **degradação graciosa**: a publicação é aditiva e opcional. Sem a variável `RABBITMQ_URL`, a API resolve o publicador para `PublicacaoDesligada` (no-op) e o comportamento da Sprint 4 permanece intacto — o receptor apenas marca `integracao.conexao.delta_pendente = TRUE`. Com `RABBITMQ_URL`, o mesmo receptor marca o delta **e** publica o envelope no barramento, e o worker consumidor faz a varredura, marcando `delta_pendente = FALSE`. Os 32 testes de contrato de webhook seguem verdes nas duas configurações, porque o composto que faz as duas coisas é indistinguível do processador anterior quando o publicador é o no-op.
+
+**Produtor.** O receptor de webhook é o produtor. O `ProcessadorComPublicacao` envolve o `ProcessadorVarreduraPendente` da Sprint 4 e, depois de marcar o delta, publica o envelope. A ordem importa: se a marcação falha (origem desativada no meio do processamento), o interno já levanta `WebhookError` e não se publica; se a publicação falha (broker fora), o `PublicadorRabbitMQ.publicar` levanta e o composto converte em `WebhookError(FALHA_DE_PROCESSAMENTO)`, o que leva `_receber_um` a liberar a reivindicação e devolver `503` — o provedor reentrega, e a idempotência do TI-37 impede efeito duplo. É assim que o TI-46 (nenhuma perda silenciosa) é satisfeito sem violar o TI-38. A publicação usa `delivery_mode=2` (mensagem persistente) e **publisher confirms**: sem a confirmação do broker, um descarte silencioso seria o oposto do TI-46.
+
+**Envelope.** O `EventoWebhook` já é o envelope acordado na Seção 6.4; serializar é transportá-lo em JSON sem perder nenhum dos seis campos — em especial a `versao` (que diz ao consumidor como interpretar a mensagem) e a `marca_de_tempo` com fuso. JSON, e não pickle, porque produtor e consumidor são processos separados que podem subir de imagens em versões diferentes; JSON é um contrato independente de versão de Python. Um payload indesserializável levanta `EnvelopeInvalido`, o que o consumidor trata como irrecuperável.
+
+**Consumidor.** O worker (`python -m mensageria.consumidor`) é um processo autônomo, na mesma imagem da API mas com outro comando. Conecta ao broker com reconexão e backoff — tanto na abertura (`connection_attempts`/`retry_delay` do pika) quanto num laço externo que reabre se a conexão cair depois de estabelecida — e consome uma mensagem por vez (`prefetch_count=1`). Para cada mensagem: desserializa, chama a varredura configurada e confirma (`basic_ack`). O worker escolhe a varredura na subida: com as credenciais do Drive (`.google_token.json` + OAuth) e a `GEMINI_API_KEY` presentes, usa a `VarreduraComIndexacao` (reindexação real, descrita abaixo); senão degrada para o stub `VarreduraDeConexao`, que apenas marca `delta_pendente = FALSE`.
+
+**Reentrega e dead-letter.** A fila principal é uma **quorum queue** com `x-dead-letter-exchange` apontando para a DLX e `x-delivery-limit` igual a `max_tentativas`. Há três desfechos de falha, e cada um mapeia num tratamento distinto:
+
+- **Falha de processamento** (ex.: banco indisponível na varredura): o consumidor recusa com `basic_nack(requeue=True)`, devolvendo a mensagem à fila. A quorum queue conta as reentregas; ao ultrapassar `x-delivery-limit`, o próprio broker a encaminha para a fila morta (`varredura.morta`) — o contador é do broker, o consumidor não conta na mão. É o TI-43 (falha persistente vai para a dead-letter) e a parte de "recusa devolve" do TI-42.
+- **Payload indesserializável ou versão de envelope desconhecida**: o consumidor recusa com `basic_nack(requeue=False)`, e a mensagem vai para a fila morta de imediato, sem consumir tentativas — reentregar algo que nunca vai ser lido só geraria laço.
+- **Sucesso**: `basic_ack`, e a mensagem é removida (parte de "confirmação remove" do TI-42).
+
+**Varredura real do Google Drive.** A reindexação real está implementada para o Google Drive e foi demonstrada ao vivo. A `VarreduraComIndexacao` (`src/mensageria/varredura_indexacao.py`), sobre o `DriveClient` (`src/services/drive_download_service.py`), executa o ciclo completo que a notificação sozinha não resolve: lê o `delta_token` da conexão, chama o feed de mudanças (`changes.list`) a partir dele e, para cada arquivo indexável (`.docx`/`.xlsx`, baixado direto ou exportado de um documento nativo do Google), baixa o conteúdo, extrai o texto pelo pipeline do RAG (Seção 2.5), fragmenta, vetoriza e indexa no pgvector; ao fim, grava o novo `delta_token` e marca `delta_pendente = FALSE`, na mesma transação. O `delta_token` só avança depois de o feed inteiro ser consumido — se o download ou a vetorização falha no meio, a exceção sobe, o consumidor devolve a mensagem à fila (`nack`/`requeue`) e o token permanece no ponto anterior, de modo que nada se perde. A idempotência vem do índice: `rag.indexador` faz `upsert` por um id derivado do conteúdo do chunk, então reprocessar o mesmo arquivo não duplica (base do TI-44 e do TI-58).
+
+**Escopo por pasta.** O `changes.watch` do Drive observa a conta inteira, não uma pasta. Para não indexar documentos alheios ao PMO, `DRIVE_PASTA_PMO_ID` limita a varredura a uma pasta: antes de baixar, o worker sobe a árvore de pastas do arquivo (com cache por varredura, para não guardar uma estrutura que pode mudar entre varreduras) e só indexa o que está sob essa raiz. Sem a variável, o worker avisa no log que indexaria o Drive inteiro. Arquivos soltos na raiz do PMO, fora de uma pasta `SYN-xx`, são indexados com `projeto_id = "PORTFOLIO"`, coerente com `parsers._projeto_id`.
+
+**Corrida aceita.** `delta_pendente` é um booleano de nível, não um contador: o produtor marca `TRUE` a cada webhook de um burst e o consumidor marca `FALSE` ao varrer, de modo que a última mudança de um burst pode ficar não-varrida até o próximo webhook reacender a marca; a próxima notificação corrige. Fechar essa janela com um cursor por etag é evolução, não requisito da PoC.
+
+**Microsoft Graph / SharePoint: ainda adiado.** A varredura real do SharePoint — o alvo principal do Metrô — **não está implementada**. Faltam duas peças: o equivalente do `DriveClient` para o Graph (o delta `/drives/{id}/root/delta` e o download `/drive/items/{id}/content`) e um tenant do Entra ID para exercitá-lo (Seção 5.1.1). O webhook do Graph existe e marca `delta_pendente`, mas o consumidor só faz a reindexação real para o Google Drive; para o Graph, cai no stub de estado. Quando houver tenant, o encaixe é criar um `GraphClient` com a mesma interface e tornar a `VarreduraComIndexacao` agnóstica de provedor, escolhendo o cliente pelo `provedor` da conexão.
+
+**Operação.** O stub só-de-estado usa o papel `az1_webhook` do receptor, que a migração `06_webhook_permissions.sql` autoriza a `UPDATE (delta_pendente) ON integracao.conexao` — sem migração nova. A varredura com indexação precisa de mais — `UPDATE (delta_token)` e escrita na coleção `vecs` do pgvector —, então roda com o papel do próprio `SUPABASE_DB_URL`, não com `az1_webhook`. E como a autenticação do Drive lê o `.google_token.json` do host, a indexação real roda com o worker **no host**; no contêiner, sem esse arquivo montado, o worker degrada para o stub. Em desenvolvimento, `docker compose up` sobe `rabbitmq` (painel de management em `http://localhost:15672`, `az1`/`az1`) e o `worker`; `make logs-worker`, `make logs-rabbit` e `make rabbitmq-ui` são os atalhos de operação. Em produção, credenciais e `RABBITMQ_URL` são obrigatórias (a subida falha sem elas) e a porta de management não é publicada.
 
 #### Módulo VHS
 
