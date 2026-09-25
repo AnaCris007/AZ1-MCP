@@ -52,6 +52,7 @@ dependencies = [
     "numpy==2.5.2",
     "openpyxl>=3.1",
     "psycopg[binary,pool]>=3.2",
+    "psycopg2-binary>=2.9",
     "pydantic>=2",
     "pyjwt[crypto]>=2.10",
     "pyyaml>=6.0",
@@ -60,9 +61,9 @@ dependencies = [
     "python-multipart>=0.0.12",
     "scikit-learn==1.9.0",
     "spacy==3.8.16",
-    "sqlalchemy>=2.0",
+    "sqlalchemy>=2.0,<2.2",
     "uvicorn[standard]>=0.30",
-    "vecs>=0.4",
+    "vecs>=0.4,<0.5",
 ]
 
 [project.optional-dependencies]
