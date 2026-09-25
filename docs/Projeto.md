@@ -77,6 +77,7 @@
 
 - [5.1 Webhooks](#51-webhooks)
 - [5.2 Integração entre Frontend e Backend](#52-integração-entre-frontend-e-backend)
+- [5.3 Chamada de Voz Contínua](#53-chamada-de-voz-contínua)
 
 </details>
 
@@ -6092,7 +6093,7 @@ Esta seção descreve as integrações implementadas até a Sprint 3 entre a int
 
 ### 5.2.1 Arquitetura da Integração
 
-A interface em React utiliza o cliente HTTP centralizado em [api.js](../src/frontend/src/lib/api.js), que chama a API FastAPI com `fetch`. O ponto de entrada [main.py](../src/az1_api/main.py) registra as rotas sob `/api/v1`; os schemas Pydantic definem as entradas e saídas, enquanto os serviços executam as operações e acessam os provedores externos. A comunicação do chat usa requisição e resposta HTTP, sem streaming, WebSocket ou fila de mensagens entre navegador e API.
+A interface em React utiliza o cliente centralizado em [api.js](../src/frontend/src/lib/api.js). O chat textual e as demais operações usam `fetch`, enquanto a chamada de voz abre um WebSocket dedicado. O ponto de entrada [main.py](../src/az1_api/main.py) registra as rotas sob `/api/v1`; os schemas Pydantic definem as entradas e saídas HTTP, enquanto os serviços executam as operações e acessam os provedores externos. O chat textual continua baseado em requisição e resposta, sem streaming de tokens ou fila de mensagens entre navegador e API.
 
 ```mermaid
 flowchart LR
@@ -6100,6 +6101,7 @@ flowchart LR
     F <-->|"SSO Microsoft via Supabase Auth"| S["Supabase Auth"]
     F -->|"HTTP /api/v1 + Bearer token"| P["Proxy Vite ou nginx"]
     P --> A["FastAPI"]
+    F <-->|"WebSocket /api/v1/voice/call"| P
     A -->|"Upload e leitura de áudio"| M["S3 / MinIO"]
     A -->|"Transcrição"| D["Deepgram"]
     A -->|"Busca de contexto"| R["RAG: src/rag, pgvector"]
@@ -6183,7 +6185,7 @@ O histórico guarda a mensagem original do usuário, não a versão com os trech
 5. O texto retornado preenche o campo de entrada. O usuário pode revisar, editar, enviar ou descartar. A transcrição não é enviada automaticamente ao chat.
 6. Se confirmada, a entrada segue o mesmo fluxo de mensagem textual.
 
-A aba separada de voz exibe uma apresentação de escuta, mas não monta o `PromptBar` responsável pela gravação. Assim, o fluxo de captura integrado descrito acima é o botão de microfone dentro do chat; a aba de voz não constitui uma conversa contínua implementada.
+A aba separada de voz implementa uma conversa contínua e não utiliza o `PromptBar`. O componente `VoiceCall` captura cada turno com `MediaRecorder`, detecta automaticamente fala e silêncio e troca eventos de controle, áudio e respostas pela mesma conexão WebSocket. O histórico de chamadas permanece separado do chat textual e só é exibido após o encerramento. A Seção 5.3 descreve esse fluxo, seus estados e limites. O botão de microfone dentro do chat continua oferecendo o fluxo com confirmação descrito acima; são duas formas de entrada distintas.
 
 #### Reprodução da resposta
 
@@ -6233,6 +6235,7 @@ Os testes automatizados verificam os contratos HTTP e o comportamento dos compon
 | [test_chat_api.py](../tests/test_chat_api.py) e [test_speech_api.py](../tests/test_speech_api.py) | Contratos de mensagem e geração de voz, respostas de sucesso e erros controlados. Não executam chamadas reais ao Gemini. |
 | [test_auth_api.py](../tests/test_auth_api.py) e [test_auth_service.py](../tests/test_auth_service.py) | Aceitação e rejeição de tokens, verificadas com chaves de teste; não equivalem a executar o redirecionamento OAuth no navegador. |
 | [test_dependencias_sem_banco.py](../tests/test_dependencias_sem_banco.py) | Degradação dos efeitos laterais quando o banco não está configurado. |
+| `tests/test_voice_api.py` | Handshake da chamada e processamento de um turno completo na mesma conexão: início, blocos binários, transcrição, resposta textual, metadados do áudio e frame WAV. Usa transcritor, agente e sintetizador substituídos. O arquivo entra na `develop` pelo MR da funcionalidade. |
 
 Os comandos para execução dos testes, após preparar as dependências, são:
 
@@ -6248,6 +6251,109 @@ O [.gitlab-ci.yml](../.gitlab-ci.yml) configura compilação Python, execução 
 
 Não foram identificados testes automatizados que percorram conjuntamente login Microsoft real, navegador, proxy, API, armazenamento, transcrição e resposta de voz. A validação desse percurso, das condições de falha e da continuidade de conversa entre workers permanece necessária para afirmar integração sistêmica completa.
 
+
+## 5.3 Chamada de Voz Contínua
+
+A chamada de voz permite conversar com o AZ1 em vários turnos sem enviar cada
+gravação manualmente. O navegador detecta o início e o fim da fala, envia o
+áudio ao backend, reproduz a resposta e volta a ouvir. A funcionalidade usa o
+mesmo agente do chat textual, mas mantém sua interface e seu histórico
+separados.
+
+### 5.3.1 Uso e estados da chamada
+
+Para iniciar, o usuário seleciona **Voz**, pressiona **Clique para começar** e
+autoriza o microfone. A interface considera uma fala válida após 120 ms acima
+do limiar de volume e encerra o turno depois de 850 ms de silêncio.
+
+O fluxo de um turno é:
+
+1. capturar a fala com `MediaRecorder`;
+2. enviar o áudio pela conexão WebSocket;
+3. transcrever com Deepgram;
+4. gerar a resposta com Gemini;
+5. reproduzir o áudio da resposta;
+6. voltar automaticamente à escuta.
+
+| Estado | Significado |
+|---|---|
+| `idle` | A chamada ainda não começou ou já foi encerrada. |
+| `connecting` | O WebSocket e o microfone estão sendo preparados. |
+| `listening` | A aplicação está aguardando a fala do usuário. |
+| `transcribing` | O Deepgram está convertendo o áudio em texto. |
+| `processing` | O agente está gerando a resposta. |
+| `speaking` | A resposta está sendo reproduzida. |
+| `error` | Uma etapa falhou e a interface apresenta uma orientação. |
+
+Durante a ligação, as mensagens ficam ocultas. Ao pressionar **Encerrar
+conversa**, o frontend desativa o microfone, interrompe reproduções, fecha os
+recursos de áudio e encerra o WebSocket. Depois disso, a transcrição e as
+respostas ficam disponíveis na área de voz. O usuário também pode continuar a
+mesma conversa, preservando o `conversation_id` e o contexto do agente.
+
+### 5.3.2 Arquitetura
+
+A chamada mantém uma conexão WebSocket entre o componente `VoiceCall` e o
+endpoint `/api/v1/voice/call` do FastAPI. A conexão permanece aberta durante a
+conversa e processa vários turnos.
+
+| Componente | Responsabilidade |
+|---|---|
+| `VoiceCall.jsx` | Capturar o microfone, controlar estados e reproduzir a resposta. |
+| `api.js` | Abrir o WebSocket com a sessão atual. |
+| `voice.py` | Autenticar e coordenar transcrição, resposta e síntese. |
+| Deepgram | Converter a fala em texto. |
+| Gemini | Gerar a resposta textual e o áudio. |
+| `SpeechSynthesis` | Reproduzir a resposta quando o Gemini TTS falhar ou demorar. |
+
+O áudio de entrada é reunido em um arquivo por turno para preservar um formato
+válido para transcrição. Eventos de controle e textos usam JSON; os áudios usam
+frames binários, evitando o aumento de tamanho causado pelo Base64. O Vite e o
+nginx estão configurados para encaminhar o upgrade WebSocket.
+
+### 5.3.3 Protocolo WebSocket
+
+Após abrir `WS /api/v1/voice/call`, o frontend envia `start_call` com o
+`conversation_id` e o token da sessão. Em produção, a conexão usa `wss`.
+
+| Direção | Eventos principais |
+|---|---|
+| Frontend → backend | `start_call`, `utterance_start`, áudio binário, `utterance_end` e `end_call`. |
+| Backend → frontend | `call_ready`, `transcribing`, `transcription_final`, `processing`, `agent_response`, `agent_audio`, áudio binário e `error`. |
+
+O backend aceita até 10 MiB por fala. A autenticação inválida encerra a conexão;
+erros de um turno, como transcrição vazia, preservam a chamada para uma nova
+tentativa.
+
+### 5.3.4 Erros, configuração e limitações
+
+| Situação | Comportamento |
+|---|---|
+| Fala não identificada | A interface pede que o usuário tente novamente. |
+| Falha no Deepgram ou no agente | O erro é apresentado e a chamada volta à escuta quando possível. |
+| Gemini TTS indisponível ou lento | Após 2,5 segundos, o navegador usa `SpeechSynthesis` em `pt-BR`. |
+| Microfone negado | A interface informa que não conseguiu iniciar a chamada. |
+| WebSocket desconectado | A chamada apresenta o erro; não há reconexão automática. |
+
+A execução depende de `DEEPGRAM_API_KEY`, `GEMINI_API_KEY` e da configuração do
+Supabase. `GEMINI_TTS_MODEL` é opcional. Os valores ficam no `.env`, que não é
+versionado; `.env.example` registra apenas os nomes esperados.
+
+Limitações atuais:
+
+- não há transcrição parcial nem interrupção da fala do agente;
+- o áudio original não é armazenado;
+- o histórico de voz fica em memória e é perdido ao recarregar a página;
+- a latência depende dos provedores externos e da rede;
+- a voz alternativa varia conforme o navegador e o sistema operacional.
+
+### 5.3.5 Validação
+
+A revisão pré-MR aprovou o build e o lint do frontend, 25 testes de frontend e
+6 testes focados no WebSocket e na transcrição. O teste do endpoint cobre um
+turno completo com serviços substituídos. Permissão real do microfone, múltiplos
+turnos, latência e fallback de voz devem ser verificados manualmente no
+navegador e registrados como evidência no MR.
 ---
 
 # 6. Planejamento de Testes Sistêmicos
