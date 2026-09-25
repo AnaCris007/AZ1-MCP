@@ -40,8 +40,7 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | Os testes funcionais executados, resultados, defeitos e limites da liberação | [Projeto.md, Execução dos testes sistêmicos](./Projeto.md#67-execução-dos-testes-sistêmicos--campanha-funcional-da-sprint-4) |
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
 | Os papéis de cada integrante e a evidência da rotação | [GestaoProjeto.md, Matriz de Papéis da Sprint 4](./GestaoProjeto.md#64-matriz-de-papéis-e-responsabilidades-da-sprint-4) |
-| O planejamento da Sprint 5 | [GestaoProjeto.md, Planejamento da Sprint 5](./GestaoProjeto.md#67-planejamento-da-sprint-5) |
-| Quanto custaria entregar a solução a um cliente real | [GestaoProjeto.md, Análise de Viabilidade Financeira](./GestaoProjeto.md#68-análise-de-viabilidade-financeira) |
+| Quanto custaria entregar a solução a um cliente real | [GestaoProjeto.md, Análise de Viabilidade Financeira](./GestaoProjeto.md#67-análise-de-viabilidade-financeira) |
 | Como o backlog é publicado no GitLab em lote | [GestaoConfiguracao.md, Automação do quadro](./GestaoConfiguracao.md#66-automação-do-quadro-com-o-gitlab-issue-kit) |
 | Como subir a pilha inteira em contêineres | [Docker.md](./Docker.md) |
 | Por que cada decisão de imagem e de compose foi tomada | [Docker.md, Técnicas aplicadas](./Docker.md#12-técnicas-aplicadas) |
