@@ -17,8 +17,8 @@ do código do repositório.
 |---|---|---|---|
 | `frontend` | `docker/frontend/Dockerfile` | Serve o bundle React e encaminha `/api` para a API. Única porta de entrada. | 8080 (prod) / 5173 (dev) |
 | `api` | `docker/api/Dockerfile` | FastAPI, pipeline de PLN, integração com Deepgram e Gemini. | 8000 |
-| `minio` | `minio/minio` (oficial) | Armazenamento de áudio compatível com S3. | 9000 / 9001 |
-| `minio-init` | `minio/mc` (oficial) | Cria o bucket e aplica a regra de expiração. Roda uma vez e sai. |: |
+| `minio` | `pgsty/minio` (build comunitária do MinIO) | Armazenamento de áudio compatível com S3. | 9000 / 9001 |
+| `minio-init` | `pgsty/mc` (build comunitária do mc) | Cria o bucket e aplica a regra de expiração. Roda uma vez e sai. |: |
 
 E dois contêineres sob demanda, controlados por `profiles`:
 

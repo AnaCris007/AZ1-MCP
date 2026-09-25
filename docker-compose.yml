@@ -195,7 +195,12 @@ services:
     # Tag de release fixa, não "latest". Com "latest", a mesma composição sobe
     # versões diferentes em máquinas diferentes conforme a data do pull — o tipo
     # de divergência que só aparece em produção.
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    #
+    # Build comunitária (Pigsty) do servidor MinIO: a MinIO deixou de publicar
+    # imagens abertas no Docker Hub e no quay.io, e o pull anônimo passou a
+    # devolver "unauthorized". A imagem mantém o layout da oficial (mesmo
+    # entrypoint e o mc embutido que o healthcheck usa).
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
     command: server /data --console-address ":9001"
 
     # O usuário root do MinIO É a chave de acesso S3 que a API usa: nesta pilha
@@ -240,7 +245,7 @@ services:
   # clássico "na minha máquina funciona" — aqui ela é parte da composição,
   # versionada e idempotente (--ignore-existing), então rodar de novo não quebra.
   minio-init:
-    image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z
+    image: pgsty/mc:RELEASE.2026-09-16T00-00-00Z
     depends_on:
       minio:
         condition: service_healthy
