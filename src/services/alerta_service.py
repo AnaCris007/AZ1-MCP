@@ -16,12 +16,15 @@ import sqlalchemy
 import yaml
 from sqlalchemy import text
 
+from pln.intencao import IntencaoDetectada
+
 logger = logging.getLogger(__name__)
 
 # src/services/alerta_service.py -> src/config/alertas.yaml
 _ARQUIVO_CONFIG = Path(__file__).resolve().parent.parent / "config" / "alertas.yaml"
 
 _TIMEOUT_HTTP = 5.0
+
 _VERSAO_EVENTO = "1"
 
 
@@ -52,19 +55,20 @@ class AssinantePublico:
     criado_em: str
 
 
+# O YAML decide QUAIS intenções são de risco. Se a classificação é confiável
+# o bastante para agir sobre ela, quem decide é `pln.intencao` — daí este
+# arquivo não ter mais `limiar_confianca`. Eram dois `0.70` independentes, e
+# nenhum dos dois era o que `pln.metricas` media.
 class ConfiguracaoAlertas:
-    def __init__(self, intencoes_de_risco: list[str], limiar_confianca: float) -> None:
+    def __init__(self, intencoes_de_risco: list[str]) -> None:
         self.intencoes_de_risco = intencoes_de_risco
-        self.limiar_confianca = limiar_confianca
 
     @classmethod
     @lru_cache(maxsize=1)
     def carregar(cls) -> ConfiguracaoAlertas:
         dados = yaml.safe_load(_ARQUIVO_CONFIG.read_text(encoding="utf-8")) or {}
-        return cls(
-            intencoes_de_risco=list(dados.get("intencoes_de_risco", [])),
-            limiar_confianca=float(dados.get("limiar_confianca", 0.0)),
-        )
+        return cls(intencoes_de_risco=list(dados.get("intencoes_de_risco", [])))
+
 
 
 def _agora_iso() -> str:
@@ -158,22 +162,25 @@ class DispatcherAlerta:
         self._engine = engine
         self._configuracao = configuracao
 
-    def _deve_disparar(self, intencao: str, confianca_pln: float) -> bool:
+    # Sem limiar próprio: a detecção já chega com a regra aplicada. Uma
+    # classificação rejeitada tem `intencao == "fora_do_catalogo"`, que nunca
+    # está na lista de risco — o `not rejeitada` é redundante e está aqui de
+    # propósito, para que a intenção do código não dependa desse acidente.
+    def _deve_disparar(self, deteccao: IntencaoDetectada) -> bool:
         return (
-            intencao in self._configuracao.intencoes_de_risco
-            and confianca_pln >= self._configuracao.limiar_confianca
+            not deteccao.rejeitada
+            and deteccao.intencao in self._configuracao.intencoes_de_risco
         )
 
     def despachar(
         self,
         *,
-        intencao: str,
-        confianca_pln: float,
+        deteccao: IntencaoDetectada,
         audio_id: str,
         transcricao: str,
         projeto_id: str | None,
     ) -> None:
-        if not self._deve_disparar(intencao, confianca_pln):
+        if not self._deve_disparar(deteccao):
             return
 
         assinantes = self._assinantes_ativos(projeto_id)
@@ -186,8 +193,8 @@ class DispatcherAlerta:
             "timestamp": _agora_iso(),
             "audio_id": audio_id,
             "risco": {
-                "intencao": intencao,
-                "confianca": confianca_pln,
+                "intencao": deteccao.intencao,
+                "confianca": deteccao.confianca,
                 "transcricao": transcricao,
             },
         }
@@ -279,3 +286,4 @@ class DispatcherAlerta:
                 {"situacao": situacao, "status_code": status_code, "id": historico_id},
             )
             conn.commit()
+

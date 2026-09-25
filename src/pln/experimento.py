@@ -17,12 +17,17 @@ import itertools
 import statistics
 import sys
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 
 from joblib import Parallel, delayed
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.model_selection import StratifiedKFold, cross_validate
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC
 
 from pln.caminhos import DATASET_PADRAO, garantir_dir_de_resultados
 from pln.preprocessamento import (
@@ -63,6 +68,34 @@ LARGURA = 118
 # série e em paralelo.
 PROCESSOS_PARALELOS = -1
 
+# AS RÉGUAS DISPONÍVEIS.
+#
+# Cada família varre o espaço com ELA PRÓPRIA como instrumento de medida, e não
+# herdando o ranking de outra. Sem isso, comparar famílias mede também a
+# diferença de texto, e favorece quem produziu o ranking.
+#
+# O custo não é simétrico, e precisa ser dito antes de alguém disparar a
+# varredura: uma validação cruzada de 5 dobras sobre este corpus custa 0,05 s no
+# `MultinomialNB`, 0,11 s no `SGDClassifier`, 0,77 s no `LinearSVC` calibrado e
+# 18,06 s na regressão logística. A varredura exaustiva são 11.884 execuções —
+# minutos para o Naive Bayes, horas para a regressão logística.
+#
+# Fábricas, e não instâncias: `joblib` serializa o estimador para cada worker, e
+# uma instância compartilhada no escopo do módulo viraria estado global entre
+# processos.
+REGUAS: dict[str, Callable[[], object]] = {
+    "multinomialnb": lambda: MultinomialNB(alpha=1.0),
+    "logisticregression": lambda: LogisticRegression(max_iter=2000, random_state=SEMENTE),
+    "linearsvc": lambda: CalibratedClassifierCV(
+        LinearSVC(random_state=SEMENTE), method="sigmoid", cv=3
+    ),
+    "sgd": lambda: SGDClassifier(
+        loss="modified_huber", max_iter=2000, tol=1e-4, random_state=SEMENTE
+    ),
+}
+
+REGUA_PADRAO = "multinomialnb"
+
 
 @dataclass(frozen=True)
 class Resultado:
@@ -89,11 +122,12 @@ def contar_colunas(vetorizador) -> int:
 
 # Devolve (F1 médio, desvio, vocabulário médio).
 def medir_configuracao(
-    textos: list[str], rotulos: list[str], vetorizacao: ConfigVetorizacao, k: int
+    textos: list[str], rotulos: list[str], vetorizacao: ConfigVetorizacao, k: int,
+    estimador=None,
 ) -> tuple[float, float, float]:
     dobras = StratifiedKFold(n_splits=k, shuffle=True, random_state=SEMENTE)
     saida = cross_validate(
-        construir_pipeline_de_medicao(vetorizacao),
+        construir_pipeline_de_medicao(vetorizacao, estimador),
         textos,
         rotulos,
         cv=dobras,
@@ -159,6 +193,7 @@ def varrer_espaco_de_busca(
     rotulos: list[str],
     k: int,
     vetorizacoes: list[ConfigVetorizacao],
+    estimador=None,
 ) -> tuple[list[Resultado], int]:
     permutacoes_examinadas = 0
     configuracoes = todas_as_configuracoes_de_preprocessamento()
@@ -201,7 +236,7 @@ def varrer_espaco_de_busca(
         print(f"\r  fase 2/2 — {len(itens)} avaliações em paralelo{' ' * 30}", end="", flush=True)
 
     medidas = Parallel(n_jobs=PROCESSOS_PARALELOS)(
-        delayed(medir_configuracao)(corpus, rotulos, vetorizacao, k)
+        delayed(medir_configuracao)(corpus, rotulos, vetorizacao, k, estimador)
         for _, corpus, _, _, vetorizacao in itens
     )
 
@@ -472,15 +507,30 @@ def imprimir_recomendacao(resultados: list[Resultado]) -> None:
     print("  para manter e na ordem padrão, que não depende do sorteio das dobras.")
 
 
+# O SUFIXO NÃO É COSMÉTICO.
+#
+# Sem ele, varrer com a segunda régua sobrescreveria o ranking da primeira, e o
+# comparativo passaria a ler para todas as famílias o ranking da última que
+# rodou — a assimetria voltaria em silêncio, com todos os arquivos no lugar.
+#
+# A régua padrão mantém o nome histórico, sem sufixo: relatórios e testes que já
+# apontam para `comparativo_preprocessamento.csv` continuam valendo.
+def nome_do_relatorio(regua: str, extensao: str) -> str:
+    base = "comparativo_preprocessamento"
+    sufixo = "" if regua == REGUA_PADRAO else f"_{regua}"
+    return f"{base}{sufixo}.{extensao}"
+
+
 def escrever_relatorio(
     resultados: list[Resultado],
     dataset: Path,
     k: int,
     permutacoes: int,
+    regua: str = REGUA_PADRAO,
 ) -> None:
     dir_resultados = garantir_dir_de_resultados()
 
-    caminho_csv = dir_resultados / "comparativo_preprocessamento.csv"
+    caminho_csv = dir_resultados / nome_do_relatorio(regua, "csv")
     with caminho_csv.open("w", encoding="utf-8", newline="") as arquivo:
         escritor = csv.writer(arquivo)
         escritor.writerow(
@@ -564,7 +614,7 @@ def escrever_relatorio(
             f"| {posicao} | {r.f1_medio:.4f} | {r.f1_desvio:.4f} | {r.tamanho_vocabulario:.0f} "
             f"| {r.vetorizacao.descrever()} | {r.config.descrever()} |"
         )
-    caminho_md = dir_resultados / "comparativo_preprocessamento.md"
+    caminho_md = dir_resultados / nome_do_relatorio(regua, "md")
     caminho_md.write_text("\n".join(linhas), encoding="utf-8")
     print(f"\nRelatório salvo em:\n  {caminho_csv}\n  {caminho_md}")
 
@@ -574,7 +624,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dataset", type=Path, default=DATASET_PADRAO)
     parser.add_argument("--k", type=int, default=5, help="número de dobras da validação cruzada")
     parser.add_argument("--top", type=int, default=10, help="quantas linhas mostrar em cada ranking")
+    parser.add_argument(
+        "--regua", choices=sorted(REGUAS), default=REGUA_PADRAO,
+        help="qual classificador serve de instrumento de medida. Cada família precisa "
+             "varrer o espaço com ela própria, senão herda a escolha de texto de outra.",
+    )
     args = parser.parse_args(argv)
+    estimador = REGUAS[args.regua]()
 
     with args.dataset.open(encoding="utf-8", newline="") as arquivo:
         linhas = list(csv.DictReader(arquivo))
@@ -588,12 +644,15 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Configurações de pré-processamento: {len(todas_as_configuracoes_de_preprocessamento())}")
     print("Varredura de ordem: todas as permutações das etapas ativas")
     print(f"Validação cruzada estratificada de {args.k} dobras, semente {SEMENTE}")
+    print(f"Régua: {args.regua} ({type(estimador).__name__})")
     print(f"Varredura EXAUSTIVA: cada pré-processamento contra as {len(vetorizacoes)} vetorizações\n")
 
-    resultados, permutacoes = varrer_espaco_de_busca(textos, rotulos, args.k, vetorizacoes)
+    resultados, permutacoes = varrer_espaco_de_busca(
+        textos, rotulos, args.k, vetorizacoes, estimador
+    )
     imprimir_varredura(resultados, args.top, permutacoes)
     imprimir_recomendacao(resultados)
-    escrever_relatorio(resultados, args.dataset, args.k, permutacoes)
+    escrever_relatorio(resultados, args.dataset, args.k, permutacoes, args.regua)
     return 0
 
 

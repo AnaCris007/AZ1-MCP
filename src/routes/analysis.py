@@ -37,10 +37,12 @@ async def analyze_audio(
 
     # projeto_id=None envia para todos os assinantes ativos independente do projeto.
     # Revisar quando o AZ1 suportar múltiplos projetos num mesmo tenant.
+    # `deteccao`, e não `intencao`/`confianca_pln`: a regra de rejeição agora
+    # é uma só, vive em `pln.intencao` e chega aqui já aplicada. O dispatcher
+    # deixou de ter limiar próprio.
     background_tasks.add_task(
         dispatcher.despachar,
-        intencao=result.intencao,
-        confianca_pln=result.confianca_pln,
+        deteccao=result.deteccao,
         audio_id=audio_id,
         transcricao=result.text,
         projeto_id=None,
@@ -54,4 +56,5 @@ async def analyze_audio(
         duration_seconds=result.duration_seconds,
         intencao=result.intencao,
         confianca_pln=result.confianca_pln,
+        rejeitada=result.rejeitada,
     )

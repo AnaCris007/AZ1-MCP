@@ -8,21 +8,32 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Sequence
-from datetime import date
+from datetime import date, time
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
+from psycopg import Error as PsycopgError
+from psycopg.errors import UndefinedTable
 
-from az1_api.dependencies import get_portfolio_repository
+from az1_api.dependencies import (
+    get_evento_local_repository,
+    get_portfolio_repository,
+    require_authenticated_user,
+)
 from schemas.portfolio import (
     CalendarDayResponse,
     CalendarEventResponse,
     CalendarResponse,
+    EventoLocalCreateRequest,
+    EventoLocalResponse,
     ProjetoResponse,
     ProjetosResponse,
     TaskPatchRequest,
     TaskResponse,
 )
+from services.auth_service import AuthenticatedUser
+from services.evento_local_repository import EventoLocal, EventoLocalRepository
 from services.portfolio_repository import (
     SITUACAO_ABERTA,
     SITUACAO_RESOLVIDA,
@@ -32,6 +43,7 @@ from services.portfolio_repository import (
 )
 
 router = APIRouter(tags=["portfolio"])
+logger = logging.getLogger(__name__)
 
 Repositorio = PortfolioRepository
 
@@ -41,6 +53,20 @@ class PortfolioAPIError(Exception):
         self.status_code = status_code
         self.error = error
         self.message = message
+
+
+def _identidade(usuario: AuthenticatedUser) -> int:
+    """O id de domínio, ou 422 se ele não existe.
+
+    É None com `AZ1_AUTH_MODE=disabled` e quando `ResolveOrCreateUsuario`
+    falhou (mesmo caso de `routes/conversas.py:_identidade`). Sem identidade
+    não há dono para atribuir a um evento criado ou apagado.
+    """
+    if usuario.domain_user_id is None:
+        raise PortfolioAPIError(
+            422, "sem_identidade", "A sessão não está ligada a um usuário do portfólio."
+        )
+    return usuario.domain_user_id
 
 
 # `criticidade` tem quatro valores no banco e a interface tem três faixas. O
@@ -112,15 +138,17 @@ def _para_projeto(projeto: SituacaoProjeto) -> ProjetoResponse:
 
 
 def montar_agenda(
-    projetos: Sequence[SituacaoProjeto], pendencias: Sequence[Pendencia]
+    projetos: Sequence[SituacaoProjeto],
+    pendencias: Sequence[Pendencia],
+    eventos_locais: Sequence[EventoLocal] = (),
 ) -> list[CalendarDayResponse]:
-    """Agrupa marcos e prazos por dia.
+    """Agrupa marcos, prazos e eventos próprios por dia.
 
-    Não há tabela de compromissos no modelo: não existe reunião, nem hora. As
-    duas únicas datas reais são `projeto.data_termino_prevista` e
-    `pendencia.prazo`. Inventar um horário para preencher a coluna da interface
-    seria fabricar dado — exatamente o que esta entrega veio corrigir; por isso
-    o campo `time` não existe no contrato.
+    `marco` e `prazo` continuam sem hora: as únicas datas reais para eles são
+    `projeto.data_termino_prevista` e `pendencia.prazo`, sem componente de
+    horário no banco, e inventar um seria fabricar dado. `evento` é a
+    exceção — criado pelo próprio usuário (ver
+    `services.evento_local_repository`), com hora real quando informada.
     """
     por_dia: dict[date, list[CalendarEventResponse]] = {}
 
@@ -133,6 +161,9 @@ def montar_agenda(
                 title=f"Término previsto — {projeto.nome}",
                 type="marco",
                 project=projeto.codigo,
+                description=f"Fase: {projeto.fase} · Portfólio: {projeto.portfolio}",
+                responsible=projeto.lider,
+                status=projeto.status,
             )
         )
 
@@ -144,7 +175,28 @@ def montar_agenda(
                 id=f"prazo-{pendencia.id}",
                 title=pendencia.titulo,
                 type="prazo",
-                project=pendencia.projeto_codigo,
+                project=f"{pendencia.projeto_codigo} — {pendencia.projeto_nome}",
+                description=pendencia.descricao or "",
+                responsible=pendencia.responsavel or "",
+                status=" · ".join(
+                    parte
+                    for parte in (
+                        pendencia.situacao.replace("_", " ").capitalize(),
+                        f"Criticidade {pendencia.criticidade}" if pendencia.criticidade else "",
+                    )
+                    if parte
+                ),
+            )
+        )
+
+    for evento in eventos_locais:
+        por_dia.setdefault(evento.data, []).append(
+            CalendarEventResponse(
+                id=f"evento-{evento.id}",
+                title=evento.titulo,
+                type="evento",
+                time="" if evento.hora is None else evento.hora.strftime("%H:%M"),
+                description=evento.descricao,
             )
         )
 
@@ -153,6 +205,7 @@ def montar_agenda(
             date=formatar_dia(dia),
             weekday=formatar_dia_da_semana(dia),
             events=eventos,
+            iso=dia.isoformat(),
         )
         for dia, eventos in sorted(por_dia.items())
     ]
@@ -209,10 +262,96 @@ def atualizar_task(
     return _para_task(atualizada)
 
 
+def _para_evento_local(evento: EventoLocal) -> EventoLocalResponse:
+    return EventoLocalResponse(
+        id=evento.id,
+        title=evento.titulo,
+        date=evento.data.isoformat(),
+        time="" if evento.hora is None else evento.hora.strftime("%H:%M"),
+        description=evento.descricao,
+    )
+
+
 @router.get("/calendar/events", response_model=CalendarResponse)
-def listar_eventos(repositorio: Repositorio = Depends(get_portfolio_repository)):
+def listar_eventos(
+    repositorio: Repositorio = Depends(get_portfolio_repository),
+    repositorio_eventos_locais: EventoLocalRepository = Depends(get_evento_local_repository),
+    usuario: AuthenticatedUser = Depends(require_authenticated_user),
+):
+    # Sem identidade (AZ1_AUTH_MODE=disabled, ou ResolveOrCreateUsuario
+    # falhou) não há "meus eventos". E, como migração de banco e deploy de
+    # código são passos separados neste projeto, uma instalação que ainda não
+    # rodou 07_evento_local.sql não pode derrubar a Agenda inteira por causa
+    # disso — a Agenda segue respondendo só sem essa seção.
+    try:
+        eventos_locais = (
+            repositorio_eventos_locais.listar(usuario.domain_user_id)
+            if usuario.domain_user_id is not None
+            else []
+        )
+    except UndefinedTable:
+        logger.warning(
+            "Tabela portfolio.evento_local ainda não existe; Agenda seguirá sem eventos próprios."
+        )
+        eventos_locais = []
+    except PsycopgError as erro:
+        logger.exception("Falha ao consultar eventos próprios da Agenda", exc_info=erro)
+        raise PortfolioAPIError(
+            503,
+            "agenda_indisponivel",
+            "Não foi possível consultar os eventos próprios da Agenda.",
+        ) from erro
+
     return CalendarResponse(
         days=montar_agenda(
-            repositorio.situacao_dos_projetos(), repositorio.pendencias()
+            repositorio.situacao_dos_projetos(),
+            repositorio.pendencias(),
+            eventos_locais,
         )
     )
+
+
+@router.post("/calendar/events", response_model=EventoLocalResponse, status_code=201)
+def criar_evento_local(
+    payload: EventoLocalCreateRequest,
+    repositorio: EventoLocalRepository = Depends(get_evento_local_repository),
+    usuario: AuthenticatedUser = Depends(require_authenticated_user),
+):
+    usuario_id = _identidade(usuario)
+
+    titulo = payload.titulo.strip()
+    if not titulo:
+        raise PortfolioAPIError(422, "titulo_obrigatorio", "Informe um título para o evento.")
+
+    try:
+        data = date.fromisoformat(payload.data)
+    except ValueError as erro:
+        raise PortfolioAPIError(422, "data_invalida", "Data inválida; use o formato AAAA-MM-DD.") from erro
+
+    hora = None
+    if payload.hora:
+        try:
+            hora = time.fromisoformat(payload.hora)
+        except ValueError as erro:
+            raise PortfolioAPIError(422, "hora_invalida", "Hora inválida; use o formato HH:MM.") from erro
+
+    criado = repositorio.criar(
+        usuario_id=usuario_id,
+        titulo=titulo,
+        data=data,
+        hora=hora,
+        descricao=payload.descricao.strip(),
+    )
+    return _para_evento_local(criado)
+
+
+@router.delete("/calendar/events/{evento_id}", status_code=204)
+def apagar_evento_local(
+    evento_id: int,
+    repositorio: EventoLocalRepository = Depends(get_evento_local_repository),
+    usuario: AuthenticatedUser = Depends(require_authenticated_user),
+):
+    usuario_id = _identidade(usuario)
+    if not repositorio.apagar(usuario_id=usuario_id, evento_id=evento_id):
+        raise PortfolioAPIError(404, "evento_nao_encontrado", f"Evento {evento_id} não encontrado.")
+    return Response(status_code=204)

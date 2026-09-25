@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from az1_api.dependencies import get_analyzer, require_authenticated_user
 from az1_api.main import app
+from pln.intencao import IntencaoDetectada
 from services.analysis_service import AnalysisResult
 from services.auth_service import AuthenticatedUser
 from services.transcription_service import TranscriptionError, TranscriptionErrorCode
@@ -26,8 +27,7 @@ _RESULTADO_PADRAO = AnalysisResult(
     language="pt-BR",
     confidence=0.95,
     duration_seconds=4.5,
-    intencao="consultar_status",
-    confianca_pln=0.88,
+    deteccao=IntencaoDetectada(prevista="consultar_status", confianca=0.88),
 )
 
 _TEST_USER = AuthenticatedUser(subject="test-user", email="teste@example.com", name="Usuário de Teste", provider="azure")
@@ -58,6 +58,7 @@ class TestAnalysisAPI(unittest.TestCase):
                 "duration_seconds": 4.5,
                 "intencao": "consultar_status",
                 "confianca_pln": 0.88,
+                "rejeitada": False,
             },
         )
 
@@ -80,7 +81,8 @@ class TestAnalysisAPI(unittest.TestCase):
     def test_rejeita_idioma_nao_suportado(self) -> None:
         result = AnalysisResult(
             text="Hello", language="en-US", confidence=0.9,
-            duration_seconds=1.0, intencao="fora_do_catalogo", confianca_pln=0.6,
+            duration_seconds=1.0,
+            deteccao=IntencaoDetectada(prevista="fora_do_catalogo", confianca=0.6),
         )
         client = self._client_with(result)
 

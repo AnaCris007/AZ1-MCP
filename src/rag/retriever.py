@@ -63,3 +63,49 @@ def buscar(
         )
         for r in brutos
     ]
+
+
+# BUSCA FOCADA, COM RECUO.
+#
+# A classificação sugere onde procurar (ver `services/foco_da_busca.py`), mas
+# sugerir não é mandar: com F1-macro de 0,87, cerca de uma em oito sugestões
+# está errada, e um filtro errado esconde justamente o trecho que responderia.
+#
+# O recuo é o que torna a sugestão segura. Se a busca focada não trouxer
+# material suficientemente relevante, a busca ampla roda e prevalece. O custo
+# do erro passa a ser uma consulta vetorial a mais — não uma resposta pior.
+#
+# E ele é barato: `vetorizar_consulta` é cacheada por texto, então as duas
+# buscas da mesma pergunta pagam UMA chamada de embedding. O que se repete é a
+# consulta ao índice, que é local.
+def buscar_com_recuo(
+    query: str,
+    *,
+    n_resultados: int = 5,
+    projeto_id: str | None = None,
+    tipo_documento: str | None = None,
+    score_minimo: float = 0.0,
+) -> tuple[list[ResultadoBusca], bool]:
+    """Devolve (resultados, focou) — `focou` diz se o filtro foi o que valeu.
+
+    O segundo elemento não é detalhe: sem ele, quem chama não tem como saber se
+    está olhando o resultado da sugestão ou o do recuo, e a decisão viraria
+    invisível no log e na auditoria.
+    """
+    if projeto_id is None and tipo_documento is None:
+        return buscar(query, n_resultados=n_resultados), False
+
+    focados = buscar(
+        query,
+        n_resultados=n_resultados,
+        projeto_id=projeto_id,
+        tipo_documento=tipo_documento,
+    )
+    if any(r.score >= score_minimo for r in focados):
+        return focados, True
+
+    # O filtro não achou nada que se sustente. Pode ser classificação errada,
+    # pode ser que o projeto não tenha aquele documento — as duas se corrigem
+    # do mesmo jeito.
+    return buscar(query, n_resultados=n_resultados), False
+

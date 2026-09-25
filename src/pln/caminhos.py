@@ -28,7 +28,18 @@ def dir_resultados() -> Path:
 
 
 DIR_DADOS = dir_dados()
+
+# Três arquivos, e uma relação entre eles: o POOL é autoral e contém todos os
+# exemplos; os outros dois são GERADOS por `python -m pln.particao` e não devem
+# ser editados à mão.
+#
+# São arquivos separados, e não uma coluna `particao` num CSV só, de propósito:
+# assim `experimento.py`, `ajuste_fino.py` e `bancada.py` ficam INCAPAZES de
+# enxergar o teste, em vez de apenas instruídos a não enxergá-lo. Nenhum deles
+# precisou mudar uma linha.
+DATASET_POOL = DIR_DADOS / "intencoes_pool.csv"
 DATASET_PADRAO = DIR_DADOS / "intencoes_exemplos.csv"
+DATASET_TESTE = DIR_DADOS / "intencoes_teste.csv"
 
 DIR_RESULTADOS = dir_resultados()
 MODELO_PADRAO = DIR_RESULTADOS / "classificador.joblib"
