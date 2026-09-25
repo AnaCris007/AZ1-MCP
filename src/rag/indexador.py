@@ -29,9 +29,22 @@ def _db_url() -> str:
     return url
 
 
+def _url_psycopg2(url: str) -> str:
+    # O vecs é escrito para o psycopg2 (é a dependência declarada dele) e envia
+    # `SET LOCAL ivfflat.probes = :probes` com parâmetro vinculado. O psycopg2
+    # interpola no cliente; o psycopg 3 manda o parâmetro ao servidor, e o
+    # PostgreSQL recusa parâmetro em SET ("syntax error at or near $1"). A partir
+    # do SQLAlchemy 2.1 o driver padrão de `postgresql://` passou a ser o
+    # psycopg 3, então o driver precisa ser explícito aqui.
+    for prefixo in ("postgresql://", "postgres://"):
+        if url.startswith(prefixo):
+            return "postgresql+psycopg2://" + url[len(prefixo):]
+    return url
+
+
 @lru_cache(maxsize=1)
 def _cliente() -> vecs.Client:
-    return vecs.create_client(_db_url())
+    return vecs.create_client(_url_psycopg2(_db_url()))
 
 
 def obter_colecao() -> vecs.Collection:
