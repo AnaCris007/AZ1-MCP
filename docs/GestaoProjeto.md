@@ -17,7 +17,6 @@
 - [Tobias Viana](https://www.linkedin.com/in/tobias-viana/)
 ---
 
-
 # Gestão do Projeto
 
 ## Sumário
@@ -140,6 +139,38 @@
 
 </details>
 
+<details>
+<summary><strong>6. Sprint 4</strong></summary>
+
+- [6.1 Visão geral da entrega](#61-visão-geral-da-entrega)
+- [6.2 Análise e retrospectiva da Sprint 4](#62-análise-e-retrospectiva-da-sprint-4)
+  - [6.2.1 Síntese da sprint](#621-síntese-da-sprint)
+  - [6.2.2 Acompanhamento das ações da Sprint 3](#622-acompanhamento-das-ações-da-sprint-3)
+  - [6.2.3 Pontos fortes](#623-pontos-fortes)
+  - [6.2.4 Pontos fracos](#624-pontos-fracos)
+  - [6.2.5 Ações de melhoria para a Sprint 5](#625-ações-de-melhoria-para-a-sprint-5)
+  - [6.2.6 Alinhamento com o Escritório de Projetos](#626-alinhamento-com-o-escritório-de-projetos)
+- [6.3 Matriz de Risco do Projeto](#63-matriz-de-risco-do-projeto)
+  - [6.3.1 Critério de severidade](#631-critério-de-severidade)
+  - [6.3.2 Revisão das ameaças na Sprint 4](#632-revisão-das-ameaças-na-sprint-4)
+  - [6.3.3 Revisão das oportunidades na Sprint 4](#633-revisão-das-oportunidades-na-sprint-4)
+  - [6.3.4 Novos itens identificados na Sprint 4](#634-novos-itens-identificados-na-sprint-4)
+  - [6.3.5 Efetividade das respostas aplicadas](#635-efetividade-das-respostas-aplicadas)
+  - [6.3.6 Quadro consolidado e representação visual](#636-quadro-consolidado-e-representação-visual)
+  - [6.3.7 Análise dos três itens mais críticos](#637-análise-dos-três-itens-mais-críticos)
+  - [6.3.8 Histórico de acompanhamento](#638-histórico-de-acompanhamento)
+- [6.4 Matriz de Papéis e Responsabilidades da Sprint 4](#64-matriz-de-papéis-e-responsabilidades-da-sprint-4)
+  - [6.4.1 Papéis, responsabilidades e rotação](#641-papéis-responsabilidades-e-rotação)
+  - [6.4.2 Evidência versionada e colaborações efetivas](#642-evidência-versionada-e-colaborações-efetivas)
+  - [6.4.3 Avaliação da distribuição](#643-avaliação-da-distribuição)
+- [6.5 Revisão do Contrato de Convivência, SLA e Rituais](#65-revisão-do-contrato-de-convivência-sla-e-rituais)
+- [6.6 Revisão da Gestão do Processo de Desenvolvimento](#66-revisão-da-gestão-do-processo-de-desenvolvimento)
+  - [6.6.1 Aderência das políticas na Sprint 4](#661-aderência-das-políticas-na-sprint-4)
+  - [6.6.2 Automação do backlog e dos templates: gitlab-issue-kit](#662-automação-do-backlog-e-dos-templates-gitlab-issue-kit)
+- [6.7 Análise de Viabilidade Financeira](#67-análise-de-viabilidade-financeira)
+
+</details>
+
 ---
 
 # 1. Introdução
@@ -150,7 +181,7 @@ Este documento reúne as práticas permanentes de gestão adotadas pela equipe a
 
 ## 1.2 Organização evolutiva do documento
 
-O documento está dividido em duas grandes partes. A primeira, composta pela Seção 2, reúne os acordos e práticas permanentes que se aplicam a todo o módulo: o Contrato de Convivência, a Gestão do Processo de Desenvolvimento e o mecanismo de Acompanhamento Contínuo dos Riscos. Essas diretrizes não são reescritas a cada sprint, e eventuais ajustes são incorporados sem apagar o histórico dos acordos anteriores, de modo que a evolução dos combinados fique registrada. A segunda parte, composta pelas Seções 3 a 5, reúne os registros específicos de cada sprint: a síntese e a retrospectiva, a revisão dos riscos, a matriz de papéis e responsabilidades e o planejamento da sprint seguinte. Cada sprint preserva seus próprios registros, sem sobrescrever os das sprints anteriores, o que permite acompanhar a evolução da equipe ao longo do módulo. A gestão de configuração, por sua vez, está documentada em arquivo separado, o GestaoConfiguracao.md, que define o fluxo gitflow, as políticas de branches e os procedimentos de criação, mesclagem e exclusão.
+O documento está dividido em duas grandes partes. A primeira, composta pela Seção 2, reúne os acordos e práticas permanentes que se aplicam a todo o módulo: o Contrato de Convivência, a Gestão do Processo de Desenvolvimento e o mecanismo de Acompanhamento Contínuo dos Riscos. Essas diretrizes não são reescritas a cada sprint, e eventuais ajustes são incorporados sem apagar o histórico dos acordos anteriores, de modo que a evolução dos combinados fique registrada. A segunda parte, composta pelas Seções 3 a 6, reúne os registros específicos de cada sprint: a síntese e a retrospectiva, a revisão dos riscos, a matriz de papéis e responsabilidades e o planejamento da sprint seguinte. Cada sprint preserva seus próprios registros, sem sobrescrever os das sprints anteriores, o que permite acompanhar a evolução da equipe ao longo do módulo. A gestão de configuração, por sua vez, está documentada em arquivo separado, o GestaoConfiguracao.md, que define o fluxo gitflow, as políticas de branches e os procedimentos de criação, mesclagem e exclusão.
 
 ---
 
@@ -183,6 +214,7 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 - **Atualização obrigatória:** continuamente, sempre que uma task mudar de estado, e obrigatoriamente antes de cada Daily.
 - **Responsável pela atualização:** cada integrante é responsável pelos próprios cards, desde a criação ou atribuição até o encerramento.
 - **Informações mínimas:** descrição, tipo, prioridade, estimativa, DoR, DoD, responsável e dependências.
+- **Primeiro incremento versionado** *(incluído na Sprint 4)*: ao mover um card para `Doing`, o responsável versiona o primeiro incremento (commit na branch de trabalho ou Merge Request em rascunho) em até um dia útil. Um card só entra em `Waiting Review` com Merge Request aberto e vinculado à issue.
 
  A gestão de um card não deve comprometer o fluxo de trabalho do revisor previamente designado. O responsável pela task deve disponibilizar a entrega com antecedência suficiente para uma revisão de qualidade e observar a Regra de Ouro, segundo a qual as entregas devem estar concluídas até quinta-feira. Impedimentos, mudanças de prazo ou dependências que possam afetar a revisão devem ser registrados no card e comunicados na Daily assim que forem identificados.
 
@@ -228,12 +260,13 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 | 1 | Contrato firmado | Não se aplica | Seção 3.2 |
 | 2 | Revisado e mantido integralmente | Nenhum | Seção 4.5 |
 | 3 | Revisado e mantido integralmente, com aceite coletivo registrado | Nenhum | Seção 5.5 e registro no canal oficial da equipe em 11/09/2026 |
+| 4 | Revisado, com **uma regra incluída** no item 2.1.4 e os demais mantidos | 2.1.4 Quadro Kanban | Seção 6.5; mensagem no Slack da equipe em 24/09/2026, às 11h, aprovada por 6 dos 7 integrantes e arquivada em `docs/evidencias/gestao/aceite-contrato-sprint-4.png` |
 
- Como nenhuma regra do contrato foi alterada até aqui, a tabela de histórico por regra permanece sem linhas de alteração. Ela é mantida com a estrutura definida, para que a primeira mudança já entre no formato correto:
+ Nenhuma regra do contrato foi alterada nas Sprints 1, 2 e 3. A primeira alteração ocorreu na Sprint 4 e entrou no formato que a tabela já previa:
 
 | Regra | Versão anterior | Versão atual | Motivo | Evidência de aceite |
 |---|---|---|---|---|
-| — | — | — | Nenhuma regra do contrato foi alterada nas Sprints 1, 2 e 3 | Não se aplica |
+| 2.1.4 Quadro Kanban (Sprint 4) | O card é atualizado sempre que muda de estado e obrigatoriamente antes de cada Daily, sem prazo para o primeiro incremento | Mantém a regra anterior e acrescenta: ao entrar em `Doing`, o primeiro incremento é versionado em até um dia útil, e `Waiting Review` exige MR aberto e vinculado | A cadência foi ponto fraco em três sprints seguidas; na Sprint 4, os quatro primeiros dias úteis passaram sem commit autoral e um card chegou a `Waiting Review` sem MR (Seção 6.2.4) | Mensagem no Slack da equipe em 24/09/2026, às 11h, com o texto da alteração e a confirmação de 6 dos 7 integrantes (maioria simples, Seção 2.1.2), arquivada em `docs/evidencias/gestao/aceite-contrato-sprint-4.png` |
 
  **O que mudou fora do contrato.** A única regra efetivamente revisada na Sprint 2 não pertence ao contrato, e sim à tabela de ações: o critério de verificação da rotação de revisores. Ela está registrada com sua justificativa na Seção 4.2.4, e não aqui, para que a distinção entre acordo de convivência e critério de acompanhamento permaneça clara.
 
@@ -260,6 +293,8 @@ As diretrizes desta seção valem para todo o módulo. Alterações devem ser di
 Issues sem milestone, sem assignee ou sem labels são consideradas não conformes e devem ser corrigidas antes de entrar em doing. Ao final da sprint, todas as issues abertas são revisadas na retrospectiva: as concluídas são encerradas, e as não concluídas são reavaliadas e replanejadas para a sprint seguinte.
 
  Cards em waiting review são de responsabilidade do autor da task. Cabe a ele acompanhar o prazo de revisão, verificar se o revisor foi corretamente designado e cobrar ativamente a revisão caso ela não ocorra dentro do prazo acordado. Cards parados em waiting review por mais de dois dias sem nenhuma interação no MR devem ser sinalizados pelo autor na daily seguinte, para que o impedimento seja resolvido sem comprometer a entrega da sprint.
+
+ **Escopo fixo do card** *(incluído na Sprint 4)*. Uma issue mantém o objetivo com que foi criada. Trabalho novo vira issue nova, com os campos mínimos da Seção 2.1.4. Uma task que deixou de fazer sentido é fechada com um comentário que explique o motivo, e não renomeada para outro assunto. Ajustes de redação no título são permitidos quando mantêm o objetivo. A regra existe porque, na Sprint 4, 26 das 47 issues passaram a descrever outro trabalho durante a sprint, o que apagou do quadro ações planejadas e impediu comparar plano e execução (Seção 6.2.4).
 
 ### 2.2.3 Política de commits
 
@@ -289,6 +324,8 @@ O quadro reúne, em uma leitura só, as políticas descritas nas seções anteri
 |---|---|---|---|---|---|
 | Criação de tasks (2.2.1) | Toda task nasce como issue com título no infinitivo, descrição, objetivo, DoR, DoD, labels, responsável e milestone preenchidos | Equipe, na Sprint Planning | Uma vez por sprint, no início do ciclo | Issues criadas com todos os campos no Kanban do GitLab | A issue não é movida para `backlog` e a task não pode ser iniciada |
 | Estimativa (2.2.1) | Toda task é estimada em t-shirt; acima de G, deve ser decomposta antes de entrar no backlog | Equipe, na Sprint Planning | Uma vez por sprint | Campo de estimativa preenchido na issue | A task volta para refinamento antes de entrar no backlog |
+| Primeiro incremento (2.1.4, incluído na Sprint 4) | Card em `Doing` tem incremento versionado em até um dia útil; `Waiting Review` só com MR aberto e vinculado | Responsável pelo card | Um dia útil após a entrada em `Doing` | Data do primeiro commit ou do MR em rascunho; MR vinculado ao card | Card sinalizado na daily seguinte; reincidência segue o fluxo da Seção 2.1.3 |
+| Escopo fixo do card (2.2.2, incluído na Sprint 4) | Card não muda de objetivo; trabalho novo vira issue nova; card abandonado é fechado com comentário | Autor ou responsável pelo card | A cada mudança de título | Notas de sistema de mudança de título no GitLab | Card renomeado para outro escopo é restaurado ou fechado, e o novo trabalho ganha issue própria |
 | Atualização do Kanban (2.2.2) | Cada integrante move os próprios cards assim que o estado real muda | Cada integrante, pelos próprios cards | Continuamente, com atualização obrigatória antes de cada daily | Histórico de movimentação do card | Card sinalizado na daily seguinte; a task é tratada como bloqueada até ser atualizada |
 | Cards em revisão (2.2.2) | O autor acompanha o prazo da revisão e cobra o revisor designado | Autor da task | Card parado mais de dois dias sem interação deve ser sinalizado | Comentário no MR ou registro na daily | O impedimento é levado à daily e, persistindo, à retrospectiva |
 | Commits (2.2.3) | Conventional Commits em português, descrição no infinitivo, máximo de 72 caracteres, referência `#N`, uma intenção por commit, distribuídos ao longo da sprint | Cada integrante | A cada commit | Histórico do repositório e aferição registrada na Seção 5.3 do `GestaoConfiguracao.md` | Commit não conforme é apontado na revisão do MR; o histórico já integrado não é reescrito, e o desvio é registrado na retrospectiva |
@@ -305,12 +342,11 @@ O quadro reúne, em uma leitura só, as políticas descritas nas seções anteri
 | Rastreabilidade (5.1 do `GestaoConfiguracao.md`) | Branch, commit e MR vinculados a uma issue | Cada integrante | A cada alteração autoral | Referência `#N` no commit e `Closes #N` no MR | O MR não é aceito sem o vínculo |
 | Revisão das políticas (2.2.4) | As políticas e o contrato são revisados a cada retrospectiva, com o desfecho registrado | Scrum Master da sprint | Uma vez por sprint | Seção de revisão da sprint neste documento e linha na Seção 2.1.8 | A revisão pendente é o primeiro item da retrospectiva seguinte |
 
-**Como esta tabela deve ser lida.** Ela registra **política documentada**, e não prática comprovada. A aferição aparece nas seções de cada ciclo: Sprint 2 nas Seções 4.6 e 5.3 do `GestaoConfiguracao.md`; Sprint 3 nas Seções 5.6 deste documento e 7.4 do `GestaoConfiguracao.md`. Onde a prática não pôde ser verificada, isso é declarado, e não suprido por estimativa.
+**Como esta tabela deve ser lida.** Ela registra **política documentada**, e não prática comprovada. A aferição aparece nas seções de cada ciclo: Sprint 2 nas Seções 4.6 e 5.3 do `GestaoConfiguracao.md`; Sprint 3 nas Seções 5.6 deste documento e 7.4 do `GestaoConfiguracao.md`; Sprint 4 nas Seções 6.6 deste documento e 7.5 do `GestaoConfiguracao.md`. Onde a prática não pôde ser verificada, isso é declarado, e não suprido por estimativa.
 
 ---
 
 ## 2.3 Acompanhamento Contínuo dos Riscos
-
 
  A matriz de riscos registrada no artefato de negócios é revisitada a cada sprint, de modo que o grupo mantenha uma visão atualizada das ameaças e oportunidades ao longo de todo o módulo. A revisão não ocorre apenas na entrega final: ela é um item fixo da retrospectiva de cada sprint, garantindo que riscos materializados sejam tratados e que novos riscos identificados ao longo do desenvolvimento sejam incorporados. A tabela a seguir define o mecanismo de acompanhamento adotado pela equipe:
 
@@ -340,7 +376,6 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 | Entregas planejadas | Artefato de entendimento de negócio (Projeto.md, parte de negócios), artefato de especificação técnica (Projeto.md, parte técnica) e artefato de gestão do projeto (GestaoProjeto.md) |
 | Entregas concluídas | Artefato de entendimento de negócio, artefato de especificação técnica e artefato de gestão do projeto |
 | Resultado geral | Sprint concluída com todas as entregas planejadas realizadas. A equipe demonstrou boa organização e comunicação ao longo do ciclo, com pontos de melhoria identificados para a Sprint 2 |
-
 
 ### 3.2.2 Pontos fortes
 
@@ -1293,7 +1328,6 @@ O registro original possuía campos de responsável e revisor ainda vazios. Esse
 | Rui Facó | Definição do MVP e tecnologias | Pilha de tecnologias e contratos de entrada | Testes não funcionais e Gestão de Projetos Evolutiva | Frontend integrado | Estruturou a documentação (`!59`), planejou RNFs (`!63`), produziu a análise e a matriz de papéis (`!72`) e corrigiu a integração e a documentação na auditoria final (`!81`) | `!64`, `!67` e `!80` | Rotação para gestão e qualidade; revisão planejada do frontend cumprida e apoios adicionais em webhooks e banco |
 | Tobias Viana | Modelagem do fluxo de negócio | Processo de deploy em nuvem | Implementação e integração do algoritmo de NLP | Webhooks | Implementou Docker/CI (`!65`), melhorou, mediu e documentou o PLN (`!69`), integrou o banco relacional (`!80`) e colaborou na integração final do algoritmo com o frontend no MR `!81` | `!73`, `!78` e `!81` | Responsabilidade principal de PLN cumprida; também ampliou a atuação para banco e revisou webhooks e a auditoria final |
 
-
 **Reconciliação das frentes definidas no início da sprint**
 
 | Frente da Planning | Responsável/revisor inicialmente registrados | Responsável/revisor efetivos | Resultado da comparação |
@@ -1417,3 +1451,741 @@ Cada card deve apresentar título, descrição, tipo, prioridade, dependências,
 Itens maiores que 120 minutos são decompostos antes da execução. O **DoR** exige objetivo compreensível, insumos disponíveis, dependências identificadas, estimativa e responsáveis definidos. O **DoD** específico de cada task descreve um resultado observável, com evidência de teste ou revisão, ajustes resolvidos e integração concluída quando aplicável. A issue não é encerrada apenas pela existência de um commit.
 
 O quadro deve refletir cada mudança de estado e ser atualizado antes da Daily. A revisão do backlog verifica duplicidades, bloqueios, carga de revisão e aderência ao entregável; as ações da Seção 5.2.5 orientam esse acompanhamento.
+
+---
+
+# 6. Sprint 4
+
+## 6.1 Visão geral da entrega
+
+Esta seção consolida a análise da Sprint 4, a evolução dos riscos, os papéis e as colaborações da equipe, a revisão dos acordos e dos processos de trabalho e a análise de viabilidade financeira da solução.
+
+Os indicadores foram conferidos em **25/09/2026, às 17h55 (BRT)**, depois do último merge da milestone `Sprint 04`. A apuração do Git está fixada no commit `f8012f4` de `develop`, de modo que os números continuam reproduzíveis mesmo que o documento receba correção posterior. Os números do GitLab (issues, Merge Requests, revisores, aprovações, pipelines e configurações do projeto) foram consultados pela API no mesmo horário.
+
+**Método da apuração.** Foram considerados os commits autorais únicos com data de autoria entre 14/09 e 25/09/2026, alcançáveis a partir de qualquer referência remota. Commits de merge foram excluídos, pela exceção da Seção 5.1 do `GestaoConfiguracao.md`, e os nomes de autor equivalentes foram consolidados (por exemplo, `Karol` e `Karol Barbosa`). Os Merge Requests considerados são os 15 vinculados à milestone `Sprint 04` (`!85` a `!99`) e o `!100`, que pertence à sprint mas foi aberto sem milestone. O MR deste próprio artefato fica fora da contagem, porque é aberto depois do corte. A promoção da Sprint 3 (`!83` e `!84`, concluída na virada de 11 para 12/09) pertence à milestone anterior.
+
+## 6.2 Análise e retrospectiva da Sprint 4
+
+### 6.2.1 Síntese da sprint
+
+| Aspecto | Registro final em 25/09/2026 |
+|---|---|
+| Objetivo da sprint | Dar durabilidade e alcance à solução: consolidar persistência e integrações, publicar a aplicação em nuvem e executar os testes planejados na Sprint 3, conforme a Seção 3.8.6 do `Projeto.md` e a estratégia da Seção 5.7.1 deste documento |
+| Entregas observadas | Testes funcionais executados com evidências (`!85`); ferramentas de teste documentadas (`!86`); módulo VHS de gravação das respostas externas (`!87`); componente Agente, que executa a intenção classificada (`!88`); testes de integração no pipeline (`!89`); chamada de voz contínua e sua documentação (`!90`, `!94`); inventário e ajuste da busca na base vetorial (`!91`, `!99`); agenda integrada ao calendário (`!92`); troca do classificador por `LinearSVC` sobre uma base de intenções reconstruída, com conjunto de teste retido (`!93`); ajuste das tabelas e integrações do banco (`!95`); mensageria assíncrona com RabbitMQ e varredura do Drive para o RAG (`!96`); análise de viabilidade financeira (`!97`); testes de usabilidade com cinco participantes externos e SUS (`!98`); publicação da aplicação na AWS com HTTPS (`!100`) |
+| Volume versionado | **72 commits autorais**, dos sete integrantes, e **16 MRs**, todos mesclados: 15 em `develop` e 1 (`!97`) na branch deste artefato |
+| Revisão dos MRs | Os 16 MRs têm revisor diferente do autor, aprovação registrada e comentário do revisor; os **sete integrantes** revisaram |
+| Quadro | 47 issues na milestone: 28 encerradas e 19 abertas. Durante a sprint, **29 issues foram renomeadas, e 26 delas passaram a descrever outro trabalho** (Seção 6.2.4) |
+| Resultado | A sprint entregou o escopo previsto: aplicação publicada em nuvem, testes funcionais, de integração e de usabilidade executados, e persistência e integrações consolidadas. Também antecipou a mensageria, prevista para a Sprint 5. Os dois desvios principais foram de **cadência** (início tardio e concentração no último dia) e de **rastreabilidade do plano** (cards reaproveitados para outro escopo). Os testes de desempenho dos requisitos não funcionais não foram executados |
+
+A leitura combina Git, GitLab e os arquivos alterados. O estado dos cards é a fotografia do quadro no horário da conferência.
+
+### 6.2.2 Acompanhamento das ações da Sprint 3
+
+A tabela confere cada ação da Seção 5.2.5 contra o critério que a própria equipe escreveu.
+
+| Ação definida na Sprint 3 | Critério de verificação | Resultado final na Sprint 4 | Situação |
+|---|---|---|---|
+| Refinar o backlog antes de publicá-lo | Nenhuma issue duplicada; 100% das issues com vínculo explícito a um entregável ou ação de melhoria | As 45 issues da Planning de 11/09 foram publicadas com objetivo e contexto ligados a entregáveis. No fechamento, porém, há **três pares duplicados**: `#275`/`#295` (popular os dados do parceiro), `#270`/`#287` (ambas renomeadas para "Criar os slides da apresentação da Sprint 4") e `#285`/`#294` (ambas renomeadas para "Executar o planejamento de testes dos requisitos não funcionais"). O vínculo com o entregável se perdeu em 26 cards reaproveitados | **Não atendida** |
+| Não mover card para `Doing` sem definição operacional | Nenhum card em `Doing` sem responsável e sem os campos mínimos | Em 24/09, `#234` estava em `Doing` sem responsável. `#300`, `#301` e `#302` foram criadas durante a sprint, e duas delas têm título fora do padrão ("Atualizando as tabelas do banco" e "Ajustar toda a estrutura do de arquivos do projeto") | **Não atendida** |
+| Decompor entregas G e antecipar a revisão | Nenhum MR recebe a primeira solicitação de revisão apenas no último dia; nenhum revisor acumula mais de dois itens simultâneos | Nenhum revisor passou de dois MRs simultâneos (Ana e Rui chegaram a dois). Mas **3 dos 16 MRs foram abertos em 25/09** (`!98`, `!99`, `!100`), e a decomposição não ocorreu: **36 das 47 issues (76,6%) são `SIZE_G`**, contra 21 de 45 (46,7%) no dia da Planning | **Parcialmente atendida** |
+| Validar a mensagem de commit por mecanismo compartilhado | 100% dos commits no infinitivo, com até 72 caracteres, tipo válido e `#N` | Nenhum mecanismo foi versionado. A issue criada para isso (`#253`, "Versionar o mecanismo compartilhado de validação da mensagem de commit") foi renomeada em 18/09 para "Integrar a captura de voz do usuário à conversa com o agente". Ainda assim, o hábito melhorou: 100% com `#N` e tipo válido, 98,6% no infinitivo e 84,7% dentro de 72 caracteres | **Não atendida** (mecanismo), com melhora de prática |
+| Conferir o documento contra o repositório após o último merge | Nenhuma afirmação sobre commits, MRs, branches ou issues diverge do estado final | Conferência refeita em 25/09 às 17h55, depois do último merge da sprint (`!100`, às 16h40), fixada em `develop@f8012f4` e na consulta à API no mesmo horário | **Atendida** |
+
+A leitura conjunta explica o resultado. As ações de melhoria da Sprint 3 viraram cards na Planning, mas parte desses cards foi reaproveitada para outro trabalho: além da `#253`, a `#254` ("Publicar os templates de issue e de Merge Request na raiz do repositório") virou "Melhorar a velocidade da chamada de voz", e a `#255` ("Auditar a conformidade dos commits e dos Merge Requests") virou "Corrigir pendências de áudio". **As ações não falharam na execução: elas saíram do quadro.** Por isso a principal ação da Sprint 5 é sobre o uso do quadro, e não sobre uma regra nova de commit.
+
+### 6.2.3 Pontos fortes
+
+| Ponto forte | Evidência | Impacto no desempenho |
+|---|---|---|
+| Escopo da sprint entregue, com antecipação | Aplicação publicada em `https://100-55-199-202.sslip.io` (`!100`, `#284`); testes funcionais (`!85`), de integração (`!89`) e de usabilidade com cinco participantes externos (`!98`) executados; mensageria com RabbitMQ (`!96`), prevista para a Sprint 5 na Seção 3.8.7 do `Projeto.md`, entregue antes | A Sprint 5 começa com a aplicação no ar e a mensageria integrada, e pode se concentrar em interface, cobertura e consolidação |
+| Revisão distribuída entre os sete integrantes | Revisões por integrante: Ana 3 (`!85`, `!97`, `!99`), Karol 3 (`!89`, `!93`, `!100`), Felipe 2, Matheus 2, Paulo 2, Rui 2 e Tobias 2. Os 16 MRs têm aprovação e comentário do revisor | Nenhum integrante concentrou a revisão: o máximo foi 18,8%, contra 25,0% na Sprint 3 |
+| Forma dos commits incorporada ao hábito | Infinitivo subiu de 80,4% para 98,6% e limite de 72 caracteres de 76,1% para 84,7%; `#N` e tipo válido mantidos em 100% pela terceira sprint | A regra passou a ser seguida por prática, e não apenas declarada |
+| Testes saíram do planejamento para a execução | Evidências da campanha funcional em `docs/evidencias/testes-funcionais`; testes de integração rodando no pipeline; sessões de usabilidade com SUS, tarefas e comentários registrados no `Projeto.md` | A Sprint 3 planejou; a Sprint 4 produziu resultado verificável por quem não executou |
+| Testes reprodutíveis sem depender de provedores externos | O módulo VHS (`!87`) grava e reproduz as respostas externas; a correção `f3de419` limitou as chamadas reais | Os testes de integração passam no pipeline sem credencial e sem custo de chamada |
+| Classificador validado em dados separados | O `!93` reconstruiu a base de intenções (1.104 frases, separadas por hash em 881 de desenvolvimento e 223 de teste retido) e trocou o modelo por `LinearSVC`, que atende aos três limites do RNF03 no teste retido | Primeira resposta executada ao risco AM6 em quatro sprints |
+| Pipeline verde em todos os MRs | Os 16 MRs têm pipeline com status `success` | Nenhum código entrou em `develop` sem lint e testes |
+
+### 6.2.4 Pontos fracos
+
+| Ponto fraco | Evidência | Impacto | Causa provável |
+|---|---|---|---|
+| Cards reaproveitados para outro escopo | 29 das 47 issues foram renomeadas durante a sprint; em 26 delas o novo título descreve outro trabalho. Exemplos: `#227` "Atualizar a matriz de risco" virou "Reproduzir por voz a resposta do agente"; `#241` "Planejar a Sprint 5" virou "Ajustar a busca das fontes do banco vetorial"; `#287` "Escrever o manual de implantação" virou "Criar os slides da apresentação". O reaproveitamento gerou dois pares duplicados (`#270`/`#287` e `#285`/`#294`) | O quadro deixou de mostrar o que foi planejado. Não é possível comparar plano e execução pelo GitLab, e ações de melhoria sumiram sem decisão registrada | Ao surgir um trabalho novo, foi mais rápido renomear um card parado do que criar uma issue. Nenhuma política proibia a prática |
+| Início tardio e concentração no último dia | Nenhum commit autoral de 14 a 17/09; 29 dos 72 commits (40,3%) em 24/09, acima do teto de 40%; **9 dos 16 merges em 25/09**, o último dia | Metade da sprint sem incremento versionado e revisão comprimida na reta final | Cards G sem primeiro incremento definido e nenhum gatilho que exija versionar logo ao entrar em `Doing` |
+| Trabalho visível só no fim | Os 7 commits de Matheus são de 24 e 25/09; a análise financeira entrou no repositório em 24/09 à noite. | O quadro e o Git não mostravam o trabalho em andamento, e a revisão só pôde começar no fim | Produção documental fora do repositório, consolidada perto da entrega |
+| Ambiente quebrado por mudança externa | Em 23/09, as imagens do MinIO deixaram de baixar sem login (`860685e`, `#297`); em 25/09, o SQLAlchemy 2.1 mudou o driver padrão e o chat parou de consultar a base (`!100`). As dependências Python continuam declaradas com `>=` em `requirements.txt` | Duas interrupções do ambiente em três dias, uma delas no dia da entrega | Versões de imagens e bibliotecas não travadas |
+| Testes de desempenho não executados | `#285` em `Doing` e `#294` em `Backlog`, ambas "Executar o planejamento de testes dos requisitos não funcionais"; o card original de desempenho (`#264`) foi reaproveitado para a usabilidade em 24/09 | O RNF de desempenho segue sem evidência | Capacidade da sprint consumida pelas frentes que avançaram e cards sem dono claro para desempenho |
+| Encerramento de ciclo incompleto | 33 branches no remoto; 5 dos 16 MRs (`!86`, `!89`, `!93`, `!96`, `!97`) sem a opção de excluir a branch de origem; `!100` sem milestone e sem labels; `!85` sem `Closes #N`; nenhuma tag no repositório | O repositório acumula branches mortas, e parte dos MRs não aparece nos filtros da sprint | Etapas finais dependem de lembrança e não fazem parte da conferência do MR |
+
+### 6.2.5 Ações de melhoria para a Sprint 5
+
+Todas as ações têm número-alvo, inclusive as de cadência, que na Sprint 3 ficaram sem meta numérica.
+
+| Problema de origem | Ação | Responsável pelo acompanhamento | Prazo | Evidência esperada | Critério verificável |
+|---|---|---|---|---|---|
+| Cards reaproveitados | Aplicar a política de escopo fixo do card (Seção 2.2.2): trabalho novo vira issue nova; card que não será feito é fechado com comentário, e não renomeado | Scrum Master da Sprint 5 | Durante toda a Sprint 5 | Histórico de título das issues (notas de sistema do GitLab) | Zero issues com mudança de escopo no título depois da Planning; ajustes de redação são permitidos se mantiverem o objetivo |
+| Início tardio e concentração no fim | Aplicar a regra do primeiro incremento versionado (Seção 2.1.4) | Scrum Master da Sprint 5 | Durante toda a Sprint 5 | Histórico de commits e data de abertura dos MRs | Nenhum dia útil da primeira semana sem commit autoral; ao menos 30% dos commits nos cinco primeiros dias úteis; nenhum dia acima de 40%; no máximo 25% dos merges no último dia (Sprint 4: 56,3%) |
+| Duplicidades e tasks G | Revisar o backlog em equipe antes de publicá-lo e decompor toda task G sem incremento revisável | Scrum Master da Sprint 5 | Planning da Sprint 5 | Labels `SIZE_*` e títulos da milestone `Sprint 05` | Zero pares duplicados; no máximo 40% dos cards em `SIZE_G` (Sprint 4: 76,6%) |
+| Trabalho visível só no fim | Todo card em `Waiting Review` precisa de MR aberto; artefatos documentais entram por MR em rascunho desde o início | Cada autor, acompanhado pelo Scrum Master | Durante toda a Sprint 5 | Quadro e lista de MRs | Nenhum card em `Waiting Review` sem MR; os sete integrantes com commit autoral em cada semana da sprint |
+| Ambiente quebrado por mudança externa | Travar as versões das dependências Python e das imagens de contêiner | Responsável pela implantação na Sprint 5 | Primeira semana da Sprint 5 | `requirements.txt` e `docker-compose.yml` versionados | Nenhuma dependência de execução com `>=` em `requirements.txt` e nenhuma imagem com tag `latest` |
+| Mensagem de commit e MR fora do padrão | Versionar o hook de `commit-msg` em `.githooks/` e instalar o template de MR com o `gitlab-issue-kit` (Seção 6.6 do `GestaoConfiguracao.md`), cada um em issue própria que não pode ser reaproveitada | Responsável pela gestão de configuração da Sprint 5 | Primeira semana da Sprint 5 | Arquivos versionados e MR que os introduz | 100% dos commits autorais conformes às quatro regras da Seção 5.2 do `GestaoConfiguracao.md`; 100% dos MRs com `Closes #N`, milestone e labels |
+| Encerramento de ciclo incompleto | Excluir as branches mescladas e criar a tag da versão como parte da promoção para `main` | Responsável pela promoção da Sprint 5 | Encerramento da Sprint 5 | Lista de branches e tags do remoto | Zero branches temporárias já mescladas no remoto e tag anotada da versão em `main` |
+
+### 6.2.6 Alinhamento com o Escritório de Projetos
+
+A conferência abaixo foi realizada por Felipe Simão, Scrum Master da Sprint 4, em **25/09/2026, às 17h55 (BRT)**, contra o commit `f8012f4` de `develop` e a milestone `Sprint 04` do GitLab.
+
+| Critério do artefato | Situação | Evidência de atendimento |
+|---|---|---|
+| Análise crítica e ações verificáveis | **Atendido** | Seções 6.2.1 a 6.2.5, com causa provável, responsável, prazo, evidência e critério numérico em todas as ações |
+| Evolução completa da matriz de risco | **Atendido** | Seções 6.3.2 a 6.3.8 e Figura 6.3: status, valores, novos itens, efetividade, três críticos e histórico com a data de cada alteração |
+| Papéis, rotação e equilíbrio | **Atendido** | Seção 6.4, com os quatro ciclos lado a lado e a atuação fora da frente na própria matriz |
+| Revisão do contrato, SLA e rituais | **Atendido** | Seção 6.5 percorre os sete acordos e registra a primeira alteração do contrato, com aceite identificável (Seção 2.1.8) |
+| Análise de viabilidade financeira | **Atendido** | Seção 6.7 |
+| Processo e gestão de configuração atualizados | **Atendido** | Seção 6.6 deste documento e Seções 5.3, 6.6 e 7.5 do `GestaoConfiguracao.md` |
+
+---
+
+## 6.3 Matriz de Risco do Projeto
+
+A revisão segue o mecanismo adotado desde a Seção 4.3: o `Projeto.md` preserva a versão original da matriz na Seção 1.9, e toda atualização é registrada aqui. A situação dos itens foi reconferida no fechamento de **25/09/2026**.
+
+**Responsáveis nominais.** Na Sprint 3, os itens AM12, AM13, AM14 e OP5 foram atribuídos a "Scrum Master da Sprint 3". Como a Seção 4.3 definiu a identificação nominal justamente porque o papel de Scrum Master é rotativo, esses itens passam a ter responsável nominal a partir desta revisão.
+
+### 6.3.1 Critério de severidade
+
+O critério permanece o da Seção 4.3.1, sem alteração: `S = 10 × (P × I − 0,1) / 4,4`, com as mesmas faixas de criticidade e os mesmos cinco status (Aberto, Em Monitoramento, Mitigado, Materializado e Encerrado).
+
+### 6.3.2 Revisão das ameaças na Sprint 4
+
+| ID | Ameaça | Situação apurada na Sprint 4 | Probabilidade S3 → S4 | Impacto S3 → S4 | Sev. S3 → S4 | Criticidade | Responsável | Status |
+|---|---|---|:--:|:--:|:--:|---|---|---|
+| AM1 | Comunicação interna do grupo | Não materializado. Os canais e SLAs da Seção 2.1.5 seguiram em uso, e nenhum bloqueio ficou sem resposta | 30% → 30% | Alto → Alto | 2,50 → 2,50 | Baixa | Tobias Viana | Em Monitoramento |
+| AM2 | Baixa acurácia na identificação de intenções | **Impacto reduzido.** O Agente (`!88`) só age com confiança mínima e recusa `fora_do_catalogo`, e o `!93` unificou a regra de rejeição em `pln/intencao.py` e trocou o modelo por `LinearSVC`, que atende aos três limites do RNF03 no teste retido. A probabilidade não é reduzida porque a medição cega da Seção 6.3 do `Projeto.md`, com frases escritas por quem não ajustou o modelo, ainda não foi feita | 30% → 30% | Muito Alto → **Alto** | 3,18 → **2,50** | Baixa | Ana Cristina Jardim | Em Monitoramento |
+| AM3 | Atraso na liberação de acesso ao ambiente Microsoft | Mitigação sustentada. O adaptador do Microsoft Graph permanece implementado e a validação ao vivo segue pelo Google Drive | 70% → 70% | Baixo → Baixo | 2,95 → 2,95 | Baixa | Rui Facó | Mitigado |
+| AM4 | Atraso no fornecimento de informações pelo Metrô | Sem nova troca registrada no repositório. As duas issues de população com os dados de portfólio do parceiro não produziram entrega: `#275` foi encerrada sem commit nem MR, e `#295` terminou em `Backlog` | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Karol Barbosa Rocha | Em Monitoramento |
+| AM5 | Não conclusão do projeto dentro do prazo | Mantido. O escopo da Sprint 4 foi entregue e a mensageria da Sprint 5 foi antecipada, o que alivia o último ciclo. Mas 9 dos 16 merges ocorreram no último dia, e os testes de desempenho ficaram para a Sprint 5 | 30% → 30% | Muito Alto → Muito Alto | 3,18 → 3,18 | Baixa | Felipe Simão | Em Monitoramento |
+| AM6 | Dados insuficientes ou inadequados para validação do agente | **Resposta executada pela primeira vez, em parte.** O `!93` (commit `8e1c5fd`) ampliou a base de 400 para 1.104 frases autorais, separou por hash 881 frases de desenvolvimento e 223 de teste retido, para que o conjunto não vaze quando a base cresce, e confirmou o modelo nesse conjunto. Continua pendente o conjunto cego da Seção 6.3 do `Projeto.md`. Como o parceiro restringe o MVP a dados sintéticos (Seção 1.3 do `Projeto.md`), a base continua autoral por decisão, não por atraso | 70% → **50%** | Alto → Alto | 6,14 → **4,32** | Alta → **Moderada** | Matheus Ferreira | Em Monitoramento → **Mitigado** |
+| AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | Não materializado. Não houve ausência nem pedido de redistribuição por sobrecarga. O trabalho que só apareceu no fim da sprint é tratado como problema de visibilidade, no item novo AM16 | 50% → 50% | Moderado → Moderado | 3,18 → 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
+| AM8 | Alucinação do modelo de linguagem | Mitigação reforçada. O Agente (`!88`) responde por ação determinística quando a intenção tem confiança suficiente, e o `!99` ajustou a busca das fontes na base vetorial. A efetividade sobre amostra representativa continua não medida | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Paulo Henrique | Mitigado |
+| AM9 | Degradação da qualidade da transcrição em ambiente ruidoso | A chamada de voz contínua (`!90`) amplia o uso da transcrição. O campo `confidence` do Deepgram continua sendo apenas repassado, sem limiar que gere alerta | 50% → 50% | Moderado → Moderado | 3,18 → 3,18 | Baixa | Matheus Ferreira | Em Monitoramento |
+| AM10 | Acúmulo de dívida documental por concentração no fim da sprint | Encerrado na Sprint 3; mantido na tabela apenas para preservar o histórico | 70% → 70% | Moderado → Moderado | 4,55 → 4,55 | Moderada | Karol Barbosa Rocha | Encerrado |
+| AM11 | Divergência entre a documentação e o estado real do repositório | Mitigação sustentada: a conferência final foi repetida depois do último merge e vinculada a SHA e horário (Seção 6.2.2) | 70% → 70% | Baixo → Baixo | 2,95 → 2,95 | Baixa | Tobias Viana | Mitigado |
+| AM12 | Backlog superdimensionado e desalinhado da capacidade real | **Materializado novamente, em forma mais grave.** Além da duplicidade `#275`/`#295`, 26 dos 47 cards foram reaproveitados para outro escopo, o que criou mais dois pares duplicados e tirou do quadro ações de melhoria planejadas | 70% → **90%** | Moderado → Moderado | 4,55 → **5,91** | Moderada | Felipe Simão | Materializado |
+| AM13 | Cadência irregular com acúmulo de revisão no encerramento | **Materializado novamente.** Quatro dias úteis iniciais sem commit, 40,3% dos commits em 24/09 e 9 dos 16 merges em 25/09 (na Sprint 3 foram 12 de 24) | 70% → 70% | Moderado → Moderado | 4,55 → 4,55 | Moderada | Felipe Simão | Materializado |
+| AM14 | Regras de forma dos commits ainda não incorporadas ao hábito | **Probabilidade reduzida por mudança de prática**: 98,6% no infinitivo e 84,7% dentro de 72 caracteres, contra 80,4% e 76,1%. O item não é encerrado porque a prevenção compartilhada ainda não existe | 70% → **50%** | Baixo → Baixo | 2,95 → **2,05** | Baixa | Felipe Simão | Em Monitoramento |
+
+### 6.3.3 Revisão das oportunidades na Sprint 4
+
+| ID | Oportunidade | Situação apurada na Sprint 4 | Probabilidade S3 → S4 | Impacto S3 → S4 | Sev. S3 → S4 | Criticidade | Responsável | Status |
+|---|---|---|:--:|:--:|:--:|---|---|---|
+| OP1 | Reutilização e evolução da solução | Padrão mantido. Agente, VHS e mensageria entraram como módulos próprios (`services/agente_service.py`, módulo VHS e `src/mensageria`), sem acoplar a API a um provedor | 90% → 90% | Alto → Alto | 7,95 → 7,95 | Alta | Felipe Simão | Materializado |
+| OP2 | Expansão do agente para novas funcionalidades de gestão de portfólio | **Materializada.** A sprint acrescentou ação sobre a intenção classificada, chamada de voz contínua, agenda integrada ao calendário e indexação do Drive por mensageria | 70% → **90%** | Moderado → Moderado | 4,55 → **5,91** | Moderada | Paulo Henrique | Em Monitoramento → **Materializado** |
+| OP3 | Validação com dados e cenários mais próximos da realidade | Avanço parcial. Os testes de usabilidade com cinco participantes externos e a aplicação publicada em endereço público aproximam o uso real, mas a base continua sintética por restrição do parceiro | 50% → 50% | Alto → Alto | 4,32 → 4,32 | Moderada | Matheus Ferreira | Em Monitoramento |
+| OP4 | Antecipação da frente de implementação | Reforçada. A mensageria com RabbitMQ (`!96`), prevista para a Sprint 5, foi entregue na Sprint 4, junto com a publicação em nuvem | 90% → 90% | Alto → Alto | 7,95 → 7,95 | Alta | Ana Cristina Jardim | Materializado |
+| OP5 | Automação do cadastro do backlog | A automação publicou as 45 issues da Planning em lote, mas não evita duplicidade nem reaproveitamento de card. Repete-se a lição da Sprint 3: publicar mais rápido não substitui o refinamento | 50% → 50% | Moderado → Moderado | 3,18 → 3,18 | Baixa | Felipe Simão | Em Monitoramento |
+
+### 6.3.4 Novos itens identificados na Sprint 4
+
+| ID | Item | Origem da identificação | Probabilidade | Impacto | Severidade | Criticidade | Responsável | Status |
+|---|---|---|:--:|:--:|:--:|---|---|---|
+| AM15 | Quebra do ambiente por mudança em imagens e dependências externas | As imagens do MinIO passaram a exigir login (23/09, `#297`, e 25/09, `!100`), e o SQLAlchemy 2.1 mudou o driver padrão e derrubou a consulta do chat à base de documentos (25/09, `!100`) | 70% | Alto | 6,14 | Alta | Felipe Simão | Materializado |
+| AM16 | Trabalho visível só no fim da sprint | Os commits de um integrante estão todos nos dois últimos dias; artefatos documentais produzidos fora do repositório até perto da entrega | 50% | Moderado | 3,18 | Baixa | Felipe Simão | Aberto |
+| OP6 | Testes reprodutíveis sem depender de provedores externos | O módulo VHS (`!87`) grava e reproduz respostas externas, e os testes de integração (`!89`) rodam no pipeline sem credencial | 90% | Moderado | 5,91 | Moderada | Ana Cristina Jardim | Materializado |
+
+### 6.3.5 Efetividade das respostas aplicadas
+
+A Seção 5.3.7 registrou uma resposta e um gatilho de contingência para cada um dos três itens mais críticos da Sprint 3, e a Seção 5.2.5 registrou as ações ligadas a AM12, AM13 e AM14.
+
+| ID | Resposta registrada na Sprint 3 | Executada? | Produziu o efeito pretendido? | Evidência |
+|---|---|---|---|---|
+| OP1 | Conferir contratos e decisões arquiteturais a cada integração, preservando a separação entre módulos | Sim | Sim | Agente, VHS e mensageria entraram como módulos próprios; os MRs `!87`, `!88` e `!96` não acoplam a API a um provedor |
+| OP4 | Confrontar a antecipação de escopo com capacidade e resultados dos testes; havendo incremento sem validação, priorizar estabilização e testes | Parcialmente | Parcialmente | Os testes funcionais, de integração e de usabilidade foram executados. O gatilho de contingência não foi acionado, e a antecipação da mensageria ocorreu enquanto os testes de desempenho ficavam sem execução |
+| AM6 | Qualificar a base com exemplos representativos e repetir as métricas sobre dados separados | Parcialmente | Sim, na parte executada | Base ampliada para 1.104 frases, com 223 separadas como teste retido; `LinearSVC` atende ao RNF03 no retido. Falta o conjunto cego |
+| AM12 | Refinar o backlog antes da publicação | Sim | Não | O refinamento antes da Planning não impediu o problema, que surgiu depois, pelo reaproveitamento dos cards |
+| AM13 | Decompor entregas G e abrir MR com a primeira parte útil | Não | Não | 76,6% das issues em `SIZE_G`; quatro dias úteis iniciais sem commit |
+| AM14 | Versionar validação compartilhada de mensagem | Não | Sim, por outra via | O card da ação (`#253`) foi reaproveitado, mas a conformidade subiu para 98,6% e 84,7% |
+
+| Item materializado | Resposta de contingência e efeito observado | Efetividade |
+|---|---|---|
+| AM12 | Refinamento coletivo antes da publicação | Ineficaz para o problema desta sprint, que nasceu durante a execução. A Sprint 5 acrescenta a política de escopo fixo do card (Seção 2.2.2) |
+| AM13 | Teto diário de 40% dos commits | Não sustentado: 40,3% em 24/09. A Sprint 5 mede o início, pela regra do primeiro incremento incluída no contrato, e o último dia, pela proporção de merges |
+| AM15 | Troca das imagens do MinIO por versões com tag de release e uso explícito do psycopg2 no cliente do `vecs` (`!100`) | Efetiva para as duas ocorrências. Ainda não é preventiva: as dependências Python seguem com `>=`. A Sprint 5 trava as versões (Seção 6.2.5) |
+
+AM14 mostra que o efeito pode vir sem a resposta planejada. A leitura correta não é que o hook seja dispensável, e sim que a atenção manual funcionou nesta sprint e pode não se sustentar sob pressão. Por isso o item desce, mas não é encerrado.
+
+### 6.3.6 Quadro consolidado e representação visual
+
+O quadro reúne os 22 itens em acompanhamento ao final da Sprint 4, sendo 16 ameaças e 6 oportunidades, ordenados por severidade decrescente:
+
+| ID | Item | Categoria | Probabilidade | Impacto | Severidade | Criticidade | Responsável | Status |
+|---|---|---|---:|---|---:|---|---|---|
+| OP1 | Reutilização e evolução da solução | Arquitetura | 90% | Alto | 7,95 | Alta | Felipe Simão | Materializado |
+| OP4 | Antecipação da frente de implementação | Cronograma | 90% | Alto | 7,95 | Alta | Ana Cristina Jardim | Materializado |
+| AM15 | Quebra do ambiente por mudança em imagens e dependências externas | Técnico | 70% | Alto | 6,14 | Alta | Felipe Simão | Materializado |
+| AM12 | Backlog superdimensionado e desalinhado da capacidade real | Processo | 90% | Moderado | 5,91 | Moderada | Felipe Simão | Materializado |
+| OP2 | Expansão do agente para novas funcionalidades de gestão de portfólio | Escopo | 90% | Moderado | 5,91 | Moderada | Paulo Henrique | Materializado |
+| OP6 | Testes reprodutíveis sem depender de provedores externos | Qualidade | 90% | Moderado | 5,91 | Moderada | Ana Cristina Jardim | Materializado |
+| AM10 | Acúmulo de dívida documental por concentração no fim da sprint | Processo | 70% | Moderado | 4,55 | Moderada | Karol Barbosa Rocha | Encerrado |
+| AM13 | Cadência irregular com acúmulo de revisão no encerramento | Processo | 70% | Moderado | 4,55 | Moderada | Felipe Simão | Materializado |
+| AM4 | Atraso no fornecimento de informações pelo Metrô | Dados e Stakeholders | 50% | Alto | 4,32 | Moderada | Karol Barbosa Rocha | Em Monitoramento |
+| AM6 | Dados insuficientes ou inadequados para validação do agente | Dados | 50% | Alto | 4,32 | Moderada | Matheus Ferreira | Mitigado |
+| AM8 | Alucinação do modelo de linguagem | Técnico | 50% | Alto | 4,32 | Moderada | Paulo Henrique | Mitigado |
+| OP3 | Validação com dados e cenários mais próximos da realidade | Dados | 50% | Alto | 4,32 | Moderada | Matheus Ferreira | Em Monitoramento |
+| AM5 | Não conclusão do projeto dentro do prazo | Cronograma | 30% | Muito Alto | 3,18 | Baixa | Felipe Simão | Em Monitoramento |
+| AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | Equipe | 50% | Moderado | 3,18 | Baixa | Paulo Henrique | Em Monitoramento |
+| AM9 | Degradação da qualidade da transcrição em ambiente ruidoso | Técnico | 50% | Moderado | 3,18 | Baixa | Matheus Ferreira | Em Monitoramento |
+| AM16 | Trabalho visível só no fim da sprint | Processo | 50% | Moderado | 3,18 | Baixa | Felipe Simão | Aberto |
+| OP5 | Automação do cadastro do backlog | Processo | 50% | Moderado | 3,18 | Baixa | Felipe Simão | Em Monitoramento |
+| AM3 | Atraso na liberação de acesso ao ambiente Microsoft | Stakeholders | 70% | Baixo | 2,95 | Baixa | Rui Facó | Mitigado |
+| AM11 | Divergência entre a documentação e o estado real do repositório | Processo | 70% | Baixo | 2,95 | Baixa | Tobias Viana | Mitigado |
+| AM1 | Comunicação interna do grupo | Comunicação | 30% | Alto | 2,50 | Baixa | Tobias Viana | Em Monitoramento |
+| AM2 | Baixa acurácia na identificação de intenções | Técnico | 30% | Alto | 2,50 | Baixa | Ana Cristina Jardim | Em Monitoramento |
+| AM14 | Regras de forma dos commits ainda não incorporadas ao hábito | Processo | 50% | Baixo | 2,05 | Baixa | Felipe Simão | Em Monitoramento |
+
+<div align="center">
+  <sub>FIGURA 6.3 - Matriz de probabilidade e impacto atualizada na Sprint 4</sub><br>
+  <img src="../assets/negócios/matriz-de-risco-sprint-4.svg" width="100%" alt="Matriz de probabilidade e impacto do projeto atualizada na Sprint 4"><br>
+  <sup>Fonte: material produzido pelos autores (2026).</sup>
+</div>
+
+Comparada à matriz da Sprint 3, a figura registra cinco movimentos:
+
+- **AM15** entra direto na faixa Alta, na célula de 70% com impacto Alto, que AM6 deixou vazia ao descer para 50%.
+- **AM12** sobe para 90% com impacto Moderado, a primeira ameaça do projeto nessa linha.
+- **AM2** desce da coluna Muito Alto para Alto, e **AM14** desce de 70% para 50%.
+- **AM16** entra na célula de 50% com impacto Moderado, ao lado de AM7 e AM9.
+- Do lado das oportunidades, **OP2** sobe para 90% e o novo **OP6** entra na mesma célula; OP1 e OP4 continuam no topo.
+
+A leitura de conjunto é a mesma da Sprint 3, agora mais nítida: as ameaças técnicas do produto caíram (AM2, AM6), e as que sobem são as de **organização do trabalho** (AM12) e de **ambiente** (AM15).
+
+### 6.3.7 Análise dos três itens mais críticos
+
+O critério permanece o da Seção 4.3.7, a ordenação por severidade. OP1 e OP4 empatam no topo, seguidos pela ameaça nova AM15.
+
+| Item | Descrição resumida | Severidade | Criticidade | Variação desde a Sprint 3 |
+|---|---|---:|---|---|
+| OP1 | Reutilização e evolução da solução | 7,95 | Alta | 7,95 → 7,95 (estável) |
+| OP4 | Antecipação da frente de implementação | 7,95 | Alta | 7,95 → 7,95 (estável) |
+| AM15 | Quebra do ambiente por mudança em imagens e dependências externas | 6,14 | Alta | Novo item |
+
+**OP1 e OP4** seguem no topo. A arquitetura absorveu mais três módulos (Agente, VHS e mensageria) sem acoplamento, e a equipe voltou a entregar à frente do roteiro. O risco de desperdiçar as duas oportunidades na Sprint 5 é usar a folga para abrir escopo novo em vez de cobrir o que ficou sem evidência, como os testes de desempenho e o conjunto cego do classificador.
+
+**AM15** entra direto entre os três mais críticos porque atingiu o ambiente duas vezes em três dias, uma delas no dia da entrega, e porque a aplicação agora está publicada: uma quebra na próxima build derruba o endereço usado na validação. A correção do `!100` resolveu as duas ocorrências, mas não impede a próxima.
+
+**AM6 deixa o grupo dos três mais críticos** pela primeira vez desde a Sprint 1, porque a resposta foi executada: a base foi ampliada, o teste retido foi separado e o modelo foi confirmado nele.
+
+| Item prioritário | Responsável registrado | Acompanhamento e resposta para a Sprint 5 | Gatilho de contingência |
+|---|---|---|---|
+| OP1 | Felipe Simão | Conferir, na revisão de cada MR de interface e integração, se o componente novo conversa por contrato e não por detalhe do provedor | MR que acopla a API a um provedor: devolver ao autor antes de aprovar |
+| OP4 | Ana Cristina Jardim | Usar a capacidade antecipada primeiro nos testes de desempenho e no conjunto cego, antes de abrir escopo novo | Testes de desempenho sem execução no fim da primeira semana: nenhum card de funcionalidade nova entra em `Doing` |
+| AM15 | Felipe Simão | Travar as versões das dependências Python e das imagens na primeira semana | Build do pipeline quebrada por dependência externa: travar a versão anterior antes de corrigir o código |
+
+### 6.3.8 Histórico de acompanhamento
+
+A tabela acrescenta a coluna da Sprint 4 sem sobrescrever os registros anteriores.
+
+| ID | Identificado em | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Tendência |
+|---|---|---|---|---|---|---|
+| AM1 | Sprint 1 | 2,50 / Em Monitoramento | 2,50 / Em Monitoramento | 2,50 / Em Monitoramento | 2,50 / Em Monitoramento | Estável |
+| AM2 | Sprint 1 | 3,18 / Aberto | 3,18 / Em Monitoramento | 3,18 / Em Monitoramento | **2,50 / Em Monitoramento** | **Impacto reduzido pelo limiar de confiança e pelo novo modelo** |
+| AM3 | Sprint 1 | 4,55 / Aberto | 2,95 / Mitigado | 2,95 / Mitigado | 2,95 / Mitigado | Estável, mitigação sustentada |
+| AM4 | Sprint 1 | 4,32 / Aberto | 4,32 / Em Monitoramento | 4,32 / Em Monitoramento | 4,32 / Em Monitoramento | Estável |
+| AM5 | Sprint 1 | 0,91 / Aberto | 0,91 / Em Monitoramento | 3,18 / Em Monitoramento | 3,18 / Em Monitoramento | Estável, com margem reduzida no fim do ciclo |
+| AM6 | Sprint 1 | 6,14 / Aberto | 6,14 / Em Monitoramento | 6,14 / Em Monitoramento | **4,32 / Mitigado** | **Primeira queda: resposta executada em parte** |
+| AM7 | Sprint 1 | 3,18 / Em Monitoramento | 3,18 / Em Monitoramento | 3,18 / Em Monitoramento | 3,18 / Em Monitoramento | Estável |
+| AM8 | Sprint 1 | Não revisado | 4,32 / Aberto | 4,32 / Mitigado | 4,32 / Mitigado | Estável, mitigação reforçada |
+| AM9 | Sprint 1 | Não revisado | 3,18 / Aberto | 3,18 / Em Monitoramento | 3,18 / Em Monitoramento | Estável, com exposição ampliada pela chamada de voz |
+| AM10 | Sprint 2 | Não aplicável | 4,55 / Materializado | 4,55 / Encerrado | 4,55 / Encerrado | Encerrado |
+| AM11 | Sprint 2 | Não aplicável | 4,55 / Materializado | 2,95 / Mitigado | 2,95 / Mitigado | Estável, mitigação sustentada |
+| AM12 | Sprint 3 | Não aplicável | Não aplicável | 4,55 / Materializado | **5,91 / Materializado** | **Em alta: reaproveitamento de cards** |
+| AM13 | Sprint 3 | Não aplicável | Não aplicável | 4,55 / Materializado | 4,55 / Materializado | Recorrente: início tardio e fim concentrado |
+| AM14 | Sprint 3 | Não aplicável | Não aplicável | 2,95 / Aberto | **2,05 / Em Monitoramento** | **Reduzido por mudança de prática** |
+| AM15 | **Sprint 4** | Não aplicável | Não aplicável | Não aplicável | 6,14 / Materializado | Novo item |
+| AM16 | **Sprint 4** | Não aplicável | Não aplicável | Não aplicável | 3,18 / Aberto | Novo item |
+| OP1 | Sprint 1 | 6,14 / Em Monitoramento | 7,95 / Materializado | 7,95 / Materializado | 7,95 / Materializado | Estável |
+| OP2 | Sprint 1 | 3,18 / Aberto | 3,18 / Em Monitoramento | 4,55 / Em Monitoramento | **5,91 / Materializado** | **Materializada por entregas concretas** |
+| OP3 | Sprint 1 | 4,32 / Em Monitoramento | 4,32 / Em Monitoramento | 4,32 / Em Monitoramento | 4,32 / Em Monitoramento | Estável, com avanço pela usabilidade externa |
+| OP4 | Sprint 2 | Não aplicável | 6,14 / Em Monitoramento | 7,95 / Materializado | 7,95 / Materializado | Estável, reforçada pela mensageria |
+| OP5 | Sprint 3 | Não aplicável | Não aplicável | 3,18 / Em Monitoramento | 3,18 / Em Monitoramento | Estável |
+| OP6 | **Sprint 4** | Não aplicável | Não aplicável | Não aplicável | 5,91 / Materializado | Novo item |
+
+#### Registro das alterações de valor
+
+Como nas Seções 4.3.8 e 5.3.8, só constam aqui os itens cujos valores ou status mudaram nesta transição, ou que entraram no acompanhamento nesta sprint. A coluna de data traz o horário comprovado do evento que motivou a mudança; quando não existe um evento datado, traz a data da aferição e diz isso explicitamente. Com a data de cada mudança, é possível medir o tempo entre o evento e a reação da equipe.
+
+| ID | Sprint | Data comprovada ou da aferição | P anterior | I anterior | Severidade anterior | Novo valor | Status | Motivo da alteração | Evidência |
+|---|---|---|---:|---|---:|---:|---|---|---|
+| AM2 | 4 | 21/09/2026, 17h00 (merge do `!88`); reforçado em 25/09, 10h30 (merge do `!93`) | 30% | Muito Alto | 3,18 | **2,50** (30%, Alto) | Em Monitoramento | O Agente passou a agir só com confiança mínima, e o novo modelo atende ao RNF03 no teste retido | MRs `!88` e `!93`; `pln/intencao.py` |
+| AM6 | 4 | 25/09/2026, 10h30 (merge do `!93`) | 70% | Alto | 6,14 | **4,32** (50%, Alto) | Mitigado | Base ampliada e teste retido separado; modelo confirmado no retido | Commit `8e1c5fd`; Seção 3.3 do `Projeto.md` |
+| AM12 | 4 | 25/09/2026, 14h34 (último card reaproveitado, `#270`) | 70% | Moderado | 4,55 | **5,91** (90%, Moderado) | Materializado | 26 cards reaproveitados para outro escopo e três pares duplicados | Notas de sistema das issues da milestone `Sprint 04` |
+| AM13 | 4 | 18/09/2026, 10h04 (primeiro commit autoral da sprint) | 70% | Moderado | 4,55 | 4,55, sem alteração numérica | Materializado | Nova ocorrência: início tardio, 40,3% dos commits em 24/09 e 9 de 16 merges em 25/09 | Commit `d520bcd`; Seção 5.3 do `GestaoConfiguracao.md` |
+| AM14 | 4 | 25/09/2026, 17h55 (aferição) | 70% | Baixo | 2,95 | **2,05** (50%, Baixo) | Em Monitoramento | Conformidade subiu para 98,6% (infinitivo) e 84,7% (72 caracteres) sem mecanismo automático | Seção 5.3 do `GestaoConfiguracao.md` |
+| AM15 | 4 | 23/09/2026, 17h50 (commit `860685e`); nova ocorrência em 25/09, 16h40 (merge do `!100`) | Não aplicável | Não aplicável | Não aplicável | 6,14 (70%, Alto) | Materializado | Item novo: duas quebras do ambiente por mudança externa em três dias | Issue `#297`; MR `!100` |
+| AM16 | 4 | 24/09/2026, 21h22 (primeiro commit autoral de um integrante na sprint) | Não aplicável | Não aplicável | Não aplicável | 3,18 (50%, Moderado) | Aberto | Item novo: trabalho em andamento sem registro versionado até perto da entrega | Commit `57b2aa0`; Seção 6.4.2 |
+| OP2 | 4 | 25/09/2026, 12h55 (merge do `!96`) | 70% | Moderado | 4,55 | **5,91** (90%, Moderado) | Materializado | Ação sobre intenção, chamada de voz, calendário e indexação por mensageria entregues | MRs `!88`, `!90`, `!92` e `!96` |
+| OP6 | 4 | 21/09/2026, 17h26 (merge do `!87`) | Não aplicável | Não aplicável | Não aplicável | 5,91 (90%, Moderado) | Materializado | Item novo: testes reprodutíveis com gravação das respostas externas | MRs `!87` e `!89` |
+| AM12, AM13, AM14, OP5 | 4 | 25/09/2026 (revisão) | — | — | — | Sem alteração numérica | — | Responsável "Scrum Master da Sprint 3" substituído por nome, conforme a Seção 4.3 | Seção 6.3 |
+
+Três leituras se destacam. **Primeiro**, AM6 caiu pela primeira vez em quatro sprints, e caiu porque a resposta foi executada, não por reavaliação. **Segundo**, a ameaça que mais subiu é de processo: AM12 chega a 90% porque o quadro foi usado de um jeito que apaga o plano. **Terceiro**, AM14 caiu sem a resposta planejada, e isso é registrado como está, sem atribuir a melhora a uma ação que não ocorreu.
+
+---
+
+## 6.4 Matriz de Papéis e Responsabilidades da Sprint 4
+
+### 6.4.1 Papéis, responsabilidades e rotação
+
+A tabela traz o papel das quatro sprints lado a lado. A coluna de **atuação fora da frente** fica dentro da matriz principal, e não em nota separada. Conforme o retorno da Sprint 3, não é mantida a reconciliação entre o par da Planning e o par efetivo: responsável e revisor são definidos quando o card é puxado para execução.
+
+| Integrante | Sprint 1 | Sprint 2 | Sprint 3 | Papel principal na Sprint 4 | Principais responsabilidades e entregas na Sprint 4 | Atuação fora da frente | Revisões na Sprint 4 | Natureza da rotação |
+|---|---|---|---|---|---|---|---|---|
+| Ana Cristina Jardim | Gestão de riscos e requisitos funcionais | Algoritmo de PLN e artefatos de gestão | Planejamento dos testes de integração; webhooks e SSO | **Infraestrutura de testes e testes de integração** | Construir o módulo VHS de gravação e reprodução de respostas externas (`!87`); implementar e executar os testes de integração no pipeline (`!89`); documentar ferramentas e bibliotecas de teste (`!86`) | Reconstrução da base de intenções e troca do classificador por `LinearSVC` (`!93`, `#290`, `#291`); slides e apresentação da Sprint Review (`#270`) | `!85`, `!97`, `!99` | Da escrita do plano para a construção da infraestrutura que o executa: primeira vez com código de teste automatizado |
+| Felipe Simão | Contexto da indústria e perfil do líder | Prototipação exploratória e modelagem de dados | Banco relacional e planejamento dos testes funcionais | **Scrum Master e gestão evolutiva** | Conduzir rituais e Planning; publicar as 45 issues da Planning; produzir a retrospectiva (`#221`), a matriz de risco e a matriz de papéis (`#234`); conferir e atualizar os dois artefatos de gestão | Execução da campanha de testes funcionais (`!85`, `#261`, `#262`); publicação da aplicação na AWS com HTTPS (`!100`, `#284`); correção do VHS na branch de Ana (`f3de419`) | `!87`, `!95` | Primeira vez na gestão do projeto, na matriz de risco e na implantação em nuvem |
+| Karol Barbosa Rocha | Perfil do diretor e requisitos não funcionais | Prototipação exploratória e organização documental | TTS, desempenho e validação técnica | **Chamada de voz em tempo real** | Integrar captura e reprodução de voz à conversa com o agente (`!90`); implementar WebSocket e reduzir a latência (`#254`); documentar arquitetura, protocolo, falhas e validação da chamada (`!94`, `#237`, `#263`) | Execução dos testes de usabilidade com cinco participantes externos e SUS (`!98`, `#269`, `#260`, `#264`) | `!89`, `!93`, `!100` | Do componente isolado de síntese (Sprint 3) para a comunicação contínua cliente-servidor |
+| Matheus Ferreira da Silva | Perfil do PMO e estratégia técnica inicial | APIs de STT e TTS | Pipeline RAG e webhooks | **Viabilidade financeira** | Produzir a análise de viabilidade financeira (`!97`, Seção 6.7, `#243`, `#244`, `#249`) | Mensageria assíncrona com RabbitMQ e varredura do Drive para o RAG (`!96`, `#272`, `#274`, `#276`, `#279`) | `!88`, `!90` | Primeira vez em análise de negócio e custos, depois de três sprints técnicas |
+| Paulo Henrique Bueno Fernandes | Entendimento do problema e visão do produto | API de recebimento de áudios | Frontend integrado e usabilidade | **Integração da intenção às ações do agente** | Criar o componente Agente, extrair entidades e ligar o agente ao chat (`!88`, `#250`); integrar a agenda ao calendário (`!92`, `#257`) | Correções do feedback da Sprint 3 (`#255`); correção da subida do Docker para toda a equipe (`#297`); melhorias de interface (`#293`); slides e apresentação da Sprint Review (`#287`) | `!86`, `!94` | Do frontend para a lógica de decisão do backend |
+| Rui Facó | Definição do MVP e tecnologias | Pilha de tecnologias e contratos de entrada | Testes não funcionais e gestão evolutiva | **Dados do parceiro e base vetorial** | Inventariar a base vetorial antes da nova carga (`!91`, `#242`); popular banco e Drive com os dados de portfólio do parceiro (`#275`, `#295`, não concluídas) | Testes dos requisitos não funcionais (`#285`, em andamento) | `!92`, `!96` | Da gestão e qualidade para a camada de dados e recuperação |
+| Tobias Viana | Modelagem do fluxo de negócio | Processo de deploy em nuvem | PLN e integração do banco relacional | **Recuperação de fontes na base vetorial** | Ajustar a busca das fontes no banco vetorial para melhorar a relevância do contexto entregue ao modelo (`!99`, `#241`), sobre o inventário feito por Rui (`!91`) | Ajuste das tabelas e das integrações do banco relacional (`!95`, `#300`, `#301`, `#302`) | `!91`, `!98` | Do classificador de intenções (Sprint 3) para a etapa de recuperação do RAG; o banco é continuidade secundária, declarada como tal |
+
+**Como a rotação foi verificada.** O papel principal da Sprint 4 foi comparado com os três anteriores de cada integrante. Nenhum repete uma responsabilidade principal já exercida. Três casos exigem leitura cuidadosa e estão declarados na própria tabela:
+
+- **Ana e Felipe** planejaram testes na Sprint 3 e os executaram na Sprint 4. A frente é a mesma, mas a responsabilidade é outra: planejar é escrever casos; executar é construir infraestrutura (Ana) ou produzir e analisar evidências (Felipe). No caso de Felipe, a execução é atuação fora da frente; o papel principal é a gestão.
+- **Karol** trabalhou com voz nas Sprints 3 e 4. Na Sprint 3 foi um componente de síntese isolado; na Sprint 4, uma chamada contínua com WebSocket, controle de estado e tratamento de falha de rede. É outra competência.
+- **Tobias** trabalhou com PLN e banco na Sprint 3. Na Sprint 4, o papel principal passou para a recuperação de fontes do RAG, frente que antes era de Matheus; o ajuste do banco é continuidade do MR `!80` e aparece como atuação fora da frente, não como rotação.
+
+### 6.4.2 Evidência versionada e colaborações efetivas
+
+| Integrante | Commits autorais | MRs de autoria | MRs revisados | Resultado final |
+|---|---:|---|---|---|
+| Ana Cristina Jardim | 11 | `!86`, `!87`, `!89`, `!93` | `!85`, `!97`, `!99` | VHS, testes de integração, ferramentas de teste e novo classificador integrados |
+| Felipe Simão | 13 | `!85`, `!100` | `!87`, `!95` | Testes funcionais e publicação em nuvem integrados; artefatos de gestão |
+| Karol Barbosa Rocha | 20 | `!90`, `!94`, `!98` | `!89`, `!93`, `!100` | Chamada de voz, sua documentação e testes de usabilidade integrados |
+| Matheus Ferreira da Silva | 7 | `!96`, `!97` | `!88`, `!90` | Mensageria integrada; análise financeira na branch deste artefato |
+| Paulo Henrique Bueno Fernandes | 11 | `!88`, `!92` | `!86`, `!94` | Agente e calendário integrados |
+| Rui Facó | 5 | `!91` | `!92`, `!96` | Inventário da base vetorial integrado |
+| Tobias Viana | 5 | `!95`, `!99` | `!91`, `!98` | Busca de fontes e ajustes do banco integrados |
+
+**Colaborações cruzadas.** No VHS, Ana construiu o módulo e Felipe corrigiu a chave do chat e o teto de chamadas reais na mesma branch (`f3de419`) antes de revisar o `!87`. Na base vetorial, Rui fez o inventário (`!91`) e Tobias, sobre ele, ajustou a busca das fontes (`!99`). O ambiente Docker foi corrigido duas vezes para toda a equipe: por Paulo (`#297`) e depois por Felipe, na publicação (`!100`).
+
+### 6.4.3 Avaliação da distribuição
+
+A **revisão** está bem distribuída: os sete integrantes revisaram, cada um de dois a três MRs, e nenhum revisou o próprio trabalho. É a melhor distribuição de revisão do módulo até aqui.
+
+A **autoria** também alcança os sete integrantes, de 5 a 20 commits e de 1 a 4 MRs. A diferença que importa não é de volume, e sim de **momento**: os 7 commits de Matheus estão em 24 e 25/09, e a análise financeira entrou no repositório na véspera da entrega. O problema não é falta de trabalho, e sim a falta de visibilidade dele durante a sprint. O quadro e o Git não mostravam o que estava em andamento, e a revisão desses artefatos só pôde começar no fim. A ação da Seção 6.2.5 que exige trabalho versionado desde o início e o risco AM16 tratam esse ponto.
+
+Contagem de commits não é medida de esforço: a análise financeira é um documento longo que podem entrar em poucos commits. A tabela 6.4.2 serve para mostrar **quando** o trabalho ficou visível, não **quanto** trabalho houve.
+
+---
+
+## 6.5 Revisão do Contrato de Convivência, SLA e Rituais
+
+O contrato foi revisado na retrospectiva da Sprint 4. Pela primeira vez desde a Sprint 1, **uma regra foi alterada**: o item 2.1.4 recebeu a regra do primeiro incremento versionado. O motivo é que a cadência foi apontada como ponto fraco em três sprints seguidas, e as ações de acompanhamento não resolveram o início tardio. Tornar o comportamento parte do contrato dá a ele o mesmo peso da Regra de Ouro e permite acionar o fluxo de gestão de conflitos (2.1.3) quando for descumprido.
+
+| Item do contrato | Aderência observada na Sprint 4 | Evidência e avaliação | Decisão |
+|---|---|---|---|
+| 2.1.1 Regra de Ouro | Parcial | 9 dos 16 MRs foram mesclados em 25/09, sexta-feira, fora da meta de conclusão até quinta-feira; na Sprint 3 foram 12 de 24. Todos foram integrados antes do fechamento, mas com janela reduzida para ajustes | Mantida sem alteração; tratada pela regra do primeiro incremento e pela meta de merges no último dia (Seção 6.2.5) |
+| 2.1.2 Resolução de impasses | Não acionada | Não houve discordância técnica que exigisse votação ou roleta | Mantida sem alteração |
+| 2.1.3 Gestão de conflitos | Não acionada | O trabalho que só apareceu no fim foi tratado como problema de visibilidade, e não de engajamento, e virou ação de processo (Seção 6.2.5) | Mantida sem alteração |
+| 2.1.4 Quadro Kanban | Parcial | `#234` em `Doing` sem responsável em 24/09; 26 cards reaproveitados para outro escopo | **Alterada**: regra do primeiro incremento versionado e vínculo obrigatório entre `Waiting Review` e MR. O reaproveitamento de cards foi tratado como política de processo (Seção 2.2.2), sem alterar o contrato |
+| 2.1.5 Comunicação oficial e SLA | Atendida | Nenhum bloqueio sem resposta e nenhuma necessidade de acionar o corpo docente | Mantida sem alteração |
+| 2.1.6 Dailies e demais rituais | Atendida | Dailies realizadas nos períodos de trabalho; Planning em 11/09 e Sprint Review em 25/09 | Mantida sem alteração |
+| 2.1.7 Acordos adicionais | Atendida | Os 16 MRs têm revisor diferente do autor e os sete integrantes revisaram | Mantida sem alteração |
+
+**Onde está o aceite.** A proposta foi publicada no Slack da equipe em 24/09/2026, às 11h, com o texto da regra incluída e a pergunta direta sobre a concordância de todos. Seis dos sete integrantes confirmaram por escrito (Felipe, autor da proposta, Ana, Matheus, Paulo, Karol e Rui), o que supera a maioria simples exigida pela Seção 2.1.2. A captura está arquivada em [`docs/evidencias/gestao/aceite-contrato-sprint-4.png`](evidencias/gestao/aceite-contrato-sprint-4.png).
+
+O histórico da alteração está na Seção 2.1.8, com a versão anterior, a atual, o motivo e a evidência de aceite.
+
+---
+
+## 6.6 Revisão da Gestão do Processo de Desenvolvimento
+
+### 6.6.1 Aderência das políticas na Sprint 4
+
+As políticas da Seção 2.2 foram revisadas. Uma foi alterada: a Seção 2.2.2 recebeu a regra de escopo fixo do card, com o registro da mudança no próprio texto. As demais permanecem vigentes.
+
+| Política | Aderência observada na Sprint 4 | Evidência | Decisão |
+|---|---|---|---|
+| 2.2.1 Fluxo de trabalho | Parcial | 15 dos 16 MRs partiram de branches de trabalho e apontaram para `develop`. O `!97` apontou para a branch deste artefato, para consolidar a Seção 6.7 no mesmo documento. Duas branches reutilizaram o nome de branches já mescladas: `fix/auditoria-desenvolvimento-solucao` (`!81` na Sprint 3 e `!95`) e `feat/inventariar-base-vetorial` (`!91` e `!99`) | Manter; nome novo para cada task, mesmo quando o tema se repete |
+| 2.2.2 Política de atualização do GitLab | Não atendida | 29 issues renomeadas, 26 com outro escopo; três pares duplicados; `#234` em `Doing` sem responsável | **Alterada**: escopo fixo do card, com trabalho novo em issue nova |
+| 2.2.3 Política de commits | Parcial, em evolução | 100% com `#N` e tipo válido, 98,6% no infinitivo, 84,7% dentro de 72 caracteres; nenhum commit de 14 a 17/09 e 40,3% em 24/09 | Manter as regras; versionar o hook |
+| 2.2.4 Revisão e melhoria contínua | Atendida | Os 16 MRs têm revisor diferente do autor, aprovação e comentário; os sete integrantes revisaram | Manter |
+| 2.2.5 Critérios de início e conclusão | Parcial | `#275` foi encerrada sem commit, MR ou evidência; `#266` foi encerrada com a label `Waiting Review` ainda aplicada; `!100` foi mesclado sem milestone e sem labels | Manter; a conferência do DoD passa a incluir a limpeza das labels de estado e a milestone do MR |
+| 2.2.6 Atualização de branches e conflitos | Atendida | Merges de atualização com `develop` usados antes dos MRs (`cc7030f`, `ae1f539`, `ed8296f`, este último com renumeração das migrações 08 e 09); nenhum conflito escalonado | Manter |
+
+### 6.6.2 Automação do backlog e dos templates: `gitlab-issue-kit`
+
+O `gitlab-issue-kit` aparecia nos documentos apenas como caminho de arquivo, sem descrição do que faz. Esta seção corrige isso. O kit foi criado por Tobias Viana na Sprint 1 (`895879a`, issue `#73`) e fica na pasta [`gitlab-issue-kit`](../gitlab-issue-kit/docs/README.md) do repositório. Ele faz parte do processo de trabalho da equipe:
+
+| Script | O que faz | Quando é usado |
+|---|---|---|
+| `create_issues.py` | Lê um CSV de backlog (título, descrição, objetivo, dependências, tarefas, DoR, DoD, labels, tamanho, milestone e prioridade) e cria as issues pela API do GitLab, com a descrição montada por um template único. **Valida o lote inteiro antes de criar qualquer issue**: um CSV mal formado aborta com zero issues criadas, sem deixar metade do backlog no quadro. Tem modo `--dry-run`, que não faz nenhuma chamada de rede | Na Planning, para publicar o backlog refinado |
+| `setup_labels.py` | Cria o catálogo de labels do projeto (camada, tamanho, prioridade, tipo) com as cores definidas. É idempotente: rodar de novo não duplica labels | Uma vez por projeto, e quando o catálogo muda |
+| `setup_mr_template.py` | Grava o template de descrição de MR em `.gitlab/merge_request_templates/` e, com `--apply-remote`, nas configurações do projeto, para que todo MR novo já nasça com as seções exigidas pela Seção 4.1 do `GestaoConfiguracao.md` | Uma vez por projeto |
+| `relabel.py` | Adiciona ou remove labels em issues já existentes | Correções em lote no quadro |
+
+Todo comportamento específico do projeto fica em `scripts/config.yml`, separado do código, e o arquivo `gitlab-issue-kit/.gitlab-ci.yml` é incluído no pipeline da raiz, que valida os scripts a cada MR.
+
+**O que está em uso e o que não está.** As 45 issues da Planning de 11/09 foram publicadas em lote. O template de MR **não está instalado**: a consulta à API em 25/09 mostra o campo `merge_requests_template` do projeto vazio, e não há `.gitlab/` na raiz do repositório. As descrições de MR seguem a convenção da Seção 4.1 do `GestaoConfiguracao.md` por disciplina de cada autor, e por isso variam: o `!85` saiu sem `Closes #N` e o `!100`, sem milestone. A instalação é uma das ações da Seção 6.2.5.
+
+**O limite da automação**, já registrado na Seção 5.6.2, se confirmou: o kit publica o que recebe e só avisa quando o **título** se repete. Ele não decide pertinência, prioridade ou capacidade e não impede que um card publicado seja renomeado depois. Essas decisões pertencem ao refinamento e à política de escopo fixo do card.
+
+---
+
+## 6.7 Análise de Viabilidade Financeira
+
+Esta seção responde quanto a equipe cobraria para entregar a solução a um cliente real. O orçamento é construído sobre a hipótese de uma empresa de desenvolvimento constituída pelos sete integrantes, que fornece ao Metrô a versão comercial da solução prototipada ao longo do módulo, com equipe em dedicação integral durante dez semanas.
+
+Todos os valores estão em reais, e cada linha traz a fonte do valor de referência ou a declaração de que se trata de arbitramento da equipe. As fontes completas estão listadas na Seção 6.7.12.
+
+**Alcance da análise.** Esta seção determina a viabilidade comercial e o custo de fornecimento da solução, percorrendo o caminho que vai do custeio ao preço de venda, passando por despesas, margem, tributos e reserva de contingência, e estendendo-se ao custo de operação e ao contrato de sustentação. A mensuração do retorno financeiro para o parceiro, com indicadores de economia gerada, payback e retorno sobre investimento, depende de uma linha de base operacional ainda não disponibilizada pelo Metrô, e o tratamento dessa lacuna está na Seção 6.7.13.
+
+### 6.7.1 Escopo considerado no orçamento
+
+O escopo orçado é a entrega comercial completa da solução, e não o protótipo acadêmico. A distinção é relevante porque uma prova de conceito legitimamente dispensa trabalho que um produto entregue a um cliente exige, e é esse trabalho adicional que explica a diferença de esforço entre o módulo e o orçamento.
+
+**O que foi construído e validado ao longo do módulo, e compõe a base da entrega:**
+
+- interface de conversa por texto e por voz, com chamada contínua e transcrição automática;
+- pipeline de processamento de linguagem natural com classificação de intenção executada localmente, extração de entidades e recusa fundamentada fora do catálogo;
+- recuperação aumentada por documentos sobre a base de conhecimento do portfólio;
+- ação sobre a intenção classificada, com registro de auditoria e explicabilidade da resposta;
+- publicação em nuvem e testes funcionais, de integração e de usabilidade.
+
+**O que a entrega comercial acrescenta, e que o protótipo não contempla:**
+
+- cobertura de testes automatizados sobre todo o fluxo crítico, incluindo casos de borda e tratamento de erro;
+- endurecimento de segurança, com controle de acesso por perfil, proteção dos dados em trânsito e em repouso e revisão de superfície de ataque;
+- ajuste de desempenho sob carga representativa do volume de usuários do PMO;
+- revisão de acessibilidade da interface, incluindo os fluxos de voz;
+- ambientes separados de desenvolvimento, homologação e produção, com integração contínua e monitoramento;
+- documentação de operação, de sustentação e de recuperação de falhas;
+- preparação e carga inicial dos dados do portfólio;
+- treinamento e transferência de conhecimento para as equipes do parceiro.
+
+Permanecem fora do escopo orçado a integração produtiva com sistemas legados não previstos nesta entrega, a expansão do catálogo de intenções além do definido em requisitos e as evoluções classificadas como "Ir Além" na TAPI.
+
+### 6.7.2 Premissas adotadas
+
+As premissas abaixo antecedem todas as tabelas e devem ser lidas junto com elas, porque os valores só são verificáveis à luz delas.
+
+| # | Premissa | Justificativa |
+|---|---|---|
+| P1 | Contratação por escopo e preço fechados, e não por alocação de equipe por tempo | Como fornecedor entrante e sem capital para manter equipe alocada por prazo indeterminado, o preço fechado por escopo dá previsibilidade de caixa e concentra o risco de prazo na própria gestão da empresa |
+| P2 | Os sete integrantes são sócios da empresa, remunerados por pró-labore, com recolhimento previdenciário declarado em eSocial e DCTFWeb | Coerente com a hipótese de que a própria equipe constitui a empresa fornecedora, e necessária para que essa remuneração componha a folha de salários utilizada no Fator R da Seção 6.7.5 |
+| P3 | Jornada integral equivalente a 160 horas mensais | Converte o salário mensal de referência em valor-hora |
+| P4 | Prazo comercial proposto de dez semanas, equivalentes a 2,5 meses | Dimensionado pela capacidade da equipe frente ao escopo da Seção 6.7.1 |
+| P5 | Esforço total de 2.800 horas, com os sete integrantes em dedicação integral | Sete pessoas × 160 horas mensais × 2,5 meses, o que confirma a coerência com a premissa P3 |
+| P6 | Licenças do ecossistema Microsoft consideradas existentes no tenant do cliente | O Metrô já opera SharePoint, Power Platform e Copilot Studio, conforme a TAPI, de modo que cobrá-las seria cobrar duas vezes |
+| P7 | Serviços de nuvem e interfaces de programação estimados a preço comercial de referência | Os valores refletem contratação no mercado, e não condições promocionais ou educacionais |
+| P8 | Câmbio de R$ 5,50 por dólar | Mesma taxa adotada pelas fontes de preço de nuvem consultadas, em agosto de 2026 |
+| P9 | Sustentação e manutenção não inclusas no preço do projeto | São propostas em separado na Seção 6.7.11 |
+| P10 | Receita apurada pelo regime de competência, com emissão de nota fiscal coincidente com o cronograma de recebimento | O Simples Nacional admite apuração por competência ou por caixa, e a opção precisa ser declarada porque altera o mês em que a receita entra no cálculo da faixa |
+| P11 | Garantia de correção de defeitos por 90 dias após a entrega, sem custo adicional | Prática usual em contratos de desenvolvimento; o esforço correspondente está coberto pela reserva de contingência da Seção 6.7.8 |
+| P12 | Cessão dos direitos patrimoniais do código desenvolvido ao contratante, mantendo-se com o fornecedor os componentes genéricos reutilizáveis | A titularidade afeta o preço de forma relevante, e a cessão total é a expectativa usual de contratante do setor público |
+| P13 | Valores do contrato de sustentação reajustados anualmente pelo IPCA | Contratos de doze meses ou mais exigem índice declarado para que o preço não seja corroído pela inflação |
+
+### 6.7.3 Custos do projeto
+
+#### 6.7.3.1 Esforço e composição da equipe
+
+As 2.800 horas da premissa P5 formam um envelope fechado, de modo que distribuí-las entre funções é redistribuir o mesmo esforço, e nunca criar esforço novo.
+
+A tradução das frentes do projeto para funções de mercado seguiu a rotação registrada na Seção 6.4, na qual cada integrante assumiu responsabilidades distintas a cada sprint, o que faz com que as oito funções abaixo correspondam a trabalho efetivamente realizado, ainda que por pessoas diferentes ao longo do módulo. A distribuição percentual foi ajustada ao escopo comprometido na Seção 6.7.1, o que eleva a participação de qualidade e de infraestrutura em relação ao observado no protótipo, já que cobertura de testes, endurecimento, documentação e preparação de ambientes pesam mais na entrega comercial do que na prova de conceito.
+
+| Função de mercado | Frentes correspondentes | Integrantes que exerceram a função | Participação | Horas |
+|---|---|---|---:|---:|
+| Engenheiro de PLN e IA | Classificador de intenção, catálogo de intenções, extração de entidades, pipeline RAG | Ana Cristina, Matheus, Tobias, Paulo Henrique | 19,0% | 532 |
+| Desenvolvedor backend | API, contratos de resposta, auditoria, webhooks, integração de voz | Paulo Henrique, Matheus, Ana Cristina, Tobias | 19,0% | 532 |
+| Engenheiro de dados e infraestrutura | Banco relacional, base vetorial, contêineres, ambientes, integração contínua e monitoramento | Tobias, Felipe, Rui | 13,0% | 364 |
+| QA | Testes funcionais, de integração, não funcionais e de carga | Ana Cristina, Felipe, Rui, Karol | 13,0% | 364 |
+| Desenvolvedor frontend | Interface de conversa, captura e reprodução de áudio | Paulo Henrique, Karol | 10,0% | 280 |
+| Gerente de projeto e Scrum Master | Ritos, backlog, gestão de configuração, documentação e transferência de conhecimento | Felipe, Rui, Ana Cristina, Karol, Tobias | 10,0% | 280 |
+| Arquiteto de soluções | Visão técnica, decisões de arquitetura, endurecimento e integração entre componentes | Rui, Matheus, Tobias | 8,0% | 224 |
+| UX e design conversacional | Personas, jornada, fluxo de fala, usabilidade e acessibilidade | Paulo Henrique, Karol, Matheus | 8,0% | 224 |
+| **Total** | | **Sete integrantes** | **100%** | **2.800** |
+
+**Como ler a tabela.** As oito funções são uma decomposição analítica do esforço, e não oito profissionais distintos em folha de pagamento. Os sete integrantes exerceram funções diferentes a cada sprint, conforme a rotação registrada na Seção 6.4, de modo que a mesma pessoa aparece em mais de uma linha e a soma das horas corresponde ao esforço total da equipe, e não a um somatório de contratações. A coluna de integrantes indica quem conduziu a função em alguma das sprints, e a atribuição detalhada por sprint está na matriz de papéis.
+
+#### 6.7.3.2 Custo de pessoal
+
+O critério de valor de referência é único para todas as funções, adotando o percentil inferior das faixas de mercado, coerente com o posicionamento de empresa entrante descrito na Seção 6.7.6. A fonte principal é o Guia Salarial 2026 da Robert Half, cujos valores publicados representam a remuneração de entrada de um profissional recém-contratado. Para UX, que não possui cargo equivalente no guia brasileiro, a referência é o Glassdoor.
+
+| Função | Horas | Salário de referência | Valor-hora | Custo | Fonte do valor |
+|---|---:|---:|---:|---:|---|
+| Engenheiro de PLN e IA | 532 | R$ 17.950 | R$ 112,19 | R$ 59.683,75 | Robert Half, Especialista em IA e ML, 25º percentil nacional |
+| Desenvolvedor backend | 532 | R$ 6.050 | R$ 37,81 | R$ 20.116,25 | Robert Half, Desenvolvedor Back-End Júnior |
+| Engenheiro de dados e infraestrutura | 364 | R$ 14.250 | R$ 89,06 | R$ 32.418,75 | Robert Half, Analista de DevOps, 25º percentil |
+| QA | 364 | R$ 5.900 | R$ 36,88 | R$ 13.422,50 | Robert Half, Analista de Testes Júnior |
+| Desenvolvedor frontend | 280 | R$ 6.050 | R$ 37,81 | R$ 10.587,50 | Robert Half, Desenvolvedor Front-End Júnior |
+| Gerente de projeto e Scrum Master | 280 | R$ 10.900 | R$ 68,12 | R$ 19.075,00 | Robert Half, Scrum Master, 25º percentil |
+| Arquiteto de soluções | 224 | R$ 15.450 | R$ 96,56 | R$ 21.630,00 | Robert Half, Arquiteto de Software, 25º percentil |
+| UX e design conversacional | 224 | R$ 4.833 | R$ 30,21 | R$ 6.766,20 | Glassdoor, UX Designer Pleno, 25º percentil, 614 salários |
+| **Total** | **2.800** | | | **R$ 183.699,95** | |
+
+**Salário de mercado como referência para o pró-labore.** Embora a remuneração dos integrantes seja modelada como pró-labore de sócios, conforme a premissa P2, as faixas salariais são utilizadas como referência de mercado para estimar o valor econômico das competências empregadas, o que é a prática usual quando se precifica o trabalho de sócios que atuam tecnicamente na operação. O valor de R$ 183.699,95 representa o montante agregado de pró-labore atribuído aos sete sócios ao longo dos 2,5 meses, o que corresponde a uma média de R$ 10.497,14 mensais por integrante, e não a oito remunerações distintas. Como os integrantes rotacionam entre funções a cada sprint, o pró-labore é distribuído igualmente entre os sete sócios — a média mensal acima —, e não conforme a função exercida no momento: as faixas por função servem apenas para atribuir valor de mercado ao esforço total da equipe, não como salário individual por cargo.
+
+**Por que duas funções não entram em faixa júnior.** Arquiteto de soluções e analista de DevOps são orçados no percentil inferior da faixa plena porque o guia não publica faixa júnior para esses cargos, o que não é lacuna da fonte e sim característica da função. O que se precifica é a competência que a entrega exige, e não o tempo de carreira de quem a executa, de modo que cobrar arquitetura a preço de júnior significaria subprecificar justamente a decisão mais difícil da solução, que foi separar a classificação local do acionamento do modelo de linguagem externo.
+
+**Sobre a divergência entre fontes.** As bases consultadas não concordam entre si, e a diferença tem explicação metodológica. A Robert Half projeta a partir da remuneração real de profissionais que a própria consultoria colocou no mercado, o que concentra a amostra em empresas médias e grandes. O Glassdoor reúne salários enviados pelos próprios profissionais e cobre o mercado inteiro. O Portal Salário parte de registros formais de contratação e, para desenvolvedor back-end, aponta faixa entre piso médio de R$ 5.676,68 e teto de R$ 11.801,70, deixando de fora quem atua como pessoa jurídica. Na comparação entre os cargos presentes nas três bases, o Glassdoor fica entre 61% e 65% da mediana da Robert Half, o que posiciona o percentil inferior adotado aqui como um meio de campo entre a fonte mais otimista e a mais conservadora.
+
+#### 6.7.3.3 Insumos, licenças e plataformas
+
+O bloco abaixo cobre os 2,5 meses de execução e contempla ambientes separados de desenvolvimento e de homologação, integração contínua e monitoramento, conforme o escopo comprometido na Seção 6.7.1. Os valores seguem preços comerciais de referência da região sa-east-1.
+
+| Item | Mensal | Período | Total |
+|---|---:|---:|---:|
+| Ambiente de desenvolvimento, instância de aplicação | R$ 352,00 | 2,5 | R$ 880,00 |
+| Ambiente de homologação, instância de aplicação | R$ 352,00 | 2,5 | R$ 880,00 |
+| Bancos de dados gerenciados dos dois ambientes | R$ 576,00 | 2,5 | R$ 1.440,00 |
+| Armazenamento de objetos e transferência de dados | R$ 200,00 | 2,5 | R$ 500,00 |
+| Interfaces de transcrição e de modelo de linguagem, testes e carga | R$ 250,00 | 2,5 | R$ 625,00 |
+| Repositório, integração contínua, monitoramento e ferramentas, sete acessos | R$ 700,00 | 2,5 | R$ 1.750,00 |
+| Licenças do ecossistema Microsoft | R$ 0,00 | 2,5 | R$ 0,00 |
+| **Total** | | | **R$ 6.075,00** |
+
+A linha zerada das licenças Microsoft é mantida visível de propósito, porque materializa a premissa P6 e demonstra que o orçamento foi construído olhando para este cliente específico, e não para um cliente genérico.
+
+**Total de custos do projeto: R$ 183.699,95 de pessoal mais R$ 6.075,00 de insumos, igual a R$ 189.774,95.**
+
+### 6.7.4 Despesas operacionais
+
+As despesas reúnem a estrutura que a empresa precisa manter para que o projeto exista, mas que não coloca hora diretamente na entrega, o que em gestão de custos se chama mão de obra indireta. Diferentemente dos custos, essas linhas entram por rateio proporcional, porque atendem simultaneamente a todos os projetos da empresa, e não apenas a este.
+
+| Item | Base mensal | Rateio no projeto | Total | Fonte do valor |
+|---|---:|---|---:|---|
+| Analista administrativo e financeiro | R$ 2.795 | 60% da jornada | R$ 4.192,50 | Glassdoor, Analista Administrativo Financeiro, 25º percentil |
+| Gestão comercial e do contrato | R$ 12.000 | 25% da jornada | R$ 7.500,00 | Arbitramento da equipe, pró-labore de sócio |
+| Aluguel e estrutura física | R$ 1.600 | integral | R$ 4.000,00 | Arbitramento da equipe |
+| Contabilidade terceirizada | R$ 450 | integral | R$ 1.125,00 | Faixa de mercado para empresa de serviço no Simples Nacional |
+| Marketing e divulgação | R$ 700 | integral | R$ 1.750,00 | Arbitramento da equipe |
+| Infraestrutura administrativa, domínio, correio e ferramentas de gestão | R$ 300 | integral | R$ 750,00 | Arbitramento da equipe |
+| **Total** | | | **R$ 19.317,50** | |
+
+Os rateios do analista administrativo e da gestão comercial são mais altos do que seriam em um projeto de dedicação parcial, porque sob a premissa P5 este projeto ocupa integralmente a capacidade produtiva da empresa durante as dez semanas, consumindo a maior parte do tempo da estrutura de apoio. Pela mesma razão, aluguel e estrutura física refletem um espaço capaz de acomodar sete pessoas em dedicação integral.
+
+O honorário contábil adotado corresponde ao patamar praticado para empresas do Simples Nacional com folha ativa e volume regular de notas, situação que corresponde à da empresa simulada, já que empresas sem funcionários ficam na faixa inferior, entre R$ 150 e R$ 350 mensais.
+
+As quatro linhas identificadas como arbitramento não possuem fonte pública aplicável, porque dependem do porte e da localização da empresa simulada, e por isso são declaradas como tal em vez de receberem uma referência artificial. A consistência dessas linhas é verificada pela proporção que guardam com o restante do orçamento, já que as despesas indiretas representam 10,2% dos custos diretos. Essa razão é utilizada como verificação interna de proporcionalidade, e não como referência de mercado, porque a equipe não dispõe de fonte pública que estabeleça uma faixa usual de overhead para consultorias de tecnologia no Brasil.
+
+### 6.7.5 Carga tributária
+
+O regime simulado é o Simples Nacional, com tributação pelo Anexo III, o que resulta em alíquota efetiva média de 12,076% sobre a receita do contrato.
+
+**O enquadramento depende do Fator R, e o Fator R depende da forma de contratação.** Atividades intelectuais de serviço, entre elas o desenvolvimento e o licenciamento de software e a consultoria, são tributadas pelo Anexo III quando a folha de salários dos últimos doze meses, chamada FS12, representa 28% ou mais da receita bruta do mesmo período, e pelo Anexo V quando fica abaixo desse limite, conforme o artigo 18 da Lei Complementar nº 123/2006.
+
+O ponto sensível está na composição da FS12. Ela reúne as remunerações pagas a empregados e a trabalhadores avulsos, as remunerações pagas a contribuintes individuais, o que abrange o pró-labore dos sócios e os pagamentos a autônomos, o décimo terceiro salário, a contribuição patronal previdenciária efetivamente recolhida, inclusive a já embutida no DAS, e o FGTS recolhido. Pagamentos feitos a outras pessoas jurídicas, incluindo microempreendedores individuais, **não** compõem a folha de quem contrata, e apenas remunerações informadas em GFIP e no eSocial ou DCTFWeb são consideradas.
+
+É por essa razão que a premissa P2 modela os integrantes como sócios remunerados por pró-labore, e não como prestadores pessoa jurídica. Sob a premissa adotada, a remuneração de R$ 183.699,95 compõe integralmente a FS12, o que resulta em Fator R de 67,17%, muito acima do limite de 28%. No início de atividade a proporcionalização incide igualmente sobre a FS12 e sobre a receita bruta, de modo que a razão entre elas não se altera e os 67,17% permanecem válidos qualquer que seja a base — a receita real ou a proporcionalizada usada para determinar a faixa. Assim, o enquadramento no Anexo III deixa de ser escolha e passa a ser consequência verificável da estrutura da operação. A premissa também não altera o custo apurado na Seção 6.7.3.2, porque em empresa do Anexo III a contribuição patronal previdenciária já está incluída no DAS, e a contribuição previdenciária de 11% incidente sobre o pró-labore é retida do sócio, reduzindo o valor líquido que ele recebe, sem acrescentar encargo ao empregador.
+
+**Cenário alternativo, caso a contratação fosse por pessoa jurídica.** Se os sete integrantes fossem contratados como prestadores pessoa jurídica, a FS12 seria praticamente nula, o Fator R não alcançaria os 28% e a empresa seria tributada pelo Anexo V, com alíquotas substancialmente superiores.
+
+| Enquadramento | Condição | Alíquota efetiva média | Preço final |
+|---|---|---:|---:|
+| **Anexo III** | Sócios com pró-labore, Fator R de 67,17% | **12,076%** | **R$ 273.482,01** |
+| Anexo V | Prestadores pessoa jurídica, Fator R abaixo de 28% | 18,76% | R$ 295.984,87 |
+
+Entre as variáveis explicitamente simuladas nesta análise, a forma de contratação apresenta o segundo maior impacto sobre o preço final, com 8,2%, atrás apenas do perfil de senioridade tratado na Seção 6.7.9.
+
+**Determinação da faixa e efeito do cronograma de faturamento.** A alíquota efetiva de cada faixa é calculada pela fórmula da Resolução CGSN nº 140/2018, subtraindo a parcela a deduzir do produto entre a receita bruta acumulada e a alíquota nominal, e dividindo o resultado pela mesma receita. Nos primeiros doze meses de atividade, o enquadramento não usa a receita acumulada real, e sim uma receita proporcionalizada, calculada no primeiro mês pela multiplicação da receita daquele mês por doze, e nos meses seguintes pela média aritmética dos meses anteriores multiplicada por doze. Sob o cronograma de pagamento da Seção 6.7.7 e o regime de competência da premissa P10, a receita proporcionalizada situa a empresa na quarta faixa do Anexo III, cuja alíquota nominal é de 16% com parcela a deduzir de R$ 35.640, resultando na alíquota efetiva média de 12,076% aplicada ao contrato.
+
+Cabe registrar que a FS12 é apurada pelo regime de caixa, contando o que foi efetivamente pago, enquanto a receita bruta acumulada é apurada por competência, de modo que os dois lados do Fator R seguem regimes distintos por determinação legal.
+
+O imposto é calculado por dentro, ou seja, embutido no preço de venda, porque incide sobre o faturamento e não sobre o custo. A operação é uma divisão pelo complemento da alíquota, e não uma multiplicação:
+
+```
+Preço final = Valor com lucro ÷ (1 − alíquota efetiva)
+Preço final = 240.456,32 ÷ 0,87924 = 273.482,01
+
+Conferência: 273.482,01 × 12,076% = 33.025,69
+             273.482,01 − 33.025,69 = 240.456,32
+```
+
+### 6.7.6 Margem de lucro
+
+A margem adotada é de 15%, aplicada sobre a soma de custos e despesas, antes da incorporação do tributo.
+
+A justificativa é de posicionamento de mercado. Trata-se do primeiro contrato da empresa, com cliente do setor público e alta visibilidade institucional, condição em que a margem é deliberadamente moderada para viabilizar a entrada e construir referência comercial. A margem recorrente é buscada no contrato de sustentação da Seção 6.7.11, e não na entrega inicial, estratégia coerente com o fato, registrado na reunião de kickoff, de que o Metrô não mantém equipe interna de desenvolvimento e contrata desenvolvedores externos quando precisa, o que torna a sustentação uma necessidade estrutural e não um acréscimo comercial.
+
+Em valores absolutos, a margem corresponde a R$ 31.363,87, o que representa 11,5% do preço final depois de embutido o tributo, ou R$ 12.545,55 por mês de operação.
+
+**Sobre a ordem de aplicação da margem.** O enunciado do artefato descreve a margem como aplicada sobre a soma de custos, despesas e impostos, enquanto a planilha de referência utilizada em sala aplica a margem sobre custos e despesas e, em seguida, embute o tributo por dentro. Esta seção adota a ordem da planilha, por ser a demonstrada em aula e por refletir a incidência real do tributo, que recai sobre o faturamento e não sobre o custo. As duas leituras produzem resultados próximos, conforme a verificação abaixo, o que torna a escolha uma questão de método e não de valor.
+
+| Leitura | Cadeia | Preço final |
+|---|---|---:|
+| Literal do enunciado | (209.092,45 + 12,076% de imposto sobre a base) × 1,15 | R$ 269.493,82 |
+| **Planilha de referência, adotada** | **209.092,45 × 1,15 ÷ 0,87924** | **R$ 273.482,01** |
+
+A diferença entre as duas é de 1,48%.
+
+### 6.7.7 Preço final e condições de pagamento
+
+| Etapa | Fórmula | Valor |
+|---|---|---:|
+| Custo de pessoal | soma das oito funções | R$ 183.699,95 |
+| Insumos, licenças e plataformas | soma do bloco 6.7.3.3 | R$ 6.075,00 |
+| **Total de custos** | pessoal + insumos | **R$ 189.774,95** |
+| Despesas operacionais | soma do bloco 6.7.4 | R$ 19.317,50 |
+| Valor sem lucro | custos + despesas | R$ 209.092,45 |
+| Valor com lucro | valor sem lucro × 1,15 | R$ 240.456,32 |
+| **Preço final** | valor com lucro ÷ 0,87924 | **R$ 273.482,01** |
+
+**Composição do preço, do ponto de vista do que o cliente paga:**
+
+| Destino do valor | Montante | Participação |
+|---|---:|---:|
+| Pró-labore da equipe técnica | R$ 183.699,95 | 67,17% |
+| Tributos | R$ 33.025,69 | 12,08% |
+| Lucro da empresa | R$ 31.363,87 | 11,47% |
+| Despesas operacionais | R$ 19.317,50 | 7,06% |
+| Insumos e plataformas | R$ 6.075,00 | 2,22% |
+
+O preço equivale a R$ 97,67 por hora faturada, considerando as 2.800 horas de esforço.
+
+**Posicionamento do valor-hora.** Esse valor situa-se na faixa inferior do que se pratica no mercado brasileiro de consultoria em tecnologia, e isso é consequência direta, e não acidental, das escolhas declaradas: perfil de início de carreira na Seção 6.7.3.2, margem moderada na Seção 6.7.6 e estrutura administrativa enxuta na Seção 6.7.4. O cenário de equipe sênior da Seção 6.7.9 eleva a hora faturada para R$ 134,46, valor mais próximo da prática de mercado, e permanece disponível caso o contratante exija perfil mais experiente. A decisão consciente da empresa é entrar pelo piso da faixa viável, e não competir por preço indefinidamente, razão pela qual o contrato de sustentação da Seção 6.7.11 integra a proposta desde a origem.
+
+| Pagamento | Momento | Percentual | Valor |
+|---|---|---:|---:|
+| Entrada | Assinatura do contrato | 30,0% | R$ 82.044,60 |
+| 1ª parcela | 30 dias após a assinatura | 24,5% | R$ 67.003,09 |
+| 2ª parcela | 60 dias após a assinatura | 21,0% | R$ 57.431,22 |
+| 3ª parcela | 90 dias após a assinatura | 14,0% | R$ 38.287,48 |
+| 4ª parcela | 120 dias após a assinatura | 10,5% | R$ 28.715,62 |
+| **Total** | | **100%** | **R$ 273.482,01** |
+
+As parcelas são **decrescentes**, e não iguais, por exigência de fluxo de caixa. O pró-labore da equipe se concentra no início da execução — R$ 73.479,98 por mês nos dois primeiros meses, contra recebimentos que se estendem por cento e vinte dias. Um cronograma de parcelas iguais deixaria a empresa sem capital para honrar a própria folha por volta do segundo mês, antes de os recebimentos posteriores compensarem o desembolso concentrado. A entrada de 30% cobre o primeiro mês de operação, e o escalonamento decrescente das parcelas mantém o saldo positivo até o encerramento, sem alterar o total do contrato nem fazer o fornecedor financiar o cliente por um horizonte longo.
+
+**Fluxo de caixa projetado.** A tabela demonstra o casamento entre recebimentos e desembolsos ao longo do contrato, e é o que justifica tanto o tamanho da entrada quanto o escalonamento das parcelas. As premissas de tempo são declaradas: os recebimentos entram no início de cada mês (dias 0, 30, 60, 90 e 120); o pró-labore, as despesas operacionais e os insumos são consumidos ao longo dos 2,5 meses de execução; e o DAS é lançado no mês do recebimento correspondente, uma simplificação conservadora — pela apuração por competência da premissa P10, o imposto seria recolhido no mês seguinte, o que apenas melhoraria o saldo dos meses iniciais.
+
+| Mês | Recebimento | Pró-labore | Despesas | Insumos | Imposto | Saldo do mês | Saldo acumulado |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 0 (assinatura) | R$ 82.044,60 | — | — | — | R$ 9.907,71 | R$ 72.136,89 | R$ 72.136,89 |
+| 1 | R$ 67.003,09 | R$ 73.479,98 | R$ 7.727,00 | R$ 2.430,00 | R$ 8.091,29 | −R$ 24.725,18 | R$ 47.411,71 |
+| 2 | R$ 57.431,22 | R$ 73.479,98 | R$ 7.727,00 | R$ 2.430,00 | R$ 6.935,39 | −R$ 33.141,15 | R$ 14.270,56 |
+| 3 | R$ 38.287,48 | R$ 36.739,99 | R$ 3.863,50 | R$ 1.215,00 | R$ 4.623,60 | −R$ 8.154,61 | R$ 6.115,95 |
+| 4 | R$ 28.715,62 | — | — | — | R$ 3.467,70 | R$ 25.247,92 | R$ 31.363,87 |
+
+O saldo acumulado permanece **positivo em todos os meses**, com mínimo de R$ 6.115,95 no terceiro mês, e encerra em R$ 31.363,87 — exatamente a margem de lucro da Seção 6.7.6, confirmando que o fluxo de caixa fecha sem aporte externo. É essa restrição de caixa, e não uma convenção comercial, que dita o desenho do pagamento: sem a entrada e o escalonamento decrescente, a operação exigiria aporte dos sócios no meio da execução.
+
+### 6.7.8 Reserva de contingência
+
+A reserva de contingência é um valor separado para cobrir riscos já identificados que, se materializados, consomem horas adicionais de trabalho. Ela não se confunde com a margem, que é o lucro planejado quando tudo corre conforme o previsto, nem com a prática de inflar estimativas sem declarar, que destrói a capacidade de comparar o planejado com o realizado.
+
+O valor não foi arbitrado por percentual de mercado, e sim derivado da matriz de risco da Seção 6.3. Foram selecionadas apenas as ameaças que geram retrabalho sob responsabilidade do fornecedor, e o impacto qualitativo de cada uma foi convertido em horas por uma regra única, proporcional ao porte do contrato, sendo Baixo igual a 32 horas, Moderado a 64 horas e Alto a 128 horas.
+
+| ID | Ameaça | Probabilidade | Impacto | Horas | Valor esperado |
+|---|---|---:|---|---:|---:|
+| AM15 | Atraso da implantação em nuvem e dos testes com usuários externos | 70% | Alto | 128h | 89,6h |
+| AM8 | Alucinação do modelo de linguagem | 50% | Alto | 128h | 64,0h |
+| AM2 | Baixa acurácia na identificação de intenções | 30% | Alto | 128h | 38,4h |
+| AM9 | Degradação da qualidade da transcrição em ambiente ruidoso | 50% | Moderado | 64h | 32,0h |
+| AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | 50% | Moderado | 64h | 32,0h |
+| AM3 | Atraso na liberação de acesso ao ambiente do cliente | 70% | Baixo | 32h | 22,4h |
+| **Total** | | | | | **278,4h** |
+
+**Critérios de exclusão.** Foram deixados de fora três grupos de itens. O primeiro reúne as ameaças de processo interno da equipe, como AM1, AM10, AM11, AM12, AM13, AM14 e AM16, que dizem respeito à disciplina de trabalho do fornecedor e são absorvidas pela margem, e não repassadas ao cliente. O segundo é composto por AM4 e AM6, que dependem do fornecimento de informações e de dados pelo contratante, e que em contrato comercial são tratados por cláusula de suspensão de prazo, e não por preço. O terceiro é AM5, que trata da não conclusão no prazo e que, conforme a própria Seção 6.3.7, é consequência das demais ameaças, de modo que incluí-lo significaria contar o mesmo risco duas vezes.
+
+As 278,4 horas equivalem a 9,9% do esforço total e, ao valor-hora médio da equipe de R$ 65,61, resultam em R$ 18.265,02 de custo, ou 9,6% dos custos diretos. A reserva recebe apenas o tributo embutido, e não a margem, porque cobre custo e não deve gerar lucro quando um risco se materializa.
+
+| Componente | Valor | Condição |
+|---|---:|---|
+| Preço fechado do projeto | R$ 273.482,01 | Fixo, em cinco pagamentos |
+| Reserva de contingência | até R$ 20.773,65 | Acionável apenas mediante ocorrência comprovada de um dos riscos acima |
+| **Teto contratual** | **R$ 294.255,66** | Pior cenário possível |
+
+A reserva não integra o cronograma de pagamento e é faturada em nota separada apenas quando e se for acionada, pelo valor efetivamente utilizado, o que evita o recolhimento de tributo sobre receita que não se confirma.
+
+A conversão de impacto qualitativo em horas é uma estimativa da equipe, e é o único elo da cadeia sem fonte externa, já que a matriz da Seção 6.3 fornece probabilidade e impacto, mas não a quantidade de horas correspondente a cada nível.
+
+### 6.7.9 Análise de sensibilidade por senioridade
+
+Entre as variáveis analisadas neste exercício, mantendo-se fixo o esforço de 2.800 horas, a senioridade contratada é a que apresenta maior impacto sobre o preço final. A tabela mantém as mesmas horas, os mesmos insumos e as mesmas despesas, variando apenas o percentil salarial adotado. As alíquotas efetivas diferem entre os cenários porque receitas maiores deslocam a empresa dentro das faixas do Anexo III.
+
+| Perfil da equipe | Critério | Alíquota efetiva | Preço final | Variação |
+|---|---|---:|---:|---:|
+| **Profissionais em início de carreira** | Faixa júnior onde publicada, 25º percentil nas demais | 12,076% | **R$ 273.482,01** | Adotado |
+| Profissionais plenos de mercado | 25º percentil em todas as funções | 12,491% | R$ 305.808,49 | mais 11,8% |
+| Profissionais sênior especializados | 50º percentil em todas as funções | 13,150% | R$ 376.485,58 | mais 37,7% |
+
+A exigência de senioridade superior por parte do cliente elevaria o preço em até cerca de trinta e oito por cento, e a estrutura do orçamento permite recalcular esse cenário substituindo apenas a coluna de salário de referência da Seção 6.7.3.2.
+
+Optou-se por não apresentar cenários nomeados como pessimista, base e otimista, porque esse vocabulário pertence a projeções de receita, situações em que a variável principal não está sob controle de quem projeta. Neste caso o preço é decisão da empresa, e a única incerteza relevante já está tratada pela reserva de contingência da Seção 6.7.8.
+
+### 6.7.10 Simulação da operação em produção: AWS e Azure
+
+O desenvolvimento e a homologação ocorrem em AWS, ambiente dominado pela equipe, mas o ambiente de produção do parceiro é o ecossistema Microsoft, conforme a TAPI e o registro do kickoff. A simulação abaixo precifica a operação da solução nas duas nuvens, com dimensionamento equivalente.
+
+A premissa de volume é declarada, porque cobrança por uso sem volume definido não constitui estimativa: duzentos usuários ativos do PMO, duas mil interações mensais, vinte por cento delas por voz com trinta segundos de áudio cada, totalizando duzentos minutos mensais, e mil e duzentas consultas que acionam o modelo de linguagem com recuperação de cinco trechos, o que corresponde a aproximadamente quatro mil tokens de entrada e quatrocentos de saída por chamada.
+
+| Componente | AWS | Azure |
+|---|---:|---:|
+| Computação, dois nós de 2 vCPU e 8 GB | R$ 704,00 | R$ 760,32 |
+| Banco PostgreSQL gerenciado | R$ 288,00 | R$ 311,04 |
+| Armazenamento de objetos, 500 GB | R$ 71,00 | R$ 76,68 |
+| Transferência de dados | R$ 100,00 | R$ 65,00 |
+| Transcrição de voz | R$ 8,47 | R$ 18,33 |
+| Modelo de linguagem | R$ 14,52 | R$ 5,54 |
+| **Total mensal** | **R$ 1.185,99** | **R$ 1.236,92** |
+
+Sob o dimensionamento e as premissas adotadas nesta simulação, a diferença estimada entre as duas nuvens é de 4,3%, resultado coerente com o fato de que AWS e Azure praticam preços similares no Brasil, com variação de 3% a 12% conforme a família e o tamanho da instância. A conclusão prática, sujeita à validação das SKUs registrada ao final desta subseção, é que o provedor de nuvem não constitui alavanca de custo relevante neste projeto, e que a escolha deve ser guiada por política de segurança da informação e por integração com o ambiente corporativo.
+
+**Três divergências relevantes entre os provedores.** Na transferência de dados o Azure é mais barato, porque isenta os primeiros cem gigabytes mensais e cobra entre R$ 0,45 e R$ 0,85 por gigabyte acima disso. Na transcrição de voz o Azure é mais caro em tempo real, a um dólar por hora de áudio contra US$ 0,0077 por minuto do serviço usado hoje, mas oferece modo em lote a US$ 0,18 por hora, 82% mais barato, o que reduziria essa linha de R$ 18,33 para R$ 3,30 caso a transcrição assíncrona substituísse a de tempo real fora da chamada de voz contínua. No modelo de linguagem o Azure é mais barato, porque o GPT-4o-mini custa US$ 0,15 por milhão de tokens de entrada e US$ 0,60 de saída, contra US$ 0,30 e US$ 2,50 do modelo em uso.
+
+**Contribuição da inteligência artificial para o custo.** Nos dois provedores, transcrição e modelo de linguagem somados representam 1,9% da conta mensal, enquanto computação e banco de dados respondem por mais de oitenta por cento. Esse resultado confirma, por via econômica, a decisão de arquitetura registrada na documentação técnica de executar a classificação de intenção localmente e acionar o modelo de linguagem apenas nas consultas, já que o custo de inteligência artificial não constitui o gargalo econômico da solução.
+
+**Observação sobre o Azure Hybrid Benefit.** Seria incorreto afirmar que o parceiro obteria desconto no Azure por já operar no ecossistema Microsoft. O mecanismo de reaproveitamento de licenças reduz de 40% a 55% do custo, mas aplica-se a licenças de Windows Server e SQL Server com Software Assurance, e a solução roda em Linux com PostgreSQL. O ganho real da migração para o Azure é de integração com Entra ID, Teams e Microsoft 365, e de aderência à política interna, e não de preço.
+
+Os valores de computação, banco e armazenamento do Azure foram derivados por paridade com os equivalentes da AWS, porque a tabela pública consultada em reais para a região Brazil South cobre apenas instâncias de memória otimizada de porte muito superior ao necessário. Os valores de transferência, transcrição e modelo de linguagem vêm diretamente das páginas de preço dos respectivos serviços.
+
+### 6.7.11 Plano de sustentação
+
+A sustentação é proposta em separado do preço do projeto, conforme a premissa P9, e cobre a operação da infraestrutura, o monitoramento, a correção de defeitos e pequenas evoluções, com reajuste anual pelo IPCA conforme a premissa P13.
+
+| Etapa | AWS | Azure |
+|---|---:|---:|
+| Infraestrutura e interfaces em produção | R$ 1.185,99 | R$ 1.236,92 |
+| Sustentação técnica, 24 horas mensais | R$ 1.205,00 | R$ 1.205,00 |
+| Rateio administrativo | R$ 400,00 | R$ 400,00 |
+| Valor sem lucro | R$ 2.790,99 | R$ 2.841,92 |
+| Margem (15%) | R$ 418,65 | R$ 426,29 |
+| Valor com lucro | R$ 3.209,64 | R$ 3.268,21 |
+| **Preço mensal** | **R$ 3.479,77** | **R$ 3.543,33** |
+| **Contrato de doze meses** | **R$ 41.757,23** | **R$ 42.519,96** |
+
+A alíquota aplicada à sustentação é de 7,76%, e não a mesma do projeto, porque o contrato é executado no exercício seguinte, quando a receita bruta acumulada da empresa já reflete o projeto entregue e a apuração deixa de usar a receita proporcionalizada do início de atividade. A diferença entre os dois provedores ao longo de um ano inteiro é de R$ 762,73, o que reforça a conclusão da Seção 6.7.10 de que a decisão de nuvem deve ser tomada por critérios técnicos e de conformidade.
+
+### 6.7.12 Fontes consultadas
+
+| Informação | Fonte |
+|---|---|
+| Faixas salariais das funções técnicas | Guia Salarial 2026, Robert Half Brasil, `roberthalf.com/br/pt/insights/guia-salarial` |
+| Salário de UX Designer e de Analista Administrativo Financeiro | Glassdoor Brasil, `glassdoor.com.br` |
+| Referência complementar de remuneração de desenvolvedor | Portal Salário, `salario.com.br` |
+| Honorários contábeis para empresa do Simples Nacional | Levantamentos de mercado de escritórios contábeis, 2026 |
+| Fórmula da alíquota efetiva e faixas do Anexo III | Lei Complementar nº 123/2006 e Resolução CGSN nº 140/2018 |
+| Regra de receita proporcionalizada no início de atividade | Lei Complementar nº 123/2006, artigo 18 |
+| Critério do Fator R e composição da folha de salários (FS12) | Lei Complementar nº 123/2006, artigo 18, §§ 5º-J, 5º-K, 5º-M e § 25; Resolução CGSN nº 140/2018, artigo 26; Perguntas e Respostas do portal do Simples Nacional |
+| Preços de computação, banco e armazenamento na AWS, região sa-east-1 | Levantamento de preços em reais, agosto de 2026, câmbio R$ 5,50 |
+| Preços de transferência de dados e de instâncias no Azure, região Brazil South | Levantamento de preços em reais, agosto de 2026, câmbio R$ 5,50 |
+| Preço de transcrição de voz, Deepgram Nova-3 | `deepgram.com/pricing` |
+| Preço de transcrição de voz, Azure AI Speech | `azure.microsoft.com/pricing/details/speech` |
+| Preço do modelo de linguagem em uso | Página pública de preços do provedor |
+| Preço do Azure OpenAI, GPT-4o-mini | Página pública de preços do Azure OpenAI |
+
+### 6.7.13 Retorno para o parceiro: o que esta análise não mede
+
+Esta seção determina o custo de fornecimento e o preço de venda da solução, ou seja, a viabilidade comercial do projeto pela ótica do fornecedor. Ela **não** demonstra o retorno financeiro para o Metrô, o que exigiria comparar o investimento contra a economia gerada, com indicadores de payback, retorno sobre investimento e valor presente líquido.
+
+Essa ausência é deliberada, e não uma omissão. A TAPI descreve os benefícios esperados em termos qualitativos, mencionando redução do tempo gasto em tarefas administrativas, consolidação de informações, obtenção de análises e preparação de relatórios, mas não fornece a linha de base operacional necessária para converter esses ganhos em valor. Produzir um retorno sobre investimento sem esses dados significaria arbitrar simultaneamente o volume de trabalho atual, o tempo economizado e o custo do trabalho poupado, o que tornaria o número menos defensável do que toda a precificação construída até aqui.
+
+Os indicadores que o parceiro precisaria fornecer para que essa medição se torne possível são:
+
+| Indicador | Para que serve no cálculo |
+|---|---|
+| Número de pessoas que registram, atualizam e acompanham informações de projeto | Define a população afetada pela automação |
+| Tempo médio hoje consumido por atividade, como registro de status mensal, consolidação de documentos e preparação da apresentação à diretoria | Estabelece a linha de base contra a qual o ganho é medido |
+| Frequência dessas atividades, por projeto e por ciclo mensal | Converte o tempo unitário em volume anual |
+| Custo-hora médio dos perfis envolvidos, do PMO à diretoria | Converte tempo economizado em valor monetário |
+| Percentual de retrabalho decorrente de inconsistência ou ausência de informação | Quantifica o ganho de qualidade, além do ganho de tempo |
+| Quantidade de projetos ativos no portfólio e projeção de crescimento | Permite avaliar o ganho de escala da solução |
+
+Com esses dados, o cálculo do retorno passa a ser direto, porque o custo do investimento já está determinado nesta seção, somando o preço do projeto de R$ 273.482,01 ao contrato de sustentação de R$ 41.757,23 no primeiro ano, e o que falta é apenas o lado do benefício. A medição está prevista para uma eventual etapa de implantação produtiva, que a TAPI classifica como evolução futura e que está explicitamente fora do escopo orçado na Seção 6.7.1.
+
