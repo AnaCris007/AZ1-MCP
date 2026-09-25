@@ -1980,24 +1980,24 @@ As quatro linhas identificadas como arbitramento não possuem fonte pública apl
 
 ### 6.8.5 Carga tributária
 
-O regime simulado é o Simples Nacional, com tributação pelo Anexo III, o que resulta em alíquota efetiva média de 11,70% sobre a receita do contrato.
+O regime simulado é o Simples Nacional, com tributação pelo Anexo III, o que resulta em alíquota efetiva média de 12,076% sobre a receita do contrato.
 
 **O enquadramento depende do Fator R, e o Fator R depende da forma de contratação.** Atividades intelectuais de serviço, entre elas o desenvolvimento e o licenciamento de software e a consultoria, são tributadas pelo Anexo III quando a folha de salários dos últimos doze meses, chamada FS12, representa 28% ou mais da receita bruta do mesmo período, e pelo Anexo V quando fica abaixo desse limite, conforme o artigo 18 da Lei Complementar nº 123/2006.
 
 O ponto sensível está na composição da FS12. Ela reúne as remunerações pagas a empregados e a trabalhadores avulsos, as remunerações pagas a contribuintes individuais, o que abrange o pró-labore dos sócios e os pagamentos a autônomos, o décimo terceiro salário, a contribuição patronal previdenciária efetivamente recolhida, inclusive a já embutida no DAS, e o FGTS recolhido. Pagamentos feitos a outras pessoas jurídicas, incluindo microempreendedores individuais, **não** compõem a folha de quem contrata, e apenas remunerações informadas em GFIP e no eSocial ou DCTFWeb são consideradas.
 
-É por essa razão que a premissa P2 modela os integrantes como sócios remunerados por pró-labore, e não como prestadores pessoa jurídica. Sob a premissa adotada, a remuneração de R$ 183.699,95 compõe integralmente a FS12, o que resulta em Fator R de 67,5% sobre o preço final, muito acima do limite de 28%, e o enquadramento no Anexo III deixa de ser escolha e passa a ser consequência verificável da estrutura da operação. A premissa também não altera o custo apurado na Seção 6.8.3.2, porque em empresa do Anexo III a contribuição patronal previdenciária já está incluída no DAS, e a contribuição previdenciária de 11% incidente sobre o pró-labore é retida do sócio, reduzindo o valor líquido que ele recebe, sem acrescentar encargo ao empregador.
+É por essa razão que a premissa P2 modela os integrantes como sócios remunerados por pró-labore, e não como prestadores pessoa jurídica. Sob a premissa adotada, a remuneração de R$ 183.699,95 compõe integralmente a FS12, o que resulta em Fator R de 67,17% sobre o preço final, muito acima do limite de 28%, e o enquadramento no Anexo III deixa de ser escolha e passa a ser consequência verificável da estrutura da operação. A premissa também não altera o custo apurado na Seção 6.8.3.2, porque em empresa do Anexo III a contribuição patronal previdenciária já está incluída no DAS, e a contribuição previdenciária de 11% incidente sobre o pró-labore é retida do sócio, reduzindo o valor líquido que ele recebe, sem acrescentar encargo ao empregador.
 
 **Cenário alternativo, caso a contratação fosse por pessoa jurídica.** Se os sete integrantes fossem contratados como prestadores pessoa jurídica, a FS12 seria praticamente nula, o Fator R não alcançaria os 28% e a empresa seria tributada pelo Anexo V, com alíquotas substancialmente superiores.
 
 | Enquadramento | Condição | Alíquota efetiva média | Preço final |
 |---|---|---:|---:|
-| **Anexo III** | Sócios com pró-labore, Fator R de 67,5% | **11,70%** | **R$ 272.319,08** |
-| Anexo V | Prestadores pessoa jurídica, Fator R abaixo de 28% | 18,11% | R$ 296.995,47 |
+| **Anexo III** | Sócios com pró-labore, Fator R de 67,17% | **12,076%** | **R$ 273.482,01** |
+| Anexo V | Prestadores pessoa jurídica, Fator R abaixo de 28% | 18,76% | R$ 295.984,87 |
 
-Entre as variáveis explicitamente simuladas nesta análise, a forma de contratação apresenta o segundo maior impacto sobre o preço final, com 9,1%, atrás apenas do perfil de senioridade tratado na Seção 6.8.9.
+Entre as variáveis explicitamente simuladas nesta análise, a forma de contratação apresenta o segundo maior impacto sobre o preço final, com 8,2%, atrás apenas do perfil de senioridade tratado na Seção 6.8.9.
 
-**Determinação da faixa e efeito do cronograma de faturamento.** A alíquota efetiva de cada faixa é calculada pela fórmula da Resolução CGSN nº 140/2018, subtraindo a parcela a deduzir do produto entre a receita bruta acumulada e a alíquota nominal, e dividindo o resultado pela mesma receita. Nos primeiros doze meses de atividade, o enquadramento não usa a receita acumulada real, e sim uma receita proporcionalizada, calculada no primeiro mês pela multiplicação da receita daquele mês por doze, e nos meses seguintes pela média aritmética dos meses anteriores multiplicada por doze. Sob o cronograma de pagamento da Seção 6.8.7 e o regime de competência da premissa P10, a receita proporcionalizada situa a empresa na terceira faixa do Anexo III, cuja alíquota nominal é de 13,5% com parcela a deduzir de R$ 17.640, resultando na alíquota efetiva média de 11,70% aplicada ao contrato.
+**Determinação da faixa e efeito do cronograma de faturamento.** A alíquota efetiva de cada faixa é calculada pela fórmula da Resolução CGSN nº 140/2018, subtraindo a parcela a deduzir do produto entre a receita bruta acumulada e a alíquota nominal, e dividindo o resultado pela mesma receita. Nos primeiros doze meses de atividade, o enquadramento não usa a receita acumulada real, e sim uma receita proporcionalizada, calculada no primeiro mês pela multiplicação da receita daquele mês por doze, e nos meses seguintes pela média aritmética dos meses anteriores multiplicada por doze. Sob o cronograma de pagamento da Seção 6.8.7 e o regime de competência da premissa P10, a receita proporcionalizada situa a empresa na terceira faixa do Anexo III, cuja alíquota nominal é de 13,5% com parcela a deduzir de R$ 17.640, resultando na alíquota efetiva média de 12,076% aplicada ao contrato.
 
 Cabe registrar que a FS12 é apurada pelo regime de caixa, contando o que foi efetivamente pago, enquanto a receita bruta acumulada é apurada por competência, de modo que os dois lados do Fator R seguem regimes distintos por determinação legal.
 
@@ -2005,10 +2005,10 @@ O imposto é calculado por dentro, ou seja, embutido no preço de venda, porque 
 
 ```
 Preço final = Valor com lucro ÷ (1 − alíquota efetiva)
-Preço final = 240.456,32 ÷ 0,8830 = 272.319,08
+Preço final = 240.456,32 ÷ 0,87924 = 273.482,01
 
-Conferência: 272.319,08 × 11,70% = 31.862,76
-             272.319,08 − 31.862,76 = 240.456,32
+Conferência: 273.482,01 × 12,076% = 33.025,69
+             273.482,01 − 33.025,69 = 240.456,32
 ```
 
 ### 6.8.6 Margem de lucro
@@ -2023,10 +2023,10 @@ Em valores absolutos, a margem corresponde a R$ 31.363,87, o que representa 11,5
 
 | Leitura | Cadeia | Preço final |
 |---|---|---:|
-| Literal do enunciado | (209.092,45 + 11,70% de imposto sobre a base) × 1,15 | R$ 268.589,71 |
-| **Planilha de referência, adotada** | **209.092,45 × 1,15 ÷ 0,8830** | **R$ 272.319,08** |
+| Literal do enunciado | (209.092,45 + 12,076% de imposto sobre a base) × 1,15 | R$ 269.493,82 |
+| **Planilha de referência, adotada** | **209.092,45 × 1,15 ÷ 0,87924** | **R$ 273.482,01** |
 
-A diferença entre as duas é de 1,39%.
+A diferença entre as duas é de 1,48%.
 
 ### 6.8.7 Preço final e condições de pagamento
 
@@ -2038,32 +2038,44 @@ A diferença entre as duas é de 1,39%.
 | Despesas operacionais | soma do bloco 6.8.4 | R$ 19.317,50 |
 | Valor sem lucro | custos + despesas | R$ 209.092,45 |
 | Valor com lucro | valor sem lucro × 1,15 | R$ 240.456,32 |
-| **Preço final** | valor com lucro ÷ 0,8830 | **R$ 272.319,08** |
+| **Preço final** | valor com lucro ÷ 0,87924 | **R$ 273.482,01** |
 
 **Composição do preço, do ponto de vista do que o cliente paga:**
 
 | Destino do valor | Montante | Participação |
 |---|---:|---:|
-| Pró-labore da equipe técnica | R$ 183.699,95 | 67,5% |
-| Tributos | R$ 31.862,76 | 11,7% |
-| Lucro da empresa | R$ 31.363,87 | 11,5% |
-| Despesas operacionais | R$ 19.317,50 | 7,1% |
-| Insumos e plataformas | R$ 6.075,00 | 2,2% |
+| Pró-labore da equipe técnica | R$ 183.699,95 | 67,17% |
+| Tributos | R$ 33.025,69 | 12,08% |
+| Lucro da empresa | R$ 31.363,87 | 11,47% |
+| Despesas operacionais | R$ 19.317,50 | 7,06% |
+| Insumos e plataformas | R$ 6.075,00 | 2,22% |
 
-O preço equivale a R$ 97,26 por hora faturada, considerando as 2.800 horas de esforço.
+O preço equivale a R$ 97,67 por hora faturada, considerando as 2.800 horas de esforço.
 
-**Posicionamento do valor-hora.** Esse valor situa-se na faixa inferior do que se pratica no mercado brasileiro de consultoria em tecnologia, e isso é consequência direta, e não acidental, das escolhas declaradas: perfil de início de carreira na Seção 6.8.3.2, margem moderada na Seção 6.8.6 e estrutura administrativa enxuta na Seção 6.8.4. O cenário de equipe sênior da Seção 6.8.9 eleva a hora faturada para R$ 134,00, valor mais próximo da prática de mercado, e permanece disponível caso o contratante exija perfil mais experiente. A decisão consciente da empresa é entrar pelo piso da faixa viável, e não competir por preço indefinidamente, razão pela qual o contrato de sustentação da Seção 6.8.11 integra a proposta desde a origem.
+**Posicionamento do valor-hora.** Esse valor situa-se na faixa inferior do que se pratica no mercado brasileiro de consultoria em tecnologia, e isso é consequência direta, e não acidental, das escolhas declaradas: perfil de início de carreira na Seção 6.8.3.2, margem moderada na Seção 6.8.6 e estrutura administrativa enxuta na Seção 6.8.4. O cenário de equipe sênior da Seção 6.8.9 eleva a hora faturada para R$ 134,46, valor mais próximo da prática de mercado, e permanece disponível caso o contratante exija perfil mais experiente. A decisão consciente da empresa é entrar pelo piso da faixa viável, e não competir por preço indefinidamente, razão pela qual o contrato de sustentação da Seção 6.8.11 integra a proposta desde a origem.
 
 | Pagamento | Momento | Percentual | Valor |
 |---|---|---:|---:|
-| Entrada | Assinatura do contrato | 30% | R$ 81.695,72 |
-| 1ª parcela | 30 dias após a assinatura | 17,5% | R$ 47.655,84 |
-| 2ª parcela | 60 dias após a assinatura | 17,5% | R$ 47.655,84 |
-| 3ª parcela | 90 dias após a assinatura | 17,5% | R$ 47.655,84 |
-| 4ª parcela | 120 dias após a assinatura | 17,5% | R$ 47.655,84 |
-| **Total** | | **100%** | **R$ 272.319,08** |
+| Entrada | Assinatura do contrato | 30,0% | R$ 82.044,60 |
+| 1ª parcela | 30 dias após a assinatura | 24,5% | R$ 67.003,09 |
+| 2ª parcela | 60 dias após a assinatura | 21,0% | R$ 57.431,22 |
+| 3ª parcela | 90 dias após a assinatura | 14,0% | R$ 38.287,48 |
+| 4ª parcela | 120 dias após a assinatura | 10,5% | R$ 28.715,62 |
+| **Total** | | **100%** | **R$ 273.482,01** |
 
-A entrada de 30% não é convenção comercial, e sim exigência de fluxo de caixa. Com a equipe em dedicação integral, o desembolso mensal de pró-labore é de R$ 73.479,98, de modo que uma entrada inferior deixaria a empresa sem capital para honrar a própria folha no primeiro mês de execução, antes de qualquer recebimento subsequente. O parcelamento em quatro vezes acompanha o ciclo de execução sem que o fornecedor financie o cliente por um horizonte longo.
+As parcelas são **decrescentes**, e não iguais, por exigência de fluxo de caixa. O pró-labore da equipe se concentra no início da execução — R$ 73.479,98 por mês nos dois primeiros meses, contra recebimentos que se estendem por cento e vinte dias. Um cronograma de parcelas iguais deixaria a empresa sem capital para honrar a própria folha por volta do segundo mês, antes de os recebimentos posteriores compensarem o desembolso concentrado. A entrada de 30% cobre o primeiro mês de operação, e o escalonamento decrescente das parcelas mantém o saldo positivo até o encerramento, sem alterar o total do contrato nem fazer o fornecedor financiar o cliente por um horizonte longo.
+
+**Fluxo de caixa projetado.** A tabela demonstra o casamento entre recebimentos e desembolsos ao longo do contrato, e é o que justifica tanto o tamanho da entrada quanto o escalonamento das parcelas. As premissas de tempo são declaradas: os recebimentos entram no início de cada mês (dias 0, 30, 60, 90 e 120); o pró-labore, as despesas operacionais e os insumos são consumidos ao longo dos 2,5 meses de execução; e o DAS é lançado no mês do recebimento correspondente, uma simplificação conservadora — pela apuração por competência da premissa P10, o imposto seria recolhido no mês seguinte, o que apenas melhoraria o saldo dos meses iniciais.
+
+| Mês | Recebimento | Pró-labore | Despesas | Insumos | Imposto | Saldo do mês | Saldo acumulado |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 0 (assinatura) | R$ 82.044,60 | — | — | — | R$ 9.907,71 | R$ 72.136,89 | R$ 72.136,89 |
+| 1 | R$ 67.003,09 | R$ 73.479,98 | R$ 7.727,00 | R$ 2.430,00 | R$ 8.091,29 | −R$ 24.725,18 | R$ 47.411,71 |
+| 2 | R$ 57.431,22 | R$ 73.479,98 | R$ 7.727,00 | R$ 2.430,00 | R$ 6.935,39 | −R$ 33.141,15 | R$ 14.270,56 |
+| 3 | R$ 38.287,48 | R$ 36.739,99 | R$ 3.863,50 | R$ 1.215,00 | R$ 4.623,60 | −R$ 8.154,61 | R$ 6.115,95 |
+| 4 | R$ 28.715,62 | — | — | — | R$ 3.467,70 | R$ 25.247,92 | R$ 31.363,87 |
+
+O saldo acumulado permanece **positivo em todos os meses**, com mínimo de R$ 6.115,95 no terceiro mês, e encerra em R$ 31.363,87 — exatamente a margem de lucro da Seção 6.8.6, confirmando que o fluxo de caixa fecha sem aporte externo. É essa restrição de caixa, e não uma convenção comercial, que dita o desenho do pagamento: sem a entrada e o escalonamento decrescente, a operação exigiria aporte dos sócios no meio da execução.
 
 ### 6.8.8 Reserva de contingência
 
@@ -2087,9 +2099,9 @@ As 278,4 horas equivalem a 9,9% do esforço total e, ao valor-hora médio da equ
 
 | Componente | Valor | Condição |
 |---|---:|---|
-| Preço fechado do projeto | R$ 272.319,08 | Fixo, em cinco pagamentos |
-| Reserva de contingência | até R$ 20.685,19 | Acionável apenas mediante ocorrência comprovada de um dos riscos acima |
-| **Teto contratual** | **R$ 293.004,27** | Pior cenário possível |
+| Preço fechado do projeto | R$ 273.482,01 | Fixo, em cinco pagamentos |
+| Reserva de contingência | até R$ 20.773,65 | Acionável apenas mediante ocorrência comprovada de um dos riscos acima |
+| **Teto contratual** | **R$ 294.255,66** | Pior cenário possível |
 
 A reserva não integra o cronograma de pagamento e é faturada em nota separada apenas quando e se for acionada, pelo valor efetivamente utilizado, o que evita o recolhimento de tributo sobre receita que não se confirma.
 
@@ -2101,9 +2113,9 @@ Entre as variáveis analisadas neste exercício, mantendo-se fixo o esforço de 
 
 | Perfil da equipe | Critério | Alíquota efetiva | Preço final | Variação |
 |---|---|---:|---:|---:|
-| **Profissionais em início de carreira** | Faixa júnior onde publicada, 25º percentil nas demais | 11,70% | **R$ 272.319,08** | Adotado |
-| Profissionais plenos de mercado | 25º percentil em todas as funções | 12,12% | R$ 304.523,34 | mais 11,8% |
-| Profissionais sênior especializados | 50º percentil em todas as funções | 12,85% | R$ 375.200,42 | mais 37,8% |
+| **Profissionais em início de carreira** | Faixa júnior onde publicada, 25º percentil nas demais | 12,076% | **R$ 273.482,01** | Adotado |
+| Profissionais plenos de mercado | 25º percentil em todas as funções | 12,491% | R$ 305.808,49 | mais 11,8% |
+| Profissionais sênior especializados | 50º percentil em todas as funções | 13,150% | R$ 376.485,58 | mais 37,7% |
 
 A exigência de senioridade superior por parte do cliente elevaria o preço em até cerca de trinta e oito por cento, e a estrutura do orçamento permite recalcular esse cenário substituindo apenas a coluna de salário de referência da Seção 6.8.3.2.
 
@@ -2192,5 +2204,5 @@ Os indicadores que o parceiro precisaria fornecer para que essa medição se tor
 | Percentual de retrabalho decorrente de inconsistência ou ausência de informação | Quantifica o ganho de qualidade, além do ganho de tempo |
 | Quantidade de projetos ativos no portfólio e projeção de crescimento | Permite avaliar o ganho de escala da solução |
 
-Com esses dados, o cálculo do retorno passa a ser direto, porque o custo do investimento já está determinado nesta seção, somando o preço do projeto de R$ 272.319,08 ao contrato de sustentação de R$ 41.757,23 no primeiro ano, e o que falta é apenas o lado do benefício. A medição está prevista para uma eventual etapa de implantação produtiva, que a TAPI classifica como evolução futura e que está explicitamente fora do escopo orçado na Seção 6.8.1.
+Com esses dados, o cálculo do retorno passa a ser direto, porque o custo do investimento já está determinado nesta seção, somando o preço do projeto de R$ 273.482,01 ao contrato de sustentação de R$ 41.757,23 no primeiro ano, e o que falta é apenas o lado do benefício. A medição está prevista para uma eventual etapa de implantação produtiva, que a TAPI classifica como evolução futura e que está explicitamente fora do escopo orçado na Seção 6.8.1.
 
