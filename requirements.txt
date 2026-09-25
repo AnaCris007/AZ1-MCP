@@ -52,3 +52,9 @@ httpx>=0.27
 # SQLAlchemy vinha só por transitividade do vecs, e src/database/conexao.py
 # depende dela diretamente. Dependência usada é dependência declarada.
 SQLAlchemy>=2.0
+
+# Barramento de mensagens assíncrono (src/mensageria, Sprint 5). Cliente AMQP
+# síncrono do produtor (receptor de webhook) e do consumidor (worker de
+# varredura). Fixado na versão instalada para reprodutibilidade, coerente com o
+# resto da stack pinada. Não influencia o F1-macro.
+pika==1.4.4

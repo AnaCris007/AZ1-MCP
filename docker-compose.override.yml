@@ -131,3 +131,41 @@ services:
       # host) e fala com "localhost:5432", conforme DATABASE_URL no
       # .env.example. Em produção não é publicada.
       - "${POSTGRES_PORT:-5432}:5432"
+
+  rabbitmq:
+    ports:
+      # 5672 = protocolo AMQP (para apontar um cliente do host ao broker);
+      # 15672 = painel web de management. Nenhuma das duas é publicada em
+      # produção — lá a operação é pelo rabbitmqctl/diagnostics dentro do
+      # contêiner.
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+
+  worker:
+    build:
+      target: dev
+    image: az1/api-dev:${AZ1_VERSION:-dev}
+
+    # Código do host por bind mount, como a API: editar um arquivo em
+    # src/mensageria tem efeito ao reiniciar o worker, sem rebuild. O consumidor
+    # não tem recarga automática (não é um servidor uvicorn), então a mudança
+    # exige `docker compose restart worker` — mas dispensa reconstruir a imagem.
+    #
+    # O mount do token OAuth (${GOOGLE_TOKEN_FILE:-/dev/null} → /app/.google_token.json)
+    # vem da BASE e é HERDADO aqui: o compose SOMA as listas de `volumes` de base +
+    # override, então não é preciso repetir. Editar a base é o ponto único de
+    # verdade do mapeamento do token. A INDEXAÇÃO REAL é operada justamente por
+    # aqui (dev): abrir o canal no host, apontar GOOGLE_TOKEN_FILE no .env e subir.
+    volumes:
+      - ./src:/app/src
+      - ./resultados:/app/resultados
+
+    # O alvo dev traz o entrypoint da imagem; como no serviço base, dispensa-se
+    # para rodar o consumidor direto.
+    entrypoint: []
+    command: ["python", "-m", "mensageria.consumidor"]
+
+    # Raiz gravável em dev (recarga/bytecode). Não afeta o token: ele já é gravável
+    # pelo próprio bind mount de arquivo, herdado da base, mesmo com raiz somente
+    # leitura em produção.
+    read_only: false
