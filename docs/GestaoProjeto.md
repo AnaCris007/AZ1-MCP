@@ -17,7 +17,6 @@
 - [Tobias Viana](https://www.linkedin.com/in/tobias-viana/)
 ---
 
-
 # Gestão do Projeto
 
 ## Sumário
@@ -347,7 +346,6 @@ O quadro reúne, em uma leitura só, as políticas descritas nas seções anteri
 
 ## 2.3 Acompanhamento Contínuo dos Riscos
 
-
  A matriz de riscos registrada no artefato de negócios é revisitada a cada sprint, de modo que o grupo mantenha uma visão atualizada das ameaças e oportunidades ao longo de todo o módulo. A revisão não ocorre apenas na entrega final: ela é um item fixo da retrospectiva de cada sprint, garantindo que riscos materializados sejam tratados e que novos riscos identificados ao longo do desenvolvimento sejam incorporados. A tabela a seguir define o mecanismo de acompanhamento adotado pela equipe:
 
 | Elemento | Definição da equipe |
@@ -376,7 +374,6 @@ Esta seção reúne todos os componentes do artefato de gestão entregues na Spr
 | Entregas planejadas | Artefato de entendimento de negócio (Projeto.md, parte de negócios), artefato de especificação técnica (Projeto.md, parte técnica) e artefato de gestão do projeto (GestaoProjeto.md) |
 | Entregas concluídas | Artefato de entendimento de negócio, artefato de especificação técnica e artefato de gestão do projeto |
 | Resultado geral | Sprint concluída com todas as entregas planejadas realizadas. A equipe demonstrou boa organização e comunicação ao longo do ciclo, com pontos de melhoria identificados para a Sprint 2 |
-
 
 ### 3.2.2 Pontos fortes
 
@@ -1329,7 +1326,6 @@ O registro original possuía campos de responsável e revisor ainda vazios. Esse
 | Rui Facó | Definição do MVP e tecnologias | Pilha de tecnologias e contratos de entrada | Testes não funcionais e Gestão de Projetos Evolutiva | Frontend integrado | Estruturou a documentação (`!59`), planejou RNFs (`!63`), produziu a análise e a matriz de papéis (`!72`) e corrigiu a integração e a documentação na auditoria final (`!81`) | `!64`, `!67` e `!80` | Rotação para gestão e qualidade; revisão planejada do frontend cumprida e apoios adicionais em webhooks e banco |
 | Tobias Viana | Modelagem do fluxo de negócio | Processo de deploy em nuvem | Implementação e integração do algoritmo de NLP | Webhooks | Implementou Docker/CI (`!65`), melhorou, mediu e documentou o PLN (`!69`), integrou o banco relacional (`!80`) e colaborou na integração final do algoritmo com o frontend no MR `!81` | `!73`, `!78` e `!81` | Responsabilidade principal de PLN cumprida; também ampliou a atuação para banco e revisou webhooks e a auditoria final |
 
-
 **Reconciliação das frentes definidas no início da sprint**
 
 | Frente da Planning | Responsável/revisor inicialmente registrados | Responsável/revisor efetivos | Resultado da comparação |
@@ -1844,4 +1840,360 @@ Todo comportamento específico do projeto fica em `scripts/config.yml`, separado
 
 ## 6.8 Análise de Viabilidade Financeira
 
-<!-- SEÇÃO A CARGO DE MATHEUS FERREIRA (issues #243, #244 e #249): escopo, custos, despesas, impostos, margem e preço final. -->
+Esta seção responde quanto a equipe cobraria para entregar a solução a um cliente real. O orçamento é construído sobre a hipótese de uma empresa de desenvolvimento constituída pelos sete integrantes, que fornece ao Metrô a versão comercial da solução prototipada ao longo do módulo, com equipe em dedicação integral durante dez semanas.
+
+Todos os valores estão em reais, e cada linha traz a fonte do valor de referência ou a declaração de que se trata de arbitramento da equipe. As fontes completas estão listadas na Seção 6.8.12.
+
+**Alcance da análise.** Esta seção determina a viabilidade comercial e o custo de fornecimento da solução, percorrendo o caminho que vai do custeio ao preço de venda, passando por despesas, margem, tributos e reserva de contingência, e estendendo-se ao custo de operação e ao contrato de sustentação. A mensuração do retorno financeiro para o parceiro, com indicadores de economia gerada, payback e retorno sobre investimento, depende de uma linha de base operacional ainda não disponibilizada pelo Metrô, e o tratamento dessa lacuna está na Seção 6.8.13.
+
+### 6.8.1 Escopo considerado no orçamento
+
+O escopo orçado é a entrega comercial completa da solução, e não o protótipo acadêmico. A distinção é relevante porque uma prova de conceito legitimamente dispensa trabalho que um produto entregue a um cliente exige, e é esse trabalho adicional que explica a diferença de esforço entre o módulo e o orçamento.
+
+**O que foi construído e validado ao longo do módulo, e compõe a base da entrega:**
+
+- interface de conversa por texto e por voz, com chamada contínua e transcrição automática;
+- pipeline de processamento de linguagem natural com classificação de intenção executada localmente, extração de entidades e recusa fundamentada fora do catálogo;
+- recuperação aumentada por documentos sobre a base de conhecimento do portfólio;
+- ação sobre a intenção classificada, com registro de auditoria e explicabilidade da resposta;
+- publicação em nuvem e testes funcionais, de integração e de usabilidade.
+
+**O que a entrega comercial acrescenta, e que o protótipo não contempla:**
+
+- cobertura de testes automatizados sobre todo o fluxo crítico, incluindo casos de borda e tratamento de erro;
+- endurecimento de segurança, com controle de acesso por perfil, proteção dos dados em trânsito e em repouso e revisão de superfície de ataque;
+- ajuste de desempenho sob carga representativa do volume de usuários do PMO;
+- revisão de acessibilidade da interface, incluindo os fluxos de voz;
+- ambientes separados de desenvolvimento, homologação e produção, com integração contínua e monitoramento;
+- documentação de operação, de sustentação e de recuperação de falhas;
+- preparação e carga inicial dos dados do portfólio;
+- treinamento e transferência de conhecimento para as equipes do parceiro.
+
+Permanecem fora do escopo orçado a integração produtiva com sistemas legados não previstos nesta entrega, a expansão do catálogo de intenções além do definido em requisitos e as evoluções classificadas como "Ir Além" na TAPI.
+
+### 6.8.2 Premissas adotadas
+
+As premissas abaixo antecedem todas as tabelas e devem ser lidas junto com elas, porque os valores só são verificáveis à luz delas.
+
+| # | Premissa | Justificativa |
+|---|---|---|
+| P1 | Contratação por escopo e preço fechados, e não por alocação de equipe por tempo | Como fornecedor entrante e sem capital para manter equipe alocada por prazo indeterminado, o preço fechado por escopo dá previsibilidade de caixa e concentra o risco de prazo na própria gestão da empresa |
+| P2 | Os sete integrantes são sócios da empresa, remunerados por pró-labore, com recolhimento previdenciário declarado em eSocial e DCTFWeb | Coerente com a hipótese de que a própria equipe constitui a empresa fornecedora, e necessária para que essa remuneração componha a folha de salários utilizada no Fator R da Seção 6.8.5 |
+| P3 | Jornada integral equivalente a 160 horas mensais | Converte o salário mensal de referência em valor-hora |
+| P4 | Prazo comercial proposto de dez semanas, equivalentes a 2,5 meses | Dimensionado pela capacidade da equipe frente ao escopo da Seção 6.8.1 |
+| P5 | Esforço total de 2.800 horas, com os sete integrantes em dedicação integral | Sete pessoas × 160 horas mensais × 2,5 meses, o que confirma a coerência com a premissa P3 |
+| P6 | Licenças do ecossistema Microsoft consideradas existentes no tenant do cliente | O Metrô já opera SharePoint, Power Platform e Copilot Studio, conforme a TAPI, de modo que cobrá-las seria cobrar duas vezes |
+| P7 | Serviços de nuvem e interfaces de programação estimados a preço comercial de referência | Os valores refletem contratação no mercado, e não condições promocionais ou educacionais |
+| P8 | Câmbio de R$ 5,50 por dólar | Mesma taxa adotada pelas fontes de preço de nuvem consultadas, em agosto de 2026 |
+| P9 | Sustentação e manutenção não inclusas no preço do projeto | São propostas em separado na Seção 6.8.11 |
+| P10 | Receita apurada pelo regime de competência, com emissão de nota fiscal coincidente com o cronograma de recebimento | O Simples Nacional admite apuração por competência ou por caixa, e a opção precisa ser declarada porque altera o mês em que a receita entra no cálculo da faixa |
+| P11 | Garantia de correção de defeitos por 90 dias após a entrega, sem custo adicional | Prática usual em contratos de desenvolvimento; o esforço correspondente está coberto pela reserva de contingência da Seção 6.8.8 |
+| P12 | Cessão dos direitos patrimoniais do código desenvolvido ao contratante, mantendo-se com o fornecedor os componentes genéricos reutilizáveis | A titularidade afeta o preço de forma relevante, e a cessão total é a expectativa usual de contratante do setor público |
+| P13 | Valores do contrato de sustentação reajustados anualmente pelo IPCA | Contratos de doze meses ou mais exigem índice declarado para que o preço não seja corroído pela inflação |
+
+### 6.8.3 Custos do projeto
+
+#### 6.8.3.1 Esforço e composição da equipe
+
+As 2.800 horas da premissa P5 formam um envelope fechado, de modo que distribuí-las entre funções é redistribuir o mesmo esforço, e nunca criar esforço novo.
+
+A tradução das frentes do projeto para funções de mercado seguiu a rotação registrada na Seção 6.4, na qual cada integrante assumiu responsabilidades distintas a cada sprint, o que faz com que as oito funções abaixo correspondam a trabalho efetivamente realizado, ainda que por pessoas diferentes ao longo do módulo. A distribuição percentual foi ajustada ao escopo comprometido na Seção 6.8.1, o que eleva a participação de qualidade e de infraestrutura em relação ao observado no protótipo, já que cobertura de testes, endurecimento, documentação e preparação de ambientes pesam mais na entrega comercial do que na prova de conceito.
+
+| Função de mercado | Frentes correspondentes | Integrantes que exerceram a função | Participação | Horas |
+|---|---|---|---:|---:|
+| Engenheiro de PLN e IA | Classificador de intenção, catálogo de intenções, extração de entidades, pipeline RAG | Ana Cristina, Matheus, Tobias, Paulo Henrique | 19,0% | 532 |
+| Desenvolvedor backend | API, contratos de resposta, auditoria, webhooks, integração de voz | Paulo Henrique, Matheus, Ana Cristina, Tobias | 19,0% | 532 |
+| Engenheiro de dados e infraestrutura | Banco relacional, base vetorial, contêineres, ambientes, integração contínua e monitoramento | Tobias, Felipe, Rui | 13,0% | 364 |
+| QA | Testes funcionais, de integração, não funcionais e de carga | Ana Cristina, Felipe, Rui, Karol | 13,0% | 364 |
+| Desenvolvedor frontend | Interface de conversa, captura e reprodução de áudio | Paulo Henrique, Karol | 10,0% | 280 |
+| Gerente de projeto e Scrum Master | Ritos, backlog, gestão de configuração, documentação e transferência de conhecimento | Felipe, Rui, Ana Cristina, Karol, Tobias | 10,0% | 280 |
+| Arquiteto de soluções | Visão técnica, decisões de arquitetura, endurecimento e integração entre componentes | Rui, Matheus, Tobias | 8,0% | 224 |
+| UX e design conversacional | Personas, jornada, fluxo de fala, usabilidade e acessibilidade | Paulo Henrique, Karol, Matheus | 8,0% | 224 |
+| **Total** | | **Sete integrantes** | **100%** | **2.800** |
+
+**Como ler a tabela.** As oito funções são uma decomposição analítica do esforço, e não oito profissionais distintos em folha de pagamento. Os sete integrantes exerceram funções diferentes a cada sprint, conforme a rotação registrada na Seção 6.4, de modo que a mesma pessoa aparece em mais de uma linha e a soma das horas corresponde ao esforço total da equipe, e não a um somatório de contratações. A coluna de integrantes indica quem conduziu a função em alguma das sprints, e a atribuição detalhada por sprint está na matriz de papéis.
+
+#### 6.8.3.2 Custo de pessoal
+
+O critério de valor de referência é único para todas as funções, adotando o percentil inferior das faixas de mercado, coerente com o posicionamento de empresa entrante descrito na Seção 6.8.6. A fonte principal é o Guia Salarial 2026 da Robert Half, cujos valores publicados representam a remuneração de entrada de um profissional recém-contratado. Para UX, que não possui cargo equivalente no guia brasileiro, a referência é o Glassdoor.
+
+| Função | Horas | Salário de referência | Valor-hora | Custo | Fonte do valor |
+|---|---:|---:|---:|---:|---|
+| Engenheiro de PLN e IA | 532 | R$ 17.950 | R$ 112,19 | R$ 59.683,75 | Robert Half, Especialista em IA e ML, 25º percentil nacional |
+| Desenvolvedor backend | 532 | R$ 6.050 | R$ 37,81 | R$ 20.116,25 | Robert Half, Desenvolvedor Back-End Júnior |
+| Engenheiro de dados e infraestrutura | 364 | R$ 14.250 | R$ 89,06 | R$ 32.418,75 | Robert Half, Analista de DevOps, 25º percentil |
+| QA | 364 | R$ 5.900 | R$ 36,88 | R$ 13.422,50 | Robert Half, Analista de Testes Júnior |
+| Desenvolvedor frontend | 280 | R$ 6.050 | R$ 37,81 | R$ 10.587,50 | Robert Half, Desenvolvedor Front-End Júnior |
+| Gerente de projeto e Scrum Master | 280 | R$ 10.900 | R$ 68,12 | R$ 19.075,00 | Robert Half, Scrum Master, 25º percentil |
+| Arquiteto de soluções | 224 | R$ 15.450 | R$ 96,56 | R$ 21.630,00 | Robert Half, Arquiteto de Software, 25º percentil |
+| UX e design conversacional | 224 | R$ 4.833 | R$ 30,21 | R$ 6.766,20 | Glassdoor, UX Designer Pleno, 25º percentil, 614 salários |
+| **Total** | **2.800** | | | **R$ 183.699,95** | |
+
+**Salário de mercado como referência para o pró-labore.** Embora a remuneração dos integrantes seja modelada como pró-labore de sócios, conforme a premissa P2, as faixas salariais são utilizadas como referência de mercado para estimar o valor econômico das competências empregadas, o que é a prática usual quando se precifica o trabalho de sócios que atuam tecnicamente na operação. O valor de R$ 183.699,95 representa o montante agregado de pró-labore atribuído aos sete sócios ao longo dos 2,5 meses, o que corresponde a uma média de R$ 10.497,14 mensais por integrante, e não a oito remunerações distintas. Como os integrantes rotacionam entre funções a cada sprint, o pró-labore é distribuído igualmente entre os sete sócios — a média mensal acima —, e não conforme a função exercida no momento: as faixas por função servem apenas para atribuir valor de mercado ao esforço total da equipe, não como salário individual por cargo.
+
+**Por que duas funções não entram em faixa júnior.** Arquiteto de soluções e analista de DevOps são orçados no percentil inferior da faixa plena porque o guia não publica faixa júnior para esses cargos, o que não é lacuna da fonte e sim característica da função. O que se precifica é a competência que a entrega exige, e não o tempo de carreira de quem a executa, de modo que cobrar arquitetura a preço de júnior significaria subprecificar justamente a decisão mais difícil da solução, que foi separar a classificação local do acionamento do modelo de linguagem externo.
+
+**Sobre a divergência entre fontes.** As bases consultadas não concordam entre si, e a diferença tem explicação metodológica. A Robert Half projeta a partir da remuneração real de profissionais que a própria consultoria colocou no mercado, o que concentra a amostra em empresas médias e grandes. O Glassdoor reúne salários enviados pelos próprios profissionais e cobre o mercado inteiro. O Portal Salário parte de registros formais de contratação e, para desenvolvedor back-end, aponta faixa entre piso médio de R$ 5.676,68 e teto de R$ 11.801,70, deixando de fora quem atua como pessoa jurídica. Na comparação entre os cargos presentes nas três bases, o Glassdoor fica entre 61% e 65% da mediana da Robert Half, o que posiciona o percentil inferior adotado aqui como um meio de campo entre a fonte mais otimista e a mais conservadora.
+
+#### 6.8.3.3 Insumos, licenças e plataformas
+
+O bloco abaixo cobre os 2,5 meses de execução e contempla ambientes separados de desenvolvimento e de homologação, integração contínua e monitoramento, conforme o escopo comprometido na Seção 6.8.1. Os valores seguem preços comerciais de referência da região sa-east-1.
+
+| Item | Mensal | Período | Total |
+|---|---:|---:|---:|
+| Ambiente de desenvolvimento, instância de aplicação | R$ 352,00 | 2,5 | R$ 880,00 |
+| Ambiente de homologação, instância de aplicação | R$ 352,00 | 2,5 | R$ 880,00 |
+| Bancos de dados gerenciados dos dois ambientes | R$ 576,00 | 2,5 | R$ 1.440,00 |
+| Armazenamento de objetos e transferência de dados | R$ 200,00 | 2,5 | R$ 500,00 |
+| Interfaces de transcrição e de modelo de linguagem, testes e carga | R$ 250,00 | 2,5 | R$ 625,00 |
+| Repositório, integração contínua, monitoramento e ferramentas, sete acessos | R$ 700,00 | 2,5 | R$ 1.750,00 |
+| Licenças do ecossistema Microsoft | R$ 0,00 | 2,5 | R$ 0,00 |
+| **Total** | | | **R$ 6.075,00** |
+
+A linha zerada das licenças Microsoft é mantida visível de propósito, porque materializa a premissa P6 e demonstra que o orçamento foi construído olhando para este cliente específico, e não para um cliente genérico.
+
+**Total de custos do projeto: R$ 183.699,95 de pessoal mais R$ 6.075,00 de insumos, igual a R$ 189.774,95.**
+
+### 6.8.4 Despesas operacionais
+
+As despesas reúnem a estrutura que a empresa precisa manter para que o projeto exista, mas que não coloca hora diretamente na entrega, o que em gestão de custos se chama mão de obra indireta. Diferentemente dos custos, essas linhas entram por rateio proporcional, porque atendem simultaneamente a todos os projetos da empresa, e não apenas a este.
+
+| Item | Base mensal | Rateio no projeto | Total | Fonte do valor |
+|---|---:|---|---:|---|
+| Analista administrativo e financeiro | R$ 2.795 | 60% da jornada | R$ 4.192,50 | Glassdoor, Analista Administrativo Financeiro, 25º percentil |
+| Gestão comercial e do contrato | R$ 12.000 | 25% da jornada | R$ 7.500,00 | Arbitramento da equipe, pró-labore de sócio |
+| Aluguel e estrutura física | R$ 1.600 | integral | R$ 4.000,00 | Arbitramento da equipe |
+| Contabilidade terceirizada | R$ 450 | integral | R$ 1.125,00 | Faixa de mercado para empresa de serviço no Simples Nacional |
+| Marketing e divulgação | R$ 700 | integral | R$ 1.750,00 | Arbitramento da equipe |
+| Infraestrutura administrativa, domínio, correio e ferramentas de gestão | R$ 300 | integral | R$ 750,00 | Arbitramento da equipe |
+| **Total** | | | **R$ 19.317,50** | |
+
+Os rateios do analista administrativo e da gestão comercial são mais altos do que seriam em um projeto de dedicação parcial, porque sob a premissa P5 este projeto ocupa integralmente a capacidade produtiva da empresa durante as dez semanas, consumindo a maior parte do tempo da estrutura de apoio. Pela mesma razão, aluguel e estrutura física refletem um espaço capaz de acomodar sete pessoas em dedicação integral.
+
+O honorário contábil adotado corresponde ao patamar praticado para empresas do Simples Nacional com folha ativa e volume regular de notas, situação que corresponde à da empresa simulada, já que empresas sem funcionários ficam na faixa inferior, entre R$ 150 e R$ 350 mensais.
+
+As quatro linhas identificadas como arbitramento não possuem fonte pública aplicável, porque dependem do porte e da localização da empresa simulada, e por isso são declaradas como tal em vez de receberem uma referência artificial. A consistência dessas linhas é verificada pela proporção que guardam com o restante do orçamento, já que as despesas indiretas representam 10,2% dos custos diretos. Essa razão é utilizada como verificação interna de proporcionalidade, e não como referência de mercado, porque a equipe não dispõe de fonte pública que estabeleça uma faixa usual de overhead para consultorias de tecnologia no Brasil.
+
+### 6.8.5 Carga tributária
+
+O regime simulado é o Simples Nacional, com tributação pelo Anexo III, o que resulta em alíquota efetiva média de 12,076% sobre a receita do contrato.
+
+**O enquadramento depende do Fator R, e o Fator R depende da forma de contratação.** Atividades intelectuais de serviço, entre elas o desenvolvimento e o licenciamento de software e a consultoria, são tributadas pelo Anexo III quando a folha de salários dos últimos doze meses, chamada FS12, representa 28% ou mais da receita bruta do mesmo período, e pelo Anexo V quando fica abaixo desse limite, conforme o artigo 18 da Lei Complementar nº 123/2006.
+
+O ponto sensível está na composição da FS12. Ela reúne as remunerações pagas a empregados e a trabalhadores avulsos, as remunerações pagas a contribuintes individuais, o que abrange o pró-labore dos sócios e os pagamentos a autônomos, o décimo terceiro salário, a contribuição patronal previdenciária efetivamente recolhida, inclusive a já embutida no DAS, e o FGTS recolhido. Pagamentos feitos a outras pessoas jurídicas, incluindo microempreendedores individuais, **não** compõem a folha de quem contrata, e apenas remunerações informadas em GFIP e no eSocial ou DCTFWeb são consideradas.
+
+É por essa razão que a premissa P2 modela os integrantes como sócios remunerados por pró-labore, e não como prestadores pessoa jurídica. Sob a premissa adotada, a remuneração de R$ 183.699,95 compõe integralmente a FS12, o que resulta em Fator R de 67,17%, muito acima do limite de 28%. No início de atividade a proporcionalização incide igualmente sobre a FS12 e sobre a receita bruta, de modo que a razão entre elas não se altera e os 67,17% permanecem válidos qualquer que seja a base — a receita real ou a proporcionalizada usada para determinar a faixa. Assim, o enquadramento no Anexo III deixa de ser escolha e passa a ser consequência verificável da estrutura da operação. A premissa também não altera o custo apurado na Seção 6.8.3.2, porque em empresa do Anexo III a contribuição patronal previdenciária já está incluída no DAS, e a contribuição previdenciária de 11% incidente sobre o pró-labore é retida do sócio, reduzindo o valor líquido que ele recebe, sem acrescentar encargo ao empregador.
+
+**Cenário alternativo, caso a contratação fosse por pessoa jurídica.** Se os sete integrantes fossem contratados como prestadores pessoa jurídica, a FS12 seria praticamente nula, o Fator R não alcançaria os 28% e a empresa seria tributada pelo Anexo V, com alíquotas substancialmente superiores.
+
+| Enquadramento | Condição | Alíquota efetiva média | Preço final |
+|---|---|---:|---:|
+| **Anexo III** | Sócios com pró-labore, Fator R de 67,17% | **12,076%** | **R$ 273.482,01** |
+| Anexo V | Prestadores pessoa jurídica, Fator R abaixo de 28% | 18,76% | R$ 295.984,87 |
+
+Entre as variáveis explicitamente simuladas nesta análise, a forma de contratação apresenta o segundo maior impacto sobre o preço final, com 8,2%, atrás apenas do perfil de senioridade tratado na Seção 6.8.9.
+
+**Determinação da faixa e efeito do cronograma de faturamento.** A alíquota efetiva de cada faixa é calculada pela fórmula da Resolução CGSN nº 140/2018, subtraindo a parcela a deduzir do produto entre a receita bruta acumulada e a alíquota nominal, e dividindo o resultado pela mesma receita. Nos primeiros doze meses de atividade, o enquadramento não usa a receita acumulada real, e sim uma receita proporcionalizada, calculada no primeiro mês pela multiplicação da receita daquele mês por doze, e nos meses seguintes pela média aritmética dos meses anteriores multiplicada por doze. Sob o cronograma de pagamento da Seção 6.8.7 e o regime de competência da premissa P10, a receita proporcionalizada situa a empresa na quarta faixa do Anexo III, cuja alíquota nominal é de 16% com parcela a deduzir de R$ 35.640, resultando na alíquota efetiva média de 12,076% aplicada ao contrato.
+
+Cabe registrar que a FS12 é apurada pelo regime de caixa, contando o que foi efetivamente pago, enquanto a receita bruta acumulada é apurada por competência, de modo que os dois lados do Fator R seguem regimes distintos por determinação legal.
+
+O imposto é calculado por dentro, ou seja, embutido no preço de venda, porque incide sobre o faturamento e não sobre o custo. A operação é uma divisão pelo complemento da alíquota, e não uma multiplicação:
+
+```
+Preço final = Valor com lucro ÷ (1 − alíquota efetiva)
+Preço final = 240.456,32 ÷ 0,87924 = 273.482,01
+
+Conferência: 273.482,01 × 12,076% = 33.025,69
+             273.482,01 − 33.025,69 = 240.456,32
+```
+
+### 6.8.6 Margem de lucro
+
+A margem adotada é de 15%, aplicada sobre a soma de custos e despesas, antes da incorporação do tributo.
+
+A justificativa é de posicionamento de mercado. Trata-se do primeiro contrato da empresa, com cliente do setor público e alta visibilidade institucional, condição em que a margem é deliberadamente moderada para viabilizar a entrada e construir referência comercial. A margem recorrente é buscada no contrato de sustentação da Seção 6.8.11, e não na entrega inicial, estratégia coerente com o fato, registrado na reunião de kickoff, de que o Metrô não mantém equipe interna de desenvolvimento e contrata desenvolvedores externos quando precisa, o que torna a sustentação uma necessidade estrutural e não um acréscimo comercial.
+
+Em valores absolutos, a margem corresponde a R$ 31.363,87, o que representa 11,5% do preço final depois de embutido o tributo, ou R$ 12.545,55 por mês de operação.
+
+**Sobre a ordem de aplicação da margem.** O enunciado do artefato descreve a margem como aplicada sobre a soma de custos, despesas e impostos, enquanto a planilha de referência utilizada em sala aplica a margem sobre custos e despesas e, em seguida, embute o tributo por dentro. Esta seção adota a ordem da planilha, por ser a demonstrada em aula e por refletir a incidência real do tributo, que recai sobre o faturamento e não sobre o custo. As duas leituras produzem resultados próximos, conforme a verificação abaixo, o que torna a escolha uma questão de método e não de valor.
+
+| Leitura | Cadeia | Preço final |
+|---|---|---:|
+| Literal do enunciado | (209.092,45 + 12,076% de imposto sobre a base) × 1,15 | R$ 269.493,82 |
+| **Planilha de referência, adotada** | **209.092,45 × 1,15 ÷ 0,87924** | **R$ 273.482,01** |
+
+A diferença entre as duas é de 1,48%.
+
+### 6.8.7 Preço final e condições de pagamento
+
+| Etapa | Fórmula | Valor |
+|---|---|---:|
+| Custo de pessoal | soma das oito funções | R$ 183.699,95 |
+| Insumos, licenças e plataformas | soma do bloco 6.8.3.3 | R$ 6.075,00 |
+| **Total de custos** | pessoal + insumos | **R$ 189.774,95** |
+| Despesas operacionais | soma do bloco 6.8.4 | R$ 19.317,50 |
+| Valor sem lucro | custos + despesas | R$ 209.092,45 |
+| Valor com lucro | valor sem lucro × 1,15 | R$ 240.456,32 |
+| **Preço final** | valor com lucro ÷ 0,87924 | **R$ 273.482,01** |
+
+**Composição do preço, do ponto de vista do que o cliente paga:**
+
+| Destino do valor | Montante | Participação |
+|---|---:|---:|
+| Pró-labore da equipe técnica | R$ 183.699,95 | 67,17% |
+| Tributos | R$ 33.025,69 | 12,08% |
+| Lucro da empresa | R$ 31.363,87 | 11,47% |
+| Despesas operacionais | R$ 19.317,50 | 7,06% |
+| Insumos e plataformas | R$ 6.075,00 | 2,22% |
+
+O preço equivale a R$ 97,67 por hora faturada, considerando as 2.800 horas de esforço.
+
+**Posicionamento do valor-hora.** Esse valor situa-se na faixa inferior do que se pratica no mercado brasileiro de consultoria em tecnologia, e isso é consequência direta, e não acidental, das escolhas declaradas: perfil de início de carreira na Seção 6.8.3.2, margem moderada na Seção 6.8.6 e estrutura administrativa enxuta na Seção 6.8.4. O cenário de equipe sênior da Seção 6.8.9 eleva a hora faturada para R$ 134,46, valor mais próximo da prática de mercado, e permanece disponível caso o contratante exija perfil mais experiente. A decisão consciente da empresa é entrar pelo piso da faixa viável, e não competir por preço indefinidamente, razão pela qual o contrato de sustentação da Seção 6.8.11 integra a proposta desde a origem.
+
+| Pagamento | Momento | Percentual | Valor |
+|---|---|---:|---:|
+| Entrada | Assinatura do contrato | 30,0% | R$ 82.044,60 |
+| 1ª parcela | 30 dias após a assinatura | 24,5% | R$ 67.003,09 |
+| 2ª parcela | 60 dias após a assinatura | 21,0% | R$ 57.431,22 |
+| 3ª parcela | 90 dias após a assinatura | 14,0% | R$ 38.287,48 |
+| 4ª parcela | 120 dias após a assinatura | 10,5% | R$ 28.715,62 |
+| **Total** | | **100%** | **R$ 273.482,01** |
+
+As parcelas são **decrescentes**, e não iguais, por exigência de fluxo de caixa. O pró-labore da equipe se concentra no início da execução — R$ 73.479,98 por mês nos dois primeiros meses, contra recebimentos que se estendem por cento e vinte dias. Um cronograma de parcelas iguais deixaria a empresa sem capital para honrar a própria folha por volta do segundo mês, antes de os recebimentos posteriores compensarem o desembolso concentrado. A entrada de 30% cobre o primeiro mês de operação, e o escalonamento decrescente das parcelas mantém o saldo positivo até o encerramento, sem alterar o total do contrato nem fazer o fornecedor financiar o cliente por um horizonte longo.
+
+**Fluxo de caixa projetado.** A tabela demonstra o casamento entre recebimentos e desembolsos ao longo do contrato, e é o que justifica tanto o tamanho da entrada quanto o escalonamento das parcelas. As premissas de tempo são declaradas: os recebimentos entram no início de cada mês (dias 0, 30, 60, 90 e 120); o pró-labore, as despesas operacionais e os insumos são consumidos ao longo dos 2,5 meses de execução; e o DAS é lançado no mês do recebimento correspondente, uma simplificação conservadora — pela apuração por competência da premissa P10, o imposto seria recolhido no mês seguinte, o que apenas melhoraria o saldo dos meses iniciais.
+
+| Mês | Recebimento | Pró-labore | Despesas | Insumos | Imposto | Saldo do mês | Saldo acumulado |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 0 (assinatura) | R$ 82.044,60 | — | — | — | R$ 9.907,71 | R$ 72.136,89 | R$ 72.136,89 |
+| 1 | R$ 67.003,09 | R$ 73.479,98 | R$ 7.727,00 | R$ 2.430,00 | R$ 8.091,29 | −R$ 24.725,18 | R$ 47.411,71 |
+| 2 | R$ 57.431,22 | R$ 73.479,98 | R$ 7.727,00 | R$ 2.430,00 | R$ 6.935,39 | −R$ 33.141,15 | R$ 14.270,56 |
+| 3 | R$ 38.287,48 | R$ 36.739,99 | R$ 3.863,50 | R$ 1.215,00 | R$ 4.623,60 | −R$ 8.154,61 | R$ 6.115,95 |
+| 4 | R$ 28.715,62 | — | — | — | R$ 3.467,70 | R$ 25.247,92 | R$ 31.363,87 |
+
+O saldo acumulado permanece **positivo em todos os meses**, com mínimo de R$ 6.115,95 no terceiro mês, e encerra em R$ 31.363,87 — exatamente a margem de lucro da Seção 6.8.6, confirmando que o fluxo de caixa fecha sem aporte externo. É essa restrição de caixa, e não uma convenção comercial, que dita o desenho do pagamento: sem a entrada e o escalonamento decrescente, a operação exigiria aporte dos sócios no meio da execução.
+
+### 6.8.8 Reserva de contingência
+
+A reserva de contingência é um valor separado para cobrir riscos já identificados que, se materializados, consomem horas adicionais de trabalho. Ela não se confunde com a margem, que é o lucro planejado quando tudo corre conforme o previsto, nem com a prática de inflar estimativas sem declarar, que destrói a capacidade de comparar o planejado com o realizado.
+
+O valor não foi arbitrado por percentual de mercado, e sim derivado da matriz de risco da Seção 6.3. Foram selecionadas apenas as ameaças que geram retrabalho sob responsabilidade do fornecedor, e o impacto qualitativo de cada uma foi convertido em horas por uma regra única, proporcional ao porte do contrato, sendo Baixo igual a 32 horas, Moderado a 64 horas e Alto a 128 horas.
+
+| ID | Ameaça | Probabilidade | Impacto | Horas | Valor esperado |
+|---|---|---:|---|---:|---:|
+| AM15 | Atraso da implantação em nuvem e dos testes com usuários externos | 70% | Alto | 128h | 89,6h |
+| AM8 | Alucinação do modelo de linguagem | 50% | Alto | 128h | 64,0h |
+| AM2 | Baixa acurácia na identificação de intenções | 30% | Alto | 128h | 38,4h |
+| AM9 | Degradação da qualidade da transcrição em ambiente ruidoso | 50% | Moderado | 64h | 32,0h |
+| AM7 | Indisponibilidade ou sobrecarga de um integrante da equipe | 50% | Moderado | 64h | 32,0h |
+| AM3 | Atraso na liberação de acesso ao ambiente do cliente | 70% | Baixo | 32h | 22,4h |
+| **Total** | | | | | **278,4h** |
+
+**Critérios de exclusão.** Foram deixados de fora três grupos de itens. O primeiro reúne as ameaças de processo interno da equipe, como AM1, AM10, AM11, AM12, AM13, AM14 e AM16, que dizem respeito à disciplina de trabalho do fornecedor e são absorvidas pela margem, e não repassadas ao cliente. O segundo é composto por AM4 e AM6, que dependem do fornecimento de informações e de dados pelo contratante, e que em contrato comercial são tratados por cláusula de suspensão de prazo, e não por preço. O terceiro é AM5, que trata da não conclusão no prazo e que, conforme a própria Seção 6.3.7, é consequência das demais ameaças, de modo que incluí-lo significaria contar o mesmo risco duas vezes.
+
+As 278,4 horas equivalem a 9,9% do esforço total e, ao valor-hora médio da equipe de R$ 65,61, resultam em R$ 18.265,02 de custo, ou 9,6% dos custos diretos. A reserva recebe apenas o tributo embutido, e não a margem, porque cobre custo e não deve gerar lucro quando um risco se materializa.
+
+| Componente | Valor | Condição |
+|---|---:|---|
+| Preço fechado do projeto | R$ 273.482,01 | Fixo, em cinco pagamentos |
+| Reserva de contingência | até R$ 20.773,65 | Acionável apenas mediante ocorrência comprovada de um dos riscos acima |
+| **Teto contratual** | **R$ 294.255,66** | Pior cenário possível |
+
+A reserva não integra o cronograma de pagamento e é faturada em nota separada apenas quando e se for acionada, pelo valor efetivamente utilizado, o que evita o recolhimento de tributo sobre receita que não se confirma.
+
+A conversão de impacto qualitativo em horas é uma estimativa da equipe, e é o único elo da cadeia sem fonte externa, já que a matriz da Seção 6.3 fornece probabilidade e impacto, mas não a quantidade de horas correspondente a cada nível.
+
+### 6.8.9 Análise de sensibilidade por senioridade
+
+Entre as variáveis analisadas neste exercício, mantendo-se fixo o esforço de 2.800 horas, a senioridade contratada é a que apresenta maior impacto sobre o preço final. A tabela mantém as mesmas horas, os mesmos insumos e as mesmas despesas, variando apenas o percentil salarial adotado. As alíquotas efetivas diferem entre os cenários porque receitas maiores deslocam a empresa dentro das faixas do Anexo III.
+
+| Perfil da equipe | Critério | Alíquota efetiva | Preço final | Variação |
+|---|---|---:|---:|---:|
+| **Profissionais em início de carreira** | Faixa júnior onde publicada, 25º percentil nas demais | 12,076% | **R$ 273.482,01** | Adotado |
+| Profissionais plenos de mercado | 25º percentil em todas as funções | 12,491% | R$ 305.808,49 | mais 11,8% |
+| Profissionais sênior especializados | 50º percentil em todas as funções | 13,150% | R$ 376.485,58 | mais 37,7% |
+
+A exigência de senioridade superior por parte do cliente elevaria o preço em até cerca de trinta e oito por cento, e a estrutura do orçamento permite recalcular esse cenário substituindo apenas a coluna de salário de referência da Seção 6.8.3.2.
+
+Optou-se por não apresentar cenários nomeados como pessimista, base e otimista, porque esse vocabulário pertence a projeções de receita, situações em que a variável principal não está sob controle de quem projeta. Neste caso o preço é decisão da empresa, e a única incerteza relevante já está tratada pela reserva de contingência da Seção 6.8.8.
+
+### 6.8.10 Simulação da operação em produção: AWS e Azure
+
+O desenvolvimento e a homologação ocorrem em AWS, ambiente dominado pela equipe, mas o ambiente de produção do parceiro é o ecossistema Microsoft, conforme a TAPI e o registro do kickoff. A simulação abaixo precifica a operação da solução nas duas nuvens, com dimensionamento equivalente.
+
+A premissa de volume é declarada, porque cobrança por uso sem volume definido não constitui estimativa: duzentos usuários ativos do PMO, duas mil interações mensais, vinte por cento delas por voz com trinta segundos de áudio cada, totalizando duzentos minutos mensais, e mil e duzentas consultas que acionam o modelo de linguagem com recuperação de cinco trechos, o que corresponde a aproximadamente quatro mil tokens de entrada e quatrocentos de saída por chamada.
+
+| Componente | AWS | Azure |
+|---|---:|---:|
+| Computação, dois nós de 2 vCPU e 8 GB | R$ 704,00 | R$ 760,32 |
+| Banco PostgreSQL gerenciado | R$ 288,00 | R$ 311,04 |
+| Armazenamento de objetos, 500 GB | R$ 71,00 | R$ 76,68 |
+| Transferência de dados | R$ 100,00 | R$ 65,00 |
+| Transcrição de voz | R$ 8,47 | R$ 18,33 |
+| Modelo de linguagem | R$ 14,52 | R$ 5,54 |
+| **Total mensal** | **R$ 1.185,99** | **R$ 1.236,92** |
+
+Sob o dimensionamento e as premissas adotadas nesta simulação, a diferença estimada entre as duas nuvens é de 4,3%, resultado coerente com o fato de que AWS e Azure praticam preços similares no Brasil, com variação de 3% a 12% conforme a família e o tamanho da instância. A conclusão prática, sujeita à validação das SKUs registrada ao final desta subseção, é que o provedor de nuvem não constitui alavanca de custo relevante neste projeto, e que a escolha deve ser guiada por política de segurança da informação e por integração com o ambiente corporativo.
+
+**Três divergências relevantes entre os provedores.** Na transferência de dados o Azure é mais barato, porque isenta os primeiros cem gigabytes mensais e cobra entre R$ 0,45 e R$ 0,85 por gigabyte acima disso. Na transcrição de voz o Azure é mais caro em tempo real, a um dólar por hora de áudio contra US$ 0,0077 por minuto do serviço usado hoje, mas oferece modo em lote a US$ 0,18 por hora, 82% mais barato, o que reduziria essa linha de R$ 18,33 para R$ 3,30 caso a transcrição assíncrona substituísse a de tempo real fora da chamada de voz contínua. No modelo de linguagem o Azure é mais barato, porque o GPT-4o-mini custa US$ 0,15 por milhão de tokens de entrada e US$ 0,60 de saída, contra US$ 0,30 e US$ 2,50 do modelo em uso.
+
+**Contribuição da inteligência artificial para o custo.** Nos dois provedores, transcrição e modelo de linguagem somados representam 1,9% da conta mensal, enquanto computação e banco de dados respondem por mais de oitenta por cento. Esse resultado confirma, por via econômica, a decisão de arquitetura registrada na documentação técnica de executar a classificação de intenção localmente e acionar o modelo de linguagem apenas nas consultas, já que o custo de inteligência artificial não constitui o gargalo econômico da solução.
+
+**Observação sobre o Azure Hybrid Benefit.** Seria incorreto afirmar que o parceiro obteria desconto no Azure por já operar no ecossistema Microsoft. O mecanismo de reaproveitamento de licenças reduz de 40% a 55% do custo, mas aplica-se a licenças de Windows Server e SQL Server com Software Assurance, e a solução roda em Linux com PostgreSQL. O ganho real da migração para o Azure é de integração com Entra ID, Teams e Microsoft 365, e de aderência à política interna, e não de preço.
+
+Os valores de computação, banco e armazenamento do Azure foram derivados por paridade com os equivalentes da AWS, porque a tabela pública consultada em reais para a região Brazil South cobre apenas instâncias de memória otimizada de porte muito superior ao necessário. Os valores de transferência, transcrição e modelo de linguagem vêm diretamente das páginas de preço dos respectivos serviços.
+
+### 6.8.11 Plano de sustentação
+
+A sustentação é proposta em separado do preço do projeto, conforme a premissa P9, e cobre a operação da infraestrutura, o monitoramento, a correção de defeitos e pequenas evoluções, com reajuste anual pelo IPCA conforme a premissa P13.
+
+| Etapa | AWS | Azure |
+|---|---:|---:|
+| Infraestrutura e interfaces em produção | R$ 1.185,99 | R$ 1.236,92 |
+| Sustentação técnica, 24 horas mensais | R$ 1.205,00 | R$ 1.205,00 |
+| Rateio administrativo | R$ 400,00 | R$ 400,00 |
+| Valor sem lucro | R$ 2.790,99 | R$ 2.841,92 |
+| Margem (15%) | R$ 418,65 | R$ 426,29 |
+| Valor com lucro | R$ 3.209,64 | R$ 3.268,21 |
+| **Preço mensal** | **R$ 3.479,77** | **R$ 3.543,33** |
+| **Contrato de doze meses** | **R$ 41.757,23** | **R$ 42.519,96** |
+
+A alíquota aplicada à sustentação é de 7,76%, e não a mesma do projeto, porque o contrato é executado no exercício seguinte, quando a receita bruta acumulada da empresa já reflete o projeto entregue e a apuração deixa de usar a receita proporcionalizada do início de atividade. A diferença entre os dois provedores ao longo de um ano inteiro é de R$ 762,73, o que reforça a conclusão da Seção 6.8.10 de que a decisão de nuvem deve ser tomada por critérios técnicos e de conformidade.
+
+### 6.8.12 Fontes consultadas
+
+| Informação | Fonte |
+|---|---|
+| Faixas salariais das funções técnicas | Guia Salarial 2026, Robert Half Brasil, `roberthalf.com/br/pt/insights/guia-salarial` |
+| Salário de UX Designer e de Analista Administrativo Financeiro | Glassdoor Brasil, `glassdoor.com.br` |
+| Referência complementar de remuneração de desenvolvedor | Portal Salário, `salario.com.br` |
+| Honorários contábeis para empresa do Simples Nacional | Levantamentos de mercado de escritórios contábeis, 2026 |
+| Fórmula da alíquota efetiva e faixas do Anexo III | Lei Complementar nº 123/2006 e Resolução CGSN nº 140/2018 |
+| Regra de receita proporcionalizada no início de atividade | Lei Complementar nº 123/2006, artigo 18 |
+| Critério do Fator R e composição da folha de salários (FS12) | Lei Complementar nº 123/2006, artigo 18, §§ 5º-J, 5º-K, 5º-M e § 25; Resolução CGSN nº 140/2018, artigo 26; Perguntas e Respostas do portal do Simples Nacional |
+| Preços de computação, banco e armazenamento na AWS, região sa-east-1 | Levantamento de preços em reais, agosto de 2026, câmbio R$ 5,50 |
+| Preços de transferência de dados e de instâncias no Azure, região Brazil South | Levantamento de preços em reais, agosto de 2026, câmbio R$ 5,50 |
+| Preço de transcrição de voz, Deepgram Nova-3 | `deepgram.com/pricing` |
+| Preço de transcrição de voz, Azure AI Speech | `azure.microsoft.com/pricing/details/speech` |
+| Preço do modelo de linguagem em uso | Página pública de preços do provedor |
+| Preço do Azure OpenAI, GPT-4o-mini | Página pública de preços do Azure OpenAI |
+
+### 6.8.13 Retorno para o parceiro: o que esta análise não mede
+
+Esta seção determina o custo de fornecimento e o preço de venda da solução, ou seja, a viabilidade comercial do projeto pela ótica do fornecedor. Ela **não** demonstra o retorno financeiro para o Metrô, o que exigiria comparar o investimento contra a economia gerada, com indicadores de payback, retorno sobre investimento e valor presente líquido.
+
+Essa ausência é deliberada, e não uma omissão. A TAPI descreve os benefícios esperados em termos qualitativos, mencionando redução do tempo gasto em tarefas administrativas, consolidação de informações, obtenção de análises e preparação de relatórios, mas não fornece a linha de base operacional necessária para converter esses ganhos em valor. Produzir um retorno sobre investimento sem esses dados significaria arbitrar simultaneamente o volume de trabalho atual, o tempo economizado e o custo do trabalho poupado, o que tornaria o número menos defensável do que toda a precificação construída até aqui.
+
+Os indicadores que o parceiro precisaria fornecer para que essa medição se torne possível são:
+
+| Indicador | Para que serve no cálculo |
+|---|---|
+| Número de pessoas que registram, atualizam e acompanham informações de projeto | Define a população afetada pela automação |
+| Tempo médio hoje consumido por atividade, como registro de status mensal, consolidação de documentos e preparação da apresentação à diretoria | Estabelece a linha de base contra a qual o ganho é medido |
+| Frequência dessas atividades, por projeto e por ciclo mensal | Converte o tempo unitário em volume anual |
+| Custo-hora médio dos perfis envolvidos, do PMO à diretoria | Converte tempo economizado em valor monetário |
+| Percentual de retrabalho decorrente de inconsistência ou ausência de informação | Quantifica o ganho de qualidade, além do ganho de tempo |
+| Quantidade de projetos ativos no portfólio e projeção de crescimento | Permite avaliar o ganho de escala da solução |
+
+Com esses dados, o cálculo do retorno passa a ser direto, porque o custo do investimento já está determinado nesta seção, somando o preço do projeto de R$ 273.482,01 ao contrato de sustentação de R$ 41.757,23 no primeiro ano, e o que falta é apenas o lado do benefício. A medição está prevista para uma eventual etapa de implantação produtiva, que a TAPI classifica como evolução futura e que está explicitamente fora do escopo orçado na Seção 6.8.1.
+
