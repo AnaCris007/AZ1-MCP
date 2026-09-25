@@ -12,7 +12,7 @@ from psycopg_pool import ConnectionPool
 # classe de `services/database_service.py`, importada mais abaixo. Duas classes
 # homônimas fariam `@app.exception_handler` registrar só uma delas.
 from database.conexao import obter_engine
-from rag.retriever import buscar as buscar_contexto_rag
+from pln.intencao import DetectarIntencao
 from services.agente_service import AgenteDesligado, ExecutarIntencao
 from services.alerta_service import (
     ConfiguracaoAlertas,
@@ -135,33 +135,37 @@ def carregar_modelo_padrao():
                 sys.modules[k] = v
 
 
+# NÃO degrada, diferente de `get_classificador_de_intencao`: classificar é a
+# razão de `POST /audio/{id}/analyze` existir, não um efeito colateral dela.
+# Sem modelo, o endpoint deve falhar, e não responder uma análise sem análise.
 @lru_cache
 def get_analyzer() -> AnalyzeAudio:
-    return AnalyzeAudio(transcriber=get_transcriber(), modelo=carregar_modelo_padrao())
+    return AnalyzeAudio(
+        transcriber=get_transcriber(),
+        detector=DetectarIntencao(carregar_modelo_padrao()),
+    )
 
 
-# O classificador entra no chat como OBSERVADOR, e nada mais: o rótulo vai para
-# `auditoria.mensagem.intencao` e não decide nem a busca, nem a recusa, nem a
-# resposta.
+# O detector devolve a intenção JÁ com a regra de rejeição aplicada — a mesma
+# que `pln.metricas` usa para medir o RNF03. Antes daqui saía um `(rótulo,
+# confiança)` cru, e cada consumidor aplicava o limiar que quisesse.
 #
-# A distinção é o ponto. O modelo mede F1-macro 0,6736 contra os 0,85 do RNF03 —
-# colocá-lo para decidir algo erraria em cerca de um terço das interações. Como
-# observador, ele torna o RNF03 mensurável sobre tráfego real (hoje `intencao` é
-# NULL em 100% das linhas) sem colocar a qualidade da resposta em suas mãos.
+# O que ele decide, e o que não decide: a intenção governa a AÇÃO do Agente e o
+# despacho de alerta. Ela não entra no prompt nem filtra a busca. Com F1-macro
+# de 0,6736 contra os 0,85 do RNF03, deixá-la escolher o contexto da resposta
+# erraria em cerca de um terço das interações — enquanto, como gatilho de ação,
+# um erro custa uma ação a menos, e o RAG responde do mesmo jeito.
 #
 # Devolve None quando o modelo não pôde ser carregado: uma instalação sem o
-# `.joblib` treinado continua conversando, apenas sem registrar a intenção.
+# `.joblib` treinado continua conversando, apenas sem agir nem registrar a
+# intenção.
 @lru_cache
-def get_classificador_de_intencao() -> Callable[[str], tuple[str, float]] | None:
+def get_classificador_de_intencao() -> DetectarIntencao | None:
     try:
-        modelo = carregar_modelo_padrao()
+        return DetectarIntencao(carregar_modelo_padrao())
     except Exception:
         logger.exception("Classificador indisponível; a intenção não será registrada.")
         return None
-
-    from pln.classificador import prever_intencao
-
-    return lambda texto: prever_intencao(modelo, texto)
 
 
 def _historico_do_banco(conversa_id: str) -> list[tuple[str, str]]:
@@ -187,12 +191,36 @@ def _historico_do_banco(conversa_id: str) -> list[tuple[str, str]]:
         return [(papel, conteudo) for papel, conteudo in cursor.fetchall()]
 
 
+# Adapta o `buscar_com_recuo` do retriever ao contrato que o modelo espera.
+#
+# O nome do parâmetro muda de `projeto_id` para `projeto_codigo` entre as duas
+# camadas, e isso é intencional: no índice vetorial o campo se chama
+# `projeto_id`, mas o que a extração de entidades produz é o CÓDIGO do projeto
+# (`SYN-04`). São a mesma coisa neste projeto, e a tradução acontece aqui, na
+# borda — não dentro de quem responde nem dentro de quem busca.
+def _buscar_contexto_focado(
+    query: str,
+    *,
+    tipo_documento: str | None = None,
+    projeto_codigo: str | None = None,
+    score_minimo: float = 0.0,
+):
+    from rag.retriever import buscar_com_recuo
+
+    return buscar_com_recuo(
+        query,
+        tipo_documento=tipo_documento,
+        projeto_id=projeto_codigo,
+        score_minimo=score_minimo,
+    )
+
+
 @lru_cache
 def get_chat_answerer() -> AnswerChatMessage:
     settings = GeminiSettings.from_environment()
     model = GeminiChatModel.from_settings(
         settings,
-        buscar_contexto=buscar_contexto_rag,
+        buscar_contexto=_buscar_contexto_focado,
         carregar_historico=_historico_do_banco,
     )
     return AnswerChatMessage(model=model)

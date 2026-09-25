@@ -13,11 +13,16 @@
 # (linha "RF04 | Não implementado") registra como não implementada em nenhum
 # lugar do sistema — não é este componente que resolve isso.
 #
-# LIMIAR_CONFIANCA_ACAO reaproveita o mesmo valor de `config/alertas.yaml`
-# porque é o único calibrado que o projeto tem hoje. Não é uma calibração
-# própria: `classificador.py` já registra que a confiança do modelo "ordena
-# bem e calibra mal", então tratar isto como definitivo seria emprestar
-# precisão que a métrica não tem.
+# O LIMIAR NÃO MORA MAIS AQUI. Este componente recebe uma `IntencaoDetectada`
+# com a regra de rejeição já aplicada por `pln.intencao` — a mesma função que
+# `pln.metricas` usa para medir o RNF03. Antes havia um `0.70` fixo neste
+# arquivo e outro em `config/alertas.yaml`, e nenhum dos dois era o que o
+# relatório media.
+#
+# O que este componente ainda decide é o que fazer com as DUAS leituras que a
+# detecção carrega: confiança insuficiente deixa o RAG responder, enquanto
+# `fora_do_catalogo` previsto COM confiança é recusa. São situações diferentes
+# e só uma delas é o caso crítico 1.
 
 from __future__ import annotations
 
@@ -26,12 +31,11 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 
 from pln.entidades import EntidadesExtraidas, extrair_entidades
+from pln.intencao import INTENCAO_FORA_DO_CATALOGO, IntencaoDetectada
 from services.portfolio_repository import Pendencia, PortfolioRepository, SituacaoProjeto
 
 logger = logging.getLogger(__name__)
 
-LIMIAR_CONFIANCA_ACAO = 0.70
-INTENCAO_FORA_DO_CATALOGO = "fora_do_catalogo"
 INTENCOES_COM_ACAO = frozenset({"gerar_alertas_pendencias", "consultar_projeto_sintetico"})
 
 
@@ -57,19 +61,25 @@ class ExecutarIntencao:
     def __init__(self, portfolio: PortfolioRepository) -> None:
         self._portfolio = portfolio
 
-    def executar(self, *, intencao: str, confianca: float, texto: str) -> RespostaDoAgente:
+    def executar(self, *, deteccao: IntencaoDetectada, texto: str) -> RespostaDoAgente:
         entidades = extrair_entidades(texto)
 
-        if confianca < LIMIAR_CONFIANCA_ACAO:
+        # Confiança insuficiente NÃO é recusa: é ausência de opinião. O RAG
+        # responde, como respondia antes de este componente existir.
+        if deteccao.rejeitada:
             return RespostaDoAgente(ResultadoAcao.SEM_ACAO, entidades)
 
-        if intencao == INTENCAO_FORA_DO_CATALOGO:
+        # `prevista`, e não `intencao`: o que autoriza a recusa é o modelo ter
+        # dito `fora_do_catalogo`, não a regra tê-lo produzido por descarte.
+        # Passado o guarda acima os dois coincidem, e escrever `prevista` é o
+        # que mantém a distinção legível se a ordem mudar.
+        if deteccao.prevista == INTENCAO_FORA_DO_CATALOGO:
             return RespostaDoAgente(ResultadoAcao.RECUSADA_FORA_DO_CATALOGO, entidades)
 
-        if intencao not in INTENCOES_COM_ACAO:
+        if deteccao.prevista not in INTENCOES_COM_ACAO:
             return RespostaDoAgente(ResultadoAcao.SEM_ACAO, entidades)
 
-        if intencao == "gerar_alertas_pendencias":
+        if deteccao.prevista == "gerar_alertas_pendencias":
             return RespostaDoAgente(
                 ResultadoAcao.PENDENCIAS, entidades, pendencias=self._pendencias(entidades)
             )
@@ -103,11 +113,11 @@ class AgenteDesligado:
         self._motivo = motivo
         self._avisou = False
 
-    def executar(self, *, intencao: str, confianca: float, texto: str) -> RespostaDoAgente:
+    def executar(self, *, deteccao: IntencaoDetectada, texto: str) -> RespostaDoAgente:
         entidades = extrair_entidades(texto)
-        if confianca < LIMIAR_CONFIANCA_ACAO:
+        if deteccao.rejeitada:
             return RespostaDoAgente(ResultadoAcao.SEM_ACAO, entidades)
-        if intencao == INTENCAO_FORA_DO_CATALOGO:
+        if deteccao.prevista == INTENCAO_FORA_DO_CATALOGO:
             return RespostaDoAgente(ResultadoAcao.RECUSADA_FORA_DO_CATALOGO, entidades)
         if not self._avisou:
             logger.warning("Agente desligado: %s", self._motivo)

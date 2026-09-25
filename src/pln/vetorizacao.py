@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
+from sklearn.base import clone
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
@@ -55,13 +56,25 @@ def construir_vetorizador(config: ConfigVetorizacao) -> CountVectorizer | TfidfV
 # que monta o modelo do produto. O Pipeline mantém vocabulário e IDF restritos às
 # dobras de treino, evitando vazamento na validação cruzada.
 #
-# A régua é a mesma para todas as vetorizações do espaço de busca. Uma vetorização
-# nova precisa ser aceita por `MultinomialNB` sem trocar de classificador, senão a
-# comparação entre representações deixa de ser identificável.
-def construir_pipeline_de_medicao(config: ConfigVetorizacao) -> Pipeline:
+# Dentro de UMA varredura a régua é fixa, e precisa ser: comparar duas
+# vetorizações medidas com classificadores diferentes não isolaria o efeito da
+# representação. `estimador` troca a régua ENTRE varreduras, não dentro de uma.
+#
+# POR QUE ISSO PASSOU A SER PARÂMETRO
+# -----------------------------------
+# Enquanto o ranking de pré-processamento saía só do `MultinomialNB`, qualquer
+# outra família herdava uma escolha de texto feita para ele — e uma família cujo
+# texto ideal estivesse na posição 800 desse ranking nunca o veria. Comparar
+# famílias sobre um ranking alheio favorece quem o produziu.
+#
+# O padrão continua sendo `MultinomialNB`: quem roda `python -m pln.experimento`
+# sem argumento obtém exatamente o que obtinha antes.
+def construir_pipeline_de_medicao(
+    config: ConfigVetorizacao, estimador=None
+) -> Pipeline:
     return Pipeline(
         [
             ("vetorizador", construir_vetorizador(config)),
-            ("classificador", MultinomialNB(alpha=1.0)),
+            ("classificador", MultinomialNB(alpha=1.0) if estimador is None else clone(estimador)),
         ]
     )

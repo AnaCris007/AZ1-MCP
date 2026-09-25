@@ -11,3 +11,7 @@ class AnalysisResponse(BaseModel):
     duration_seconds: float
     intencao: str
     confianca_pln: float
+    # A previsão crua acima, e a decisão aqui. `intencao` continua sendo o que
+    # o modelo achou; `rejeitada` diz se a confiança ficou abaixo do limiar
+    # calibrado e, portanto, se o sistema agiria sobre ela.
+    rejeitada: bool

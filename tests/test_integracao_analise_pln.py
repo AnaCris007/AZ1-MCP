@@ -39,6 +39,7 @@ from az1_api.dependencies import (
     get_classificador_de_intencao,
     get_conversa_repository,
 )
+from pln.intencao import DetectarIntencao
 from services.agente_service import AgenteDesligado
 from services.analysis_service import AnalyzeAudio
 from services.conversa_repository import PersistenciaDesligada
@@ -132,7 +133,7 @@ class TestAnaliseIntegracao(unittest.TestCase):
     def _analisador_com_fita(self) -> AnalyzeAudio:
         return AnalyzeAudio(
             transcriber=TranscribeAudio(FetcherDeMemoria(self.audio), "irrelevante-no-replay"),
-            modelo=self.modelo,
+            detector=DetectarIntencao(self.modelo),
         )
 
     # -- TI-16 ---------------------------------------------------------------
@@ -189,7 +190,11 @@ class TestAnaliseIntegracao(unittest.TestCase):
         self.assertEqual(resposta_audio.status_code, 200)
         texto_transcrito = resposta_audio.json()["text"]
 
-        rotulo_direto, _ = classificador(texto_transcrito)
+        # O classificador passou a devolver `IntencaoDetectada`, e não a tupla
+        # `(rotulo, confianca)`: a regra de rejeição do RNF03 saiu de quatro
+        # cópias espalhadas e virou contrato em `pln/intencao.py`. `prevista` é
+        # o argmax cru — o mesmo que a rota expõe como `intencao`.
+        rotulo_direto = classificador(texto_transcrito).prevista
         self.assertEqual(
             rotulo_direto,
             resposta_audio.json()["intencao"],
@@ -228,7 +233,8 @@ class TestAnaliseIntegracao(unittest.TestCase):
         dos dublês.
         """
         analisador = AnalyzeAudio(
-            transcriber=_TranscritorFixo(PEDIDO_FORA_DO_CATALOGO), modelo=self.modelo
+            transcriber=_TranscritorFixo(PEDIDO_FORA_DO_CATALOGO),
+            detector=DetectarIntencao(self.modelo),
         )
 
         resposta = self._analisar(analisador)
@@ -281,7 +287,7 @@ class _AnswerFixo:
     def __init__(self, texto: str) -> None:
         self._texto = texto
 
-    def answer(self, message: str, conversation_id: str | None = None):
+    def answer(self, message: str, conversation_id: str | None = None, **_):
         from services.chat_service import ChatReply
 
         return ChatReply(text=self._texto)

@@ -316,7 +316,13 @@ services:
       # Bind mount: o artefato precisa aterrissar no repositório do host, para
       # ser inspecionado e versionado. É o oposto do caso do MinIO.
       - ./resultados:/app/resultados
-      - ./src/pln/dados:/app/src/pln/dados:ro
+      # Leitura E ESCRITA, e não `:ro` como era até a Sprint 3. O motivo é que
+      # `python -m pln.particao` passou a GERAR dois arquivos aqui dentro —
+      # `intencoes_exemplos.csv` (desenvolvimento) e `intencoes_teste.csv`
+      # (teste retido) — a partir do `intencoes_pool.csv`, que continua sendo o
+      # único autoral. Com `:ro`, `make particionar` falha com sistema de
+      # arquivos somente leitura.
+      - ./src/pln/dados:/app/src/pln/dados
     # Em Linux, exporte DOCKER_UID=$(id -u) e DOCKER_GID=$(id -g) antes de rodar,
     # senão os arquivos gerados saem pertencendo ao root do host. Em Windows e
     # macOS o padrão 0:0 é o correto, porque a tradução de permissão é do Docker
