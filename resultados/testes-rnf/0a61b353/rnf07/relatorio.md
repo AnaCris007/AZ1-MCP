@@ -11,7 +11,7 @@
 
 ## Desvio de escopo
 
-Esta rodada foi deliberadamente reduzida de quatro horas para uma hora por restricao de tempo. Ela preserva o intervalo de uma verificacao por minuto, mas nao e equivalente as 240 verificacoes do criterio oficial. Nao foram preenchidas artificialmente amostras ausentes.
+Esta primeira rodada foi executada como triagem exploratoria do monitor e do contrato de saude no ambiente local. A janela continua de uma hora permitiu validar o instrumento em 60 ciclos e executar os cenarios controlados antes de uma sessao prolongada. A triagem revelou uma falha determinante no caso negativo: `/health` nao reflete a indisponibilidade do banco e nao produz registro tecnico nem alerta. Prolongar a mesma versao aumentaria a amostra natural, mas nao removeria essa reprovacao. A rodada preserva o intervalo de uma verificacao por minuto, nao equivale as 240 verificacoes oficiais e nao preenche artificialmente amostras ausentes. A sessao de quatro horas permanece pendente para depois da correcao.
 
 ## Cenarios controlados
 
@@ -21,7 +21,7 @@ O cenario de aplicacao internamente nao saudavel nao foi executavel: A versao av
 
 ## Conclusao
 
-A janela reduzida de uma hora nao comprova o criterio oficial de quatro horas e limita a conclusao a esta execucao academica. O resultado global exige simultaneamente a disponibilidade natural e o comportamento previsto para as falhas controladas.
+A janela exploratoria de uma hora nao comprova o criterio oficial de quatro horas e limita a conclusao a esta execucao academica. O resultado global exige simultaneamente a disponibilidade natural e o comportamento previsto para as falhas controladas. Depois da correcao do endpoint e dos alertas, o caso devera ser repetido por quatro horas na mesma versao candidata.
 
 ## Evidencias
 

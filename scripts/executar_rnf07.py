@@ -237,7 +237,7 @@ def montar_resultado(
         "ct_rnf07_n": "APROVADO" if negativo_aprovado else "REPROVADO",
         "criterio": ">=99% de GET /health HTTP 200 em ate 2 s; falhas controladas devem gerar 503, registro, alerta e recuperar para 200",
         "ressalva": (
-            "A janela reduzida de uma hora nao comprova o criterio oficial de quatro horas "
+            "A janela exploratoria de uma hora nao comprova o criterio oficial de quatro horas "
             "e limita a conclusao a esta execucao academica."
             if args.duration_minutes < JANELA_OFICIAL_MINUTOS
             else "Nenhuma reducao da janela oficial."
@@ -261,7 +261,7 @@ def gravar_relatorio(saida: Path, resultado: dict[str, Any], controlados: dict[s
 
 ## Desvio de escopo
 
-Esta rodada foi deliberadamente reduzida de quatro horas para uma hora por restricao de tempo. Ela preserva o intervalo de uma verificacao por minuto, mas nao e equivalente as 240 verificacoes do criterio oficial. Nao foram preenchidas artificialmente amostras ausentes.
+Esta primeira rodada foi executada como triagem exploratoria do monitor e do contrato de saude no ambiente local. A janela continua de uma hora permite validar o instrumento e os cenarios controlados antes de uma sessao prolongada. Ela preserva o intervalo de uma verificacao por minuto, mas nao e equivalente as 240 verificacoes do criterio oficial. Nao foram preenchidas artificialmente amostras ausentes, e a sessao de quatro horas permanece pendente para depois das correcoes encontradas.
 
 ## Cenarios controlados
 
