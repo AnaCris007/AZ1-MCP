@@ -1,0 +1,33 @@
+{
+  "rnf": "RNF09",
+  "resultado": "REPROVADO",
+  "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+  "instante_referencia": "2026-09-25T15:00:00+00:00",
+  "base_dedicada": "az1_rnf09_0a61b353_20260925",
+  "controles": 15,
+  "aprovados": 10,
+  "reprovados": 5,
+  "falhas": [
+    {
+      "id": "ACESSO-COMUM",
+      "observado": "HTTP 200; registros=3"
+    },
+    {
+      "id": "IMUT-CONV-TITULO",
+      "observado": "operação permitida"
+    },
+    {
+      "id": "IMUT-CONV-ARQ",
+      "observado": "operação permitida"
+    },
+    {
+      "id": "PRIVACIDADE",
+      "observado": "mensagem=1; evento=1"
+    },
+    {
+      "id": "CONTINGENCIA",
+      "observado": "registro_tecnico=True; buffer=False; alerta=False; tentativas=1"
+    }
+  ],
+  "dados": "exclusivamente sintéticos"
+}

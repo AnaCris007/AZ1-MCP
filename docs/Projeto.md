@@ -93,6 +93,7 @@
 - [6.7 Execução dos testes sistêmicos — campanha funcional da Sprint 4](#67-execução-dos-testes-sistêmicos--campanha-funcional-da-sprint-4)
 - [6.8 Ferramentas e Bibliotecas Utilizadas](#68-ferramentas-e-bibliotecas-utilizadas)
 - [6.9 Execução dos Testes de Usabilidade](#69-execução-dos-testes-de-usabilidade)
+- [6.10 Execução dos Testes Não Funcionais](#610-execução-dos-testes-não-funcionais)
 
 </details>
 
@@ -9490,6 +9491,168 @@ O RNF08 permanece baseado em EU-01, EU-07 e EU-08 da primeira rodada: 4 de 5 par
 Considerando as duas rodadas, os oito casos textuais possuem resultado aprovado. EU-02, EU-04 e EU-05 foram aprovados com base na nova execução complementar, e não por reconstrução dos dados perdidos da primeira rodada. A rodada complementar também obteve 100% de sucesso na voz e comprovou 100% de conclusão da recuperação após falha, sendo 80% sem ajuda. As ações corretivas continuam relevantes para tornar a chamada mais evidente e orientar melhor o primeiro uso.
 
 A principal limitação permanece sendo a amostra pequena e concentrada em participantes familiarizados com tecnologia. Uma nova rodada deve incluir mais participantes, pessoas com menor familiaridade digital e perfis próximos das personas profissionais do Metrô.
+
+## 6.10 Execução dos testes não funcionais
+
+### 6.10.1 Objetivo, escopo e continuidade do planejamento
+
+Esta seção registra a execução dos casos não funcionais planejados na Seção
+6.3. O objetivo foi aplicar os critérios previamente definidos, preservar os
+observáveis e identificar riscos antes da liberação. Os limites não foram
+reduzidos para acomodar o comportamento encontrado: divergências observadas
+foram classificadas como reprovação e pré-condições ausentes, como bloqueio.
+
+A campanha principal avaliou o commit
+`0a61b353829dee491537bb2863facbe589d48cc8`. O RNF06 foi executado sobre o
+commit anterior `6b3eb96b9e0d1c6269156808468d56450d96deae`; sua aprovação comprova aquela
+versão e não é generalizada automaticamente para a campanha principal. O RNF08
+é sustentado pelas sessões externas da Seção 6.9. Os demais resultados e seus
+arquivos brutos estão no [índice da campanha](../resultados/testes-rnf/README.md).
+
+Foram feitas duas adaptações operacionais transparentes. No RNF07, esta primeira
+rodada foi tratada como uma triagem exploratória do monitor e do contrato de
+saúde no ambiente local. Adotou-se uma janela contínua de uma hora, suficiente
+para verificar o instrumento em 60 ciclos e executar os cenários controlados
+antes de reservar uma sessão prolongada. A triagem revelou que `/health` não
+reflete a indisponibilidade do banco e que não há registro técnico nem alerta;
+portanto, prolongar a mesma versão por mais três horas aumentaria a amostra de
+disponibilidade natural, mas não corrigiria a reprovação já determinada pelo
+caso negativo. A janela de quatro horas e suas 240 verificações continuam como
+critério oficial e deverão ser executadas depois da correção. No RNF12, a
+reprovação foi determinada pelos limites objetivos já observados; as rubricas
+humanas permaneceram vazias porque não poderiam elevar o melhor resultado
+possível à meta. Essas adaptações limitam a evidência e não redefinem os
+requisitos.
+
+### 6.10.2 Ferramentas e bibliotecas efetivamente utilizadas
+
+| Ferramenta ou biblioteca | Aplicação na campanha | Justificativa e limite |
+|---|---|---|
+| Python e scripts dedicados | Orquestração, massas, medições e consolidação dos RNFs | Automatiza cálculos e preserva repetibilidade; cada resultado continua restrito à versão registrada |
+| FastAPI `TestClient` e HTTPX | Contratos HTTP, autenticação, clientes e falhas controladas | Exercitam as rotas e dependências reais sem exigir tráfego externo em todos os cenários |
+| PostgreSQL, psycopg e SQLAlchemy | Rastreabilidade, auditoria, permissões, retenção e massa dedicada | Permitem conferir efeitos persistidos; bases de teste evitam alterar dados compartilhados |
+| scikit-learn | Inferência congelada, F1-macro, cobertura, matriz de confusão e memória do classificador | Métricas calculadas automaticamente; a validade depende da independência da massa cega |
+| Deepgram | Transcrição dos 30 áudios do RNF06 | Exercita o provedor real; o resultado depende do corpus e da versão do modelo registrados |
+| Vitest e Node.js | Execução do adaptador React no RNF05 | Compara dois clientes sem duplicar a regra de negócio; não substitui um ensaio completo de navegador |
+| psutil e amostragem de processo | RSS e comportamento de memória no RNF10 | Observa o processo real, com resolução de 100 ms declarada como limitação |
+| monitor HTTP com relógio monotônico | Sessão do RNF07 e duração de cada sondagem | Evita distorção do relógio civil; a janela executada foi menor que a oficial |
+| OpenPyXL, JSON, CSV e Markdown | Massas tabulares, resultados brutos e relatórios auditáveis | Formatos simples permitem inspeção; planilhas intermediárias não substituem os registros textuais finais |
+
+Os scripts foram separados por requisito em `scripts/executar_rnfNN.py`, com
+auxiliares nomeados pelo cenário. O [índice de execução](../resultados/testes-rnf/README.md)
+relaciona cada requisito ao executor e às dependências necessárias. Segredos,
+URLs privadas e tokens não compõem os artefatos de evidência.
+
+### 6.10.3 Casos, entradas, passos e resultados
+
+As fichas completas de `CT-RNF01-P/N` a `CT-RNF12-P/N`, incluindo propósito,
+pré-condições, entradas, passos e resultados esperados, permanecem nas Seções
+6.3.3 e 6.3.4. A tabela abaixo acrescenta os dados efetivamente observados e a
+ligação com as evidências, sem duplicar ou substituir o oráculo planejado.
+
+| RNF e casos | Entrada e execução efetiva | Resultado esperado | Resultado observado | Situação e evidência |
+|---|---|---|---|---|
+| RNF01 — CT-RNF01-P/N | Duas rodadas de 100 consultas; cenário negativo com atrasos reais de 20 s e 65 s | Pelo menos 80% completas em 15 s e 100% encerradas em 60 s | Positivo atendeu; no negativo, 95/100 encerraram em até 60 s | **Reprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf01/relatorio.md) |
+| RNF02 — CT-RNF02-P/N | 19 endpoints, credencial válida e cinco condições inválidas por endpoint | Válidas aceitas e 100% das inválidas rejeitadas antes do negócio | 19/19 válidas aceitas; 95/95 inválidas receberam 401; zero chamadas indevidas ao negócio | **Aprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf02/relatorio.md) |
+| RNF03 — CT-RNF03-P/N | Conjunto cego de 200 exemplos equilibrados, modelo e limiar congelados | F1-macro ≥ 0,85; cobertura ≥ 90%; aceitação indevida ≤ 15% | F1 0,4975; cobertura 69,4%; aceitação indevida 15% | **Reprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf03/relatorio.md) |
+| RNF04 — CT-RNF04-P/N | 20 interações de texto e voz, duas falhas controladas e registro incompleto de controle | Todos os elementos aplicáveis correlacionados; falhas rastreadas | 10/20 completas; voz 0/10; falhas rastreadas 0/2; controle incompleto detectado | **Reprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf04/relatorio.md) |
+| RNF05 — CT-RNF05-P/N | Vinte solicitações válidas e três negativas pelo React e por cliente Python | Contrato e resultado de negócio equivalentes sem regra duplicada | 23/23 pares equivalentes e nenhuma regra de negócio duplicada | **Aprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf05/relatorio.md) |
+| RNF06 — CT-RNF06-P/N | Trinta gravações reais: cinco locutores, três frases, versões limpa e com ruído | WER agregado ≤ 15% | WER geral 11,03%; limpo 10,29%; ruído 11,76%; execução no commit `6b3eb96` | **Aprovado na versão registrada** — [relatório](../resultados/testes-rnf/6b3eb96/rnf06/relatorio.md) |
+| RNF07 — CT-RNF07-P/N | Sessão reduzida de 60 min, uma sondagem por minuto; falhas controladas separadas | ≥ 99%; falha de aplicação/banco produz 503, registro, alerta e recuperação | 60/60 sondagens em até 2 s; `/health` permaneceu 200 na falha do banco, sem registro nem alerta | **Reprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf07/relatorio.md) |
+| RNF08 — CT-RNF08-P/N | Cinco participantes externos, tarefas de informação, fonte e limitação | Pelo menos 80% compreendem sem auxílio | 4/5 participantes atenderam ao critério, totalizando 80% | **Aprovado** — Seção 6.9.4 |
+| RNF09 — CT-RNF09-P/N | Quinze controles de acesso, imutabilidade, retenção, privacidade e contingência | Todos os controles obrigatórios atendidos | 10 aprovados e 5 reprovados, incluindo acesso comum, mutabilidade, privacidade e contingência | **Reprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf09/relatorio.md) |
+| RNF10 — CT-RNF10-C-P/N e CT-RNF10-M-P/N | Três progressões e picos até 50 solicitações; datasets de 1x a 10x, três repetições | p95 em 10x ≤ 20 s e ≤ 2x a base; treino ≤ 8x e serviço ≤ 2x em memória | 212.691/212.691 respostas; p95 10x 0,975 s e 1,892x; todas as razões de memória dentro dos limites | **Aprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf10/relatorio.md) |
+| RNF11 — CT-RNF11-P/N | Inventário do fluxo de sugestões, contrato HTTP e tabelas necessárias | ≥ 85% das sugestões sustentadas e negativas com limitação segura | Nenhuma sugestão executável: RF04 ausente e tabelas sem massa | **Bloqueado** — [relatório](../resultados/testes-rnf/0a61b353/rnf11/relatorio.md) |
+| RNF12 — CT-RNF12-P/N | Trinta consultas positivas, dez negativas e oito documentos sintéticos | 100% das referências recuperáveis, ≥ 90% das afirmações sustentadas e 10/10 limitações seguras | Referências 4/4 recuperáveis; teto factual 33,33%; limitações compatíveis 3/10 | **Reprovado** — [relatório](../resultados/testes-rnf/0a61b353/rnf12/relatorio.md) |
+
+Resultado agregado: **cinco RNFs aprovados, seis reprovados e um bloqueado**.
+Casos positivos aprovados dentro de um requisito globalmente reprovado não
+foram contabilizados como aprovação do requisito.
+
+### 6.10.4 Registros, evidências e tratamento dos problemas
+
+Cada diretório contém, conforme aplicável, o ambiente e commit, massa ou seu
+hash, tentativas individuais, matriz de confusão, registros recuperados,
+medições de recursos, respostas completas, logs sanitizados, cálculo agregado
+e relatório. Os resultados aprovados também preservam seus logs: RNF02 registra
+as 114 tentativas, RNF05 os 23 pares, RNF06 as 30 transcrições e RNF10 os
+estágios, tentativas e amostras de recursos. Assim, o registro não se limita aos
+defeitos.
+
+As gravações reais do RNF06 não são versionadas porque a voz identifica os
+participantes. Permanecem no repositório apenas referências textuais,
+transcrições, contagens de substituição/exclusão/inserção e o cálculo do WER.
+Da mesma forma, credenciais e endereços privados não são evidências. Modelos
+temporários reproduzíveis do ensaio de memória foram excluídos; manifesto,
+medições e scripts foram preservados.
+
+| Problema encontrado | Impacto | Ação corretiva proposta |
+|---|---|---|
+| Dependência lenta ultrapassa 60 s sem erro controlado | Viola o teto do RNF01 e prolonga a espera | Aplicar timeout interno inferior a 60 s, cancelar a chamada e devolver erro controlado |
+| Classificador com baixa F1 e cobertura | Interpretação incorreta ou rejeição de consultas válidas | Revisar classes e exemplos, treinar novamente e calibrar em validação separada, preservando novo conjunto cego |
+| Turnos de voz e falhas sem trilha completa | Impede reconstruir interações e incidentes | Unificar persistência dos canais e registrar resultado/categoria de erro pelo identificador |
+| `/health` não reflete banco nem gera alerta | Monitor pode declarar saudável um serviço sem prontidão | Incorporar prontidão ao contrato monitorado ou formalizar `/health/ready`, adicionar log/alerta e repetir quatro horas |
+| Auditoria permite acesso/mudança e persiste marcas sensíveis | Risco de exposição e adulteração | Restringir rota por perfil administrativo, reforçar imutabilidade, redigir segredos e implementar buffer, alerta e repetição |
+| Fluxo de sugestões ausente | RNF11 não pode ser medido | Implementar RF04, contrato por campo, massa e rubricas antes de executar o caso |
+| Recuperação/fundamentação insuficiente | Respostas podem omitir fonte ou usar limitação incorreta | Corrigir resolução do projeto, recuperar documentos pertinentes, exigir citação por afirmação e tratar ausência/conflito explicitamente |
+
+### 6.10.5 Discussão crítica da abrangência e condição de liberação
+
+A campanha cobriu os doze requisitos no nível de inventário: onze chegaram a
+uma execução ou inspeção objetiva e um ficou bloqueado antes da geração do
+objeto medido. Houve automação de segurança, classificação, rastreabilidade,
+interoperabilidade, voz, disponibilidade, auditoria, carga, memória e
+fundamentação, complementada por sessões reais de usabilidade. As massas
+sintéticas protegeram dados corporativos, e os áudios reais deram diversidade
+ao RNF06 sem serem publicados.
+
+Essa abrangência não equivale a homologação. O RNF06 pertence a uma versão
+anterior; o RNF07 observou somente uma hora das quatro planejadas; RNF01 e RNF10
+controlaram dependências para isolar o comportamento interno; o RNF08 tem
+amostra pequena; e o RNF11 não pôde ser exercitado. Provedores, limites
+comerciais, rede de produção, implantação em nuvem e operação prolongada não
+foram abrangidos.
+
+A solução **não deve ser considerada pronta para liberação irrestrita** pelos
+resultados desta campanha. As reprovações de desempenho de cauda,
+classificação, rastreabilidade, monitoramento, auditoria e fundamentação afetam
+fluxos centrais ou controles de segurança. A priorização recomendada antes de
+nova avaliação é: corrigir auditoria e fundamentação; completar rastreabilidade
+e timeout; revisar o classificador e o contrato de saúde; implementar o fluxo
+de sugestões; e repetir os casos reprovados na mesma versão candidata. Os RNFs
+aprovados reduzem riscos específicos, mas não compensam critérios cumulativos
+que falharam.
+
+### 6.10.6 Plano de continuidade para a sprint seguinte
+
+Os achados reprovados e o caso bloqueado não encerram o trabalho de qualidade.
+A equipe os incorporará ao backlog técnico da sprint seguinte, preservando os
+resultados desta campanha como linha de base. Uma correção somente será
+considerada encerrada depois da reexecução do caso correspondente sobre um novo
+commit identificado; alterar código ou observar um exemplo isolado não basta
+para mudar o veredito.
+
+| Prioridade | RNF | Trabalho previsto para a sprint seguinte | Critério para encerramento |
+|---|---|---|---|
+| Crítica | RNF09 | Restringir a consulta administrativa, impedir alterações indevidas, redigir dados sensíveis e implementar contingência com repetição e alerta | Reexecutar os 15 controles com zero falhas e preservar logs sanitizados |
+| Crítica | RNF12 | Corrigir resolução de projetos e recuperação documental, exigir fonte por afirmação e diferenciar ausência, conflito e irrelevância | Obter 100% de referências recuperáveis, pelo menos 90% de afirmações sustentadas e 10/10 limitações seguras |
+| Alta | RNF04 | Persistir turnos de voz e falhas com o mesmo identificador, resultado e categoria de erro usados no canal textual | Reexecutar as 20 interações e duas falhas com 100% dos elementos aplicáveis correlacionados |
+| Alta | RNF01 | Aplicar timeout e cancelamento internos, devolvendo erro controlado antes do teto do cliente | Reexecutar os casos positivo e negativo com ≥ 80% em 15 s e 100% dos desfechos em até 60 s |
+| Alta | RNF03 | Revisar exemplos e fronteiras das intenções, treinar novamente e calibrar o limiar sem usar o novo conjunto cego | Avaliar uma nova base independente com F1-macro ≥ 0,85, cobertura ≥ 90% e aceitação indevida ≤ 15% |
+| Alta | RNF07 | Fazer o endpoint monitorado refletir aplicação e banco, emitir registro técnico e alerta e comprovar recuperação | Reexecutar os cenários negativos e, após sua aprovação, realizar 240 verificações em quatro horas com disponibilidade ≥ 99% |
+| Média | RNF11 | Implementar o fluxo do RF04, o contrato de sugestões por campo, a massa e as referências necessárias | Executar 20 positivas e 10 negativas, com dois avaliadores independentes, e atingir a meta de 85% |
+
+Além das correções obrigatórias, a equipe deverá repetir o RNF06 na mesma
+versão candidata usada pelos demais testes, eliminando a diferença entre os
+commits, e ampliar a diversidade da amostra do RNF08 quando houver nova janela
+de avaliação com participantes. Esses dois itens refinam a força da evidência,
+mas não alteram retroativamente os resultados registrados nesta campanha.
+
+Na consolidação da próxima sprint, cada item deverá relacionar defeito, commit
+da correção, script executado, evidência bruta e resultado comparado ao mesmo
+critério. Reprovações anteriores permanecerão no histórico; uma nova aprovação
+será acrescentada como rodada posterior, e não usada para reescrever a
+execução original.
 
 ---
 

@@ -1,0 +1,201 @@
+id,texto,esperado,previsto_cru,confianca,rejeitado_pelo_limiar,previsto_final,correto
+RNF03_V2_001,Faça uma auditoria do registro e indique informações ausentes ou incompatíveis entre si.,analisar_completude_coerencia,fora_do_catalogo,0.7831608594356502,False,fora_do_catalogo,False
+RNF03_V2_002,"Antes do fechamento, confirme se o cadastro apresenta lacunas que prejudiquem a leitura do projeto.",analisar_completude_coerencia,analisar_completude_coerencia,0.7451296729912319,False,analisar_completude_coerencia,True
+RNF03_V2_003,Verifique se o percentual executado combina com a fase em que o projeto foi declarado.,analisar_completude_coerencia,analisar_completude_coerencia,0.5716744829621473,False,analisar_completude_coerencia,True
+RNF03_V2_004,Há datas ou valores registrados que entram em conflito com o andamento informado?,analisar_completude_coerencia,analisar_completude_coerencia,0.32337585211839615,False,analisar_completude_coerencia,True
+RNF03_V2_005,"Examine o cadastro em busca de inconsistências entre situação, prazos e realizações.",analisar_completude_coerencia,fora_do_catalogo,0.5520774929273026,False,fora_do_catalogo,False
+RNF03_V2_006,Indique se existe algum campo essencial sem conteúdo ou preenchido de maneira conflitante.,analisar_completude_coerencia,analisar_completude_coerencia,0.6213373305610244,False,analisar_completude_coerencia,True
+RNF03_V2_007,Quero uma revisão da integridade das informações registradas para este projeto.,analisar_completude_coerencia,fora_do_catalogo,0.7393324592091259,False,fora_do_catalogo,False
+RNF03_V2_008,Avalie se os dados disponíveis são suficientes para representar corretamente a condição atual.,analisar_completude_coerencia,fora_do_catalogo,0.5058427303629686,False,fora_do_catalogo,False
+RNF03_V2_009,Procure divergências entre o que foi entregue e o progresso que consta no acompanhamento.,analisar_completude_coerencia,analisar_completude_coerencia,0.7296139657239614,False,analisar_completude_coerencia,True
+RNF03_V2_010,Cheque se a informação financeira e a evolução física estão compatíveis com o status apresentado.,analisar_completude_coerencia,analisar_completude_coerencia,0.677003030756679,False,analisar_completude_coerencia,True
+RNF03_V2_011,Analise o registro e destaque qualquer lacuna que impeça uma interpretação confiável.,analisar_completude_coerencia,fora_do_catalogo,0.8591050852187481,False,fora_do_catalogo,False
+RNF03_V2_012,Existe algo no cadastro que pareça contraditório quando os campos são lidos em conjunto?,analisar_completude_coerencia,gerar_alertas_pendencias,0.29158302767544103,False,gerar_alertas_pendencias,False
+RNF03_V2_013,Faça um diagnóstico da qualidade do preenchimento considerando ausência e consistência dos dados.,analisar_completude_coerencia,fora_do_catalogo,0.7551626694613721,False,fora_do_catalogo,False
+RNF03_V2_014,Valide se as informações mais recentes formam um retrato coerente do projeto.,analisar_completude_coerencia,analisar_completude_coerencia,0.6124446820159014,False,analisar_completude_coerencia,True
+RNF03_V2_015,"Revise os registros e identifique campos incompletos, desatualizados ou incompatíveis.",analisar_completude_coerencia,fora_do_catalogo,0.750146429262386,False,fora_do_catalogo,False
+RNF03_V2_016,Confira se o próximo marco informado faz sentido diante das entregas já registradas.,analisar_completude_coerencia,orientar_entregas_cronograma,0.39215214456448216,False,orientar_entregas_cronograma,False
+RNF03_V2_017,Quero saber se o conjunto de dados do projeto passa em uma checagem de consistência.,analisar_completude_coerencia,fora_do_catalogo,0.4287134150756781,False,fora_do_catalogo,False
+RNF03_V2_018,"Verifique se algum valor, data ou situação precisa ser revisto por falta de coerência.",analisar_completude_coerencia,analisar_completude_coerencia,0.6127726879707758,False,analisar_completude_coerencia,True
+RNF03_V2_019,Aponte o que ainda falta preencher e o que merece conferência por possível divergência.,analisar_completude_coerencia,analisar_completude_coerencia,0.4367497308378359,False,analisar_completude_coerencia,True
+RNF03_V2_020,Faça uma análise cruzada dos campos para detectar omissões e contradições.,analisar_completude_coerencia,fora_do_catalogo,0.8379986291224385,False,fora_do_catalogo,False
+RNF03_V2_021,Em qual documento oficial está definido o processo de acompanhamento do portfólio?,consultar_documentos_normativos,consultar_documentos_normativos,0.6584081790193507,False,consultar_documentos_normativos,True
+RNF03_V2_022,Localize a instrução corporativa que orienta o preenchimento das informações dos projetos.,consultar_documentos_normativos,fora_do_catalogo,0.4500219240612695,False,fora_do_catalogo,False
+RNF03_V2_023,Que regra institucional deve ser seguida para registrar alterações de escopo?,consultar_documentos_normativos,consultar_documentos_normativos,0.6954554151709539,False,consultar_documentos_normativos,True
+RNF03_V2_024,Consulte a documentação oficial sobre governança de riscos do portfólio.,consultar_documentos_normativos,fora_do_catalogo,0.4237393691985965,False,fora_do_catalogo,False
+RNF03_V2_025,Qual referência formal explica a elaboração do termo de abertura?,consultar_documentos_normativos,orientar_tap,0.577349435735795,False,orientar_tap,False
+RNF03_V2_026,Preciso encontrar a norma que estabelece como os benefícios devem ser acompanhados.,consultar_documentos_normativos,consultar_documentos_normativos,0.5507449541328925,False,consultar_documentos_normativos,True
+RNF03_V2_027,Há algum procedimento aprovado para criação e atualização de marcos?,consultar_documentos_normativos,gerar_alertas_pendencias,0.325909854171444,False,gerar_alertas_pendencias,False
+RNF03_V2_028,Busque a orientação corporativa aplicável ao reporte periódico de projetos.,consultar_documentos_normativos,fora_do_catalogo,0.7847411234809951,False,fora_do_catalogo,False
+RNF03_V2_029,O que a documentação vigente estabelece para encerramento de uma iniciativa?,consultar_documentos_normativos,consultar_documentos_normativos,0.8292188278244202,False,consultar_documentos_normativos,True
+RNF03_V2_030,Qual referência de governança orienta quando um tema deve ser levado a uma instância superior?,consultar_documentos_normativos,consultar_documentos_normativos,0.3855734874243668,False,consultar_documentos_normativos,True
+RNF03_V2_031,Encontre a regra institucional usada para cadastrar entregas no acompanhamento.,consultar_documentos_normativos,consultar_documentos_normativos,0.5697508743044385,False,consultar_documentos_normativos,True
+RNF03_V2_032,Em que manual está descrita a forma correta de reportar evolução física?,consultar_documentos_normativos,consultar_documentos_normativos,0.7451957340298602,False,consultar_documentos_normativos,True
+RNF03_V2_033,Qual documento determina a frequência com que os dados de projeto devem ser revisados?,consultar_documentos_normativos,consultar_documentos_normativos,0.8239511875949651,False,consultar_documentos_normativos,True
+RNF03_V2_034,Procure a diretriz que define atribuições do responsável pelo projeto.,consultar_documentos_normativos,fora_do_catalogo,0.6086117690596843,False,fora_do_catalogo,False
+RNF03_V2_035,Existe uma regra formal que indique quais dados são indispensáveis no reporte periódico?,consultar_documentos_normativos,gerar_alertas_pendencias,0.5105361289304821,False,gerar_alertas_pendencias,False
+RNF03_V2_036,Consulte o procedimento interno para abertura e tratamento de problemas.,consultar_documentos_normativos,fora_do_catalogo,0.6839284185119322,False,fora_do_catalogo,False
+RNF03_V2_037,Que documento orienta a apuração dos resultados associados aos benefícios?,consultar_documentos_normativos,orientar_mapa_beneficios,0.33077632827814996,False,orientar_mapa_beneficios,False
+RNF03_V2_038,Localize a regra aplicável quando é necessário alterar datas do planejamento.,consultar_documentos_normativos,fora_do_catalogo,0.7459502589297031,False,fora_do_catalogo,False
+RNF03_V2_039,Qual norma interna descreve as etapas de aprovação de uma mudança?,consultar_documentos_normativos,consultar_documentos_normativos,0.5443825852451454,False,consultar_documentos_normativos,True
+RNF03_V2_040,Quero a referência oficial que trata do registro das decisões tomadas em governança.,consultar_documentos_normativos,fora_do_catalogo,0.6104322908213534,False,fora_do_catalogo,False
+RNF03_V2_041,Apresente o projeto Sinalização Digital Integrada em um resumo de leitura rápida.,consultar_projeto_sintetico,fora_do_catalogo,0.7169673917310728,False,fora_do_catalogo,False
+RNF03_V2_042,Faça um retrato resumido da iniciativa considerando a informação mais recente.,consultar_projeto_sintetico,fora_do_catalogo,0.8743243442644545,False,fora_do_catalogo,False
+RNF03_V2_043,Preciso de uma síntese curta com o que está acontecendo e o que merece atenção.,consultar_projeto_sintetico,analisar_completude_coerencia,0.5474368262040792,False,analisar_completude_coerencia,False
+RNF03_V2_044,"Condense a situação do projeto em status, etapa seguinte e pontos em aberto.",consultar_projeto_sintetico,consultar_projeto_sintetico,0.7097127500007817,False,consultar_projeto_sintetico,True
+RNF03_V2_045,Explique rapidamente como está o projeto Armários Inteligentes em Estações.,consultar_projeto_sintetico,fora_do_catalogo,0.6620273870976985,False,fora_do_catalogo,False
+RNF03_V2_046,Monte uma visão executiva bem curta sobre o momento atual desta iniciativa.,consultar_projeto_sintetico,fora_do_catalogo,0.8729549808598017,False,fora_do_catalogo,False
+RNF03_V2_047,Selecione apenas as informações centrais para eu entender este projeto.,consultar_projeto_sintetico,fora_do_catalogo,0.45346574203608064,False,fora_do_catalogo,False
+RNF03_V2_048,"Resuma propósito, andamento e próximos movimentos em poucas linhas.",consultar_projeto_sintetico,fora_do_catalogo,0.776879276313725,False,fora_do_catalogo,False
+RNF03_V2_049,Quero entender este projeto sem consultar todos os detalhes do cadastro.,consultar_projeto_sintetico,fora_do_catalogo,0.5618892234487903,False,fora_do_catalogo,False
+RNF03_V2_050,"Faça uma síntese com progresso recente, ameaças relevantes e próximo passo.",consultar_projeto_sintetico,fora_do_catalogo,0.8522248427559478,False,fora_do_catalogo,False
+RNF03_V2_051,Qual é a leitura rápida da situação atual desta iniciativa?,consultar_projeto_sintetico,fora_do_catalogo,0.491604376832156,False,fora_do_catalogo,False
+RNF03_V2_052,Prepare um resumo executivo compacto para eu usar antes da reunião.,consultar_projeto_sintetico,fora_do_catalogo,0.5143652417615245,False,fora_do_catalogo,False
+RNF03_V2_053,Quais informações essenciais resumem melhor o momento deste projeto?,consultar_projeto_sintetico,fora_do_catalogo,0.3529565531000962,False,fora_do_catalogo,False
+RNF03_V2_054,Monte um briefing enxuto com avanços recentes e assuntos que ainda exigem atenção.,consultar_projeto_sintetico,fora_do_catalogo,0.7439139765509185,False,fora_do_catalogo,False
+RNF03_V2_055,"Em poucas linhas, sintetize a situação, o que já ocorreu e o próximo marco.",consultar_projeto_sintetico,consultar_projeto_sintetico,0.581903257744369,False,consultar_projeto_sintetico,True
+RNF03_V2_056,Crie uma ficha-resumo do projeto somente com os pontos mais relevantes.,consultar_projeto_sintetico,fora_do_catalogo,0.554447939401299,False,fora_do_catalogo,False
+RNF03_V2_057,Preciso de uma versão condensada da situação para apresentar em uma conversa executiva.,consultar_projeto_sintetico,fora_do_catalogo,0.761491341549724,False,fora_do_catalogo,False
+RNF03_V2_058,Sintetize o projeto com base no registro mais recente disponível.,consultar_projeto_sintetico,fora_do_catalogo,0.8597144336664869,False,fora_do_catalogo,False
+RNF03_V2_059,"Dê uma visão breve da iniciativa incluindo algum bloqueio importante, se houver.",consultar_projeto_sintetico,fora_do_catalogo,0.8040795499721849,False,fora_do_catalogo,False
+RNF03_V2_060,"Resuma objetivo, momento atual e eventos previstos na sequência.",consultar_projeto_sintetico,fora_do_catalogo,0.799072801173261,False,fora_do_catalogo,False
+RNF03_V2_061,Vai chover no litoral neste fim de semana?,fora_do_catalogo,fora_do_catalogo,0.47812624891716,False,fora_do_catalogo,True
+RNF03_V2_062,Conte uma charada curta para passar o tempo.,fora_do_catalogo,fora_do_catalogo,0.8563731713067423,False,fora_do_catalogo,True
+RNF03_V2_063,Quanto custa um euro em reais agora?,fora_do_catalogo,fora_do_catalogo,0.7669233163782921,False,fora_do_catalogo,True
+RNF03_V2_064,Quem marcou os gols da partida de ontem?,fora_do_catalogo,fora_do_catalogo,0.5033680584340603,False,fora_do_catalogo,True
+RNF03_V2_065,Me ensine a preparar panqueca de banana.,fora_do_catalogo,fora_do_catalogo,0.7386468991916292,False,fora_do_catalogo,True
+RNF03_V2_066,Tem algum café bom aberto perto daqui?,fora_do_catalogo,gerar_alertas_pendencias,0.6856506795864856,False,gerar_alertas_pendencias,False
+RNF03_V2_067,Agende uma sala de reunião para sexta à tarde.,fora_do_catalogo,fora_do_catalogo,0.843571719397381,False,fora_do_catalogo,True
+RNF03_V2_068,Quantos dias de licença eu ainda posso tirar?,fora_do_catalogo,orientar_entregas_cronograma,0.21247105281177228,False,orientar_entregas_cronograma,False
+RNF03_V2_069,Quanto recebe mensalmente o diretor desta área?,fora_do_catalogo,fora_do_catalogo,0.6930118709406051,False,fora_do_catalogo,True
+RNF03_V2_070,Crie um ticket para trocar a senha do meu computador.,fora_do_catalogo,fora_do_catalogo,0.883322625526335,False,fora_do_catalogo,True
+RNF03_V2_071,Qual linha de metrô eu uso para chegar ao estádio?,fora_do_catalogo,fora_do_catalogo,0.3785413006458658,False,fora_do_catalogo,True
+RNF03_V2_072,Resuma as manchetes do Brasil de hoje.,fora_do_catalogo,fora_do_catalogo,0.8058616806999247,False,fora_do_catalogo,True
+RNF03_V2_073,Agende um horário no dentista para mim.,fora_do_catalogo,fora_do_catalogo,0.8747412797901846,False,fora_do_catalogo,True
+RNF03_V2_074,Quanto tenho restante no cartão de alimentação?,fora_do_catalogo,fora_do_catalogo,0.5092334123388427,False,fora_do_catalogo,True
+RNF03_V2_075,Desligue e ligue novamente o meu notebook.,fora_do_catalogo,fora_do_catalogo,0.790199393074421,False,fora_do_catalogo,True
+RNF03_V2_076,Escreva um convite informal para uma festa de aniversário.,fora_do_catalogo,fora_do_catalogo,0.8650531550345026,False,fora_do_catalogo,True
+RNF03_V2_077,Quem ocupa atualmente a presidência do país?,fora_do_catalogo,fora_do_catalogo,0.605161773983822,False,fora_do_catalogo,True
+RNF03_V2_078,Você sabe o contato de uma hamburgueria próxima?,fora_do_catalogo,fora_do_catalogo,0.6480268005836366,False,fora_do_catalogo,True
+RNF03_V2_079,Veja quanto dinheiro tenho disponível na minha conta.,fora_do_catalogo,fora_do_catalogo,0.8795671697475808,False,fora_do_catalogo,True
+RNF03_V2_080,Quando será a próxima partida do Palmeiras?,fora_do_catalogo,consultar_projeto_sintetico,0.30381747109381885,False,consultar_projeto_sintetico,False
+RNF03_V2_081,Mostre o que ainda precisa ser resolvido antes da próxima atualização do projeto.,gerar_alertas_pendencias,orientar_avanco_mensal,0.3451209851377887,False,orientar_avanco_mensal,False
+RNF03_V2_082,Quais assuntos permanecem sem conclusão e precisam de responsável?,gerar_alertas_pendencias,gerar_alertas_pendencias,0.6961659058341277,False,gerar_alertas_pendencias,True
+RNF03_V2_083,"Crie avisos para pendências de informação, aprovação ou decisão.",gerar_alertas_pendencias,fora_do_catalogo,0.4715342976800007,False,fora_do_catalogo,False
+RNF03_V2_084,Há algum compromisso atrasado ou com vencimento próximo que eu precise observar?,gerar_alertas_pendencias,gerar_alertas_pendencias,0.5389833118323436,False,gerar_alertas_pendencias,True
+RNF03_V2_085,Identifique pontos em aberto capazes de impedir a continuidade da iniciativa.,gerar_alertas_pendencias,fora_do_catalogo,0.8327678921878539,False,fora_do_catalogo,False
+RNF03_V2_086,Quais providências ainda não tiveram conclusão registrada?,gerar_alertas_pendencias,gerar_alertas_pendencias,0.5866573135424332,False,gerar_alertas_pendencias,True
+RNF03_V2_087,Avise sempre que um dado necessário ao acompanhamento continuar em branco.,gerar_alertas_pendencias,fora_do_catalogo,0.8342207843245205,False,fora_do_catalogo,False
+RNF03_V2_088,Existe alguma deliberação ainda aguardando posicionamento da governança?,gerar_alertas_pendencias,gerar_alertas_pendencias,0.6067169841038218,False,gerar_alertas_pendencias,True
+RNF03_V2_089,Liste tudo o que depende de ação para deixar de ficar pendente.,gerar_alertas_pendencias,orientar_riscos_problemas,0.3197048440971955,False,orientar_riscos_problemas,False
+RNF03_V2_090,Quais aprovações ou atualizações ainda não foram concluídas dentro do prazo?,gerar_alertas_pendencias,gerar_alertas_pendencias,0.561329846953801,False,gerar_alertas_pendencias,True
+RNF03_V2_091,Que assuntos abertos merecem acompanhamento mais próximo neste período?,gerar_alertas_pendencias,gerar_alertas_pendencias,0.47698906258307594,False,gerar_alertas_pendencias,True
+RNF03_V2_092,Organize os alertas das pendências atuais por tipo de necessidade.,gerar_alertas_pendencias,fora_do_catalogo,0.4814395295051253,False,fora_do_catalogo,False
+RNF03_V2_093,Existe algum compromisso do projeto já atrasado e ainda sem solução?,gerar_alertas_pendencias,consultar_projeto_sintetico,0.5959096539170964,False,consultar_projeto_sintetico,False
+RNF03_V2_094,Quais itens estão parados esperando retorno de uma área externa?,gerar_alertas_pendencias,gerar_alertas_pendencias,0.8838069236800262,False,gerar_alertas_pendencias,True
+RNF03_V2_095,Identifique pendências que possam deslocar a data do próximo marco.,gerar_alertas_pendencias,orientar_entregas_cronograma,0.28273273551428274,False,orientar_entregas_cronograma,False
+RNF03_V2_096,Há obrigações registradas sem evidência de conclusão?,gerar_alertas_pendencias,gerar_alertas_pendencias,0.328323453874195,False,gerar_alertas_pendencias,True
+RNF03_V2_097,"Para cada ponto em aberto, indique qual providência deve ocorrer em seguida.",gerar_alertas_pendencias,fora_do_catalogo,0.7478856220743065,False,fora_do_catalogo,False
+RNF03_V2_098,"Sinalize ausência de prazo, responsável ou aprovação em itens que dependam dessas informações.",gerar_alertas_pendencias,orientar_tap,0.2926966438586257,False,orientar_tap,False
+RNF03_V2_099,Quero visualizar somente os assuntos ainda não encerrados.,gerar_alertas_pendencias,fora_do_catalogo,0.6749903905404726,False,fora_do_catalogo,False
+RNF03_V2_100,Avise se houver algum ponto aberto que possa prejudicar o ciclo de acompanhamento.,gerar_alertas_pendencias,analisar_completude_coerencia,0.4604968423765486,False,analisar_completude_coerencia,False
+RNF03_V2_101,Como devo preparar as informações do projeto para o fechamento deste período?,orientar_avanco_mensal,orientar_avanco_mensal,0.2948041398607647,False,orientar_avanco_mensal,True
+RNF03_V2_102,Explique como atualizar corretamente o acompanhamento mensal da iniciativa.,orientar_avanco_mensal,fora_do_catalogo,0.7449135587364658,False,fora_do_catalogo,False
+RNF03_V2_103,"Antes de enviar o reporte do mês, o que eu deveria revisar?",orientar_avanco_mensal,orientar_avanco_mensal,0.881728605292504,False,orientar_avanco_mensal,True
+RNF03_V2_104,Qual é a forma adequada de registrar a evolução ocorrida neste ciclo?,orientar_avanco_mensal,fora_do_catalogo,0.32529349822406856,False,fora_do_catalogo,False
+RNF03_V2_105,Que partes do acompanhamento precisam receber os dados deste mês?,orientar_avanco_mensal,orientar_avanco_mensal,0.46063905896380913,False,orientar_avanco_mensal,True
+RNF03_V2_106,Monte uma orientação prática para eu fazer o reporte periódico do projeto.,orientar_avanco_mensal,orientar_avanco_mensal,0.4665220294393666,False,orientar_avanco_mensal,True
+RNF03_V2_107,Que fatos do período devem aparecer na atualização mensal?,orientar_avanco_mensal,orientar_avanco_mensal,0.7089346284267694,False,orientar_avanco_mensal,True
+RNF03_V2_108,Como informar neste mês os percentuais físico e financeiro?,orientar_avanco_mensal,orientar_avanco_mensal,0.5018943050820424,False,orientar_avanco_mensal,True
+RNF03_V2_109,O que precisa estar atualizado para representar a posição do projeto na data de corte?,orientar_avanco_mensal,orientar_avanco_mensal,0.534733566674657,False,orientar_avanco_mensal,True
+RNF03_V2_110,Ajude a organizar o reporte mensal que será encaminhado ao PMO.,orientar_avanco_mensal,orientar_avanco_mensal,0.5906405115146217,False,orientar_avanco_mensal,True
+RNF03_V2_111,Quais informações são indispensáveis para concluir o acompanhamento deste ciclo?,orientar_avanco_mensal,orientar_avanco_mensal,0.5398878086509576,False,orientar_avanco_mensal,True
+RNF03_V2_112,Como fazer a revisão mensal dos dados cadastrados no projeto?,orientar_avanco_mensal,orientar_avanco_mensal,0.27850894268103077,False,orientar_avanco_mensal,True
+RNF03_V2_113,"Oriente a atualização das realizações, situação e evolução observadas no período.",orientar_avanco_mensal,orientar_avanco_mensal,0.46539175891584567,False,orientar_avanco_mensal,True
+RNF03_V2_114,O que deve ser conferido quando chegar a data mensal de referência?,orientar_avanco_mensal,consultar_documentos_normativos,0.42364597081224686,False,consultar_documentos_normativos,False
+RNF03_V2_115,Em que ordem é melhor atualizar os dados do acompanhamento periódico?,orientar_avanco_mensal,consultar_projeto_sintetico,0.3371245649570677,False,consultar_projeto_sintetico,False
+RNF03_V2_116,Como incluir no reporte deste ciclo tanto os avanços quanto os assuntos em aberto?,orientar_avanco_mensal,orientar_avanco_mensal,0.6923115381611957,False,orientar_avanco_mensal,True
+RNF03_V2_117,"Se nada mudou em determinado campo, como devo tratá-lo na revisão do mês?",orientar_avanco_mensal,consultar_projeto_sintetico,0.4368762269182907,False,consultar_projeto_sintetico,False
+RNF03_V2_118,Quero organizar tudo que preciso reunir antes de concluir o reporte mensal.,orientar_avanco_mensal,orientar_avanco_mensal,0.641289657513496,False,orientar_avanco_mensal,True
+RNF03_V2_119,Que atualizações devo fazer agora para manter o acompanhamento do projeto em dia?,orientar_avanco_mensal,orientar_tap,0.25538761144294164,False,orientar_tap,False
+RNF03_V2_120,Descreva um fluxo simples para concluir a atualização mensal sem esquecer informações importantes.,orientar_avanco_mensal,fora_do_catalogo,0.6204076938066888,False,fora_do_catalogo,False
+RNF03_V2_121,O que o planejamento indica como próxima entrega desta iniciativa?,orientar_entregas_cronograma,consultar_documentos_normativos,0.3883317558918537,False,consultar_documentos_normativos,False
+RNF03_V2_122,Apresente os marcos que ainda ocorrerão com as datas atualmente registradas.,orientar_entregas_cronograma,analisar_completude_coerencia,0.4359378478608284,False,analisar_completude_coerencia,False
+RNF03_V2_123,Quero consultar a programação das entregas deste projeto.,orientar_entregas_cronograma,orientar_entregas_cronograma,0.5228968898732149,False,orientar_entregas_cronograma,True
+RNF03_V2_124,Qual evento está previsto na sequência e qual é sua data planejada?,orientar_entregas_cronograma,fora_do_catalogo,0.46977441620398647,False,fora_do_catalogo,False
+RNF03_V2_125,Organize os marcos futuros pela ordem em que devem acontecer.,orientar_entregas_cronograma,fora_do_catalogo,0.5160793603168349,False,fora_do_catalogo,False
+RNF03_V2_126,Existe alguma entrega com previsão de conclusão durante o mês atual?,orientar_entregas_cronograma,gerar_alertas_pendencias,0.4724308424100901,False,gerar_alertas_pendencias,False
+RNF03_V2_127,Que atividades precisam terminar para liberar o marco seguinte?,orientar_entregas_cronograma,orientar_entregas_cronograma,0.5715582139481622,False,orientar_entregas_cronograma,True
+RNF03_V2_128,Explique a sequência planejada das entregas que ainda faltam.,orientar_entregas_cronograma,orientar_entregas_cronograma,0.45500953128084703,False,orientar_entregas_cronograma,True
+RNF03_V2_129,Quando está prevista a etapa de homologação neste planejamento?,orientar_entregas_cronograma,orientar_entregas_cronograma,0.37293495406649496,False,orientar_entregas_cronograma,True
+RNF03_V2_130,Separe os marcos já cumpridos daqueles que permanecem planejados.,orientar_entregas_cronograma,fora_do_catalogo,0.524578494018746,False,fora_do_catalogo,False
+RNF03_V2_131,Quais resultados estão programados para o próximo período de acompanhamento?,orientar_entregas_cronograma,gerar_alertas_pendencias,0.5213050080083943,False,gerar_alertas_pendencias,False
+RNF03_V2_132,Há alguma data importante se aproximando no cronograma?,orientar_entregas_cronograma,analisar_completude_coerencia,0.4167972867955423,False,analisar_completude_coerencia,False
+RNF03_V2_133,O que o projeto pretende concluir até o encerramento deste trimestre?,orientar_entregas_cronograma,consultar_documentos_normativos,0.45667238267324944,False,consultar_documentos_normativos,False
+RNF03_V2_134,Quais tarefas antecedem cada um dos próximos marcos?,orientar_entregas_cronograma,gerar_alertas_pendencias,0.6167464348855477,False,gerar_alertas_pendencias,False
+RNF03_V2_135,Como devo proceder para atualizar a previsão de uma entrega no planejamento?,orientar_entregas_cronograma,orientar_avanco_mensal,0.48109625644904624,False,orientar_avanco_mensal,False
+RNF03_V2_136,Mostre quais entregas possuem dependência de atividades anteriores.,orientar_entregas_cronograma,orientar_entregas_cronograma,0.3998897992573521,False,orientar_entregas_cronograma,True
+RNF03_V2_137,Monte uma linha do tempo com os principais marcos ainda previstos.,orientar_entregas_cronograma,fora_do_catalogo,0.6784358798776028,False,fora_do_catalogo,False
+RNF03_V2_138,Existe algum marco futuro cadastrado sem uma data de previsão?,orientar_entregas_cronograma,gerar_alertas_pendencias,0.4515729613318851,False,gerar_alertas_pendencias,False
+RNF03_V2_139,Quais prazos do planejamento precisam ser acompanhados nas próximas semanas?,orientar_entregas_cronograma,gerar_alertas_pendencias,0.6646828273999438,False,gerar_alertas_pendencias,False
+RNF03_V2_140,Ajude a conferir se as datas das entregas continuam adequadas ao planejamento atual.,orientar_entregas_cronograma,analisar_completude_coerencia,0.4832681443908942,False,analisar_completude_coerencia,False
+RNF03_V2_141,Que ganhos o projeto pretende produzir e quais medidas comprovam esses ganhos?,orientar_mapa_beneficios,gerar_alertas_pendencias,0.38321676213958433,False,gerar_alertas_pendencias,False
+RNF03_V2_142,Oriente a montagem do mapa de benefícios desta iniciativa.,orientar_mapa_beneficios,orientar_mapa_beneficios,0.5948639570235928,False,orientar_mapa_beneficios,True
+RNF03_V2_143,Qual métrica deve ser usada para acompanhar cada resultado de valor esperado?,orientar_mapa_beneficios,consultar_documentos_normativos,0.3677673919431184,False,consultar_documentos_normativos,False
+RNF03_V2_144,Quais benefícios possuem comprovação registrada até agora?,orientar_mapa_beneficios,gerar_alertas_pendencias,0.609191372714013,False,gerar_alertas_pendencias,False
+RNF03_V2_145,Como faço a ligação entre o que foi entregue e o valor que se espera gerar?,orientar_mapa_beneficios,analisar_completude_coerencia,0.7551993663373381,False,analisar_completude_coerencia,False
+RNF03_V2_146,Apresente os benefícios cadastrados com o estágio atual de sua mensuração.,orientar_mapa_beneficios,fora_do_catalogo,0.6255062475050863,False,fora_do_catalogo,False
+RNF03_V2_147,"Como definir quem mede, o que mede e quando mede cada benefício?",orientar_mapa_beneficios,orientar_mapa_beneficios,0.8539236312623778,False,orientar_mapa_beneficios,True
+RNF03_V2_148,Existe algum ganho esperado sem indicador associado?,orientar_mapa_beneficios,gerar_alertas_pendencias,0.680770155718025,False,gerar_alertas_pendencias,False
+RNF03_V2_149,Faça uma revisão do mapa de benefícios e indique o que ainda está faltando.,orientar_mapa_beneficios,orientar_mapa_beneficios,0.5764417896454608,False,orientar_mapa_beneficios,True
+RNF03_V2_150,Como registrar a realização de valor sem tratar uma simples entrega como benefício?,orientar_mapa_beneficios,orientar_mapa_beneficios,0.4863208740876758,False,orientar_mapa_beneficios,True
+RNF03_V2_151,Que tipo de evidência deve existir antes de marcar um benefício como realizado?,orientar_mapa_beneficios,orientar_mapa_beneficios,0.7122531826427552,False,orientar_mapa_beneficios,True
+RNF03_V2_152,Identifique os pontos fracos do acompanhamento dos benefícios desta iniciativa.,orientar_mapa_beneficios,fora_do_catalogo,0.5856226833288419,False,fora_do_catalogo,False
+RNF03_V2_153,Como estão as métricas usadas para verificar os benefícios atualmente?,orientar_mapa_beneficios,gerar_alertas_pendencias,0.2845932206437569,False,gerar_alertas_pendencias,False
+RNF03_V2_154,"Explique como conectar produto entregue, efeito gerado e benefício final.",orientar_mapa_beneficios,fora_do_catalogo,0.5777888344728161,False,fora_do_catalogo,False
+RNF03_V2_155,Quais ganhos planejados ainda não possuem resultado apurado?,orientar_mapa_beneficios,gerar_alertas_pendencias,0.5942724249439334,False,gerar_alertas_pendencias,False
+RNF03_V2_156,O que precisa ser complementado para acompanhar a geração de valor de forma adequada?,orientar_mapa_beneficios,consultar_documentos_normativos,0.6305097639144762,False,consultar_documentos_normativos,False
+RNF03_V2_157,"Depois de uma entrega relevante, como o mapa de benefícios deve ser revisado?",orientar_mapa_beneficios,orientar_mapa_beneficios,0.6483476660918456,False,orientar_mapa_beneficios,True
+RNF03_V2_158,Quais benefícios só poderão ser confirmados em uma medição posterior?,orientar_mapa_beneficios,gerar_alertas_pendencias,0.4148458239418386,False,gerar_alertas_pendencias,False
+RNF03_V2_159,Ajude a validar metas e métricas previstas para os benefícios do projeto.,orientar_mapa_beneficios,fora_do_catalogo,0.3012790959594634,False,fora_do_catalogo,False
+RNF03_V2_160,Que dados mínimos preciso cadastrar para conseguir acompanhar um benefício ao longo do tempo?,orientar_mapa_beneficios,orientar_mapa_beneficios,0.8204001033197286,False,orientar_mapa_beneficios,True
+RNF03_V2_161,Ajude a descrever um risco relacionado à possibilidade de atraso de um fornecedor.,orientar_riscos_problemas,orientar_riscos_problemas,0.6690575560120425,False,orientar_riscos_problemas,True
+RNF03_V2_162,Como saber se devo cadastrar esta situação como risco ou como problema?,orientar_riscos_problemas,orientar_riscos_problemas,0.8620328489699602,False,orientar_riscos_problemas,True
+RNF03_V2_163,"Reescreva esta situação separando origem, ocorrência possível e impacto.",orientar_riscos_problemas,fora_do_catalogo,0.7116641498561509,False,fora_do_catalogo,False
+RNF03_V2_164,Mostre os eventos de risco e os problemas ainda ativos nesta iniciativa.,orientar_riscos_problemas,orientar_riscos_problemas,0.31919354127051985,False,orientar_riscos_problemas,True
+RNF03_V2_165,Como registrar de maneira clara o efeito potencial de um risco sobre os prazos?,orientar_riscos_problemas,consultar_documentos_normativos,0.5239539941636225,False,consultar_documentos_normativos,False
+RNF03_V2_166,Qual é a melhor forma de representar uma dependência de terceiro como risco?,orientar_riscos_problemas,orientar_riscos_problemas,0.5264433039841759,False,orientar_riscos_problemas,True
+RNF03_V2_167,Revise a redação deste risco e veja se os elementos necessários estão bem definidos.,orientar_riscos_problemas,analisar_completude_coerencia,0.5608555696426889,False,analisar_completude_coerencia,False
+RNF03_V2_168,Quais dados são necessários ao abrir o registro de um problema ocorrido?,orientar_riscos_problemas,orientar_riscos_problemas,0.45429211120254226,False,orientar_riscos_problemas,True
+RNF03_V2_169,Formule um risco para uma situação em que a equipe pode não ter capacidade suficiente.,orientar_riscos_problemas,fora_do_catalogo,0.5782838709423994,False,fora_do_catalogo,False
+RNF03_V2_170,Que respostas ou ações foram cadastradas para os riscos mais relevantes?,orientar_riscos_problemas,gerar_alertas_pendencias,0.3030444705443475,False,gerar_alertas_pendencias,False
+RNF03_V2_171,O que devo alterar no registro quando a chance de um risco ocorrer aumenta?,orientar_riscos_problemas,orientar_riscos_problemas,0.7800377894633539,False,orientar_riscos_problemas,True
+RNF03_V2_172,Há algum problema atual que ainda esteja sem ação corretiva associada?,orientar_riscos_problemas,gerar_alertas_pendencias,0.40428641447518937,False,gerar_alertas_pendencias,False
+RNF03_V2_173,Transforme este cenário incerto em uma formulação apropriada de risco.,orientar_riscos_problemas,fora_do_catalogo,0.6627831653912928,False,fora_do_catalogo,False
+RNF03_V2_174,Que riscos registrados podem interferir no resultado previsto para a próxima entrega?,orientar_riscos_problemas,orientar_avanco_mensal,0.3759555067989637,False,orientar_avanco_mensal,False
+RNF03_V2_175,Como descrever o possível impacto de uma integração que pode falhar?,orientar_riscos_problemas,orientar_riscos_problemas,0.29709199460926455,False,orientar_riscos_problemas,True
+RNF03_V2_176,Ajude a registrar corretamente um problema que já está causando efeito no projeto.,orientar_riscos_problemas,orientar_riscos_problemas,0.4144041659551034,False,orientar_riscos_problemas,True
+RNF03_V2_177,Quais informações precisam ser reavaliadas quando um risco é atualizado?,orientar_riscos_problemas,orientar_riscos_problemas,0.6516754216865893,False,orientar_riscos_problemas,True
+RNF03_V2_178,"Como informar proprietário, resposta e acompanhamento de um risco?",orientar_riscos_problemas,orientar_riscos_problemas,0.7803791929288341,False,orientar_riscos_problemas,True
+RNF03_V2_179,Quais riscos apresentam necessidade de tratamento em nível de governança?,orientar_riscos_problemas,gerar_alertas_pendencias,0.3302400886055778,False,gerar_alertas_pendencias,False
+RNF03_V2_180,Ajude a escrever o risco deixando claro que o evento ainda é uma possibilidade.,orientar_riscos_problemas,fora_do_catalogo,0.566575883739168,False,fora_do_catalogo,False
+RNF03_V2_181,Oriente o preenchimento do termo de abertura desta iniciativa.,orientar_tap,orientar_tap,0.5316685052218252,False,orientar_tap,True
+RNF03_V2_182,O que precisa constar obrigatoriamente no TAP antes de ele seguir adiante?,orientar_tap,orientar_tap,0.7297440626332475,False,orientar_tap,True
+RNF03_V2_183,Como formular o objetivo principal no Termo de Abertura do Projeto?,orientar_tap,orientar_tap,0.7899764325800923,False,orientar_tap,True
+RNF03_V2_184,Ajude a estabelecer o que fica dentro e fora do escopo inicial no TAP.,orientar_tap,orientar_tap,0.8565235155019378,False,orientar_tap,True
+RNF03_V2_185,Que conteúdo deve entrar na justificativa do termo de abertura?,orientar_tap,orientar_tap,0.8673925492019222,False,orientar_tap,True
+RNF03_V2_186,Como apresentar as condições assumidas e as limitações iniciais no TAP?,orientar_tap,orientar_tap,0.7511133412061516,False,orientar_tap,True
+RNF03_V2_187,Quais seções do termo precisam estar concluídas para encaminhamento à aprovação?,orientar_tap,orientar_tap,0.4160493193793933,False,orientar_tap,True
+RNF03_V2_188,Faça uma revisão do TAP e identifique informações fundamentais ainda ausentes.,orientar_tap,fora_do_catalogo,0.5547321758547166,False,fora_do_catalogo,False
+RNF03_V2_189,Como registrar as partes interessadas relevantes no termo de abertura?,orientar_tap,orientar_tap,0.8577926197795734,False,orientar_tap,True
+RNF03_V2_190,Os ganhos esperados devem ser descritos no TAP? Como fazer isso?,orientar_tap,orientar_tap,0.8670725411882522,False,orientar_tap,True
+RNF03_V2_191,Ajude a definir critérios objetivos de sucesso para incluir no termo.,orientar_tap,orientar_tap,0.7645279806802948,False,orientar_tap,True
+RNF03_V2_192,Como demonstrar no TAP a relação da iniciativa com uma diretriz estratégica?,orientar_tap,orientar_tap,0.7578451497119548,False,orientar_tap,True
+RNF03_V2_193,Que ameaças iniciais devem ser registradas na abertura do projeto?,orientar_tap,orientar_tap,0.43159018333905724,False,orientar_tap,True
+RNF03_V2_194,Ajude a criar um texto conciso para explicar a finalidade da iniciativa no TAP.,orientar_tap,orientar_tap,0.6576641071462564,False,orientar_tap,True
+RNF03_V2_195,Como delimitar adequadamente o escopo de alto nível no termo de abertura?,orientar_tap,orientar_tap,0.8966891215619611,False,orientar_tap,True
+RNF03_V2_196,Que informações iniciais de custo e duração devem aparecer no TAP?,orientar_tap,orientar_tap,0.8750132772023353,False,orientar_tap,True
+RNF03_V2_197,Como apresentar as entregas principais ainda em nível macro no termo?,orientar_tap,orientar_tap,0.6491471956226633,False,orientar_tap,True
+RNF03_V2_198,Quais registros de aceite ou autorização devem constar no TAP?,orientar_tap,orientar_tap,0.8098765567123865,False,orientar_tap,True
+RNF03_V2_199,"Se um dado inicial mudar, qual é a forma correta de refletir isso no termo de abertura?",orientar_tap,orientar_tap,0.8291012127531233,False,orientar_tap,True
+RNF03_V2_200,Revise a estrutura do TAP e indique se alguma seção necessária continua sem preenchimento.,orientar_tap,analisar_completude_coerencia,0.5789390605161616,False,analisar_completude_coerencia,False

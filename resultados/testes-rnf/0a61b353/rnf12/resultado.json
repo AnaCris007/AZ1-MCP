@@ -1,0 +1,39 @@
+{
+  "rnf": "RNF12",
+  "casos": [
+    "CT-RNF12-P",
+    "CT-RNF12-N"
+  ],
+  "resultado": "REPROVADO",
+  "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+  "executado_em_utc": "2026-09-25T23:57:35.616226+00:00",
+  "massa": {
+    "tipo": "sintética",
+    "consultas_positivas": 30,
+    "consultas_negativas": 10,
+    "documentos_indexados": 8
+  },
+  "execucao": {
+    "consultas_executadas": 40,
+    "http_200": 40,
+    "positivas_com_resposta_factual_e_fonte": 4,
+    "positivas_sem_resposta_factual_fundamentada": 26,
+    "referencias_apresentadas": 4,
+    "referencias_recuperaveis": 4,
+    "percentual_referencias_recuperaveis": 1.0,
+    "negativas_com_limitacao_compativel_com_o_caso": 3,
+    "total_negativas": 10
+  },
+  "fundamentacao_objetiva": {
+    "afirmacoes_candidatas_a_sustentadas": 4,
+    "afirmacoes_fatuais_sem_citacao_identificadas_no_minimo": 8,
+    "limite_superior_conservador_de_sustentacao": 0.3333333333333333,
+    "meta": 0.9,
+    "observacao": "O limite superior já fica abaixo da meta mesmo antes das rubricas humanas; avaliações podem reduzir, mas não elevar, esse teto."
+  },
+  "motivos": [
+    "Somente 4 das 30 consultas positivas produziram resposta factual com fonte.",
+    "P21 apresentou fatos de oito outros projetos sem qualquer referência.",
+    "Apenas 3 das 10 negativas explicaram uma limitação compatível com a condição preparada."
+  ]
+}

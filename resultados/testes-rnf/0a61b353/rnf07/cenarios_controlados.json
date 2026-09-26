@@ -1,0 +1,56 @@
+{
+  "executado_em": "2026-09-25T21:12:41.060869-03:00",
+  "aplicacao_internamente_nao_saudavel": {
+    "executavel": false,
+    "motivo": "A versao avaliada nao expoe estado interno de saude nem mecanismo controlado que torne GET /health 503 mantendo o servidor HTTP acessivel.",
+    "resultado_contrato_planejado": false
+  },
+  "banco_indisponivel": {
+    "metodo": "substituicao controlada do pool no processo de teste; banco externo nao foi interrompido",
+    "antes_200": true,
+    "falha_ready_503": true,
+    "health_oficial_na_falha_503": false,
+    "health_oficial_observado": 200,
+    "recuperacao_200": true,
+    "registro_tecnico_observado": false,
+    "registros_capturados": [],
+    "alerta_observado": false,
+    "resultado_contrato_planejado": false
+  },
+  "eventos": [
+    {
+      "etapa": "banco_antes",
+      "endpoint": "/health/ready",
+      "status": 200,
+      "corpo": {
+        "status": "ok"
+      }
+    },
+    {
+      "etapa": "banco_indisponivel",
+      "endpoint": "/health/ready",
+      "status": 503,
+      "corpo": {
+        "status": "indisponivel",
+        "motivo": "OSError: conexao recusada no cenario controlado RNF07"
+      }
+    },
+    {
+      "etapa": "banco_indisponivel",
+      "endpoint": "/health",
+      "status": 200,
+      "corpo": {
+        "status": "ok"
+      }
+    },
+    {
+      "etapa": "banco_recuperado",
+      "endpoint": "/health/ready",
+      "status": 200,
+      "corpo": {
+        "status": "ok"
+      }
+    }
+  ],
+  "observacao": "GET /health e uma verificacao rasa nesta versao; /health/ready detectou a falha do banco, mas esse endpoint auxiliar nao substitui o contrato oficial planejado."
+}

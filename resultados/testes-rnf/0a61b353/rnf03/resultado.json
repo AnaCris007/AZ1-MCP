@@ -1,0 +1,2257 @@
+{
+  "resumo": {
+    "casos": [
+      "CT-RNF03-P",
+      "CT-RNF03-N"
+    ],
+    "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+    "iniciado_em_utc": "2026-09-25T16:01:52.228751+00:00",
+    "finalizado_em_utc": "2026-09-25T16:01:52.318712+00:00",
+    "conjunto": "CSV_1.csv",
+    "conjunto_sha256": "c51ca6466caf45c068beca25b9d43a94ec20f72f0671e989b071b29bf32c9eb3",
+    "modelo": "classificador.joblib",
+    "modelo_sha256": "75ab09d9249e13bc2d3ecd95d517517f11e4b7721e897f587822c4eec4ea05c5",
+    "treino": "intencoes_exemplos.csv",
+    "treino_sha256": "668baa908c040fcbdbda6ce74c4358c24a8a0353ef6e9278326633178baa1b81",
+    "historico_de_desenvolvimento": "intencoes_pool.csv",
+    "historico_sha256": "59a157bfefd1bf609e0aef4c1bb7c6b42a8154c43c351ffd7f622a929ee67500",
+    "semente_documentada": 42,
+    "limiar_congelado": 0.2,
+    "exemplos": 200,
+    "conhecidos": 180,
+    "fora_do_catalogo": 20,
+    "sobreposicoes_exatas_normalizadas_com_historico": 0,
+    "f1_macro": 0.49745848091416456,
+    "meta_f1_macro": 0.85,
+    "cobertura": 0.6944444444444444,
+    "meta_cobertura": 0.9,
+    "aceitacao_indevida": 0.15,
+    "meta_aceitacao_indevida": 0.15,
+    "acertos": 98,
+    "rejeitados_pelo_limiar": 0,
+    "resultado": "Reprovado"
+  },
+  "distribuicao": {
+    "analisar_completude_coerencia": 20,
+    "consultar_documentos_normativos": 20,
+    "consultar_projeto_sintetico": 20,
+    "fora_do_catalogo": 20,
+    "gerar_alertas_pendencias": 20,
+    "orientar_avanco_mensal": 20,
+    "orientar_entregas_cronograma": 20,
+    "orientar_mapa_beneficios": 20,
+    "orientar_riscos_problemas": 20,
+    "orientar_tap": 20
+  },
+  "metricas_por_classe": {
+    "analisar_completude_coerencia": {
+      "precision": 0.5294117647058824,
+      "recall": 0.45,
+      "f1-score": 0.4864864864864865,
+      "support": 20.0
+    },
+    "consultar_documentos_normativos": {
+      "precision": 0.6,
+      "recall": 0.45,
+      "f1-score": 0.5142857142857142,
+      "support": 20.0
+    },
+    "consultar_projeto_sintetico": {
+      "precision": 0.3333333333333333,
+      "recall": 0.1,
+      "f1-score": 0.15384615384615385,
+      "support": 20.0
+    },
+    "fora_do_catalogo": {
+      "precision": 0.2361111111111111,
+      "recall": 0.85,
+      "f1-score": 0.3695652173913043,
+      "support": 20.0
+    },
+    "gerar_alertas_pendencias": {
+      "precision": 0.3076923076923077,
+      "recall": 0.4,
+      "f1-score": 0.34782608695652173,
+      "support": 20.0
+    },
+    "orientar_avanco_mensal": {
+      "precision": 0.8125,
+      "recall": 0.65,
+      "f1-score": 0.7222222222222222,
+      "support": 20.0
+    },
+    "orientar_entregas_cronograma": {
+      "precision": 0.625,
+      "recall": 0.25,
+      "f1-score": 0.35714285714285715,
+      "support": 20.0
+    },
+    "orientar_mapa_beneficios": {
+      "precision": 0.875,
+      "recall": 0.35,
+      "f1-score": 0.5,
+      "support": 20.0
+    },
+    "orientar_riscos_problemas": {
+      "precision": 0.9090909090909091,
+      "recall": 0.5,
+      "f1-score": 0.6451612903225806,
+      "support": 20.0
+    },
+    "orientar_tap": {
+      "precision": 0.8571428571428571,
+      "recall": 0.9,
+      "f1-score": 0.8780487804878049,
+      "support": 20.0
+    },
+    "accuracy": 0.49,
+    "macro avg": {
+      "precision": 0.60852822830764,
+      "recall": 0.49000000000000005,
+      "f1-score": 0.49745848091416456,
+      "support": 200.0
+    },
+    "weighted avg": {
+      "precision": 0.6085282283076401,
+      "recall": 0.49,
+      "f1-score": 0.49745848091416456,
+      "support": 200.0
+    }
+  },
+  "classes_matriz": [
+    "analisar_completude_coerencia",
+    "consultar_documentos_normativos",
+    "consultar_projeto_sintetico",
+    "fora_do_catalogo",
+    "gerar_alertas_pendencias",
+    "orientar_avanco_mensal",
+    "orientar_entregas_cronograma",
+    "orientar_mapa_beneficios",
+    "orientar_riscos_problemas",
+    "orientar_tap"
+  ],
+  "matriz_confusao": [
+    [
+      9,
+      0,
+      0,
+      9,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      9,
+      0,
+      7,
+      2,
+      0,
+      0,
+      1,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      2,
+      17,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      17,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      1,
+      6,
+      8,
+      1,
+      1,
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      1,
+      2,
+      3,
+      0,
+      13,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      3,
+      2,
+      0,
+      4,
+      5,
+      1,
+      5,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      2,
+      0,
+      4,
+      6,
+      0,
+      0,
+      7,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      0,
+      4,
+      3,
+      1,
+      0,
+      0,
+      10,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      18
+    ]
+  ],
+  "registros": [
+    {
+      "id": "RNF03_V2_001",
+      "texto": "Faça uma auditoria do registro e indique informações ausentes ou incompatíveis entre si.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7831608594356502,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_002",
+      "texto": "Antes do fechamento, confirme se o cadastro apresenta lacunas que prejudiquem a leitura do projeto.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.7451296729912319,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_003",
+      "texto": "Verifique se o percentual executado combina com a fase em que o projeto foi declarado.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.5716744829621473,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_004",
+      "texto": "Há datas ou valores registrados que entram em conflito com o andamento informado?",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.32337585211839615,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_005",
+      "texto": "Examine o cadastro em busca de inconsistências entre situação, prazos e realizações.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5520774929273026,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_006",
+      "texto": "Indique se existe algum campo essencial sem conteúdo ou preenchido de maneira conflitante.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.6213373305610244,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_007",
+      "texto": "Quero uma revisão da integridade das informações registradas para este projeto.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7393324592091259,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_008",
+      "texto": "Avalie se os dados disponíveis são suficientes para representar corretamente a condição atual.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5058427303629686,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_009",
+      "texto": "Procure divergências entre o que foi entregue e o progresso que consta no acompanhamento.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.7296139657239614,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_010",
+      "texto": "Cheque se a informação financeira e a evolução física estão compatíveis com o status apresentado.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.677003030756679,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_011",
+      "texto": "Analise o registro e destaque qualquer lacuna que impeça uma interpretação confiável.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8591050852187481,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_012",
+      "texto": "Existe algo no cadastro que pareça contraditório quando os campos são lidos em conjunto?",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.29158302767544103,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_013",
+      "texto": "Faça um diagnóstico da qualidade do preenchimento considerando ausência e consistência dos dados.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7551626694613721,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_014",
+      "texto": "Valide se as informações mais recentes formam um retrato coerente do projeto.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.6124446820159014,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_015",
+      "texto": "Revise os registros e identifique campos incompletos, desatualizados ou incompatíveis.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.750146429262386,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_016",
+      "texto": "Confira se o próximo marco informado faz sentido diante das entregas já registradas.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "orientar_entregas_cronograma",
+      "confianca": 0.39215214456448216,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_entregas_cronograma",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_017",
+      "texto": "Quero saber se o conjunto de dados do projeto passa em uma checagem de consistência.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.4287134150756781,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_018",
+      "texto": "Verifique se algum valor, data ou situação precisa ser revisto por falta de coerência.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.6127726879707758,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_019",
+      "texto": "Aponte o que ainda falta preencher e o que merece conferência por possível divergência.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.4367497308378359,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_020",
+      "texto": "Faça uma análise cruzada dos campos para detectar omissões e contradições.",
+      "esperado": "analisar_completude_coerencia",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8379986291224385,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_021",
+      "texto": "Em qual documento oficial está definido o processo de acompanhamento do portfólio?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.6584081790193507,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_022",
+      "texto": "Localize a instrução corporativa que orienta o preenchimento das informações dos projetos.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.4500219240612695,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_023",
+      "texto": "Que regra institucional deve ser seguida para registrar alterações de escopo?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.6954554151709539,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_024",
+      "texto": "Consulte a documentação oficial sobre governança de riscos do portfólio.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.4237393691985965,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_025",
+      "texto": "Qual referência formal explica a elaboração do termo de abertura?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.577349435735795,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_026",
+      "texto": "Preciso encontrar a norma que estabelece como os benefícios devem ser acompanhados.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.5507449541328925,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_027",
+      "texto": "Há algum procedimento aprovado para criação e atualização de marcos?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.325909854171444,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_028",
+      "texto": "Busque a orientação corporativa aplicável ao reporte periódico de projetos.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7847411234809951,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_029",
+      "texto": "O que a documentação vigente estabelece para encerramento de uma iniciativa?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.8292188278244202,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_030",
+      "texto": "Qual referência de governança orienta quando um tema deve ser levado a uma instância superior?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.3855734874243668,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_031",
+      "texto": "Encontre a regra institucional usada para cadastrar entregas no acompanhamento.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.5697508743044385,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_032",
+      "texto": "Em que manual está descrita a forma correta de reportar evolução física?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.7451957340298602,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_033",
+      "texto": "Qual documento determina a frequência com que os dados de projeto devem ser revisados?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.8239511875949651,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_034",
+      "texto": "Procure a diretriz que define atribuições do responsável pelo projeto.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6086117690596843,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_035",
+      "texto": "Existe uma regra formal que indique quais dados são indispensáveis no reporte periódico?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.5105361289304821,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_036",
+      "texto": "Consulte o procedimento interno para abertura e tratamento de problemas.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6839284185119322,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_037",
+      "texto": "Que documento orienta a apuração dos resultados associados aos benefícios?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "orientar_mapa_beneficios",
+      "confianca": 0.33077632827814996,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_mapa_beneficios",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_038",
+      "texto": "Localize a regra aplicável quando é necessário alterar datas do planejamento.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7459502589297031,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_039",
+      "texto": "Qual norma interna descreve as etapas de aprovação de uma mudança?",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.5443825852451454,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_040",
+      "texto": "Quero a referência oficial que trata do registro das decisões tomadas em governança.",
+      "esperado": "consultar_documentos_normativos",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6104322908213534,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_041",
+      "texto": "Apresente o projeto Sinalização Digital Integrada em um resumo de leitura rápida.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7169673917310728,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_042",
+      "texto": "Faça um retrato resumido da iniciativa considerando a informação mais recente.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8743243442644545,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_043",
+      "texto": "Preciso de uma síntese curta com o que está acontecendo e o que merece atenção.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.5474368262040792,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_044",
+      "texto": "Condense a situação do projeto em status, etapa seguinte e pontos em aberto.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "consultar_projeto_sintetico",
+      "confianca": 0.7097127500007817,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_projeto_sintetico",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_045",
+      "texto": "Explique rapidamente como está o projeto Armários Inteligentes em Estações.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6620273870976985,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_046",
+      "texto": "Monte uma visão executiva bem curta sobre o momento atual desta iniciativa.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8729549808598017,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_047",
+      "texto": "Selecione apenas as informações centrais para eu entender este projeto.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.45346574203608064,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_048",
+      "texto": "Resuma propósito, andamento e próximos movimentos em poucas linhas.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.776879276313725,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_049",
+      "texto": "Quero entender este projeto sem consultar todos os detalhes do cadastro.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5618892234487903,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_050",
+      "texto": "Faça uma síntese com progresso recente, ameaças relevantes e próximo passo.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8522248427559478,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_051",
+      "texto": "Qual é a leitura rápida da situação atual desta iniciativa?",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.491604376832156,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_052",
+      "texto": "Prepare um resumo executivo compacto para eu usar antes da reunião.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5143652417615245,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_053",
+      "texto": "Quais informações essenciais resumem melhor o momento deste projeto?",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.3529565531000962,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_054",
+      "texto": "Monte um briefing enxuto com avanços recentes e assuntos que ainda exigem atenção.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7439139765509185,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_055",
+      "texto": "Em poucas linhas, sintetize a situação, o que já ocorreu e o próximo marco.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "consultar_projeto_sintetico",
+      "confianca": 0.581903257744369,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_projeto_sintetico",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_056",
+      "texto": "Crie uma ficha-resumo do projeto somente com os pontos mais relevantes.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.554447939401299,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_057",
+      "texto": "Preciso de uma versão condensada da situação para apresentar em uma conversa executiva.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.761491341549724,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_058",
+      "texto": "Sintetize o projeto com base no registro mais recente disponível.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8597144336664869,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_059",
+      "texto": "Dê uma visão breve da iniciativa incluindo algum bloqueio importante, se houver.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8040795499721849,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_060",
+      "texto": "Resuma objetivo, momento atual e eventos previstos na sequência.",
+      "esperado": "consultar_projeto_sintetico",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.799072801173261,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_061",
+      "texto": "Vai chover no litoral neste fim de semana?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.47812624891716,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_062",
+      "texto": "Conte uma charada curta para passar o tempo.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8563731713067423,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_063",
+      "texto": "Quanto custa um euro em reais agora?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7669233163782921,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_064",
+      "texto": "Quem marcou os gols da partida de ontem?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5033680584340603,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_065",
+      "texto": "Me ensine a preparar panqueca de banana.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7386468991916292,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_066",
+      "texto": "Tem algum café bom aberto perto daqui?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.6856506795864856,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_067",
+      "texto": "Agende uma sala de reunião para sexta à tarde.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.843571719397381,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_068",
+      "texto": "Quantos dias de licença eu ainda posso tirar?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "orientar_entregas_cronograma",
+      "confianca": 0.21247105281177228,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_entregas_cronograma",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_069",
+      "texto": "Quanto recebe mensalmente o diretor desta área?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6930118709406051,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_070",
+      "texto": "Crie um ticket para trocar a senha do meu computador.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.883322625526335,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_071",
+      "texto": "Qual linha de metrô eu uso para chegar ao estádio?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.3785413006458658,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_072",
+      "texto": "Resuma as manchetes do Brasil de hoje.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8058616806999247,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_073",
+      "texto": "Agende um horário no dentista para mim.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8747412797901846,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_074",
+      "texto": "Quanto tenho restante no cartão de alimentação?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5092334123388427,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_075",
+      "texto": "Desligue e ligue novamente o meu notebook.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.790199393074421,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_076",
+      "texto": "Escreva um convite informal para uma festa de aniversário.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8650531550345026,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_077",
+      "texto": "Quem ocupa atualmente a presidência do país?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.605161773983822,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_078",
+      "texto": "Você sabe o contato de uma hamburgueria próxima?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6480268005836366,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_079",
+      "texto": "Veja quanto dinheiro tenho disponível na minha conta.",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8795671697475808,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_080",
+      "texto": "Quando será a próxima partida do Palmeiras?",
+      "esperado": "fora_do_catalogo",
+      "previsto_cru": "consultar_projeto_sintetico",
+      "confianca": 0.30381747109381885,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_projeto_sintetico",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_081",
+      "texto": "Mostre o que ainda precisa ser resolvido antes da próxima atualização do projeto.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.3451209851377887,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_082",
+      "texto": "Quais assuntos permanecem sem conclusão e precisam de responsável?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.6961659058341277,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_083",
+      "texto": "Crie avisos para pendências de informação, aprovação ou decisão.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.4715342976800007,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_084",
+      "texto": "Há algum compromisso atrasado ou com vencimento próximo que eu precise observar?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.5389833118323436,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_085",
+      "texto": "Identifique pontos em aberto capazes de impedir a continuidade da iniciativa.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8327678921878539,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_086",
+      "texto": "Quais providências ainda não tiveram conclusão registrada?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.5866573135424332,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_087",
+      "texto": "Avise sempre que um dado necessário ao acompanhamento continuar em branco.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.8342207843245205,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_088",
+      "texto": "Existe alguma deliberação ainda aguardando posicionamento da governança?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.6067169841038218,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_089",
+      "texto": "Liste tudo o que depende de ação para deixar de ficar pendente.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.3197048440971955,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_090",
+      "texto": "Quais aprovações ou atualizações ainda não foram concluídas dentro do prazo?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.561329846953801,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_091",
+      "texto": "Que assuntos abertos merecem acompanhamento mais próximo neste período?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.47698906258307594,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_092",
+      "texto": "Organize os alertas das pendências atuais por tipo de necessidade.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.4814395295051253,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_093",
+      "texto": "Existe algum compromisso do projeto já atrasado e ainda sem solução?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "consultar_projeto_sintetico",
+      "confianca": 0.5959096539170964,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_projeto_sintetico",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_094",
+      "texto": "Quais itens estão parados esperando retorno de uma área externa?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.8838069236800262,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_095",
+      "texto": "Identifique pendências que possam deslocar a data do próximo marco.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "orientar_entregas_cronograma",
+      "confianca": 0.28273273551428274,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_entregas_cronograma",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_096",
+      "texto": "Há obrigações registradas sem evidência de conclusão?",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.328323453874195,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_097",
+      "texto": "Para cada ponto em aberto, indique qual providência deve ocorrer em seguida.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7478856220743065,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_098",
+      "texto": "Sinalize ausência de prazo, responsável ou aprovação em itens que dependam dessas informações.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.2926966438586257,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_099",
+      "texto": "Quero visualizar somente os assuntos ainda não encerrados.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6749903905404726,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_100",
+      "texto": "Avise se houver algum ponto aberto que possa prejudicar o ciclo de acompanhamento.",
+      "esperado": "gerar_alertas_pendencias",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.4604968423765486,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_101",
+      "texto": "Como devo preparar as informações do projeto para o fechamento deste período?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.2948041398607647,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_102",
+      "texto": "Explique como atualizar corretamente o acompanhamento mensal da iniciativa.",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7449135587364658,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_103",
+      "texto": "Antes de enviar o reporte do mês, o que eu deveria revisar?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.881728605292504,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_104",
+      "texto": "Qual é a forma adequada de registrar a evolução ocorrida neste ciclo?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.32529349822406856,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_105",
+      "texto": "Que partes do acompanhamento precisam receber os dados deste mês?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.46063905896380913,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_106",
+      "texto": "Monte uma orientação prática para eu fazer o reporte periódico do projeto.",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.4665220294393666,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_107",
+      "texto": "Que fatos do período devem aparecer na atualização mensal?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.7089346284267694,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_108",
+      "texto": "Como informar neste mês os percentuais físico e financeiro?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.5018943050820424,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_109",
+      "texto": "O que precisa estar atualizado para representar a posição do projeto na data de corte?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.534733566674657,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_110",
+      "texto": "Ajude a organizar o reporte mensal que será encaminhado ao PMO.",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.5906405115146217,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_111",
+      "texto": "Quais informações são indispensáveis para concluir o acompanhamento deste ciclo?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.5398878086509576,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_112",
+      "texto": "Como fazer a revisão mensal dos dados cadastrados no projeto?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.27850894268103077,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_113",
+      "texto": "Oriente a atualização das realizações, situação e evolução observadas no período.",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.46539175891584567,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_114",
+      "texto": "O que deve ser conferido quando chegar a data mensal de referência?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.42364597081224686,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_115",
+      "texto": "Em que ordem é melhor atualizar os dados do acompanhamento periódico?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "consultar_projeto_sintetico",
+      "confianca": 0.3371245649570677,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_projeto_sintetico",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_116",
+      "texto": "Como incluir no reporte deste ciclo tanto os avanços quanto os assuntos em aberto?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.6923115381611957,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_117",
+      "texto": "Se nada mudou em determinado campo, como devo tratá-lo na revisão do mês?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "consultar_projeto_sintetico",
+      "confianca": 0.4368762269182907,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_projeto_sintetico",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_118",
+      "texto": "Quero organizar tudo que preciso reunir antes de concluir o reporte mensal.",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.641289657513496,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_119",
+      "texto": "Que atualizações devo fazer agora para manter o acompanhamento do projeto em dia?",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.25538761144294164,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_120",
+      "texto": "Descreva um fluxo simples para concluir a atualização mensal sem esquecer informações importantes.",
+      "esperado": "orientar_avanco_mensal",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6204076938066888,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_121",
+      "texto": "O que o planejamento indica como próxima entrega desta iniciativa?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.3883317558918537,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_122",
+      "texto": "Apresente os marcos que ainda ocorrerão com as datas atualmente registradas.",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.4359378478608284,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_123",
+      "texto": "Quero consultar a programação das entregas deste projeto.",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "orientar_entregas_cronograma",
+      "confianca": 0.5228968898732149,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_entregas_cronograma",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_124",
+      "texto": "Qual evento está previsto na sequência e qual é sua data planejada?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.46977441620398647,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_125",
+      "texto": "Organize os marcos futuros pela ordem em que devem acontecer.",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5160793603168349,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_126",
+      "texto": "Existe alguma entrega com previsão de conclusão durante o mês atual?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.4724308424100901,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_127",
+      "texto": "Que atividades precisam terminar para liberar o marco seguinte?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "orientar_entregas_cronograma",
+      "confianca": 0.5715582139481622,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_entregas_cronograma",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_128",
+      "texto": "Explique a sequência planejada das entregas que ainda faltam.",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "orientar_entregas_cronograma",
+      "confianca": 0.45500953128084703,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_entregas_cronograma",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_129",
+      "texto": "Quando está prevista a etapa de homologação neste planejamento?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "orientar_entregas_cronograma",
+      "confianca": 0.37293495406649496,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_entregas_cronograma",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_130",
+      "texto": "Separe os marcos já cumpridos daqueles que permanecem planejados.",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.524578494018746,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_131",
+      "texto": "Quais resultados estão programados para o próximo período de acompanhamento?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.5213050080083943,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_132",
+      "texto": "Há alguma data importante se aproximando no cronograma?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.4167972867955423,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_133",
+      "texto": "O que o projeto pretende concluir até o encerramento deste trimestre?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.45667238267324944,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_134",
+      "texto": "Quais tarefas antecedem cada um dos próximos marcos?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.6167464348855477,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_135",
+      "texto": "Como devo proceder para atualizar a previsão de uma entrega no planejamento?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.48109625644904624,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_136",
+      "texto": "Mostre quais entregas possuem dependência de atividades anteriores.",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "orientar_entregas_cronograma",
+      "confianca": 0.3998897992573521,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_entregas_cronograma",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_137",
+      "texto": "Monte uma linha do tempo com os principais marcos ainda previstos.",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6784358798776028,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_138",
+      "texto": "Existe algum marco futuro cadastrado sem uma data de previsão?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.4515729613318851,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_139",
+      "texto": "Quais prazos do planejamento precisam ser acompanhados nas próximas semanas?",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.6646828273999438,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_140",
+      "texto": "Ajude a conferir se as datas das entregas continuam adequadas ao planejamento atual.",
+      "esperado": "orientar_entregas_cronograma",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.4832681443908942,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_141",
+      "texto": "Que ganhos o projeto pretende produzir e quais medidas comprovam esses ganhos?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.38321676213958433,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_142",
+      "texto": "Oriente a montagem do mapa de benefícios desta iniciativa.",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "orientar_mapa_beneficios",
+      "confianca": 0.5948639570235928,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_mapa_beneficios",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_143",
+      "texto": "Qual métrica deve ser usada para acompanhar cada resultado de valor esperado?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.3677673919431184,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_144",
+      "texto": "Quais benefícios possuem comprovação registrada até agora?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.609191372714013,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_145",
+      "texto": "Como faço a ligação entre o que foi entregue e o valor que se espera gerar?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.7551993663373381,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_146",
+      "texto": "Apresente os benefícios cadastrados com o estágio atual de sua mensuração.",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6255062475050863,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_147",
+      "texto": "Como definir quem mede, o que mede e quando mede cada benefício?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "orientar_mapa_beneficios",
+      "confianca": 0.8539236312623778,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_mapa_beneficios",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_148",
+      "texto": "Existe algum ganho esperado sem indicador associado?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.680770155718025,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_149",
+      "texto": "Faça uma revisão do mapa de benefícios e indique o que ainda está faltando.",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "orientar_mapa_beneficios",
+      "confianca": 0.5764417896454608,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_mapa_beneficios",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_150",
+      "texto": "Como registrar a realização de valor sem tratar uma simples entrega como benefício?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "orientar_mapa_beneficios",
+      "confianca": 0.4863208740876758,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_mapa_beneficios",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_151",
+      "texto": "Que tipo de evidência deve existir antes de marcar um benefício como realizado?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "orientar_mapa_beneficios",
+      "confianca": 0.7122531826427552,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_mapa_beneficios",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_152",
+      "texto": "Identifique os pontos fracos do acompanhamento dos benefícios desta iniciativa.",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5856226833288419,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_153",
+      "texto": "Como estão as métricas usadas para verificar os benefícios atualmente?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.2845932206437569,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_154",
+      "texto": "Explique como conectar produto entregue, efeito gerado e benefício final.",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5777888344728161,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_155",
+      "texto": "Quais ganhos planejados ainda não possuem resultado apurado?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.5942724249439334,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_156",
+      "texto": "O que precisa ser complementado para acompanhar a geração de valor de forma adequada?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.6305097639144762,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_157",
+      "texto": "Depois de uma entrega relevante, como o mapa de benefícios deve ser revisado?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "orientar_mapa_beneficios",
+      "confianca": 0.6483476660918456,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_mapa_beneficios",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_158",
+      "texto": "Quais benefícios só poderão ser confirmados em uma medição posterior?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.4148458239418386,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_159",
+      "texto": "Ajude a validar metas e métricas previstas para os benefícios do projeto.",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.3012790959594634,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_160",
+      "texto": "Que dados mínimos preciso cadastrar para conseguir acompanhar um benefício ao longo do tempo?",
+      "esperado": "orientar_mapa_beneficios",
+      "previsto_cru": "orientar_mapa_beneficios",
+      "confianca": 0.8204001033197286,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_mapa_beneficios",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_161",
+      "texto": "Ajude a descrever um risco relacionado à possibilidade de atraso de um fornecedor.",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.6690575560120425,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_162",
+      "texto": "Como saber se devo cadastrar esta situação como risco ou como problema?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.8620328489699602,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_163",
+      "texto": "Reescreva esta situação separando origem, ocorrência possível e impacto.",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.7116641498561509,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_164",
+      "texto": "Mostre os eventos de risco e os problemas ainda ativos nesta iniciativa.",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.31919354127051985,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_165",
+      "texto": "Como registrar de maneira clara o efeito potencial de um risco sobre os prazos?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "consultar_documentos_normativos",
+      "confianca": 0.5239539941636225,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "consultar_documentos_normativos",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_166",
+      "texto": "Qual é a melhor forma de representar uma dependência de terceiro como risco?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.5264433039841759,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_167",
+      "texto": "Revise a redação deste risco e veja se os elementos necessários estão bem definidos.",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.5608555696426889,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_168",
+      "texto": "Quais dados são necessários ao abrir o registro de um problema ocorrido?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.45429211120254226,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_169",
+      "texto": "Formule um risco para uma situação em que a equipe pode não ter capacidade suficiente.",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5782838709423994,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_170",
+      "texto": "Que respostas ou ações foram cadastradas para os riscos mais relevantes?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.3030444705443475,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_171",
+      "texto": "O que devo alterar no registro quando a chance de um risco ocorrer aumenta?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.7800377894633539,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_172",
+      "texto": "Há algum problema atual que ainda esteja sem ação corretiva associada?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.40428641447518937,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_173",
+      "texto": "Transforme este cenário incerto em uma formulação apropriada de risco.",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.6627831653912928,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_174",
+      "texto": "Que riscos registrados podem interferir no resultado previsto para a próxima entrega?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_avanco_mensal",
+      "confianca": 0.3759555067989637,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_avanco_mensal",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_175",
+      "texto": "Como descrever o possível impacto de uma integração que pode falhar?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.29709199460926455,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_176",
+      "texto": "Ajude a registrar corretamente um problema que já está causando efeito no projeto.",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.4144041659551034,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_177",
+      "texto": "Quais informações precisam ser reavaliadas quando um risco é atualizado?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.6516754216865893,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_178",
+      "texto": "Como informar proprietário, resposta e acompanhamento de um risco?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "orientar_riscos_problemas",
+      "confianca": 0.7803791929288341,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_riscos_problemas",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_179",
+      "texto": "Quais riscos apresentam necessidade de tratamento em nível de governança?",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "gerar_alertas_pendencias",
+      "confianca": 0.3302400886055778,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "gerar_alertas_pendencias",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_180",
+      "texto": "Ajude a escrever o risco deixando claro que o evento ainda é uma possibilidade.",
+      "esperado": "orientar_riscos_problemas",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.566575883739168,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_181",
+      "texto": "Oriente o preenchimento do termo de abertura desta iniciativa.",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.5316685052218252,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_182",
+      "texto": "O que precisa constar obrigatoriamente no TAP antes de ele seguir adiante?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.7297440626332475,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_183",
+      "texto": "Como formular o objetivo principal no Termo de Abertura do Projeto?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.7899764325800923,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_184",
+      "texto": "Ajude a estabelecer o que fica dentro e fora do escopo inicial no TAP.",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.8565235155019378,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_185",
+      "texto": "Que conteúdo deve entrar na justificativa do termo de abertura?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.8673925492019222,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_186",
+      "texto": "Como apresentar as condições assumidas e as limitações iniciais no TAP?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.7511133412061516,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_187",
+      "texto": "Quais seções do termo precisam estar concluídas para encaminhamento à aprovação?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.4160493193793933,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_188",
+      "texto": "Faça uma revisão do TAP e identifique informações fundamentais ainda ausentes.",
+      "esperado": "orientar_tap",
+      "previsto_cru": "fora_do_catalogo",
+      "confianca": 0.5547321758547166,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "fora_do_catalogo",
+      "correto": false
+    },
+    {
+      "id": "RNF03_V2_189",
+      "texto": "Como registrar as partes interessadas relevantes no termo de abertura?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.8577926197795734,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_190",
+      "texto": "Os ganhos esperados devem ser descritos no TAP? Como fazer isso?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.8670725411882522,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_191",
+      "texto": "Ajude a definir critérios objetivos de sucesso para incluir no termo.",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.7645279806802948,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_192",
+      "texto": "Como demonstrar no TAP a relação da iniciativa com uma diretriz estratégica?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.7578451497119548,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_193",
+      "texto": "Que ameaças iniciais devem ser registradas na abertura do projeto?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.43159018333905724,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_194",
+      "texto": "Ajude a criar um texto conciso para explicar a finalidade da iniciativa no TAP.",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.6576641071462564,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_195",
+      "texto": "Como delimitar adequadamente o escopo de alto nível no termo de abertura?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.8966891215619611,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_196",
+      "texto": "Que informações iniciais de custo e duração devem aparecer no TAP?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.8750132772023353,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_197",
+      "texto": "Como apresentar as entregas principais ainda em nível macro no termo?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.6491471956226633,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_198",
+      "texto": "Quais registros de aceite ou autorização devem constar no TAP?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.8098765567123865,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_199",
+      "texto": "Se um dado inicial mudar, qual é a forma correta de refletir isso no termo de abertura?",
+      "esperado": "orientar_tap",
+      "previsto_cru": "orientar_tap",
+      "confianca": 0.8291012127531233,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "orientar_tap",
+      "correto": true
+    },
+    {
+      "id": "RNF03_V2_200",
+      "texto": "Revise a estrutura do TAP e indique se alguma seção necessária continua sem preenchimento.",
+      "esperado": "orientar_tap",
+      "previsto_cru": "analisar_completude_coerencia",
+      "confianca": 0.5789390605161616,
+      "rejeitado_pelo_limiar": false,
+      "previsto_final": "analisar_completude_coerencia",
+      "correto": false
+    }
+  ]
+}
