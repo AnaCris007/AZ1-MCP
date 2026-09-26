@@ -1,0 +1,9 @@
+item,estado,evidencia,impacto
+Fluxo RF04 de sugestão por campo,AUSENTE,"docs/Projeto.md:6738; src/services/agente_service.py:11-13",Impede produzir sugestões avaliáveis
+Contrato de sugestão estruturada,AUSENTE,"src/schemas/chat.py:40-45 contém somente reply e fontes",Impede separar campo sugerido fonte e justificativa
+Massa de artefatos,AUSENTE,"consulta PostgreSQL: portfolio.artefato=0",Impede identificar o documento alvo
+Massa de campos de artefato,AUSENTE,"consulta PostgreSQL: portfolio.campo_artefato=0",Impede identificar campos pendentes
+20 solicitações positivas versionadas,AUSENTE,"nenhuma massa RNF11 encontrada no repositório",Impede executar CT-RNF11-P
+10 solicitações negativas versionadas,AUSENTE,"nenhuma massa RNF11 encontrada no repositório",Impede executar CT-RNF11-N
+Fontes e gabaritos pré-registrados,AUSENTE,"nenhuma fonte/gabarito RNF11 encontrado no repositório",Impede julgar sustentação
+Dois avaliadores independentes e desempate,AUSENTE,"nenhuma rubrica preenchida para RNF11",Impede consolidar clareza e sustentação

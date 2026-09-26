@@ -1,0 +1,45 @@
+{
+  "tags": [
+    "chat"
+  ],
+  "summary": "Send Chat Message",
+  "description": "Classifica, age se houver ação, e só então pergunta ao modelo.\n\nESTA ORDEM É O CONTRATO, e por muito tempo não foi o código. O handler\nchamava `answerer.answer` primeiro e classificava depois, de modo que todo\nturno em que o Agente agia — pendências, situação de projeto ou recusa —\npagava uma geração no Gemini e uma busca vetorial cujo resultado era\ndescartado na linha seguinte.\n\nNo caso da recusa isso não era só desperdício: a Seção 2.1 do Projeto.md\nespecifica recusar pedidos fora do escopo \"antes mesmo de consultar as\nfontes de dados\", e o caso crítico 1 da Seção 2.2.3 modela a classificação\nantes do roteamento. Consultar as fontes para depois jogar fora a resposta\né o oposto do que o artefato descreve.",
+  "operationId": "send_chat_message_api_v1_chat_post",
+  "requestBody": {
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ChatRequest"
+        }
+      }
+    },
+    "required": true
+  },
+  "responses": {
+    "200": {
+      "description": "Successful Response",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ChatResponse"
+          }
+        }
+      }
+    },
+    "422": {
+      "description": "Validation Error",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/HTTPValidationError"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "HTTPBearer": []
+    }
+  ]
+}

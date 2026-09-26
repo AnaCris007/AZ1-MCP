@@ -1,0 +1,97 @@
+[
+  {
+    "metodo": "GET",
+    "endpoint": "/api/v1/alertas/assinantes",
+    "operation_id": "listar_assinantes_api_v1_alertas_assinantes_get"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/alertas/assinantes",
+    "operation_id": "registrar_assinante_api_v1_alertas_assinantes_post"
+  },
+  {
+    "metodo": "PATCH",
+    "endpoint": "/api/v1/alertas/assinantes/{assinante_id}/desativar",
+    "operation_id": "desativar_assinante_api_v1_alertas_assinantes__assinante_id__desativar_patch"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/audio",
+    "operation_id": "upload_audio_api_v1_audio_post"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/audio/{audio_id}/analyze",
+    "operation_id": "analyze_audio_api_v1_audio__audio_id__analyze_post"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/audio/{audio_id}/transcribe",
+    "operation_id": "transcribe_audio_api_v1_audio__audio_id__transcribe_post"
+  },
+  {
+    "metodo": "GET",
+    "endpoint": "/api/v1/auditoria/consultas",
+    "operation_id": "listar_consultas_api_v1_auditoria_consultas_get"
+  },
+  {
+    "metodo": "GET",
+    "endpoint": "/api/v1/calendar/events",
+    "operation_id": "listar_eventos_api_v1_calendar_events_get"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/calendar/events",
+    "operation_id": "criar_evento_local_api_v1_calendar_events_post"
+  },
+  {
+    "metodo": "DELETE",
+    "endpoint": "/api/v1/calendar/events/{evento_id}",
+    "operation_id": "apagar_evento_local_api_v1_calendar_events__evento_id__delete"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/chat",
+    "operation_id": "send_chat_message_api_v1_chat_post"
+  },
+  {
+    "metodo": "GET",
+    "endpoint": "/api/v1/conversas",
+    "operation_id": "listar_conversas_api_v1_conversas_get"
+  },
+  {
+    "metodo": "GET",
+    "endpoint": "/api/v1/conversas/{conversa_id}/mensagens",
+    "operation_id": "listar_mensagens_api_v1_conversas__conversa_id__mensagens_get"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/conversas/avaliacoes",
+    "operation_id": "avaliar_resposta_api_v1_conversas_avaliacoes_post"
+  },
+  {
+    "metodo": "GET",
+    "endpoint": "/api/v1/projetos",
+    "operation_id": "listar_projetos_api_v1_projetos_get"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/rag/search",
+    "operation_id": "search_rag_api_v1_rag_search_post"
+  },
+  {
+    "metodo": "GET",
+    "endpoint": "/api/v1/tasks",
+    "operation_id": "listar_tasks_api_v1_tasks_get"
+  },
+  {
+    "metodo": "PATCH",
+    "endpoint": "/api/v1/tasks/{pendencia_id}",
+    "operation_id": "atualizar_task_api_v1_tasks__pendencia_id__patch"
+  },
+  {
+    "metodo": "POST",
+    "endpoint": "/api/v1/text-to-speech",
+    "operation_id": "text_to_speech_api_v1_text_to_speech_post"
+  }
+]

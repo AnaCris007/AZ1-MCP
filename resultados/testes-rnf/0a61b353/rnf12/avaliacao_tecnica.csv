@@ -1,0 +1,13 @@
+consulta,afirmacao_atomica,referencia_apresentada,classificacao_tecnica,motivo
+P05,O status do SYN-12 é Em execução,sim,CANDIDATA_A_SUSTENTADA,A fonte citada contém o status informado
+P15,O risco de alto impacto do SYN-12 é atraso na integração com o sistema legado,sim,CANDIDATA_A_SUSTENTADA,A fonte citada contém o risco e o impacto
+P17,A Equipe de Integração trata o risco de atraso na integração do SYN-12,sim,CANDIDATA_A_SUSTENTADA,A fonte citada contém o responsável
+P26,O Termo de Abertura do SYN-12 foi atualizado em 20/09/2026,sim,CANDIDATA_A_SUSTENTADA,A fonte citada contém a data de atualização
+P21,O SYN-01 possui 64% de avanço,não,NAO_SUSTENTADA,Nenhuma referência foi apresentada
+P21,O SYN-07 possui 47% de avanço,não,NAO_SUSTENTADA,Nenhuma referência foi apresentada
+P21,O SYN-04 possui 70% de avanço,não,NAO_SUSTENTADA,Nenhuma referência foi apresentada
+P21,O SYN-06 possui 15% de avanço,não,NAO_SUSTENTADA,Nenhuma referência foi apresentada
+P21,O SYN-03 possui 41% de avanço,não,NAO_SUSTENTADA,Nenhuma referência foi apresentada
+P21,O SYN-08 possui 100% de avanço,não,NAO_SUSTENTADA,Nenhuma referência foi apresentada
+P21,O SYN-02 possui 71% de avanço,não,NAO_SUSTENTADA,Nenhuma referência foi apresentada
+P21,O SYN-05 possui 78% de avanço,não,NAO_SUSTENTADA,Nenhuma referência foi apresentada

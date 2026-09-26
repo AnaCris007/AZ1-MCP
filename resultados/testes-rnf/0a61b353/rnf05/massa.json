@@ -1,0 +1,423 @@
+[
+  {
+    "id": "RNF05-P01",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P01] Consulte o projeto sintético.",
+    "conversation_id": "3af720b8-da17-5004-961d-750ed45b5e2d",
+    "intencao_esperada": "consultar_documentos_normativos",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P01.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P01.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P02",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P02] Consulte o projeto sintético.",
+    "conversation_id": "039554ee-8118-548d-8d23-22d9ea1a2597",
+    "intencao_esperada": "consultar_projeto_sintetico",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P02.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P02.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P03",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P03] Consulte o projeto sintético.",
+    "conversation_id": "82f13556-68e2-575f-8f72-dc865fd13ade",
+    "intencao_esperada": "orientar_mapa_beneficios",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P03. [1]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P03.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-04",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_03.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-03-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P03."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P04",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P04] Consulte o projeto sintético.",
+    "conversation_id": "27e8c9f5-a18d-56c5-ba77-1e9ab4427e1e",
+    "intencao_esperada": "orientar_tap",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P04.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P04.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P05",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P05] Consulte o projeto sintético.",
+    "conversation_id": "cd08d015-d01c-580c-9b79-1bb3ab6b0f33",
+    "intencao_esperada": "orientar_entregas_cronograma",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P05. [1][2]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P05.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-06",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_05.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-05-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P05."
+      },
+      {
+        "posicao": 2,
+        "projeto_id": "SYN-06",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_05.xlsx",
+        "secao": "Marcos",
+        "score": 0.93,
+        "chunk_id": "rnf05-05-2",
+        "trecho": "Trecho controlado 2 do caso RNF05-P05."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P06",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P06] Consulte o projeto sintético.",
+    "conversation_id": "028b1e74-6a12-51a2-87b9-3472c2fd8601",
+    "intencao_esperada": "orientar_avanco_mensal",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P06. [1]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P06.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-07",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_06.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-06-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P06."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P07",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P07] Consulte o projeto sintético.",
+    "conversation_id": "85bb6cff-bac8-5075-88f6-8ae34faa995a",
+    "intencao_esperada": "orientar_riscos_problemas",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P07.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P07.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P08",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P08] Consulte o projeto sintético.",
+    "conversation_id": "c051ad80-1739-564a-9ba3-22b1faa0a5f5",
+    "intencao_esperada": "analisar_completude_coerencia",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P08.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P08.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P09",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P09] Consulte o projeto sintético.",
+    "conversation_id": "641a90e4-10ee-59b3-9571-e24934bd5196",
+    "intencao_esperada": "gerar_alertas_pendencias",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P09. [1]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P09.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-02",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_09.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-09-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P09."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P10",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P10] Consulte o projeto sintético.",
+    "conversation_id": "453c7597-3120-5c1f-9356-d230b03d670f",
+    "intencao_esperada": "fora_do_catalogo",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P10. [1][2]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P10.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-03",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_10.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-10-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P10."
+      },
+      {
+        "posicao": 2,
+        "projeto_id": "SYN-03",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_10.xlsx",
+        "secao": "Marcos",
+        "score": 0.93,
+        "chunk_id": "rnf05-10-2",
+        "trecho": "Trecho controlado 2 do caso RNF05-P10."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P11",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P11] Consulte o projeto sintético.",
+    "conversation_id": "7905918d-35d0-5806-9a54-ad2eee4b4779",
+    "intencao_esperada": "consultar_documentos_normativos",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P11.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P11.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P12",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P12] Consulte o projeto sintético.",
+    "conversation_id": "3896af11-d9d0-58d5-bc63-1af2f1ea27a7",
+    "intencao_esperada": "consultar_projeto_sintetico",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P12. [1]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P12.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-05",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_12.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-12-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P12."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P13",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P13] Consulte o projeto sintético.",
+    "conversation_id": "755496ec-6700-5b51-a168-2092d79a8ea3",
+    "intencao_esperada": "orientar_mapa_beneficios",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P13.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P13.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P14",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P14] Consulte o projeto sintético.",
+    "conversation_id": "cca37e5b-b860-5847-b580-61a8ec57df09",
+    "intencao_esperada": "orientar_tap",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P14.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P14.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P15",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P15] Consulte o projeto sintético.",
+    "conversation_id": "76bb40f5-63f2-54aa-ad19-0f2e56d7a177",
+    "intencao_esperada": "orientar_entregas_cronograma",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P15. [1][2]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P15.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-08",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_15.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-15-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P15."
+      },
+      {
+        "posicao": 2,
+        "projeto_id": "SYN-08",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_15.xlsx",
+        "secao": "Marcos",
+        "score": 0.93,
+        "chunk_id": "rnf05-15-2",
+        "trecho": "Trecho controlado 2 do caso RNF05-P15."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P16",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P16] Consulte o projeto sintético.",
+    "conversation_id": "cdefd68d-5c3a-598b-ad37-9b82a3bb7d70",
+    "intencao_esperada": "orientar_avanco_mensal",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P16.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P16.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P17",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P17] Consulte o projeto sintético.",
+    "conversation_id": "2079224c-de17-55d3-9449-4182dc37d0b0",
+    "intencao_esperada": "orientar_riscos_problemas",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P17.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P17.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P18",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P18] Consulte o projeto sintético.",
+    "conversation_id": "9f21297e-5011-5208-ae50-503e27c2d9f6",
+    "intencao_esperada": "analisar_completude_coerencia",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P18. [1]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P18.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-03",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_18.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-18-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P18."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P19",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P19] Consulte o projeto sintético.",
+    "conversation_id": "d71b76f2-c1d5-52c7-962e-451960fd7670",
+    "intencao_esperada": "gerar_alertas_pendencias",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P19.",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P19.",
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-P20",
+    "tipo": "positivo",
+    "mensagem": "[RNF05-P20] Consulte o projeto sintético.",
+    "conversation_id": "1d3759c9-8c36-5ac6-9fb3-3382bdd2fb4d",
+    "intencao_esperada": "fora_do_catalogo",
+    "resposta_bruta": "Resposta controlada do caso RNF05-P20. [1][2]",
+    "resposta_esperada": "Resposta controlada do caso RNF05-P20.",
+    "fontes_esperadas": [
+      {
+        "posicao": 1,
+        "projeto_id": "SYN-05",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_20.xlsx",
+        "secao": "Marcos",
+        "score": 0.94,
+        "chunk_id": "rnf05-20-1",
+        "trecho": "Trecho controlado 1 do caso RNF05-P20."
+      },
+      {
+        "posicao": 2,
+        "projeto_id": "SYN-05",
+        "tipo_documento": "cronograma",
+        "arquivo_origem": "02_Cronograma_RNF05_20.xlsx",
+        "secao": "Marcos",
+        "score": 0.93,
+        "chunk_id": "rnf05-20-2",
+        "trecho": "Trecho controlado 2 do caso RNF05-P20."
+      }
+    ],
+    "token": "valido",
+    "status_esperado": 200
+  },
+  {
+    "id": "RNF05-N01",
+    "tipo": "negativo",
+    "categoria": "entrada_invalida",
+    "mensagem": "   ",
+    "conversation_id": "f8f9d73c-3459-55c0-bf7c-b00dd7098caa",
+    "intencao_esperada": null,
+    "resposta_bruta": null,
+    "resposta_esperada": null,
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 422,
+    "erro_esperado": "empty_message"
+  },
+  {
+    "id": "RNF05-N02",
+    "tipo": "negativo",
+    "categoria": "credencial_invalida",
+    "mensagem": "Consulta com credencial inválida.",
+    "conversation_id": "e26676ed-6b20-5d8d-ba4e-abac4ce95188",
+    "intencao_esperada": null,
+    "resposta_bruta": null,
+    "resposta_esperada": null,
+    "fontes_esperadas": [],
+    "token": "invalido",
+    "status_esperado": 401,
+    "erro_esperado": "unauthorized"
+  },
+  {
+    "id": "RNF05-N03",
+    "tipo": "negativo",
+    "categoria": "falha_servico",
+    "mensagem": "Falha controlada do serviço externo.",
+    "conversation_id": "69664032-36cc-5a09-b403-bf76394b380e",
+    "intencao_esperada": "consultar_projeto_sintetico",
+    "resposta_bruta": null,
+    "resposta_esperada": null,
+    "fontes_esperadas": [],
+    "token": "valido",
+    "status_esperado": 503,
+    "erro_esperado": "service_unavailable"
+  }
+]
