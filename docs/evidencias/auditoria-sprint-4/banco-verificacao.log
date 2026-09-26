@@ -1,0 +1,23 @@
+Verificacao do banco em PostgreSQL 16 dedicado (2026-09-26T00:44:25-03:00)
+Scripts aplicados em ordem com ON_ERROR_STOP: 01, 02, 03_rls_policies (inclui 06), 03_webhooks_auditoria, 07, 08, 09
+
+ Cada bloco DEVE imprimir "RECUSADO (ok)". "ACEITOU" indica falha.
+psql:04_verificacao.sql:146: NOTICE:  RECUSADO (ok) — prompt do usuário não pode ter resultado
+psql:04_verificacao.sql:155: NOTICE:  RECUSADO (ok) — resposta do agente não classifica intenção
+psql:04_verificacao.sql:163: NOTICE:  RECUSADO (ok) — só mensagem de áudio referencia áudio
+psql:04_verificacao.sql:172: NOTICE:  RECUSADO (ok) — intenção fora do catálogo da Seção 3.1
+psql:04_verificacao.sql:180: NOTICE:  RECUSADO (ok) — a ordem é única dentro da conversa
+psql:04_verificacao.sql:189: NOTICE:  RECUSADO (ok) — a avaliação recai sobre um alvo só
+psql:04_verificacao.sql:198: NOTICE:  RECUSADO (ok) — avaliação exige nota ou polaridade
+psql:04_verificacao.sql:205: NOTICE:  RECUSADO (ok) — avanço físico fora de 0..100
+ROLLBACK
+== ROLLBACK executado: nenhum resíduo gravado ==
+
+ table_schema | tabelas 
+--------------+---------
+ alerta       |       2
+ auditoria    |       7
+ integracao   |       1
+ portfolio    |       8
+(4 rows)
+

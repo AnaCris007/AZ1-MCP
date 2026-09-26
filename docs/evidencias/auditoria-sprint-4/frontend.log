@@ -1,0 +1,71 @@
+
+ RUN  v5.0.0 C:/Users/Inteli/OneDrive/Desktop/modulo7/g01/src/frontend
+
+ ✓ src/lib/api.test.js (8 tests) 43ms
+ ✓ src/hooks/useMicVolume.test.js (4 tests) 186ms
+stderr | src/pages/AgentPage.test.jsx
+VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY não configuradas — o login com Microsoft não vai funcionar. Preencha as duas no .env (ver .env.example).
+
+ ✓ src/components/ChatMessage/ChatMessage.test.jsx (2 tests) 240ms
+ ✓ src/components/CalendarView/CalendarGridView.test.jsx (5 tests) 1681ms
+   ✓ renderiza 42 células, seis semanas começando na segunda-feira 337ms
+   ✓ navega entre meses ao clicar em anterior/próximo 719ms
+stderr | src/components/CalendarView/CalendarView.test.jsx > distingue falha de carregamento de uma agenda vazia
+[calendar] não foi possível carregar a agenda do portfólio
+
+stderr | src/components/TasksView/TasksView.test.jsx > informa falha de leitura sem apresentar uma lista vazia como sucesso
+[tasks] não foi possível carregar as pendências do portfólio
+
+ ✓ src/components/Sidebar/Sidebar.test.jsx (1 test) 908ms
+   ✓ oferece configurações no rodapé da barra lateral 895ms
+ ✓ src/components/TopBar/TopBar.test.jsx (2 tests) 1312ms
+   ✓ mostra o e-mail e a ação de sair somente após abrir o perfil 1131ms
+stderr | src/pages/AgentPage.test.jsx > AgentPage — confirmação de transcrição > apresenta a transcrição no campo de texto sem enviá-la automaticamente
+[conversas] não foi possível carregar o histórico
+
+stderr | src/pages/AgentPage.test.jsx > AgentPage — confirmação de transcrição > envia a transcrição quando o usuário confirma
+[conversas] não foi possível carregar o histórico
+
+ ✓ src/components/TasksView/TasksView.test.jsx (5 tests) 2494ms
+   ✓ informa falha de leitura sem apresentar uma lista vazia como sucesso 712ms
+   ✓ preserva o estado da tarefa quando a gravação falha 549ms
+   ✓ exibe a conclusão imediatamente e impede outra gravação da mesma tarefa 343ms
+   ✓ permite salvar outra tarefa e reverte somente a que falhou 418ms
+   ✓ filtra tarefas abertas e concluídas sem alterar os dados 461ms
+stderr | src/pages/AgentPage.test.jsx > AgentPage — confirmação de transcrição > CT-RF01-19: envia somente a transcrição corrigida após confirmação
+[conversas] não foi possível carregar o histórico
+
+stderr | src/pages/AgentPage.test.jsx > AgentPage — confirmação de transcrição > não envia a transcrição quando o usuário descarta
+[conversas] não foi possível carregar o histórico
+
+ ✓ src/components/CalendarView/CalendarView.test.jsx (12 tests) 5089ms
+   ✓ distingue falha de carregamento de uma agenda vazia 663ms
+   ✓ abre os detalhes de um marco ao clicar no item 521ms
+   ✓ restaura somente o evento cuja exclusão falhou e permite tentar novamente 629ms
+   ✓ abre o modal, cria um evento e recarrega a agenda 897ms
+   ✓ fecha o modal de criação ao clicar fora, mas não ao clicar no conteúdo 595ms
+   ✓ fecha os detalhes ao clicar fora, mas não ao clicar no conteúdo 688ms
+stderr | src/pages/AgentPage.test.jsx > AgentPage — confirmação de transcrição > apresenta feedback quando a transcrição vem vazia
+[conversas] não foi possível carregar o histórico
+
+stderr | src/pages/AgentPage.test.jsx > AgentPage — erros do chat > CT-RF01-15: falha de rede apresenta erro sem resposta fictícia
+[conversas] não foi possível carregar o histórico
+
+stderr | src/pages/AgentPage.test.jsx > AgentPage — erros do chat > apresenta a mensagem de sobrecarga quando o backend responde 503 service_unavailable
+[conversas] não foi possível carregar o histórico
+
+ ✓ src/pages/AgentPage.test.jsx (7 tests) 6946ms
+   ✓ AgentPage — confirmação de transcrição (5)
+     ✓ apresenta a transcrição no campo de texto sem enviá-la automaticamente 979ms
+     ✓ envia a transcrição quando o usuário confirma 833ms
+     ✓ CT-RF01-19: envia somente a transcrição corrigida após confirmação 1976ms
+     ✓ não envia a transcrição quando o usuário descarta 415ms
+   ✓ AgentPage — erros do chat (2)
+     ✓ CT-RF01-15: falha de rede apresenta erro sem resposta fictícia 1849ms
+     ✓ apresenta a mensagem de sobrecarga quando o backend responde 503 service_unavailable 631ms
+
+ Test Files  9 passed (9)
+      Tests  46 passed (46)
+   Start at  00:34:19
+   Duration  36.88s (environment 72%, setup 10%, import 8%, tests 7%, transform 2%, worker 1%)
+
