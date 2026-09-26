@@ -1,0 +1,6 @@
+Sondagem do endereco publico registrado no !100 (2026-09-26T00:44:28-03:00)
+GET https://100-55-199-202.sslip.io/health -> http=000 tempo=15.001055s
+GET https://100-55-199-202.sslip.io/health/ready -> http=000 tempo=15.004952s
+GET https://100-55-199-202.sslip.io/ -> http=000 tempo=15.002452s
+GET http://100-55-199-202.sslip.io/health -> http=000 tempo=15.005104s
+http=000 significa ausencia de resposta dentro do tempo limite (instancia parada ou inacessivel).

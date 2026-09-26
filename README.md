@@ -112,7 +112,7 @@ python -m unittest discover tests  # a suite completa
 - `src/routes/`: endpoints da API (FastAPI).
 - `src/schemas/`: modelos Pydantic de request/response da API.
 - `src/services/`: casos de uso e integração com armazenamento S3-compatível.
-- `src/mensageria/`: barramento de mensagens assíncrono (RabbitMQ) da Sprint 5. O receptor de webhook publica o envelope; um worker autônomo (`python -m mensageria.consumidor`) consome e faz a varredura da origem marcada como pendente. A publicação é opcional: sem `RABBITMQ_URL`, a API degrada para no-op e o comportamento anterior permanece intacto. [Documentação técnica](docs/Projeto.md#6441-implementação-do-barramento-assíncrono).
+- `src/mensageria/`: barramento de mensagens assíncrono (RabbitMQ), previsto para a Sprint 5 e antecipado para a Sprint 4. O receptor de webhook publica o envelope; um worker autônomo (`python -m mensageria.consumidor`) consome e faz a varredura da origem marcada como pendente. A publicação é opcional: sem `RABBITMQ_URL`, a API degrada para no-op e o comportamento anterior permanece intacto. [Documentação técnica](docs/Projeto.md#6441-implementação-do-barramento-assíncrono).
 - `src/az1_api/main.py`: ponto de entrada da aplicação FastAPI.
 - `resultados/`: saída gerada. Nada ali é editado à mão. Os comparativos vêm de
   `python -m pln.experimento` e `python -m pln.ajuste_fino`, o modelo treinado de
@@ -121,7 +121,7 @@ python -m unittest discover tests  # a suite completa
 
 ##  Rodando com Docker
 
-A pilha inteira — interface, API, armazenamento de áudio e criação do bucket — sobe com um comando. É o caminho recomendado: não exige Python, Node nem MinIO instalados na máquina, e é o mesmo empacotamento que vai para a nuvem.
+A pilha inteira (interface, API, armazenamento de áudio e criação do bucket) sobe com um comando. É o caminho recomendado: não exige Python, Node nem MinIO instalados na máquina, e é o mesmo empacotamento que vai para a nuvem.
 
 ```bash
 cp .env.example .env      # preencha DEEPGRAM_API_KEY, GEMINI_API_KEY e a autenticação (ver abaixo)
@@ -137,7 +137,7 @@ docker compose up -d --build
 
 O código do repositório é montado dentro dos contêineres: editar um arquivo recarrega a API ou a interface, sem reconstruir imagem.
 
-A interface pede login com uma conta Microsoft (RNF02, ver `docs/Projeto.md` Seção 3.4). Isso exige configurar `SUPABASE_URL` e `SUPABASE_ANON_KEY` no `.env` — os comentários do `.env.example` têm o passo a passo do app registration no Entra ID e do provider no Supabase. Para desenvolver sem passar por essa configuração, defina `AZ1_AUTH_MODE=disabled` no `.env`: as rotas protegidas ficam abertas sem token. Essa válvula **não funciona em produção** — `docker-compose.prod.yml` recusa a subida se ela estiver ligada.
+A interface pede login com uma conta Microsoft (RNF02, ver `docs/Projeto.md` Seção 3.4). Isso exige configurar `SUPABASE_URL` e `SUPABASE_ANON_KEY` no `.env`: os comentários do `.env.example` têm o passo a passo do app registration no Entra ID e do provider no Supabase. Para desenvolver sem passar por essa configuração, defina `AZ1_AUTH_MODE=disabled` no `.env`: as rotas protegidas ficam abertas sem token. Essa válvula **não funciona em produção**: `docker-compose.prod.yml` recusa a subida se ela estiver ligada.
 
 ```bash
 docker compose --profile ci run --rm tests      # a suite completa, dentro da imagem
@@ -146,7 +146,7 @@ docker compose logs -f api                      # acompanha os logs
 docker compose down                             # derruba, preservando os áudios
 ```
 
-Para subir em modo produção — interface na porta 80, API e MinIO fechados na rede interna, limites de recurso e credenciais obrigatórias:
+Para subir em modo produção: interface na porta 80, API e MinIO fechados na rede interna, limites de recurso e credenciais obrigatórias:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
@@ -168,7 +168,7 @@ Depois, com o projeto instalado por `pip install -e .`, rode a API normalmente:
 uvicorn az1_api.main:app --reload
 ```
 
-A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000/docs`. O console do MinIO fica em `http://127.0.0.1:9001`, com o usuário e a senha definidos em `AUDIO_STORAGE_ACCESS_KEY` e `AUDIO_STORAGE_SECRET_KEY` no `.env` — as mesmas chaves com que a API assina as requisições S3.
+A documentação interativa (Swagger) fica disponível em `http://127.0.0.1:8000/docs`. O console do MinIO fica em `http://127.0.0.1:9001`, com o usuário e a senha definidos em `AUDIO_STORAGE_ACCESS_KEY` e `AUDIO_STORAGE_SECRET_KEY` no `.env`: as mesmas chaves com que a API assina as requisições S3.
 
 Os arquivos são armazenados com a chave `incoming/{audio_id}` e expiram automaticamente após sete dias. O componente de Speech-to-Text recebe o `audio_id` do orquestrador e recupera o objeto diretamente do bucket `az1-audio`; esta API não oferece endpoint de download nem inicia a transcrição.
 
@@ -188,18 +188,20 @@ git clone https://git.inteli.edu.br/graduacao/2026-2a/t17/g01
     * Artefato - Entendimento do negócio
     * Artefato - Especificação de requisitos funcionais e não funcionais
     * Artefato - Gestão de projeto e configuração
-* 0.2.0 - DD/MM/2026
-    * Artefato
-    * Artefato
-* 0.3.0 - DD/MM/2026
-    * Artefato
-    * Artefato
-* 0.4.0 - DD/MM/2026
-    * Artefato
-    * Artefato
-* 0.5.0 - DD/MM/2026
-    * Artefato
-    * Artefato
+* 0.2.0 - 28/08/2026
+    * Artefato - Prototipação exploratória de design e UX
+    * Artefato - Definição técnica e arquitetural da solução
+    * Artefato - Gestão evolutiva da Sprint 2
+* 0.3.0 - 12/09/2026
+    * Artefato - API de recebimento de áudio, Speech to Text e algoritmo de PLN
+    * Artefato - Interface básica integrada e planejamento dos testes sistêmicos
+    * Artefato - Gestão evolutiva da Sprint 3
+* 0.4.0 - Sprint 4, integrada em `develop` em 25/09/2026 e ainda não promovida para `main`
+    * Artefato - Webhooks, banco de dados, mensageria e implantação em nuvem
+    * Artefato - Execução dos testes funcionais, de integração, não funcionais e de usabilidade
+    * Artefato - Gestão evolutiva da Sprint 4, planejamento da Sprint 5 e viabilidade financeira
+* 0.5.0 - Sprint 5, com entrega prevista para 09/10/2026
+    * Artefato - Frontend completo, integração ponta a ponta e versão final publicada
 
 ## 📋 Licença/License
 

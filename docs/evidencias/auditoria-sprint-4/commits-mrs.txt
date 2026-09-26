@@ -1,0 +1,54 @@
+Apuracao de commits e MRs da Sprint 4 (2026-09-26T00:45:46-03:00)
+Criterio: commits autorais (sem merges) alcancaveis por qualquer referencia remota, data de autoria em America/Sao_Paulo entre 14/09/2026 00:00 e 25/09/2026 23:59
+
+Total ate o corte de 25/09 17:55: 72
+Total final da sprint: 78
+
+Por nome de autor no Git:
+     11 Ana Cristina Alves Jardim
+     16 FelipeSimao9
+     20 Karol
+     11 Paulo Henrique Bueno Fernandes
+      8 Rui Facó
+      5 Tobias Viana
+      7 matheus.silva
+
+Por dia:
+      4 2026-09-18
+      1 2026-09-19
+      9 2026-09-20
+      4 2026-09-21
+      9 2026-09-22
+     10 2026-09-23
+     29 2026-09-24
+     12 2026-09-25
+
+Commits posteriores ao corte de 17:55:
+f429a8a|Rui Facó|2026-09-25 22:53|docs(testes): consolida execucao dos requisitos nao funcionais #285
+b9e84cd|Rui Facó|2026-09-25 22:40|test(rnf): registra evidencias da campanha nao funcional #285
+0501e49|Rui Facó|2026-09-25 22:39|test(rnf): adiciona executores e massas da campanha #285
+9368c99|FelipeSimao9|2026-09-25 19:12|docs: atualizar matriz de papéis com o fechamento da Sprint 4 #234
+0e4eb7b|FelipeSimao9|2026-09-25 19:12|docs: atualizar aderência de configuração com o fechamento #221
+3470bf5|FelipeSimao9|2026-09-25 19:12|docs: atualizar retrospectiva e riscos do fechamento da Sprint 4 #221
+
+Merges de MR com data de 25/09 (America/Sao_Paulo):
+0f27f7d|Karol Barbosa|2026-09-25 23:03|Merge branch 'feat/executar-testes-rnf' into 'develop'
+a2cf6cf|Paulo Fernandes|2026-09-25 20:11|Merge branch 'docs/gestao-projeto-sprint-4' into 'develop'
+f8012f4|Karol Barbosa|2026-09-25 16:40|Merge branch 'feat/deploy-https' into 'develop'
+21fa487|Felipe Simao|2026-09-25 16:38|Merge branch 'fix/auditoria-desenvolvimento-solucao' into 'develop'
+a5986af|Ana Jardim|2026-09-25 16:25|Merge branch 'docs/analise-viabilidade-financeira' into 'docs/gestao-projeto-sprint-4'
+0a61b35|Rui Faco|2026-09-25 12:55|Merge branch 'feat/mensageria-assincrona-webhooks' into 'develop'
+15d399f|Ana Jardim|2026-09-25 12:41|Merge branch 'feat/inventariar-base-vetorial' into 'develop'
+e1bd52f|Tobias Viana|2026-09-25 11:04|Merge branch 'test/executar-testes-usabilidade-voz' into 'develop'
+ffd6d33|Karol Barbosa|2026-09-25 10:30|Merge branch 'feat/pln-teste-retido-e-integracao-agente-23-09-2026' into 'develop'
+132f536|Rui Faco|2026-09-25 08:11|Merge branch 'feat/integrar-calendario' into 'develop'
+d62652e|Paulo Fernandes|2026-09-25 01:25|Merge branch 'docs/documentar-chamada-voz' into 'develop'
+
+MRs referenciados em merges: !85 !86 !87 !88 !89 !90 !91 !92 !93 !94 !95 !96 !97 !98 !99 !100 !101 !102 
+
+Conformidade das mensagens (78 commits finais): tipo valido 78/78; referencia #N 78/78; primeira linha ate 72 caracteres 67/78 (85,9%); infinitivo 74/78 (94,9%)
+Fora do infinitivo:
+test(rnf): adiciona executores e massas da campanha #285
+fix: testes de integração pra passar no pipeline #265
+test(rnf): registra evidencias da campanha nao funcional #285
+docs(testes): consolida execucao dos requisitos nao funcionais #285

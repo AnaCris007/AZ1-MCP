@@ -1,0 +1,12 @@
+Auditoria final da Sprint 4 - ambiente de execucao
+Data: 2026-09-26T00:43:57-03:00
+Commit base: 0f27f7d6bc94097c556b7e0fada267b5b567765c (develop, apos o merge do !102)
+Alteracoes locais aplicadas na execucao: .gitattributes restaurado; fixture de usuario em tests/test_integracao_persistencia.py com perfil
+SO do host: Windows 11 Pro 10.0.26200
+Docker: 29.2.1
+Imagem de teste: az1/auditoria:local (docker/api/Dockerfile, alvo dev)
+Python da imagem: Python 3.12.14
+Node: v22.13.1; npm: 10.9.2
+PostgreSQL de teste: postgres:16-alpine dedicado (porta 55432), sem .env
+MinIO de teste: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z dedicado (porta 59000)
+RabbitMQ: nao iniciou no Docker Desktop local (erro de permissao do .erlang.cookie); 7 casos do barramento real ficaram pulados
