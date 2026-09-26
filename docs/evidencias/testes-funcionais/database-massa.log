@@ -1,0 +1,47 @@
+BEGIN
+TRUNCATE TABLE
+NOTICE:  truncate cascades to table "conversa"
+NOTICE:  truncate cascades to table "mensagem_fonte"
+NOTICE:  truncate cascades to table "avaliacao"
+NOTICE:  truncate cascades to table "evento_plataforma"
+NOTICE:  truncate cascades to table "notificacao"
+NOTICE:  truncate cascades to table "mensagem"
+TRUNCATE TABLE
+INSERT 0 4
+INSERT 0 10
+INSERT 0 8
+INSERT 0 6
+INSERT 0 37
+INSERT 0 18
+INSERT 0 24
+COMMIT
+
+== Contagem por tabela ==
+       tabela        | count 
+---------------------+-------
+ portfolio           |     4
+ usuario             |    10
+ projeto             |     8
+ projeto_relacionado |     6
+ artefato            |    37
+ pendencia           |    18
+ usuario_projeto     |    24
+(7 rows)
+
+
+== Situação do portfólio (a pergunta do Diretor) ==
+ codigo |        status         |  prev  |  real  | desvio_pp | pendencias_abertas | artefatos |      lider       
+--------+-----------------------+--------+--------+-----------+--------------------+-----------+------------------
+ SYN-01 | Atrasado              |  82.00 |  64.00 |    -18.00 |                  4 |         5 | Rafael Antunes
+ SYN-07 | Crítico               |  61.00 |  47.00 |    -14.00 |                  2 |         5 | Marcos Ribeiro
+ SYN-04 | Parcialmente atrasado |  79.00 |  70.00 |     -9.00 |                  3 |         5 | Patrícia Moraes
+ SYN-06 | Em estruturação       |  18.00 |  15.00 |     -3.00 |                  1 |         4 | Juliana Prado
+ SYN-03 | Em risco              |  43.00 |  41.00 |     -2.00 |                  1 |         4 | Eduardo Tanaka
+ SYN-08 | Concluído             | 100.00 | 100.00 |      0.00 |                  0 |         6 | Ana Beatriz Lima
+ SYN-02 | Dentro do previsto    |  68.00 |  71.00 |      3.00 |                  3 |         4 | Camila Nogueira
+ SYN-05 | Acima do previsto     |  70.00 |  78.00 |      8.00 |                  2 |         4 | Sérgio Vilela
+(8 rows)
+
+
+== Cobertura: artefatos no banco x documentos indexados no RAG ==
+Carga relacional concluída. A comparação com o RAG se aplica após a indexação.

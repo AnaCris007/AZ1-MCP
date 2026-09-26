@@ -1,0 +1,7 @@
+9:56:45 AM [vite] http proxy error: /api/v1/conversas
+Error: connect ECONNREFUSED 127.0.0.1:8010
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)
+9:56:45 AM [vite] (client) [console.error] [conversas] não foi possível carregar o histórico
+9:56:55 AM [vite] http proxy error: /api/v1/chat
+Error: connect ECONNREFUSED 127.0.0.1:8010
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16)

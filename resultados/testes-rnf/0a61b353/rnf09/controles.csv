@@ -1,0 +1,16 @@
+id,descricao,esperado,observado,resultado
+RET-89,Registro de 89 dias preservado,Disponível e íntegro,True,PASSOU
+RET-90,Registro de 90 dias preservado,Disponível e íntegro,True,PASSOU
+RET-91,Registro de 91 dias elegível para expurgo,"Elegível, remoção não obrigatória",elegíveis=1,PASSOU
+RET-S3,Cópia da trilha no objeto respeita retenção mínima,>= 90 dias,365 dias,PASSOU
+ACESSO-ADMIN,Consulta pela identidade administrativa,HTTP 200 com registros,HTTP 200,PASSOU
+ACESSO-COMUM,Consulta da rota administrativa pela identidade comum,Acesso negado,HTTP 200; registros=3,FALHOU
+RLS-ISOLAMENTO,Identidade comum lê registros de outra identidade diretamente,Nenhuma linha,linhas=0,PASSOU
+IMUT-MSG-UPD,Alteração de mensagem,Bloqueada,InsufficientPrivilege,PASSOU
+IMUT-MSG-DEL,Exclusão de mensagem,Bloqueada,InsufficientPrivilege,PASSOU
+IMUT-CONV-DEL,Exclusão de conversa,Bloqueada,InsufficientPrivilege,PASSOU
+IMUT-CONV-TITULO,Renomeação de conversa auditável,Bloqueada conforme plano RNF09,operação permitida,FALHOU
+IMUT-CONV-ARQ,Arquivamento de conversa auditável,Bloqueado conforme plano RNF09,operação permitida,FALHOU
+FEEDBACK,Atualização controlada de feedback,Permitida somente nas colunas autorizadas,polaridade=negativa,PASSOU
+PRIVACIDADE,Senhas/tokens fictícios não persistem na auditoria,Zero ocorrências em mensagem e evento_plataforma.detalhe,mensagem=1; evento=1,FALHOU
+CONTINGENCIA,Falha da persistência não perde o evento silenciosamente,"Registro/buffer, alerta e nova tentativa observáveis",registro_tecnico=True; buffer=False; alerta=False; tentativas=1,FALHOU

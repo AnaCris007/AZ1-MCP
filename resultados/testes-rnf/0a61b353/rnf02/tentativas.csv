@@ -1,0 +1,115 @@
+metodo,endpoint,condicao,authorization,corpo,status,identidade_resolvida,regra_negocio_alcancada,resultado
+GET,/api/v1/alertas/assinantes,valido,Bearer <redacted>,json,500,True,True,PASSOU
+POST,/api/v1/alertas/assinantes,valido,Bearer <redacted>,json,500,True,True,PASSOU
+PATCH,/api/v1/alertas/assinantes/{assinante_id}/desativar,valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+POST,/api/v1/audio,valido,Bearer <redacted>,multipart,500,True,True,PASSOU
+POST,/api/v1/audio/{audio_id}/analyze,valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+POST,/api/v1/audio/{audio_id}/transcribe,valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+GET,/api/v1/auditoria/consultas,valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+GET,/api/v1/calendar/events,valido,Bearer <redacted>,json,500,True,True,PASSOU
+POST,/api/v1/calendar/events,valido,Bearer <redacted>,json,500,True,True,PASSOU
+DELETE,/api/v1/calendar/events/{evento_id},valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+POST,/api/v1/chat,valido,Bearer <redacted>,json,500,True,True,PASSOU
+GET,/api/v1/conversas,valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+GET,/api/v1/conversas/{conversa_id}/mensagens,valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+POST,/api/v1/conversas/avaliacoes,valido,Bearer <redacted>,json,500,True,True,PASSOU
+GET,/api/v1/projetos,valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+POST,/api/v1/rag/search,valido,Bearer <redacted>,json,500,True,True,PASSOU
+GET,/api/v1/tasks,valido,Bearer <redacted>,sem_corpo,500,True,True,PASSOU
+PATCH,/api/v1/tasks/{pendencia_id},valido,Bearer <redacted>,json,500,True,True,PASSOU
+POST,/api/v1/text-to-speech,valido,Bearer <redacted>,json,500,True,True,PASSOU
+GET,/api/v1/alertas/assinantes,ausente,<absent>,json,401,False,False,PASSOU
+GET,/api/v1/alertas/assinantes,malformado,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/alertas/assinantes,expirado,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/alertas/assinantes,assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/alertas/assinantes,audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/alertas/assinantes,ausente,<absent>,json,401,False,False,PASSOU
+POST,/api/v1/alertas/assinantes,malformado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/alertas/assinantes,expirado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/alertas/assinantes,assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/alertas/assinantes,audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU
+PATCH,/api/v1/alertas/assinantes/{assinante_id}/desativar,ausente,<absent>,sem_corpo,401,False,False,PASSOU
+PATCH,/api/v1/alertas/assinantes/{assinante_id}/desativar,malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+PATCH,/api/v1/alertas/assinantes/{assinante_id}/desativar,expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+PATCH,/api/v1/alertas/assinantes/{assinante_id}/desativar,assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+PATCH,/api/v1/alertas/assinantes/{assinante_id}/desativar,audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio,ausente,<absent>,multipart,401,False,False,PASSOU
+POST,/api/v1/audio,malformado,Bearer <redacted>,multipart,401,False,False,PASSOU
+POST,/api/v1/audio,expirado,Bearer <redacted>,multipart,401,False,False,PASSOU
+POST,/api/v1/audio,assinatura_invalida,Bearer <redacted>,multipart,401,False,False,PASSOU
+POST,/api/v1/audio,audiencia_incorreta,Bearer <redacted>,multipart,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/analyze,ausente,<absent>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/analyze,malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/analyze,expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/analyze,assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/analyze,audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/transcribe,ausente,<absent>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/transcribe,malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/transcribe,expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/transcribe,assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/audio/{audio_id}/transcribe,audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/auditoria/consultas,ausente,<absent>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/auditoria/consultas,malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/auditoria/consultas,expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/auditoria/consultas,assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/auditoria/consultas,audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/calendar/events,ausente,<absent>,json,401,False,False,PASSOU
+GET,/api/v1/calendar/events,malformado,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/calendar/events,expirado,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/calendar/events,assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/calendar/events,audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/calendar/events,ausente,<absent>,json,401,False,False,PASSOU
+POST,/api/v1/calendar/events,malformado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/calendar/events,expirado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/calendar/events,assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/calendar/events,audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU
+DELETE,/api/v1/calendar/events/{evento_id},ausente,<absent>,sem_corpo,401,False,False,PASSOU
+DELETE,/api/v1/calendar/events/{evento_id},malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+DELETE,/api/v1/calendar/events/{evento_id},expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+DELETE,/api/v1/calendar/events/{evento_id},assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+DELETE,/api/v1/calendar/events/{evento_id},audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/chat,ausente,<absent>,json,401,False,False,PASSOU
+POST,/api/v1/chat,malformado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/chat,expirado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/chat,assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/chat,audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/conversas,ausente,<absent>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas,malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas,expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas,assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas,audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas/{conversa_id}/mensagens,ausente,<absent>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas/{conversa_id}/mensagens,malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas/{conversa_id}/mensagens,expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas/{conversa_id}/mensagens,assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/conversas/{conversa_id}/mensagens,audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/conversas/avaliacoes,ausente,<absent>,json,401,False,False,PASSOU
+POST,/api/v1/conversas/avaliacoes,malformado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/conversas/avaliacoes,expirado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/conversas/avaliacoes,assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/conversas/avaliacoes,audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/projetos,ausente,<absent>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/projetos,malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/projetos,expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/projetos,assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/projetos,audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+POST,/api/v1/rag/search,ausente,<absent>,json,401,False,False,PASSOU
+POST,/api/v1/rag/search,malformado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/rag/search,expirado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/rag/search,assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/rag/search,audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU
+GET,/api/v1/tasks,ausente,<absent>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/tasks,malformado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/tasks,expirado,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/tasks,assinatura_invalida,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+GET,/api/v1/tasks,audiencia_incorreta,Bearer <redacted>,sem_corpo,401,False,False,PASSOU
+PATCH,/api/v1/tasks/{pendencia_id},ausente,<absent>,json,401,False,False,PASSOU
+PATCH,/api/v1/tasks/{pendencia_id},malformado,Bearer <redacted>,json,401,False,False,PASSOU
+PATCH,/api/v1/tasks/{pendencia_id},expirado,Bearer <redacted>,json,401,False,False,PASSOU
+PATCH,/api/v1/tasks/{pendencia_id},assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+PATCH,/api/v1/tasks/{pendencia_id},audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/text-to-speech,ausente,<absent>,json,401,False,False,PASSOU
+POST,/api/v1/text-to-speech,malformado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/text-to-speech,expirado,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/text-to-speech,assinatura_invalida,Bearer <redacted>,json,401,False,False,PASSOU
+POST,/api/v1/text-to-speech,audiencia_incorreta,Bearer <redacted>,json,401,False,False,PASSOU

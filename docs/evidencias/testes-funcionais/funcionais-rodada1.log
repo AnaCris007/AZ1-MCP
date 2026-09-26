@@ -1,0 +1,47 @@
+/app/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+conversation_id 'functional-test' não é UUID; turno não registrado.
+conversation_id 'functional-test' não é UUID; turno não registrado.
+conversation_id 'functional-test' não é UUID; turno não registrado.
+conversation_id 'functional-test' não é UUID; turno não registrado.
+conversation_id 'functional-test' não é UUID; turno não registrado.
+conversation_id 'functional-test' não é UUID; turno não registrado.
+conversation_id 'functional-test' não é UUID; turno não registrado.
+conversation_id 'functional-test' não é UUID; turno não registrado.
+conversation_id 'isolated' não é UUID; turno não registrado.
+conversation_id 'isolated' não é UUID; turno não registrado.
+CT-RF01-01 | WAV real (parcial: demais formatos pendentes) | Aprovado
+CT-RF01-06 | assinatura Ogg | Aprovado
+CT-RF01-07 | 12 MiB | Aprovado
+CT-RF01-08 | WAV 360 segundos | Aprovado
+CT-RF01-09 | zero byte | Aprovado
+CT-RF01-09 | WAV truncado | Aprovado
+CT-RF01-10 | JSON sem multipart | Aprovado
+CT-RF01-11 | objeto inexistente | Aprovado
+CT-RF01-12 | falha injetada no STT; sem cassette VHS | Aprovado
+CT-RF01-04 | texto-1 | Aprovado
+CT-RF01-04 | texto-2 | Aprovado
+CT-RF01-04 | texto-3 | Aprovado
+CT-RF01-04 | texto-4 | Aprovado
+CT-RF01-04 | texto-5 | Aprovado
+CT-RF01-13 | '' | Aprovado
+CT-RF01-13 | '   ' | Aprovado
+CT-RF01-14 | 4001 caracteres | Aprovado
+CT-RF01-16 | 10 MiB | Aprovado
+CT-RF01-16 | 10 MiB + 1 byte | Aprovado
+CT-RF01-16 | 300 segundos | Aprovado
+CT-RF01-16 | 300.001 segundos | Aprovado
+CT-RF01-17 | WAV com MIME genérico | Aprovado
+CT-RF01-17 | texto com MIME WAV | Aprovado
+CT-RF01-18 | /api/v1/chat: bruto=3999, trim=3999 | Aprovado
+CT-RF01-18 | /api/v1/text-to-speech: bruto=3999, trim=3999 | Aprovado
+CT-RF01-18 | /api/v1/chat: bruto=4000, trim=4000 | Aprovado
+CT-RF01-18 | /api/v1/text-to-speech: bruto=4000, trim=4000 | Aprovado
+CT-RF01-18 | /api/v1/chat: bruto=4001, trim=4001 | Aprovado
+CT-RF01-18 | /api/v1/text-to-speech: bruto=4001, trim=4001 | Aprovado
+CT-RF01-18 | /api/v1/chat: bruto=4004, trim=4000 | Aprovado
+CT-RF01-18 | /api/v1/text-to-speech: bruto=4004, trim=4000 | Aprovado
+CT-RF01-18 | /api/v1/chat: bruto=0, trim=0 | Aprovado
+CT-RF01-18 | /api/v1/text-to-speech: bruto=0, trim=0 | Aprovado
+CT-RF02-07 | proibição de busca antes da recusa/esclarecimento | Reprovado
+CT-RF02-08 | proibição de busca antes da recusa/esclarecimento | Reprovado

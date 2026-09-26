@@ -1,0 +1,32 @@
+{
+  "rnf": "RNF11",
+  "casos": [
+    "CT-RNF11-P",
+    "CT-RNF11-N"
+  ],
+  "resultado": "BLOQUEADO",
+  "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+  "executado_em_utc": "2026-09-25T20:26:07Z",
+  "motivo_principal": "O fluxo funcional RF04, do qual o RNF11 depende, não está implementado.",
+  "pre_requisitos": {
+    "fluxo_rf04_sugestao_por_campo": "AUSENTE",
+    "contrato_com_sugestao_fonte_justificativa": "AUSENTE",
+    "registros_campo_artefato": 0,
+    "registros_artefato": 0,
+    "solicitacoes_positivas_versionadas": 0,
+    "solicitacoes_negativas_versionadas": 0,
+    "fontes_e_gabaritos_versionados": 0,
+    "avaliadores_independentes_disponiveis": 0
+  },
+  "metricas": {
+    "positivas_executadas": 0,
+    "positivas_validas": 0,
+    "negativas_executadas": 0,
+    "negativas_seguras": 0,
+    "percentual_valido": null
+  },
+  "criterio_planejado": {
+    "positivas": "pelo menos 17 de 20 válidas",
+    "negativas": "10 de 10 com abstenção ou limitação segura"
+  }
+}

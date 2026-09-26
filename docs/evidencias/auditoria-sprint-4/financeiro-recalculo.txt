@@ -1,0 +1,40 @@
+Recalculo independente da Secao 6.7 do GestaoProjeto.md (2026-09-26T01:04:29-03:00)
+Aritmetica decimal com arredondamento meio para cima, a partir dos valores de referencia declarados
+Linhas 'cont h' = reserva do corte de 25/09; 'cont revisada' = reserva apos a Secao 6.3.9
+
+PLN 532.00 112.19 59683.75 | doc-rounded-rate cost 59685.08
+back 532.00 37.81 20116.25 | doc-rounded-rate cost 20114.92
+dados 364.00 89.06 32418.75 | doc-rounded-rate cost 32417.84
+QA 364.00 36.88 13422.50 | doc-rounded-rate cost 13424.32
+front 280.00 37.81 10587.50 | doc-rounded-rate cost 10586.80
+GP 280.00 68.13 19075.00 | doc-rounded-rate cost 19076.40
+arq 224.00 96.56 21630.00 | doc-rounded-rate cost 21629.44
+UX 224.00 30.21 6766.20 | doc-rounded-rate cost 6767.04
+pessoal exato 183699.95
+insumos 6075
+desp 19317.50 check 2795*.6*2.5 4192.50 7500.000
+custos 189774.95 base 209092.45 desp/custos 10.2
+vl 240456.32 pf 273482.01 imp 33025.69 lucro 31363.87 lucro/pf 11.47
+literal 269493.82 dif 1.48
+rubric formula: imposto sobre base 25250.00 base c/ imp 234342.45 lucro 15% 35151.37
+hora 97.67 fatorR 67.17 prolabore mes 10497.14 73479.98
+parc 0.30 82044.60
+parc 0.245 67003.09
+parc 0.21 57431.22
+parc 0.14 38287.48
+parc 0.105 28715.61
+sum parc 273482.00
+RBT12 implied 908256.88
+mes 0 82044.60 0 0 0 9907.71 72136.89 72136.89
+mes 1 67003.09 73479.98 7727.00 2430.00 8091.29 -24725.18 47411.71
+mes 2 57431.22 73479.98 7727.00 2430.00 6935.39 -33141.15 14270.56
+mes 3 38287.48 36739.99 3863.50 1215.00 4623.60 -8154.61 6115.95
+mes 4 28715.61 0 0 0 3467.70 25247.91 31363.86
+cont h 278.4 9.9 vh 65.61 custo 18265.02 9.6 com imp 20773.65 teto 294255.66
+sust 2790.99 418.65 3209.64 3479.66 41755.92
+sust 2841.92 426.29 3268.21 3543.16 42517.92
+aws total 1185.99 az 1236.91
+ia share aws 1.94 1.93
+anexoV price 295982.67 diff 8.2
+sust 24h valor-hora 50.21
+cont revisada h 342.4 12.2 custo 22463.88 11.8 com imp 25549.20 teto 299031.21

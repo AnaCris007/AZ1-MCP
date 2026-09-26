@@ -1,0 +1,20 @@
+{
+  "rnf": "RNF01",
+  "resultado": "REPROVADO",
+  "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+  "criterio": "cada caso deve ter pelo menos 80% de respostas completas em 15 s e 100% de desfechos em 60 s",
+  "positivo": {
+    "resultado": "APROVADO",
+    "completas_ate_15s": "100/100",
+    "desfechos_ate_60s": "100/100",
+    "p95_s": 0.139935
+  },
+  "negativo": {
+    "resultado": "REPROVADO",
+    "completas_ate_15s": "90/100",
+    "desfechos_ate_60s": "95/100",
+    "p95_s": 20.010934,
+    "timeouts_sem_erro_controlado": 5
+  }
+}
+

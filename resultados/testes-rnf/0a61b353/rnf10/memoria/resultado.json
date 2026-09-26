@@ -1,0 +1,23 @@
+{
+  "resultado": "APROVADO",
+  "linha_base": {
+    "treino_pico_mib": 166.44140625,
+    "servico_estabilizada_mib": 123.81640625,
+    "servico_pico_mib": 143.19921875
+  },
+  "comparacoes": {
+    "controlado_10x": {
+      "razao_treino": 1.0422445962120679,
+      "razao_servico_estabilizada": 1.0146386093321134,
+      "razao_servico_pico": 1.0142120625221638,
+      "aprovado": true
+    },
+    "adverso_10x": {
+      "razao_treino": 1.0592597807974842,
+      "razao_servico_estabilizada": 1.0082657664763226,
+      "razao_servico_pico": 1.0085108704547314,
+      "aprovado": true
+    }
+  },
+  "amostragem_rss_ms": 100
+}

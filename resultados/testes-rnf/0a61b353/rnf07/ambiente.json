@@ -1,0 +1,20 @@
+{
+  "requisito": "RNF07",
+  "campanha": "0a61b353",
+  "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+  "base_url": "http://127.0.0.1:8010",
+  "endpoint_oficial": "/health",
+  "endpoint_auxiliar": "/health/ready",
+  "fuso_horario": "America/Sao_Paulo",
+  "inicio": "2026-09-25T21:12:39.761760-03:00",
+  "fim_previsto": "2026-09-25T22:12:39.761760-03:00",
+  "janela_planejada_minutos": 240,
+  "janela_executada_minutos": 60.0,
+  "intervalo_planejado_segundos": 60,
+  "intervalo_executado_segundos": 60.0,
+  "amostras": 60,
+  "limite_por_verificacao_segundos": 2.0,
+  "manutencoes_previamente_comunicadas": [],
+  "evidencia_reduzida": true,
+  "fim_real": "2026-09-25T22:12:41.080418-03:00"
+}

@@ -23,9 +23,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.naive_bayes import MultinomialNB
 
 from pln.caminhos import DATASET_PADRAO, dir_resultados, garantir_dir_de_resultados
 from pln.classificador import carregar_dataset, construir_classificador
+from pln.experimento import REGUA_PADRAO, nome_do_relatorio
 from pln.preprocessamento import (
     ConfigPreprocessamento,
     ModoMorfologia,
@@ -95,13 +97,19 @@ def config_da_linha(linha: dict[str, str]) -> ConfigPreprocessamento:
 
 # Distintos, porque o CSV tem uma linha por (pré-processamento, vetorização) e o
 # mesmo texto aparece repetido no topo do ranking.
-def carregar_candidatos_de_texto(quantos: int) -> tuple[list[ConfigPreprocessamento], str]:
-    caminho = dir_resultados() / "comparativo_preprocessamento.csv"
+# `regua` seleciona QUAL ranking ler. Cada família varre o espaço com ela
+# própria como instrumento de medida (ver `experimento.REGUAS`), e ler o ranking
+# de outra é exatamente a assimetria que a varredura por régua existe para
+# desfazer. O padrão é o Naive Bayes, que é a régua do próprio `ajuste_fino`.
+def carregar_candidatos_de_texto(
+    quantos: int, regua: str = REGUA_PADRAO
+) -> tuple[list[ConfigPreprocessamento], str]:
+    caminho = dir_resultados() / nome_do_relatorio(regua, "csv")
     if not caminho.is_file():
         return list(PRE_PROCESSAMENTOS_DE_EMERGENCIA), (
             f"⚠️  {caminho.name} não encontrado, usando a lista mínima embutida.\n"
-            f"   Rode `python -m pln.experimento` primeiro para ajustar sobre os "
-            f"pré-processamentos realmente medidos."
+            f"   Rode `python -m pln.experimento --regua {regua}` primeiro para ajustar "
+            f"sobre os pré-processamentos realmente medidos."
         )
 
     with caminho.open(encoding="utf-8", newline="") as arquivo:
@@ -135,11 +143,16 @@ def montar_candidatos(configs_pre: list[ConfigPreprocessamento]) -> list[Candida
 # O pré-processamento é etapa do Pipeline e por isso é reaplicado dentro de cada
 # dobra: mais lento, e o que impede vazamento do treino para o teste.
 def medir(candidato: Candidato, textos: list[str], rotulos: list[str], k: int) -> ResultadoDoAjuste:
+    # `estimador=` explícito, e não `alpha=`/`fit_prior=`: o produto deixou de
+    # ser Naive Bayes, e passar esses parâmetros ao construtor faria o estimador
+    # padrão ignorá-los sem erro — a busca inteira mediria a mesma coisa 240
+    # vezes. O que se ajusta aqui é a RÉGUA de `experimento.py`, que segue sendo
+    # `MultinomialNB`; os hiperparâmetros do produto saem do estágio 3 de
+    # `comparativo_modelos.py`.
     modelo = construir_classificador(
         config_pre=candidato.config_pre,
         config_vet=candidato.config_vet,
-        alpha=candidato.suavizacao,
-        fit_prior=candidato.fit_prior,
+        estimador=MultinomialNB(alpha=candidato.suavizacao, fit_prior=candidato.fit_prior),
     )
     dobras = StratifiedKFold(n_splits=k, shuffle=True, random_state=SEMENTE)
     notas = cross_val_score(modelo, textos, rotulos, cv=dobras, scoring="f1_macro")

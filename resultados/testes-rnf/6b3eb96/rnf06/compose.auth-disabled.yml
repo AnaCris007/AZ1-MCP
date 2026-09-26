@@ -1,0 +1,4 @@
+services:
+  api:
+    environment:
+      AZ1_AUTH_MODE: disabled

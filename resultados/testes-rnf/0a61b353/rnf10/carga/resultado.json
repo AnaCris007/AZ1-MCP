@@ -1,0 +1,15 @@
+{
+  "resultado": "APROVADO",
+  "B_p95_mediano_1x_s": 0.515,
+  "C_p95_mediano_10x_progressivo_s": 0.974555,
+  "P_p95_mediano_pico_s": 0.967597,
+  "razao_C_B": 1.8923398058252425,
+  "razao_P_B": 1.8788291262135923,
+  "limite_absoluto_s": 20,
+  "limite_relativo": 2,
+  "respostas_completas_em_todos_estagios": true,
+  "carga_atingida": true,
+  "tentativas_totais": 212691,
+  "duracao_estagio_s": 300,
+  "aquecimento_s": 60
+}

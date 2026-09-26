@@ -1,0 +1,21 @@
+{
+  "fonte": "src/pln/dados/intencoes_exemplos.csv",
+  "sha256": "668baa908c040fcbdbda6ce74c4358c24a8a0353ef6e9278326633178baa1b81",
+  "classes": 10,
+  "base": {
+    "exemplos": 881,
+    "termos_aproximados": 1578
+  },
+  "controlados": [
+    {"fator": 1, "exemplos": 881, "termos_aproximados": 1578},
+    {"fator": 2, "exemplos": 1762, "termos_aproximados": 1578},
+    {"fator": 5, "exemplos": 4405, "termos_aproximados": 1578},
+    {"fator": 10, "exemplos": 8810, "termos_aproximados": 1578}
+  ],
+  "adverso_10x": {
+    "exemplos": 8810,
+    "termos_aproximados": 10388,
+    "regra": "um termo exclusivo por exemplo e cópia"
+  }
+}
+

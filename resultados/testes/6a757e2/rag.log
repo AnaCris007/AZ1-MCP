@@ -1,0 +1,33 @@
+test_busca_com_filtro_combinado_respeita_projeto_e_tipo (tests.test_integracao_rag.TestBuscaRagPontaAPonta.test_busca_com_filtro_combinado_respeita_projeto_e_tipo)
+Dois documentos sintéticos de projetos distintos, e o filtro separa. ... skipped 'TEST_RAG_DB_URL não definido. Este bloco indexa em `vecs` sobre PostgreSQL e gasta chamadas reais de embedding; precisa de opt-in explícito.'
+test_filtro_sem_correspondencia_devolve_lista_vazia_com_200 (tests.test_integracao_rag.TestContratoDaBuscaRag.test_filtro_sem_correspondencia_devolve_lista_vazia_com_200)
+Nenhum registro correspondente não é erro: é `200` com `resultados=[]`. ... /home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+ok
+test_limites_invalidos_e_campo_ausente_sao_recusados (tests.test_integracao_rag.TestContratoDaBuscaRag.test_limites_invalidos_e_campo_ausente_sao_recusados)
+`n_resultados` fora de 1..20 e `query` ausente param no schema. ... ok
+test_limites_validos_nas_bordas_sao_aceitos (tests.test_integracao_rag.TestContratoDaBuscaRag.test_limites_validos_nas_bordas_sao_aceitos)
+1 e 20 passam. O contraste que dá sentido ao caso acima. ... ok
+test_query_vazia_e_aceita_pelo_schema (tests.test_integracao_rag.TestContratoDaBuscaRag.test_query_vazia_e_aceita_pelo_schema)
+CARACTERIZAÇÃO, não garantia. ... ok
+test_resultado_atravessa_com_os_metadados_do_indice (tests.test_integracao_rag.TestContratoDaBuscaRag.test_resultado_atravessa_com_os_metadados_do_indice)
+Os campos que o RNF12 exige chegam ao cliente, incluindo `chunk_id`. ... ok
+test_falhas_do_embedding_ou_do_banco_saem_como_500_sem_segredo (tests.test_integracao_rag.TestErrosDaBuscaRag.test_falhas_do_embedding_ou_do_banco_saem_como_500_sem_segredo)
+Contrato atual: exceção não tratada vira `500 internal_error`. ... ok
+test_alterar_o_conteudo_muda_o_identificador_do_chunk (tests.test_integracao_rag.TestIngestaoRag.test_alterar_o_conteudo_muda_o_identificador_do_chunk)
+E a outra metade: conteúdo diferente, identificador diferente. ... ok
+test_chunks_nao_misturam_secoes_nem_projetos (tests.test_integracao_rag.TestIngestaoRag.test_chunks_nao_misturam_secoes_nem_projetos)
+A fragmentação respeita a fronteira de arquivo e de seção. ... ok
+test_docx_preserva_secao_e_projeto (tests.test_integracao_rag.TestIngestaoRag.test_docx_preserva_secao_e_projeto)
+Título vira `secao`; parágrafos viram trechos do projeto da pasta. ... ok
+test_reindexar_a_mesma_massa_produz_os_mesmos_identificadores (tests.test_integracao_rag.TestIngestaoRag.test_reindexar_a_mesma_massa_produz_os_mesmos_identificadores)
+Repetição idêntica não duplica: o `chunk_id` é função do conteúdo. ... ok
+test_tabela_de_docx_nao_e_extraida (tests.test_integracao_rag.TestIngestaoRag.test_tabela_de_docx_nao_e_extraida)
+LACUNA CONHECIDA, registrada em vez de mascarada. ... ok
+test_xlsx_separa_abas_e_ignora_linhas_vazias (tests.test_integracao_rag.TestIngestaoRag.test_xlsx_separa_abas_e_ignora_linhas_vazias)
+Cada aba vira `secao`; linhas sem conteúdo não geram trecho. ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.371s
+
+OK (skipped=1)

@@ -1,0 +1,32 @@
+Unable to find image 'quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z' locally
+RELEASE.2025-09-07T16-13-09Z: Pulling from minio/minio
+4ca31cd8344e: Pulling fs layer
+7b79da5d3567: Pulling fs layer
+1e1cfd58aa02: Pulling fs layer
+4e6e13ec1e11: Pulling fs layer
+166b5f0a4239: Pulling fs layer
+c75db12fb9c0: Pulling fs layer
+7c6ea1bdb2f6: Pulling fs layer
+f06361c774fa: Pulling fs layer
+2f0dae0f0359: Pulling fs layer
+4e6e13ec1e11: Download complete
+1e1cfd58aa02: Download complete
+f06361c774fa: Download complete
+2f0dae0f0359: Download complete
+c75db12fb9c0: Download complete
+7c6ea1bdb2f6: Download complete
+4ca31cd8344e: Download complete
+4e6e13ec1e11: Pull complete
+c75db12fb9c0: Pull complete
+4ca31cd8344e: Pull complete
+166b5f0a4239: Download complete
+7b79da5d3567: Download complete
+7b79da5d3567: Pull complete
+1e1cfd58aa02: Pull complete
+f06361c774fa: Pull complete
+2f0dae0f0359: Pull complete
+7c6ea1bdb2f6: Pull complete
+166b5f0a4239: Pull complete
+Digest: sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+Status: Downloaded newer image for quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+849905ab62554395bc51aeee9d52ba2b05f32427ec5d0661ab6f02533ddcba61

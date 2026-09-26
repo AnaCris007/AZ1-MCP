@@ -1,0 +1,9 @@
+{
+  "modo": "enabled",
+  "provedor": "azure",
+  "modo_chave": "jwks",
+  "algoritmo": "ES256",
+  "issuer": "https://rnf02-sintetico.supabase.co/auth/v1",
+  "audience": "authenticated",
+  "material_criptografico": "efemero_em_memoria_nao_persistido"
+}

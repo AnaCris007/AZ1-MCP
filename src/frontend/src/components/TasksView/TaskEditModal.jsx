@@ -63,10 +63,10 @@ export default function TaskEditModal({ open, task, onClose, onSave }) {
               role="dialog"
               aria-modal="true"
               aria-label="Editar tarefa"
-              className="w-full max-w-[440px] rounded-[28px] border border-border bg-surface p-6 shadow-xl"
+              className="w-full max-w-[420px] rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-white/10 dark:bg-slate-900"
             >
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-[17px] font-semibold text-text-primary">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-[16px] font-semibold text-slate-950 dark:text-white">
                   Editar tarefa
                 </h2>
                 <button
@@ -79,7 +79,7 @@ export default function TaskEditModal({ open, task, onClose, onSave }) {
                 </button>
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <label
                   htmlFor="task-title"
                   className="mb-1.5 block text-[13px] font-medium text-text-secondary"
@@ -93,11 +93,11 @@ export default function TaskEditModal({ open, task, onClose, onSave }) {
                   value={form.title}
                   onChange={(e) => updateField('title', e.target.value)}
                   placeholder="Ex.: Atualizar status de risco"
-                  className="w-full rounded-xl border border-border-soft bg-transparent px-3.5 py-2.5 text-[14px] text-text-primary placeholder:text-text-muted focus:border-text-secondary focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/10 dark:border-white/10 dark:text-white"
                 />
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <label
                   htmlFor="task-project"
                   className="mb-1.5 block text-[13px] font-medium text-text-secondary"
@@ -110,11 +110,11 @@ export default function TaskEditModal({ open, task, onClose, onSave }) {
                   value={form.project}
                   onChange={(e) => updateField('project', e.target.value)}
                   placeholder="Ex.: Linha 6 — Laranja"
-                  className="w-full rounded-xl border border-border-soft bg-transparent px-3.5 py-2.5 text-[14px] text-text-primary placeholder:text-text-muted focus:border-text-secondary focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/10 dark:border-white/10 dark:text-white"
                 />
               </div>
 
-              <div className="mb-4 flex gap-3">
+              <div className="mb-3 flex gap-3">
                 <div className="flex-1">
                   <p className="mb-1.5 text-[13px] font-medium text-text-secondary">
                     Prioridade
@@ -125,9 +125,9 @@ export default function TaskEditModal({ open, task, onClose, onSave }) {
                         key={option.value}
                         type="button"
                         onClick={() => updateField('priority', option.value)}
-                        className={`flex-1 rounded-lg py-2 text-[13px] font-medium transition-colors ${
+                        className={`flex-1 rounded-lg py-1.5 text-[12px] font-medium transition-colors ${
                           form.priority === option.value
-                            ? 'bg-surface text-text-primary shadow-sm'
+                            ? 'bg-white text-violet-700 shadow-sm dark:bg-slate-800 dark:text-violet-300'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
@@ -149,12 +149,12 @@ export default function TaskEditModal({ open, task, onClose, onSave }) {
                     type="date"
                     value={form.dueDate}
                     onChange={(e) => updateField('dueDate', e.target.value)}
-                    className="w-full rounded-xl border border-border-soft bg-transparent px-3 py-2.5 text-[13px] text-text-primary focus:border-text-secondary focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-[12px] text-slate-900 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/10 dark:border-white/10 dark:text-white"
                   />
                 </div>
               </div>
 
-              <div className="mb-6">
+              <div className="mb-4">
                 <label
                   htmlFor="task-description"
                   className="mb-1.5 block text-[13px] font-medium text-text-secondary"
@@ -163,11 +163,11 @@ export default function TaskEditModal({ open, task, onClose, onSave }) {
                 </label>
                 <textarea
                   id="task-description"
-                  rows={3}
+                  rows={2}
                   value={form.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   placeholder="Contexto, próximos passos ou observações do agente..."
-                  className="w-full resize-none rounded-xl border border-border-soft bg-transparent px-3.5 py-2.5 text-[14px] leading-relaxed text-text-primary placeholder:text-text-muted focus:border-text-secondary focus:outline-none"
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-[13px] leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/10 dark:border-white/10 dark:text-white"
                 />
               </div>
 
@@ -181,7 +181,7 @@ export default function TaskEditModal({ open, task, onClose, onSave }) {
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-button-primary px-4 py-2 text-[13px] font-medium text-button-primary-text transition-opacity hover:opacity-90"
+                  className="rounded-xl bg-violet-600 px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-violet-700"
                 >
                   Salvar
                 </button>

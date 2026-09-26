@@ -211,6 +211,13 @@ _SQL_TRAVAR_CONVERSA = """
 SELECT usuario_id FROM auditoria.conversa WHERE id = %s FOR UPDATE
 """
 
+# Leitura sem trava, para o porteiro da rota. O caminho de ESCRITA usa
+# `_SQL_TRAVAR_CONVERSA`, que confere o mesmo dono já com a linha travada —
+# entre esta leitura e a gravação existe janela, e é a segunda que fecha.
+_SQL_DONO_DA_CONVERSA = """
+SELECT usuario_id FROM auditoria.conversa WHERE id = %s
+"""
+
 _SQL_PROXIMA_ORDEM = """
 SELECT coalesce(max(ordem), 0) FROM auditoria.mensagem WHERE conversa_id = %s
 """
@@ -234,6 +241,21 @@ INSERT INTO auditoria.mensagem_fonte (
 
 class ConversaNaoGravada(RuntimeError):
     """Turno recusado antes de tocar o banco, por dado incoerente."""
+
+
+class ConversaDeOutroUsuario(ConversaNaoGravada):
+    """O `conversa_id` existe e pertence a outra pessoa.
+
+    Subclasse de `ConversaNaoGravada` de propósito: quem já trata a recusa
+    continua tratando, sem saber do caso novo. Quem precisa distinguir — a rota
+    de chat, que devolve 403 — captura esta.
+
+    O identificador vem do corpo do cliente (`ChatRequest.conversation_id`,
+    gerado por `crypto.randomUUID()` no navegador), então nada impede alguém de
+    enviar o UUID da conversa de outro. Sem esta verificação o turno era
+    anexado à conversa alheia com o `usuario_id` original preservado, que é
+    contaminação da trilha do RNF09 por um caminho de escrita.
+    """
 
 
 @dataclass(frozen=True)
@@ -297,6 +319,13 @@ class PersistenciaDesligada:
     def mensagens_da_conversa(self, conversa_id: str, usuario_id: int) -> tuple:
         self._avisar()
         return ()
+
+    def dono_da_conversa(self, conversa_id: str) -> int | None:
+        # Sem banco não há conversa registrada, logo não há dono a contrariar.
+        # Devolver None deixa a rota seguir, que é o comportamento de sempre
+        # quando a persistência está desligada.
+        self._avisar()
+        return None
 
     def registrar_avaliacao(self, **_: object) -> bool:
         self._avisar()
@@ -372,6 +401,18 @@ class ConversaRepository:
             )
 
 
+    def dono_da_conversa(self, conversa_id: str) -> int | None:
+        """`usuario_id` da conversa, ou None se ela ainda não existe.
+
+        None é resposta legítima, não erro: a primeira mensagem de uma conversa
+        chega com um UUID que o cliente acabou de gerar e que o banco ainda não
+        viu. Quem chama trata os dois casos — ausente segue, divergente recusa.
+        """
+        with self._pool.connection() as conexao, conexao.cursor() as cursor:
+            cursor.execute(_SQL_DONO_DA_CONVERSA, (conversa_id,))
+            linha = cursor.fetchone()
+            return None if linha is None else linha[0]
+
     def registrar_avaliacao(
         self,
         *,
@@ -419,6 +460,16 @@ class ConversaRepository:
                     ),
                 )
                 cursor.execute(_SQL_TRAVAR_CONVERSA, (turno.conversa_id,))
+                # O `usuario_id` já vinha selecionado aqui e era descartado. Com
+                # a linha travada, este é o único ponto em que a conferência não
+                # tem janela: se a conversa é de outra pessoa, nada foi escrito
+                # ainda e o `raise` desfaz até o INSERT de `_SQL_GARANTIR_CONVERSA`.
+                dono = cursor.fetchone()
+                if dono is not None and dono[0] != turno.usuario_id:
+                    raise ConversaDeOutroUsuario(
+                        f"conversa {turno.conversa_id} pertence a outro usuário"
+                    )
+
                 cursor.execute(_SQL_PROXIMA_ORDEM, (turno.conversa_id,))
                 ultima = cursor.fetchone()[0]
 

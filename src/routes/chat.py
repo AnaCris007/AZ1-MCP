@@ -3,19 +3,23 @@ from __future__ import annotations
 import logging
 import re
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from fastapi import APIRouter, BackgroundTasks, Depends
 
 from az1_api.dependencies import (
+    get_agente,
     get_chat_answerer,
     get_classificador_de_intencao,
     get_conversa_repository,
     require_authenticated_user,
 )
+from pln.entidades import extrair_entidades
+from pln.intencao import DetectarIntencao, IntencaoDetectada
 from rag.retriever import ResultadoBusca
 from schemas.chat import ChatErrorCode, ChatRequest, ChatResponse, FonteCitada
+from services.agente_service import AgenteDesligado, ExecutarIntencao, RespostaDoAgente, ResultadoAcao
 from services.auth_service import AuthenticatedUser
 from services.chat_service import (
     MAX_MESSAGE_LENGTH,
@@ -23,6 +27,7 @@ from services.chat_service import (
     ChatReceptionError,
     ChatReceptionErrorCode,
     ChatReply,
+    validar_mensagem,
 )
 from services.conversa_repository import (
     ConversaNaoGravada,
@@ -32,6 +37,7 @@ from services.conversa_repository import (
     TurnoDoChat,
     conversa_uuid,
 )
+from services.foco_da_busca import focar_busca
 
 logger = logging.getLogger(__name__)
 
@@ -124,6 +130,53 @@ _ERROR_DETAILS = {
 }
 
 
+def recusar_conversa_alheia(
+    repositorio: ConversaRepository | PersistenciaDesligada,
+    conversation_id: str,
+    usuario: AuthenticatedUser,
+) -> None:
+    """Barra o turno quando o `conversation_id` é de outra pessoa.
+
+    Precisa vir ANTES de `answerer.answer()`, não depois: é ali que
+    `_historico_do_banco` lê `auditoria.mensagem` pelo `conversa_id` sozinho,
+    sem `usuario_id`. Enviando o UUID de uma conversa alheia, o histórico dela
+    entrava no contexto do modelo e podia sair na resposta — o vazamento
+    acontecia mesmo que nada fosse gravado depois.
+
+    O identificador nasce no cliente (`crypto.randomUUID()` em `AgentPage.jsx`),
+    então ele é entrada do usuário, e não prova de nada.
+
+    Não engole exceção de banco de propósito. Deixar passar em caso de falha
+    seria abrir exatamente o buraco que este porteiro fecha, e o `SELECT` do
+    histórico, logo adiante, usa o mesmo pool: se este falhou, aquele falha
+    também. Falhar fechado aqui é a diferença entre um 500 e um vazamento.
+    """
+    conversa_id = conversa_uuid(conversation_id)
+    if conversa_id is None:
+        # UUID inválido não alcança o banco: `_historico_do_banco` também o
+        # recusa, e `_turno_da_conversa` já descarta o turno com aviso.
+        return
+
+    if usuario.domain_user_id is None:
+        # Sem ligação com `portfolio.usuario` não há com o que comparar. O turno
+        # tampouco será gravado (ver `_turno_da_conversa`), e o histórico volta
+        # vazio porque nenhuma conversa aponta para um dono inexistente.
+        return
+
+    dono = repositorio.dono_da_conversa(str(conversa_id))
+    if dono is not None and dono != usuario.domain_user_id:
+        logger.warning(
+            "Usuário %s tentou usar a conversa %s, que é de outro.",
+            usuario.domain_user_id,
+            conversa_id,
+        )
+        raise ChatAPIError(
+            403,
+            "forbidden",
+            "Esta conversa pertence a outro usuário.",
+        )
+
+
 def fontes_para_auditoria(citadas: Sequence[FonteCitada]) -> tuple[FonteDaResposta, ...]:
     """Converte as fontes do contrato HTTP nas que a trilha grava.
 
@@ -151,27 +204,99 @@ def fontes_para_auditoria(citadas: Sequence[FonteCitada]) -> tuple[FonteDaRespos
 
 
 def classificar_sem_interferir(
-    classificador: Callable[[str], tuple[str, float]] | None, texto: str
-) -> tuple[str | None, float | None]:
-    """A intenção prevista, ou (None, None) se não foi possível prevê-la.
+    classificador: DetectarIntencao | None, texto: str
+) -> IntencaoDetectada | None:
+    """A intenção detectada, ou None se não foi possível detectá-la.
 
-    OBSERVAÇÃO, NÃO DECISÃO. O rótulo vai para `auditoria.mensagem.intencao` e
-    não influencia busca, recusa nem resposta. Com F1-macro de 0,6736 contra os
-    0,85 do RNF03, dar-lhe controle de fluxo erraria em cerca de um terço das
-    interações; observando, ele torna o requisito mensurável sobre tráfego real
-    — hoje a coluna é NULL em 100% das linhas — sem custar nada a quem pergunta.
+    O que ela decide, e o que não decide: a intenção governa a AÇÃO do Agente
+    — e, por consequência, se vale a pena perguntar ao modelo de linguagem.
+    Ela não entra no prompt e não filtra a busca. Com F1-macro de 0,6736 contra
+    os 0,85 do RNF03, deixá-la escolher o contexto da resposta erraria em cerca
+    de um terço das interações; como gatilho de ação, um erro custa uma ação a
+    menos e o RAG responde do mesmo jeito.
 
-    Qualquer falha é engolida de propósito: classificar é acessório, e um
-    modelo com problema não pode derrubar a conversa.
+    Qualquer falha é engolida de propósito: sem detecção, `None` faz o fluxo
+    cair no RAG. Um modelo com problema não pode derrubar a conversa.
     """
     if classificador is None:
-        return None, None
+        return None
     try:
-        rotulo, confianca = classificador(texto)
+        return classificador(texto)
     except Exception:
         logger.exception("Falha ao classificar a intenção; seguindo sem registrá-la.")
-        return None, None
-    return rotulo, float(confianca)
+        return None
+
+
+def executar_acao_sem_interferir(
+    agente: ExecutarIntencao | AgenteDesligado,
+    deteccao: IntencaoDetectada | None,
+    texto: str,
+) -> RespostaDoAgente | None:
+    """A ação do Agente para esta mensagem, ou None se não há o que executar.
+
+    Mesma postura de `classificar_sem_interferir`: qualquer falha do Agente é
+    engolida e o fluxo segue para o RAG — agir é um recurso a mais, não pode
+    ser um jeito novo de a conversa quebrar.
+
+    `None` aqui é o que decide se o modelo de linguagem chega a ser chamado, e
+    por isso o `except` importa mais do que parece: um Agente quebrado degrada
+    para a conversa de sempre, e não para uma resposta vazia.
+    """
+    if deteccao is None:
+        return None
+    try:
+        resposta = agente.executar(deteccao=deteccao, texto=texto)
+    except Exception:
+        logger.exception("Falha ao executar a ação do Agente; seguindo para o RAG.")
+        return None
+    return None if resposta.resultado is ResultadoAcao.SEM_ACAO else resposta
+
+
+def texto_da_acao(resposta: RespostaDoAgente) -> str:
+    """O texto que substitui a resposta do RAG quando o Agente agiu.
+
+    `resposta.pendencias`/`resposta.projetos` já vêm filtrados por
+    `ExecutarIntencao` — aqui só se formata o que chegou.
+    """
+    if resposta.resultado is ResultadoAcao.RECUSADA_FORA_DO_CATALOGO:
+        # Texto literal da resposta-padrão 1.1 do material entregue pelo Metrô,
+        # que a classifica como obrigatória e com prioridade sobre qualquer
+        # tentativa de completar a informação. Não é redação nossa, e mudá-la
+        # exige concordância do parceiro.
+        return (
+            "Essa pergunta não está relacionada ao Portfólio Organizacional e não "
+            "possuo essa informação. Posso ajudá-lo com assuntos relacionados ao "
+            "portfólio, programas e projetos."
+        )
+
+    if resposta.resultado is ResultadoAcao.PENDENCIAS:
+        abertas = [p for p in resposta.pendencias if not p.resolvida]
+        if not abertas:
+            return "Não há pendências em aberto no momento."
+        linhas = (
+            f"- [{p.projeto_codigo}] {p.titulo}" + (f" (prazo {p.prazo.isoformat()})" if p.prazo else "")
+            for p in abertas
+        )
+        return "Pendências que precisam de atenção:\n" + "\n".join(linhas)
+
+    if resposta.resultado is ResultadoAcao.PROJETO:
+        if not resposta.projetos:
+            return "Não encontrei o projeto informado."
+        linhas = (
+            f"- {p.codigo} — {p.nome}: {p.percentual_avanco:.0f}% concluído "
+            f"(previsto {p.percentual_previsto:.0f}%), status {p.status}"
+            for p in resposta.projetos
+        )
+        return "Situação do(s) projeto(s):\n" + "\n".join(linhas)
+
+    return ""
+
+
+_RESULTADO_POR_ACAO = {
+    ResultadoAcao.RECUSADA_FORA_DO_CATALOGO: "recusada",
+    ResultadoAcao.PENDENCIAS: "sucesso",
+    ResultadoAcao.PROJETO: "sucesso",
+}
 
 
 def registrar_turno_em_segundo_plano(
@@ -202,31 +327,84 @@ def send_chat_message(
     answerer: AnswerChatMessage = Depends(get_chat_answerer),
     repositorio: ConversaRepository | PersistenciaDesligada = Depends(get_conversa_repository),
     usuario: AuthenticatedUser = Depends(require_authenticated_user),
-    classificador=Depends(get_classificador_de_intencao),
+    classificador: DetectarIntencao | None = Depends(get_classificador_de_intencao),
+    agente: ExecutarIntencao | AgenteDesligado = Depends(get_agente),
 ) -> ChatResponse:
+    """Classifica, age se houver ação, e só então pergunta ao modelo.
+
+    ESTA ORDEM É O CONTRATO, e por muito tempo não foi o código. O handler
+    chamava `answerer.answer` primeiro e classificava depois, de modo que todo
+    turno em que o Agente agia — pendências, situação de projeto ou recusa —
+    pagava uma geração no Gemini e uma busca vetorial cujo resultado era
+    descartado na linha seguinte.
+
+    No caso da recusa isso não era só desperdício: a Seção 2.1 do Projeto.md
+    especifica recusar pedidos fora do escopo "antes mesmo de consultar as
+    fontes de dados", e o caso crítico 1 da Seção 2.2.3 modela a classificação
+    antes do roteamento. Consultar as fontes para depois jogar fora a resposta
+    é o oposto do que o artefato descreve.
+    """
     inicio = time.monotonic()
+
+    # Validar ANTES de classificar. Sem isto, mensagem vazia chegaria ao
+    # classificador, e o 422 passaria a depender do que o modelo achasse de uma
+    # string em branco.
+    #
+    # Requisição inválida (422) não é auditada: o manipulador de exceção monta
+    # uma JSONResponse nova, sem as tarefas de fundo. Comportamento herdado e
+    # intencional.
     try:
-        reply = answerer.answer(payload.message, payload.conversation_id)
+        mensagem = validar_mensagem(payload.message)
     except ChatReceptionError as exc:
-        # Requisição inválida (422) não é auditada: o manipulador de exceção
-        # monta uma JSONResponse nova, sem as tarefas de fundo. Comportamento
-        # herdado e intencional.
         details = _ERROR_DETAILS[exc.code]
         raise ChatAPIError(details.status_code, details.error, details.message) from exc
 
-    # A ordem importa: as fontes saem do texto AINDA com os marcadores, e só
-    # depois o texto é limpo. Invertida, não haveria como saber quais trechos o
-    # modelo usou.
-    fontes = fontes_citadas(reply.text, reply.fontes)
-    resposta_texto = limpar_citacoes(reply.text)
+    # Antes de classificar e de qualquer leitura de histórico: ver o docstring
+    # de `recusar_conversa_alheia`.
+    recusar_conversa_alheia(repositorio, payload.conversation_id, usuario)
+
+    deteccao = classificar_sem_interferir(classificador, mensagem)
+    resposta_do_agente = executar_acao_sem_interferir(agente, deteccao, mensagem)
+
+    if resposta_do_agente is not None:
+        # Nenhuma chamada ao modelo e nenhuma busca: não há o que citar quando
+        # a resposta veio do portfólio ou é uma recusa.
+        reply = None
+        resposta_texto = texto_da_acao(resposta_do_agente)
+        fontes: list[FonteCitada] = []
+    else:
+        try:
+            # A classificação chega à LLM aqui — não como afirmação dentro
+            # do prompt, mas escolhendo EM QUE DOCUMENTOS buscar. Um rótulo
+            # errado custa uma consulta vetorial a mais, porque o buscador
+            # recua para a busca ampla; dentro do prompt, custaria a resposta.
+            # `resposta_do_agente` é None aqui por construção — este ramo só
+            # roda quando o Agente NÃO agiu —, então as entidades se extraem
+            # da mensagem. A extração é por regra (`SYN-\d{2}`), então o
+            # código do projeto entra no foco mesmo quando a intenção não
+            # sugere tipo de documento: a confiabilidade dele não depende do
+            # F1 do classificador.
+            foco = focar_busca(deteccao, extrair_entidades(mensagem))
+            reply = answerer.answer(mensagem, payload.conversation_id, foco=foco)
+        except ChatReceptionError as exc:
+            details = _ERROR_DETAILS[exc.code]
+            raise ChatAPIError(details.status_code, details.error, details.message) from exc
+
+        # A ordem importa: as fontes saem do texto AINDA com os marcadores, e
+        # só depois o texto é limpo. Invertida, não haveria como saber quais
+        # trechos o modelo usou.
+        fontes = fontes_citadas(reply.text, reply.fontes)
+        resposta_texto = limpar_citacoes(reply.text)
+
     duracao_ms = int((time.monotonic() - inicio) * 1000)
 
-    intencao, confianca = classificar_sem_interferir(classificador, payload.message)
     turno = _turno_da_conversa(
-        payload, usuario, reply, resposta_texto, fontes, duracao_ms, intencao, confianca
+        payload, usuario, reply, resposta_texto, fontes, duracao_ms, deteccao,
+        resposta_do_agente,
     )
     if turno is not None:
         background_tasks.add_task(registrar_turno_em_segundo_plano, repositorio, turno)
+
 
     # `resposta_texto` é o mesmo que foi para a trilha: o que a pessoa viu é o
     # que fica registrado. A ligação afirmação↔fonte não se perde, porque vive
@@ -234,15 +412,16 @@ def send_chat_message(
     return ChatResponse(reply=resposta_texto, fontes=fontes)
 
 
+
 def _turno_da_conversa(
     payload: ChatRequest,
     usuario: AuthenticatedUser,
-    reply: ChatReply,
+    reply: ChatReply | None,
     resposta_texto: str,
     fontes: Sequence[FonteCitada],
     duracao_ms: int,
-    intencao: str | None,
-    confianca: float | None,
+    deteccao: IntencaoDetectada | None,
+    resposta_do_agente: RespostaDoAgente | None,
 ) -> TurnoDoChat | None:
     """O turno a gravar, ou None quando gravá-lo seria registrar uma falsidade.
 
@@ -255,9 +434,19 @@ def _turno_da_conversa(
        produziu o `usuario_id = 0` que este projeto acabou de aposentar.
     2. IDENTIFICADOR INVÁLIDO. `conversa.id` é UUID.
 
-    `intencao` é OBSERVADA, não usada: vem do classificador e vai para a linha
-    do usuário — o CHECK `mensagem_papel_coerente` a recusa na do agente —, sem
-    influenciar a resposta. Ver `classificar_sem_interferir`.
+    `intencao` vai para a linha do usuário — o CHECK `mensagem_papel_coerente`
+    a recusa na do agente — e grava a previsão CRUA do modelo, não o que sobra
+    da rejeição. A distinção importa: a regra de rejeição é reconstituível a
+    partir de `confianca_intencao` e do limiar, enquanto o argmax descartado
+    não é. Guardar o cru é o que permitirá recalibrar o limiar sobre tráfego
+    real, que é a razão de a coluna existir.
+
+    `resultado`/`modelo` vêm do RAG por padrão, mas quando o Agente agiu
+    (`resposta_do_agente` não é None) são os dele: `recusada` para
+    fora-do-catálogo, `sucesso` para uma ação de portfólio executada, sem
+    `modelo` nenhum por trás — e, desde que a classificação passou a vir antes,
+    sem geração nenhuma por trás também, motivo pelo qual `reply` é None nesse
+    ramo.
     """
     conversa_id = conversa_uuid(payload.conversation_id)
     if conversa_id is None:
@@ -272,15 +461,22 @@ def _turno_da_conversa(
         )
         return None
 
+    if resposta_do_agente is not None:
+        resultado = _RESULTADO_POR_ACAO[resposta_do_agente.resultado]
+        modelo = None
+    else:
+        resultado = reply.resultado
+        modelo = reply.modelo or None
+
     return TurnoDoChat(
         conversa_id=conversa_id,
         usuario_id=usuario.domain_user_id,
         prompt=payload.message,
         resposta=resposta_texto,
-        resultado=reply.resultado,
-        modelo=reply.modelo or None,
+        resultado=resultado,
+        modelo=modelo,
         tempo_processamento_ms=duracao_ms,
-        intencao=intencao,
-        confianca_intencao=confianca,
+        intencao=deteccao.prevista if deteccao is not None else None,
+        confianca_intencao=deteccao.confianca if deteccao is not None else None,
         fontes=fontes_para_auditoria(fontes),
     )

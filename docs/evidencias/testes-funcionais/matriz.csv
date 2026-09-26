@@ -1,0 +1,63 @@
+id,rf,prioridade,status,motivo,variantes_executadas,evidencia,proxima_etapa
+CT-RF01-01,RF01,Alta,Parcial,Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral.,1,funcionais.json,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF01-02,RF01,Alta,Bloqueado,Falta execução navegador/microfone real ou gravações faladas nos quatro formatos; comparação comum de intenção pendente.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF01-03,RF01,Alta,Parcial,Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral.,1,frontend.json,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF01-04,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,5,funcionais.json,Revisão humana
+CT-RF01-05,RF01,Alta,Bloqueado,Falta execução navegador/microfone real ou gravações faladas nos quatro formatos; comparação comum de intenção pendente.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF01-06,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,1,funcionais.json,Revisão humana
+CT-RF01-07,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,1,funcionais.json,Revisão humana
+CT-RF01-08,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,1,funcionais.json,Revisão humana
+CT-RF01-09,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,2,funcionais.json,Revisão humana
+CT-RF01-10,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,1,funcionais.json,Revisão humana
+CT-RF01-11,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,1,funcionais.json,Revisão humana
+CT-RF01-12,RF01,Alta,Parcial,Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral.,1,funcionais.json,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF01-13,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,2,funcionais.json,Revisão humana
+CT-RF01-14,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,1,funcionais.json,Revisão humana
+CT-RF01-15,RF01,Alta,Parcial,Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral.,2,frontend.json; navegador.json; CT-RF01-15.png,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF01-16,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,4,funcionais.json,Revisão humana
+CT-RF01-17,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,2,funcionais.json,Revisão humana
+CT-RF01-18,RF01,Alta,Aprovado controlado,Todos os observáveis deste caso passaram no recorte controlado; não comprova SSO/modelo externo real.,10,funcionais.json,Revisão humana
+CT-RF01-19,RF01,Alta,Parcial,Variantes executadas não atendem todas as pré-condições/observáveis da ficha; não contabilizar aprovação integral.,2,frontend.json,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-01,RF02,Alta,Bloqueado,Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-02,RF02,Alta,Bloqueado,Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-03,RF02,Alta,Bloqueado,Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-04,RF02,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-05,RF02,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-06,RF02,Alta,Reprovado,Observável obrigatório divergente; consultar funcionais.json e registro de defeitos.,1,funcionais.json,Reteste após correção
+CT-RF02-07,RF02,Alta,Reprovado,Observável obrigatório divergente; consultar funcionais.json e registro de defeitos.,1,funcionais.json,Reteste após correção
+CT-RF02-08,RF02,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-09,RF02,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-10,RF02,Alta,Fora do recorte,D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP.,0,,Revisão humana
+CT-RF02-11,RF02,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-12,RF02,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-13,RF02,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF02-14,RF02,Alta,Bloqueado,Base cega independente e entidades de referência não disponibilizadas/congeladas; não usar base saturada para aceitar requisito.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF03-01,RF03,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF03-02,RF03,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF03-03,RF03,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF03-04,RF03,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF03-05,RF03,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF03-06,RF03,Alta,Bloqueado,"Massa E/F e recuperação vetorial real com versões, referências e gabaritos dedicados não provisionadas nesta campanha.",0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF04-01,RF04,Média,Bloqueado,Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF04-02,RF04,Média,Bloqueado,Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF04-03,RF04,Média,Bloqueado,Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF04-04,RF04,Média,Bloqueado,Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF04-05,RF04,Média,Bloqueado,Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF04-06,RF04,Média,Bloqueado,Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF04-07,RF04,Média,Bloqueado,Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF04-08,RF04,Média,Bloqueado,Fluxo integrado por campo e massa G não disponíveis; campo_artefato sem massa nesta campanha.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-01,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-02,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-03,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-04,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-05,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-06,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-07,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-08,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF05-09,RF05,Alta,Bloqueado,Agendador/canal de entrega e configuração de elegibilidade não disponibilizados; assinantes/webhooks não comprovam notificação automática.,0,,Sprint 4/5: cumprir pré-condições e executar ficha
+CT-RF06-01,RF06,Média,Fora do recorte,D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP.,0,,Revisão humana
+CT-RF06-02,RF06,Média,Fora do recorte,D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP.,0,,Revisão humana
+CT-RF06-03,RF06,Média,Fora do recorte,D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP.,0,,Revisão humana
+CT-RF06-04,RF06,Média,Fora do recorte,D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP.,0,,Revisão humana
+CT-RF06-05,RF06,Média,Fora do recorte,D04/D07; preservar caso histórico; escrita futura não entra no aceite do MVP.,0,,Revisão humana
+CT-RF06-06,RF06,Média,Bloqueado,Fonte dedicada para comparação antes/depois e diálogo explicativo do MVP ainda precisam ser exercitados conjuntamente.,0,,Sprint 4/5: cumprir pré-condições e executar ficha

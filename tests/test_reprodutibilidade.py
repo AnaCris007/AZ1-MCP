@@ -8,7 +8,7 @@
 # nenhum teste acusasse.
 #
 # Estes testes fecham essa porta: as três fontes (os dois arquivos de
-# dependência e a tabela da Seção 3.3.7) precisam concordar, sempre.
+# dependência e a tabela da Seção 3.3.8) precisam concordar, sempre.
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ def _versoes_do_pyproject() -> dict[str, str]:
 
 def _versoes_da_documentacao() -> dict[str, str]:
     texto = (RAIZ / "docs" / "Projeto.md").read_text(encoding="utf-8")
-    # Linhas da tabela da Seção 3.3.7: | `pacote` | versão | papel |
+    # Linhas da tabela da Seção 3.3.8: | `pacote` | versão | papel |
     return dict(re.findall(r"^\|\s*`([a-z-]+)`\s*\|\s*([0-9][0-9.]*)\s*\|", texto, re.MULTILINE))
 
 
@@ -74,11 +74,11 @@ class TesteVersoesFixadas(unittest.TestCase):
         for pacote in PACOTES_DA_METRICA:
             self.assertIn(
                 pacote, doc,
-                f"{pacote} não aparece na tabela de bibliotecas da Seção 3.3.7.",
+                f"{pacote} não aparece na tabela de bibliotecas da Seção 3.3.8.",
             )
             self.assertEqual(
                 doc[pacote], req[pacote],
-                f"a Seção 3.3.7 declara {pacote} {doc[pacote]}, mas requirements.txt fixa "
+                f"a Seção 3.3.8 declara {pacote} {doc[pacote]}, mas requirements.txt fixa "
                 f"{req[pacote]}. Regere os relatórios de resultados/ antes de editar a tabela.",
             )
 
@@ -104,15 +104,18 @@ class TesteAmbienteInstaladoBateComOsPins(unittest.TestCase):
             )
 
 
-# Os módulos que compõem o pipeline de PLN propriamente dito. A Seção 3.3.9
+# Os módulos que compõem o pipeline de PLN propriamente dito. A Seção 3.3.11
 # conta só estes; o README conta a suíte inteira, que inclui os testes de API
 # e de serviços. Os dois números são diferentes de propósito.
 MODULOS_DO_PIPELINE = (
     "test_ajuste_fino.py",
     "test_bancada.py",
     "test_classificador.py",
+    "test_comparativo_modelos.py",
     "test_experimento.py",
+    "test_intencao.py",
     "test_metricas.py",
+    "test_particao.py",
     "test_preprocessamento.py",
     "test_reprodutibilidade.py",
     "test_vetorizacao.py",
@@ -147,7 +150,7 @@ class TesteContagemDocumentada(unittest.TestCase):
         declarado = re.search(r"mais de \*\*(\d+) testes automatizados\*\*", doc)
         self.assertIsNotNone(
             declarado,
-            "a Seção 3.3.9 precisa declarar um piso no formato "
+            "a Seção 3.3.11 precisa declarar um piso no formato "
             "'mais de **N testes automatizados**'.",
         )
 
@@ -155,7 +158,7 @@ class TesteContagemDocumentada(unittest.TestCase):
         real = _contar_testes(RAIZ / "tests" / nome for nome in MODULOS_DO_PIPELINE)
         self.assertGreater(
             real, piso,
-            f"a Seção 3.3.9 promete mais de {piso} testes no pipeline de PLN, mas os "
+            f"a Seção 3.3.11 promete mais de {piso} testes no pipeline de PLN, mas os "
             f"módulos somam {real}. Ou faltam testes, ou o piso da documentação está alto "
             f"demais.",
         )

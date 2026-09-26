@@ -34,15 +34,34 @@ set -a && source ../../.env && set +a
 psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 01_create_database.sql
 psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 02_initial_data.sql
 psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 03_rls_policies.sql
+psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 03_webhooks_auditoria.sql
+psql "$SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -f 07_evento_local.sql
 psql "$SUPABASE_DB_URL" -X -f 04_verificacao.sql   # sem ON_ERROR_STOP: ver abaixo
 ```
+
+**`03_webhooks_auditoria.sql` não é opcional**, apesar do nome fora de padrão e
+do prefixo repetido. Ele cria o schema `alerta`; sem ele, `alerta_service.py`
+falha em runtime com `UndefinedTable` e as rotas de assinante e o dispatcher de
+alerta quebram numa base recém-criada. A renumeração destes scripts é dívida
+conhecida.
+
+`06_webhook_permissions.sql` não aparece na lista porque `03_rls_policies.sql`
+o inclui com `\ir` no fim. Isso só funciona no `psql`, a partir deste diretório
+— **quem colar o SQL no editor do Supabase precisa rodar o `06` à mão**, e é ele
+que tira os segredos de `integracao.conexao` do alcance de `az1_app`.
 
 | Script | O que faz |
 |---|---|
 | `01_create_database.sql` | Schemas, tabelas, restrições, índices, gatilho, visões e a proteção da trilha de auditoria |
 | `02_initial_data.sql` | Carga da base sintética. Reexecutável: limpa antes de inserir |
-| `03_rls_policies.sql` | Papel da aplicação, ponte com o SSO e Row Level Security |
+| `03_rls_policies.sql` | Papel da aplicação, ponte com o SSO e Row Level Security. Puxa o `06` por `\ir` |
+| `03_webhooks_auditoria.sql` | Schema `alerta`: assinantes e histórico de disparo |
 | `04_verificacao.sql` | Exercita o caminho de escrita e prova que o banco recusa dado incoerente. Termina em `ROLLBACK` |
+| `05_migracao_usuario_zero.sql` | Migração: aposenta o `usuario_id = 0` do código legado. No-op em base nova |
+| `06_webhook_permissions.sql` | Papel `az1_webhook` e grants por coluna. Serve como setup e como migração |
+| `07_evento_local.sql` | Migração idempotente dos compromissos próprios da Agenda para bancos existentes |
+| `08_seguranca_acesso.sql` | Migração: `security_invoker` em `auditoria.vw_turno`. **Necessário em toda base criada antes desta correção** |
+| `09_remove_portfolio.sql` | Migração: remove a tabela `portfolio.portfolio` e `projeto.portfolio_id`, e recria `vw_projeto_situacao` sem o JOIN |
 
 Fora desta pasta, `scripts/verificar_modelo_documentado.py` confere se a Seção 3.6.6 do `docs/Projeto.md`, o `01_create_database.sql` e o banco em execução descrevem o mesmo modelo.
 
@@ -50,18 +69,55 @@ O `04_verificacao.sql` roda **sem** `-v ON_ERROR_STOP=1` de propósito: a segund
 metade provoca erros para verificar que as restrições reagem. Cada bloco deve
 imprimir `RECUSADO (ok)`; um `ACEITOU` significa que uma restrição se perdeu.
 
+### Inventariar o índice vetorial
+
+`inventario_rag.sql` consulta a coleção `vecs.documentos_metro` sem modificar
+seu conteúdo. O executor abre uma transação `READ ONLY`, aplica timeout e produz
+um JSON com totais, cobertura dos metadados, dimensão vetorial, índices e sinais
+de duplicação ou caminhos sensíveis:
+
+```bash
+python scripts/inventariar_indice_rag.py
+
+# Evidência local para anexar à task ou ao MR. O caminho precisa ficar FORA
+# do repositório: o executor recusa qualquer destino interno, e é o que
+# impede a evidência de entrar no histórico do Git por acidente.
+python scripts/inventariar_indice_rag.py --saida /tmp/inventario-rag.json
+```
+
+Projetos e arquivos aparecem somente como hashes, suficientes para distinguir
+grupos no relatório sem publicar os identificadores originais. Esses hashes são
+pseudônimos técnicos, não uma anonimização criptográfica dos valores de origem.
+Não salve o relatório dentro do repositório e não versione texto de chunks,
+nomes de arquivos, caminhos pessoais ou outros metadados identificáveis.
+
+O que NÃO é mascarado é o `tipo_documento`, que sai em claro por ser
+vocabulário fechado do próprio modelo (`riscos_problemas`, `cronograma`,
+...) e não identificar projeto nem arquivo. Se algum dia esse campo passar
+a carregar valor livre, ele precisa entrar na lista dos que viram hash.
+
 ## Estrutura
 
 ### Schema `portfolio` — dados operacionais
 
 ```
-portfolio ──< projeto ──< artefato ──< campo_artefato
-                 │  │
-                 │  └──< pendencia
-                 │
-     usuario ────┴──< usuario_projeto
-                      projeto_relacionado (projeto ↔ projeto)
+projeto ──< artefato ──< campo_artefato
+   │  │
+   │  └──< pendencia
+   │
+usuario ──┴──< usuario_projeto
+   └──────< evento_local
+               projeto_relacionado (projeto ↔ projeto)
 ```
+
+Havia uma tabela `portfolio` acima de `projeto`, agrupando-o por subportfólio da
+planilha. Ela saiu em `09_remove_portfolio.sql`: nenhuma consulta usava o
+agrupamento, e o campo atravessava o repositório, o contrato `ProjetoResponse` e
+a rota `/api/v1/projetos` até uma interface que não o exibe.
+
+Em bases novas, `evento_local` já nasce pelo `01_create_database.sql`. A
+migração 07 existe para volumes e ambientes persistentes anteriores a essa
+tabela e deve ser aplicada antes do deploy da API que permite criar eventos.
 
 `usuario` traz a coluna `auth_user_id`, hoje nula. É por ali que a frente de
 autenticação vai amarrar cada pessoa à sua conta de SSO — ver
@@ -112,7 +168,6 @@ que já estão indexados no banco vetorial.
 
 | Tabela | Linhas | Origem |
 |---|---:|---|
-| `portfolio` | 4 | Subportfólios da planilha `Portfolio_Sintetico_2026.xlsx` |
 | `usuario` | 10 | Duas personas da Seção 1.5 e um líder por projeto (nomes fictícios) |
 | `projeto` | 8 | Planilha de portfólio: fase, situação, datas, previsto e realizado |
 | `projeto_relacionado` | 6 | Dependências declaradas na mesma planilha |
@@ -250,8 +305,18 @@ gerada); `projeto_relacionado`; e em `pendencia`, as colunas `codigo`, `titulo`,
   relativo, e a junção entre os dois é feita por `LIKE '%' || referencia`.
   Corrigir do lado do `src/rag/indexador.py` elimina a gambiarra e evita exibir
   a pasta pessoal de alguém como fonte ao usuário (RF03).
-- **Persistir de fato.** As tabelas existem, mas `src/services/chat_service.py`
-  ainda não grava nada: a conversa continua vivendo só no estado do React. É a
-  task T26.
+- ~~**Persistir de fato.**~~ **Feito.** `POST /chat` grava o turno em tarefa de
+  fundo: `routes/chat.py::registrar_turno_em_segundo_plano` chama
+  `ConversaRepository.registrar_turno`, que escreve as duas linhas de
+  `auditoria.mensagem`, as de `mensagem_fonte` e os dois objetos no S3 dentro da
+  mesma transação.
+- **`AZ1_DB_ROLE` vazia deixa a RLS inerte, e hoje não há como preenchê-la.**
+  Sem `SET ROLE` a aplicação conecta como dono, e dono ignora RLS. Mas assumir
+  `az1_app` também não resolve sozinho: nada no código executa
+  `set_config('request.jwt.claims', ...)`, então `portfolio.usuario_atual()`
+  devolveria NULL em toda sessão — leituras vazias, `INSERT` em `conversa`
+  violando `WITH CHECK` e `UPDATE` de pendência virando no-op silencioso.
+  Preencher a variável antes de injetar o JWT quebra a aplicação em silêncio.
+  Enquanto isso, a separação entre usuários depende de filtro explícito no SQL.
 - `campo_artefato` está vazia. Depende de extrair os campos de dentro dos
   documentos, que é o insumo do RF04.
