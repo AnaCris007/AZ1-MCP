@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import unittest
 
 from fastapi.testclient import TestClient
@@ -26,11 +27,17 @@ class FakeListador:
 # autenticação, cada requisição destes testes construía o verificador de token
 # de verdade e morria em `SUPABASE_URL não configurada` — 500 no lugar do código
 # esperado, e nada na falha apontava para a autenticação.
+# `perfil` importa aqui: a rota devolve `conteudo` de `auditoria.mensagem` sem
+# filtro de dono — leitura administrativa, restrita a diretor e PMO. Um usuário
+# sem perfil administrativo recebe 403, e é o que
+# `test_perfil_comum_nao_le_a_trilha` verifica.
 _TEST_USER = AuthenticatedUser(
     subject="test-user",
     email="teste@example.com",
     name="Usuário de Teste",
     provider="azure",
+    domain_user_id=7,
+    perfil="pmo",
 )
 
 
@@ -45,6 +52,45 @@ class TestAuditoriaAPI(unittest.TestCase):
         fake = FakeListador(registros)
         app.dependency_overrides[get_listador_auditoria] = lambda: fake
         return TestClient(app, raise_server_exceptions=False), fake
+
+    def test_perfil_comum_nao_le_a_trilha(self) -> None:
+        """Líder de projeto não lê a conversa dos outros.
+
+        Antes da correção esta rota devolvia `conteudo` de até 100 mensagens de
+        qualquer usuário para quem estivesse apenas autenticado.
+        """
+        client, fake = self._client_com([])
+        app.dependency_overrides[require_authenticated_user] = lambda: dataclasses.replace(
+            _TEST_USER, perfil="lider_projeto"
+        )
+
+        response = client.get("/api/v1/auditoria/consultas")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["error"], "forbidden")
+        # E não chegou a consultar: a recusa vem antes do banco.
+        self.assertIsNone(fake.ultimo_limit)
+
+    def test_perfil_ausente_nao_le_a_trilha(self) -> None:
+        """Sem ligação com portfolio.usuario, a dúvida recusa."""
+        client, _ = self._client_com([])
+        app.dependency_overrides[require_authenticated_user] = lambda: dataclasses.replace(
+            _TEST_USER, domain_user_id=None, perfil=None
+        )
+
+        response = client.get("/api/v1/auditoria/consultas")
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_diretor_le_a_trilha(self) -> None:
+        client, _ = self._client_com([])
+        app.dependency_overrides[require_authenticated_user] = lambda: dataclasses.replace(
+            _TEST_USER, perfil="diretor"
+        )
+
+        response = client.get("/api/v1/auditoria/consultas")
+
+        self.assertEqual(response.status_code, 200)
 
     def test_retorna_lista_vazia_quando_sem_registros(self) -> None:
         client, _ = self._client_com([])

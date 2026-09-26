@@ -19,6 +19,45 @@ NOME_COLECAO = "documentos_metro"
 # erro só apareceria no upsert.
 
 
+# A `vecs` precisa do psycopg2, e isso NÃO é preferência de driver.
+#
+# Em toda chamada de `Collection.query()` ela executa, incondicionalmente:
+#
+#     text("set local ivfflat.probes = :probes").bindparams(probes=probes)
+#
+# O PostgreSQL não aceita parâmetro em `SET`. Com o psycopg2, que interpola do
+# lado do cliente, o comando chega literal e funciona. Com o psycopg3, que faz
+# binding no servidor, chega `set local ivfflat.probes = $1` e é erro de
+# sintaxe — a busca inteira levanta, o chat cai no curto-circuito
+# BASE_INDISPONIVEL e o agente recusa TODA pergunta com a resposta canônica de
+# "não consegui consultar a base".
+#
+# Foi o que aconteceu: `vecs>=0.4` e `SQLAlchemy>=2.0` eram pisos sem teto, e o
+# SQLAlchemy 2.1 mudou o DBAPI padrão de `postgresql://` de psycopg2 para
+# psycopg3. A `vecs` foi escrita contra o psycopg2 e o chão saiu de baixo dela.
+# Nenhum teste pegou, porque a suíte substitui `rag.retriever.buscar` por um
+# dublê e o caso que toca o banco de verdade é pulado sem `TEST_RAG_DB_URL`.
+#
+# O escopo é só este cliente. O pool de `services/database_service.py` segue no
+# psycopg3, e `database/conexao.py` segue sem driver explícito.
+_DRIVER_VECS = "postgresql+psycopg2://"
+
+
+def _com_driver_explicito(url: str) -> str:
+    """Fixa o psycopg2 no DSN, sem estragar um que já traga driver.
+
+    `postgresql+psycopg2://` e `postgres://` (forma antiga que o Supabase ainda
+    emite às vezes) passam intactos ou convertidos; qualquer outro driver
+    explícito é respeitado, porque quem o escreveu tinha um motivo.
+    """
+    if url.startswith("postgresql+"):
+        return url
+    for prefixo in ("postgresql://", "postgres://"):
+        if url.startswith(prefixo):
+            return _DRIVER_VECS + url[len(prefixo) :]
+    return url
+
+
 def _db_url() -> str:
     url = os.environ.get("SUPABASE_DB_URL", "")
     if not url:
@@ -26,12 +65,25 @@ def _db_url() -> str:
             "SUPABASE_DB_URL não configurada. Use a connection string PostgreSQL "
             "(Supabase → Settings → Database → Connection string → URI)."
         )
+    return _com_driver_explicito(url)
+
+
+def _url_psycopg2(url: str) -> str:
+    # O vecs é escrito para o psycopg2 (é a dependência declarada dele) e envia
+    # `SET LOCAL ivfflat.probes = :probes` com parâmetro vinculado. O psycopg2
+    # interpola no cliente; o psycopg 3 manda o parâmetro ao servidor, e o
+    # PostgreSQL recusa parâmetro em SET ("syntax error at or near $1"). A partir
+    # do SQLAlchemy 2.1 o driver padrão de `postgresql://` passou a ser o
+    # psycopg 3, então o driver precisa ser explícito aqui.
+    for prefixo in ("postgresql://", "postgres://"):
+        if url.startswith(prefixo):
+            return "postgresql+psycopg2://" + url[len(prefixo):]
     return url
 
 
 @lru_cache(maxsize=1)
 def _cliente() -> vecs.Client:
-    return vecs.create_client(_db_url())
+    return vecs.create_client(_url_psycopg2(_db_url()))
 
 
 def obter_colecao() -> vecs.Collection:

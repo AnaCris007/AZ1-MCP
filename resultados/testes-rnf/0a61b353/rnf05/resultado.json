@@ -1,0 +1,32 @@
+{
+  "requisito": "RNF05",
+  "status": "Aprovado",
+  "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+  "inicio_utc": "2026-09-25T17:12:19.626849+00:00",
+  "fim_utc": "2026-09-25T17:14:08.705314+00:00",
+  "pares_total": 23,
+  "pares_positivos": 20,
+  "pares_negativos": 3,
+  "pares_equivalentes": 23,
+  "taxa_equivalencia": 1.0,
+  "sem_duplicacao_regras_negocio": true,
+  "clientes": {
+    "react": {
+      "aplicacao": "adaptador da interface React",
+      "frontend": "0.0.0",
+      "node": "v22.23.3",
+      "executor": "Vitest 5",
+      "base_url": "http://api:8001"
+    },
+    "python": {
+      "aplicacao": "cliente Python independente",
+      "python": "3.12.14",
+      "httpx": "0.28.1",
+      "base_url": "http://127.0.0.1:8001"
+    }
+  },
+  "contrato_chat_sha256": "b422f68a363cb0a63a5553f33a7802496aa9145cbc20d49e67c3fe5d6d72f85b",
+  "instance_ids": [
+    "1e8fbf11-5746-4344-9344-d93d4611994d"
+  ]
+}

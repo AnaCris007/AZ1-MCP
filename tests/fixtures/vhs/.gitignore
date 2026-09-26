@@ -1,0 +1,3 @@
+# Versão candidata gerada em modo `atualizar`: existe para revisão do diff e é
+# promovida (ou descartada) antes do commit — nunca versionada como está.
+*.candidato.yaml

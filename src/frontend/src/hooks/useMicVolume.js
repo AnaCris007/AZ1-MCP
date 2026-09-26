@@ -1,5 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+// Sem `mimeType` explícito, o MediaRecorder usa o padrão de cada navegador —
+// e no Firefox isso é `audio/ogg`, formato que a API de recebimento de áudio
+// não reconhece (só detecta wav, mp3, m4a e webm pelo conteúdo do arquivo).
+// A entrada por voz falhava silenciosamente por isso. A ordem tenta webm
+// primeiro (Chrome e Firefox), com mp4 como alternativa para Safari.
+const TIPOS_MIME_PREFERIDOS = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4']
+
+function escolherTipoMimeSuportado() {
+  if (typeof MediaRecorder === 'undefined' || typeof MediaRecorder.isTypeSupported !== 'function') {
+    return undefined
+  }
+  return TIPOS_MIME_PREFERIDOS.find((tipo) => MediaRecorder.isTypeSupported(tipo))
+}
+
 export function useMicVolume({ onRecordingComplete } = {}) {
   const [volume, setVolume] = useState(0)
   const [permissionDenied, setPermissionDenied] = useState(false)
@@ -83,7 +97,8 @@ export function useMicVolume({ onRecordingComplete } = {}) {
       analyserRef.current = analyser
 
       chunksRef.current = []
-      const recorder = new MediaRecorder(stream)
+      const tipoMime = escolherTipoMimeSuportado()
+      const recorder = tipoMime ? new MediaRecorder(stream, { mimeType: tipoMime }) : new MediaRecorder(stream)
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) chunksRef.current.push(event.data)
       }

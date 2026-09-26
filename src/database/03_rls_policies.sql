@@ -44,6 +44,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA portfolio TO az1_app;
 GRANT INSERT, UPDATE, DELETE ON portfolio.projeto, portfolio.artefato,
       portfolio.campo_artefato, portfolio.pendencia, portfolio.usuario_projeto
       TO az1_app;
+GRANT INSERT, DELETE ON portfolio.evento_local TO az1_app;
 
 -- Na auditoria o padrão é inserir e ler; nunca alterar nem apagar (RNF09).
 GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA auditoria TO az1_app;
@@ -69,7 +70,7 @@ GRANT UPDATE (polaridade, nota, motivo, comentario) ON auditoria.avaliacao  TO a
 -- INHERIT fica FALSE de propósito: não se quer que o usuário da conexão ganhe
 -- os privilégios de az1_app em silêncio. Quer-se que ele os assuma
 -- explicitamente, com `SET ROLE`, que é o que faz `current_user` deixar de ser
--- dono das tabelas e as 17 policies de RLS passarem a valer. Herdar sem
+-- dono das tabelas e as policies de RLS passarem a valer. Herdar sem
 -- assumir manteria a RLS inativa, que é o defeito que esta linha corrige.
 DO $$
 BEGIN
@@ -160,7 +161,6 @@ $$;
 -- Sem FORCE: o dono do schema (a API do backend) permanece fora do filtro. É
 -- ele quem aplica as regras de negócio e quem precisa gravar a auditoria de
 -- todos os usuários.
-ALTER TABLE portfolio.portfolio           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.usuario             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.projeto             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.projeto_relacionado ENABLE ROW LEVEL SECURITY;
@@ -168,6 +168,7 @@ ALTER TABLE portfolio.artefato            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.campo_artefato      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.pendencia           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio.usuario_projeto     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE portfolio.evento_local        ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE auditoria.conversa            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE auditoria.mensagem            ENABLE ROW LEVEL SECURITY;
@@ -184,8 +185,6 @@ ALTER TABLE auditoria.notificacao         ENABLE ROW LEVEL SECURITY;
 -- O RNF02 exige autenticação e diz explicitamente que o perfil não concede
 -- permissões distintas. A condição é, portanto, "existe um usuário ativo por
 -- trás desta sessão" — e não "este usuário acompanha este projeto".
-CREATE POLICY portfolio_leitura_autenticada ON portfolio.portfolio
-    FOR SELECT USING (portfolio.usuario_atual() IS NOT NULL);
 CREATE POLICY projeto_leitura_autenticada ON portfolio.projeto
     FOR SELECT USING (portfolio.usuario_atual() IS NOT NULL);
 CREATE POLICY projeto_relacionado_leitura_autenticada ON portfolio.projeto_relacionado
@@ -204,6 +203,15 @@ CREATE POLICY usuario_projeto_leitura_autenticada ON portfolio.usuario_projeto
 -- líder de um projeto), e não por leitura direta da tabela.
 CREATE POLICY usuario_le_o_proprio_registro ON portfolio.usuario
     FOR SELECT USING (id = portfolio.usuario_atual());
+
+-- Compromissos da Agenda são privados e têm exclusão física: diferentemente
+-- de pendências e conversas, não pertencem à trilha de auditoria do RNF09.
+CREATE POLICY evento_local_propria_leitura ON portfolio.evento_local
+    FOR SELECT USING (usuario_id = portfolio.usuario_atual());
+CREATE POLICY evento_local_propria_criacao ON portfolio.evento_local
+    FOR INSERT WITH CHECK (usuario_id = portfolio.usuario_atual());
+CREATE POLICY evento_local_propria_exclusao ON portfolio.evento_local
+    FOR DELETE USING (usuario_id = portfolio.usuario_atual());
 
 
 -- -----------------------------------------------------------------------------

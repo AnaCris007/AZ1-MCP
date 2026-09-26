@@ -1,0 +1,7 @@
+Falha ao gravar a trilha da conversa 94000000-0000-4000-8000-000000000094.
+Traceback (most recent call last):
+  File "/app/src/routes/chat.py", line 269, in registrar_turno_em_segundo_plano
+    repositorio.registrar_turno(turno)
+  File "/app/executar_rnf09.py", line 58, in registrar_turno
+    raise ConnectionError("persistência de auditoria indisponível [sintético]")
+ConnectionError: persistência de auditoria indisponível [sintético]

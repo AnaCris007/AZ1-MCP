@@ -12,7 +12,15 @@ from psycopg_pool import ConnectionPool
 # classe de `services/database_service.py`, importada mais abaixo. Duas classes
 # homônimas fariam `@app.exception_handler` registrar só uma delas.
 from database.conexao import obter_engine
-from rag.retriever import buscar as buscar_contexto_rag
+from mensageria.config import MensageriaSettings
+from mensageria.processador_publicador import ProcessadorComPublicacao
+from mensageria.publicador import (
+    PublicacaoDesligada,
+    Publicador,
+    PublicadorRabbitMQ,
+)
+from pln.intencao import DetectarIntencao
+from services.agente_service import AgenteDesligado, ExecutarIntencao
 from services.alerta_service import (
     ConfiguracaoAlertas,
     DesativarAssinante,
@@ -45,6 +53,7 @@ from services.drive_push_service import (
     VerificadorCanalAtivo,
     VerificadorChannelToken,
 )
+from services.evento_local_repository import EventoLocalRepository
 from services.gemini_service import GeminiChatModel, GeminiSettings
 from services.gemini_speech_service import DEFAULT_TTS_MODEL, GeminiSpeechModel
 from services.graph_push_service import PROVEDOR as PROVEDOR_GRAPH
@@ -133,33 +142,37 @@ def carregar_modelo_padrao():
                 sys.modules[k] = v
 
 
+# NÃO degrada, diferente de `get_classificador_de_intencao`: classificar é a
+# razão de `POST /audio/{id}/analyze` existir, não um efeito colateral dela.
+# Sem modelo, o endpoint deve falhar, e não responder uma análise sem análise.
 @lru_cache
 def get_analyzer() -> AnalyzeAudio:
-    return AnalyzeAudio(transcriber=get_transcriber(), modelo=carregar_modelo_padrao())
+    return AnalyzeAudio(
+        transcriber=get_transcriber(),
+        detector=DetectarIntencao(carregar_modelo_padrao()),
+    )
 
 
-# O classificador entra no chat como OBSERVADOR, e nada mais: o rótulo vai para
-# `auditoria.mensagem.intencao` e não decide nem a busca, nem a recusa, nem a
-# resposta.
+# O detector devolve a intenção JÁ com a regra de rejeição aplicada — a mesma
+# que `pln.metricas` usa para medir o RNF03. Antes daqui saía um `(rótulo,
+# confiança)` cru, e cada consumidor aplicava o limiar que quisesse.
 #
-# A distinção é o ponto. O modelo mede F1-macro 0,6736 contra os 0,85 do RNF03 —
-# colocá-lo para decidir algo erraria em cerca de um terço das interações. Como
-# observador, ele torna o RNF03 mensurável sobre tráfego real (hoje `intencao` é
-# NULL em 100% das linhas) sem colocar a qualidade da resposta em suas mãos.
+# O que ele decide, e o que não decide: a intenção governa a AÇÃO do Agente e o
+# despacho de alerta. Ela não entra no prompt nem filtra a busca. Com F1-macro
+# de 0,6736 contra os 0,85 do RNF03, deixá-la escolher o contexto da resposta
+# erraria em cerca de um terço das interações — enquanto, como gatilho de ação,
+# um erro custa uma ação a menos, e o RAG responde do mesmo jeito.
 #
 # Devolve None quando o modelo não pôde ser carregado: uma instalação sem o
-# `.joblib` treinado continua conversando, apenas sem registrar a intenção.
+# `.joblib` treinado continua conversando, apenas sem agir nem registrar a
+# intenção.
 @lru_cache
-def get_classificador_de_intencao() -> Callable[[str], tuple[str, float]] | None:
+def get_classificador_de_intencao() -> DetectarIntencao | None:
     try:
-        modelo = carregar_modelo_padrao()
+        return DetectarIntencao(carregar_modelo_padrao())
     except Exception:
         logger.exception("Classificador indisponível; a intenção não será registrada.")
         return None
-
-    from pln.classificador import prever_intencao
-
-    return lambda texto: prever_intencao(modelo, texto)
 
 
 def _historico_do_banco(conversa_id: str) -> list[tuple[str, str]]:
@@ -185,12 +198,36 @@ def _historico_do_banco(conversa_id: str) -> list[tuple[str, str]]:
         return [(papel, conteudo) for papel, conteudo in cursor.fetchall()]
 
 
+# Adapta o `buscar_com_recuo` do retriever ao contrato que o modelo espera.
+#
+# O nome do parâmetro muda de `projeto_id` para `projeto_codigo` entre as duas
+# camadas, e isso é intencional: no índice vetorial o campo se chama
+# `projeto_id`, mas o que a extração de entidades produz é o CÓDIGO do projeto
+# (`SYN-04`). São a mesma coisa neste projeto, e a tradução acontece aqui, na
+# borda — não dentro de quem responde nem dentro de quem busca.
+def _buscar_contexto_focado(
+    query: str,
+    *,
+    tipo_documento: str | None = None,
+    projeto_codigo: str | None = None,
+    score_minimo: float = 0.0,
+):
+    from rag.retriever import buscar_com_recuo
+
+    return buscar_com_recuo(
+        query,
+        tipo_documento=tipo_documento,
+        projeto_id=projeto_codigo,
+        score_minimo=score_minimo,
+    )
+
+
 @lru_cache
 def get_chat_answerer() -> AnswerChatMessage:
     settings = GeminiSettings.from_environment()
     model = GeminiChatModel.from_settings(
         settings,
-        buscar_contexto=buscar_contexto_rag,
+        buscar_contexto=_buscar_contexto_focado,
         carregar_historico=_historico_do_banco,
     )
     return AnswerChatMessage(model=model)
@@ -257,6 +294,29 @@ def get_conversa_repository() -> ConversaRepository | PersistenciaDesligada:
 @lru_cache
 def get_portfolio_repository() -> PortfolioRepository:
     return PortfolioRepository(pool=get_connection_pool())
+
+
+# Mesmo pool de domínio de get_portfolio_repository. Esta fábrica em si não
+# degrada — constrói o repositório de qualquer forma. Quem degrada é a rota
+# (`listar_eventos`, em routes/portfolio.py): sem identidade do usuário, ou
+# com falha na leitura (por exemplo `07_evento_local.sql` ainda não aplicada),
+# a Agenda responde só sem a seção de eventos próprios, nunca com 500 —
+# migração de banco e deploy de código são passos separados neste projeto.
+@lru_cache
+def get_evento_local_repository() -> EventoLocalRepository:
+    return EventoLocalRepository(pool=get_connection_pool())
+
+
+# Mesmo raciocínio de `get_alerta_dispatcher`, logo abaixo: o Agente é EFEITO
+# de `POST /chat` existir, não a razão do endpoint. Sem `SUPABASE_DB_URL`,
+# degrada para `AgenteDesligado` em vez de estourar a resolução das
+# dependências e derrubar a rota inteira com 500.
+@lru_cache
+def get_agente() -> ExecutarIntencao | AgenteDesligado:
+    try:
+        return ExecutarIntencao(portfolio=get_portfolio_repository())
+    except BancoNaoConfigurado as erro:
+        return AgenteDesligado(str(erro))
 
 
 @lru_cache
@@ -345,7 +405,9 @@ def require_authenticated_user(
     if usuario_resolver is not None:
         try:
             domain_user = usuario_resolver.resolve(auth_user_id=user.subject, email=user.email, name=user.name)
-            user = dataclasses.replace(user, domain_user_id=domain_user.id)
+            user = dataclasses.replace(
+                user, domain_user_id=domain_user.id, perfil=domain_user.perfil
+            )
         except Exception:
             # Autenticação (RNF02) não depende de portfolio.usuario: uma falha
             # aqui não deve virar 401 nem 500 para quem só quer usar o agente.
@@ -365,6 +427,22 @@ def get_webhook_connection_pool() -> ConnectionPool:
     if not dsn:
         dsn = PostgresSettings.from_environment().dsn
     return abrir_pool(PostgresSettings(dsn=dsn, papel="az1_webhook"))
+
+
+# A publicação no barramento é ADITIVA e OPCIONAL. Sem `RABBITMQ_URL`, devolve o
+# publicador no-op (`PublicacaoDesligada`) e o comportamento da Sprint 4 fica
+# intacto — o composto `ProcessadorComPublicacao` passa a ser indistinguível do
+# processador anterior, e os testes de contrato de webhook seguem verdes. Com
+# `RABBITMQ_URL`, devolve o publicador real, que marca o delta E publica.
+#
+# `lru_cache` garante uma conexão só ao broker por processo, como nos demais
+# provedores deste módulo.
+@lru_cache
+def get_publicador() -> Publicador:
+    settings = MensageriaSettings.from_environment()
+    if settings is None:
+        return PublicacaoDesligada()
+    return PublicadorRabbitMQ(settings)
 
 
 def _segredo(variavel: str, provedor: str) -> str:
@@ -405,7 +483,10 @@ def get_webhook_receiver() -> ReceberEventoWebhook:
         ),
         tradutor=TradutorGraph(),
         registro=RegistroEventosPostgres(pool, PROVEDOR_GRAPH),
-        processador=ProcessadorVarreduraPendente(pool, PROVEDOR_GRAPH, TIPOS_GRAPH),
+        processador=ProcessadorComPublicacao(
+            ProcessadorVarreduraPendente(pool, PROVEDOR_GRAPH, TIPOS_GRAPH),
+            get_publicador(),
+        ),
     )
 
 
@@ -431,7 +512,10 @@ def get_drive_webhook_receiver() -> ReceberEventoWebhook:
         ),
         tradutor=TradutorDrive(),
         registro=RegistroEventosPostgres(pool, PROVEDOR_DRIVE),
-        processador=ProcessadorVarreduraPendente(pool, PROVEDOR_DRIVE, TIPOS_DRIVE),
+        processador=ProcessadorComPublicacao(
+            ProcessadorVarreduraPendente(pool, PROVEDOR_DRIVE, TIPOS_DRIVE),
+            get_publicador(),
+        ),
     )
 
 

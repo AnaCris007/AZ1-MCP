@@ -73,18 +73,26 @@ services:
         BUILD_DATE: ${AZ1_BUILD_DATE:-unknown}
     image: az1/api:${AZ1_VERSION:-dev}
 
-    # "required: false" para que a pilha suba numa máquina recém-clonada, sem
-    # .env. Sem a chave do Gemini o endpoint de chat falha — mas falha ele, e
-    # não o "docker compose up" inteiro, com um erro de arquivo ausente.
+    # O .env é esperado aqui: ele traz a chave do Gemini e demais segredos que a
+    # API lê. A forma curta é usada por compatibilidade — a forma longa com
+    # "required: false" exige Compose >= 2.24, e o ambiente de referência roda
+    # 2.23. Num clone recém-feito, sem .env, o "docker compose up" ainda sobe
+    # (a validação passa e o arquivo ausente é ignorado), mas o endpoint de chat
+    # falha por falta da chave; copie o .env.example para .env antes de subir.
     env_file:
-      - path: .env
-        required: false
+      - .env
 
     # Vem DEPOIS do env_file e vence: o .env é escrito para rodar a API no host
     # (localhost:9000), e dentro da rede do compose o MinIO atende por "minio".
     # Sem esta sobreposição, a API tentaria falar consigo mesma na 9000.
     environment:
       DATABASE_URL: ${DATABASE_URL:-${SUPABASE_DB_URL:-postgresql://az1:az1@postgres:5432/az1}}
+      # Barramento de mensagens (Sprint 5). Presente por padrão dentro do
+      # compose: com ele, cada webhook marca o delta E publica o envelope; o
+      # worker abaixo consome e faz a varredura. Sem RABBITMQ_URL (instalação
+      # fora do compose), a API degrada para o publicador no-op e o
+      # comportamento da Sprint 4 permanece intacto.
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://az1:az1@rabbitmq:5672/}
       AUDIO_STORAGE_ENDPOINT_URL: http://minio:9000
       AUDIO_STORAGE_BUCKET: ${AUDIO_STORAGE_BUCKET:-az1-audio}
       AUDIO_STORAGE_REGION: ${AUDIO_STORAGE_REGION:-us-east-1}
@@ -107,6 +115,12 @@ services:
         # E espera o bucket existir. "service_started" deixaria a API subir antes
         # da criação do bucket — a primeira gravação de áudio daria NoSuchBucket.
         condition: service_completed_successfully
+      rabbitmq:
+        # Apenas "service_started", e não "service_healthy": a publicação é
+        # OPCIONAL e degrada com o broker fora. A API não deve deixar de subir só
+        # porque o RabbitMQ ainda está inicializando — se ele não estiver pronto
+        # na primeira publicação, o receptor devolve 5xx e o provedor reentrega.
+        condition: service_started
 
     # Sem "ports": a API não é publicada no host. Quem atende na porta é o
     # frontend, que encaminha /api pela rede interna. Uma porta a menos exposta
@@ -195,7 +209,12 @@ services:
     # Tag de release fixa, não "latest". Com "latest", a mesma composição sobe
     # versões diferentes em máquinas diferentes conforme a data do pull — o tipo
     # de divergência que só aparece em produção.
-    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    #
+    # Build comunitária (Pigsty) do servidor MinIO: a MinIO deixou de publicar
+    # imagens abertas no Docker Hub e no quay.io, e o pull anônimo passou a
+    # devolver "unauthorized". A imagem mantém o layout da oficial (mesmo
+    # entrypoint e o mc embutido que o healthcheck usa).
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
     command: server /data --console-address ":9001"
 
     # O usuário root do MinIO É a chave de acesso S3 que a API usa: nesta pilha
@@ -240,7 +259,7 @@ services:
   # clássico "na minha máquina funciona" — aqui ela é parte da composição,
   # versionada e idempotente (--ignore-existing), então rodar de novo não quebra.
   minio-init:
-    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    image: pgsty/mc:RELEASE.2026-09-16T00-00-00Z
     depends_on:
       minio:
         condition: service_healthy
@@ -279,9 +298,10 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Inicialização de uma base local nova. Volumes existentes recebem a
-      # migração 06 manualmente, sem apagar dados.
+      # migração 06/07 manualmente, sem apagar dados.
       - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create_database.sql:ro
       - ./src/database/06_webhook_permissions.sql:/docker-entrypoint-initdb.d/06_webhook_permissions.sql:ro
+      - ./src/database/07_evento_local.sql:/docker-entrypoint-initdb.d/07_evento_local.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U az1 -d az1"]
       interval: 5s
@@ -289,6 +309,214 @@ services:
       retries: 5
     # A API alcança postgres:5432 na rede interna; o override publica a porta
     # para ferramentas operacionais executadas no host.
+    networks:
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # rabbitmq — barramento de mensagens assíncrono (Seção 6.4.4)
+  # ---------------------------------------------------------------------------
+  # O receptor de webhook publica aqui; o worker abaixo consome e faz a
+  # varredura da origem marcada como pendente. A imagem "-management" traz o
+  # painel web na 15672, publicado só em desenvolvimento (ver override).
+  rabbitmq:
+    <<: [*logging, *restart]
+    image: rabbitmq:3.13-management-alpine
+
+    # Endurecimento explícito, e NÃO o x-hardening compartilhado: ao contrário
+    # da API e do frontend, o RabbitMQ precisa de algumas capacidades de kernel
+    # (o Erlang VM ajusta limites e o entrypoint faz chown do diretório de dados
+    # na primeira subida). Derrubar TODAS, como faz o x-hardening, impediria a
+    # inicialização. Mantém-se no-new-privileges e init, e derruba-se tudo menos
+    # o conjunto mínimo de que o broker precisa.
+    security_opt:
+      - "no-new-privileges:true"
+    init: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+
+    # Sem read_only: o RabbitMQ escreve mnesia, logs e o cookie de Erlang no
+    # diretório de dados, que é um volume nomeado — a raiz somente-leitura da API
+    # não se aplica a um serviço com estado em disco.
+
+    environment:
+      # Credenciais padrão de desenvolvimento; produção as sobrepõe por variável
+      # obrigatória (ver docker-compose.prod.yml).
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-az1}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-az1}
+
+    volumes:
+      # Volume nomeado, mesmo raciocínio do postgres_data: o Docker gerencia,
+      # sobrevive ao "down" (só "down -v" apaga) e não paga a tradução de I/O de
+      # um bind mount em Windows/macOS.
+      - rabbitmq_data:/var/lib/rabbitmq
+
+    healthcheck:
+      # check_port_connectivity confirma que o listener AMQP na 5672 aceita
+      # conexão — mais barato que um check completo e suficiente para o
+      # depends_on do worker.
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      # RabbitMQ leva alguns segundos para o Erlang VM e o plugin de management
+      # subirem; sem um start_period generoso, as falhas iniciais contariam para
+      # o limite de retries.
+      start_period: 45s
+
+    networks:
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # worker — consumidor da fila de varredura (Sprint 5)
+  # ---------------------------------------------------------------------------
+  # Mesma imagem da API (az1/api): o código do consumidor mora em src/mensageria,
+  # já empacotado. Troca-se apenas o comando — em vez do uvicorn, roda o módulo
+  # do consumidor, que abre o pool no papel az1_webhook e consome a fila.
+  worker:
+    <<: [*logging, *hardening, *restart]
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+      target: runtime
+      args:
+        PYTHON_VERSION: "3.12"
+        VERSION: ${AZ1_VERSION:-0.1.0}
+        VCS_REF: ${AZ1_VCS_REF:-unknown}
+        BUILD_DATE: ${AZ1_BUILD_DATE:-unknown}
+    image: az1/api:${AZ1_VERSION:-dev}
+
+    # O entrypoint da imagem avisa sobre o modelo de PLN ausente e depois exec-a
+    # o comando; o worker não usa o modelo, então dispensa-se o entrypoint e
+    # roda-se o consumidor direto.
+    entrypoint: []
+    command: ["python", "-m", "mensageria.consumidor"]
+
+    # Mesmo raciocínio da API: o .env é esperado (traz as credenciais do Drive e
+    # a chave do Gemini de que a indexação real depende). Forma curta por
+    # compatibilidade com Compose 2.23 — a forma longa "required: false" exigiria
+    # >= 2.24. Sem .env o worker degrada para o stub, mas o "up" não quebra.
+    env_file:
+      - .env
+
+    environment:
+      # Para a INDEXAÇÃO REAL (baixar do Drive + vetorizar), o pool do worker
+      # (DATABASE_URL) precisa apontar para o MESMO banco onde o canal do Drive foi
+      # aberto — é lá que mora `integracao.conexao` com o delta_token que a
+      # varredura lê e reescreve. E a coleção vetorial `vecs` fica no
+      # SUPABASE_DB_URL. Para a PoC, o caminho coerente é os dois serem o MESMO
+      # Supabase: por isso o default abaixo cai para SUPABASE_DB_URL antes do
+      # postgres local. REQUISITO: abrir o canal (drive_channel_service abrir) no
+      # host CONTRA O MESMO DB que o worker vai ler — se abrir contra o postgres
+      # local e o worker ler o Supabase (ou vice-versa), a varredura não acha a
+      # conexão e não indexa nada. Ver .env.example (bloco "Banco de dados").
+      DATABASE_URL: ${DATABASE_URL:-${SUPABASE_DB_URL:-postgresql://az1:az1@postgres:5432/az1}}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://az1:az1@rabbitmq:5672/}
+      TZ: ${TZ:-America/Sao_Paulo}
+
+    # Token OAuth do Google Drive, montado do HOST para dentro do container no
+    # caminho que o código espera: `drive_channel_service.CREDENCIAIS` e
+    # `consumidor._indexacao_disponivel` procuram `.google_token.json` relativo ao
+    # cwd, que aqui é o WORKDIR /app. Sem este arquivo (mais GOOGLE_CLIENT_ID/
+    # SECRET e GEMINI_API_KEY, que já chegam pelo env_file), `_indexacao_disponivel`
+    # devolve False e o worker degrada para o stub `VarreduraDeConexao`: fecha o
+    # delta sem baixar arquivo nenhum. É EXATAMENTE o achado DEP-1 do QA.
+    #
+    # Gravável de PROPÓSITO (sem `:ro`): `obter_token()` reescreve o arquivo ao
+    # renovar o access token. Mesmo com `read_only: true` na raiz, um bind mount de
+    # arquivo específico permanece gravável — mantém-se o hardening do resto do fs
+    # e abre-se só este ponto. Como o container roda como UID 10001 (ver
+    # Dockerfile, USER 10001:10001), o `.google_token.json` no host precisa ser
+    # legível E gravável por esse UID (ex.: `chmod 666 .google_token.json`, ou
+    # `chown 10001 .google_token.json`) — senão a renovação falha ao reescrever.
+    #
+    # SEGREDO: este arquivo carrega o refresh_token da conta Google. É montado do
+    # host, NUNCA vai para a imagem (está no .dockerignore/.gitignore) e este
+    # arranjo — token de "Desktop app" OAuth operado pelo host — é adequado para a
+    # PoC/single-tenant, NÃO para produção multiusuário. Produção exigiria service
+    # account / OAuth server-side (ver docker-compose.prod.yml, que mantém o stub).
+    #
+    # A ORIGEM do mount é a variável GOOGLE_TOKEN_FILE, com default `/dev/null`. É
+    # deliberado: montar `./.google_token.json` diretamente quebraria o `up` num
+    # clone recém-feito — o Docker, ao não achar o arquivo de origem, CRIA um
+    # diretório vazio no lugar, e a partir daí `_indexacao_disponivel` passa a ver
+    # um "arquivo" que na verdade é um diretório. `/dev/null` como default evita
+    # isso: é sempre um arquivo existente e vazio.
+    #
+    # Comportamento por combinação (o que o operador precisa saber):
+    #   • creds do Drive AUSENTES (default de clone limpo): `_indexacao_disponivel`
+    #     já dá False por falta de GOOGLE_CLIENT_ID/SECRET/GEMINI — worker no stub,
+    #     o /dev/null nem é lido. Caminho curto seguro, sem crash.
+    #   • creds + GEMINI presentes, mas GOOGLE_TOKEN_FILE NÃO apontado ao token
+    #     real: `_indexacao_disponivel` vê /dev/null (existe) e dá True, mas ao ler
+    #     o token vazio `json.loads("")` estoura DENTRO de `varrer()`. O consumidor
+    #     trata (nack/requeue), então NÃO derruba o worker — mas entra em
+    #     reentrega até o x-delivery-limit sem indexar. É erro de configuração:
+    #     quem liga as creds tem de apontar o token junto (as três peças andam
+    #     juntas). [RECOMENDAÇÃO DE CÓDIGO, não implementada: `_indexacao_disponivel`
+    #     poderia exigir arquivo NÃO-vazio, tornando este combo um stub limpo.]
+    #
+    # Para LIGAR a indexação real, aponte GOOGLE_TOKEN_FILE ao token do host:
+    #   GOOGLE_TOKEN_FILE=./.google_token.json   (no .env — ver .env.example)
+    # Assim o caminho curto (up sem token) não quebra, e o caminho da demo é uma
+    # linha no .env — sem editar o compose.
+    volumes:
+      - ${GOOGLE_TOKEN_FILE:-/dev/null}:/app/.google_token.json
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        # O worker, ao contrário da API, EXISTE para consumir o barramento: sem
+        # broker saudável não há o que fazer, então aqui espera-se o healthcheck.
+        condition: service_healthy
+
+    # Sistema de arquivos imutável: o consumidor não escreve em disco (o único
+    # ponto gravável de disco é o bind mount do token acima, aberto de propósito).
+    # O único diretório gravável geral é /tmp — usado pelos downloads temporários
+    # da varredura antes de vetorizar, e por arquivos temporários de bibliotecas.
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+
+    # Sonda de LIVENESS do consumidor. Diferente da API, o worker não tem porta
+    # nem endpoint /health: o modo de falha a detectar é o consumidor que morre
+    # em loop silencioso de reconexão e some — o "restart" reage a um processo
+    # que ENCERRA, mas não a um que trava sem sair. O healthcheck confirma que o
+    # processo do consumidor (`mensageria.consumidor`) continua vivo lendo os
+    # cmdline em /proc; sem dependência de rede externa, coerente com a raiz
+    # somente-leitura. Usa-se `python -c` e não `pgrep` porque a imagem slim não
+    # garante o procps, mas sempre tem o mesmo Python do healthcheck da API.
+    # Ninguém faz depends_on: service_healthy do worker — isto é só
+    # observabilidade (docker compose ps mostra healthy/unhealthy). Parâmetros
+    # folgados: o consumidor é single-thread e um pico de varredura não deve
+    # marcá-lo unhealthy à toa.
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import glob, sys
+          for p in glob.glob('/proc/[0-9]*/cmdline'):
+              try:
+                  with open(p, 'rb') as f:
+                      if b'mensageria.consumidor' in f.read():
+                          sys.exit(0)
+              except OSError:
+                  pass
+          sys.exit(1)
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      # Generoso: cobre a abertura do pool no papel az1_webhook e a espera pelo
+      # RabbitMQ saudável antes de o consumidor de fato começar a consumir.
+      start_period: 40s
+
     networks:
       - backend
 
@@ -315,7 +543,13 @@ services:
       # Bind mount: o artefato precisa aterrissar no repositório do host, para
       # ser inspecionado e versionado. É o oposto do caso do MinIO.
       - ./resultados:/app/resultados
-      - ./src/pln/dados:/app/src/pln/dados:ro
+      # Leitura E ESCRITA, e não `:ro` como era até a Sprint 3. O motivo é que
+      # `python -m pln.particao` passou a GERAR dois arquivos aqui dentro —
+      # `intencoes_exemplos.csv` (desenvolvimento) e `intencoes_teste.csv`
+      # (teste retido) — a partir do `intencoes_pool.csv`, que continua sendo o
+      # único autoral. Com `:ro`, `make particionar` falha com sistema de
+      # arquivos somente leitura.
+      - ./src/pln/dados:/app/src/pln/dados
     # Em Linux, exporte DOCKER_UID=$(id -u) e DOCKER_GID=$(id -g) antes de rodar,
     # senão os arquivos gerados saem pertencendo ao root do host. Em Windows e
     # macOS o padrão 0:0 é o correto, porque a tradução de permissão é do Docker
@@ -341,6 +575,25 @@ services:
       args:
         PYTHON_VERSION: "3.12"
     image: az1/api-dev:${AZ1_VERSION:-dev}
+
+    # Três caminhos do repositório que a imagem não carrega, montados apenas
+    # para leitura. A imagem copia o que a aplicação executa — `src`, `tests` e
+    # `pyproject.toml` —, e três suítes verificam coerência entre o código e
+    # arquivos que ficam fora dele: `test_reprodutibilidade` compara as versões
+    # fixadas em `requirements.txt` e declaradas na Seção 3.3.7 do `Projeto.md`
+    # com as instaladas, e `TesteRegraDeCicloDeVida` confere a retenção de
+    # `lifecycle.json` contra o mínimo do RNF09.
+    #
+    # Montar é melhor do que copiar para a imagem por dois motivos: a
+    # documentação muda a cada sprint e invalidaria a camada a cada commit, e
+    # uma imagem de aplicação não tem por que carregar `docs/`. Sem estes três
+    # mounts, `make test` termina com oito erros de arquivo ausente — que não
+    # são defeito do código, e escondem os que seriam.
+    volumes:
+      - ./requirements.txt:/app/requirements.txt:ro
+      - ./docs:/app/docs:ro
+      - ./infra:/app/infra:ro
+
     environment:
       # Os testes de API sobem o app com dependências substituídas por dublês,
       # mas a construção das dependências reais lê estas variáveis. Valores
@@ -369,3 +622,5 @@ volumes:
     name: az1_minio_data
   postgres_data:
     name: az1_postgres_data
+  rabbitmq_data:
+    name: az1_rabbitmq_data

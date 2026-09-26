@@ -1,0 +1,33 @@
+{
+  "requisito": "RNF04",
+  "status": "Reprovado",
+  "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+  "banco_dedicado": "az1_rnf04_0a61b353_20260925_r2",
+  "inicio_utc": "2026-09-25T17:06:03.392431+00:00",
+  "fim_utc": "2026-09-25T17:06:03.480389+00:00",
+  "interacoes_planejadas": 20,
+  "interacoes_completas": 10,
+  "taxa_completude": 0.5,
+  "por_canal": {
+    "texto": {
+      "total": 10,
+      "completas": 10
+    },
+    "voz": {
+      "total": 10,
+      "completas": 0
+    }
+  },
+  "falhas_controladas": 2,
+  "falhas_controladas_rastreadas": 0,
+  "registro_incompleto_controlado_detectado": true,
+  "campos_ausentes_no_controle": [
+    "tempo"
+  ],
+  "ambiente": {
+    "api": "FastAPI TestClient (rotas reais em processo)",
+    "persistencia": "ConversaRepository + PostgreSQL 16 dedicado",
+    "dependencias_externas": "LLM/STT/TTS controladas",
+    "armazenamento_textual": "dublê contratual em memória, conteúdo e metadados inspecionados"
+  }
+}

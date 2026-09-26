@@ -1,0 +1,1587 @@
+Python 3.12.14
+/app/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+test_acao_de_portfolio_fica_sem_acao_sem_banco (tests.test_agente_service.TestAgenteDesligado.test_acao_de_portfolio_fica_sem_acao_sem_banco) ... Agente desligado: SUPABASE_DB_URL não configurada
+ok
+test_recusa_fora_do_catalogo_mesmo_sem_banco (tests.test_agente_service.TestAgenteDesligado.test_recusa_fora_do_catalogo_mesmo_sem_banco) ... ok
+test_baixa_confianca_nao_executa_acao (tests.test_agente_service.TestExecutarIntencao.test_baixa_confianca_nao_executa_acao) ... ok
+test_consultar_projeto_sintetico_filtra_pelo_codigo_extraido (tests.test_agente_service.TestExecutarIntencao.test_consultar_projeto_sintetico_filtra_pelo_codigo_extraido) ... ok
+test_fora_do_catalogo_com_confianca_suficiente_e_recusada (tests.test_agente_service.TestExecutarIntencao.test_fora_do_catalogo_com_confianca_suficiente_e_recusada) ... ok
+test_gerar_alertas_pendencias_filtra_pelo_codigo_extraido (tests.test_agente_service.TestExecutarIntencao.test_gerar_alertas_pendencias_filtra_pelo_codigo_extraido) ... ok
+test_gerar_alertas_pendencias_lista_todas_sem_codigo_de_projeto (tests.test_agente_service.TestExecutarIntencao.test_gerar_alertas_pendencias_lista_todas_sem_codigo_de_projeto) ... ok
+test_intencao_sem_acao_implementada_fica_sem_acao (tests.test_agente_service.TestExecutarIntencao.test_intencao_sem_acao_implementada_fica_sem_acao) ... ok
+test_emite_os_dois_parametros_do_modelo (tests.test_ajuste_fino.TesteBlocoDeConfiguracao.test_emite_os_dois_parametros_do_modelo) ... ok
+test_nao_usa_repr_de_dataclass (tests.test_ajuste_fino.TesteBlocoDeConfiguracao.test_nao_usa_repr_de_dataclass) ... ok
+test_o_bloco_e_python_valido_e_executavel (tests.test_ajuste_fino.TesteBlocoDeConfiguracao.test_o_bloco_e_python_valido_e_executavel) ... ok
+test_o_bloco_reproduz_os_padroes_em_vigor (tests.test_ajuste_fino.TesteBlocoDeConfiguracao.test_o_bloco_reproduz_os_padroes_em_vigor) ... ok
+test_omite_campos_no_valor_padrao (tests.test_ajuste_fino.TesteBlocoDeConfiguracao.test_omite_campos_no_valor_padrao) ... ok
+test_registra_a_tokenizacao_mesmo_no_padrao (tests.test_ajuste_fino.TesteBlocoDeConfiguracao.test_registra_a_tokenizacao_mesmo_no_padrao) ... ok
+test_comparar_no_espaco_inteiro_produz_a_tabela (tests.test_ajuste_fino.TesteComparacaoPareada.test_comparar_no_espaco_inteiro_produz_a_tabela) ... ok
+test_eixo_constante_nao_rende_tabela (tests.test_ajuste_fino.TesteComparacaoPareada.test_eixo_constante_nao_rende_tabela) ... ok
+test_todo_eixo_analisado_rende_tabela (tests.test_ajuste_fino.TesteComparacaoPareada.test_todo_eixo_analisado_rende_tabela) ... ok
+test_escolhe_a_mais_simples_entre_as_empatadas (tests.test_ajuste_fino.TesteDesempate.test_escolhe_a_mais_simples_entre_as_empatadas) ... ok
+test_nao_escolhe_fora_do_empate (tests.test_ajuste_fino.TesteDesempate.test_nao_escolhe_fora_do_empate) ... ok
+test_prefere_menos_etapas_de_preprocessamento (tests.test_ajuste_fino.TesteDesempate.test_prefere_menos_etapas_de_preprocessamento) ... ok
+test_barra_vertical_e_escapada (tests.test_ajuste_fino.TesteEscapeDeTabela.test_barra_vertical_e_escapada) ... ok
+test_cobre_o_produto_cartesiano_completo (tests.test_ajuste_fino.TesteEspacoDeBusca.test_cobre_o_produto_cartesiano_completo) ... ok
+test_o_classificador_nao_e_eixo_de_busca (tests.test_ajuste_fino.TesteEspacoDeBusca.test_o_classificador_nao_e_eixo_de_busca) ... ok
+test_reconstroi_a_configuracao_a_partir_do_csv (tests.test_ajuste_fino.TesteLeituraDoRelatorio.test_reconstroi_a_configuracao_a_partir_do_csv) ... ok
+test_booleano_sai_como_texto (tests.test_ajuste_fino.TesteRotulos.test_booleano_sai_como_texto) ... ok
+test_config_de_vetorizacao_sai_legivel (tests.test_ajuste_fino.TesteRotulos.test_config_de_vetorizacao_sai_legivel) ... ok
+test_enum_sai_pelo_valor (tests.test_ajuste_fino.TesteRotulos.test_enum_sai_pelo_valor) ... ok
+test_cria_assinante_com_sucesso_e_retorna_secret (tests.test_alerta_api.TestAlertaAPI.test_cria_assinante_com_sucesso_e_retorna_secret) ... ok
+test_desativar_assinante_com_sucesso (tests.test_alerta_api.TestAlertaAPI.test_desativar_assinante_com_sucesso) ... ok
+test_desativar_assinante_inexistente_retorna_404 (tests.test_alerta_api.TestAlertaAPI.test_desativar_assinante_inexistente_retorna_404) ... ok
+test_get_assinantes_nao_expoe_secret (tests.test_alerta_api.TestAlertaAPI.test_get_assinantes_nao_expoe_secret) ... ok
+test_url_sem_https_retorna_422 (tests.test_alerta_api.TestAlertaAPI.test_url_sem_https_retorna_422) ... ok
+test_intencoes_de_risco_existem_no_catalogo_do_classificador (tests.test_alerta_service.TestConfiguracaoAlertas.test_intencoes_de_risco_existem_no_catalogo_do_classificador)
+Reproduz o defeito relatado: `alertas.yaml` citava intenções que o ... ok
+test_yaml_nao_declara_limiar_proprio (tests.test_alerta_service.TestConfiguracaoAlertas.test_yaml_nao_declara_limiar_proprio)
+O limiar é um só, e mora em `pln.intencao`. ... ok
+test_dispara_com_intencao_de_risco_e_confianca_suficiente (tests.test_alerta_service.TestDeveDisparar.test_dispara_com_intencao_de_risco_e_confianca_suficiente) ... ok
+test_nao_dispara_intencao_fora_da_lista_de_risco (tests.test_alerta_service.TestDeveDisparar.test_nao_dispara_intencao_fora_da_lista_de_risco) ... ok
+test_nao_dispara_quando_a_deteccao_foi_rejeitada (tests.test_alerta_service.TestDeveDisparar.test_nao_dispara_quando_a_deteccao_foi_rejeitada)
+Rejeitada é `fora_do_catalogo`, que nunca está na lista de risco. ... ok
+test_oculta_detalhes_de_erro_inesperado (tests.test_analysis_api.TestAnalysisAPI.test_oculta_detalhes_de_erro_inesperado) ... ok
+test_rejeita_idioma_nao_suportado (tests.test_analysis_api.TestAnalysisAPI.test_rejeita_idioma_nao_suportado) ... ok
+test_retorna_404_quando_audio_nao_encontrado (tests.test_analysis_api.TestAnalysisAPI.test_retorna_404_quando_audio_nao_encontrado) ... ok
+test_retorna_502_quando_transcricao_falha (tests.test_analysis_api.TestAnalysisAPI.test_retorna_502_quando_transcricao_falha) ... ok
+test_retorna_analise_completa (tests.test_analysis_api.TestAnalysisAPI.test_retorna_analise_completa) ... Despacho de alertas desligado: SUPABASE_DB_URL não configurada. Use a connection string PostgreSQL do Supabase (Settings → Database → Connection string → URI).
+ok
+test_confianca_abaixo_do_limiar_marca_rejeitada (tests.test_analysis_service.TestAnalyzeAudio.test_confianca_abaixo_do_limiar_marca_rejeitada)
+O caminho de áudio passou a aplicar a MESMA regra do chat. ... ok
+test_confidence_pode_ser_none (tests.test_analysis_service.TestAnalyzeAudio.test_confidence_pode_ser_none) ... ok
+test_propaga_transcription_error (tests.test_analysis_service.TestAnalyzeAudio.test_propaga_transcription_error) ... ok
+test_repassa_language_para_transcricao (tests.test_analysis_service.TestAnalyzeAudio.test_repassa_language_para_transcricao) ... ok
+test_retorna_resultado_completo (tests.test_analysis_service.TestAnalyzeAudio.test_retorna_resultado_completo) ... ok
+test_mapeia_erros_controlados (tests.test_audio_api.TestAudioAPI.test_mapeia_erros_controlados) ... ok
+test_oculta_detalhes_de_erro_inesperado (tests.test_audio_api.TestAudioAPI.test_oculta_detalhes_de_erro_inesperado) ... ok
+test_recebe_audio_com_usuario_autenticado (tests.test_audio_api.TestAudioAPI.test_recebe_audio_com_usuario_autenticado) ... ok
+test_retorna_422_quando_campo_audio_esta_ausente (tests.test_audio_api.TestAudioAPI.test_retorna_422_quando_campo_audio_esta_ausente) ... ok
+test_classifica_formato_suportado_corrompido (tests.test_audio_service.TestProbeAudio.test_classifica_formato_suportado_corrompido) ... ok
+test_reconhece_os_quatro_formatos_suportados (tests.test_audio_service.TestProbeAudio.test_reconhece_os_quatro_formatos_suportados) ... ok
+test_rejeita_container_com_video (tests.test_audio_service.TestProbeAudio.test_rejeita_container_com_video) ... ok
+test_rejeita_mov_3gp_e_matroska_antes_de_abrir_com_pyav (tests.test_audio_service.TestProbeAudio.test_rejeita_mov_3gp_e_matroska_antes_de_abrir_com_pyav) ... ok
+test_sonda_arquivo_wav_real (tests.test_audio_service.TestProbeAudio.test_sonda_arquivo_wav_real) ... ok
+test_sonda_spooled_temporary_file_aberto_para_escrita_e_leitura (tests.test_audio_service.TestProbeAudio.test_sonda_spooled_temporary_file_aberto_para_escrita_e_leitura) ... ok
+test_aceita_arquivo_exatamente_no_limite (tests.test_audio_service.TestReceiveAudio.test_aceita_arquivo_exatamente_no_limite) ... ok
+test_aceita_audio_com_exatamente_cinco_minutos (tests.test_audio_service.TestReceiveAudio.test_aceita_audio_com_exatamente_cinco_minutos) ... ok
+test_converte_erros_da_sondagem_em_erros_do_caso_de_uso (tests.test_audio_service.TestReceiveAudio.test_converte_erros_da_sondagem_em_erros_do_caso_de_uso) ... ok
+test_persiste_com_chave_uuid_content_type_e_metadata (tests.test_audio_service.TestReceiveAudio.test_persiste_com_chave_uuid_content_type_e_metadata) ... ok
+test_rejeita_arquivo_acima_do_limite_antes_da_sondagem (tests.test_audio_service.TestReceiveAudio.test_rejeita_arquivo_acima_do_limite_antes_da_sondagem) ... ok
+test_rejeita_arquivo_vazio_sem_persistir (tests.test_audio_service.TestReceiveAudio.test_rejeita_arquivo_vazio_sem_persistir) ... ok
+test_rejeita_audio_acima_de_cinco_minutos (tests.test_audio_service.TestReceiveAudio.test_rejeita_audio_acima_de_cinco_minutos) ... ok
+test_diretor_le_a_trilha (tests.test_auditoria_api.TestAuditoriaAPI.test_diretor_le_a_trilha) ... ok
+test_limit_acima_de_100_retorna_422 (tests.test_auditoria_api.TestAuditoriaAPI.test_limit_acima_de_100_retorna_422) ... ok
+test_perfil_ausente_nao_le_a_trilha (tests.test_auditoria_api.TestAuditoriaAPI.test_perfil_ausente_nao_le_a_trilha)
+Sem ligação com portfolio.usuario, a dúvida recusa. ... ok
+test_perfil_comum_nao_le_a_trilha (tests.test_auditoria_api.TestAuditoriaAPI.test_perfil_comum_nao_le_a_trilha)
+Líder de projeto não lê a conversa dos outros. ... ok
+test_respeita_parametro_limit (tests.test_auditoria_api.TestAuditoriaAPI.test_respeita_parametro_limit) ... ok
+test_retorna_lista_vazia_quando_sem_registros (tests.test_auditoria_api.TestAuditoriaAPI.test_retorna_lista_vazia_quando_sem_registros) ... ok
+test_retorna_mensagens_existentes (tests.test_auditoria_api.TestAuditoriaAPI.test_retorna_mensagens_existentes) ... ok
+test_401_vence_422_quando_corpo_tambem_e_invalido (tests.test_auth_api.TestAuthAPI.test_401_vence_422_quando_corpo_tambem_e_invalido) ... SUPABASE_DB_URL não configurada: login não será ligado a portfolio.usuario.
+ok
+test_aceita_token_valido_e_executa_a_regra_de_negocio (tests.test_auth_api.TestAuthAPI.test_aceita_token_valido_e_executa_a_regra_de_negocio) ... conversation_id 'conv_1' não é UUID; turno não registrado.
+ok
+test_causa_da_falha_nao_aparece_no_corpo_nem_credencial_no_log (tests.test_auth_api.TestAuthAPI.test_causa_da_falha_nao_aparece_no_corpo_nem_credencial_no_log) ... ok
+test_health_nao_exige_credencial (tests.test_auth_api.TestAuthAPI.test_health_nao_exige_credencial) ... ok
+test_rejeita_assinatura_invalida (tests.test_auth_api.TestAuthAPI.test_rejeita_assinatura_invalida) ... Falha de autenticação (INVALID_SIGNATURE): Signature verification failed
+ok
+test_rejeita_audiencia_incorreta (tests.test_auth_api.TestAuthAPI.test_rejeita_audiencia_incorreta) ... Falha de autenticação (INVALID_AUDIENCE): Audience doesn't match
+ok
+test_rejeita_credencial_ausente (tests.test_auth_api.TestAuthAPI.test_rejeita_credencial_ausente) ... ok
+test_rejeita_credencial_expirada (tests.test_auth_api.TestAuthAPI.test_rejeita_credencial_expirada) ... Falha de autenticação (EXPIRED): Signature has expired
+ok
+test_rejeita_credencial_malformada (tests.test_auth_api.TestAuthAPI.test_rejeita_credencial_malformada) ... Falha de autenticação (MALFORMED): Not enough segments
+ok
+test_libera_acesso_sem_credencial (tests.test_auth_api.TestAuthModeDisabled.test_libera_acesso_sem_credencial) ... conversation_id 'conv_1' não é UUID; turno não registrado.
+ok
+test_le_supabase_url_e_remove_barra_final (tests.test_auth_service.TestSupabaseAuthSettingsFromEnvironment.test_le_supabase_url_e_remove_barra_final) ... ok
+test_modo_disabled_nao_exige_supabase_url (tests.test_auth_service.TestSupabaseAuthSettingsFromEnvironment.test_modo_disabled_nao_exige_supabase_url) ... ok
+test_modo_enabled_sem_supabase_url_levanta_erro_de_configuracao (tests.test_auth_service.TestSupabaseAuthSettingsFromEnvironment.test_modo_enabled_sem_supabase_url_levanta_erro_de_configuracao) ... ok
+test_modo_shared_secret_sem_segredo_levanta_erro_de_configuracao (tests.test_auth_service.TestSupabaseAuthSettingsFromEnvironment.test_modo_shared_secret_sem_segredo_levanta_erro_de_configuracao) ... ok
+test_aceita_token_valido_e_extrai_o_usuario (tests.test_auth_service.TestSupabaseTokenVerifier.test_aceita_token_valido_e_extrai_o_usuario) ... ok
+test_rejeita_assinatura_invalida (tests.test_auth_service.TestSupabaseTokenVerifier.test_rejeita_assinatura_invalida) ... ok
+test_rejeita_audiencia_incorreta (tests.test_auth_service.TestSupabaseTokenVerifier.test_rejeita_audiencia_incorreta) ... ok
+test_rejeita_issuer_de_outro_projeto_supabase (tests.test_auth_service.TestSupabaseTokenVerifier.test_rejeita_issuer_de_outro_projeto_supabase) ... ok
+test_rejeita_provider_diferente_de_azure (tests.test_auth_service.TestSupabaseTokenVerifier.test_rejeita_provider_diferente_de_azure) ... ok
+test_rejeita_token_ausente (tests.test_auth_service.TestSupabaseTokenVerifier.test_rejeita_token_ausente) ... ok
+test_rejeita_token_expirado (tests.test_auth_service.TestSupabaseTokenVerifier.test_rejeita_token_expirado) ... ok
+test_rejeita_token_malformado (tests.test_auth_service.TestSupabaseTokenVerifier.test_rejeita_token_malformado) ... ok
+test_rejeita_token_sem_claim_sub (tests.test_auth_service.TestSupabaseTokenVerifier.test_rejeita_token_sem_claim_sub) ... ok
+test_mede_exatamente_as_repeticoes_pedidas (tests.test_bancada.TesteMedicaoDeLatencia.test_mede_exatamente_as_repeticoes_pedidas) ... ok
+test_percentis_sao_nao_decrescentes (tests.test_bancada.TesteMedicaoDeLatencia.test_percentis_sao_nao_decrescentes) ... ok
+test_percorre_as_entradas_ciclicamente (tests.test_bancada.TesteMedicaoDeLatencia.test_percorre_as_entradas_ciclicamente) ... ok
+test_reporta_todos_os_percentis_exigidos (tests.test_bancada.TesteMedicaoDeLatencia.test_reporta_todos_os_percentis_exigidos) ... ok
+test_sem_entradas_levanta (tests.test_bancada.TesteMedicaoDeLatencia.test_sem_entradas_levanta) ... ok
+test_amostra_unica (tests.test_bancada.TestePercentil.test_amostra_unica) ... ok
+test_devolve_sempre_um_valor_observado (tests.test_bancada.TestePercentil.test_devolve_sempre_um_valor_observado) ... ok
+test_e_monotonico (tests.test_bancada.TestePercentil.test_e_monotonico) ... ok
+test_lista_vazia_levanta (tests.test_bancada.TestePercentil.test_lista_vazia_levanta) ... ok
+test_p100_e_o_maximo (tests.test_bancada.TestePercentil.test_p100_e_o_maximo) ... ok
+test_p50_de_dez_amostras_e_a_quinta (tests.test_bancada.TestePercentil.test_p50_de_dez_amostras_e_a_quinta) ... ok
+test_percentil_baixo_nao_sai_do_intervalo (tests.test_bancada.TestePercentil.test_percentil_baixo_nao_sai_do_intervalo) ... ok
+test_fator_invalido_levanta (tests.test_bancada.TesteReplicacao.test_fator_invalido_levanta) ... ok
+test_fator_um_devolve_copia_e_nao_o_original (tests.test_bancada.TesteReplicacao.test_fator_um_devolve_copia_e_nao_o_original) ... ok
+test_multiplica_o_numero_de_exemplos (tests.test_bancada.TesteReplicacao.test_multiplica_o_numero_de_exemplos) ... ok
+test_preserva_o_balanceamento_entre_classes (tests.test_bancada.TesteReplicacao.test_preserva_o_balanceamento_entre_classes) ... ok
+test_texto_e_rotulo_continuam_pareados (tests.test_bancada.TesteReplicacao.test_texto_e_rotulo_continuam_pareados) ... ok
+test_mapeia_erros_controlados (tests.test_chat_api.TestChatAPI.test_mapeia_erros_controlados) ... ok
+test_oculta_detalhes_de_erro_inesperado (tests.test_chat_api.TestChatAPI.test_oculta_detalhes_de_erro_inesperado) ... ok
+test_responde_mensagem_com_sucesso (tests.test_chat_api.TestChatAPI.test_responde_mensagem_com_sucesso) ... conversation_id 'conv_123' não é UUID; turno não registrado.
+ok
+test_retorna_422_quando_campo_message_esta_ausente (tests.test_chat_api.TestChatAPI.test_retorna_422_quando_campo_message_esta_ausente) ... ok
+test_fontes_chegam_numeradas_a_partir_de_um (tests.test_chat_api.TestChatAPIFontes.test_fontes_chegam_numeradas_a_partir_de_um) ... conversation_id 'c1' não é UUID; turno não registrado.
+ok
+test_acao_confiante_sobrepoe_a_resposta_do_rag (tests.test_chat_api.TesteAgenteNoChat.test_acao_confiante_sobrepoe_a_resposta_do_rag) ... ok
+test_falha_no_agente_nao_derruba_a_conversa (tests.test_chat_api.TesteAgenteNoChat.test_falha_no_agente_nao_derruba_a_conversa) ... ok
+test_recusa_fora_do_catalogo_grava_resultado_recusada (tests.test_chat_api.TesteAgenteNoChat.test_recusa_fora_do_catalogo_grava_resultado_recusada) ... ok
+test_sem_acao_mantem_a_resposta_do_rag (tests.test_chat_api.TesteAgenteNoChat.test_sem_acao_mantem_a_resposta_do_rag) ... ok
+test_acao_de_portfolio_nao_consulta_o_modelo (tests.test_chat_api.TesteClassificaAntesDeConsultarAsFontes.test_acao_de_portfolio_nao_consulta_o_modelo) ... ok
+test_agente_quebrado_cai_no_modelo (tests.test_chat_api.TesteClassificaAntesDeConsultarAsFontes.test_agente_quebrado_cai_no_modelo)
+Degradar é cair na conversa de sempre, e não devolver vazio. ... ok
+test_recusa_nao_consulta_o_modelo (tests.test_chat_api.TesteClassificaAntesDeConsultarAsFontes.test_recusa_nao_consulta_o_modelo) ... ok
+test_sem_acao_consulta_o_modelo_uma_vez (tests.test_chat_api.TesteClassificaAntesDeConsultarAsFontes.test_sem_acao_consulta_o_modelo_uma_vez)
+O outro lado da asserção: sem ação, a conversa é a de sempre. ... ok
+test_codigo_do_projeto_chega_a_busca (tests.test_chat_api.TesteClassificacaoChegaABusca.test_codigo_do_projeto_chega_a_busca) ... Agente desligado: SUPABASE_DB_URL não configurada. Use a connection string PostgreSQL do Supabase (Settings → Database → Connection string → URI). É a mesma URL usada pelo índice vetorial.
+conversation_id 'c1' não é UUID; turno não registrado.
+ok
+test_intencao_confiante_estreita_a_busca_por_tipo_de_documento (tests.test_chat_api.TesteClassificacaoChegaABusca.test_intencao_confiante_estreita_a_busca_por_tipo_de_documento) ... conversation_id 'c1' não é UUID; turno não registrado.
+ok
+test_intencao_rejeitada_nao_estreita_nada (tests.test_chat_api.TesteClassificacaoChegaABusca.test_intencao_rejeitada_nao_estreita_nada)
+O classificador inseguro não pode piorar o que funcionava sem ele. ... conversation_id 'c1' não é UUID; turno não registrado.
+ok
+test_sem_classificador_a_busca_continua_ampla (tests.test_chat_api.TesteClassificacaoChegaABusca.test_sem_classificador_a_busca_continua_ampla)
+Instalação sem o `.joblib` treinado segue conversando. ... conversation_id 'c1' não é UUID; turno não registrado.
+ok
+test_devolve_apenas_as_citadas (tests.test_chat_api.TesteFontesCitadas.test_devolve_apenas_as_citadas) ... ok
+test_entende_citacao_com_varios_numeros (tests.test_chat_api.TesteFontesCitadas.test_entende_citacao_com_varios_numeros) ... ok
+test_numero_fora_da_faixa_e_ignorado (tests.test_chat_api.TesteFontesCitadas.test_numero_fora_da_faixa_e_ignorado) ... ok
+test_o_projeto_acompanha_a_fonte (tests.test_chat_api.TesteFontesCitadas.test_o_projeto_acompanha_a_fonte) ... ok
+test_preserva_a_numeracao_do_texto (tests.test_chat_api.TesteFontesCitadas.test_preserva_a_numeracao_do_texto) ... ok
+test_sem_citacao_devolve_lista_vazia (tests.test_chat_api.TesteFontesCitadas.test_sem_citacao_devolve_lista_vazia) ... ok
+test_a_fonte_e_extraida_antes_da_limpeza (tests.test_chat_api.TesteLimpezaDasCitacoes.test_a_fonte_e_extraida_antes_da_limpeza) ... ok
+test_nao_come_colchete_que_nao_e_citacao (tests.test_chat_api.TesteLimpezaDasCitacoes.test_nao_come_colchete_que_nao_e_citacao) ... ok
+test_remove_citacao_com_varios_numeros (tests.test_chat_api.TesteLimpezaDasCitacoes.test_remove_citacao_com_varios_numeros) ... ok
+test_remove_citacao_simples_sem_deixar_espaco (tests.test_chat_api.TesteLimpezaDasCitacoes.test_remove_citacao_simples_sem_deixar_espaco) ... ok
+test_texto_sem_citacao_fica_intacto (tests.test_chat_api.TesteLimpezaDasCitacoes.test_texto_sem_citacao_fica_intacto) ... ok
+test_classificador_ausente_nao_impede_a_gravacao (tests.test_chat_api.TesteTrilhaDaConversa.test_classificador_ausente_nao_impede_a_gravacao) ... ok
+test_classificador_com_defeito_nao_derruba_a_conversa (tests.test_chat_api.TesteTrilhaDaConversa.test_classificador_com_defeito_nao_derruba_a_conversa) ... ok
+test_conversa_de_outro_usuario_e_recusada (tests.test_chat_api.TesteTrilhaDaConversa.test_conversa_de_outro_usuario_e_recusada)
+A do vizinho não se abre, nem para ler nem para escrever. ... Usuário 7 tentou usar a conversa 3f1c0c4e-0000-4000-8000-000000000001, que é de outro.
+ok
+test_conversa_propria_continua_passando (tests.test_chat_api.TesteTrilhaDaConversa.test_conversa_propria_continua_passando)
+A verificação não pode barrar a segunda mensagem da própria conversa. ... ok
+test_conversation_id_nao_uuid_nao_custa_a_resposta (tests.test_chat_api.TesteTrilhaDaConversa.test_conversation_id_nao_uuid_nao_custa_a_resposta) ... ok
+test_falha_ao_gravar_nao_escapa_da_tarefa_de_fundo (tests.test_chat_api.TesteTrilhaDaConversa.test_falha_ao_gravar_nao_escapa_da_tarefa_de_fundo) ... ok
+test_grava_com_a_identidade_autenticada (tests.test_chat_api.TesteTrilhaDaConversa.test_grava_com_a_identidade_autenticada) ... ok
+test_intencao_observada_vai_para_a_trilha (tests.test_chat_api.TesteTrilhaDaConversa.test_intencao_observada_vai_para_a_trilha) ... ok
+test_posicao_gravada_e_o_numero_citado_no_texto (tests.test_chat_api.TesteTrilhaDaConversa.test_posicao_gravada_e_o_numero_citado_no_texto) ... ok
+test_resultado_recusada_chega_a_trilha (tests.test_chat_api.TesteTrilhaDaConversa.test_resultado_recusada_chega_a_trilha) ... ok
+test_sem_identidade_nao_grava_e_ainda_responde (tests.test_chat_api.TesteTrilhaDaConversa.test_sem_identidade_nao_grava_e_ainda_responde) ... ok
+test_classificador_ve_a_mensagem_sem_espacos_nas_pontas (tests.test_chat_api.TesteValidacaoAntesDaClassificacao.test_classificador_ve_a_mensagem_sem_espacos_nas_pontas)
+O mesmo texto para os dois. ... Sem identidade de domínio para teste@example.com; turno não registrado.
+ok
+test_mensagem_longa_demais_nao_chega_ao_classificador (tests.test_chat_api.TesteValidacaoAntesDaClassificacao.test_mensagem_longa_demais_nao_chega_ao_classificador) ... ok
+test_mensagem_vazia_nao_chega_ao_classificador (tests.test_chat_api.TesteValidacaoAntesDaClassificacao.test_mensagem_vazia_nao_chega_ao_classificador) ... ok
+test_converte_indisponibilidade_do_modelo_em_service_unavailable (tests.test_chat_service.TestAnswerChatMessage.test_converte_indisponibilidade_do_modelo_em_service_unavailable) ... ok
+test_rejeita_mensagem_muito_longa (tests.test_chat_service.TestAnswerChatMessage.test_rejeita_mensagem_muito_longa) ... ok
+test_rejeita_mensagem_vazia (tests.test_chat_service.TestAnswerChatMessage.test_rejeita_mensagem_vazia) ... ok
+test_repassa_mensagem_tratada_ao_modelo (tests.test_chat_service.TestAnswerChatMessage.test_repassa_mensagem_tratada_ao_modelo) ... ok
+test_avaliar_devolve_f1_relatorio_matriz_e_classes (tests.test_classificador.TesteAvaliacao.test_avaliar_devolve_f1_relatorio_matriz_e_classes) ... ok
+test_matriz_de_confusao_soma_o_total_de_exemplos (tests.test_classificador.TesteAvaliacao.test_matriz_de_confusao_soma_o_total_de_exemplos) ... ok
+test_a_regua_continua_sendo_naive_bayes (tests.test_classificador.TesteClassificadorDoProdutoEAReguaDoExperimento.test_a_regua_continua_sendo_naive_bayes) ... ok
+test_o_produto_produz_probabilidade (tests.test_classificador.TesteClassificadorDoProdutoEAReguaDoExperimento.test_o_produto_produz_probabilidade) ... ok
+test_produto_e_regua_sao_familias_diferentes (tests.test_classificador.TesteClassificadorDoProdutoEAReguaDoExperimento.test_produto_e_regua_sao_familias_diferentes) ... ok
+test_treina_com_toda_vetorizacao_do_espaco (tests.test_classificador.TesteClassificadorDoProdutoEAReguaDoExperimento.test_treina_com_toda_vetorizacao_do_espaco) ... ok
+test_ida_e_volta_pelo_disco_preserva_as_previsoes (tests.test_classificador.TesteConfiguracaoViajaComOModelo.test_ida_e_volta_pelo_disco_preserva_as_previsoes) ... ok
+test_modelo_salvo_carrega_a_config_de_preprocessamento (tests.test_classificador.TesteConfiguracaoViajaComOModelo.test_modelo_salvo_carrega_a_config_de_preprocessamento) ... ok
+test_padroes_do_modelo_vieram_do_ajuste_fino (tests.test_classificador.TesteConstrucao.test_padroes_do_modelo_vieram_do_ajuste_fino) ... ok
+test_pipeline_tem_as_tres_etapas_na_ordem (tests.test_classificador.TesteConstrucao.test_pipeline_tem_as_tres_etapas_na_ordem) ... ok
+test_regularizacao_e_convergencia_configuradas (tests.test_classificador.TesteConstrucao.test_regularizacao_e_convergencia_configuradas) ... ok
+test_treina_a_partir_de_texto_bruto (tests.test_classificador.TesteConstrucao.test_treina_a_partir_de_texto_bruto) ... ok
+test_config_padrao_e_a_vencedora_da_busca_de_tres_estagios (tests.test_classificador.TesteDatasetPadrao.test_config_padrao_e_a_vencedora_da_busca_de_tres_estagios) ... ok
+test_dataset_de_exemplo_carrega (tests.test_classificador.TesteDatasetPadrao.test_dataset_de_exemplo_carrega) ... ok
+test_devolve_termos_para_cada_classe (tests.test_classificador.TesteExplicacao.test_devolve_termos_para_cada_classe) ... ok
+test_termos_vem_ordenados_por_peso (tests.test_classificador.TesteExplicacao.test_termos_vem_ordenados_por_peso) ... ok
+test_treina_pelo_cli_e_carrega_por_import (tests.test_classificador.TesteModeloSalvoCarregaDeFora.test_treina_pelo_cli_e_carrega_por_import) ... ok
+test_fit_devolve_self (tests.test_classificador.TestePreprocessadorDeTexto.test_fit_devolve_self) ... ok
+test_sobrevive_ao_clone (tests.test_classificador.TestePreprocessadorDeTexto.test_sobrevive_ao_clone) ... ok
+test_transform_aplica_a_config (tests.test_classificador.TestePreprocessadorDeTexto.test_transform_aplica_a_config) ... ok
+test_confianca_e_a_maior_probabilidade (tests.test_classificador.TestePrevisao.test_confianca_e_a_maior_probabilidade) ... ok
+test_prever_devolve_rotulo_e_confianca (tests.test_classificador.TestePrevisao.test_prever_devolve_rotulo_e_confianca) ... ok
+test_probabilidades_somam_um (tests.test_classificador.TestePrevisao.test_probabilidades_somam_um) ... ok
+test_as_quatro_familias_do_parecer (tests.test_comparativo_modelos.TesteBuscaConjunta.test_as_quatro_familias_do_parecer) ... ok
+test_cada_familia_recebe_os_textos_dela (tests.test_comparativo_modelos.TesteBuscaConjunta.test_cada_familia_recebe_os_textos_dela)
+A correção central desta rodada, e a regressão que a desfaria. ... ok
+test_devolve_uma_medicao_por_familia_na_ordem_dos_candidatos (tests.test_comparativo_modelos.TesteBuscaConjunta.test_devolve_uma_medicao_por_familia_na_ordem_dos_candidatos) ... ok
+test_espaco_e_o_produto_das_tres_dimensoes (tests.test_comparativo_modelos.TesteBuscaConjunta.test_espaco_e_o_produto_das_tres_dimensoes) ... ok
+test_familia_sem_ranking_proprio_falha_alto (tests.test_comparativo_modelos.TesteBuscaConjunta.test_familia_sem_ranking_proprio_falha_alto)
+Herdar em silêncio é pior que quebrar: a assimetria voltaria invisível. ... ok
+test_melhor_por_familia_escolhe_pela_distancia_ao_requisito (tests.test_comparativo_modelos.TesteBuscaConjunta.test_melhor_por_familia_escolhe_pela_distancia_ao_requisito)
+E não pelo F1 bruto — a mesma régua que ordena a tabela agregada. ... ok
+test_toda_familia_aparece_no_espaco (tests.test_comparativo_modelos.TesteBuscaConjunta.test_toda_familia_aparece_no_espaco) ... ok
+test_toda_familia_declara_regua_propria (tests.test_comparativo_modelos.TesteBuscaConjunta.test_toda_familia_declara_regua_propria) ... ok
+test_a_referencia_vem_primeiro (tests.test_comparativo_modelos.TesteCandidatos.test_a_referencia_vem_primeiro) ... ok
+test_nomes_nao_se_repetem (tests.test_comparativo_modelos.TesteCandidatos.test_nomes_nao_se_repetem) ... ok
+test_todos_produzem_probabilidade (tests.test_comparativo_modelos.TesteCandidatos.test_todos_produzem_probabilidade) ... ok
+test_devolve_o_limiar_usado_junto_com_o_resultado (tests.test_comparativo_modelos.TesteConfirmacaoNoRetido.test_devolve_o_limiar_usado_junto_com_o_resultado) ... ok
+test_o_limiar_e_calibrado_so_no_desenvolvimento (tests.test_comparativo_modelos.TesteConfirmacaoNoRetido.test_o_limiar_e_calibrado_so_no_desenvolvimento) ... ok
+test_sem_combinacao_nao_ha_o_que_confirmar (tests.test_comparativo_modelos.TesteConfirmacaoNoRetido.test_sem_combinacao_nao_ha_o_que_confirmar) ... ok
+test_folga_alem_do_limite_nao_compensa_violacao_em_outra_metrica (tests.test_comparativo_modelos.TesteDistanciaDoRequisito.test_folga_alem_do_limite_nao_compensa_violacao_em_outra_metrica)
+Os três limites são cumulativos: não existe crédito entre eles. ... ok
+test_resultado_aprovado_tem_distancia_zero (tests.test_comparativo_modelos.TesteDistanciaDoRequisito.test_resultado_aprovado_tem_distancia_zero) ... ok
+test_comparar_notas_reproduz_o_pareado_direto (tests.test_comparativo_modelos.TesteExtracaoDoPareado.test_comparar_notas_reproduz_o_pareado_direto) ... ok
+test_series_de_tamanhos_diferentes_nao_sao_pareaveis (tests.test_comparativo_modelos.TesteExtracaoDoPareado.test_series_de_tamanhos_diferentes_nao_sao_pareaveis)
+O teste pressupõe que a i-ésima nota das duas veio da MESMA partição. ... ok
+test_todos_os_pares_cobre_a_combinacao_completa (tests.test_comparativo_modelos.TesteExtracaoDoPareado.test_todos_os_pares_cobre_a_combinacao_completa) ... ok
+test_candidato_aprovado_e_anunciado_como_tal (tests.test_comparativo_modelos.TesteLeitura.test_candidato_aprovado_e_anunciado_como_tal) ... ok
+test_o_custo_da_troca_aparece_sempre_que_ha_troca (tests.test_comparativo_modelos.TesteLeitura.test_o_custo_da_troca_aparece_sempre_que_ha_troca)
+A ressalva da régua não pode sumir do relatório. ... ok
+test_ranqueia_pelo_ponto_de_operacao_e_nao_pelo_f1_bruto (tests.test_comparativo_modelos.TesteLeitura.test_ranqueia_pelo_ponto_de_operacao_e_nao_pelo_f1_bruto)
+A distinção que o primeiro veredito deste módulo errava. ... ok
+test_referencia_vencendo_nao_propoe_troca (tests.test_comparativo_modelos.TesteLeitura.test_referencia_vencendo_nao_propoe_troca) ... ok
+test_a_mesma_diferenca_separa_com_50_e_nao_com_10 (tests.test_comparativo_modelos.TestePareado.test_a_mesma_diferenca_separa_com_50_e_nao_com_10)
+Reproduz o erro que este módulo cometeu, com os números reais. ... ok
+test_diferenca_consistente_e_significativa (tests.test_comparativo_modelos.TestePareado.test_diferenca_consistente_e_significativa) ... ok
+test_diferenca_que_troca_de_sinal_nao_e_significativa (tests.test_comparativo_modelos.TestePareado.test_diferenca_que_troca_de_sinal_nao_e_significativa) ... ok
+test_intervalo_contem_a_media (tests.test_comparativo_modelos.TestePareado.test_intervalo_contem_a_media) ... ok
+test_diz_quando_o_padrao_ja_era_o_melhor (tests.test_comparativo_modelos.TesteTabelaDeHiperparametros.test_diz_quando_o_padrao_ja_era_o_melhor) ... ok
+test_mostra_as_duas_linhas_quando_a_grade_venceu (tests.test_comparativo_modelos.TesteTabelaDeHiperparametros.test_mostra_as_duas_linhas_quando_a_grade_venceu)
+Sem as duas linhas o relatório pareceria contraditório. ... ok
+test_diz_quando_as_familias_preferem_textos_diferentes (tests.test_comparativo_modelos.TesteTabelaDeTextos.test_diz_quando_as_familias_preferem_textos_diferentes) ... ok
+test_diz_quando_todas_preferem_o_mesmo (tests.test_comparativo_modelos.TesteTabelaDeTextos.test_diz_quando_todas_preferem_o_mesmo) ... ok
+test_escapa_o_pipe_da_descricao (tests.test_comparativo_modelos.TesteTabelaDeTextos.test_escapa_o_pipe_da_descricao)
+`bow n=1 | [tok:regex] ...` tem `|`, que separa célula em markdown. ... ok
+test_marca_a_melhor_de_cada_linha (tests.test_comparativo_modelos.TesteTabelaPorIntencao.test_marca_a_melhor_de_cada_linha) ... ok
+test_nomeia_a_vencedora_por_intencao (tests.test_comparativo_modelos.TesteTabelaPorIntencao.test_nomeia_a_vencedora_por_intencao) ... ok
+test_placar_conta_as_vitorias (tests.test_comparativo_modelos.TesteTabelaPorIntencao.test_placar_conta_as_vitorias) ... ok
+test_uma_coluna_por_familia (tests.test_comparativo_modelos.TesteTabelaPorIntencao.test_uma_coluna_por_familia) ... ok
+test_preprocessamento_e_vetorizacao_nao_mudam (tests.test_comparativo_modelos.TesteTrocaSomenteOEstimador.test_preprocessamento_e_vetorizacao_nao_mudam) ... ok
+test_sem_estimador_vem_o_modelo_do_produto (tests.test_comparativo_modelos.TesteTrocaSomenteOEstimador.test_sem_estimador_vem_o_modelo_do_produto)
+E o produto deixou de ser Naive Bayes. ... ok
+test_familia_sem_grade_nao_gera_variante (tests.test_comparativo_modelos.TesteVariantesDeHiperparametro.test_familia_sem_grade_nao_gera_variante) ... ok
+test_produto_cartesiano_da_grade (tests.test_comparativo_modelos.TesteVariantesDeHiperparametro.test_produto_cartesiano_da_grade) ... ok
+test_todo_candidato_real_declara_grade (tests.test_comparativo_modelos.TesteVariantesDeHiperparametro.test_todo_candidato_real_declara_grade) ... ok
+test_variante_preserva_o_texto_da_familia (tests.test_comparativo_modelos.TesteVariantesDeHiperparametro.test_variante_preserva_o_texto_da_familia)
+A grade roda sobre o MELHOR texto, não sobre um texto qualquer. ... ok
+test_arquiva_os_dois_lados_do_turno (tests.test_conversa_repository.TesteArquivamentoNoS3.test_arquiva_os_dois_lados_do_turno) ... ok
+test_falha_no_s3_impede_o_commit (tests.test_conversa_repository.TesteArquivamentoNoS3.test_falha_no_s3_impede_o_commit) ... ok
+test_metadado_do_objeto_nao_carrega_acento (tests.test_conversa_repository.TesteArquivamentoNoS3.test_metadado_do_objeto_nao_carrega_acento) ... ok
+test_o_texto_arquivado_e_o_mesmo_da_linha (tests.test_conversa_repository.TesteArquivamentoNoS3.test_o_texto_arquivado_e_o_mesmo_da_linha) ... ok
+test_turno_bem_sucedido_commita (tests.test_conversa_repository.TesteArquivamentoNoS3.test_turno_bem_sucedido_commita) ... ok
+test_formato_da_chave_e_contrato (tests.test_conversa_repository.TesteChaveDoObjeto.test_formato_da_chave_e_contrato) ... ok
+test_ordem_com_zeros_a_esquerda_mantem_a_listagem_ordenada (tests.test_conversa_repository.TesteChaveDoObjeto.test_ordem_com_zeros_a_esquerda_mantem_a_listagem_ordenada) ... ok
+test_prefixo_nao_e_o_do_audio (tests.test_conversa_repository.TesteChaveDoObjeto.test_prefixo_nao_e_o_do_audio) ... ok
+test_copia_o_trecho_em_vez_de_deixar_para_juncao (tests.test_conversa_repository.TesteConversaoDasFontesDaBusca.test_copia_o_trecho_em_vez_de_deixar_para_juncao) ... ok
+test_lista_vazia (tests.test_conversa_repository.TesteConversaoDasFontesDaBusca.test_lista_vazia) ... ok
+test_posicao_comeca_em_um_e_segue_a_relevancia (tests.test_conversa_repository.TesteConversaoDasFontesDaBusca.test_posicao_comeca_em_um_e_segue_a_relevancia) ... ok
+test_formatos (tests.test_conversa_repository.TesteDominiosBatemComODdl.test_formatos) ... ok
+test_intencoes (tests.test_conversa_repository.TesteDominiosBatemComODdl.test_intencoes) ... ok
+test_resultados (tests.test_conversa_repository.TesteDominiosBatemComODdl.test_resultados) ... ok
+test_a_conversa_e_criada_sem_duplicar (tests.test_conversa_repository.TesteGravacaoDoTurno.test_a_conversa_e_criada_sem_duplicar) ... ok
+test_conversa_nova_nao_tem_dono_a_contrariar (tests.test_conversa_repository.TesteGravacaoDoTurno.test_conversa_nova_nao_tem_dono_a_contrariar)
+`dono=None` é a primeira mensagem: o UUID ainda não existe no banco. ... ok
+test_fontes_sao_ligadas_a_resposta_e_nao_ao_prompt (tests.test_conversa_repository.TesteGravacaoDoTurno.test_fontes_sao_ligadas_a_resposta_e_nao_ao_prompt) ... ok
+test_grava_duas_mensagens_continuando_a_ordem (tests.test_conversa_repository.TesteGravacaoDoTurno.test_grava_duas_mensagens_continuando_a_ordem) ... ok
+test_intencao_vai_na_linha_do_usuario_e_nao_na_do_agente (tests.test_conversa_repository.TesteGravacaoDoTurno.test_intencao_vai_na_linha_do_usuario_e_nao_na_do_agente) ... ok
+test_o_conteudo_de_cada_linha_e_o_texto_do_papel (tests.test_conversa_repository.TesteGravacaoDoTurno.test_o_conteudo_de_cada_linha_e_o_texto_do_papel) ... ok
+test_sem_fontes_nao_insere_nada_em_mensagem_fonte (tests.test_conversa_repository.TesteGravacaoDoTurno.test_sem_fontes_nao_insere_nada_em_mensagem_fonte) ... ok
+test_trava_a_conversa_antes_de_ler_a_ordem (tests.test_conversa_repository.TesteGravacaoDoTurno.test_trava_a_conversa_antes_de_ler_a_ordem) ... ok
+test_turno_em_conversa_alheia_e_recusado (tests.test_conversa_repository.TesteGravacaoDoTurno.test_turno_em_conversa_alheia_e_recusado)
+Segunda barreira, com a linha já travada. ... ok
+test_a_regra_do_audio_continua_curta (tests.test_conversa_repository.TesteRegraDeCicloDeVida.test_a_regra_do_audio_continua_curta) ... ok
+test_existe_regra_para_o_prefixo_das_conversas (tests.test_conversa_repository.TesteRegraDeCicloDeVida.test_existe_regra_para_o_prefixo_das_conversas) ... ok
+test_retencao_das_conversas_cobre_o_minimo_do_rnf09 (tests.test_conversa_repository.TesteRegraDeCicloDeVida.test_retencao_das_conversas_cobre_o_minimo_do_rnf09) ... ok
+test_normaliza_espaco (tests.test_conversa_repository.TesteTitulo.test_normaliza_espaco) ... ok
+test_trunca_prompt_longo (tests.test_conversa_repository.TesteTitulo.test_trunca_prompt_longo) ... ok
+test_usa_o_prompt_quando_curto (tests.test_conversa_repository.TesteTitulo.test_usa_o_prompt_quando_curto) ... ok
+test_confianca_fora_da_faixa (tests.test_conversa_repository.TesteValidacao.test_confianca_fora_da_faixa) ... ok
+test_fonte_sem_arquivo_origem (tests.test_conversa_repository.TesteValidacao.test_fonte_sem_arquivo_origem) ... ok
+test_fonte_sem_chunk_id (tests.test_conversa_repository.TesteValidacao.test_fonte_sem_chunk_id) ... ok
+test_fontes_com_posicao_repetida (tests.test_conversa_repository.TesteValidacao.test_fontes_com_posicao_repetida) ... ok
+test_formato_fora_do_dominio (tests.test_conversa_repository.TesteValidacao.test_formato_fora_do_dominio) ... ok
+test_intencao_ausente_e_aceita (tests.test_conversa_repository.TesteValidacao.test_intencao_ausente_e_aceita) ... ok
+test_intencao_fora_do_catalogo (tests.test_conversa_repository.TesteValidacao.test_intencao_fora_do_catalogo) ... ok
+test_mesmo_chunk_citado_duas_vezes (tests.test_conversa_repository.TesteValidacao.test_mesmo_chunk_citado_duas_vezes) ... ok
+test_prompt_vazio (tests.test_conversa_repository.TesteValidacao.test_prompt_vazio) ... ok
+test_resposta_vazia (tests.test_conversa_repository.TesteValidacao.test_resposta_vazia) ... ok
+test_resultado_fora_do_dominio (tests.test_conversa_repository.TesteValidacao.test_resultado_fora_do_dominio) ... ok
+test_tempo_negativo (tests.test_conversa_repository.TesteValidacao.test_tempo_negativo) ... ok
+test_conversa_invalida_nao_chega_ao_repositorio (tests.test_conversas_api.TesteAvaliacao.test_conversa_invalida_nao_chega_ao_repositorio) ... ok
+test_mensagem_inexistente_e_404 (tests.test_conversas_api.TesteAvaliacao.test_mensagem_inexistente_e_404) ... ok
+test_polaridade_fora_do_dominio_e_422 (tests.test_conversas_api.TesteAvaliacao.test_polaridade_fora_do_dominio_e_422) ... ok
+test_registra_o_polegar (tests.test_conversas_api.TesteAvaliacao.test_registra_o_polegar) ... ok
+test_devolve_as_conversas_da_pessoa (tests.test_conversas_api.TesteListagemDeConversas.test_devolve_as_conversas_da_pessoa) ... ok
+test_o_usuario_autenticado_e_quem_filtra (tests.test_conversas_api.TesteListagemDeConversas.test_o_usuario_autenticado_e_quem_filtra) ... ok
+test_sem_identidade_e_422 (tests.test_conversas_api.TesteListagemDeConversas.test_sem_identidade_e_422) ... ok
+test_conversa_de_outra_pessoa_e_inexistente_dao_a_mesma_resposta (tests.test_conversas_api.TesteMensagensDaConversa.test_conversa_de_outra_pessoa_e_inexistente_dao_a_mesma_resposta) ... ok
+test_devolve_os_turnos_em_ordem (tests.test_conversas_api.TesteMensagensDaConversa.test_devolve_os_turnos_em_ordem) ... ok
+test_identificador_que_nao_e_uuid_e_422 (tests.test_conversas_api.TesteMensagensDaConversa.test_identificador_que_nao_e_uuid_e_422) ... ok
+test_o_dono_entra_na_consulta (tests.test_conversas_api.TesteMensagensDaConversa.test_o_dono_entra_na_consulta) ... ok
+test_dsn_ausente_e_dsn_vazia_sao_a_mesma_coisa (tests.test_database_service.TesteConfiguracao.test_dsn_ausente_e_dsn_vazia_sao_a_mesma_coisa) ... ok
+test_le_a_dsn_do_ambiente (tests.test_database_service.TesteConfiguracao.test_le_a_dsn_do_ambiente) ... ok
+test_papel_definido_e_lido (tests.test_database_service.TesteConfiguracao.test_papel_definido_e_lido) ... ok
+test_sem_dsn_levanta_com_orientacao (tests.test_database_service.TesteConfiguracao.test_sem_dsn_levanta_com_orientacao) ... ok
+test_sem_papel_definido_o_papel_e_none (tests.test_database_service.TesteConfiguracao.test_sem_papel_definido_o_papel_e_none) ... ok
+test_com_papel_emite_set_role (tests.test_database_service.TesteConfiguracaoDaConexao.test_com_papel_emite_set_role) ... ok
+test_papel_invalido_levanta_antes_de_tocar_o_banco (tests.test_database_service.TesteConfiguracaoDaConexao.test_papel_invalido_levanta_antes_de_tocar_o_banco) ... ok
+test_sem_papel_nao_emite_set_role (tests.test_database_service.TesteConfiguracaoDaConexao.test_sem_papel_nao_emite_set_role) ... ok
+test_nao_abre_conexao_na_criacao (tests.test_database_service.TesteCriacaoDoPool.test_nao_abre_conexao_na_criacao) ... ok
+test_aceita_digitos_e_sublinhado (tests.test_database_service.TesteIdentificadorSeguro.test_aceita_digitos_e_sublinhado) ... ok
+test_aceita_nome_valido (tests.test_database_service.TesteIdentificadorSeguro.test_aceita_nome_valido) ... ok
+test_recusa_tentativa_de_injecao (tests.test_database_service.TesteIdentificadorSeguro.test_recusa_tentativa_de_injecao) ... ok
+test_falso_quando_a_resposta_nao_e_a_esperada (tests.test_database_service.TesteVerificacaoDeConexao.test_falso_quando_a_resposta_nao_e_a_esperada) ... ok
+test_verdadeiro_quando_o_banco_responde (tests.test_database_service.TesteVerificacaoDeConexao.test_verdadeiro_quando_o_banco_responde) ... ok
+test_avisa_uma_vez_e_nao_a_cada_chamada (tests.test_dependencias_sem_banco.TesteDependenciasAcessoriasDegradam.test_avisa_uma_vez_e_nao_a_cada_chamada) ... ok
+test_despachante_de_alertas_vira_objeto_nulo (tests.test_dependencias_sem_banco.TesteDependenciasAcessoriasDegradam.test_despachante_de_alertas_vira_objeto_nulo) ... ok
+test_despachar_sem_banco_nao_levanta (tests.test_dependencias_sem_banco.TesteDependenciasAcessoriasDegradam.test_despachar_sem_banco_nao_levanta) ... Despacho de alertas desligado: SUPABASE_DB_URL não configurada. Use a connection string PostgreSQL do Supabase (Settings → Database → Connection string → URI).
+ok
+test_registrar_turno_sem_banco_nao_levanta (tests.test_dependencias_sem_banco.TesteDependenciasAcessoriasDegradam.test_registrar_turno_sem_banco_nao_levanta) ... Persistência de conversas desligada: SUPABASE_DB_URL não configurada. Use a connection string PostgreSQL do Supabase (Settings → Database → Connection string → URI). É a mesma URL usada pelo índice vetorial.
+ok
+test_repositorio_de_conversas_vira_objeto_nulo (tests.test_dependencias_sem_banco.TesteDependenciasAcessoriasDegradam.test_repositorio_de_conversas_vira_objeto_nulo) ... ok
+test_a_mensagem_diz_onde_conseguir_a_url (tests.test_dependencias_sem_banco.TesteDependenciasEssenciaisLevantam.test_a_mensagem_diz_onde_conseguir_a_url) ... ok
+test_listador_de_auditoria (tests.test_dependencias_sem_banco.TesteDependenciasEssenciaisLevantam.test_listador_de_auditoria) ... ok
+test_provedores_de_alerta (tests.test_dependencias_sem_banco.TesteDependenciasEssenciaisLevantam.test_provedores_de_alerta) ... ok
+test_ausencia_de_codigo_devolve_none (tests.test_entidades.TestExtrairEntidades.test_ausencia_de_codigo_devolve_none) ... ok
+test_nao_confunde_outras_siglas_com_codigo_de_projeto (tests.test_entidades.TestExtrairEntidades.test_nao_confunde_outras_siglas_com_codigo_de_projeto) ... ok
+test_normaliza_para_maiusculas (tests.test_entidades.TestExtrairEntidades.test_normaliza_para_maiusculas) ... ok
+test_reconhece_codigo_de_projeto (tests.test_entidades.TestExtrairEntidades.test_reconhece_codigo_de_projeto) ... ok
+test_apagar_evento_de_outra_pessoa_devolve_false_sem_apagar (tests.test_evento_local_repository.TestEventoLocalRepository.test_apagar_evento_de_outra_pessoa_devolve_false_sem_apagar) ... ok
+test_apagar_evento_proprio_devolve_true (tests.test_evento_local_repository.TestEventoLocalRepository.test_apagar_evento_proprio_devolve_true) ... ok
+test_criar_devolve_os_campos_ecoados_pelo_banco (tests.test_evento_local_repository.TestEventoLocalRepository.test_criar_devolve_os_campos_ecoados_pelo_banco) ... ok
+test_criar_sem_hora_nao_fabrica_horario (tests.test_evento_local_repository.TestEventoLocalRepository.test_criar_sem_hora_nao_fabrica_horario) ... ok
+test_listar_filtra_por_usuario_no_sql (tests.test_evento_local_repository.TestEventoLocalRepository.test_listar_filtra_por_usuario_no_sql) ... ok
+test_a_primeira_permutacao_e_a_ordem_padrao (tests.test_experimento.TesteEspacoDeBusca.test_a_primeira_permutacao_e_a_ordem_padrao) ... ok
+test_cobre_o_produto_cartesiano_completo (tests.test_experimento.TesteEspacoDeBusca.test_cobre_o_produto_cartesiano_completo) ... ok
+test_permuta_todas_as_etapas_ativas (tests.test_experimento.TesteEspacoDeBusca.test_permuta_todas_as_etapas_ativas) ... ok
+test_toda_ordem_gerada_e_valida (tests.test_experimento.TesteEspacoDeBusca.test_toda_ordem_gerada_e_valida) ... ok
+test_empate_e_um_desvio_padrao_da_melhor (tests.test_experimento.TesteRecomendacao.test_empate_e_um_desvio_padrao_da_melhor) ... ok
+test_f1_ainda_desempata_quando_o_resto_e_igual (tests.test_experimento.TesteRecomendacao.test_f1_ainda_desempata_quando_o_resto_e_igual) ... ok
+test_prefere_a_ordem_padrao_ao_f1_mais_alto (tests.test_experimento.TesteRecomendacao.test_prefere_a_ordem_padrao_ao_f1_mais_alto) ... ok
+test_prefere_janela_menor_entre_empatadas (tests.test_experimento.TesteRecomendacao.test_prefere_janela_menor_entre_empatadas) ... ok
+test_prefere_menos_etapas_mesmo_com_f1_menor (tests.test_experimento.TesteRecomendacao.test_prefere_menos_etapas_mesmo_com_f1_menor) ... ok
+test_codigo_do_projeto_entra_mesmo_sem_classificador (tests.test_foco_da_busca.TesteFocarBusca.test_codigo_do_projeto_entra_mesmo_sem_classificador)
+A extração é por REGRA, não por modelo: casa ou não casa. ... ok
+test_codigo_sobrevive_a_intencao_rejeitada (tests.test_foco_da_busca.TesteFocarBusca.test_codigo_sobrevive_a_intencao_rejeitada) ... ok
+test_intencao_confiante_sugere_o_tipo_de_documento (tests.test_foco_da_busca.TesteFocarBusca.test_intencao_confiante_sugere_o_tipo_de_documento) ... ok
+test_intencao_rejeitada_nao_foca_nada (tests.test_foco_da_busca.TesteFocarBusca.test_intencao_rejeitada_nao_foca_nada)
+Abaixo do limiar o rótulo é palpite, e palpite não estreita busca. ... ok
+test_intencao_sem_tipo_associado_nao_inventa_um (tests.test_foco_da_busca.TesteFocarBusca.test_intencao_sem_tipo_associado_nao_inventa_um) ... ok
+test_os_dois_filtros_convivem (tests.test_foco_da_busca.TesteFocarBusca.test_os_dois_filtros_convivem) ... ok
+test_sem_classificador_nao_foca_nada (tests.test_foco_da_busca.TesteFocarBusca.test_sem_classificador_nao_foca_nada) ... ok
+test_qualquer_filtro_deixa_de_ser_vazio (tests.test_foco_da_busca.TesteFocoVazio.test_qualquer_filtro_deixa_de_ser_vazio) ... ok
+test_sem_foco_e_vazio (tests.test_foco_da_busca.TesteFocoVazio.test_sem_foco_e_vazio) ... ok
+test_o_mapa_e_parcial_de_proposito (tests.test_foco_da_busca.TesteMapaDeTipos.test_o_mapa_e_parcial_de_proposito) ... ok
+test_todo_tipo_mapeado_existe_na_taxonomia_dos_documentos (tests.test_foco_da_busca.TesteMapaDeTipos.test_todo_tipo_mapeado_existe_na_taxonomia_dos_documentos)
+Um tipo escrito errado não levanta erro: devolve busca vazia. ... ok
+test_busca_indisponivel_e_dita_e_nao_disfarcada (tests.test_gemini_service.TestGeminiChatModel.test_busca_indisponivel_e_dita_e_nao_disfarcada) ... Falha ao consultar a base de documentos.
+Traceback (most recent call last):
+  File "/repo/src/services/gemini_service.py", line 318, in _preparar
+    resultados, focou = self._buscar_contexto(
+                        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/tests/test_gemini_service.py", line 157, in busca_com_falha
+    raise RuntimeError("SUPABASE_DB_URL não configurada.")
+RuntimeError: SUPABASE_DB_URL não configurada.
+ok
+test_converte_client_error_429_em_chat_model_unavailable (tests.test_gemini_service.TestGeminiChatModel.test_converte_client_error_429_em_chat_model_unavailable) ... ok
+test_converte_server_error_em_chat_model_unavailable (tests.test_gemini_service.TestGeminiChatModel.test_converte_server_error_em_chat_model_unavailable) ... ok
+test_gera_resposta_com_contrato_esperado (tests.test_gemini_service.TestGeminiChatModel.test_gera_resposta_com_contrato_esperado) ... ok
+test_historico_guarda_mensagem_original_sem_contexto_recuperado (tests.test_gemini_service.TestGeminiChatModel.test_historico_guarda_mensagem_original_sem_contexto_recuperado) ... ok
+test_inclui_contexto_recuperado_quando_disponivel (tests.test_gemini_service.TestGeminiChatModel.test_inclui_contexto_recuperado_quando_disponivel) ... ok
+test_repropaga_client_error_diferente_de_429 (tests.test_gemini_service.TestGeminiChatModel.test_repropaga_client_error_diferente_de_429) ... ok
+test_sem_trecho_relevante_devolve_mensagem_padrao_sem_chamar_o_modelo (tests.test_gemini_service.TestGeminiChatModel.test_sem_trecho_relevante_devolve_mensagem_padrao_sem_chamar_o_modelo) ... ok
+test_trecho_abaixo_do_score_minimo_nao_conta_como_fundamento (tests.test_gemini_service.TestGeminiChatModel.test_trecho_abaixo_do_score_minimo_nao_conta_como_fundamento) ... ok
+test_envia_texto_modelo_e_voz_ao_sdk (tests.test_gemini_speech_service.TestGeminiSpeechModel.test_envia_texto_modelo_e_voz_ao_sdk) ... ok
+test_rejeita_resposta_do_gemini_sem_audio (tests.test_gemini_speech_service.TestGeminiSpeechModel.test_rejeita_resposta_do_gemini_sem_audio) ... ok
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+test_modelo_ausente_falha_na_composicao (tests.test_integracao_analise_pln.TestAnaliseIntegracao.test_modelo_ausente_falha_na_composicao)
+Sem o `.joblib`, a composição falha e a requisição sai como 500. ... Erro não tratado ao processar POST /api/v1/audio/aud_massa/analyze
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 481, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 676, in solve_dependencies
+    solved = await run_in_threadpool(call, **solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/az1_api/dependencies.py", line 151, in get_analyzer
+    transcriber=get_transcriber(),
+                ^^^^^^^^^^^^^^^^^
+  File "/repo/src/az1_api/dependencies.py", line 109, in get_transcriber
+    api_key = os.environ["DEEPGRAM_API_KEY"]
+              ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'DEEPGRAM_API_KEY'
+ok
+test_solicitacao_fora_do_catalogo_retorna_intencao_valida (tests.test_integracao_analise_pln.TestAnaliseIntegracao.test_solicitacao_fora_do_catalogo_retorna_intencao_valida)
+Pedido fora do escopo recebe o rótulo `fora_do_catalogo`. ... ok
+test_texto_digitado_e_transcrito_produzem_a_mesma_intencao (tests.test_integracao_analise_pln.TestAnaliseIntegracao.test_texto_digitado_e_transcrito_produzem_a_mesma_intencao)
+Caracterização: `/chat` classifica, mas não devolve a intenção. ... /app/.venv/lib/python3.12/site-packages/deepgram/core/websocket_compat.py:4: DeprecationWarning: websockets.exceptions.InvalidStatusCode is deprecated
+  from websockets.exceptions import InvalidStatusCode as InvalidWebSocketStatus  # type: ignore[attr-defined]
+/app/.venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  warnings.warn(  # deprecated in 14.0 - 2024-11-09
+Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_transcricao_recebe_intencao_do_catalogo (tests.test_integracao_analise_pln.TestAnaliseIntegracao.test_transcricao_recebe_intencao_do_catalogo)
+O texto transcrito chega ao classificador e volta como rótulo válido. ... ok
+test_arquivo_rejeitado_nao_grava_objeto (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_arquivo_rejeitado_nao_grava_objeto)
+Extensão não é formato: um `.txt` renomeado é recusado pela assinatura. ... ok
+test_audio_id_inexistente_retorna_404 (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_audio_id_inexistente_retorna_404)
+A ausência do objeto vira `404 audio_not_found`, sem tocar no provedor. ... ok
+test_falha_de_infraestrutura_retorna_500 (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_falha_de_infraestrutura_retorna_500)
+As três causas dão `500 internal_error`, sem detalhe de infraestrutura. ... Erro não tratado ao processar POST /api/v1/audio
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/routes/audio.py", line 63, in upload_audio
+    receipt = receiver.receive(audio.file)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/services/audio_service.py", line 92, in receive
+    self._storage.store(
+  File "/repo/src/services/storage_service.py", line 64, in store
+    self._client.put_object(
+  File "/app/.venv/lib/python3.12/site-packages/botocore/client.py", line 606, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/client.py", line 1094, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.NoSuchBucket: An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist
+Erro não tratado ao processar POST /api/v1/audio
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/routes/audio.py", line 63, in upload_audio
+    receipt = receiver.receive(audio.file)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/services/audio_service.py", line 92, in receive
+    self._storage.store(
+  File "/repo/src/services/storage_service.py", line 64, in store
+    self._client.put_object(
+  File "/app/.venv/lib/python3.12/site-packages/botocore/client.py", line 606, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/client.py", line 1094, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.exceptions.ClientError: An error occurred (InvalidAccessKeyId) when calling the PutObject operation: The Access Key Id you provided does not exist in our records.
+Erro não tratado ao processar POST /api/v1/audio
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 239, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/botocore/httpsession.py", line 509, in send
+    urllib_response = conn.urlopen(
+                      ^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/util/retry.py", line 485, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 499, in _make_request
+    conn.request(
+  File "/app/.venv/lib/python3.12/site-packages/botocore/awsrequest.py", line 96, in request
+    rval = super().request(method, url, body, headers, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 567, in request
+    self.endheaders()
+  File "/usr/local/lib/python3.12/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/app/.venv/lib/python3.12/site-packages/botocore/awsrequest.py", line 123, in _send_output
+    self.send(msg)
+  File "/app/.venv/lib/python3.12/site-packages/botocore/awsrequest.py", line 223, in send
+    return super().send(str)
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/http/client.py", line 1085, in send
+    self.connect()
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 398, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 254, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: AWSHTTPConnection(host='127.0.0.1', port=9): Failed to establish a new connection: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/routes/audio.py", line 63, in upload_audio
+    receipt = receiver.receive(audio.file)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/services/audio_service.py", line 92, in receive
+    self._storage.store(
+  File "/repo/src/services/storage_service.py", line 64, in store
+    self._client.put_object(
+  File "/app/.venv/lib/python3.12/site-packages/botocore/client.py", line 606, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/client.py", line 1076, in _make_api_call
+    http, parsed_response = self._make_request(
+                            ^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/client.py", line 1100, in _make_request
+    return self._endpoint.make_request(operation_model, request_dict)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/endpoint.py", line 119, in make_request
+    return self._send_request(request_dict, operation_model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/endpoint.py", line 231, in _send_request
+    raise exception
+  File "/app/.venv/lib/python3.12/site-packages/botocore/endpoint.py", line 281, in _do_get_response
+    http_response = self._send(request)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/endpoint.py", line 385, in _send
+    return self.http_session.send(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/botocore/httpsession.py", line 539, in send
+    raise EndpointConnectionError(endpoint_url=request.url, error=e)
+botocore.exceptions.EndpointConnectionError: Could not connect to the endpoint URL: "http://127.0.0.1:9/az1-audio-teste/incoming/aud_2286932fbc0a487792b6e74628e8e7b9"
+ok
+test_leitura_devolve_bytes_identicos_ao_upload (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_leitura_devolve_bytes_identicos_ao_upload)
+O que `TranscribeAudio` lê é byte a byte o que foi enviado. ... ok
+test_objeto_ausente_apos_expurgo_leva_a_404 (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_objeto_ausente_apos_expurgo_leva_a_404)
+O efeito do expurgo, ensaiado por remoção direta. ... ok
+test_politica_de_ciclo_de_vida_corresponde_ao_arquivo_versionado (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_politica_de_ciclo_de_vida_corresponde_ao_arquivo_versionado)
+A regra aplicada no bucket é a que está no repositório. ... skipped 'o bucket de teste não tem ciclo de vida aplicado; rode `minio-init` contra ele ou aplique infra/minio/lifecycle.json manualmente'
+test_upload_valido_grava_objeto_no_bucket (tests.test_integracao_audio_minio.TestRecebimentoAudioIntegracao.test_upload_valido_grava_objeto_no_bucket)
+O `201` corresponde a um objeto que existe, com os metadados certos. ... ok
+test_429_do_provedor_nao_vira_429_publico (tests.test_integracao_chat.TestChatIntegracao.test_429_do_provedor_nao_vira_429_publico)
+A tradução do limite excedido, separada por ser fácil de errar. ... ok
+test_mensagem_acima_do_limite_nao_aciona_o_provedor (tests.test_integracao_chat.TestChatIntegracao.test_mensagem_acima_do_limite_nao_aciona_o_provedor)
+Acima de 4000 caracteres, a recusa vem antes da chamada. ... ok
+test_mensagem_no_limite_exato_e_aceita (tests.test_integracao_chat.TestChatIntegracao.test_mensagem_no_limite_exato_e_aceita)
+A fronteira do limite: 4000 passam, 4001 não. Complementa TI-22. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_mensagem_vazia_nao_aciona_o_provedor (tests.test_integracao_chat.TestChatIntegracao.test_mensagem_vazia_nao_aciona_o_provedor)
+Vazia e só-espaços param no serviço, sem chamada externa. ... ok
+test_resposta_gerada_pelo_provedor (tests.test_integracao_chat.TestChatIntegracao.test_resposta_gerada_pelo_provedor)
+Mensagem típica atravessa até `reply`, com a resposta real gravada. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_variantes_de_falha_e_resposta_vazia (tests.test_integracao_chat.TestChatIntegracao.test_variantes_de_falha_e_resposta_vazia)
+Cada variante isolada, com o status que o contrato de hoje produz. ... Erro não tratado ao processar POST /api/v1/chat
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/routes/chat.py", line 388, in send_chat_message
+    reply = answerer.answer(mensagem, payload.conversation_id, foco=foco)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/services/chat_service.py", line 105, in answer
+    resposta = self._model.generate_reply(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/services/gemini_service.py", line 241, in generate_reply
+    response = self._client.models.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/tests/test_integracao_chat.py", line 85, in generate_content
+    raise self._erro
+RuntimeError: falha inesperada (simulada)
+Erro não tratado ao processar POST /api/v1/chat
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/routes/chat.py", line 396, in send_chat_message
+    fontes = fontes_citadas(reply.text, reply.fontes)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/routes/chat.py", line 80, in fontes_citadas
+    for grupo in _CITACAO.findall(texto)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: expected string or bytes-like object, got 'NoneType'
+Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_confirmacao_remove_e_recusa_devolve_a_mensagem (tests.test_integracao_contrato_barramento.TestContratoBarramentoEmMemoria.test_confirmacao_remove_e_recusa_devolve_a_mensagem) ... Falha ao varrer correlacao=sub-2; devolvendo à fila para nova tentativa.
+ok
+test_consumidor_nao_depende_de_ordem_global (tests.test_integracao_contrato_barramento.TestContratoBarramentoEmMemoria.test_consumidor_nao_depende_de_ordem_global) ... ok
+test_consumo_duplicado_produz_efeito_unico (tests.test_integracao_contrato_barramento.TestContratoBarramentoEmMemoria.test_consumo_duplicado_produz_efeito_unico) ... ok
+test_falha_persistente_vai_para_dead_letter (tests.test_integracao_contrato_barramento.TestContratoBarramentoEmMemoria.test_falha_persistente_vai_para_dead_letter) ... Falha ao varrer correlacao=sub-x; devolvendo à fila para nova tentativa.
+Falha ao varrer correlacao=sub-x; devolvendo à fila para nova tentativa.
+Falha ao varrer correlacao=sub-x; devolvendo à fila para nova tentativa.
+Falha ao varrer correlacao=sub-x; devolvendo à fila para nova tentativa.
+ok
+test_indisponibilidade_na_publicacao_e_reportada (tests.test_integracao_contrato_barramento.TestContratoBarramentoEmMemoria.test_indisponibilidade_na_publicacao_e_reportada) ... ok
+test_payload_indesserializavel_vai_de_imediato_para_dead_letter (tests.test_integracao_contrato_barramento.TestContratoBarramentoEmMemoria.test_payload_indesserializavel_vai_de_imediato_para_dead_letter) ... Payload indesserializável na fila varredura.pendente; enviando para a fila morta.
+Traceback (most recent call last):
+  File "/repo/src/mensageria/envelope.py", line 62, in desserializar
+    bruto = json.loads(dados)
+            ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/json/decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/json/decoder.py", line 356, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/repo/src/mensageria/consumidor.py", line 62, in _tratar
+    evento = desserializar(corpo)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/mensageria/envelope.py", line 64, in desserializar
+    raise EnvelopeInvalido(f"payload não é JSON desserializável: {exc}") from exc
+mensageria.envelope.EnvelopeInvalido: payload não é JSON desserializável: Expecting value: line 1 column 1 (char 0)
+ok
+test_publica_e_consome_o_envelope_integro (tests.test_integracao_contrato_barramento.TestContratoBarramentoEmMemoria.test_publica_e_consome_o_envelope_integro) ... ok
+test_confirmacao_remove_e_recusa_devolve_a_mensagem (tests.test_integracao_contrato_barramento.TestContratoBarramentoRabbitMQ.test_confirmacao_remove_e_recusa_devolve_a_mensagem) ... skipped 'defina TEST_RABBITMQ_URL para exercitar o contrato contra um RabbitMQ real'
+test_consumidor_nao_depende_de_ordem_global (tests.test_integracao_contrato_barramento.TestContratoBarramentoRabbitMQ.test_consumidor_nao_depende_de_ordem_global) ... skipped 'defina TEST_RABBITMQ_URL para exercitar o contrato contra um RabbitMQ real'
+test_consumo_duplicado_produz_efeito_unico (tests.test_integracao_contrato_barramento.TestContratoBarramentoRabbitMQ.test_consumo_duplicado_produz_efeito_unico) ... skipped 'defina TEST_RABBITMQ_URL para exercitar o contrato contra um RabbitMQ real'
+test_falha_persistente_vai_para_dead_letter (tests.test_integracao_contrato_barramento.TestContratoBarramentoRabbitMQ.test_falha_persistente_vai_para_dead_letter) ... skipped 'defina TEST_RABBITMQ_URL para exercitar o contrato contra um RabbitMQ real'
+test_indisponibilidade_na_publicacao_e_reportada (tests.test_integracao_contrato_barramento.TestContratoBarramentoRabbitMQ.test_indisponibilidade_na_publicacao_e_reportada) ... skipped 'defina TEST_RABBITMQ_URL para exercitar o contrato contra um RabbitMQ real'
+test_payload_indesserializavel_vai_de_imediato_para_dead_letter (tests.test_integracao_contrato_barramento.TestContratoBarramentoRabbitMQ.test_payload_indesserializavel_vai_de_imediato_para_dead_letter) ... skipped 'defina TEST_RABBITMQ_URL para exercitar o contrato contra um RabbitMQ real'
+test_publica_e_consome_o_envelope_integro (tests.test_integracao_contrato_barramento.TestContratoBarramentoRabbitMQ.test_publica_e_consome_o_envelope_integro) ... skipped 'defina TEST_RABBITMQ_URL para exercitar o contrato contra um RabbitMQ real'
+test_confirmacao_remove_e_recusa_devolve_a_mensagem (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_confirmacao_remove_e_recusa_devolve_a_mensagem)
+Confirmada não volta; recusada volta para a fila. ... ok
+test_consumidor_nao_depende_de_ordem_global (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_consumidor_nao_depende_de_ordem_global)
+Publicadas fora de ordem, todas são processadas corretamente. ... ok
+test_consumo_duplicado_produz_efeito_unico (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_consumo_duplicado_produz_efeito_unico)
+A mesma mensagem processada duas vezes aplica o efeito uma vez. ... ok
+test_falha_persistente_vai_para_dead_letter (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_falha_persistente_vai_para_dead_letter)
+Contador cresce a cada reentrega; no limite, a mensagem é isolada. ... ok
+test_indisponibilidade_na_publicacao_e_reportada (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_indisponibilidade_na_publicacao_e_reportada)
+Barramento fora do ar: erro explícito ao produtor, sem perda silenciosa. ... ok
+test_payload_indesserializavel_vai_direto_para_dead_letter (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_payload_indesserializavel_vai_direto_para_dead_letter)
+A segunda causa de TI-43: sem reentrega, porque não há o que tentar. ... ok
+test_publica_e_consome_o_envelope_integro (tests.test_integracao_contrato_mensageria.TestContratoBarramentoEmMemoria.test_publica_e_consome_o_envelope_integro)
+Os seis campos do envelope chegam ao consumidor preservados. ... ok
+test_assinatura_invalida_e_rejeitada (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_assinatura_invalida_e_rejeitada) ... ok
+test_confirmacao_so_ocorre_apos_persistencia (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_confirmacao_so_ocorre_apos_persistencia) ... ok
+test_conteudo_malformado_e_rejeitado (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_conteudo_malformado_e_rejeitado) ... ok
+test_entrega_com_assinatura_valida_e_processada (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_entrega_com_assinatura_valida_e_processada) ... ok
+test_entrega_duplicada_produz_efeito_unico (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_entrega_duplicada_produz_efeito_unico) ... ok
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... ok
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... ok
+test_reentrega_apos_falha_parcial_completa_sem_repetir (tests.test_integracao_contrato_webhook.TestContratoWebhookEmMemoria.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... ok
+test_contrato_da_rota_de_chat (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_contrato_da_rota_de_chat)
+Os campos de `ChatRequest`/`ChatResponse` valem nos dois sentidos. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_contrato_do_envio_de_audio (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_contrato_do_envio_de_audio)
+`Blob` sem nome de arquivo, como o `MediaRecorder` do navegador manda. ... ok
+test_conversation_id_e_obrigatorio_no_contrato_de_chat (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_conversation_id_e_obrigatorio_no_contrato_de_chat)
+Faltando `conversation_id`, o backend recusa com 422. ... ok
+test_erro_4xx_5xx_e_tratado_pela_interface (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_erro_4xx_5xx_e_tratado_pela_interface)
+O envelope de erro é sempre o mesmo, e é o que a interface lê. ... ok
+test_porta_do_proxy_coincide_com_a_porta_do_servidor (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_porta_do_proxy_coincide_com_a_porta_do_servidor)
+O alvo padrão do proxy do Vite é a porta que o compose publica. ... ok
+test_prefixo_do_proxy_cobre_as_rotas_da_api (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_prefixo_do_proxy_cobre_as_rotas_da_api)
+O proxy intercepta `/api`, e as rotas de negócio vivem sob `/api/v1`. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_rotas_de_portfolio_do_planejamento_foram_implementadas (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_rotas_de_portfolio_do_planejamento_foram_implementadas)
+Complemento de TI-33: as três rotas da massa original hoje existem. ... ok
+test_rotas_nao_implementadas_retornam_404 (tests.test_integracao_frontend_backend.TestFrontendBackendIntegracao.test_rotas_nao_implementadas_retornam_404)
+Rota que não existe responde `404` limpo, e não 500 nem 405. ... ok
+test_verificador_nao_aponta_divergencia (tests.test_integracao_persistencia.TestModeloDocumentado.test_verificador_nao_aponta_divergencia) ... ok
+test_feedback_autorizado_continua_permitido (tests.test_integracao_persistencia.TestPermissoesDaAuditoria.test_feedback_autorizado_continua_permitido)
+O contraste que dá sentido ao caso acima. ... ERROR
+test_historico_de_um_usuario_nao_vaza_para_o_outro (tests.test_integracao_persistencia.TestPermissoesDaAuditoria.test_historico_de_um_usuario_nao_vaza_para_o_outro)
+Duas identidades, cada uma enxergando a própria conversa. ... ok
+test_mensagens_de_conversa_alheia_nao_sao_devolvidas (tests.test_integracao_persistencia.TestPermissoesDaAuditoria.test_mensagens_de_conversa_alheia_nao_sao_devolvidas)
+O mesmo isolamento, um nível abaixo: as mensagens da conversa. ... ok
+test_carga_inicial_esta_populada (tests.test_integracao_persistencia.TestPersistenciaEsquema.test_carga_inicial_esta_populada)
+`02_initial_data.sql` deixou o portfólio com conteúdo. ... ok
+test_evento_local_tem_colunas_do_contrato (tests.test_integracao_persistencia.TestPersistenciaEsquema.test_evento_local_tem_colunas_do_contrato) ... ok
+test_schemas_e_tabelas_do_ddl_estao_presentes (tests.test_integracao_persistencia.TestPersistenciaEsquema.test_schemas_e_tabelas_do_ddl_estao_presentes)
+O mesmo resultado, conferido na base de teste já migrada. ... ok
+test_avaliacao_exige_alvo_e_juizo_unicos (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_avaliacao_exige_alvo_e_juizo_unicos)
+Alvo único, juízo obrigatório, e reavaliar atualiza em vez de empilhar. ... ok
+test_banco_indisponivel_nao_perde_o_turno (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_banco_indisponivel_nao_perde_o_turno)
+CARACTERIZAÇÃO: hoje o turno É perdido, e só sobra o registro no log. ... Persistência de conversas desligada: banco fora do ar no ensaio
+ok
+test_consulta_de_projeto_retorna_dados_e_fontes_registradas (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_consulta_de_projeto_retorna_dados_e_fontes_registradas)
+Uma linha em `mensagem_fonte` por trecho citado, com os metadados copiados. ... ok
+test_papel_da_mensagem_delimita_as_colunas (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_papel_da_mensagem_delimita_as_colunas)
+`mensagem_papel_coerente` recusa as duas combinações cruzadas. ... ok
+test_papel_de_aplicacao_nao_altera_auditoria (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_papel_de_aplicacao_nao_altera_auditoria)
+A aplicação insere e lê a trilha, e não a reescreve nem a apaga. ... ok
+test_schema_e_criado_em_base_vazia (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_schema_e_criado_em_base_vazia)
+Os scripts-base e as migrações 07 a 09 aplicados a uma base recém-criada. ... skipped 'psql ausente no PATH. O DDL usa metacomandos do cliente (\\set, \\echo, \\if) e precisa dele; instale postgresql-client.'
+test_segundo_turno_continua_a_numeracao_da_conversa (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_segundo_turno_continua_a_numeracao_da_conversa)
+Ordens seguem crescendo na mesma conversa. Complementa TI-24. ... ok
+test_turno_por_texto_e_gravado_com_atributos_minimos (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_turno_por_texto_e_gravado_com_atributos_minimos)
+Um turno vira duas linhas irmãs, com ordens consecutivas. ... ok
+test_turno_por_voz_vincula_o_audio_de_origem (tests.test_integracao_persistencia.TestPersistenciaIntegracao.test_turno_por_voz_vincula_o_audio_de_origem)
+Formato `audio` aceita `audio_referencia`; formato `texto` não. ... ok
+test_busca_com_filtro_combinado_respeita_projeto_e_tipo (tests.test_integracao_rag.TestBuscaRagPontaAPonta.test_busca_com_filtro_combinado_respeita_projeto_e_tipo)
+Dois documentos sintéticos de projetos distintos, e o filtro separa. ... skipped 'TEST_RAG_DB_URL não definido. Este bloco indexa em `vecs` sobre PostgreSQL e gasta chamadas reais de embedding; precisa de opt-in explícito.'
+test_filtro_sem_correspondencia_devolve_lista_vazia_com_200 (tests.test_integracao_rag.TestContratoDaBuscaRag.test_filtro_sem_correspondencia_devolve_lista_vazia_com_200)
+Nenhum registro correspondente não é erro: é `200` com `resultados=[]`. ... ok
+test_limites_invalidos_e_campo_ausente_sao_recusados (tests.test_integracao_rag.TestContratoDaBuscaRag.test_limites_invalidos_e_campo_ausente_sao_recusados)
+`n_resultados` fora de 1..20 e `query` ausente param no schema. ... ok
+test_limites_validos_nas_bordas_sao_aceitos (tests.test_integracao_rag.TestContratoDaBuscaRag.test_limites_validos_nas_bordas_sao_aceitos)
+1 e 20 passam. O contraste que dá sentido ao caso acima. ... ok
+test_query_vazia_e_aceita_pelo_schema (tests.test_integracao_rag.TestContratoDaBuscaRag.test_query_vazia_e_aceita_pelo_schema)
+CARACTERIZAÇÃO, não garantia. ... ok
+test_resultado_atravessa_com_os_metadados_do_indice (tests.test_integracao_rag.TestContratoDaBuscaRag.test_resultado_atravessa_com_os_metadados_do_indice)
+Os campos que o RNF12 exige chegam ao cliente, incluindo `chunk_id`. ... ok
+test_falhas_do_embedding_ou_do_banco_saem_como_500_sem_segredo (tests.test_integracao_rag.TestErrosDaBuscaRag.test_falhas_do_embedding_ou_do_banco_saem_como_500_sem_segredo)
+Contrato atual: exceção não tratada vira `500 internal_error`. ... ok
+test_alterar_o_conteudo_muda_o_identificador_do_chunk (tests.test_integracao_rag.TestIngestaoRag.test_alterar_o_conteudo_muda_o_identificador_do_chunk)
+E a outra metade: conteúdo diferente, identificador diferente. ... ok
+test_chunks_nao_misturam_secoes_nem_projetos (tests.test_integracao_rag.TestIngestaoRag.test_chunks_nao_misturam_secoes_nem_projetos)
+A fragmentação respeita a fronteira de arquivo e de seção. ... ok
+test_docx_preserva_secao_e_projeto (tests.test_integracao_rag.TestIngestaoRag.test_docx_preserva_secao_e_projeto)
+Título vira `secao`; parágrafos viram trechos do projeto da pasta. ... ok
+test_reindexar_a_mesma_massa_produz_os_mesmos_identificadores (tests.test_integracao_rag.TestIngestaoRag.test_reindexar_a_mesma_massa_produz_os_mesmos_identificadores)
+Repetição idêntica não duplica: o `chunk_id` é função do conteúdo. ... ok
+test_tabela_de_docx_nao_e_extraida (tests.test_integracao_rag.TestIngestaoRag.test_tabela_de_docx_nao_e_extraida)
+LACUNA CONHECIDA, registrada em vez de mascarada. ... ok
+test_xlsx_separa_abas_e_ignora_linhas_vazias (tests.test_integracao_rag.TestIngestaoRag.test_xlsx_separa_abas_e_ignora_linhas_vazias)
+Cada aba vira `secao`; linhas sem conteúdo não geram trecho. ... ok
+test_401_vem_antes_da_regra_de_negocio (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_401_vem_antes_da_regra_de_negocio)
+A recusa acontece sem que o serviço de domínio seja construído. ... Falha de autenticação (MALFORMED): Not enough segments
+ok
+test_corpo_do_401_nao_serve_de_oraculo (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_corpo_do_401_nao_serve_de_oraculo)
+A resposta é a mesma para causas diferentes. ... Falha de autenticação (MALFORMED): Invalid header string: 'utf-8' codec can't decode byte 0xb7 in position 1: invalid start byte
+ok
+test_health_e_webhooks_ficam_fora_por_decisao_registrada (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_health_e_webhooks_ficam_fora_por_decisao_registrada)
+As duas exceções à autenticação, e por que cada uma existe. ... ok
+test_recusa_de_assinatura_e_recusa_de_sessao_sao_distinguiveis (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_recusa_de_assinatura_e_recusa_de_sessao_sao_distinguiveis)
+O contraste que dá sentido ao caso acima. ... ok
+test_toda_rota_de_negocio_exige_sessao (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_toda_rota_de_negocio_exige_sessao)
+Sem credencial, as doze rotas respondem 401 — nenhuma escapa. ... ok
+test_instrucao_adversaria_nao_produz_fonte_inventada (tests.test_integracao_seguranca.TestEntradaHostilIntegracao.test_instrucao_adversaria_nao_produz_fonte_inventada)
+Sem trecho acima do piso, o modelo NÃO é chamado. Nada a subverter. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_marca_html_atravessa_como_dado_e_nao_como_documento (tests.test_integracao_seguranca.TestEntradaHostilIntegracao.test_marca_html_atravessa_como_dado_e_nao_como_documento)
+Script no texto sai como string JSON, nunca como corpo HTML. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_segredo_nao_aparece_nos_registros_de_erro (tests.test_integracao_seguranca.TestEntradaHostilIntegracao.test_segredo_nao_aparece_nos_registros_de_erro)
+Uma falha interna não pode arrastar credencial para o log. ... ok
+test_trecho_acima_do_piso_e_citado_e_o_de_baixo_nao (tests.test_integracao_seguranca.TestEntradaHostilIntegracao.test_trecho_acima_do_piso_e_citado_e_o_de_baixo_nao)
+O contraste que dá sentido ao caso anterior. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_falha_ou_audio_vazio_do_provedor_retorna_502 (tests.test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_falha_ou_audio_vazio_do_provedor_retorna_502)
+As duas causas dão o mesmo `502 speech_generation_failed`. ... ok
+test_gera_audio_wav_a_partir_do_texto (tests.test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_gera_audio_wav_a_partir_do_texto)
+Texto típico atravessa até o WAV, com a resposta real do provedor. ... ok
+test_texto_acima_do_limite_nao_aciona_o_provedor (tests.test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_texto_acima_do_limite_nao_aciona_o_provedor)
+Acima de 4000 caracteres, a recusa vem antes da chamada. ... ok
+test_texto_no_limite_exato_e_aceito (tests.test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_texto_no_limite_exato_e_aceito)
+A fronteira do limite: 4000 caracteres passam, 4001 não. ... ok
+test_texto_vazio_nao_aciona_o_provedor (tests.test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_texto_vazio_nao_aciona_o_provedor)
+Vazio e só-espaços param no serviço, antes do provedor de voz. ... ok
+test_voz_ou_formato_nao_suportado_retorna_422 (tests.test_integracao_sintese_fala.TestSinteseDeFalaIntegracao.test_voz_ou_formato_nao_suportado_retorna_422)
+Voz e formato fora do catálogo são recusados pelo schema Pydantic. ... ok
+test_audio_sem_fala_retorna_texto_vazio (tests.test_integracao_transcricao.TestTranscricaoIntegracao.test_audio_sem_fala_retorna_texto_vazio)
+Silêncio não é erro: o provedor devolve 200 com transcrição vazia. ... ok
+test_falha_do_provedor_retorna_502 (tests.test_integracao_transcricao.TestTranscricaoIntegracao.test_falha_do_provedor_retorna_502)
+As três causas de indisponibilidade dão o mesmo `502`, sem vazar SDK. ... ok
+test_idioma_nao_suportado_retorna_422_sem_chamar_provedor (tests.test_integracao_transcricao.TestTranscricaoIntegracao.test_idioma_nao_suportado_retorna_422_sem_chamar_provedor)
+`en-US` é recusado pelo schema, antes de qualquer efeito colateral. ... ok
+test_termos_do_dominio_sao_enviados_ao_provedor (tests.test_integracao_transcricao.TestTranscricaoIntegracao.test_termos_do_dominio_sao_enviados_ao_provedor)
+Os 12 termos do domínio e o modelo `nova-3` chegam ao SDK. ... ok
+test_transcreve_audio_de_referencia (tests.test_integracao_transcricao.TestTranscricaoIntegracao.test_transcreve_audio_de_referencia)
+Áudio com fala em português atravessa até o schema de resposta. ... ok
+test_abrir_campanha_nao_devolve_orcamento_ja_gasto (tests.test_integracao_vhs.TestManifestoVhs.test_abrir_campanha_nao_devolve_orcamento_ja_gasto)
+Abrir zera o contador, e por isso não pode acontecer sem querer. ... ok
+test_encerramento_remove_temporarios_e_barra_nova_gravacao (tests.test_integracao_vhs.TestManifestoVhs.test_encerramento_remove_temporarios_e_barra_nova_gravacao)
+O que não foi selecionado para regressão sai ao fechar a campanha. ... ok
+test_manifesto_sobrevive_a_recarga (tests.test_integracao_vhs.TestManifestoVhs.test_manifesto_sobrevive_a_recarga)
+O estado é o arquivo, não a memória: outra instância lê o mesmo. ... ok
+test_teto_de_chamadas_reais_interrompe_a_campanha (tests.test_integracao_vhs.TestManifestoVhs.test_teto_de_chamadas_reais_interrompe_a_campanha)
+Atingido o limite do manifesto, a próxima gravação não sai. ... ok
+test_ausencia_ou_expiracao_aciona_o_adaptador_real (tests.test_integracao_vhs.TestVhsIntegracao.test_ausencia_ou_expiracao_aciona_o_adaptador_real)
+Chave nova, ou registro vencido: grava chamando; reproduz falhando. ... ok
+test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao (tests.test_integracao_vhs.TestVhsIntegracao.test_chave_e_sensivel_a_mudanca_de_idioma_modelo_ou_instrucao)
+Mudou idioma, modelo ou instrução: chave nova, registro não reusado. ... ok
+test_modo_reproduzir_sem_registro_valido_falha_sem_acessar_a_rede (tests.test_integracao_vhs.TestVhsIntegracao.test_modo_reproduzir_sem_registro_valido_falha_sem_acessar_a_rede)
+Ausência e corrupção falham, com mensagens distintas e sem rede. ... ok
+test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado (tests.test_integracao_vhs.TestVhsIntegracao.test_modos_ignorar_e_atualizar_se_comportam_conforme_especificado)
+Sem contexto não há fita; `atualizar` grava candidato, não sobrescreve. ... ok
+test_nenhum_segredo_e_gravado_no_registro (tests.test_integracao_vhs.TestVhsIntegracao.test_nenhum_segredo_e_gravado_no_registro)
+Varredura das gravações de sucesso e de falha: nada de credencial. ... ok
+test_registro_existente_nao_aciona_o_adaptador (tests.test_integracao_vhs.TestVhsIntegracao.test_registro_existente_nao_aciona_o_adaptador)
+Segunda chamada com a mesma entrada é servida pela fita. ... ok
+test_erro_http_gravado_reproduz_e_vira_o_status_da_rota (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_erro_http_gravado_reproduz_e_vira_o_status_da_rota)
+A recusa real do provedor é reproduzida e traduzida pelo contrato. ... ok
+test_gravacoes_dos_dois_sdks_reproduzem_sem_rede (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_gravacoes_dos_dois_sdks_reproduzem_sem_rede)
+Cada SDK reproduz sua gravação real, e o `play_count` incrementa. ... ok
+test_manifesto_declara_origem_real_para_cada_gravacao (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_manifesto_declara_origem_real_para_cada_gravacao)
+Toda fita versionada é interação genuína, e está dentro do prazo. ... ok
+test_mudanca_de_modelo_idioma_ou_termos_invalida_a_gravacao (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_mudanca_de_modelo_idioma_ou_termos_invalida_a_gravacao)
+Alterado o que é semanticamente relevante, a fita antiga não serve. ... ok
+test_nenhum_segredo_ou_marcador_sobrevive_nas_gravacoes (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_nenhum_segredo_ou_marcador_sobrevive_nas_gravacoes)
+Varredura das fitas versionadas, por nome e por valor. ... ok
+test_registro_vencido_ou_corrompido_falha_sem_rede (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_registro_vencido_ou_corrompido_falha_sem_rede)
+Validade e integridade barram o replay antes de a fita abrir. ... ok
+test_replay_com_chave_ausente_nao_alcanca_a_rede (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_replay_com_chave_ausente_nao_alcanca_a_rede)
+A falha por ausência acontece ANTES de qualquer tentativa de conexão. ... ok
+test_reproducao_funciona_em_processo_novo (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_reproducao_funciona_em_processo_novo)
+Item 4 do contrato: o replay não depende da memória da gravação. ... ok
+test_timeout_sem_resposta_nao_tem_fita_e_e_declarado_simulado (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_timeout_sem_resposta_nao_tem_fita_e_e_declarado_simulado)
+Ausência de resposta não é gravável, e o registro não finge que é. ... ok
+test_varredura_de_segredos_acha_o_que_deve_achar (tests.test_integracao_vhs_provedores.TestVhsProvedoresIntegracao.test_varredura_de_segredos_acha_o_que_deve_achar)
+Controle do próprio instrumento: a varredura não é vacuamente vazia. ... ok
+test_expiracao_do_onedrive_e_respeitada (tests.test_integracao_webhook.TestAvisosOneDrive.test_expiracao_do_onedrive_e_respeitada) ... ok
+test_item_sem_versao_nao_e_chave_de_deduplicacao (tests.test_integracao_webhook.TestAvisosOneDrive.test_item_sem_versao_nao_e_chave_de_deduplicacao) ... ok
+test_payload_minimo_oficial_aceito_e_nova_mudanca_nao_e_descartada (tests.test_integracao_webhook.TestAvisosOneDrive.test_payload_minimo_oficial_aceito_e_nova_mudanca_nao_e_descartada) ... ok
+test_tipos_invalidos_nao_produzem_erro_interno (tests.test_integracao_webhook.TestAvisosOneDrive.test_tipos_invalidos_nao_produzem_erro_interno) ... ok
+test_versoes_diferentes_do_item_produzem_chaves_diferentes (tests.test_integracao_webhook.TestAvisosOneDrive.test_versoes_diferentes_do_item_produzem_chaves_diferentes) ... ok
+test_assinatura_invalida_e_rejeitada (tests.test_integracao_webhook.TestContratoWebhookHTTP.test_assinatura_invalida_e_rejeitada) ... ok
+test_confirmacao_so_ocorre_apos_persistencia (tests.test_integracao_webhook.TestContratoWebhookHTTP.test_confirmacao_so_ocorre_apos_persistencia) ... ok
+test_conteudo_malformado_e_rejeitado (tests.test_integracao_webhook.TestContratoWebhookHTTP.test_conteudo_malformado_e_rejeitado) ... ok
+test_entrega_com_assinatura_valida_e_processada (tests.test_integracao_webhook.TestContratoWebhookHTTP.test_entrega_com_assinatura_valida_e_processada) ... ok
+test_entrega_duplicada_produz_efeito_unico (tests.test_integracao_webhook.TestContratoWebhookHTTP.test_entrega_duplicada_produz_efeito_unico) ... ok
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (tests.test_integracao_webhook.TestContratoWebhookHTTP.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... ok
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (tests.test_integracao_webhook.TestContratoWebhookHTTP.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... ok
+test_reentrega_apos_falha_parcial_completa_sem_repetir (tests.test_integracao_webhook.TestContratoWebhookHTTP.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... ok
+test_devolve_o_token_em_texto_puro (tests.test_integracao_webhook.TestHandshakeDeValidacao.test_devolve_o_token_em_texto_puro) ... ok
+test_handshake_nao_depende_do_receptor (tests.test_integracao_webhook.TestHandshakeDeValidacao.test_handshake_nao_depende_do_receptor) ... ok
+test_entrega_com_varias_mudancas_e_desdobrada (tests.test_integracao_webhook.TestTradutorGraph.test_entrega_com_varias_mudancas_e_desdobrada) ... ok
+test_identificador_combina_assinatura_e_item (tests.test_integracao_webhook.TestTradutorGraph.test_identificador_combina_assinatura_e_item) ... ok
+test_assinatura_desativada_deixa_de_ser_aceita (tests.test_integracao_webhook.TestVerificadorAssinaturaAtiva.test_assinatura_desativada_deixa_de_ser_aceita) ... ok
+test_assinatura_desconhecida_e_recusada (tests.test_integracao_webhook.TestVerificadorAssinaturaAtiva.test_assinatura_desconhecida_e_recusada) ... ok
+test_assinatura_invalida_e_rejeitada (tests.test_integracao_webhook_drive.TestContratoWebhookDrive.test_assinatura_invalida_e_rejeitada) ... ok
+test_confirmacao_so_ocorre_apos_persistencia (tests.test_integracao_webhook_drive.TestContratoWebhookDrive.test_confirmacao_so_ocorre_apos_persistencia) ... ok
+test_conteudo_malformado_e_rejeitado (tests.test_integracao_webhook_drive.TestContratoWebhookDrive.test_conteudo_malformado_e_rejeitado) ... ok
+test_entrega_com_assinatura_valida_e_processada (tests.test_integracao_webhook_drive.TestContratoWebhookDrive.test_entrega_com_assinatura_valida_e_processada) ... ok
+test_entrega_duplicada_produz_efeito_unico (tests.test_integracao_webhook_drive.TestContratoWebhookDrive.test_entrega_duplicada_produz_efeito_unico) ... ok
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (tests.test_integracao_webhook_drive.TestContratoWebhookDrive.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... ok
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (tests.test_integracao_webhook_drive.TestContratoWebhookDrive.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... ok
+test_reentrega_apos_falha_parcial_completa_sem_repetir (tests.test_integracao_webhook_drive.TestContratoWebhookDrive.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... ok
+test_sync_e_confirmado_e_nao_produz_efeito (tests.test_integracao_webhook_drive.TestMensagemDeAberturaDoCanal.test_sync_e_confirmado_e_nao_produz_efeito) ... ok
+test_le_os_cabecalhos_e_ignora_o_corpo_vazio (tests.test_integracao_webhook_drive.TestTradutorDrive.test_le_os_cabecalhos_e_ignora_o_corpo_vazio) ... ok
+test_assinatura_invalida_e_rejeitada (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_assinatura_invalida_e_rejeitada) ... ok
+test_confirmacao_so_ocorre_apos_persistencia (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_confirmacao_so_ocorre_apos_persistencia) ... ok
+test_conteudo_malformado_e_rejeitado (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_conteudo_malformado_e_rejeitado) ... ok
+test_entrega_com_assinatura_valida_e_processada (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_entrega_com_assinatura_valida_e_processada) ... ok
+test_entrega_duplicada_produz_efeito_unico (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_entrega_duplicada_produz_efeito_unico) ... ok
+test_evento_de_tipo_desconhecido_e_registrado_e_ignorado (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_evento_de_tipo_desconhecido_e_registrado_e_ignorado) ... ok
+test_lote_de_mudancas_produz_um_efeito_por_mudanca (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_lote_de_mudancas_produz_um_efeito_por_mudanca)
+Três mudanças na origem produzem três efeitos. ... ok
+test_reentrega_apos_falha_parcial_completa_sem_repetir (tests.test_integracao_webhook_postgres.TestContratoWebhookPostgres.test_reentrega_apos_falha_parcial_completa_sem_repetir)
+A reentrega de um lote parcialmente processado completa, sem repetir. ... ok
+test_abrir_preserva_canal_ativo_no_postgres (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_abrir_preserva_canal_ativo_no_postgres) ... /app/.venv/lib/python3.12/site-packages/psycopg_pool/pool.py:134: DeprecationWarning: the default for the ConnectionPool 'open' parameter will become 'False' in a future release. Please use open={True|False} explicitly, or use the pool as context manager using: `with ConnectionPool(...) as pool: ...`
+  warnings.warn(
+ok
+test_aviso_minimo_onedrive_marca_novamente_apos_varredura (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_aviso_minimo_onedrive_marca_novamente_apos_varredura) ... ok
+test_papel_nao_pode_apagar_reescrever_corpo_ou_ler_segredos (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_papel_nao_pode_apagar_reescrever_corpo_ou_ler_segredos) ... ok
+test_receptor_restrito_persiste_conclui_e_marca_varredura (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_receptor_restrito_persiste_conclui_e_marca_varredura) ... ok
+test_usuario_da_aplicacao_nao_le_webhooks (tests.test_integracao_webhook_postgres.TestPermissoesWebhook.test_usuario_da_aplicacao_nao_le_webhooks) ... ok
+test_processador_marca_varredura_pendente (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_processador_marca_varredura_pendente) ... ok
+test_recusa_grava_o_corpo_bruto_sem_envelope (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_recusa_grava_o_corpo_bruto_sem_envelope) ... ok
+test_reivindicacao_concorrente_espera_e_ve_a_conclusao (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_concorrente_espera_e_ve_a_conclusao)
+Prova com duas threads de verdade que a segunda espera a primeira — ... ok
+test_reivindicacao_concorrente_retoma_apos_a_primeira_liberar (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_concorrente_retoma_apos_a_primeira_liberar)
+A reentrega de verdade do TI-38 — a primeira tentativa falhou. ... ok
+test_reivindicacao_e_duplicata_apos_concluida (tests.test_integracao_webhook_postgres.TestPersistenciaDoEvento.test_reivindicacao_e_duplicata_apos_concluida)
+TI-37, sem concorrência: uma vez concluída, mais ninguém reivindica. ... ok
+test_abaixo_do_limiar_vira_fora_do_catalogo (tests.test_intencao.TesteAplicarLimiar.test_abaixo_do_limiar_vira_fora_do_catalogo) ... ok
+test_em_lote_exige_listas_do_mesmo_tamanho (tests.test_intencao.TesteAplicarLimiar.test_em_lote_exige_listas_do_mesmo_tamanho) ... ok
+test_no_limiar_nao_rejeita (tests.test_intencao.TesteAplicarLimiar.test_no_limiar_nao_rejeita) ... ok
+test_devolve_argmax_e_confianca_do_modelo (tests.test_intencao.TesteDetectarIntencao.test_devolve_argmax_e_confianca_do_modelo) ... ok
+test_limiar_do_detector_chega_a_deteccao (tests.test_intencao.TesteDetectarIntencao.test_limiar_do_detector_chega_a_deteccao) ... ok
+test_confianca_suficiente_preserva_a_previsao (tests.test_intencao.TesteIntencaoDetectada.test_confianca_suficiente_preserva_a_previsao) ... ok
+test_limiar_padrao_quando_nao_informado (tests.test_intencao.TesteIntencaoDetectada.test_limiar_padrao_quando_nao_informado) ... ok
+test_rejeitada_separa_a_previsao_crua_da_decisao (tests.test_intencao.TesteIntencaoDetectada.test_rejeitada_separa_a_previsao_crua_da_decisao)
+As duas leituras são o motivo de esta classe existir. ... ok
+test_agente_nao_declara_limiar_proprio (tests.test_intencao.TesteRegraUnica.test_agente_nao_declara_limiar_proprio) ... ok
+test_despacho_de_alerta_nao_declara_limiar_proprio (tests.test_intencao.TesteRegraUnica.test_despacho_de_alerta_nao_declara_limiar_proprio) ... ok
+test_metricas_usa_a_mesma_funcao_do_servico (tests.test_intencao.TesteRegraUnica.test_metricas_usa_a_mesma_funcao_do_servico)
+Medição e execução compartilham o objeto, não a intenção de serem iguais. ... ok
+test_a_propria_raiz_e_recusada (tests.test_inventario_rag.TesteCaminhoDeSaida.test_a_propria_raiz_e_recusada) ... ok
+test_caminho_dentro_do_repositorio_e_recusado (tests.test_inventario_rag.TesteCaminhoDeSaida.test_caminho_dentro_do_repositorio_e_recusado) ... ok
+test_caminho_externo_e_aceito (tests.test_inventario_rag.TesteCaminhoDeSaida.test_caminho_externo_e_aceito) ... ok
+test_caminho_relativo_e_resolvido_antes_de_decidir (tests.test_inventario_rag.TesteCaminhoDeSaida.test_caminho_relativo_e_resolvido_antes_de_decidir) ... ok
+test_irmao_com_nome_parecido_nao_e_confundido_com_o_repositorio (tests.test_inventario_rag.TesteCaminhoDeSaida.test_irmao_com_nome_parecido_nao_e_confundido_com_o_repositorio) ... ok
+test_subpasta_do_repositorio_tambem_e_recusada (tests.test_inventario_rag.TesteCaminhoDeSaida.test_subpasta_do_repositorio_tambem_e_recusada) ... ok
+test_a_consulta_nao_escreve (tests.test_inventario_rag.TesteConsultaDoInventario.test_a_consulta_nao_escreve) ... ok
+test_o_arquivo_sql_existe_no_caminho_que_o_script_espera (tests.test_inventario_rag.TesteConsultaDoInventario.test_o_arquivo_sql_existe_no_caminho_que_o_script_espera) ... ok
+test_os_padroes_com_barra_invertida_usam_prefixo_e (tests.test_inventario_rag.TesteConsultaDoInventario.test_os_padroes_com_barra_invertida_usam_prefixo_e)
+Sem o `E`, a barra invertida deixa de ser escape e o padrão morre. ... ok
+test_a_recusa_acontece_antes_de_tocar_o_banco (tests.test_inventario_rag.TesteOrdemDasVerificacoes.test_a_recusa_acontece_antes_de_tocar_o_banco)
+A trava é a primeira coisa que `main` avalia. ... Erro: A evidência não pode ser salva dentro do repositório. Use um caminho externo, como /tmp/inventario-rag.json.
+ok
+test_conteudo_aninhado_preservado (tests.test_mensageria_envelope.TesteEnvelopeRoundTrip.test_conteudo_aninhado_preservado) ... ok
+test_datetime_tz_aware_preservado (tests.test_mensageria_envelope.TesteEnvelopeRoundTrip.test_datetime_tz_aware_preservado) ... ok
+test_marca_de_tempo_invalida_levanta (tests.test_mensageria_envelope.TesteEnvelopeRoundTrip.test_marca_de_tempo_invalida_levanta) ... ok
+test_payload_corrompido_levanta (tests.test_mensageria_envelope.TesteEnvelopeRoundTrip.test_payload_corrompido_levanta) ... ok
+test_payload_incompleto_levanta (tests.test_mensageria_envelope.TesteEnvelopeRoundTrip.test_payload_incompleto_levanta) ... ok
+test_round_trip_preserva_os_seis_campos (tests.test_mensageria_envelope.TesteEnvelopeRoundTrip.test_round_trip_preserva_os_seis_campos) ... ok
+test_versao_preservada (tests.test_mensageria_envelope.TesteEnvelopeRoundTrip.test_versao_preservada) ... ok
+test_confianca_abaixo_do_limiar_rejeita (tests.test_metricas.TesteAplicarLimiar.test_confianca_abaixo_do_limiar_rejeita) ... ok
+test_confianca_acima_do_limiar_mantem (tests.test_metricas.TesteAplicarLimiar.test_confianca_acima_do_limiar_mantem) ... ok
+test_confianca_igual_ao_limiar_nao_rejeita (tests.test_metricas.TesteAplicarLimiar.test_confianca_igual_ao_limiar_nao_rejeita) ... ok
+test_em_lote_exige_mesmo_tamanho (tests.test_metricas.TesteAplicarLimiar.test_em_lote_exige_mesmo_tamanho) ... ok
+test_em_lote_preserva_a_ordem (tests.test_metricas.TesteAplicarLimiar.test_em_lote_preserva_a_ordem) ... ok
+test_limiar_zero_nunca_rejeita (tests.test_metricas.TesteAplicarLimiar.test_limiar_zero_nunca_rejeita) ... ok
+test_aprovado_exige_os_tres_limites (tests.test_metricas.TesteAvaliacao.test_aprovado_exige_os_tres_limites) ... ok
+test_aprovado_quando_os_tres_passam (tests.test_metricas.TesteAvaliacao.test_aprovado_quando_os_tres_passam) ... ok
+test_sem_exemplos_levanta (tests.test_metricas.TesteAvaliacao.test_sem_exemplos_levanta) ... ok
+test_aceitacao_indevida_nunca_sobe_quando_o_limiar_sobe (tests.test_metricas.TesteCurvaDoLimiar.test_aceitacao_indevida_nunca_sobe_quando_o_limiar_sobe) ... ok
+test_cobertura_nunca_sobe_quando_o_limiar_sobe (tests.test_metricas.TesteCurvaDoLimiar.test_cobertura_nunca_sobe_quando_o_limiar_sobe) ... ok
+test_cobre_todos_os_limiares_pedidos (tests.test_metricas.TesteCurvaDoLimiar.test_cobre_todos_os_limiares_pedidos) ... ok
+test_limiar_maximo_rejeita_tudo (tests.test_metricas.TesteCurvaDoLimiar.test_limiar_maximo_rejeita_tudo) ... ok
+test_fora_do_catalogo_aceito_como_conhecida_conta (tests.test_metricas.TesteDefinicaoDeAceitacaoIndevida.test_fora_do_catalogo_aceito_como_conhecida_conta) ... ok
+test_rejeicao_pelo_limiar_evita_a_aceitacao_indevida (tests.test_metricas.TesteDefinicaoDeAceitacaoIndevida.test_rejeicao_pelo_limiar_evita_a_aceitacao_indevida) ... ok
+test_tudo_aceito_indevidamente (tests.test_metricas.TesteDefinicaoDeAceitacaoIndevida.test_tudo_aceito_indevidamente) ... ok
+test_conhecido_previsto_como_fora_do_catalogo_nao_conta (tests.test_metricas.TesteDefinicaoDeCobertura.test_conhecido_previsto_como_fora_do_catalogo_nao_conta) ... ok
+test_conhecido_previsto_errado_ainda_conta_como_coberto (tests.test_metricas.TesteDefinicaoDeCobertura.test_conhecido_previsto_errado_ainda_conta_como_coberto) ... ok
+test_conhecido_rejeitado_nao_conta (tests.test_metricas.TesteDefinicaoDeCobertura.test_conhecido_rejeitado_nao_conta) ... ok
+test_conta_apenas_os_conhecidos (tests.test_metricas.TesteDefinicaoDeCobertura.test_conta_apenas_os_conhecidos) ... ok
+test_devolve_none_quando_nenhum_limiar_atende (tests.test_metricas.TesteEscolhaDoLimiar.test_devolve_none_quando_nenhum_limiar_atende) ... ok
+test_escolhe_o_de_maior_f1_entre_os_aprovados (tests.test_metricas.TesteEscolhaDoLimiar.test_escolhe_o_de_maior_f1_entre_os_aprovados) ... ok
+test_menos_distante_sempre_devolve_algo (tests.test_metricas.TesteEscolhaDoLimiar.test_menos_distante_sempre_devolve_algo) ... ok
+test_e_deterministica (tests.test_metricas.TesteSubamostragem.test_e_deterministica) ... ok
+test_fracao_invalida_levanta (tests.test_metricas.TesteSubamostragem.test_fracao_invalida_levanta) ... ok
+test_fracao_total_devolve_copia (tests.test_metricas.TesteSubamostragem.test_fracao_total_devolve_copia) ... ok
+test_garante_o_minimo_para_a_validacao_cruzada (tests.test_metricas.TesteSubamostragem.test_garante_o_minimo_para_a_validacao_cruzada) ... ok
+test_mantem_texto_e_rotulo_pareados (tests.test_metricas.TesteSubamostragem.test_mantem_texto_e_rotulo_pareados) ... ok
+test_preserva_o_balanceamento (tests.test_metricas.TesteSubamostragem.test_preserva_o_balanceamento) ... ok
+test_desenvolvimento_e_teste_nao_se_sobrepoem (tests.test_particao.TesteArquivosGerados.test_desenvolvimento_e_teste_nao_se_sobrepoem) ... ok
+test_todo_exemplo_do_teste_seria_sorteado_para_o_teste (tests.test_particao.TesteArquivosGerados.test_todo_exemplo_do_teste_seria_sorteado_para_o_teste)
+Os arquivos correspondem à regra que diz tê-los produzido. ... ok
+test_encontra_repeticao_que_so_difere_em_acento (tests.test_particao.TesteDuplicatas.test_encontra_repeticao_que_so_difere_em_acento) ... ok
+test_pool_sem_repeticao_nao_acusa (tests.test_particao.TesteDuplicatas.test_pool_sem_repeticao_nao_acusa) ... ok
+test_acento_maiuscula_e_pontuacao_nao_distinguem_dois_textos (tests.test_particao.TesteNormalizar.test_acento_maiuscula_e_pontuacao_nao_distinguem_dois_textos) ... ok
+test_espaco_repetido_nao_distingue (tests.test_particao.TesteNormalizar.test_espaco_repetido_nao_distingue) ... ok
+test_crescer_o_pool_nao_move_quem_ja_estava (tests.test_particao.TesteSeparar.test_crescer_o_pool_nao_move_quem_ja_estava)
+A propriedade que justifica hash em vez de embaralhamento. ... ok
+test_e_deterministico (tests.test_particao.TesteSeparar.test_e_deterministico) ... ok
+test_fracao_invalida_e_recusada (tests.test_particao.TesteSeparar.test_fracao_invalida_e_recusada) ... ok
+test_nada_se_perde (tests.test_particao.TesteSeparar.test_nada_se_perde) ... ok
+test_nenhum_exemplo_aparece_nas_duas_particoes (tests.test_particao.TesteSeparar.test_nenhum_exemplo_aparece_nas_duas_particoes) ... ok
+test_proporcao_fica_proxima_da_pedida (tests.test_particao.TesteSeparar.test_proporcao_fica_proxima_da_pedida) ... ok
+test_semente_diferente_produz_particao_diferente (tests.test_particao.TesteSeparar.test_semente_diferente_produz_particao_diferente) ... ok
+test_a_forma_aninhada_e_a_que_o_componente_consome (tests.test_portfolio_api.TesteCalendario.test_a_forma_aninhada_e_a_que_o_componente_consome) ... ok
+test_data_e_unica_por_dia (tests.test_portfolio_api.TesteCalendario.test_data_e_unica_por_dia) ... ok
+test_dias_saem_em_ordem_cronologica (tests.test_portfolio_api.TesteCalendario.test_dias_saem_em_ordem_cronologica) ... ok
+test_erro_de_programacao_ao_listar_eventos_locais_nao_e_mascarado (tests.test_portfolio_api.TesteCalendario.test_erro_de_programacao_ao_listar_eventos_locais_nao_e_mascarado) ... Erro não tratado ao processar GET /api/v1/calendar/events
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/app/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/app/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/src/routes/portfolio.py", line 287, in listar_eventos
+    repositorio_eventos_locais.listar(usuario.domain_user_id)
+  File "/repo/tests/test_portfolio_api.py", line 100, in listar
+    raise self._erro_ao_listar
+RuntimeError: erro inesperado
+ok
+test_evento_local_aparece_na_agenda_com_hora_real (tests.test_portfolio_api.TesteCalendario.test_evento_local_aparece_na_agenda_com_hora_real) ... ok
+test_evento_local_e_marco_no_mesmo_dia_ficam_juntos (tests.test_portfolio_api.TesteCalendario.test_evento_local_e_marco_no_mesmo_dia_ficam_juntos) ... ok
+test_evento_local_sem_hora_nao_fabrica_horario (tests.test_portfolio_api.TesteCalendario.test_evento_local_sem_hora_nao_fabrica_horario) ... ok
+test_falha_de_banco_ao_listar_eventos_locais_devolve_503 (tests.test_portfolio_api.TesteCalendario.test_falha_de_banco_ao_listar_eventos_locais_devolve_503) ... Falha ao consultar eventos próprios da Agenda
+Traceback (most recent call last):
+  File "/repo/src/routes/portfolio.py", line 287, in listar_eventos
+    repositorio_eventos_locais.listar(usuario.domain_user_id)
+  File "/repo/tests/test_portfolio_api.py", line 100, in listar
+    raise self._erro_ao_listar
+psycopg.OperationalError: conexão indisponível
+ok
+test_marco_e_prazo_continuam_sem_hora_fabricada (tests.test_portfolio_api.TesteCalendario.test_marco_e_prazo_continuam_sem_hora_fabricada) ... ok
+test_montar_agenda_continua_aceitando_dois_argumentos (tests.test_portfolio_api.TesteCalendario.test_montar_agenda_continua_aceitando_dois_argumentos) ... ok
+test_pendencia_resolvida_nao_ocupa_a_agenda (tests.test_portfolio_api.TesteCalendario.test_pendencia_resolvida_nao_ocupa_a_agenda) ... ok
+test_rota_degrada_quando_tabela_de_eventos_locais_nao_existe (tests.test_portfolio_api.TesteCalendario.test_rota_degrada_quando_tabela_de_eventos_locais_nao_existe) ... Tabela portfolio.evento_local ainda não existe; Agenda seguirá sem eventos próprios.
+ok
+test_sem_identidade_agenda_responde_200_sem_eventos_proprios (tests.test_portfolio_api.TesteCalendario.test_sem_identidade_agenda_responde_200_sem_eventos_proprios) ... ok
+test_apaga_evento_proprio_e_devolve_204 (tests.test_portfolio_api.TesteEventoLocal.test_apaga_evento_proprio_e_devolve_204) ... ok
+test_apagar_evento_inexistente_ou_de_outra_pessoa_e_404 (tests.test_portfolio_api.TesteEventoLocal.test_apagar_evento_inexistente_ou_de_outra_pessoa_e_404) ... ok
+test_cria_evento_e_devolve_a_forma_esperada (tests.test_portfolio_api.TesteEventoLocal.test_cria_evento_e_devolve_a_forma_esperada) ... ok
+test_data_invalida_e_422 (tests.test_portfolio_api.TesteEventoLocal.test_data_invalida_e_422) ... ok
+test_hora_invalida_e_422 (tests.test_portfolio_api.TesteEventoLocal.test_hora_invalida_e_422) ... ok
+test_sem_identidade_e_422 (tests.test_portfolio_api.TesteEventoLocal.test_sem_identidade_e_422) ... ok
+test_sem_titulo_e_422 (tests.test_portfolio_api.TesteEventoLocal.test_sem_titulo_e_422) ... ok
+test_cobre_os_doze_meses_e_os_sete_dias (tests.test_portfolio_api.TesteFormatacaoDeData.test_cobre_os_doze_meses_e_os_sete_dias) ... ok
+test_dia_da_semana_em_portugues (tests.test_portfolio_api.TesteFormatacaoDeData.test_dia_da_semana_em_portugues) ... ok
+test_mes_em_portugues (tests.test_portfolio_api.TesteFormatacaoDeData.test_mes_em_portugues) ... ok
+test_campos_de_texto_nao_chegam_ao_banco (tests.test_portfolio_api.TestePatchDeTask.test_campos_de_texto_nao_chegam_ao_banco) ... ok
+test_devolve_a_linha_relida_e_nao_o_que_foi_enviado (tests.test_portfolio_api.TestePatchDeTask.test_devolve_a_linha_relida_e_nao_o_que_foi_enviado) ... ok
+test_done_false_grava_aberta (tests.test_portfolio_api.TestePatchDeTask.test_done_false_grava_aberta) ... ok
+test_done_true_grava_resolvida (tests.test_portfolio_api.TestePatchDeTask.test_done_true_grava_resolvida) ... ok
+test_pendencia_inexistente_e_404 (tests.test_portfolio_api.TestePatchDeTask.test_pendencia_inexistente_e_404) ... ok
+test_sem_done_nem_situacao_e_422 (tests.test_portfolio_api.TestePatchDeTask.test_sem_done_nem_situacao_e_422) ... ok
+test_situacao_explicita_vence_o_booleano (tests.test_portfolio_api.TestePatchDeTask.test_situacao_explicita_vence_o_booleano) ... ok
+test_situacao_fora_do_dominio_e_422 (tests.test_portfolio_api.TestePatchDeTask.test_situacao_fora_do_dominio_e_422) ... ok
+test_responde_503_e_nao_lista_vazia (tests.test_portfolio_api.TesteSemBanco.test_responde_503_e_nao_lista_vazia) ... ok
+test_as_chaves_sao_as_que_o_frontend_le (tests.test_portfolio_api.TesteTasks.test_as_chaves_sao_as_que_o_frontend_le) ... ok
+test_criticidade_colapsa_em_tres_prioridades (tests.test_portfolio_api.TesteTasks.test_criticidade_colapsa_em_tres_prioridades) ... ok
+test_criticidade_desconhecida_nao_derruba_a_rota (tests.test_portfolio_api.TesteTasks.test_criticidade_desconhecida_nao_derruba_a_rota) ... ok
+test_prazo_ausente_vira_string_vazia_e_nao_nulo (tests.test_portfolio_api.TesteTasks.test_prazo_ausente_vira_string_vazia_e_nao_nulo) ... ok
+test_projeto_traz_codigo_e_nome (tests.test_portfolio_api.TesteTasks.test_projeto_traz_codigo_e_nome) ... ok
+test_resolvida_vira_done (tests.test_portfolio_api.TesteTasks.test_resolvida_vira_done) ... ok
+test_as_duas_constantes_usadas_pertencem_ao_dominio (tests.test_portfolio_repository.TesteDominioBateComODdl.test_as_duas_constantes_usadas_pertencem_ao_dominio) ... ok
+test_situacoes_validas_espelham_o_check (tests.test_portfolio_repository.TesteDominioBateComODdl.test_situacoes_validas_espelham_o_check) ... ok
+test_o_update_toca_apenas_situacao (tests.test_portfolio_repository.TesteEscritaEhMinima.test_o_update_toca_apenas_situacao) ... ok
+test_pendencia_inexistente_devolve_none (tests.test_portfolio_repository.TesteEscritaEhMinima.test_pendencia_inexistente_devolve_none) ... ok
+test_situacao_fora_do_dominio_nao_chega_ao_banco (tests.test_portfolio_repository.TesteEscritaEhMinima.test_situacao_fora_do_dominio_nao_chega_ao_banco) ... ok
+test_a_ordem_do_select_acompanha_a_da_view (tests.test_portfolio_repository.TesteLeituraUsaAView.test_a_ordem_do_select_acompanha_a_da_view)
+O acoplamento que não avisa quando quebra. ... ok
+test_a_tabela_portfolio_nao_existe_mais (tests.test_portfolio_repository.TesteLeituraUsaAView.test_a_tabela_portfolio_nao_existe_mais)
+Removida em 09_remove_portfolio.sql: nada pode voltar a referenciá-la. ... ok
+test_a_view_existe_no_ddl (tests.test_portfolio_repository.TesteLeituraUsaAView.test_a_view_existe_no_ddl) ... ok
+test_o_mapeamento_posicional_poe_cada_valor_no_seu_campo (tests.test_portfolio_repository.TesteLeituraUsaAView.test_o_mapeamento_posicional_poe_cada_valor_no_seu_campo)
+Valores distinguíveis, na ordem da view, conferidos um a um. ... ok
+test_projetos_leem_a_view_e_nao_uma_juncao_propria (tests.test_portfolio_repository.TesteLeituraUsaAView.test_projetos_leem_a_view_e_nao_uma_juncao_propria) ... ok
+test_projetos_saem_do_mais_atrasado_para_o_menos (tests.test_portfolio_repository.TesteLeituraUsaAView.test_projetos_saem_do_mais_atrasado_para_o_menos) ... ok
+test_toda_criticidade_semeada_tem_prioridade (tests.test_portfolio_repository.TesteMapaDePrioridadeCobreASeed.test_toda_criticidade_semeada_tem_prioridade) ... ok
+test_minusculas (tests.test_preprocessamento.TesteEtapasIsoladas.test_minusculas) ... ok
+test_nenhuma_etapa_preserva_o_texto (tests.test_preprocessamento.TesteEtapasIsoladas.test_nenhuma_etapa_preserva_o_texto) ... ok
+test_radical_e_deterministico (tests.test_preprocessamento.TesteEtapasIsoladas.test_radical_e_deterministico) ... ok
+test_remover_acentos (tests.test_preprocessamento.TesteEtapasIsoladas.test_remover_acentos) ... ok
+test_remover_numeros (tests.test_preprocessamento.TesteEtapasIsoladas.test_remover_numeros) ... ok
+test_remover_pontuacao_vira_espaco (tests.test_preprocessamento.TesteEtapasIsoladas.test_remover_pontuacao_vira_espaco) ... ok
+test_config_e_hasheavel (tests.test_preprocessamento.TesteInvariantes.test_config_e_hasheavel) ... ok
+test_descricao_mostra_ordem_e_modo (tests.test_preprocessamento.TesteInvariantes.test_descricao_mostra_ordem_e_modo) ... ok
+test_funcao_e_deterministica (tests.test_preprocessamento.TesteInvariantes.test_funcao_e_deterministica) ... ok
+test_sem_espaco_duplicado_com_tudo_ligado (tests.test_preprocessamento.TesteInvariantes.test_sem_espaco_duplicado_com_tudo_ligado) ... ok
+test_manter_nao_remove_nada (tests.test_preprocessamento.TesteModosDeStopwords.test_manter_nao_remove_nada) ... ok
+test_negacao_sobrevive_tambem_sem_acento (tests.test_preprocessamento.TesteModosDeStopwords.test_negacao_sobrevive_tambem_sem_acento) ... ok
+test_os_tres_modos_produzem_saidas_distintas (tests.test_preprocessamento.TesteModosDeStopwords.test_os_tres_modos_produzem_saidas_distintas) ... ok
+test_preservar_negacoes_cobre_as_principais (tests.test_preprocessamento.TesteModosDeStopwords.test_preservar_negacoes_cobre_as_principais) ... ok
+test_preservar_negacoes_mantem_a_negacao (tests.test_preprocessamento.TesteModosDeStopwords.test_preservar_negacoes_mantem_a_negacao) ... ok
+test_remover_tudo_apaga_a_negacao (tests.test_preprocessamento.TesteModosDeStopwords.test_remover_tudo_apaga_a_negacao) ... ok
+test_todas_as_negacoes_declaradas_sao_preservadas (tests.test_preprocessamento.TesteModosDeStopwords.test_todas_as_negacoes_declaradas_sao_preservadas) ... ok
+test_lematizacao_depende_do_contexto (tests.test_preprocessamento.TesteMorfologia.test_lematizacao_depende_do_contexto) ... ok
+test_lematizacao_devolve_palavra_real_e_stemming_nao (tests.test_preprocessamento.TesteMorfologia.test_lematizacao_devolve_palavra_real_e_stemming_nao) ... ok
+test_lematizacao_normaliza_flexoes_em_frase (tests.test_preprocessamento.TesteMorfologia.test_lematizacao_normaliza_flexoes_em_frase) ... ok
+test_morfologia_e_exclusiva_por_construcao (tests.test_preprocessamento.TesteMorfologia.test_morfologia_e_exclusiva_por_construcao) ... ok
+test_nenhuma_nao_altera_o_texto (tests.test_preprocessamento.TesteMorfologia.test_nenhuma_nao_altera_o_texto) ... ok
+test_os_tres_modos_produzem_saidas_distintas (tests.test_preprocessamento.TesteMorfologia.test_os_tres_modos_produzem_saidas_distintas) ... ok
+test_stemming_converge_formas_verbais (tests.test_preprocessamento.TesteMorfologia.test_stemming_converge_formas_verbais) ... ok
+test_etapas_ativas_respeitam_a_ordem_configurada (tests.test_preprocessamento.TesteOrdem.test_etapas_ativas_respeitam_a_ordem_configurada) ... ok
+test_ordem_altera_o_resultado (tests.test_preprocessamento.TesteOrdem.test_ordem_altera_o_resultado) ... ok
+test_ordem_invalida_e_rejeitada (tests.test_preprocessamento.TesteOrdem.test_ordem_invalida_e_rejeitada) ... ok
+test_ordem_padrao_e_a_declarada_em_etapas (tests.test_preprocessamento.TesteOrdem.test_ordem_padrao_e_a_declarada_em_etapas) ... ok
+test_as_tres_estrategias_diferem (tests.test_preprocessamento.TesteTokenizacao.test_as_tres_estrategias_diferem) ... ok
+test_linguistico_preserva_numero_e_abreviatura (tests.test_preprocessamento.TesteTokenizacao.test_linguistico_preserva_numero_e_abreviatura) ... ok
+test_regex_fragmenta_o_que_o_linguistico_mantem (tests.test_preprocessamento.TesteTokenizacao.test_regex_fragmenta_o_que_o_linguistico_mantem) ... ok
+test_regex_separa_pontuacao (tests.test_preprocessamento.TesteTokenizacao.test_regex_separa_pontuacao) ... ok
+test_split_nao_separa_pontuacao_grudada (tests.test_preprocessamento.TesteTokenizacao.test_split_nao_separa_pontuacao_grudada) ... ok
+test_tokenizacao_altera_o_resultado_do_preprocessamento (tests.test_preprocessamento.TesteTokenizacao.test_tokenizacao_altera_o_resultado_do_preprocessamento) ... ok
+test_devolve_os_resultados_com_as_fontes (tests.test_rag_api.TesteBuscaRag.test_devolve_os_resultados_com_as_fontes) ... ok
+test_exige_a_query (tests.test_rag_api.TesteBuscaRag.test_exige_a_query) ... ok
+test_recusa_n_resultados_fora_da_faixa (tests.test_rag_api.TesteBuscaRag.test_recusa_n_resultados_fora_da_faixa) ... ok
+test_repassa_os_filtros_para_a_busca (tests.test_rag_api.TesteBuscaRag.test_repassa_os_filtros_para_a_busca) ... ok
+test_sem_resultados_devolve_lista_vazia_e_nao_erro (tests.test_rag_api.TesteBuscaRag.test_sem_resultados_devolve_lista_vazia_e_nao_erro) ... ok
+test_health_nao_toca_o_banco (tests.test_rag_api.TesteSaude.test_health_nao_toca_o_banco) ... ok
+test_ready_responde_200_com_banco_utilizavel (tests.test_rag_api.TesteSaude.test_ready_responde_200_com_banco_utilizavel) ... ok
+test_ready_responde_503_quando_a_conexao_falha (tests.test_rag_api.TesteSaude.test_ready_responde_503_quando_a_conexao_falha) ... ok
+test_ready_responde_503_sem_configuracao (tests.test_rag_api.TesteSaude.test_ready_responde_503_sem_configuracao) ... ok
+test_consulta_repetida_nao_chama_a_api_de_novo (tests.test_rag_embedder.TesteCacheDeConsultas.test_consulta_repetida_nao_chama_a_api_de_novo) ... ok
+test_consultas_distintas_chamam_a_api (tests.test_rag_embedder.TesteCacheDeConsultas.test_consultas_distintas_chamam_a_api) ... ok
+test_devolve_lista_nova_a_cada_chamada (tests.test_rag_embedder.TesteCacheDeConsultas.test_devolve_lista_nova_a_cada_chamada) ... ok
+test_documento_e_consulta_usam_tarefas_diferentes (tests.test_rag_embedder.TesteChamadaAApi.test_documento_e_consulta_usam_tarefas_diferentes) ... ok
+test_lista_vazia_nao_chama_a_api (tests.test_rag_embedder.TesteChamadaAApi.test_lista_vazia_nao_chama_a_api) ... ok
+test_normaliza_o_que_a_api_devolve (tests.test_rag_embedder.TesteChamadaAApi.test_normaliza_o_que_a_api_devolve) ... ok
+test_pede_a_dimensao_truncada_e_um_timeout (tests.test_rag_embedder.TesteChamadaAApi.test_pede_a_dimensao_truncada_e_um_timeout) ... ok
+test_quebra_em_lotes (tests.test_rag_embedder.TesteChamadaAApi.test_quebra_em_lotes) ... ok
+test_cabe_no_limite_de_indice_do_pgvector (tests.test_rag_embedder.TesteDimensao.test_cabe_no_limite_de_indice_do_pgvector) ... ok
+test_indexador_usa_a_mesma_constante_do_embedder (tests.test_rag_embedder.TesteDimensao.test_indexador_usa_a_mesma_constante_do_embedder) ... ok
+test_a_fila_avanca_um_intervalo_por_chamada (tests.test_rag_embedder.TesteLimitadorDeRequisicoes.test_a_fila_avanca_um_intervalo_por_chamada) ... ok
+test_chamadas_sequenciais_recebem_vagas_espacadas (tests.test_rag_embedder.TesteLimitadorDeRequisicoes.test_chamadas_sequenciais_recebem_vagas_espacadas) ... ok
+test_threads_concorrentes_nao_disputam_a_mesma_vaga (tests.test_rag_embedder.TesteLimitadorDeRequisicoes.test_threads_concorrentes_nao_disputam_a_mesma_vaga) ... ok
+test_preserva_a_direcao (tests.test_rag_embedder.TesteNormalizacao.test_preserva_a_direcao) ... ok
+test_resultado_tem_norma_unitaria (tests.test_rag_embedder.TesteNormalizacao.test_resultado_tem_norma_unitaria) ... ok
+test_vetor_nulo_nao_divide_por_zero (tests.test_rag_embedder.TesteNormalizacao.test_vetor_nulo_nao_divide_por_zero) ... ok
+test_indexador_nao_declara_a_propria_dimensao (tests.test_rag_indexador.TesteDimensaoVemDeUmaFonteSo.test_indexador_nao_declara_a_propria_dimensao)
+A dimensão é importada do `embedder`, não redeclarada. ... ok
+test_db_url_aplica_o_driver_ao_valor_do_ambiente (tests.test_rag_indexador.TesteDriverDoClienteVetorial.test_db_url_aplica_o_driver_ao_valor_do_ambiente) ... ok
+test_db_url_sem_variavel_continua_explicando_o_que_falta (tests.test_rag_indexador.TesteDriverDoClienteVetorial.test_db_url_sem_variavel_continua_explicando_o_que_falta) ... ok
+test_driver_explicito_de_outra_pessoa_e_respeitado (tests.test_rag_indexador.TesteDriverDoClienteVetorial.test_driver_explicito_de_outra_pessoa_e_respeitado) ... ok
+test_dsn_do_supabase_recebe_o_psycopg2 (tests.test_rag_indexador.TesteDriverDoClienteVetorial.test_dsn_do_supabase_recebe_o_psycopg2) ... ok
+test_dsn_que_ja_traz_o_driver_passa_intacto (tests.test_rag_indexador.TesteDriverDoClienteVetorial.test_dsn_que_ja_traz_o_driver_passa_intacto) ... ok
+test_esquema_desconhecido_nao_e_remendado (tests.test_rag_indexador.TesteDriverDoClienteVetorial.test_esquema_desconhecido_nao_e_remendado) ... ok
+test_forma_antiga_postgres_tambem_e_convertida (tests.test_rag_indexador.TesteDriverDoClienteVetorial.test_forma_antiga_postgres_tambem_e_convertida) ... ok
+test_devolve_textoextraido (tests.test_rag_parsers.TesteDespacho.test_devolve_textoextraido) ... ok
+test_extensao_desconhecida_devolve_vazio_em_vez_de_erro (tests.test_rag_parsers.TesteDespacho.test_extensao_desconhecida_devolve_vazio_em_vez_de_erro) ... ok
+test_extensao_em_maiuscula_e_aceita (tests.test_rag_parsers.TesteDespacho.test_extensao_em_maiuscula_e_aceita) ... ok
+test_metadados_acompanham_cada_trecho (tests.test_rag_parsers.TesteExtracaoDeDocx.test_metadados_acompanham_cada_trecho) ... ok
+test_o_titulo_nao_vira_conteudo (tests.test_rag_parsers.TesteExtracaoDeDocx.test_o_titulo_nao_vira_conteudo) ... ok
+test_paragrafo_vazio_e_descartado (tests.test_rag_parsers.TesteExtracaoDeDocx.test_paragrafo_vazio_e_descartado) ... ok
+test_titulo_vira_secao_dos_paragrafos_seguintes (tests.test_rag_parsers.TesteExtracaoDeDocx.test_titulo_vira_secao_dos_paragrafos_seguintes) ... ok
+test_cabecalho_e_a_primeira_linha_com_duas_celulas (tests.test_rag_parsers.TesteExtracaoDeXlsx.test_cabecalho_e_a_primeira_linha_com_duas_celulas) ... ok
+test_cabecalho_rotula_cada_celula (tests.test_rag_parsers.TesteExtracaoDeXlsx.test_cabecalho_rotula_cada_celula) ... ok
+test_celula_vazia_nao_vira_rotulo_solto (tests.test_rag_parsers.TesteExtracaoDeXlsx.test_celula_vazia_nao_vira_rotulo_solto) ... ok
+test_linha_curta_demais_e_descartada (tests.test_rag_parsers.TesteExtracaoDeXlsx.test_linha_curta_demais_e_descartada) ... ok
+test_codigo_precisa_estar_no_inicio (tests.test_rag_parsers.TesteIdentificacaoDoProjeto.test_codigo_precisa_estar_no_inicio) ... ok
+test_le_o_codigo_da_pasta (tests.test_rag_parsers.TesteIdentificacaoDoProjeto.test_le_o_codigo_da_pasta) ... ok
+test_pasta_sem_codigo_vira_portfolio (tests.test_rag_parsers.TesteIdentificacaoDoProjeto.test_pasta_sem_codigo_vira_portfolio) ... ok
+test_guarda_o_nome_e_nao_o_caminho (tests.test_rag_parsers.TesteOrigemDoArquivo.test_guarda_o_nome_e_nao_o_caminho) ... ok
+test_nao_vaza_a_arvore_de_diretorios (tests.test_rag_parsers.TesteOrigemDoArquivo.test_nao_vaza_a_arvore_de_diretorios) ... ok
+test_o_extrator_usa_o_nome (tests.test_rag_parsers.TesteOrigemDoArquivo.test_o_extrator_usa_o_nome) ... ok
+test_fora_da_convencao_vira_desconhecido (tests.test_rag_parsers.TesteTipoDeDocumento.test_fora_da_convencao_vira_desconhecido) ... ok
+test_portfolio_pelo_nome (tests.test_rag_parsers.TesteTipoDeDocumento.test_portfolio_pelo_nome) ... ok
+test_tipos_pelo_prefixo_numerico (tests.test_rag_parsers.TesteTipoDeDocumento.test_tipos_pelo_prefixo_numerico) ... ok
+test_criterio_vazio_conta_como_ausente (tests.test_rag_retriever.TesteMontagemDoFiltro.test_criterio_vazio_conta_como_ausente) ... ok
+test_dois_criterios_exigem_and (tests.test_rag_retriever.TesteMontagemDoFiltro.test_dois_criterios_exigem_and) ... ok
+test_sem_criterio_nao_envia_filtro (tests.test_rag_retriever.TesteMontagemDoFiltro.test_sem_criterio_nao_envia_filtro) ... ok
+test_um_criterio_vai_sozinho (tests.test_rag_retriever.TesteMontagemDoFiltro.test_um_criterio_vai_sozinho) ... ok
+test_converte_distancia_de_cosseno_em_score (tests.test_rag_retriever.TesteRepasseDoChunkId.test_converte_distancia_de_cosseno_em_score) ... ok
+test_metadado_ausente_vira_string_vazia_e_nao_erro (tests.test_rag_retriever.TesteRepasseDoChunkId.test_metadado_ausente_vira_string_vazia_e_nao_erro) ... ok
+test_o_id_do_chunk_chega_ao_resultado (tests.test_rag_retriever.TesteRepasseDoChunkId.test_o_id_do_chunk_chega_ao_resultado) ... ok
+test_repassa_n_resultados (tests.test_rag_retriever.TesteVetorizacaoDaConsulta.test_repassa_n_resultados) ... ok
+test_usa_a_funcao_de_consulta_e_nao_a_de_documento (tests.test_rag_retriever.TesteVetorizacaoDaConsulta.test_usa_a_funcao_de_consulta_e_nao_a_de_documento) ... ok
+test_versoes_instaladas_sao_as_fixadas (tests.test_reprodutibilidade.TesteAmbienteInstaladoBateComOsPins.test_versoes_instaladas_sao_as_fixadas) ... ok
+test_documentacao_nao_promete_mais_testes_do_que_existem (tests.test_reprodutibilidade.TesteContagemDocumentada.test_documentacao_nao_promete_mais_testes_do_que_existem) ... ok
+test_documentacao_declara_as_versoes_realmente_fixadas (tests.test_reprodutibilidade.TesteVersoesFixadas.test_documentacao_declara_as_versoes_realmente_fixadas) ... ok
+test_pyproject_fixa_os_pacotes_da_metrica (tests.test_reprodutibilidade.TesteVersoesFixadas.test_pyproject_fixa_os_pacotes_da_metrica) ... ok
+test_requirements_e_pyproject_concordam (tests.test_reprodutibilidade.TesteVersoesFixadas.test_requirements_e_pyproject_concordam) ... ok
+test_requirements_fixa_os_pacotes_da_metrica (tests.test_reprodutibilidade.TesteVersoesFixadas.test_requirements_fixa_os_pacotes_da_metrica) ... ok
+test_filtro_que_acha_material_relevante_prevalece (tests.test_retriever_recuo.TesteBuscaComRecuo.test_filtro_que_acha_material_relevante_prevalece) ... ok
+test_filtro_que_nao_sustenta_nada_recua_para_busca_ampla (tests.test_retriever_recuo.TesteBuscaComRecuo.test_filtro_que_nao_sustenta_nada_recua_para_busca_ampla)
+O caso do rótulo errado: filtra no documento errado e não acha nada. ... ok
+test_o_corte_e_por_score_e_nao_por_quantidade (tests.test_retriever_recuo.TesteBuscaComRecuo.test_o_corte_e_por_score_e_nao_por_quantidade)
+Cinco trechos irrelevantes não são melhores que nenhum. ... ok
+test_o_recuo_devolve_o_resultado_amplo_e_nao_o_focado (tests.test_retriever_recuo.TesteBuscaComRecuo.test_o_recuo_devolve_o_resultado_amplo_e_nao_o_focado) ... ok
+test_sem_filtro_nenhum_busca_uma_vez_so (tests.test_retriever_recuo.TesteBuscaComRecuo.test_sem_filtro_nenhum_busca_uma_vez_so)
+O caminho de quem não tem classificação não paga nada a mais. ... ok
+test_mapeia_erros_controlados (tests.test_speech_api.TestSpeechAPI.test_mapeia_erros_controlados) ... ok
+test_rejeita_voz_ou_formato_nao_suportado (tests.test_speech_api.TestSpeechAPI.test_rejeita_voz_ou_formato_nao_suportado) ... ok
+test_retorna_audio_wav_com_sucesso (tests.test_speech_api.TestSpeechAPI.test_retorna_audio_wav_com_sucesso) ... ok
+test_converte_falha_do_provedor_em_erro_controlado (tests.test_speech_service.TestGenerateSpeech.test_converte_falha_do_provedor_em_erro_controlado) ... ok
+test_gera_wav_a_partir_do_pcm (tests.test_speech_service.TestGenerateSpeech.test_gera_wav_a_partir_do_pcm) ... ok
+test_rejeita_resposta_de_audio_vazia (tests.test_speech_service.TestGenerateSpeech.test_rejeita_resposta_de_audio_vazia) ... ok
+test_rejeita_texto_muito_longo (tests.test_speech_service.TestGenerateSpeech.test_rejeita_texto_muito_longo) ... ok
+test_rejeita_texto_vazio_sem_chamar_modelo (tests.test_speech_service.TestGenerateSpeech.test_rejeita_texto_vazio_sem_chamar_modelo) ... ok
+test_envia_objeto_com_contrato_esperado (tests.test_storage_service.TestS3ObjectStorage.test_envia_objeto_com_contrato_esperado) ... ok
+test_oculta_detalhes_de_erro_inesperado (tests.test_transcription_api.TestTranscriptionAPI.test_oculta_detalhes_de_erro_inesperado) ... ok
+test_rejeita_idioma_nao_suportado (tests.test_transcription_api.TestTranscriptionAPI.test_rejeita_idioma_nao_suportado) ... ok
+test_retorna_404_quando_audio_nao_encontrado (tests.test_transcription_api.TestTranscriptionAPI.test_retorna_404_quando_audio_nao_encontrado) ... ok
+test_retorna_502_quando_deepgram_falha (tests.test_transcription_api.TestTranscriptionAPI.test_retorna_502_quando_deepgram_falha) ... ok
+test_retorna_transcricao_com_sucesso (tests.test_transcription_api.TestTranscriptionAPI.test_retorna_transcricao_com_sucesso) ... ok
+test_busca_audio_com_chave_correta (tests.test_transcription_service.TestTranscribeAudio.test_busca_audio_com_chave_correta) ... ok
+test_levanta_audio_not_found_quando_fetcher_falha (tests.test_transcription_service.TestTranscribeAudio.test_levanta_audio_not_found_quando_fetcher_falha) ... ok
+test_levanta_transcription_failed_quando_deepgram_falha (tests.test_transcription_service.TestTranscribeAudio.test_levanta_transcription_failed_quando_deepgram_falha) ... ok
+test_repassa_language_para_o_resultado (tests.test_transcription_service.TestTranscribeAudio.test_repassa_language_para_o_resultado) ... ok
+test_retorna_transcricao_com_sucesso (tests.test_transcription_service.TestTranscribeAudio.test_retorna_transcricao_com_sucesso) ... ok
+test_cria_usuario_novo_quando_nao_encontra_nenhuma_correspondencia (tests.test_usuario_service.TestResolveOrCreateUsuario.test_cria_usuario_novo_quando_nao_encontra_nenhuma_correspondencia) ... ok
+test_encontra_por_auth_user_id_sem_escrever_no_banco (tests.test_usuario_service.TestResolveOrCreateUsuario.test_encontra_por_auth_user_id_sem_escrever_no_banco) ... ok
+test_encontra_por_email_e_liga_o_auth_user_id (tests.test_usuario_service.TestResolveOrCreateUsuario.test_encontra_por_email_e_liga_o_auth_user_id) ... ok
+test_usa_email_como_nome_quando_nome_vem_vazio (tests.test_usuario_service.TestResolveOrCreateUsuario.test_usa_email_como_nome_quando_nome_vem_vazio) ... ok
+test_baixa_indexa_e_avanca_o_token (tests.test_varredura_indexacao.TesteVarreduraComIndexacao.test_baixa_indexa_e_avanca_o_token) ... ok
+test_escopo_ignora_fora_da_pasta_do_pmo (tests.test_varredura_indexacao.TesteVarreduraComIndexacao.test_escopo_ignora_fora_da_pasta_do_pmo) ... ok
+test_escopo_indexa_sob_a_pasta_do_pmo (tests.test_varredura_indexacao.TesteVarreduraComIndexacao.test_escopo_indexa_sob_a_pasta_do_pmo) ... ok
+test_origem_inexistente_nao_baixa_nada (tests.test_varredura_indexacao.TesteVarreduraComIndexacao.test_origem_inexistente_nao_baixa_nada) ... ok
+test_pasta_sem_syn_cai_para_portfolio (tests.test_varredura_indexacao.TesteVarreduraComIndexacao.test_pasta_sem_syn_cai_para_portfolio) ... ok
+test_pula_removido_e_tipo_nao_indexavel (tests.test_varredura_indexacao.TesteVarreduraComIndexacao.test_pula_removido_e_tipo_nao_indexavel) ... ok
+test_cada_modo_entra_uma_vez_por_janela (tests.test_vetorizacao.TesteEspacoDeVetorizacao.test_cada_modo_entra_uma_vez_por_janela) ... ok
+test_descricao_curta (tests.test_vetorizacao.TesteEspacoDeVetorizacao.test_descricao_curta) ... ok
+test_sem_duplicatas (tests.test_vetorizacao.TesteEspacoDeVetorizacao.test_sem_duplicatas) ... ok
+test_tfidf_unigrama_esta_no_espaco (tests.test_vetorizacao.TesteEspacoDeVetorizacao.test_tfidf_unigrama_esta_no_espaco) ... ok
+test_todo_modo_aparece (tests.test_vetorizacao.TesteEspacoDeVetorizacao.test_todo_modo_aparece) ... ok
+test_bigrama_aumenta_o_vocabulario (tests.test_vetorizacao.TesteModosEJanelas.test_bigrama_aumenta_o_vocabulario) ... ok
+test_bow_conta_e_tfidf_pondera (tests.test_vetorizacao.TesteModosEJanelas.test_bow_conta_e_tfidf_pondera) ... ok
+test_bow_e_tfidf_usam_classes_diferentes (tests.test_vetorizacao.TesteModosEJanelas.test_bow_e_tfidf_usam_classes_diferentes) ... ok
+test_maiuscula_e_minuscula_ficam_distintas (tests.test_vetorizacao.TesteNaoRetokeniza.test_maiuscula_e_minuscula_ficam_distintas) ... ok
+test_padroes_do_sklearn_estao_desligados (tests.test_vetorizacao.TesteNaoRetokeniza.test_padroes_do_sklearn_estao_desligados) ... ok
+test_pontuacao_sobrevive_como_token (tests.test_vetorizacao.TesteNaoRetokeniza.test_pontuacao_sobrevive_como_token) ... ok
+test_token_de_uma_letra_nao_e_descartado (tests.test_vetorizacao.TesteNaoRetokeniza.test_token_de_uma_letra_nao_e_descartado) ... ok
+test_classificador_e_deterministico (tests.test_vetorizacao.TestePipeline.test_classificador_e_deterministico) ... ok
+test_pipeline_tem_vetorizador_e_classificador (tests.test_vetorizacao.TestePipeline.test_pipeline_tem_vetorizador_e_classificador) ... ok
+test_pipeline_treina_e_prediz (tests.test_vetorizacao.TestePipeline.test_pipeline_treina_e_prediz) ... ok
+test_a_regua_e_a_mesma_em_todo_o_espaco_de_busca (tests.test_vetorizacao.TesteReguaUnica.test_a_regua_e_a_mesma_em_todo_o_espaco_de_busca) ... ok
+test_toda_vetorizacao_do_espaco_alimenta_a_regua (tests.test_vetorizacao.TesteReguaUnica.test_toda_vetorizacao_do_espaco_alimenta_a_regua) ... ok
+test_processa_uma_fala_na_mesma_conexao (tests.test_voice_api.TestVoiceCallAPI.test_processa_uma_fala_na_mesma_conexao) ... ok
+test_canal_ativo_nao_dispara_watch_nem_compensacao (tests.test_webhook_cli.TestAberturaDrive.test_canal_ativo_nao_dispara_watch_nem_compensacao) ... ok
+test_falha_watch_desativa_apenas_a_reserva_nova (tests.test_webhook_cli.TestAberturaDrive.test_falha_watch_desativa_apenas_a_reserva_nova) ... ok
+test_lista_todas_as_variaveis_ausentes_de_uma_vez (tests.test_webhook_cli.TestConfigGraph.test_lista_todas_as_variaveis_ausentes_de_uma_vez) ... ok
+test_monta_a_url_de_notificacao_sem_barra_dobrada (tests.test_webhook_cli.TestConfigGraph.test_monta_a_url_de_notificacao_sem_barra_dobrada) ... ok
+test_recurso_de_producao_e_so_uma_variavel (tests.test_webhook_cli.TestConfigGraph.test_recurso_de_producao_e_so_uma_variavel) ... ok
+test_recurso_e_tenant_tem_padrao_de_desenvolvimento (tests.test_webhook_cli.TestConfigGraph.test_recurso_e_tenant_tem_padrao_de_desenvolvimento) ... ok
+test_recusa_url_sem_https (tests.test_webhook_cli.TestConfigGraph.test_recusa_url_sem_https) ... ok
+test_corpo_nao_json_nao_quebra (tests.test_webhook_cli.TestErroHTTP.test_corpo_nao_json_nao_quebra) ... ok
+test_expoe_o_codigo_do_provedor (tests.test_webhook_cli.TestErroHTTP.test_expoe_o_codigo_do_provedor) ... ok
+test_duplicata_devolve_uma_vez_mesmo_com_commit_falhando (tests.test_webhook_registry_service.TestCicloConexao.test_duplicata_devolve_uma_vez_mesmo_com_commit_falhando) ... ok
+test_falha_insert_devolve_conexao_e_desfaz_transacao (tests.test_webhook_registry_service.TestCicloConexao.test_falha_insert_devolve_conexao_e_desfaz_transacao) ... ok
+test_falha_rollback_descarta_conexao (tests.test_webhook_registry_service.TestCicloConexao.test_falha_rollback_descarta_conexao) ... ok
+test_falha_select_devolve_conexao (tests.test_webhook_registry_service.TestCicloConexao.test_falha_select_devolve_conexao) ... ok
+test_reivindicacao_mantem_conexao_ate_concluir (tests.test_webhook_registry_service.TestCicloConexao.test_reivindicacao_mantem_conexao_ate_concluir) ... ok
+test_cli_e_receptor_selecionam_a_mesma_base (tests.test_webhook_registry_service.TestConfiguracaoWebhook.test_cli_e_receptor_selecionam_a_mesma_base) ... ok
+test_pool_separado_restrito_mesmo_sem_database_url (tests.test_webhook_registry_service.TestConfiguracaoWebhook.test_pool_separado_restrito_mesmo_sem_database_url) ... ok
+
+======================================================================
+ERROR: test_feedback_autorizado_continua_permitido (tests.test_integracao_persistencia.TestPermissoesDaAuditoria.test_feedback_autorizado_continua_permitido)
+O contraste que dá sentido ao caso acima.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_integracao_persistencia.py", line 615, in test_feedback_autorizado_continua_permitido
+    conexao.execute(
+  File "/app/.venv/lib/python3.12/site-packages/psycopg/connection.py", line 304, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.InsufficientPrivilege: new row violates row-level security policy for table "avaliacao"
+
+----------------------------------------------------------------------
+Ran 796 tests in 79.052s
+
+FAILED (errors=1, skipped=10)

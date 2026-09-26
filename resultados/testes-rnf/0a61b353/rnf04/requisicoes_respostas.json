@@ -1,0 +1,466 @@
+[
+  {
+    "id": "RNF04-T01",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "O projeto possui o marco controlado 1.",
+      "fontes": [
+        {
+          "posicao": 1,
+          "projeto_id": "SYN-01",
+          "tipo_documento": "cronograma",
+          "arquivo_origem": "02_Cronograma_SYN-01.xlsx",
+          "secao": "Marcos",
+          "score": 0.89,
+          "chunk_id": "rnf04-syn-01-01",
+          "trecho": "Trecho controlado 1 do projeto SYN-01."
+        }
+      ]
+    }
+  },
+  {
+    "id": "RNF04-T02",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "O projeto possui o marco controlado 2.",
+      "fontes": [
+        {
+          "posicao": 1,
+          "projeto_id": "SYN-01",
+          "tipo_documento": "cronograma",
+          "arquivo_origem": "02_Cronograma_SYN-01.xlsx",
+          "secao": "Marcos",
+          "score": 0.88,
+          "chunk_id": "rnf04-syn-01-02",
+          "trecho": "Trecho controlado 2 do projeto SYN-01."
+        }
+      ]
+    }
+  },
+  {
+    "id": "RNF04-T03",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "Não há pendências abertas no conjunto controlado.",
+      "fontes": []
+    }
+  },
+  {
+    "id": "RNF04-T04",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "Informe qual seção do TAP deseja consultar.",
+      "fontes": []
+    }
+  },
+  {
+    "id": "RNF04-T05",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "A solicitação está fora do catálogo do portfólio.",
+      "fontes": []
+    }
+  },
+  {
+    "id": "RNF04-T06",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "O projeto possui o marco controlado 6.",
+      "fontes": [
+        {
+          "posicao": 1,
+          "projeto_id": "SYN-01",
+          "tipo_documento": "cronograma",
+          "arquivo_origem": "02_Cronograma_SYN-01.xlsx",
+          "secao": "Marcos",
+          "score": 0.8400000000000001,
+          "chunk_id": "rnf04-syn-01-06",
+          "trecho": "Trecho controlado 6 do projeto SYN-01."
+        }
+      ]
+    }
+  },
+  {
+    "id": "RNF04-T07",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "O projeto possui o marco controlado 7.",
+      "fontes": [
+        {
+          "posicao": 1,
+          "projeto_id": "SYN-01",
+          "tipo_documento": "cronograma",
+          "arquivo_origem": "02_Cronograma_SYN-01.xlsx",
+          "secao": "Marcos",
+          "score": 0.8300000000000001,
+          "chunk_id": "rnf04-syn-01-07",
+          "trecho": "Trecho controlado 7 do projeto SYN-01."
+        }
+      ]
+    }
+  },
+  {
+    "id": "RNF04-T08",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "Não há pendências abertas no conjunto controlado.",
+      "fontes": []
+    }
+  },
+  {
+    "id": "RNF04-T09",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "Informe qual seção do TAP deseja consultar.",
+      "fontes": []
+    }
+  },
+  {
+    "id": "RNF04-T10",
+    "canal": "texto",
+    "transporte": "HTTP POST /api/v1/chat",
+    "status": 200,
+    "resposta": {
+      "reply": "A solicitação está fora do catálogo do portfólio.",
+      "fontes": []
+    }
+  },
+  {
+    "id": "RNF04-V01",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V01] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "O projeto possui o marco controlado 11 [1]."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 47
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V02",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V02] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "O projeto possui o marco controlado 12 [1]."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 47
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V03",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V03] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "Não há pendências abertas no conjunto controlado."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 56
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V04",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V04] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "Informe qual seção do TAP deseja consultar."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 49
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V05",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V05] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "A solicitação está fora do catálogo do portfólio."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 58
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V06",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V06] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "O projeto possui o marco controlado 16 [1]."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 47
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V07",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V07] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "O projeto possui o marco controlado 17 [1]."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 47
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V08",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V08] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "Não há pendências abertas no conjunto controlado."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 56
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V09",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V09] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "Informe qual seção do TAP deseja consultar."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 49
+      }
+    ]
+  },
+  {
+    "id": "RNF04-V10",
+    "canal": "voz",
+    "transporte": "WebSocket /api/v1/voice/call",
+    "status": 101,
+    "resposta": [
+      {
+        "type": "call_ready"
+      },
+      {
+        "type": "transcribing"
+      },
+      {
+        "type": "transcription_final",
+        "text": "[RNF04-V10] Solicitação sintética sobre o projeto SYN-01."
+      },
+      {
+        "type": "processing"
+      },
+      {
+        "type": "agent_response",
+        "text": "A solicitação está fora do catálogo do portfólio."
+      },
+      {
+        "type": "agent_audio",
+        "media_type": "audio/wav"
+      },
+      {
+        "audio_bytes": 58
+      }
+    ]
+  }
+]

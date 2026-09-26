@@ -45,10 +45,25 @@ psycopg[binary,pool]>=3.2
 # Dependências do pipeline RAG (src/rag)
 openpyxl>=3.1
 python-docx>=1.1
-vecs>=0.4
+# Teto, e não só piso, por incidente: a `vecs` emite `set local ivfflat.probes =
+# :probes` em toda busca, e `SET` não aceita parâmetro no PostgreSQL. Isso só
+# funciona com um driver que interpole do lado do cliente. Ver o comentário em
+# src/rag/indexador.py.
+vecs>=0.4,<0.5
+# Declarado de propósito, e não herdado da `vecs`: `src/rag/indexador.py` fixa
+# `postgresql+psycopg2://` no DSN do cliente vetorial, então este driver passou
+# a ser dependência direta nossa. Herdá-lo por transitividade deixaria a busca
+# do agente à mercê de uma mudança de árvore de dependências.
+psycopg2-binary>=2.9
 
 # Dependências dos webhooks de alerta e auditoria (src/database, src/services)
 httpx>=0.27
 # SQLAlchemy vinha só por transitividade do vecs, e src/database/conexao.py
 # depende dela diretamente. Dependência usada é dependência declarada.
-SQLAlchemy>=2.0
+SQLAlchemy>=2.0,<2.2
+
+# Barramento de mensagens assíncrono (src/mensageria, Sprint 5). Cliente AMQP
+# síncrono do produtor (receptor de webhook) e do consumidor (worker de
+# varredura). Fixado na versão instalada para reprodutibilidade, coerente com o
+# resto da stack pinada. Não influencia o F1-macro.
+pika==1.4.4

@@ -1,0 +1,21 @@
+{
+  "requisito": "RNF07",
+  "campanha": "0a61b353",
+  "status_execucao": "CONCLUIDA",
+  "resultado_global": "REPROVADO",
+  "inicio": "2026-09-25T21:12:39.761760-03:00",
+  "fim": "2026-09-25T22:12:41.080418-03:00",
+  "janela_planejada_minutos": 240,
+  "janela_executada_minutos": 60.0,
+  "evidencia_reduzida": true,
+  "intervalo_segundos": 60.0,
+  "amostras_planejadas_nesta_execucao": 60,
+  "verificacoes_realizadas": 60,
+  "verificacoes_elegiveis": 60,
+  "verificacoes_bem_sucedidas": 60,
+  "disponibilidade_percentual": 100.0,
+  "ct_rnf07_p": "APROVADO",
+  "ct_rnf07_n": "REPROVADO",
+  "criterio": ">=99% de GET /health HTTP 200 em ate 2 s; falhas controladas devem gerar 503, registro, alerta e recuperar para 200",
+  "ressalva": "A janela reduzida de uma hora nao comprova o criterio oficial de quatro horas e limita a conclusao a esta execucao academica."
+}

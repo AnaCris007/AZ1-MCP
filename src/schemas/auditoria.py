@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-AuditoriaErrorCode = Literal["internal_error"]
+AuditoriaErrorCode = Literal["forbidden", "internal_error"]
 
 
 class ConsultaLog(BaseModel):

@@ -1,0 +1,17 @@
+{
+  "rnf": "RNF02",
+  "resultado": "APROVADO",
+  "endpoints_protegidos": 19,
+  "tentativas_totais": 114,
+  "credencial_valida": {
+    "passou": 19,
+    "total": 19
+  },
+  "credenciais_invalidas": {
+    "passou": 95,
+    "total": 95
+  },
+  "falhas": 0,
+  "segredo_em_log": false,
+  "criterio": "100% válidas aceitas; 100% inválidas bloqueadas antes do negócio; nenhum segredo em log"
+}

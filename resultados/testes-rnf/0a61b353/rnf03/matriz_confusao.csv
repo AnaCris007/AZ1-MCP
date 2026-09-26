@@ -1,0 +1,11 @@
+real\prevista,analisar_completude_coerencia,consultar_documentos_normativos,consultar_projeto_sintetico,fora_do_catalogo,gerar_alertas_pendencias,orientar_avanco_mensal,orientar_entregas_cronograma,orientar_mapa_beneficios,orientar_riscos_problemas,orientar_tap
+analisar_completude_coerencia,9,0,0,9,1,0,1,0,0,0
+consultar_documentos_normativos,0,9,0,7,2,0,0,1,0,1
+consultar_projeto_sintetico,1,0,2,17,0,0,0,0,0,0
+fora_do_catalogo,0,0,1,17,1,0,1,0,0,0
+gerar_alertas_pendencias,1,0,1,6,8,1,1,0,1,1
+orientar_avanco_mensal,0,1,2,3,0,13,0,0,0,1
+orientar_entregas_cronograma,3,2,0,4,5,1,5,0,0,0
+orientar_mapa_beneficios,1,2,0,4,6,0,0,7,0,0
+orientar_riscos_problemas,1,1,0,4,3,1,0,0,10,0
+orientar_tap,1,0,0,1,0,0,0,0,0,18

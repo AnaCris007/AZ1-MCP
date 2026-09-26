@@ -1,0 +1,30 @@
+{
+  "rnf": "RNF10",
+  "resultado": "APROVADO",
+  "commit": "0a61b353829dee491537bb2863facbe589d48cc8",
+  "concorrencia": {
+    "resultado": "APROVADO",
+    "tentativas": 212691,
+    "B_p95_mediano_1x_s": 0.515,
+    "C_p95_mediano_10x_progressivo_s": 0.974555,
+    "P_p95_mediano_pico_s": 0.967597,
+    "razao_C_B": 1.8923398058252425,
+    "razao_P_B": 1.8788291262135923,
+    "respostas_completas": "212691/212691",
+    "carga_maxima_observada": "50/50"
+  },
+  "memoria": {
+    "resultado": "APROVADO",
+    "controlado_10x": {
+      "razao_treino": 1.0422445962120679,
+      "razao_servico_estabilizada": 1.0146386093321134,
+      "razao_servico_pico": 1.0142120625221638
+    },
+    "adverso_10x": {
+      "razao_treino": 1.0592597807974842,
+      "razao_servico_estabilizada": 1.0082657664763226,
+      "razao_servico_pico": 1.0085108704547314
+    }
+  }
+}
+

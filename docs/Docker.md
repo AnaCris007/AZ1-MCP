@@ -17,15 +17,15 @@ do código do repositório.
 |---|---|---|---|
 | `frontend` | `docker/frontend/Dockerfile` | Serve o bundle React e encaminha `/api` para a API. Única porta de entrada. | 8080 (prod) / 5173 (dev) |
 | `api` | `docker/api/Dockerfile` | FastAPI, pipeline de PLN, integração com Deepgram e Gemini. | 8000 |
-| `minio` | `minio/minio` (oficial) | Armazenamento de áudio compatível com S3. | 9000 / 9001 |
-| `minio-init` | `minio/mc` (oficial) | Cria o bucket e aplica a regra de expiração. Roda uma vez e sai. |: |
+| `minio` | `pgsty/minio` (build comunitária do MinIO) | Armazenamento de áudio compatível com S3. | 9000 / 9001 |
+| `minio-init` | `pgsty/mc` (build comunitária do mc) | Cria o bucket e aplica a regra de expiração. Roda uma vez e sai. |: |
 
 E dois contêineres sob demanda, controlados por `profiles`:
 
 | Contêiner | Perfil | Papel |
 |---|---|---|
 | `trainer` | `ml` | Retreina o classificador e roda as varreduras de experimento. |
-| `tests` | `ci` | Executa a suíte de testes dentro da imagem. |
+| `tests` | `ci` | Executa a suíte de testes dentro da imagem, com `requirements.txt`, `docs/` e `infra/` montados só para leitura. |
 
 ### Topologia
 
@@ -184,9 +184,11 @@ docker compose --profile ml run --rm trainer python -m pln.experimento
 # varredura de hiperparâmetros
 docker compose --profile ml run --rm trainer python -m pln.ajuste_fino
 
-# suíte completa (145 testes)
+# suíte completa (mais de 500 testes)
 docker compose --profile ci run --rm tests
 ```
+
+O serviço `tests` monta três caminhos do repositório em modo somente leitura: `requirements.txt`, `docs/` e `infra/`. A imagem carrega apenas o que a aplicação executa, e três suítes comparam o código com arquivos que ficam fora dele: as versões fixadas contra as instaladas, e a retenção declarada em `infra/minio/lifecycle.json` contra o mínimo do RNF09. Montar em vez de copiar mantém `docs/` fora da imagem e evita invalidar a camada a cada alteração de documentação.
 
 O valor de treinar em contêiner é a correspondência de ambiente: o modelo que
 vai a produção é gerado com as mesmas versões de `scikit-learn`, `nltk` e
@@ -315,23 +317,61 @@ contêiner em produção sem depender da memória de ninguém:
 docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' az1/api:0.2.0
 ```
 
+### Borda HTTPS com Caddy
+
+O login com Microsoft (Supabase Auth com PKCE) e a captura de áudio do
+navegador só funcionam em contexto seguro, então a interface não pode ficar
+exposta em HTTP puro fora de `localhost`. O `docker-compose.https.yml`
+acrescenta um Caddy nas portas 80 e 443: ele emite e renova o certificado do
+Let's Encrypt, redireciona HTTP para HTTPS e encaminha tudo, inclusive o
+WebSocket da chamada de voz, para o nginx do frontend. O nginx deixa de publicar
+porta no host.
+
+Sem domínio próprio, o [sslip.io](https://sslip.io) resolve o nome a partir do
+IP: `54.12.34.56` vira `54-12-34-56.sslip.io`. Associe um Elastic IP à
+instância, se o laboratório permitir; sem ele, o IP muda a cada sessão e, com
+ele, o domínio e as URLs de redirecionamento.
+
+```bash
+# .env do servidor, além das variáveis da Seção 4
+AZ1_DOMAIN=54-12-34-56.sslip.io
+
+export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml:docker-compose.https.yml
+docker compose up -d --build
+docker compose logs -f caddy      # aguarde "certificate obtained successfully"
+```
+
+No painel do Supabase, em *Authentication → URL Configuration*, defina a
+**Site URL** como `https://<AZ1_DOMAIN>` e acrescente `https://<AZ1_DOMAIN>/**`
+às **Redirect URLs**. O aplicativo no Entra ID não muda: o redirecionamento dele
+aponta para o callback do Supabase (`https://<ref>.supabase.co/auth/v1/callback`),
+e não para a interface.
+
+O grupo de segurança precisa das portas 80 e 443 abertas: o Let's Encrypt valida
+o domínio pela 80 antes de emitir o certificado.
+
 ---
 
 ## 9. Banco de dados e permissões dos webhooks
 
-O Compose inclui PostgreSQL 16 Alpine. Uma base local nova recebe `01_create_database.sql` e `06_webhook_permissions.sql`. A API aguarda o health check do banco e seleciona `DATABASE_URL`, depois `SUPABASE_DB_URL` e, sem as duas, `postgresql://az1:az1@postgres:5432/az1` para o receptor local. Ferramentas no host usam `localhost` pela porta publicada no override.
+O Compose inclui PostgreSQL 16 Alpine. Uma base local nova recebe `01_create_database.sql`, `06_webhook_permissions.sql` e `07_evento_local.sql`. A API aguarda o health check do banco e seleciona `DATABASE_URL`, depois `SUPABASE_DB_URL` e, sem as duas, `postgresql://az1:az1@postgres:5432/az1` para o receptor local. Ferramentas no host usam `localhost` pela porta publicada no override.
 
 O receptor abre pool próprio e assume obrigatoriamente `az1_webhook`; o pool das consultas de usuário continua separado. Esse papel só pode inserir/ler eventos, atualizar sua conclusão e marcar a origem para varredura. Não recebe DELETE, alteração do corpo ou leitura dos segredos de integração.
 
-Volumes existentes não reaplicam scripts de inicialização. Antes de iniciar o receptor atualizado, confira `SHOW server_version` e aplique as permissões sem apagar dados. A migração 06 exige PostgreSQL 16 ou superior:
+Volumes existentes não reaplicam scripts de inicialização. Antes de iniciar os serviços atualizados, confira `SHOW server_version` e aplique as migrações sem apagar dados. As migrações 06 e 07 exigem PostgreSQL 16 ou superior:
 
 ```bash
 docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -v webhook_login=az1 < src/database/06_webhook_permissions.sql
+docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 -f /docker-entrypoint-initdb.d/07_evento_local.sql
+docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 < src/database/08_seguranca_acesso.sql
+docker compose exec -T postgres psql -U az1 -d az1 -v ON_ERROR_STOP=1 < src/database/09_remove_portfolio.sql
 ```
+
+`08_seguranca_acesso.sql` e `09_remove_portfolio.sql` não são montados na inicialização porque uma base nova já nasce corrigida pelo `01_create_database.sql`; só volumes anteriores precisam deles. A 09 remove `portfolio.portfolio` e a coluna `projeto.portfolio_id`, e deve rodar junto com o deploy da API que deixou de ler essa coluna.
 
 Em outro ambiente, `webhook_login` deve ser o nome do usuário no DSN do receptor, mesmo que a migração seja executada por outro administrador. Se omitido, o script usa o usuário conectado. O receptor falha ao abrir o pool quando não consegue assumir `az1_webhook`; `/health` sozinho não verifica essas permissões.
 
-A base relacional completa pode receber `02_initial_data.sql` e `03_rls_policies.sql`, que inclui a migração 06. O RAG usa `SUPABASE_DB_URL` com extensão vetorial; a imagem PostgreSQL local não instala pgvector. Testes destrutivos usam base dedicada indicada por `TEST_DATABASE_URL`.
+A base relacional completa pode receber `02_initial_data.sql` e `03_rls_policies.sql`, que inclui a migração 06; aplique as migrações 07, 08 e 09 depois das políticas. O RAG usa `SUPABASE_DB_URL` com extensão vetorial; a imagem PostgreSQL local não instala pgvector. Testes destrutivos usam base dedicada indicada por `TEST_DATABASE_URL`.
 
 ---
 

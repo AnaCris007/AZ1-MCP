@@ -64,3 +64,18 @@ it('permite salvar outra tarefa e reverte somente a que falhou', async () => {
   expect(buttons[1]).toBeEnabled()
   expect(screen.getByRole('alert')).toHaveTextContent('estado anterior')
 })
+
+it('filtra tarefas abertas e concluídas sem alterar os dados', async () => {
+  const doneTask = { ...task, id: '2', title: 'Risco revisado', done: true }
+  fetchTasks.mockResolvedValue([task, doneTask])
+  render(<TasksView />)
+
+  await screen.findByText('Revisar risco')
+  await userEvent.click(screen.getByRole('button', { name: /^Abertas/ }))
+  expect(screen.getByText('Revisar risco')).toBeInTheDocument()
+  expect(screen.queryByText('Risco revisado')).not.toBeInTheDocument()
+
+  await userEvent.click(screen.getByRole('button', { name: /^Concluídas/ }))
+  expect(screen.queryByText('Revisar risco')).not.toBeInTheDocument()
+  expect(screen.getByText('Risco revisado')).toBeInTheDocument()
+})

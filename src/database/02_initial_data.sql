@@ -26,20 +26,10 @@ TRUNCATE auditoria.mensagem_fonte, auditoria.avaliacao, auditoria.evento_platafo
          auditoria.notificacao, auditoria.mensagem, auditoria.conversa RESTART IDENTITY CASCADE;
 TRUNCATE portfolio.usuario_projeto, portfolio.projeto_relacionado, portfolio.campo_artefato,
          portfolio.pendencia, portfolio.artefato, portfolio.projeto,
-         portfolio.usuario, portfolio.portfolio RESTART IDENTITY CASCADE;
+         portfolio.usuario RESTART IDENTITY CASCADE;
 
 
--- 1. Portfólios ---------------------------------------------------------------
--- Correspondem aos subportfólios declarados na planilha de portfólio, que é o
--- nível pelo qual o PMO agrupa os projetos de fato.
-INSERT INTO portfolio.portfolio (nome, ano_exercicio) VALUES
-    ('Desempenho, Eficiência e Segurança Operacional', 2026),
-    ('Expansão da Rede', 2026),
-    ('Gestão e Finanças', 2026),
-    ('Pessoas e Patrimônio', 2026);
-
-
--- 2. Usuários -----------------------------------------------------------------
+-- 1. Usuários -----------------------------------------------------------------
 -- As três personas da Seção 1.5 mais um líder por projeto. auth_user_id fica
 -- nulo até a frente de autenticação (RNF02) associar cada um ao SSO.
 INSERT INTO portfolio.usuario (nome, email, perfil) VALUES
@@ -55,40 +45,32 @@ INSERT INTO portfolio.usuario (nome, email, perfil) VALUES
     ('Ana Beatriz Lima', 'ana.lima@metro.example', 'lider_projeto');
 
 
--- 3. Projetos -----------------------------------------------------------------
+-- 2. Projetos -----------------------------------------------------------------
 -- percentual_previsto e percentual_avanco são as colunas Previsto e Realizado
 -- da planilha, convertidas de fração para percentual. desvio_pp é gerado.
 INSERT INTO portfolio.projeto
     (codigo, nome, fase, status, data_inicio, data_termino_prevista,
-     percentual_previsto, percentual_avanco, portfolio_id, lider_id)
+     percentual_previsto, percentual_avanco, lider_id)
 VALUES
     ('SYN-01', 'Modernização da Ventilação Operacional', 'Execução', 'Atrasado', DATE '2026-02-15', DATE '2026-11-30', 82, 64,
-     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
      (SELECT id FROM portfolio.usuario   WHERE nome = 'Rafael Antunes')),
     ('SYN-02', 'Sistema Integrado de Monitoramento de Ativos', 'Execução', 'Dentro do previsto', DATE '2026-03-01', DATE '2026-12-15', 68, 71,
-     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
      (SELECT id FROM portfolio.usuario   WHERE nome = 'Camila Nogueira')),
     ('SYN-03', 'Ampliação da Estação Horizonte', 'Execução', 'Em risco', DATE '2026-01-10', DATE '2027-06-30', 43, 41,
-     (SELECT id FROM portfolio.portfolio WHERE nome = 'Expansão da Rede' AND ano_exercicio = 2026),
      (SELECT id FROM portfolio.usuario   WHERE nome = 'Eduardo Tanaka')),
     ('SYN-04', 'Integração de Comunicação Operacional', 'Execução', 'Parcialmente atrasado', DATE '2026-02-01', DATE '2026-10-31', 79, 70,
-     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
      (SELECT id FROM portfolio.usuario   WHERE nome = 'Patrícia Moraes')),
     ('SYN-05', 'Programa de Eficiência Energética das Instalações', 'Execução', 'Acima do previsto', DATE '2026-01-15', DATE '2026-12-15', 70, 78,
-     (SELECT id FROM portfolio.portfolio WHERE nome = 'Gestão e Finanças' AND ano_exercicio = 2026),
      (SELECT id FROM portfolio.usuario   WHERE nome = 'Sérgio Vilela')),
     ('SYN-06', 'Plataforma de Gestão do Conhecimento Técnico', 'Iniciação', 'Em estruturação', DATE '2026-07-01', DATE '2027-06-30', 18, 15,
-     (SELECT id FROM portfolio.portfolio WHERE nome = 'Pessoas e Patrimônio' AND ano_exercicio = 2026),
      (SELECT id FROM portfolio.usuario   WHERE nome = 'Juliana Prado')),
     ('SYN-07', 'Otimização da Manutenção Preventiva', 'Execução', 'Crítico', DATE '2026-01-01', DATE '2027-04-30', 61, 47,
-     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
      (SELECT id FROM portfolio.usuario   WHERE nome = 'Marcos Ribeiro')),
     ('SYN-08', 'Modernização do Centro Integrado de Controle', 'Encerramento', 'Concluído', DATE '2025-01-10', DATE '2026-06-30', 100, 100,
-     (SELECT id FROM portfolio.portfolio WHERE nome = 'Desempenho, Eficiência e Segurança Operacional' AND ano_exercicio = 2026),
      (SELECT id FROM portfolio.usuario   WHERE nome = 'Ana Beatriz Lima'));
 
 
--- 4. Dependências entre projetos ----------------------------------------------
+-- 3. Dependências entre projetos ----------------------------------------------
 INSERT INTO portfolio.projeto_relacionado (projeto_id, relacionado_id, relacao) VALUES
     ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-02'),
      (SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-07'), 'Fornece dados de monitoramento'),
@@ -104,7 +86,7 @@ INSERT INTO portfolio.projeto_relacionado (projeto_id, relacionado_id, relacao) 
      (SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-04'), 'Fornece infraestrutura utilizada');
 
 
--- 5. Artefatos ----------------------------------------------------------------
+-- 4. Artefatos ----------------------------------------------------------------
 -- Os 37 documentos de projeto que estão indexados. Os três documentos sem
 -- projeto (planilha de portfólio e os dois materiais normativos) ficam de fora:
 -- artefato.projeto_id é NOT NULL e a Seção 3.6.7 registra essa limitação. Eles
@@ -152,7 +134,7 @@ INSERT INTO portfolio.artefato (projeto_id, tipo, referencia, titulo, data) VALU
     ((SELECT id FROM portfolio.projeto WHERE codigo = 'SYN-08'), 'termo_abertura', 'base_sintetica_metro/SYN-08_modernizacao_do_centro_integrado_de_controle/01_Termo_de_Abertura.docx', 'Termo de Abertura', TIMESTAMPTZ '2026-08-31 00:00:00-03');
 
 
--- 6. Pendências ---------------------------------------------------------------
+-- 5. Pendências ---------------------------------------------------------------
 -- Os 18 riscos e problemas registrados nas planilhas 04_Riscos_e_Problemas.
 INSERT INTO portfolio.pendencia
     (projeto_id, codigo, tipo, titulo, descricao, criticidade, responsavel,
@@ -214,7 +196,7 @@ VALUES
      'Moderado', 'Gerência de Tecnologia', 'Reprogramar atividades sem impacto final', 'resolvida');
 
 
--- 7. Acompanhamento -----------------------------------------------------------
+-- 6. Acompanhamento -----------------------------------------------------------
 -- O diretor e a analista de PMO acompanham o portfólio inteiro; cada líder
 -- acompanha o próprio projeto. Define os destinatários da notificação do RF05.
 INSERT INTO portfolio.usuario_projeto (usuario_id, projeto_id)
@@ -232,8 +214,7 @@ COMMIT;
 -- =============================================================================
 \echo ''
 \echo '== Contagem por tabela =='
-SELECT 'portfolio'   AS tabela, count(*) FROM portfolio.portfolio
-UNION ALL SELECT 'usuario',            count(*) FROM portfolio.usuario
+SELECT 'usuario'     AS tabela, count(*) FROM portfolio.usuario
 UNION ALL SELECT 'projeto',            count(*) FROM portfolio.projeto
 UNION ALL SELECT 'projeto_relacionado',count(*) FROM portfolio.projeto_relacionado
 UNION ALL SELECT 'artefato',           count(*) FROM portfolio.artefato

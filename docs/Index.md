@@ -22,8 +22,9 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | As personas, jornadas e o fluxo de negócio | [Projeto.md, Personas e Jornada](./Projeto.md#15-personas-e-jornada-do-usuário) |
 | Os requisitos e a solução técnica | [Projeto.md, Especificação de Requisitos](./Projeto.md#2-especificação-de-requisitos-de-software-sprint-1) |
 | Os riscos do projeto, na identificação inicial | [Projeto.md, Matriz de Risco](./Projeto.md#19-matriz-de-risco-do-projeto) |
-| Os riscos atualizados e seu histórico por sprint | [GestaoProjeto.md, Matriz de Risco do Projeto](./GestaoProjeto.md#53-matriz-de-risco-do-projeto) |
+| Os riscos atualizados e seu histórico por sprint | [GestaoProjeto.md, Matriz de Risco do Projeto](./GestaoProjeto.md#63-matriz-de-risco-do-projeto) |
 | As APIs de voz, com endpoints, limites e exemplos | [Projeto.md, API de Speech to Text e Text to Speech](./Projeto.md#32-api-de-speech-to-text-e-text-to-speech) |
+| Como funciona a chamada contínua por voz | [Projeto.md, Chamada de Voz Contínua](./Projeto.md#53-chamada-de-voz-contínua) |
 | O contrato da API de recebimento de áudios | [Projeto.md, API para Recebimento de Áudios](./Projeto.md#34-api-para-recebimento-de-áudios) |
 | A pilha de tecnologias e as razões de cada escolha | [Projeto.md, Pilha de Tecnologias](./Projeto.md#35-pilha-de-tecnologias) |
 | Os modelos conceitual, lógico e físico dos dados | [Projeto.md, Modelagem Conceitual e Lógica dos Dados](./Projeto.md#36-modelagem-conceitual-e-lógica-dos-dados) |
@@ -37,9 +38,15 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | Os diagramas de classes, de componentes e de sequência | [Projeto.md, Projeto Técnico e Arquitetural](./Projeto.md#39-projeto-técnico-e-arquitetural) |
 | O algoritmo de PLN, como ele foi escolhido e como rodá-lo | [Projeto.md, Algoritmo de NLP e Implementação](./Projeto.md#33-algoritmo-de-nlp-e-implementação) |
 | Como os protótipos foram construídos e executados | [Projeto.md, Prototipação Exploratória](./Projeto.md#4-prototipação-exploratória-design-e-ux) |
+| Os testes funcionais executados, resultados, defeitos e limites da liberação | [Projeto.md, Execução dos testes sistêmicos](./Projeto.md#67-execução-dos-testes-sistêmicos-campanha-funcional-da-sprint-4) |
+| Os testes de usabilidade com participantes externos e o SUS | [Projeto.md, Execução dos Testes de Usabilidade](./Projeto.md#69-execução-dos-testes-de-usabilidade) |
+| Os testes dos requisitos não funcionais e seus resultados | [Projeto.md, Execução dos testes não funcionais](./Projeto.md#610-execução-dos-testes-não-funcionais) |
+| A reexecução final da Sprint 4, os defeitos encontrados e a cobertura de requisitos | [Projeto.md, Auditoria Final da Sprint 4](./Projeto.md#611-auditoria-final-da-sprint-4-reexecução-e-cobertura) |
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
-| Os papéis de cada integrante e a evidência da rotação | [GestaoProjeto.md, Matriz de Papéis da Sprint 2](./GestaoProjeto.md#44-matriz-de-papéis-e-responsabilidades-da-sprint-2) |
-| O planejamento da Sprint 3, com estimativas, DoR e DoD | [GestaoProjeto.md, Planejamento da Sprint 3](./GestaoProjeto.md#47-planejamento-da-sprint-3) |
+| Os papéis de cada integrante e a evidência da rotação | [GestaoProjeto.md, Matriz de Papéis da Sprint 4](./GestaoProjeto.md#64-matriz-de-papéis-e-responsabilidades-da-sprint-4) |
+| Quanto custaria entregar a solução a um cliente real | [GestaoProjeto.md, Análise de Viabilidade Financeira](./GestaoProjeto.md#67-análise-de-viabilidade-financeira) |
+| O que será feito na Sprint 5, com estimativas e critérios de aceite | [GestaoProjeto.md, Planejamento da Sprint 5](./GestaoProjeto.md#68-planejamento-da-sprint-5) |
+| Como o backlog é publicado no GitLab em lote | [GestaoConfiguracao.md, Automação do quadro](./GestaoConfiguracao.md#66-automação-do-quadro-com-o-gitlab-issue-kit) |
 | Como subir a pilha inteira em contêineres | [Docker.md](./Docker.md) |
 | Por que cada decisão de imagem e de compose foi tomada | [Docker.md, Técnicas aplicadas](./Docker.md#12-técnicas-aplicadas) |
 | O Gitflow, as branches, os commits e os MRs | [GestaoConfiguracao.md](./GestaoConfiguracao.md) |
@@ -52,7 +59,7 @@ Os diagramas e as imagens utilizados pelos documentos estão armazenados na past
 - personas do Diretor, da Analista de PMO e do Líder de Projeto;
 - jornadas das três personas;
 - Matriz SWOT;
-- Matriz de Riscos da Sprint 1 e suas atualizações nas Sprints 2 e 3;
+- Matriz de Riscos da Sprint 1 e suas atualizações nas Sprints 2, 3 e 4;
 - diagramas de classes, de componentes e de sequência;
 - diagramas BPMN dos fluxos AS-IS e TO-BE e a cadeia de valor;
 - registros visuais dos protótipos A e B;
@@ -75,4 +82,4 @@ docs/
 ├── Docker.md
 └── RoteiroPrototipoA.md
 ```
-A [auditoria do desenvolvimento](AuditoriaDesenvolvimento.md) reúne rastreabilidade e resultados executados da revisão técnica da Sprint 3.
+A [auditoria do desenvolvimento](AuditoriaDesenvolvimento.md) reúne rastreabilidade e resultados executados da revisão técnica da Sprint 3. A auditoria final da Sprint 4 está na Seção 6.11 do `Projeto.md`, e seus logs, em [`evidencias/auditoria-sprint-4`](evidencias/auditoria-sprint-4/ambiente.txt).

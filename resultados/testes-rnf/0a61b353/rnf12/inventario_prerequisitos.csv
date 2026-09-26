@@ -1,0 +1,8 @@
+item,estado,evidencia
+Massa de 30 consultas positivas,ATENDIDO,outputs/rnf12/campanha_rnf12.xlsx
+Massa de 10 consultas negativas,ATENDIDO,outputs/rnf12/campanha_rnf12.xlsx
+Documentos e fatos esperados pré-registrados,ATENDIDO,8 arquivos em outputs/rnf12/fontes
+Coleção vetorial,ATENDIDO,8 documentos indexados e 4 referências recuperadas na rodada
+Execução das 40 consultas,ATENDIDO,respostas_execucao.json
+Rubricas de dois avaliadores,PENDENTE,campos preservados em campanha_rnf12_executada.xlsx
+Resultado determinável sem rubricas,ATENDIDO,teto conservador de sustentação 33.33% abaixo da meta de 90%

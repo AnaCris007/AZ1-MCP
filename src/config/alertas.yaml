@@ -1,5 +1,2 @@
 intencoes_de_risco:
-  - reclamacao
-  - solicitacao_urgente
-  - relato_incidente
-limiar_confianca: 0.70
+  - gerar_alertas_pendencias

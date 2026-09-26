@@ -1,0 +1,30 @@
+/home/inteli/Documentos/g01/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+test_401_vem_antes_da_regra_de_negocio (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_401_vem_antes_da_regra_de_negocio)
+A recusa acontece sem que o serviço de domínio seja construído. ... Falha de autenticação (MALFORMED): Not enough segments
+ok
+test_corpo_do_401_nao_serve_de_oraculo (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_corpo_do_401_nao_serve_de_oraculo)
+A resposta é a mesma para causas diferentes. ... Falha de autenticação (MALFORMED): Invalid header string: 'utf-8' codec can't decode byte 0xb7 in position 1: invalid start byte
+ok
+test_health_e_webhooks_ficam_fora_por_decisao_registrada (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_health_e_webhooks_ficam_fora_por_decisao_registrada)
+As duas exceções à autenticação, e por que cada uma existe. ... ok
+test_recusa_de_assinatura_e_recusa_de_sessao_sao_distinguiveis (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_recusa_de_assinatura_e_recusa_de_sessao_sao_distinguiveis)
+O contraste que dá sentido ao caso acima. ... ok
+test_toda_rota_de_negocio_exige_sessao (tests.test_integracao_seguranca.TestAutenticacaoIntegracao.test_toda_rota_de_negocio_exige_sessao)
+Sem credencial, as doze rotas respondem 401 — nenhuma escapa. ... ok
+test_instrucao_adversaria_nao_produz_fonte_inventada (tests.test_integracao_seguranca.TestEntradaHostilIntegracao.test_instrucao_adversaria_nao_produz_fonte_inventada)
+Sem trecho acima do piso, o modelo NÃO é chamado. Nada a subverter. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_marca_html_atravessa_como_dado_e_nao_como_documento (tests.test_integracao_seguranca.TestEntradaHostilIntegracao.test_marca_html_atravessa_como_dado_e_nao_como_documento)
+Script no texto sai como string JSON, nunca como corpo HTML. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+test_segredo_nao_aparece_nos_registros_de_erro (tests.test_integracao_seguranca.TestEntradaHostilIntegracao.test_segredo_nao_aparece_nos_registros_de_erro)
+Uma falha interna não pode arrastar credencial para o log. ... ok
+test_trecho_acima_do_piso_e_citado_e_o_de_baixo_nao (tests.test_integracao_seguranca.TestEntradaHostilIntegracao.test_trecho_acima_do_piso_e_citado_e_o_de_baixo_nao)
+O contraste que dá sentido ao caso anterior. ... Sem identidade de domínio para integracao@example.com; turno não registrado.
+ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.222s
+
+OK

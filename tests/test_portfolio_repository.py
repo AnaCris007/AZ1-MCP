@@ -13,9 +13,11 @@ from __future__ import annotations
 
 import re
 import unittest
+from datetime import date
 from pathlib import Path
 
 from services.portfolio_repository import (
+    _SQL_PROJETOS,
     SITUACAO_ABERTA,
     SITUACAO_RESOLVIDA,
     SITUACOES_VALIDAS,
@@ -26,6 +28,59 @@ from services.portfolio_repository import (
 RAIZ = Path(__file__).resolve().parent.parent
 DDL = (RAIZ / "src" / "database" / "01_create_database.sql").read_text(encoding="utf-8")
 SEED = (RAIZ / "src" / "database" / "02_initial_data.sql").read_text(encoding="utf-8")
+
+
+def _sem_comentarios(sql: str) -> str:
+    """O SQL sem as linhas de `--`, para asserções sobre estrutura."""
+    return "\n".join(re.sub(r"--.*$", "", linha) for linha in sql.split("\n"))
+
+
+def _colunas_no_topo(corpo: str) -> list[str]:
+    """Nomes de saída de uma lista de colunas SQL, na ordem.
+
+    Divide por vírgula respeitando parênteses — as subconsultas de contagem da
+    view têm vírgula nenhuma, mas têm `FROM` e parênteses, e um split ingênuo
+    as quebraria ao meio.
+    """
+    partes, atual, profundidade = [], [], 0
+    for caractere in corpo:
+        if caractere == "(":
+            profundidade += 1
+        elif caractere == ")":
+            profundidade -= 1
+        if caractere == "," and profundidade == 0:
+            partes.append("".join(atual))
+            atual = []
+        else:
+            atual.append(caractere)
+    partes.append("".join(atual))
+
+    nomes = []
+    for parte in partes:
+        expressao = " ".join(parte.split())
+        if not expressao:
+            continue
+        # `x AS apelido` vale pelo apelido; `pr.codigo` vale pelo que vem depois
+        # do ponto; `pr.id` idem.
+        apelido = re.search(r"\bAS\s+([A-Za-z_][A-Za-z0-9_]*)\s*$", expressao, re.IGNORECASE)
+        nomes.append(apelido.group(1) if apelido else expressao.rsplit(".", 1)[-1])
+    return nomes
+
+
+def _colunas_da_view() -> list[str]:
+    inicio = DDL.index("CREATE VIEW portfolio.vw_projeto_situacao")
+    # O FROM da view, nao o das subconsultas de contagem: so o de cima
+    # comeca em coluna 1.
+    fim = DDL.index("\nFROM portfolio.projeto pr", inicio)
+    corpo = DDL[DDL.index("SELECT", inicio) + len("SELECT") : fim]
+    return _colunas_no_topo(corpo)
+
+
+def _colunas_do_select() -> list[str]:
+    corpo = _SQL_PROJETOS[
+        _SQL_PROJETOS.index("SELECT") + len("SELECT") : _SQL_PROJETOS.index("FROM portfolio.vw_projeto_situacao")
+    ]
+    return _colunas_no_topo(corpo)
 
 
 class _CursorFalso:
@@ -91,6 +146,64 @@ class TesteLeituraUsaAView(unittest.TestCase):
 
     def test_a_view_existe_no_ddl(self):
         self.assertIn("vw_projeto_situacao", DDL)
+
+    def test_a_ordem_do_select_acompanha_a_da_view(self):
+        """O acoplamento que não avisa quando quebra.
+
+        `_para_projeto` lê a linha POR POSIÇÃO. Se a view ganhar, perder ou
+        reordenar uma coluna e o `SELECT` do repositório não acompanhar, cada
+        campo passa a ler o vizinho — e entre colunas do mesmo tipo isso não
+        levanta exceção nenhuma. Foi exatamente o risco da remoção de
+        `portfolio.portfolio`, que tirou uma coluna do meio da lista.
+
+        Comparar as duas ordens aqui é o que transforma um erro silencioso em
+        suíte vermelha.
+        """
+        self.assertEqual(_colunas_da_view(), _colunas_do_select())
+
+    def test_o_mapeamento_posicional_poe_cada_valor_no_seu_campo(self):
+        """Valores distinguíveis, na ordem da view, conferidos um a um.
+
+        Em especial `lider` e `lider_email`: são vizinhos, são os dois texto, e
+        trocá-los passaria por qualquer asserção de tipo.
+        """
+        linha = (
+            7, "SYN-09", "Nome do Projeto", "Execução", "Atrasado",
+            date(2026, 1, 2), date(2026, 12, 31),
+            80, 65, -15,
+            "Nome do Líder", "lider@metro.example",
+            3, 11,
+        )
+        self.assertEqual(len(linha), len(_colunas_da_view()))
+
+        pool = _PoolFalso(respostas=[[linha]])
+        projeto = PortfolioRepository(pool).situacao_dos_projetos()[0]
+
+        self.assertEqual(projeto.id, 7)
+        self.assertEqual(projeto.codigo, "SYN-09")
+        self.assertEqual(projeto.nome, "Nome do Projeto")
+        self.assertEqual(projeto.fase, "Execução")
+        self.assertEqual(projeto.status, "Atrasado")
+        self.assertEqual(projeto.data_inicio, date(2026, 1, 2))
+        self.assertEqual(projeto.data_termino_prevista, date(2026, 12, 31))
+        self.assertEqual(projeto.percentual_previsto, 80.0)
+        self.assertEqual(projeto.percentual_avanco, 65.0)
+        self.assertEqual(projeto.desvio_pp, -15.0)
+        self.assertEqual(projeto.lider, "Nome do Líder")
+        self.assertEqual(projeto.lider_email, "lider@metro.example")
+        self.assertEqual(projeto.pendencias_abertas, 3)
+        self.assertEqual(projeto.artefatos, 11)
+
+    def test_a_tabela_portfolio_nao_existe_mais(self):
+        """Removida em 09_remove_portfolio.sql: nada pode voltar a referenciá-la.
+
+        Compara o SQL sem os comentários, porque o DDL explica em texto por que
+        a tabela saiu — e uma asserção que tropeça na própria justificativa
+        obrigaria a escolher entre o teste e a documentação.
+        """
+        self.assertNotIn("portfolio.portfolio", _sem_comentarios(DDL))
+        self.assertNotIn("portfolio_id", _sem_comentarios(DDL))
+        self.assertNotIn("portfolio.portfolio", _sem_comentarios(SEED))
 
 
 class TesteEscritaEhMinima(unittest.TestCase):
