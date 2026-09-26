@@ -87,6 +87,7 @@
 - [7.3 Leitura do quadro](#73-leitura-do-quadro)
 - [7.4 Atualização de aderência na Sprint 3](#74-atualização-de-aderência-na-sprint-3)
 - [7.5 Atualização de aderência na Sprint 4](#75-atualização-de-aderência-na-sprint-4)
+- [7.6 Fechamento final da Sprint 4](#76-fechamento-final-da-sprint-4)
 
 </details>
 
@@ -645,7 +646,7 @@ O `--dry-run` do `create_issues.py` valida o lote inteiro antes de criar qualque
 
 | Item | Política documentada | Prática observada | Desvio | Ação para a Sprint 3 |
 |---|---|---|---|---|
-| Nomenclatura de branches | `<prefixo>/<descricao-em-kebab-case>`, com prefixo da lista da Seção 3.1 | As 25 branches distintas da sprint usam prefixo válido — `docs`, `feat`, `feature` e `fix` — e descrição em kebab-case. Uma delas, `docs/diario-de-construcao-prototipo-B`, termina com letra maiúscula | **Desvio pontual**: 24 de 25 em conformidade integral | Manter a convenção; conferir o nome na abertura do MR, quando ainda é barato renomear |
+| Nomenclatura de branches | `<prefixo>/<descricao-em-kebab-case>`, com prefixo da lista da Seção 3.1 | As 25 branches distintas da sprint usam prefixo válido (`docs`, `feat`, `feature` e `fix`) e descrição em kebab-case. Uma delas, `docs/diario-de-construcao-prototipo-B`, termina com letra maiúscula | **Desvio pontual**: 24 de 25 em conformidade integral | Manter a convenção; conferir o nome na abertura do MR, quando ainda é barato renomear |
 | Origem das branches | Branches de trabalho partem de `develop` | Verificado nos 26 merges: em todos, o ponto de bifurcação entre a branch e o destino pertence à `develop` | Nenhum | Manter |
 | Destino dos Merge Requests | Branches de trabalho apontam para `develop` | Os 26 MRs da sprint apontam para `develop` | Nenhum | Manter |
 | Proteção de branches permanentes | Sem commit direto em `main`, `hmg` e `develop` | Nenhum commit direto observado no histórico das três branches | Nenhum | Manter |
@@ -723,6 +724,22 @@ Esta atualização foi conferida em **25/09/2026, às 17h55 (BRT)**, com a anál
 | `release/*` e `hotfix/*` | Não houve condição nem uso | **Não aplicável** | Manter como política condicional |
 
 A Sprint 4 confirma pela configuração do projeto uma política que antes só era verificada pelo histórico (proteção de branches) e melhora a forma das mensagens de commit. Os desvios que restam são de dois tipos: **etapas de encerramento** (exclusão de branches e tag) e **mecanismos que ninguém instalou** (hook e template de MR). Os dois mecanismos tinham issue na Planning, e as duas issues foram reaproveitadas para outro trabalho. A política de escopo fixo do card, incluída na Seção 2.2.2 do `GestaoProjeto.md`, fecha esse caminho.
+
+
+## 7.6 Fechamento final da Sprint 4
+
+A Seção 7.5 fixou o corte em 25/09/2026, às 17h55. Depois dele, dois MRs foram mesclados em `develop`: o `!101` (artefato de gestão, às 20h11) e o `!102` (campanha dos requisitos não funcionais, às 23h03). A auditoria final de 26/09/2026 reconferiu o Git em `develop@0f27f7d` e o remoto por `git ls-remote`. A API do GitLab não respondeu ao token disponível (`401`), por isso os itens que dependem dela (revisor, aprovação e pipeline do `!101` e do `!102`) aparecem como não verificados. A apuração está em [`commits-mrs.txt`](evidencias/auditoria-sprint-4/commits-mrs.txt).
+
+**Commits no fechamento.** Com o mesmo método da Seção 5.3, a sprint fecha com 78 commits autorais: referência `#N` e tipo válido em 78 de 78 (100%), infinitivo em 74 de 78 (94,9%) e primeira linha com até 72 caracteres em 67 de 78 (85,9%). Os três commits da campanha não funcional (`test(rnf): adiciona ...`, `test(rnf): registra ...` e `docs(testes): consolida ...`) estão na terceira pessoa, e não no infinitivo. O pico diário caiu para 37,2% (29 de 78, em 24/09), e 25/09 passou a concentrar 12 commits (15,4%). Onze dos 18 merges ocorreram em 25/09 (61,1%).
+
+| Item | Política | Prática observada no fechamento | Inconsistência | Correção |
+|---|---|---|---|---|
+| Tratamento de conflitos (Seção 4.5) | Resolver os marcadores e executar as verificações aplicáveis antes de concluir o merge | O merge `ed8296f`, de 25/09, registra na mensagem a resolução de conflito no `.gitattributes`; o arquivo ficou com uma única linha de comentário, e as regras de fim de linha LF da `#297` desapareceram. Em checkout Windows, as fitas VHS passaram a falhar por hash | Verificação da resolução não cobriu arquivo de configuração | Arquivo restaurado na auditoria final (defeito AUD-01 da Seção 6.11.2 do `Projeto.md`). Proposta para a retrospectiva: acrescentar ao passo 4 a conferência do diff de cada arquivo de configuração resolvido contra as duas origens |
+| Mensagem de commit (Seção 5.2) | Descrição no infinitivo | 74 de 78 no fechamento; os 3 commits posteriores ao corte fora do padrão | Hook ainda não versionado | Task S5-06 do `GestaoProjeto.md` |
+| Revisão por pares (Seção 4.1) | Revisor diferente do autor, com aprovação registrada | Conferida nos 16 MRs até o corte; `!101` e `!102` sem conferência pela API. O Git registra o merge por Paulo Fernandes (`!101`) e por Karol Barbosa (`!102`) | Não verificável no fechamento | Renovar o token (task S5-02) e completar a conferência na Planning |
+| Promoção `develop → hmg → main` (Seções 2 e 6.4) | A entrega da sprint é promovida por `hmg` até `main`, com tag | Em 26/09, `hmg` estava em `94b5cd8` e `main` em `f9b430c`, ambos na entrega da Sprint 3; `develop` tinha 108 commits à frente de `hmg`. O remoto não tinha nenhuma tag | Promoção e tag da Sprint 4 não realizadas | Tasks S5-48 e S5-49 do `GestaoProjeto.md` |
+| Exclusão de branches (Seção 4.3) | Branch temporária excluída após o merge | 32 branches no remoto em 26/09, das quais 29 são de trabalho (`feat/`, `docs/`, `fix/`, `test/` e `feature/`) | Etapa de encerramento não executada, pela quarta sprint | Task S5-50 do `GestaoProjeto.md` |
+| Esteira de verificação (Seção 3.7.6 do `Projeto.md`) | Suíte completa a cada integração | O job de testes não tem PostgreSQL nem RabbitMQ; as suítes que dependem deles são puladas, e doze erros de teste só apareceram na reexecução com banco real (AUD-02) | Pipeline verde não cobre persistência | Tasks S5-31 e S5-33 do `GestaoProjeto.md`; risco AM18 |
 
 ---
 
