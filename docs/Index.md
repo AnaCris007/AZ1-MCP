@@ -38,10 +38,14 @@ Este índice apresenta somente os documentos consolidados e navegáveis na vers�
 | Os diagramas de classes, de componentes e de sequência | [Projeto.md, Projeto Técnico e Arquitetural](./Projeto.md#39-projeto-técnico-e-arquitetural) |
 | O algoritmo de PLN, como ele foi escolhido e como rodá-lo | [Projeto.md, Algoritmo de NLP e Implementação](./Projeto.md#33-algoritmo-de-nlp-e-implementação) |
 | Como os protótipos foram construídos e executados | [Projeto.md, Prototipação Exploratória](./Projeto.md#4-prototipação-exploratória-design-e-ux) |
-| Os testes funcionais executados, resultados, defeitos e limites da liberação | [Projeto.md, Execução dos testes sistêmicos](./Projeto.md#67-execução-dos-testes-sistêmicos--campanha-funcional-da-sprint-4) |
+| Os testes funcionais executados, resultados, defeitos e limites da liberação | [Projeto.md, Execução dos testes sistêmicos](./Projeto.md#67-execução-dos-testes-sistêmicos-campanha-funcional-da-sprint-4) |
+| Os testes de usabilidade com participantes externos e o SUS | [Projeto.md, Execução dos Testes de Usabilidade](./Projeto.md#69-execução-dos-testes-de-usabilidade) |
+| Os testes dos requisitos não funcionais e seus resultados | [Projeto.md, Execução dos testes não funcionais](./Projeto.md#610-execução-dos-testes-não-funcionais) |
+| A reexecução final da Sprint 4, os defeitos encontrados e a cobertura de requisitos | [Projeto.md, Auditoria Final da Sprint 4](./Projeto.md#611-auditoria-final-da-sprint-4-reexecução-e-cobertura) |
 | A gestão das sprints e os acordos da equipe | [GestaoProjeto.md](./GestaoProjeto.md) |
 | Os papéis de cada integrante e a evidência da rotação | [GestaoProjeto.md, Matriz de Papéis da Sprint 4](./GestaoProjeto.md#64-matriz-de-papéis-e-responsabilidades-da-sprint-4) |
 | Quanto custaria entregar a solução a um cliente real | [GestaoProjeto.md, Análise de Viabilidade Financeira](./GestaoProjeto.md#67-análise-de-viabilidade-financeira) |
+| O que será feito na Sprint 5, com estimativas e critérios de aceite | [GestaoProjeto.md, Planejamento da Sprint 5](./GestaoProjeto.md#68-planejamento-da-sprint-5) |
 | Como o backlog é publicado no GitLab em lote | [GestaoConfiguracao.md, Automação do quadro](./GestaoConfiguracao.md#66-automação-do-quadro-com-o-gitlab-issue-kit) |
 | Como subir a pilha inteira em contêineres | [Docker.md](./Docker.md) |
 | Por que cada decisão de imagem e de compose foi tomada | [Docker.md, Técnicas aplicadas](./Docker.md#12-técnicas-aplicadas) |
@@ -78,4 +82,4 @@ docs/
 ├── Docker.md
 └── RoteiroPrototipoA.md
 ```
-A [auditoria do desenvolvimento](AuditoriaDesenvolvimento.md) reúne rastreabilidade e resultados executados da revisão técnica da Sprint 3.
+A [auditoria do desenvolvimento](AuditoriaDesenvolvimento.md) reúne rastreabilidade e resultados executados da revisão técnica da Sprint 3. A auditoria final da Sprint 4 está na Seção 6.11 do `Projeto.md`, e seus logs, em [`evidencias/auditoria-sprint-4`](evidencias/auditoria-sprint-4/ambiente.txt).
