@@ -138,8 +138,8 @@ class _BaseDePersistencia(unittest.TestCase):
     def _usuario(self, email: str, nome: str) -> int:
         with self.pool.connection() as conexao, conexao.cursor() as cursor:
             cursor.execute(
-                "INSERT INTO portfolio.usuario (nome, email) VALUES (%s, %s) RETURNING id",
-                (nome, email),
+                "INSERT INTO portfolio.usuario (nome, email, perfil) VALUES (%s, %s, %s) RETURNING id",
+                (nome, email, "pmo"),
             )
             return cursor.fetchone()[0]
 
