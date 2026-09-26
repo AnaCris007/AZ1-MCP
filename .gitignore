@@ -20,3 +20,34 @@ dist/
 
 # cache local das builds do buildx bake
 .docker-cache/
+
+# Massas com voz de participantes reais: preservar somente transcricoes,
+# metadados anonimizados e resultados derivados no repositorio.
+assets/data/audios/
+
+# Artefatos intermediarios reproduziveis da campanha de memoria do RNF10.
+resultados/testes-rnf/**/modelos_temporarios/
+
+# Rodada preliminar do RNF03, substituida pela campanha do commit 0a61b353.
+resultados/testes-rnf/6b3eb96/rnf03/
+
+# Evidencias intermediarias ou duplicadas; os relatorios, resultados
+# consolidados e observaveis necessarios permanecem versionaveis.
+resultados/testes-rnf/0a61b353/rnf01/positivo/ambiente.json
+resultados/testes-rnf/0a61b353/rnf01/positivo/massa.json
+resultados/testes-rnf/0a61b353/rnf01/positivo/resultado.json
+resultados/testes-rnf/0a61b353/rnf01/negativo/ambiente.json
+resultados/testes-rnf/0a61b353/rnf01/negativo/massa.json
+resultados/testes-rnf/0a61b353/rnf01/negativo/resultado.json
+resultados/testes-rnf/0a61b353/rnf04/cenarios_negativos.json
+resultados/testes-rnf/0a61b353/rnf04/massa.json
+resultados/testes-rnf/0a61b353/rnf04/consultas.sql
+resultados/testes-rnf/0a61b353/rnf05/inicio.json
+resultados/testes-rnf/0a61b353/rnf05/servidor.json
+resultados/testes-rnf/0a61b353/rnf05/resultados_python.json
+resultados/testes-rnf/0a61b353/rnf05/resultados_react.json
+resultados/testes-rnf/0a61b353/rnf07/processo.json
+resultados/testes-rnf/0a61b353/rnf09/massa.json
+resultados/testes-rnf/0a61b353/rnf10/carga/tentativas.csv
+resultados/testes-rnf/0a61b353/rnf10/carga/recursos.csv
+resultados/testes-rnf/0a61b353/rnf12/execucao_tecnica.json
