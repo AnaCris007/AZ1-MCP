@@ -75,12 +75,7 @@ def fontes_citadas(texto: str, recuperadas: Sequence[ResultadoBusca]) -> list[Fo
     A numeração ORIGINAL é preservada. Renumerar quebraria a ligação com o `[3]`
     escrito no texto, que é justamente o que torna a citação conferível.
     """
-    numeros = {
-        int(n)
-        for grupo in _CITACAO.findall(texto)
-        for n in grupo.split(",")
-        if n.strip().isdigit()
-    }
+    numeros = {int(n) for grupo in _CITACAO.findall(texto) for n in grupo.split(",") if n.strip().isdigit()}
     return [
         FonteCitada(
             posicao=n,
@@ -203,9 +198,7 @@ def fontes_para_auditoria(citadas: Sequence[FonteCitada]) -> tuple[FonteDaRespos
     )
 
 
-def classificar_sem_interferir(
-    classificador: DetectarIntencao | None, texto: str
-) -> IntencaoDetectada | None:
+def classificar_sem_interferir(classificador: DetectarIntencao | None, texto: str) -> IntencaoDetectada | None:
     """A intenção detectada, ou None se não foi possível detectá-la.
 
     O que ela decide, e o que não decide: a intenção governa a AÇÃO do Agente
@@ -344,6 +337,83 @@ def send_chat_message(
     antes do roteamento. Consultar as fontes para depois jogar fora a resposta
     é o oposto do que o artefato descreve.
     """
+    resultado = responder_turno(
+        payload=payload,
+        usuario=usuario,
+        answerer=answerer,
+        repositorio=repositorio,
+        classificador=classificador,
+        agente=agente,
+    )
+
+    if resultado.turno is not None:
+        background_tasks.add_task(registrar_turno_em_segundo_plano, repositorio, resultado.turno)
+
+    # `resultado.texto` é o mesmo que foi para a trilha: o que a pessoa viu é o
+    # que fica registrado. A ligação afirmação↔fonte não se perde, porque vive
+    # em `mensagem_fonte.posicao`.
+    return ChatResponse(reply=resultado.texto, fontes=resultado.fontes)
+
+
+def _resultado_do_turno(reply: ChatReply | None, resposta_do_agente: RespostaDoAgente | None) -> tuple[str, str | None]:
+    """O par `resultado`/`modelo` de `auditoria.mensagem`, em um lugar só.
+
+    Vive separado porque dois chamadores precisam dele: `_turno_da_conversa`,
+    para gravar, e `responder_turno`, para informar ao servidor MCP se a
+    resposta foi uma recusa. Se cada um derivasse por conta própria, bastaria
+    um acrescentar um caso novo para o outro passar a mentir.
+    """
+    if resposta_do_agente is not None:
+        return _RESULTADO_POR_ACAO[resposta_do_agente.resultado], None
+    assert reply is not None  # os dois ramos são exclusivos, por construção
+    return reply.resultado, reply.modelo or None
+
+
+@dataclass(frozen=True)
+class TurnoRespondido:
+    """O que um turno produziu, sem decidir como ele será persistido.
+
+    Separar produzir de gravar existe porque os dois chamadores de
+    `responder_turno` gravam de formas diferentes: a rota HTTP agenda a escrita
+    em `BackgroundTasks`, para não fazer o usuário esperar por ela; o servidor
+    MCP grava em linha, porque ali não há resposta HTTP cujo tempo precise ser
+    protegido.
+    """
+
+    texto: str
+    fontes: list[FonteCitada]
+    turno: TurnoDoChat | None
+    # `sucesso`, `esclarecimento`, `recusada` ou `falha`. Informado mesmo quando
+    # `turno` é None, porque quem chama pode precisar saber que houve recuo sem
+    # depender de a trilha ter sido gravada.
+    resultado: str
+
+
+def responder_turno(
+    *,
+    payload: ChatRequest,
+    usuario: AuthenticatedUser,
+    answerer: AnswerChatMessage,
+    repositorio: ConversaRepository | PersistenciaDesligada,
+    classificador: DetectarIntencao | None,
+    agente: ExecutarIntencao | AgenteDesligado,
+) -> TurnoRespondido:
+    """O percurso de um turno, compartilhado entre a rota HTTP e o servidor MCP.
+
+    Extraída do handler para que `src/mcp_servidor/` exerça EXATAMENTE este
+    caminho, e não uma reimplementação dele. Com duas orquestrações próprias, a
+    ordem descrita no docstring de `send_chat_message` valeria para um canal só,
+    e a divergência apareceria como resposta diferente para a mesma pergunta
+    conforme por onde ela entrou.
+
+    Levanta `ChatAPIError`, que é vocabulário HTTP, e isso é dívida reconhecida:
+    o lugar próprio desta função é `services/`. Ela ficou aqui porque os seis
+    auxiliares que chama já moram neste módulo, e movê-los junto é refatoração
+    de arquivo coberto por teste — trabalho que não cabia no mesmo passo em que
+    o caminho MCP é validado pela primeira vez. Quem chama de fora do HTTP
+    traduz a exceção, como `mcp_servidor/servidor.py` faz.
+    """
+
     inicio = time.monotonic()
 
     # Validar ANTES de classificar. Sem isto, mensagem vazia chegaria ao
@@ -399,18 +469,18 @@ def send_chat_message(
     duracao_ms = int((time.monotonic() - inicio) * 1000)
 
     turno = _turno_da_conversa(
-        payload, usuario, reply, resposta_texto, fontes, duracao_ms, deteccao,
+        payload,
+        usuario,
+        reply,
+        resposta_texto,
+        fontes,
+        duracao_ms,
+        deteccao,
         resposta_do_agente,
     )
-    if turno is not None:
-        background_tasks.add_task(registrar_turno_em_segundo_plano, repositorio, turno)
 
-
-    # `resposta_texto` é o mesmo que foi para a trilha: o que a pessoa viu é o
-    # que fica registrado. A ligação afirmação↔fonte não se perde, porque vive
-    # em `mensagem_fonte.posicao`.
-    return ChatResponse(reply=resposta_texto, fontes=fontes)
-
+    resultado_do_turno, _ = _resultado_do_turno(reply, resposta_do_agente)
+    return TurnoRespondido(texto=resposta_texto, fontes=fontes, turno=turno, resultado=resultado_do_turno)
 
 
 def _turno_da_conversa(
@@ -450,23 +520,14 @@ def _turno_da_conversa(
     """
     conversa_id = conversa_uuid(payload.conversation_id)
     if conversa_id is None:
-        logger.warning(
-            "conversation_id %r não é UUID; turno não registrado.", payload.conversation_id
-        )
+        logger.warning("conversation_id %r não é UUID; turno não registrado.", payload.conversation_id)
         return None
 
     if usuario.domain_user_id is None:
-        logger.warning(
-            "Sem identidade de domínio para %s; turno não registrado.", usuario.email
-        )
+        logger.warning("Sem identidade de domínio para %s; turno não registrado.", usuario.email)
         return None
 
-    if resposta_do_agente is not None:
-        resultado = _RESULTADO_POR_ACAO[resposta_do_agente.resultado]
-        modelo = None
-    else:
-        resultado = reply.resultado
-        modelo = reply.modelo or None
+    resultado, modelo = _resultado_do_turno(reply, resposta_do_agente)
 
     return TurnoDoChat(
         conversa_id=conversa_id,

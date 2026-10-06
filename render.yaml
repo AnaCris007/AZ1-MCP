@@ -1,0 +1,61 @@
+# Implantação do AZ1 no Render, para expor o servidor MCP ao Copilot Studio.
+#
+# ESCOPO: este arquivo sobe APENAS a API. Não há MinIO, RabbitMQ nem Postgres
+# aqui, e isso é deliberado: as ferramentas MCP tocam o banco e o modelo, nada
+# mais. O banco relacional e o índice vetorial já vivem no Supabase, que é
+# externo e continua no ar; o que faltava era um endereço estável para o
+# processo Python. As rotas de áudio e o worker de varredura não funcionam
+# nesta implantação, e não precisam funcionar para o piloto do canal.
+#
+# O `healthCheckPath` aponta para /health, que a Seção 3.10.3 do Projeto.md
+# mantém deliberadamente fora da autenticação para poder ser sondado.
+services:
+  - type: web
+    name: az1-mcp
+    runtime: docker
+    dockerfilePath: ./docker/api/Dockerfile
+    dockerContext: .
+    # NÃO existe chave para escolher o estágio: `dockerTarget` não faz parte da
+    # especificação do Render. Ele constrói o ÚLTIMO estágio do Dockerfile, e
+    # hoje o último é o `runtime`, que é o desejado: roda como UID 10001, traz
+    # o classificador treinado no estágio `trainer` e passa pelas travas do
+    # entrypoint.
+    #
+    # A armadilha: acrescentar qualquer estágio DEPOIS do `runtime` faz o
+    # Render publicar esse outro, em silêncio e sem erro. Se um dia for
+    # preciso um estágio novo, ele vai ANTES, nunca no fim.
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      # Banco e índice vetorial, no Supabase já existente.
+      - key: SUPABASE_DB_URL
+        sync: false
+      # Geração de resposta e embeddings da busca.
+      - key: GEMINI_API_KEY
+        sync: false
+      # Chave do conector. Aceita várias separadas por vírgula, para rotacionar
+      # sem janela de indisponibilidade. Sem ela, o /mcp não é montado.
+      - key: AZ1_MCP_API_KEY
+        sync: false
+      # Usuário de serviço em portfolio.usuario sob o qual os turnos do MCP são
+      # gravados. Vazio significa que a trilha não é gravada, e a resposta sai
+      # do mesmo jeito. Ver identidade_de_servico em mcp_servidor/servidor.py.
+      - key: AZ1_MCP_USUARIO_EMAIL
+        sync: false
+      # Trava do entrypoint: recusa subir com credencial de exemplo. Num
+      # endereço público isso trabalha a favor.
+      - key: AZ1_REFUSE_DEFAULT_CREDENTIALS
+        value: "1"
+      # Exigida pela trava acima, embora esta implantação não tenha MinIO: o
+      # entrypoint verifica AUDIO_STORAGE_SECRET_KEY incondicionalmente e
+      # recusa vazio ou valor de exemplo. Afrouxar a verificação para o deploy
+      # passar seria o instinto errado; gerar um valor real satisfaz o
+      # invariante que ela protege, que é não haver credencial de exemplo em
+      # produção. O valor não é usado por ferramenta nenhuma do MCP, e o Render
+      # o gera sozinho, para ninguém precisar inventar nem guardar segredo que
+      # não serve para nada.
+      - key: AUDIO_STORAGE_SECRET_KEY
+        generateValue: true
+      - key: TZ
+        value: America/Sao_Paulo

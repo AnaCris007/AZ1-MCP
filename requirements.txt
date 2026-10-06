@@ -22,6 +22,11 @@ joblib==1.6.0
 
 # Dependências da API de recebimento de áudio
 fastapi>=0.115
+
+# Servidor MCP do caminho do Copilot Studio (src/mcp_servidor/).
+# Faixa maior fixada: o fastmcp 4 renomeou a listagem de ferramentas e mudou o
+# retorno de @mcp.tool em relação à 2.x, e a suíte de contrato depende das duas.
+fastmcp>=4.0,<5
 pydantic>=2
 python-multipart>=0.0.12
 uvicorn[standard]>=0.30

@@ -13,6 +13,7 @@ from az1_api.dependencies import (
     get_connection_pool,
     require_authenticated_user,
 )
+from mcp_servidor.seguranca import ExigirChaveDeApi, NormalizarCaminhoMcp, chaves_aceitas
 from routes import (
     alerta_router,
     analysis_router,
@@ -43,7 +44,22 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="AZ1 API")
+# O sub-aplicativo MCP precisa ser construído ANTES do FastAPI, porque o
+# `lifespan` dele tem de ser passado ao construtor. Sem isso, o gerenciador de
+# sessões do transporte Streamable HTTP nunca é inicializado e TODA chamada ao
+# /mcp falha em tempo de execução, com erro que só aparece na primeira
+# requisição real. O caso TI-46 da suíte de contrato existe por causa disso.
+#
+# A construção é condicional: sem `AZ1_MCP_API_KEY` no ambiente, o /mcp nem
+# existe. Um caminho que não existe é mais seguro que um caminho que recusa, e
+# quem roda a API sem intenção de expor MCP não ganha superfície por descuido.
+_mcp_app = None
+if chaves_aceitas():
+    from mcp_servidor.servidor import aplicativo_asgi
+
+    _mcp_app = aplicativo_asgi()
+
+app = FastAPI(title="AZ1 API", lifespan=_mcp_app.lifespan if _mcp_app else None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -71,6 +87,17 @@ app.include_router(voice_router, prefix="/api/v1")
 # Microsoft Graph), que não tem token do SSO. A autenticidade dessas entregas
 # vem do segredo compartilhado verificado em src/services/webhook_*.
 app.include_router(webhooks_router, prefix="/api/v1")
+
+# Servidor MCP em /mcp, construído acima junto com o `lifespan`.
+#
+# Fica fora do RNF02 pelo mesmo motivo dos webhooks, e pelo oposto: quem chama
+# é o conector do Copilot Studio, que é cliente de serviço e não tem token do
+# SSO. A autenticidade vem da chave de API verificada em
+# `mcp_servidor/seguranca.py`, que envolve o sub-aplicativo inteiro.
+if _mcp_app is not None:
+    app.add_middleware(NormalizarCaminhoMcp)
+    app.mount("/mcp", ExigirChaveDeApi(_mcp_app))
+    logger.info("Servidor MCP montado em /mcp com %d chave(s) aceita(s).", len(chaves_aceitas()))
 
 
 # Deliberadamente raso: não toca banco, MinIO, Deepgram nem Gemini. O RNF07
