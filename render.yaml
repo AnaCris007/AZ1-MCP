@@ -59,3 +59,39 @@ services:
         generateValue: true
       - key: TZ
         value: America/Sao_Paulo
+
+  # ---------------------------------------------------------------------------
+  # Keep-alive: evita que o plano gratuito hiberne o az1-mcp
+  # ---------------------------------------------------------------------------
+  # O plano free do Render suspende o serviço após 15 minutos sem requisição.
+  # O Copilot Studio tem timeout menor que os 30–60 s de wake-up, então toda
+  # chamada ao responder_consulta falha enquanto o backend está adormecido.
+  #
+  # Este cron bate no /health a cada 10 minutos — dentro da franquia de 750 h/mês
+  # do plano gratuito (10 min × 6/h × 744 h/mês ≈ 4464 execuções; cada uma dura
+  # segundos, logo o consumo de horas de cron é desprezível).
+  #
+  # POR QUE A MESMA IMAGEM DOCKER
+  # A imagem de produção não tem curl nem wget — foi uma decisão deliberada para
+  # minimizar a superfície de ataque (ver Dockerfile, linha "sonda em Python puro").
+  # Usar a mesma imagem garante que o cron tem o mesmo Python e urllib do runtime,
+  # sem acrescentar nenhuma dependência nova. O Render reutiliza a camada já
+  # construída para o web service, então não há rebuild do zero a cada execução.
+  #
+  # POR QUE SEM AZ1_REFUSE_DEFAULT_CREDENTIALS
+  # O entrypoint.sh só dispara as verificações de credencial quando essa variável
+  # vale "1". Sem ela (padrão 0), o container inicia, executa o one-liner e sai —
+  # sem precisar de GEMINI_API_KEY nem SUPABASE_DB_URL.
+  - type: cron
+    name: az1-mcp-keepalive
+    runtime: docker
+    dockerfilePath: ./docker/api/Dockerfile
+    dockerContext: .
+    schedule: "*/10 * * * *"
+    startCommand: >-
+      python3 -c
+      "import urllib.request, sys;
+      r = urllib.request.urlopen('https://az1-mcp.onrender.com/health', timeout=10);
+      sys.exit(0 if r.status == 200 else 1)"
+    plan: free
+    region: oregon
